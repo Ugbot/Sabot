@@ -1,0 +1,384 @@
+{
+  "run_info": {
+    "timestamp": 1759221894.265439,
+    "system_info": {
+      "cpu": {
+        "physical_cores": 12,
+        "logical_cores": 12,
+        "frequency_mhz": 4056
+      },
+      "memory": {
+        "total_gb": 18.0,
+        "available_gb": 3.65277099609375
+      },
+      "python_version": "3.13",
+      "platform": "macOS-15.6-arm64-arm-64bit-Mach-O",
+      "hostname": "Bens-MacBook-Pro-3.local"
+    },
+    "total_benchmarks": 3
+  },
+  "results": [
+    {
+      "benchmark_name": "memory_processing_efficiency",
+      "timestamp": 1759218650.0378392,
+      "config": {
+        "name": "memory_processing_efficiency",
+        "description": "Benchmark memory usage during data processing",
+        "iterations": 2,
+        "warmup_iterations": 1,
+        "duration_seconds": null,
+        "concurrency": 1,
+        "enable_gc": true,
+        "enable_profiling": false,
+        "metadata": {}
+      },
+      "metrics": {
+        "throughput_items_per_sec": {
+          "mean": 11257.552265936865,
+          "min": 11066.697311333637,
+          "max": 11448.407220540095,
+          "count": 2,
+          "stddev": 269.9096652459879
+        },
+        "peak_memory_mb": {
+          "mean": 151.3125,
+          "min": 149.9375,
+          "max": 152.6875,
+          "count": 2,
+          "stddev": 1.9445436482630056
+        },
+        "avg_processing_time_per_iteration": {
+          "mean": 4.382765746116638,
+          "min": 4.297922849655151,
+          "max": 4.467608642578125,
+          "count": 2,
+          "stddev": 0.11998597484685106
+        },
+        "enable_gc": {
+          "mean": 1,
+          "min": true,
+          "max": true,
+          "count": 2,
+          "stddev": 0.0
+        },
+        "total_time_seconds": {
+          "mean": 22.213698863983154,
+          "min": 21.837098836898804,
+          "max": 22.590298891067505,
+          "count": 2,
+          "stddev": 0.5325928658927636
+        },
+        "processing_iterations": {
+          "mean": 5,
+          "min": 5,
+          "max": 5,
+          "count": 2,
+          "stddev": 0.0
+        },
+        "initial_memory_mb": {
+          "mean": 52.484375,
+          "min": 51.4375,
+          "max": 53.53125,
+          "count": 2,
+          "stddev": 1.4805048231093338
+        },
+        "object_size_bytes": {
+          "mean": 512,
+          "min": 512,
+          "max": 512,
+          "count": 2,
+          "stddev": 0.0
+        },
+        "memory_delta_mb": {
+          "mean": 97.296875,
+          "min": 96.09375,
+          "max": 98.5,
+          "count": 2,
+          "stddev": 1.70147569223013
+        },
+        "avg_memory_mb": {
+          "mean": 144.8125,
+          "min": 143.91875,
+          "max": 145.70625,
+          "count": 2,
+          "stddev": 1.2639533713709699
+        },
+        "final_memory_mb": {
+          "mean": 149.78125,
+          "min": 149.625,
+          "max": 149.9375,
+          "count": 2,
+          "stddev": 0.2209708691207961
+        },
+        "memory_efficiency_mb_per_item": {
+          "mean": 408.092672,
+          "min": 403.0464,
+          "max": 413.138944,
+          "count": 2,
+          "stddev": 7.1365063018235855
+        },
+        "dataset_size": {
+          "mean": 50000,
+          "min": 50000,
+          "max": 50000,
+          "count": 2,
+          "stddev": 0.0
+        }
+      },
+      "system_info": {
+        "cpu": {
+          "physical_cores": 12,
+          "logical_cores": 12,
+          "frequency_mhz": 4056
+        },
+        "memory": {
+          "total_gb": 18.0,
+          "available_gb": 3.65277099609375
+        },
+        "python_version": "3.13",
+        "platform": "macOS-15.6-arm64-arm-64bit-Mach-O",
+        "hostname": "Bens-MacBook-Pro-3.local"
+      },
+      "raw_measurements": [
+        22.68134307861328,
+        21.923586130142212
+      ],
+      "statistics": {
+        "count": 2,
+        "mean": 22.302464604377747,
+        "median": 22.302464604377747,
+        "stddev": 0.5358150767551184,
+        "min": 21.923586130142212,
+        "max": 22.68134307861328,
+        "p95": 22.68134307861328,
+        "p99": 22.68134307861328
+      }
+    },
+    {
+      "benchmark_name": "memory_large_dataset",
+      "timestamp": 1759221243.311486,
+      "config": {
+        "name": "memory_large_dataset",
+        "description": "Benchmark memory handling of large datasets",
+        "iterations": 2,
+        "warmup_iterations": 1,
+        "duration_seconds": null,
+        "concurrency": 1,
+        "enable_gc": true,
+        "enable_profiling": false,
+        "metadata": {}
+      },
+      "metrics": {
+        "throughput_items_per_sec": {
+          "mean": 1858.021530361888,
+          "min": 1759.9511380997274,
+          "max": 1956.0919226240487,
+          "count": 2,
+          "stddev": 138.69247880439707
+        },
+        "peak_memory_mb": {
+          "mean": 904.7734375,
+          "min": 904.234375,
+          "max": 905.3125,
+          "count": 2,
+          "stddev": 0.7623494984667466
+        },
+        "avg_processing_time_per_iteration": {
+          "mean": 269.3799695173899,
+          "min": 255.15027475357056,
+          "max": 283.6096642812093,
+          "count": 2,
+          "stddev": 20.123827323422766
+        },
+        "enable_gc": {
+          "mean": 1,
+          "min": true,
+          "max": true,
+          "count": 2,
+          "stddev": 0.0
+        },
+        "total_time_seconds": {
+          "mean": 809.5657585859299,
+          "min": 766.835128068924,
+          "max": 852.2963891029358,
+          "count": 2,
+          "stddev": 60.43023720590343
+        },
+        "processing_iterations": {
+          "mean": 3,
+          "min": 3,
+          "max": 3,
+          "count": 2,
+          "stddev": 0.0
+        },
+        "initial_memory_mb": {
+          "mean": 61.2578125,
+          "min": 60.75,
+          "max": 61.765625,
+          "count": 2,
+          "stddev": 0.7181553246425874
+        },
+        "object_size_bytes": {
+          "mean": 256,
+          "min": 256,
+          "max": 256,
+          "count": 2,
+          "stddev": 0.0
+        },
+        "memory_delta_mb": {
+          "mean": 843.515625,
+          "min": 843.484375,
+          "max": 843.546875,
+          "count": 2,
+          "stddev": 0.04419417382415922
+        },
+        "avg_memory_mb": {
+          "mean": 901.5208333333333,
+          "min": 901.5104166666666,
+          "max": 901.53125,
+          "count": 2,
+          "stddev": 0.014731391274746536
+        },
+        "final_memory_mb": {
+          "mean": 904.7734375,
+          "min": 904.234375,
+          "max": 905.3125,
+          "count": 2,
+          "stddev": 0.7623494984667466
+        },
+        "memory_efficiency_mb_per_item": {
+          "mean": 589.66016,
+          "min": 589.6383146666667,
+          "max": 589.6820053333333,
+          "count": 2,
+          "stddev": 0.030893966674538358
+        },
+        "dataset_size": {
+          "mean": 500000,
+          "min": 500000,
+          "max": 500000,
+          "count": 2,
+          "stddev": 0.0
+        }
+      },
+      "system_info": {
+        "cpu": {
+          "physical_cores": 12,
+          "logical_cores": 12,
+          "frequency_mhz": 4056
+        },
+        "memory": {
+          "total_gb": 18.0,
+          "available_gb": 3.65277099609375
+        },
+        "python_version": "3.13",
+        "platform": "macOS-15.6-arm64-arm-64bit-Mach-O",
+        "hostname": "Bens-MacBook-Pro-3.local"
+      },
+      "raw_measurements": [
+        854.286337852478,
+        769.1550679206848
+      ],
+      "statistics": {
+        "count": 2,
+        "mean": 811.7207028865814,
+        "median": 811.7207028865814,
+        "stddev": 60.196898259793414,
+        "min": 769.1550679206848,
+        "max": 854.286337852478,
+        "p95": 854.286337852478,
+        "p99": 854.286337852478
+      }
+    },
+    {
+      "benchmark_name": "memory_gc_efficiency",
+      "timestamp": 1759221894.264569,
+      "config": {
+        "name": "memory_gc_efficiency",
+        "description": "Benchmark garbage collection efficiency",
+        "iterations": 3,
+        "warmup_iterations": 1,
+        "duration_seconds": null,
+        "concurrency": 1,
+        "enable_gc": true,
+        "enable_profiling": false,
+        "metadata": {}
+      },
+      "metrics": {
+        "memory_improvement_percent": {
+          "mean": 1.1282616325375583,
+          "min": 0.2638632936840342,
+          "max": 2.4645869155817572,
+          "count": 3,
+          "stddev": 1.1738110561263764
+        },
+        "with_gc": {
+          "dataset_size": 100000,
+          "object_size_bytes": 1024,
+          "processing_iterations": 10,
+          "enable_gc": true,
+          "total_time_seconds": 132.0357210636139,
+          "avg_processing_time_per_iteration": 13.116868019104004,
+          "initial_memory_mb": 183.671875,
+          "final_memory_mb": 342.28125,
+          "peak_memory_mb": 366.578125,
+          "avg_memory_mb": 342.146875,
+          "memory_delta_mb": 158.609375,
+          "memory_efficiency_mb_per_item": 166.313984,
+          "throughput_items_per_sec": 7573.708023438649
+        },
+        "without_gc": {
+          "dataset_size": 100000,
+          "object_size_bytes": 1024,
+          "processing_iterations": 10,
+          "enable_gc": false,
+          "total_time_seconds": 33.60666084289551,
+          "avg_processing_time_per_iteration": 3.360607552528381,
+          "initial_memory_mb": 183.1875,
+          "final_memory_mb": 363.28125,
+          "peak_memory_mb": 369.0,
+          "avg_memory_mb": 343.1265625,
+          "memory_delta_mb": 180.09375,
+          "memory_efficiency_mb_per_item": 188.841984,
+          "throughput_items_per_sec": 29756.00594997528
+        },
+        "performance_impact_percent": {
+          "mean": -74.52376974869154,
+          "min": -75.61011015715829,
+          "max": -73.41390277559825,
+          "count": 3,
+          "stddev": 1.0982926932912969
+        }
+      },
+      "system_info": {
+        "cpu": {
+          "physical_cores": 12,
+          "logical_cores": 12,
+          "frequency_mhz": 4056
+        },
+        "memory": {
+          "total_gb": 18.0,
+          "available_gb": 3.65277099609375
+        },
+        "python_version": "3.13",
+        "platform": "macOS-15.6-arm64-arm-64bit-Mach-O",
+        "hostname": "Bens-MacBook-Pro-3.local"
+      },
+      "raw_measurements": [
+        160.60617208480835,
+        160.54946208000183,
+        166.05309891700745
+      ],
+      "statistics": {
+        "count": 3,
+        "mean": 162.40291102727255,
+        "median": 160.60617208480835,
+        "stddev": 3.161282608204588,
+        "min": 160.54946208000183,
+        "max": 166.05309891700745,
+        "p95": 166.05309891700745,
+        "p99": 166.05309891700745
+      }
+    }
+  ]
+}

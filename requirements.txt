@@ -1,0 +1,43 @@
+# Core dependencies for Sabot
+# Install with: pip install -r requirements.txt
+#
+# NOTE: Sabot uses internal Cython implementations for Arrow and RocksDB
+# External pyarrow/rocksdb packages are optional and only needed for advanced features
+
+# Build requirements
+Cython>=3.0.0
+
+# Core streaming infrastructure
+uvloop>=0.17.0
+structlog>=22.0.0
+
+# CLI and user interface
+rich>=12.0.0
+typer>=0.7.0
+
+# Data validation and configuration
+pydantic>=2.0.0
+
+# High-performance serialization
+orjson>=3.9.0
+
+# Numerical operations (for Cython extensions)
+numpy>=1.21.0
+
+# System monitoring
+psutil>=5.9.0
+
+# Metrics and monitoring
+prometheus-client>=0.19.0
+
+# Service management (inspired by Faust)
+mode>=2.0.0
+
+# Database support for durable state
+sqlalchemy>=2.0.0
+alembic>=1.12.0
+
+# Optional: External libraries (internal Cython implementations preferred)
+# Uncomment if you need full Arrow C++ API or Python RocksDB bindings:
+# pyarrow>=10.0.0
+# rocksdb>=1.0.0
