@@ -15,14 +15,15 @@ __all__ = [
 
 # Import Cython extensions (will be available after compilation)
 try:
-    from .batch_processor import ArrowBatchProcessor, ArrowComputeEngine
-    from .window_processor import ArrowWindowProcessor
-    from .join_processor import ArrowJoinProcessor
-    from .flight_client import ArrowFlightClient
+    from sabot._cython.arrow.batch_processor import ArrowBatchProcessor, ArrowComputeEngine
+    from sabot._cython.arrow.window_processor import ArrowWindowProcessor
+    from sabot._cython.arrow.join_processor import ArrowJoinProcessor
+    # from sabot._cython.arrow.flight_client import ArrowFlightClient  # Not available
 
     ARROW_PROCESSING_AVAILABLE = True
 
-except ImportError:
+except ImportError as e:
+    print(f"Warning: Arrow processing not available: {e}")
     ARROW_PROCESSING_AVAILABLE = False
 
     # Provide fallback interfaces

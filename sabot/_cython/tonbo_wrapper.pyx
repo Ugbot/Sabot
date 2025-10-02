@@ -19,6 +19,18 @@ import asyncio
 import logging
 
 
+cdef class _DefaultSerializer:
+    """Default pickle-based serializer."""
+
+    def serialize(self, obj: Any) -> bytes:
+        import pickle
+        return pickle.dumps(obj)
+
+    def deserialize(self, data: bytes) -> Any:
+        import pickle
+        return pickle.loads(data)
+
+
 @cython.final
 cdef class FastTonboBackend:
     """
@@ -27,13 +39,6 @@ cdef class FastTonboBackend:
     This provides direct access to Tonbo's LSM tree and Arrow integration
     with minimal Python overhead for maximum streaming performance.
     """
-
-    cdef:
-        object _db_path
-        object _tonbo_db
-        object _event_loop
-        bint _initialized
-        object _logger
 
     def __cinit__(self, str db_path):
         """Initialize the fast Tonbo backend."""
@@ -128,7 +133,7 @@ cdef class FastTonboBackend:
 
         try:
             # Get current timestamp for versioning
-            cdef int64_t timestamp = self._get_current_timestamp_ns()
+            timestamp = self._get_current_timestamp_ns()
 
             # Create record directly
             record = {
@@ -197,7 +202,7 @@ cdef class FastTonboBackend:
             )
 
             # Yield results directly (zero-copy)
-            cdef int32_t count = 0
+            count = 0
             async for record in scan_stream:
                 if count >= limit:
                     break
@@ -228,10 +233,9 @@ cdef class FastTonboBackend:
 
         try:
             # Prepare batch records
-            cdef int64_t timestamp = self._get_current_timestamp_ns()
+            timestamp = self._get_current_timestamp_ns()
             records = []
 
-            cdef Py_ssize_t i
             for i in range(len(key_value_pairs)):
                 key, value_bytes = key_value_pairs[i]
                 records.append({
@@ -286,10 +290,6 @@ cdef class TonboCythonWrapper:
     Provides a high-level interface to the fast Tonbo backend
     with automatic serialization/deserialization.
     """
-
-    cdef:
-        FastTonboBackend _backend
-        object _serializer
 
     def __cinit__(self, str db_path):
         """Initialize the wrapper."""
@@ -362,17 +362,6 @@ cdef class TonboCythonWrapper:
                 return int(key_str)
         except ValueError:
             return key_str
-
-    class _DefaultSerializer:
-        """Default pickle-based serializer."""
-
-        def serialize(self, obj: Any) -> bytes:
-            import pickle
-            return pickle.dumps(obj)
-
-        def deserialize(self, data: bytes) -> Any:
-            import pickle
-            return pickle.loads(data)
 
     @property
     def _default_serializer(self):

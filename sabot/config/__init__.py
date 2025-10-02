@@ -56,8 +56,48 @@ class SabotConfig:
     performance: PerformanceConfig = field(default_factory=PerformanceConfig)
     operational: OperationalConfig = field(default_factory=OperationalConfig)
 
+    # Schema class for data schemas
+    Schema: Any = None
+
+    # Stream configuration
+    stream_buffer_maxsize: int = 10000
+
+    # Development mode flag
+    is_development: bool = True
+
     def __post_init__(self):
         """Load configuration from environment and files."""
+        # Define a simple Schema class that mimics expected interface
+        class Schema:
+            def __init__(self, key_type=None, value_type=None, key_serializer=None,
+                         value_serializer=None, allow_empty=None, **kwargs):
+                self.key_type = key_type
+                self.value_type = value_type
+                self.key_serializer = key_serializer
+                self.value_serializer = value_serializer
+                self.allow_empty = allow_empty
+                self.fields = kwargs
+
+            def update(self, key_type=None, value_type=None, key_serializer=None,
+                      value_serializer=None, allow_empty=None, **kwargs):
+                """Update schema attributes."""
+                if key_type is not None:
+                    self.key_type = key_type
+                if value_type is not None:
+                    self.value_type = value_type
+                if key_serializer is not None:
+                    self.key_serializer = key_serializer
+                if value_serializer is not None:
+                    self.value_serializer = value_serializer
+                if allow_empty is not None:
+                    self.allow_empty = allow_empty
+                self.fields.update(kwargs)
+
+            def __repr__(self):
+                return f"Schema(key_type={self.key_type}, value_type={self.value_type}, key_serializer={self.key_serializer}, value_serializer={self.value_serializer})"
+
+        self.Schema = Schema
+
         self._load_from_environment()
         self._load_from_config_files()
 

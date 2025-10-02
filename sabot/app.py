@@ -110,6 +110,10 @@ class App(AppT):
         self._tables = {}
         self._agents = {}
 
+        # Configuration
+        from .config import SabotConfig
+        self.conf = SabotConfig()
+
         # Real stream processing engine (replaces mocked processing)
         self._stream_engine = None
         self._stream_config = StreamConfig()
@@ -374,11 +378,31 @@ class App(AppT):
 
         # For memory channels, create synchronously
         if backend == ChannelBackend.MEMORY:
-            return factory.create_channel(self, config)  # type: ignore
+            # Create memory channel synchronously
+            from .channels import Channel
+            return Channel(
+                app=self,
+                maxsize=config.maxsize,
+                schema=config.schema,
+                key_type=config.key_type,
+                value_type=config.value_type,
+            )
         else:
-            # For other backends, we need async creation
-            # This is a limitation - we need to make channel creation async
-            raise NotImplementedError("Non-memory channels require async creation. Use await app.create_channel_async(...)")
+            # For other backends, run async creation in sync context
+            try:
+                # Try to get existing event loop (in async context)
+                loop = asyncio.get_running_loop()
+                # If we're in an async context, this will raise RuntimeError
+                # and we'll need to tell the user to use create_channel_async
+                raise NotImplementedError("Cannot create non-memory channels in async context. Use await app.create_channel_async(...)")
+            except RuntimeError:
+                # Not in async context, can run async creation synchronously
+                return asyncio.run(self.create_channel_async(
+                    name=name,
+                    backend=backend,
+                    policy=policy,
+                    **kwargs
+                ))
 
     def _select_channel_backend_sync(
         self,

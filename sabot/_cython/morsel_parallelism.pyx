@@ -45,7 +45,7 @@ cdef class AtomicCounter:
             with self._lock:
                 self._value -= 1
 
-    cdef inline long long get_value(self) nogil:
+    cpdef inline long long get_value(self):
         """Get current value."""
         return self._value
 
@@ -261,7 +261,7 @@ cdef class FastWorker:
         int _worker_id
         FastWorkStealingQueue* _local_queue
         object _dbos_controller
-        AtomicCounter* _processed_count
+        AtomicCounter _processed_count
         double _last_heartbeat
         bint _is_running
         object _executor
@@ -271,7 +271,7 @@ cdef class FastWorker:
         self._worker_id = worker_id
         self._dbos_controller = dbos_controller
         self._local_queue = new FastWorkStealingQueue(1024)
-        self._processed_count = new AtomicCounter()
+        self._processed_count = AtomicCounter()
         self._last_heartbeat = time.time()
         self._is_running = False
         self._loop = loop or asyncio.get_event_loop()
@@ -280,8 +280,7 @@ cdef class FastWorker:
     def __dealloc__(self):
         if self._local_queue != NULL:
             del self._local_queue
-        if self._processed_count != NULL:
-            del self._processed_count
+        # AtomicCounter is automatically managed
 
     cdef inline void update_heartbeat(self):
         """Update worker heartbeat."""
@@ -375,7 +374,7 @@ cdef class FastParallelProcessor:
         long long _morsel_size_bytes
         object _dbos_controller
         dict _workers
-        AtomicCounter* _total_processed
+        AtomicCounter _total_processed
         double _start_time
         bint _is_running
         object _morsel_factory
@@ -385,13 +384,13 @@ cdef class FastParallelProcessor:
         self._morsel_size_bytes = morsel_size_kb * 1024
         self._dbos_controller = dbos_controller
         self._workers = {}
-        self._total_processed = new AtomicCounter()
+        self._total_processed = AtomicCounter()
         self._start_time = time.time()
         self._is_running = False
 
     def __dealloc__(self):
-        if self._total_processed != NULL:
-            del self._total_processed
+        # AtomicCounter is automatically managed
+        pass
 
     async def start(self):
         """Start the parallel processor with DBOS coordination."""

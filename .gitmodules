@@ -1,0 +1,3 @@
+[submodule "vendor/arrow"]
+	path = vendor/arrow
+	url = https://github.com/apache/arrow

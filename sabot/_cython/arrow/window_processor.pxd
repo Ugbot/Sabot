@@ -5,6 +5,8 @@ Arrow Window Processor Cython Header
 Header declarations for ArrowWindowProcessor.
 """
 
+from libc.stdint cimport int64_t
+
 
 cdef class ArrowWindowProcessor:
     cdef:

@@ -1,0 +1,9 @@
+{
+  "instrumentId": "BOND_00001",
+  "dealerId": "DEALER_001",
+  "bidPrice": 99.5,
+  "offerPrice": 99.75,
+  "bidSize": 1000000,
+  "offerSize": 500000,
+  "timestamp": "2025-10-02T12:00:00Z"
+}

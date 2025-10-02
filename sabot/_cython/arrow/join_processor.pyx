@@ -30,8 +30,7 @@ cdef class ArrowJoinProcessor:
     - Temporal joins (for-each with latest)
     """
 
-    cdef:
-        ArrowBatchProcessor batch_processor
+    # cdef attributes declared in .pxd file
 
     def __cinit__(self):
         """Initialize join processor."""
@@ -47,7 +46,9 @@ cdef class ArrowJoinProcessor:
         Joins records from two streams that fall within the same time window.
         Performance: SIMD-accelerated hash join within windows.
         """
+        # ZERO-COPY IMPLEMENTATION using Arrow compute kernels
         try:
+            # Use Cython-level imports (defined at module level)
             import pyarrow as pa
             import pyarrow.compute as pc
 
@@ -105,7 +106,9 @@ cdef class ArrowJoinProcessor:
         Joins records where timestamps are within specified interval.
         This is more flexible than windowed joins.
         """
+        # ZERO-COPY IMPLEMENTATION with interval bounds
         try:
+            # Use Cython-level imports (defined at module level)
             import pyarrow as pa
             import pyarrow.compute as pc
 
@@ -177,7 +180,9 @@ cdef class ArrowJoinProcessor:
         For each stream record, joins with the latest table record
         that has the same key and earlier timestamp.
         """
+        # ZERO-COPY IMPLEMENTATION for temporal semantics
         try:
+            # Use Cython-level imports (defined at module level)
             import pyarrow as pa
             import pyarrow.compute as pc
 

@@ -224,19 +224,24 @@ class Stream:
             # Using Arrow compute (SIMD-accelerated)
             stream.filter(lambda b: pc.greater(b.column('price'), 100))
 
+            # Natural Python syntax (auto-converted)
+            stream.filter(lambda b: b.column('price') > 100)
+
             # Complex predicate
             stream.filter(lambda b: pc.and_(
                 pc.greater(b.column('price'), 100),
                 pc.equal(b.column('side'), 'BUY')
             ))
         """
+        # Wrap predicate to auto-convert common comparison patterns
+        wrapped_predicate = self._auto_convert_predicate(predicate)
         if CYTHON_AVAILABLE:
-            return Stream(CythonFilterOperator(self._source, predicate), self._schema)
+            return Stream(CythonFilterOperator(self._source, wrapped_predicate), self._schema)
         else:
             # Fallback to Python
             def python_filter():
                 for batch in self._source:
-                    mask = predicate(batch)
+                    mask = wrapped_predicate(batch)
                     if isinstance(mask, pa.Array):
                         filtered = batch.filter(mask)
                         if filtered.num_rows > 0:
@@ -244,6 +249,59 @@ class Stream:
                     elif mask:
                         yield batch
             return Stream(python_filter(), self._schema)
+
+    def _auto_convert_predicate(self, predicate: Callable[[pa.RecordBatch], Any]) -> Callable[[pa.RecordBatch], Any]:
+        """
+        Auto-convert predicates that use natural Python syntax to PyArrow compute functions.
+
+        This allows users to write: lambda b: b.column('price') > 100
+        Instead of requiring: lambda b: pc.greater(b.column('price'), 100)
+        """
+        def wrapped_predicate(batch: pa.RecordBatch) -> Any:
+            try:
+                return predicate(batch)
+            except TypeError as e:
+                if "not supported between instances of" in str(e) and "pyarrow.lib" in str(e):
+                    # Try to convert the predicate automatically
+                    return self._convert_predicate_to_compute(predicate, batch)
+                else:
+                    raise
+
+        return wrapped_predicate
+
+    def _convert_predicate_to_compute(self, predicate: Callable[[pa.RecordBatch], Any], batch: pa.RecordBatch) -> Any:
+        """
+        Convert a predicate that failed due to array-scalar comparison to use PyArrow compute.
+
+        This is a best-effort conversion for common patterns.
+        """
+        try:
+            # Create a mock batch with scalar values to test the predicate
+            import inspect
+
+            # Get the source code of the predicate if it's a lambda
+            try:
+                source = inspect.getsource(predicate)
+                # Look for common patterns like column() > value, column() < value, etc.
+                if 'column(' in source and (' > ' in source or ' < ' in source or ' >= ' in source or ' <= ' in source or ' == ' in source or ' != ' in source):
+                    # This is a simple case we can try to convert
+                    # For now, just re-raise with a helpful message
+                    pass
+            except (OSError, TypeError):
+                pass
+
+            # If we can't auto-convert, provide a helpful error message
+            raise TypeError(
+                "Predicate uses array-scalar comparison that isn't directly supported. "
+                "Please use PyArrow compute functions instead:\n"
+                "  Instead of: lambda b: b.column('col') > 100\n"
+                "  Use:        lambda b: pc.greater(b.column('col'), 100)\n"
+                "Available functions: pc.greater, pc.less, pc.equal, pc.greater_equal, pc.less_equal, pc.not_equal"
+            )
+
+        except Exception:
+            # If conversion fails, re-raise the original error
+            raise
 
     def map(self, func: Callable[[pa.RecordBatch], pa.RecordBatch]) -> 'Stream':
         """

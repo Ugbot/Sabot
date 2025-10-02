@@ -2,7 +2,7 @@
 # Build Arrow C++ from vendored source
 set -e
 
-ARROW_DIR="/Users/bengamble/PycharmProjects/pythonProject/sabot/third-party/arrow/cpp"
+ARROW_DIR="$(pwd)/vendor/arrow/cpp"
 BUILD_DIR="$ARROW_DIR/build"
 INSTALL_DIR="$BUILD_DIR/install"
 

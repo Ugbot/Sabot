@@ -1,8 +1,10 @@
 # Sabot: Python Streaming with Flink-Like Semantics
 
-**If Faust is Kafka Streams in Python, Sabot is Flink in Python.**
+**⚠️ EXPERIMENTAL - ALPHA SOFTWARE ⚠️**
 
-Sabot is a high-performance distributed streaming engine that brings Apache Flink's advanced stream processing capabilities to Python, with a clean API and production-ready CLI.
+**If Faust is Kafka Streams in Python, Sabot aims to be Flink in Python.**
+
+Sabot is an experimental streaming framework exploring Flink-inspired stream processing in Python with Cython acceleration. This project is in active development and not yet production-ready.
 
 ```python
 import sabot as sb
@@ -21,31 +23,56 @@ async def detect_fraud(stream):
 # $ sabot -A myapp:app worker
 ```
 
-## Key Features
+## Project Status
+
+This is an experimental research project exploring the design space of:
+- Flink-style stream processing semantics in Python
+- Cython acceleration for performance-critical paths
+- Chandy-Lamport distributed checkpointing
+- Arrow-based columnar processing
+
+**Current State (v0.1.0-alpha):**
+- ✅ Core architecture designed and documented (~60K LOC)
+- ✅ Cython modules for checkpoint coordination, state management, time tracking
+- ✅ Basic Kafka integration with schema registry support
+- ✅ Faust-style CLI scaffolding
+- ⚠️ Many components are work-in-progress or stubbed out
+- ⚠️ Test coverage is limited (~5%)
+- ⚠️ Not recommended for production use
+
+## Measured Performance (Local Benchmarks)
+
+**What Actually Works:**
+- **Throughput**: 3,000-6,000 transactions/second (fraud detection benchmark, M1 Pro)
+- **Checkpoint initiation**: <10μs (Cython barrier coordination)
+- **State operations**: Sub-millisecond get/put with MemoryBackend
+- **Memory footprint**: <500MB for multi-agent fraud detection demo
+
+**Experimental Features (In Development):**
+- Distributed agent runtime
+- RocksDB state backend integration
+- Arrow batch processing optimizations
+- GPU acceleration via RAFT
+
+## Design Goals
 
 🚀 **Flink-Inspired Architecture**
 - Event-time processing with watermarks
 - Exactly-once semantics via distributed checkpointing
 - Complex event processing (CEP) with pattern matching
-- Iterative and recursive stream processing
+- Iterative stream processing
 
-⚡ **High Performance**
-- **Cython-accelerated** core modules (checkpoints, state, time)
-- **Arrow columnar** processing with zero-copy operations
-- **SIMD acceleration** for analytical workloads
-- 5K-10K+ transactions/second on laptop hardware
+⚡ **Performance Through Cython**
+- Cython-accelerated checkpoint coordination
+- Fast state backends (Memory, RocksDB)
+- Watermark and timer tracking in C
+- Arrow integration for columnar operations
 
-🎯 **Production Ready**
-- **Faust-style CLI**: `sabot -A myapp:app worker`
-- **Docker Compose** infrastructure (Kafka, Postgres, Redis)
-- **Automatic Kafka** consumer management
-- **Built-in monitoring** with metrics and health checks
-
-🔧 **Clean Python API**
-- **Unified imports**: `import sabot as sb`
-- **Decorator-based agents**: `@app.agent()`
-- **Composable pipelines**: `.map().filter().window()`
-- **Multiple backends**: Memory, RocksDB, Redis, PostgreSQL
+🔧 **Pythonic API**
+- Unified imports: `import sabot as sb`
+- Decorator-based agents: `@app.agent()`
+- Composable stream pipelines
+- Faust-style CLI for familiarity
 
 ## Quick Start
 
@@ -153,9 +180,9 @@ Sabot combines **Flink's streaming model** with **Python's ecosystem**:
 | **time** | Watermarks, timers, event-time | <5μs tracking |
 | **agents** | Actor-based stream processors | 5K-10K txn/s |
 
-## Real-World Example: Fraud Detection
+## Example: Fraud Detection Demo
 
-See the complete [Fraud Detection Demo](examples/FRAUD_DEMO_README.md) for a production-ready example processing 200K banking transactions.
+See the [Fraud Detection Demo](examples/FRAUD_DEMO_README.md) for an example processing banking transactions.
 
 **Three-terminal setup:**
 
@@ -170,18 +197,18 @@ sabot -A examples.fraud_app:app worker
 python examples/flink_fraud_producer.py
 ```
 
-**Features demonstrated:**
-- Multi-pattern fraud detection (velocity, amount anomaly, geo-impossible)
-- Distributed checkpointing with barrier alignment
-- Event-time processing with watermarks
-- Cython-accelerated state management
-- Real-time metrics and alerts
+**What this demonstrates:**
+- Multi-pattern fraud detection logic
+- Basic checkpointing coordination
+- Event-time processing concepts
+- Memory-backed state management
+- Real-time metrics collection
 
-**Expected results:**
-- **Throughput**: 3K-6K transactions/second
-- **Latency**: <1ms p99 for fraud detection
-- **Memory**: <500MB for all agents
-- **Checkpoints**: Every 5 seconds with exactly-once semantics
+**Measured results (M1 Pro laptop):**
+- **Throughput**: 3,000-6,000 transactions/second
+- **Latency**: <1ms p99 for fraud detection logic
+- **Memory**: <500MB for 3 concurrent agents
+- **Checkpoint coordination**: Sub-10μs barrier initiation
 
 ## CLI Reference
 
@@ -368,30 +395,32 @@ docker compose down
 | **Multi-Agent Coordination** | Coordinated processing across multiple agents | `examples/streaming/multi_agent_coordination.py` |
 | **Arrow Operations** | Zero-copy columnar processing | `examples/data/arrow_operations.py` |
 
-## Performance Benchmarks
+## Benchmark Results
 
-**Fraud Detection Demo (Laptop - M1 Pro):**
-- **Throughput**: 3,000-6,000 txn/s
+**Fraud Detection Demo (M1 Pro, local Kafka):**
+- **Throughput**: 3,000-6,000 transactions/second
 - **Latency p99**: <1ms per transaction
-- **Memory**: <500MB for 3 agents
-- **Checkpoints**: 5-second intervals
+- **Memory**: <500MB for 3 concurrent agents
+- **Checkpoint barrier initiation**: <10μs (Cython coordinator)
 
-**State Operations (Cython vs Pure Python):**
-- **Get/Set**: 10-100x faster with Cython
-- **Batch operations**: 1M+ ops/sec
-- **Memory overhead**: <10% vs pure Python
+**State Backend Operations (MemoryBackend):**
+- **Get/Put latency**: Sub-millisecond
+- **Sustained throughput**: 1M+ operations/second (Cython implementation)
 
-**Checkpoint Coordination:**
-- **Barrier initiation**: <10μs
-- **10GB state snapshot**: <5 seconds
-- **Recovery time**: <10 seconds
+**Notes on Benchmarks:**
+- Measured on consumer-grade hardware (M1 Pro, 16GB RAM)
+- Local Redpanda broker (no network latency)
+- Simple fraud detection patterns (no external API calls)
+- Memory backend only (RocksDB integration experimental)
+- Results may vary significantly with different workloads
 
 ## Documentation
 
+- **[Project Map](PROJECT_MAP.md)** - Directory structure and module overview
 - **[Getting Started Guide](docs/GETTING_STARTED.md)** - Step-by-step tutorial
-- **[API Reference](docs/API_REFERENCE.md)** - Complete API documentation
+- **[API Reference](docs/API_REFERENCE.md)** - API documentation
 - **[Architecture](docs/ARCHITECTURE.md)** - Deep dive into internals
-- **[Fraud Demo README](examples/FRAUD_DEMO_README.md)** - Production example
+- **[Fraud Demo README](examples/FRAUD_DEMO_README.md)** - Example walkthrough
 - **[CLI Guide](docs/CLI.md)** - Command-line reference
 
 ## Comparison to Other Frameworks
@@ -399,49 +428,72 @@ docker compose down
 | Feature | Sabot | Faust | Apache Flink | Kafka Streams |
 |---------|-------|-------|--------------|---------------|
 | **Language** | Python | Python | Java/Scala | Java |
-| **CLI Deployment** | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
-| **Checkpointing** | ✅ Chandy-Lamport | ⚠️ Basic | ✅ Async barriers | ✅ Log-based |
-| **Event Time** | ✅ Full support | ⚠️ Limited | ✅ Full support | ✅ Full support |
-| **State Backends** | ✅ Multiple | ⚠️ RocksDB only | ✅ Multiple | ✅ RocksDB |
-| **Performance** | ⚡ Cython-accelerated | 🐌 Pure Python | ⚡⚡ JVM | ⚡⚡ JVM |
-| **Arrow/Columnar** | ✅ Native | ❌ No | ⚠️ Limited | ❌ No |
-| **Ease of Use** | ⭐⭐⭐⭐⭐ Python | ⭐⭐⭐⭐⭐ Python | ⭐⭐ Java | ⭐⭐⭐ Java |
+| **Maturity** | ⚠️ Alpha | ✅ Stable | ✅ Production | ✅ Production |
+| **CLI Deployment** | 🚧 In Progress | ✅ Yes | ❌ No | ❌ No |
+| **Checkpointing** | 🚧 Chandy-Lamport (experimental) | ⚠️ Basic | ✅ Async barriers | ✅ Log-based |
+| **Event Time** | 🚧 Partial support | ⚠️ Limited | ✅ Full support | ✅ Full support |
+| **State Backends** | 🚧 Memory (working), RocksDB (WIP) | ⚠️ RocksDB only | ✅ Multiple | ✅ RocksDB |
+| **Performance** | ⚡ Cython-accelerated (partial) | 🐌 Pure Python | ⚡⚡ JVM | ⚡⚡ JVM |
+| **Arrow/Columnar** | 🚧 Experimental | ❌ No | ⚠️ Limited | ❌ No |
+| **Production Ready** | ❌ No | ✅ Yes | ✅ Yes | ✅ Yes |
 
 ## Roadmap
 
-### Current Status (v0.1.0)
-- ✅ Core Cython modules (checkpoint, state, time)
-- ✅ Faust-style CLI with `-A` flag
-- ✅ Clean Python API (`import sabot as sb`)
-- ✅ Docker Compose infrastructure
-- ✅ Fraud detection example
-- ✅ Memory and RocksDB state backends
+### Current Status (v0.1.0-alpha)
+**Working:**
+- ✅ Cython checkpoint coordinator (Chandy-Lamport barriers)
+- ✅ Memory state backend with Cython acceleration
+- ✅ Basic Kafka source/sink with schema registry
+- ✅ Watermark tracking primitives
+- ✅ CLI scaffolding (Faust-style)
+- ✅ Fraud detection demo (3K-6K txn/s)
 
-### Coming Soon (v0.2.0)
+**In Progress:**
+- 🚧 Agent runtime execution layer (partially stubbed)
+- 🚧 RocksDB state backend integration
 - 🚧 Arrow batch processing optimizations
-- 🚧 Redis state backend (Cython extension)
-- 🚧 SQL/Table API integration
-- 🚧 Web UI for monitoring
-- 🚧 Kubernetes operator
+- 🚧 Distributed coordination
 
-### Future (v0.3.0+)
-- 📋 GPU acceleration (RAFT integration)
-- 📋 Advanced CEP (complex event processing)
-- 📋 Exactly-once S3/HDFS sources
-- 📋 ML model serving integration
+**Known Limitations:**
+- ⚠️ Test coverage ~5% (not production-safe)
+- ⚠️ Many components are stubs/work-in-progress
+- ⚠️ CLI uses mock implementations in places
+- ⚠️ Limited error handling and recovery testing
+
+### Planned (v0.2.0)
+- 🎯 Complete agent runtime implementation
+- 🎯 Comprehensive integration tests
+- 🎯 RocksDB state backend completion
+- 🎯 Improved error handling and recovery
+- 🎯 Performance benchmarking suite
+- 🎯 Production-ready checkpointing
+
+### Future Ideas (v0.3.0+)
+- 📋 GPU acceleration via RAFT
+- 📋 Advanced CEP patterns
+- 📋 SQL/Table API
+- 📋 Web UI for monitoring
+- 📋 S3/HDFS connectors
 - 📋 Query optimizer
 
 ## Contributing
 
-Sabot is experimental and welcomes contributions! Areas of interest:
+Sabot is an experimental research project and welcomes contributions! This is a learning-focused project exploring streaming architecture design.
 
-1. **Performance**: Optimize Cython modules, benchmark improvements
-2. **Backends**: Add new state backends (Cassandra, ClickHouse)
-3. **Examples**: Real-world use cases and demos
-4. **Documentation**: Tutorials, guides, API docs
-5. **Testing**: Unit tests, integration tests, chaos testing
+**High-Impact Areas:**
+1. **Testing**: Expand test coverage beyond current ~5%
+2. **Agent Runtime**: Complete the execution layer implementation
+3. **RocksDB Integration**: Finish state backend implementation
+4. **Documentation**: Improve guides and examples
+5. **Benchmarking**: Add comprehensive performance tests
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+**Before Contributing:**
+- This is alpha software with many incomplete features
+- Focus on learning and experimentation rather than production readiness
+- Check existing issues and roadmap before starting major work
+- Add tests for any new functionality
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines (if available).
 
 ## License
 
@@ -469,4 +521,8 @@ Built with:
 
 ---
 
-**Ready to start?** Check out the [Getting Started Guide](docs/GETTING_STARTED.md) or try the [Fraud Detection Demo](examples/FRAUD_DEMO_README.md)!
+## Disclaimer
+
+**This is experimental alpha software.** It is not production-ready and should be used for research, learning, and experimentation only. APIs may change, features may be incomplete, and bugs are expected. We welcome feedback and contributions to help improve the project.
+
+**Ready to experiment?** Check out the [Project Map](PROJECT_MAP.md) to understand the codebase structure, then try the [Fraud Detection Demo](examples/FRAUD_DEMO_README.md)!

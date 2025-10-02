@@ -43,41 +43,37 @@ def detect_system_libs():
     arrow_cpp_build_include = None
     arrow_libs = []
 
-    # Use vendored Arrow from third-party/arrow/python
-    # This provides the .pxd files for `cimport pyarrow.lib`
-    arrow_python_dir = os.path.join(os.path.dirname(__file__), "third-party", "arrow", "python")
-    arrow_cpp_src_dir = os.path.join(arrow_python_dir, "pyarrow", "src")
-    arrow_cpp_api_dir = os.path.join(os.path.dirname(__file__), "third-party", "arrow", "cpp", "src")
-    arrow_cpp_build_dir = os.path.join(os.path.dirname(__file__), "third-party", "arrow", "cpp", "build", "install", "include")
-    arrow_lib_dir = os.path.join(os.path.dirname(__file__), "third-party", "arrow", "cpp", "build", "install", "lib")
+    # Use vendored Arrow from vendor/arrow
+    # For direct C++ bindings, we use the C++ headers directly
+    arrow_cpp_api_dir = os.path.join(os.path.dirname(__file__), "vendor", "arrow", "cpp", "src")
+    arrow_cpp_build_dir = os.path.join(os.path.dirname(__file__), "vendor", "arrow", "cpp", "build", "install", "include")
+    arrow_lib_dir = os.path.join(os.path.dirname(__file__), "vendor", "arrow", "cpp", "build", "install", "lib")
 
-    if os.path.exists(arrow_python_dir):
-        arrow_include = arrow_python_dir
-        arrow_cpp_include = arrow_cpp_src_dir if os.path.exists(arrow_cpp_src_dir) else None
+    # For PyArrow compatibility (legacy), check if PyArrow is available
+    arrow_python_dir = None
+    arrow_cpp_src_dir = None
+
+    # Check for our vendored Arrow C++ build first (preferred)
+    if os.path.exists(arrow_lib_dir) and os.path.exists(arrow_cpp_build_dir):
         arrow_cpp_api_include = arrow_cpp_api_dir if os.path.exists(arrow_cpp_api_dir) else None
-        arrow_cpp_build_include = arrow_cpp_build_dir if os.path.exists(arrow_cpp_build_dir) else None
-        arrow_libs = [arrow_lib_dir] if os.path.exists(arrow_lib_dir) else []
-        print(f"Using vendored Arrow .pxd files from: {arrow_include}")
-        if arrow_cpp_include:
-            print(f"Using vendored Arrow Python C++ headers from: {arrow_cpp_include}")
-        if arrow_cpp_api_include:
-            print(f"Using vendored Arrow C++ API headers from: {arrow_cpp_api_include}")
-        if arrow_cpp_build_include:
-            print(f"Using vendored Arrow C++ build headers from: {arrow_cpp_build_include}")
-        if arrow_libs:
-            print(f"Using vendored Arrow C++ libraries from: {arrow_lib_dir}")
+        arrow_cpp_build_include = arrow_cpp_build_dir
+        arrow_libs = [arrow_lib_dir]
+        print("✅ Using vendored Arrow C++ build for direct bindings")
+        print(f"   Headers: {arrow_cpp_build_include}")
+        print(f"   Libraries: {arrow_lib_dir}")
     else:
-        # Fallback to installed pyarrow
+        # Fallback to PyArrow for legacy compatibility
         try:
             import pyarrow as pa
             arrow_include = pa.get_include()
-            arrow_cpp_include = arrow_include  # pyarrow.get_include() returns C++ headers
+            arrow_cpp_include = arrow_include
             arrow_cpp_api_include = arrow_include
             arrow_cpp_build_include = arrow_include
             arrow_libs = pa.get_library_dirs()
-            print(f"Using installed PyArrow: {pa.__version__}")
+            print(f"⚠️  Using installed PyArrow fallback: {pa.__version__}")
+            print("   (Consider building vendored Arrow for better performance)")
         except ImportError:
-            print("Warning: No vendored Arrow or PyArrow installation found")
+            print("❌ No Arrow installation found - direct C++ bindings unavailable")
 
     # RocksDB (system installation)
     rocksdb_include = None
@@ -152,24 +148,28 @@ def find_pyx_files():
 
         # Core processing modules
         "sabot/_cython/agents.pyx",
-        # "sabot/_cython/windows.pyx",  # TODO: Multiple cdef in control flow statements
+        # "sabot/_cython/windows.pyx",  # TODO: Multiple cdef in control flow statements (needs extensive fixes)
         # "sabot/_cython/joins.pyx",  # TODO: Complex nested templates with PyObject* causing typedef issues
         "sabot/_cython/channels.pyx",
-        # "sabot/_cython/morsel_parallelism.pyx",  # TODO: AtomicCounter C++ class issues
+        # "sabot/_cython/morsel_parallelism.pyx",  # TODO: AtomicCounter and FastMorsel pointer issues (advanced feature)
         # "sabot/_cython/materialized_views.pyx",  # TODO: Same PyObject* template issue as joins
 
         # Tonbo LSM storage wrapper
-        # "sabot/_cython/tonbo_wrapper.pyx",  # TODO: Depends on tonbo_state
+        "sabot/_cython/tonbo_wrapper.pyx",  # Tonbo Cython wrapper
+        "sabot/_cython/tonbo_arrow.pyx",  # Tonbo Arrow integration
 
         # Internal Arrow implementation (simple, no C API)
         # "sabot/_cython/arrow_core_simple.pyx",  # Pure Python fallback, no C++ libs needed - still requires arrow headers
 
+        # Zero-copy Arrow compute functions
+        "sabot/_c/arrow_core.pyx",  # Core zero-copy compute functions (window_ids, sort_and_take, hash_join)
+
         # Zero-copy Arrow operators (using cimport pyarrow.lib)
-        # "sabot/core/_ops.pyx",  # Core zero-copy stream operators - requires libarrow
-        # "sabot/_cython/arrow/batch_processor.pyx",  # Zero-copy RecordBatch processor - requires libarrow
-        # TODO: Still need to fix:
-        # "sabot/_cython/arrow/window_processor.pyx",
-        # "sabot/_cython/arrow/join_processor.pyx",
+        "sabot/core/_ops.pyx",  # Core zero-copy stream operators
+        "sabot/_cython/arrow/batch_processor.pyx",  # Zero-copy RecordBatch processor
+        "sabot/_cython/arrow/window_processor.pyx",  # Window processing
+        "sabot/_cython/arrow/join_processor.pyx",  # Join operations
+        # "sabot/_cython/arrow/flight_client.pyx",  # Arrow Flight client - needs fixes
 
         # Streaming operators (Phase 1: Transform operators)
         "sabot/_cython/operators/transform.pyx",  # map, filter, select, flatMap, union
@@ -246,8 +246,7 @@ def create_extensions():
                 print(f"  Library dirs: {library_dirs}")
 
             elif "arrow" in pyx_file.lower() or "core/_ops" in pyx_file:
-                # Arrow extensions - Use cimport pyarrow.lib for zero-copy operations
-                # Link against vendored Arrow C++ libraries
+                # Arrow extensions - different handling based on implementation
                 if system_libs['arrow_include']:
                     include_dirs.append(system_libs['arrow_include'])
                 if system_libs['arrow_cpp_include']:
@@ -256,11 +255,33 @@ def create_extensions():
                     include_dirs.append(system_libs['arrow_cpp_api_include'])
                 if system_libs['arrow_cpp_build_include']:
                     include_dirs.append(system_libs['arrow_cpp_build_include'])
-                if system_libs['arrow_libs']:
-                    library_dirs.extend(system_libs['arrow_libs'])
-                libraries = ["arrow"]  # Core Arrow library (includes Python bindings when built with ARROW_PYTHON=ON)
+
+                # Check if this module uses cimport pyarrow.lib directly or imports from modules that do
+                try:
+                    with open(pyx_file, 'r') as f:
+                        content = f.read()
+                        if ("cimport pyarrow.lib" in content or
+                            "from .batch_processor cimport" in content or
+                            "_c/arrow_core" in pyx_file):
+                            # Uses cimport pyarrow.lib directly or imports from modules that do - no external Arrow libs needed
+                            libraries = []
+                            print(f"Configuring Arrow extension (cimport pyarrow.lib, no external linking): {module_name}")
+                        elif ("import pyarrow" in content and "cimport pyarrow" not in content):
+                            # Uses Python-level pyarrow imports only - no external linking needed
+                            libraries = []
+                            print(f"Configuring Arrow extension (Python pyarrow imports, no external linking): {module_name}")
+                        else:
+                            # Legacy Arrow usage - link libarrow
+                            if system_libs['arrow_libs']:
+                                library_dirs.extend(system_libs['arrow_libs'])
+                            libraries = ["arrow"]
+                            print(f"Configuring Arrow extension (linking against libarrow): {module_name}")
+                except:
+                    # Fallback
+                    libraries = []
+                    print(f"Configuring Arrow extension (fallback): {module_name}")
+
                 language = "c++"
-                print(f"Configuring Arrow extension (cimport pyarrow.lib, linking against libarrow): {module_name}")
 
             elif "redis" in pyx_file.lower():
                 # Redis extensions (requires hiredis)
@@ -306,12 +327,17 @@ def create_extensions():
             if language == "c++":
                 ext.extra_compile_args.append("-std=c++17")
 
-            # Add rpath for Arrow libraries on macOS
-            if ("arrow" in pyx_file.lower() or "core/_ops" in pyx_file) and system_libs['arrow_libs']:
-                arrow_lib_dir = system_libs['arrow_libs'][0]
-                ext.extra_link_args.extend([
-                    f"-Wl,-rpath,{arrow_lib_dir}",
-                ])
+            # For modules that cimport pyarrow.lib, don't link external Arrow libs
+            # PyArrow provides all necessary Arrow functionality internally
+            if ("arrow" in pyx_file.lower() or "core/_ops" in pyx_file):
+                if "cimport pyarrow.lib" in open(pyx_file).read():
+                    # These modules use cimport pyarrow.lib, so don't add external Arrow libs
+                    pass
+                elif system_libs['arrow_libs']:
+                    arrow_lib_dir = system_libs['arrow_libs'][0]
+                    ext.extra_link_args.extend([
+                        f"-Wl,-rpath,{arrow_lib_dir}",
+                    ])
 
             extensions.append(ext)
 
