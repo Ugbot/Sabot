@@ -46,10 +46,8 @@ cdef class ArrowRecordBatch:
 
 
 cdef class ArrowComputeEngine:
-    @staticmethod
-    cpdef object filter_batch(pa.RecordBatch batch, str condition)
-    @staticmethod
-    cpdef object hash_join(pa.RecordBatch left, pa.RecordBatch right,
+    cpdef object filter_batch(self, pa.RecordBatch batch, str condition)
+    cpdef object hash_join(self, pa.RecordBatch left, pa.RecordBatch right,
                           str left_key, str right_key, str join_type=*)
 
 
