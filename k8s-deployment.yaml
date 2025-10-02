@@ -1,0 +1,294 @@
+# Kubernetes deployment for distributed Sabot
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sabot
+  labels:
+    name: sabot
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sabot-config
+  namespace: sabot
+data:
+  CLUSTER_NAME: "sabot-cluster"
+  COORDINATOR_HOST: "sabot-coordinator"
+  COORDINATOR_PORT: "8080"
+  LOG_LEVEL: "INFO"
+  MORSEL_SIZE_KB: "64"
+  TARGET_UTILIZATION: "0.8"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sabot-coordinator
+  namespace: sabot
+  labels:
+    app: sabot
+    component: coordinator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sabot
+      component: coordinator
+  template:
+    metadata:
+      labels:
+        app: sabot
+        component: coordinator
+    spec:
+      containers:
+      - name: coordinator
+        image: sabot:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: SABOT_MODE
+          value: "coordinator"
+        - name: CLUSTER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: sabot-config
+              key: CLUSTER_NAME
+        - name: COORDINATOR_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: sabot-config
+              key: COORDINATOR_PORT
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: sabot-config
+              key: LOG_LEVEL
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sabot-worker
+  namespace: sabot
+  labels:
+    app: sabot
+    component: worker
+spec:
+  replicas: 3  # Scale this based on needs
+  selector:
+    matchLabels:
+      app: sabot
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: sabot
+        component: worker
+    spec:
+      containers:
+      - name: worker
+        image: sabot:latest
+        env:
+        - name: SABOT_MODE
+          value: "worker"
+        - name: COORDINATOR_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: sabot-config
+              key: COORDINATOR_HOST
+        - name: COORDINATOR_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: sabot-config
+              key: COORDINATOR_PORT
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: sabot-config
+              key: LOG_LEVEL
+        - name: MORSEL_SIZE_KB
+          valueFrom:
+            configMapKeyRef:
+              name: sabot-config
+              key: MORSEL_SIZE_KB
+        - name: TARGET_UTILIZATION
+          valueFrom:
+            configMapKeyRef:
+              name: sabot-config
+              key: TARGET_UTILIZATION
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 2Gi
+          limits:
+            cpu: 4000m
+            memory: 8Gi
+        livenessProbe:
+          exec:
+            command:
+            - python3
+            - -c
+            - "import requests; requests.get('http://sabot-coordinator:8080/health')"
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          exec:
+            command:
+            - python3
+            - -c
+            - "import requests; requests.get('http://sabot-coordinator:8080/health')"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sabot-coordinator
+  namespace: sabot
+  labels:
+    app: sabot
+    component: coordinator
+spec:
+  selector:
+    app: sabot
+    component: coordinator
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sabot-ingress
+  namespace: sabot
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: sabot.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sabot-coordinator
+            port:
+              number: 8080
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sabot-service-account
+  namespace: sabot
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sabot-cluster-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "nodes", "services"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sabot-cluster-role-binding
+subjects:
+- kind: ServiceAccount
+  name: sabot-service-account
+  namespace: sabot
+roleRef:
+  kind: ClusterRole
+  name: sabot-cluster-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: sabot-coordinator-pdb
+  namespace: sabot
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: sabot
+      component: coordinator
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sabot-worker-hpa
+  namespace: sabot
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sabot-worker
+  minReplicas: 1
+  maxReplicas: 50
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sabot-storage
+  namespace: sabot
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sabot-scripts
+  namespace: sabot
+data:
+  init.sh: |
+    #!/bin/bash
+    echo "Initializing Sabot node..."
+    # Add initialization logic here
+
+  healthcheck.sh: |
+    #!/bin/bash
+    # Health check script
+    curl -f http://localhost:8080/health || exit 1

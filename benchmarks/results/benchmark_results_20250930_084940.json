@@ -1,0 +1,454 @@
+{
+  "run_info": {
+    "timestamp": 1759218580.777534,
+    "system_info": {
+      "cpu": {
+        "physical_cores": 12,
+        "logical_cores": 12,
+        "frequency_mhz": 4056
+      },
+      "memory": {
+        "total_gb": 18.0,
+        "available_gb": 3.65277099609375
+      },
+      "python_version": "3.13",
+      "platform": "macOS-15.6-arm64-arm-64bit-Mach-O",
+      "hostname": "Bens-MacBook-Pro-3.local"
+    },
+    "total_benchmarks": 4
+  },
+  "results": [
+    {
+      "benchmark_name": "stream_throughput_simple",
+      "timestamp": 1759218383.629571,
+      "config": {
+        "name": "stream_throughput_simple",
+        "description": "Measure throughput for simple stream processing",
+        "iterations": 3,
+        "warmup_iterations": 1,
+        "duration_seconds": null,
+        "concurrency": 1,
+        "enable_gc": true,
+        "enable_profiling": false,
+        "metadata": {}
+      },
+      "metrics": {
+        "processing_complexity": "simple",
+        "avg_latency_ms": {
+          "mean": 0.0002100372314453125,
+          "min": 0.00020999908447265627,
+          "max": 0.00021007537841796875,
+          "count": 3,
+          "stddev": 3.814697265624241e-08
+        },
+        "total_time_seconds": {
+          "mean": 0.010501861572265625,
+          "min": 0.010499954223632812,
+          "max": 0.010503768920898438,
+          "count": 3,
+          "stddev": 1.9073486328125e-06
+        },
+        "message_size_bytes": {
+          "mean": 512,
+          "min": 512,
+          "max": 512,
+          "count": 3,
+          "stddev": 0.0
+        },
+        "throughput_msg_per_sec": {
+          "mean": 4761060.765795388,
+          "min": 4760196.11403668,
+          "max": 4761925.522252498,
+          "count": 3,
+          "stddev": 864.70411266283
+        },
+        "processed_messages": {
+          "mean": 50000,
+          "min": 50000,
+          "max": 50000,
+          "count": 3,
+          "stddev": 0.0
+        },
+        "concurrency": {
+          "mean": 1,
+          "min": 1,
+          "max": 1,
+          "count": 3,
+          "stddev": 0.0
+        },
+        "error_messages": {
+          "mean": 0,
+          "min": 0,
+          "max": 0,
+          "count": 3,
+          "stddev": 0.0
+        },
+        "total_messages": {
+          "mean": 50000,
+          "min": 50000,
+          "max": 50000,
+          "count": 3,
+          "stddev": 0.0
+        }
+      },
+      "system_info": {
+        "cpu": {
+          "physical_cores": 12,
+          "logical_cores": 12,
+          "frequency_mhz": 4056
+        },
+        "memory": {
+          "total_gb": 18.0,
+          "available_gb": 3.65277099609375
+        },
+        "python_version": "3.13",
+        "platform": "macOS-15.6-arm64-arm-64bit-Mach-O",
+        "hostname": "Bens-MacBook-Pro-3.local"
+      },
+      "raw_measurements": [
+        0.08628392219543457,
+        0.0858912467956543,
+        0.08511519432067871
+      ],
+      "statistics": {
+        "count": 3,
+        "mean": 0.08576345443725586,
+        "median": 0.0858912467956543,
+        "stddev": 0.0005947515249720785,
+        "min": 0.08511519432067871,
+        "max": 0.08628392219543457,
+        "p95": 0.08628392219543457,
+        "p99": 0.08628392219543457
+      }
+    },
+    {
+      "benchmark_name": "stream_throughput_complex",
+      "timestamp": 1759218549.4371939,
+      "config": {
+        "name": "stream_throughput_complex",
+        "description": "Measure throughput for complex stream processing",
+        "iterations": 3,
+        "warmup_iterations": 1,
+        "duration_seconds": null,
+        "concurrency": 1,
+        "enable_gc": true,
+        "enable_profiling": false,
+        "metadata": {}
+      },
+      "metrics": {
+        "processing_complexity": "complex",
+        "avg_latency_ms": {
+          "mean": 4.134524949391683,
+          "min": 4.117493915557861,
+          "max": 4.15088119506836,
+          "count": 3,
+          "stddev": 0.016703865198534354
+        },
+        "total_time_seconds": {
+          "mean": 41.34524949391683,
+          "min": 41.17493915557861,
+          "max": 41.508811950683594,
+          "count": 3,
+          "stddev": 0.16703865198534087
+        },
+        "message_size_bytes": {
+          "mean": 2048,
+          "min": 2048,
+          "max": 2048,
+          "count": 3,
+          "stddev": 0.0
+        },
+        "throughput_msg_per_sec": {
+          "mean": 241.86838793944295,
+          "min": 240.91270094362008,
+          "max": 242.86617552038675,
+          "count": 3,
+          "stddev": 0.9774175540520385
+        },
+        "processed_messages": {
+          "mean": 10000,
+          "min": 10000,
+          "max": 10000,
+          "count": 3,
+          "stddev": 0.0
+        },
+        "concurrency": {
+          "mean": 1,
+          "min": 1,
+          "max": 1,
+          "count": 3,
+          "stddev": 0.0
+        },
+        "error_messages": {
+          "mean": 0,
+          "min": 0,
+          "max": 0,
+          "count": 3,
+          "stddev": 0.0
+        },
+        "total_messages": {
+          "mean": 10000,
+          "min": 10000,
+          "max": 10000,
+          "count": 3,
+          "stddev": 0.0
+        }
+      },
+      "system_info": {
+        "cpu": {
+          "physical_cores": 12,
+          "logical_cores": 12,
+          "frequency_mhz": 4056
+        },
+        "memory": {
+          "total_gb": 18.0,
+          "available_gb": 3.65277099609375
+        },
+        "python_version": "3.13",
+        "platform": "macOS-15.6-arm64-arm-64bit-Mach-O",
+        "hostname": "Bens-MacBook-Pro-3.local"
+      },
+      "raw_measurements": [
+        41.38289785385132,
+        41.21320033073425,
+        41.5328266620636
+      ],
+      "statistics": {
+        "count": 3,
+        "mean": 41.37630828221639,
+        "median": 41.38289785385132,
+        "stddev": 0.15991502356099335,
+        "min": 41.21320033073425,
+        "max": 41.5328266620636,
+        "p95": 41.5328266620636,
+        "p99": 41.5328266620636
+      }
+    },
+    {
+      "benchmark_name": "stream_concurrency_scaling",
+      "timestamp": 1759218580.1799831,
+      "config": {
+        "name": "stream_concurrency_scaling",
+        "description": "Measure performance scaling with concurrency",
+        "iterations": 3,
+        "warmup_iterations": 1,
+        "duration_seconds": null,
+        "concurrency": 4,
+        "enable_gc": true,
+        "enable_profiling": false,
+        "metadata": {}
+      },
+      "metrics": {
+        "processing_complexity": "medium",
+        "avg_latency_ms": {
+          "mean": 0.30525551478068036,
+          "min": 0.3039877986907959,
+          "max": 0.3071514320373535,
+          "count": 3,
+          "stddev": 0.001672758654836038
+        },
+        "total_time_seconds": {
+          "mean": 7.631387869517009,
+          "min": 7.5996949672698975,
+          "max": 7.678785800933838,
+          "count": 3,
+          "stddev": 0.04181896637090105
+        },
+        "message_size_bytes": {
+          "mean": 1024,
+          "min": 1024,
+          "max": 1024,
+          "count": 3,
+          "stddev": 0.0
+        },
+        "throughput_msg_per_sec": {
+          "mean": 3276.0095014384146,
+          "min": 3255.7230593617655,
+          "max": 3289.6057154489927,
+          "count": 3,
+          "stddev": 17.90469099323857
+        },
+        "processed_messages": {
+          "mean": 25000,
+          "min": 25000,
+          "max": 25000,
+          "count": 3,
+          "stddev": 0.0
+        },
+        "concurrency": {
+          "mean": 4,
+          "min": 4,
+          "max": 4,
+          "count": 3,
+          "stddev": 0.0
+        },
+        "error_messages": {
+          "mean": 0,
+          "min": 0,
+          "max": 0,
+          "count": 3,
+          "stddev": 0.0
+        },
+        "total_messages": {
+          "mean": 25000,
+          "min": 25000,
+          "max": 25000,
+          "count": 3,
+          "stddev": 0.0
+        }
+      },
+      "system_info": {
+        "cpu": {
+          "physical_cores": 12,
+          "logical_cores": 12,
+          "frequency_mhz": 4056
+        },
+        "memory": {
+          "total_gb": 18.0,
+          "available_gb": 3.65277099609375
+        },
+        "python_version": "3.13",
+        "platform": "macOS-15.6-arm64-arm-64bit-Mach-O",
+        "hostname": "Bens-MacBook-Pro-3.local"
+      },
+      "raw_measurements": [
+        7.64157509803772,
+        7.72369909286499,
+        7.662704944610596
+      ],
+      "statistics": {
+        "count": 3,
+        "mean": 7.675993045171102,
+        "median": 7.662704944610596,
+        "stddev": 0.04264408334079866,
+        "min": 7.64157509803772,
+        "max": 7.72369909286499,
+        "p95": 7.72369909286499,
+        "p99": 7.72369909286499
+      }
+    },
+    {
+      "benchmark_name": "stream_memory_efficiency",
+      "timestamp": 1759218580.777473,
+      "config": {
+        "name": "stream_memory_efficiency",
+        "description": "Measure memory usage during stream processing",
+        "iterations": 2,
+        "warmup_iterations": 1,
+        "duration_seconds": null,
+        "concurrency": 1,
+        "enable_gc": true,
+        "enable_profiling": false,
+        "metadata": {}
+      },
+      "metrics": {
+        "processing_complexity": "simple",
+        "avg_latency_ms": {
+          "mean": 0.00026571035385131837,
+          "min": 0.000210721492767334,
+          "max": 0.00032069921493530276,
+          "count": 2,
+          "stddev": 7.77659931244208e-05
+        },
+        "total_time_seconds": {
+          "mean": 0.026571035385131836,
+          "min": 0.0210721492767334,
+          "max": 0.03206992149353027,
+          "count": 2,
+          "stddev": 0.0077765993124420795
+        },
+        "message_size_bytes": {
+          "mean": 256,
+          "min": 256,
+          "max": 256,
+          "count": 2,
+          "stddev": 0.0
+        },
+        "memory_after_mb": {
+          "mean": 102.3125,
+          "min": 100.546875,
+          "max": 104.078125,
+          "count": 2,
+          "stddev": 2.496970821064996
+        },
+        "throughput_msg_per_sec": {
+          "mean": 3931893.507487281,
+          "min": 3118186.616707927,
+          "max": 4745600.398266635,
+          "count": 2,
+          "stddev": 1150755.320736605
+        },
+        "processed_messages": {
+          "mean": 100000,
+          "min": 100000,
+          "max": 100000,
+          "count": 2,
+          "stddev": 0.0
+        },
+        "memory_delta_mb": {
+          "mean": 2.671875,
+          "min": 1.8125,
+          "max": 3.53125,
+          "count": 2,
+          "stddev": 1.2153397801643786
+        },
+        "memory_before_mb": {
+          "mean": 99.640625,
+          "min": 98.734375,
+          "max": 100.546875,
+          "count": 2,
+          "stddev": 1.2816310409006173
+        },
+        "concurrency": {
+          "mean": 1,
+          "min": 1,
+          "max": 1,
+          "count": 2,
+          "stddev": 0.0
+        },
+        "error_messages": {
+          "mean": 0,
+          "min": 0,
+          "max": 0,
+          "count": 2,
+          "stddev": 0.0
+        },
+        "total_messages": {
+          "mean": 100000,
+          "min": 100000,
+          "max": 100000,
+          "count": 2,
+          "stddev": 0.0
+        }
+      },
+      "system_info": {
+        "cpu": {
+          "physical_cores": 12,
+          "logical_cores": 12,
+          "frequency_mhz": 4056
+        },
+        "memory": {
+          "total_gb": 18.0,
+          "available_gb": 3.65277099609375
+        },
+        "python_version": "3.13",
+        "platform": "macOS-15.6-arm64-arm-64bit-Mach-O",
+        "hostname": "Bens-MacBook-Pro-3.local"
+      },
+      "raw_measurements": [
+        0.1779799461364746,
+        0.1944289207458496
+      ],
+      "statistics": {
+        "count": 2,
+        "mean": 0.1862044334411621,
+        "median": 0.1862044334411621,
+        "stddev": 0.011631181489854404,
+        "min": 0.1779799461364746,
+        "max": 0.1944289207458496,
+        "p95": 0.1944289207458496,
+        "p99": 0.1944289207458496
+      }
+    }
+  ]
+}

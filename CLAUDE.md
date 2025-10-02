@@ -1,0 +1,6 @@
+- dont simplfy thigns to get a fix as that makes it harder to get it right in the long run. refactor and clarify only
+- we always prefer using Cython to python for perfomance critical code in streaming libraries
+- if  we are vendoring a library that has cython bindings we should use the cython directly rather than go in via ptyhon.
+- use the vendored librarys over hte ones from pip (arrow, tonbo, rocksdb)
+- always use our version of arrow, not one from pip
+- use UV for all venv and pip stuff
