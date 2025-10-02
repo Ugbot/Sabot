@@ -1,0 +1,8 @@
+{
+  "tradeId": "TRD_00001",
+  "instrumentId": "BOND_00001",
+  "price": 99.6,
+  "quantity": 250000,
+  "timestamp": "2025-10-02T12:00:01Z",
+  "buySellIndicator": "B"
+}

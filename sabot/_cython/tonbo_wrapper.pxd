@@ -13,24 +13,9 @@ cdef class FastTonboBackend:
         bint _initialized
         object _logger
 
-    cpdef initialize(self)
-    cpdef close(self)
-    cpdef fast_get(self, str key)
-    cpdef fast_insert(self, str key, bytes value)
-    cpdef fast_delete(self, str key) except -1
-    cpdef fast_scan_range(self, str start_key = *, str end_key = *, int32_t limit = *)
-    cpdef fast_batch_insert(self, list key_value_pairs)
-    cpdef fast_exists(self, str key) except -1
-    cpdef get_stats(self)
+    cdef int64_t _get_current_timestamp_ns(self)
 
 cdef class TonboCythonWrapper:
     cdef:
         FastTonboBackend _backend
         object _serializer
-
-    cpdef initialize(self, serializer = *)
-    cpdef close(self)
-    cpdef get(self, object key)
-    cpdef put(self, object key, object value)
-    cpdef delete(self, object key) except -1
-    cpdef scan(self, object start_key = *, object end_key = *, int limit = *)"

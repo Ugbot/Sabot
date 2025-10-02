@@ -4,3 +4,5 @@
 - use the vendored librarys over hte ones from pip (arrow, tonbo, rocksdb)
 - always use our version of arrow, not one from pip
 - use UV for all venv and pip stuff
+- check @PROJECT_MAP.md  before working on somthing and udpate it afterwards
+- always use local arrow.

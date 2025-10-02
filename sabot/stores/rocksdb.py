@@ -95,7 +95,7 @@ class RocksDBBackend(StoreBackend):
 
         # Initialize RocksDB
         self._db = None
-        self._db_path = config.path or Path("./sabot_rocksdb")
+        self._db_path = Path(config.path) if config.path else Path("./sabot_rocksdb")
         self._db_options = self._create_db_options(config)
 
         # Serialization options
@@ -131,9 +131,18 @@ class RocksDBBackend(StoreBackend):
     async def start(self) -> None:
         """Initialize the RocksDB backend."""
         try:
-            import rocksdb
+            # Try vendored rocksdb first
+            import sys
+            import os
+            vendored_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'rocksdb')
+            if os.path.exists(vendored_path):
+                sys.path.insert(0, vendored_path)
+                import rocksdb
+                sys.path.pop(0)
+            else:
+                import rocksdb
         except ImportError:
-            raise RuntimeError("RocksDB not available. Install with: pip install rocksdb")
+            raise RuntimeError("RocksDB not available. Vendored version should be available.")
 
         # Ensure directory exists
         self._db_path.mkdir(parents=True, exist_ok=True)

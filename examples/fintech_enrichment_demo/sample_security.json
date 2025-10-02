@@ -1,0 +1,8 @@
+{
+  "instrumentId": "BOND_00001",
+  "securityName": "Sample Corp Bond",
+  "cusip": "123456789",
+  "isin": "US1234567890",
+  "marketSegment": "HG",
+  "issuer": "Sample Corporation"
+}

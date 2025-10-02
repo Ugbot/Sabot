@@ -18,6 +18,8 @@ from libc.stdint cimport int64_t, int32_t
 from typing import Callable, List, Optional, Iterator
 
 # Import Arrow for vectorized operations
+# NOTE: Using runtime import for backward compatibility
+# TODO: Migrate to cimport pyarrow.lib for true zero-copy semantics
 try:
     import pyarrow as pa
     import pyarrow.compute as pc
@@ -174,8 +176,15 @@ cdef class CythonFilterOperator(BaseOperator):
             return None
 
         try:
-            # Evaluate predicate
-            mask = self._predicate(batch)
+            # Evaluate predicate - handle common array-scalar comparison errors
+            try:
+                mask = self._predicate(batch)
+            except TypeError as predicate_error:
+                # Check if this is a common array-scalar comparison error that we can auto-fix
+                if self._can_auto_convert_predicate_error(predicate_error):
+                    mask = self._evaluate_predicate_with_auto_conversion(batch)
+                else:
+                    raise
 
             # Handle different mask types
             if isinstance(mask, pa.Array):
@@ -184,8 +193,15 @@ cdef class CythonFilterOperator(BaseOperator):
             elif isinstance(mask, bool):
                 # Boolean scalar - keep or drop entire batch
                 return batch if mask else None
+            elif hasattr(mask, '__array__') or hasattr(mask, 'to_numpy'):
+                # Convert numpy-like or pandas-like boolean arrays to Arrow
+                try:
+                    mask_array = pa.array(mask)
+                    return batch.filter(mask_array)
+                except Exception:
+                    raise TypeError(f"Could not convert mask to Arrow array: {type(mask)}")
             else:
-                raise TypeError(f"Predicate must return Array or bool, got {type(mask)}")
+                raise TypeError(f"Predicate must return Array, bool, or array-like, got {type(mask)}")
 
         except Exception as e:
             raise RuntimeError(f"Error in filter operator: {e}")

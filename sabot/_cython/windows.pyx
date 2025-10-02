@@ -241,8 +241,9 @@ cdef class WindowBuffer:
         """Get windows that have expired."""
         cdef vector[uint64_t] expired
         cdef unordered_map[uint64_t, WindowState*].iterator it = self.windows.begin()
+        cdef WindowState* window
         while it != self.windows.end():
-            cdef WindowState* window = deref(it).second
+            window = deref(it).second
             if window.end_time < current_time:
                 expired.push_back(deref(it).first)
             inc(it)
@@ -251,13 +252,14 @@ cdef class WindowBuffer:
     cdef void remove_window(self, uint64_t window_id):
         """Remove a window."""
         cdef unordered_map[uint64_t, WindowState*].iterator it = self.windows.find(window_id)
+        cdef deque[uint64_t].iterator order_it
         if it != self.windows.end():
             deref(it).second.clear()
             del deref(it).second
             self.windows.erase(it)
 
             # Remove from order deque
-            cdef deque[uint64_t].iterator order_it = self.window_order.begin()
+            order_it = self.window_order.begin()
             while order_it != self.window_order.end():
                 if deref(order_it) == window_id:
                     self.window_order.erase(order_it)
@@ -395,7 +397,7 @@ cdef class TumblingWindowProcessor(BaseWindowProcessor):
         # Add records to current window
         await self._add_records_to_window(record_batch, self.current_window)
 
-    cdef async def _add_records_to_window(self, object record_batch, WindowState* window):
+    async def _add_records_to_window(self, object record_batch, WindowState* window):
         """Add records to a specific window."""
         if window == NULL:
             return
@@ -432,6 +434,7 @@ cdef class SlidingWindowProcessor(BaseWindowProcessor):
     async def process_record(self, object record_batch):
         """Process records through sliding windows."""
         cdef double current_time = time.time()
+        cdef WindowState* window
 
         # Initialize if needed
         if self.last_window_start == 0.0:
@@ -439,7 +442,7 @@ cdef class SlidingWindowProcessor(BaseWindowProcessor):
 
         # Create new windows as needed
         while self.last_window_start <= current_time:
-            cdef WindowState* window = self.buffer.create_window(
+            window = self.buffer.create_window(
                 self.last_window_start,
                 self.last_window_start + self.config.size_seconds
             )
@@ -454,12 +457,13 @@ cdef class SlidingWindowProcessor(BaseWindowProcessor):
 
         # Clean up expired windows
         cdef vector[uint64_t] expired = self.buffer.get_expired_windows(current_time)
+        cdef uint64_t window_id
         for i in range(expired.size()):
-            cdef uint64_t window_id = expired[i]
+            window_id = expired[i]
             self.active_windows.erase(window_id)
             self.buffer.remove_window(window_id)
 
-    cdef async def _add_records_to_window(self, object record_batch, WindowState* window):
+    async def _add_records_to_window(self, object record_batch, WindowState* window):
         """Add records to a specific window."""
         if window == NULL:
             return
@@ -492,13 +496,14 @@ cdef class HoppingWindowProcessor(BaseWindowProcessor):
     async def process_record(self, object record_batch):
         """Process records through hopping windows."""
         cdef double current_time = time.time()
+        cdef WindowState* window
 
         if self.last_window_start == 0.0:
             self.last_window_start = current_time
 
         # Create windows with hop-based spacing
         while self.last_window_start <= current_time:
-            cdef WindowState* window = self.buffer.create_window(
+            window = self.buffer.create_window(
                 self.last_window_start,
                 self.last_window_start + self.config.size_seconds
             )
@@ -530,15 +535,17 @@ cdef class SessionWindowProcessor(BaseWindowProcessor):
             records = [record_batch]
 
         cdef double current_time = time.time()
+        cdef cpp_string session_key
+        cdef WindowState* window = NULL
+        cdef unordered_map[cpp_string, WindowState*].iterator it
 
         for record in records:
             if isinstance(record, dict):
                 key = record.get(self.config.key_field.decode('utf-8'), 'default')
-                cdef cpp_string session_key = str(key).encode('utf-8')
+                session_key = str(key).encode('utf-8')
 
                 # Get or create session window
-                cdef WindowState* window = NULL
-                cdef unordered_map[cpp_string, WindowState*].iterator it = self.session_windows.find(session_key)
+                it = self.session_windows.find(session_key)
 
                 if it != self.session_windows.end():
                     window = deref(it).second
@@ -563,8 +570,9 @@ cdef class SessionWindowProcessor(BaseWindowProcessor):
         cdef vector[cpp_string] to_remove
 
         cdef unordered_map[cpp_string, WindowState*].iterator it = self.session_windows.begin()
+        cdef WindowState* window
         while it != self.session_windows.end():
-            cdef WindowState* window = deref(it).second
+            window = deref(it).second
             if window.is_complete or (current_time - window.last_update > self.session_timeout):
                 # Emit this session window
                 window.is_complete = True
@@ -581,7 +589,7 @@ cdef class SessionWindowProcessor(BaseWindowProcessor):
 
 
 # Factory function for creating window processors
-cpdef object create_window_processor(str window_type, double size_seconds, **kwargs):
+def create_window_processor(str window_type, double size_seconds, **kwargs):
     """Create a window processor instance."""
     cdef WindowType wt
     cdef WindowConfig config
@@ -648,8 +656,9 @@ cdef class WindowManager:
                 # Return stats for all windows
                 cdef dict all_stats = {}
                 cdef unordered_map[cpp_string, BaseWindowProcessor].iterator it = self.processors.begin()
+                cdef str name
                 while it != self.processors.end():
-                    cdef str name = deref(it).first.decode('utf-8')
+                    name = deref(it).first.decode('utf-8')
                     all_stats[name] = await deref(it).second.get_window_stats()
                     inc(it)
                 return all_stats

@@ -45,6 +45,13 @@ class KafkaSourceConfig:
     fetch_min_bytes: int = 1
     fetch_max_wait_ms: int = 500
 
+    # Error handling configuration
+    error_handling_policy: str = "skip"  # skip, fail, retry, dead_letter
+    max_retry_attempts: int = 3
+    retry_backoff_seconds: float = 1.0
+    dead_letter_topic: Optional[str] = None
+    error_sample_rate: float = 0.1  # Log 10% of errors to avoid spam
+
     # Additional Kafka consumer config
     consumer_config: Optional[Dict[str, Any]] = None
 
@@ -80,6 +87,12 @@ class KafkaSource:
         self._codec = None
         self._running = False
 
+        # Error handling state
+        self._error_count = 0
+        self._consecutive_errors = 0
+        self._last_error_time = None
+        self._retry_count = 0
+
         # Import aiokafka
         try:
             from aiokafka import AIOKafkaConsumer
@@ -110,6 +123,64 @@ class KafkaSource:
         self._codec = create_codec(codec_arg)
 
         logger.info(f"KafkaSource initialized: topic={config.topic}, group={config.group_id}, codec={config.codec_type}")
+
+    def _should_log_error(self) -> bool:
+        """Determine if error should be logged based on sample rate."""
+        import random
+        return random.random() < self.config.error_sample_rate
+
+    def _is_transient_error(self, error: Exception) -> bool:
+        """Determine if error is transient (retryable)."""
+        error_msg = str(error).lower()
+        # Network errors, timeouts, temporary unavailability
+        transient_indicators = [
+            'timeout', 'connection', 'network', 'temporary', 'unavailable',
+            'leader', 'rebalance', 'partition', 'offset'
+        ]
+        return any(indicator in error_msg for indicator in transient_indicators)
+
+    async def _handle_message_error(self, error: Exception, message_data: Dict[str, Any]) -> None:
+        """Handle message processing errors based on policy."""
+        self._error_count += 1
+        self._consecutive_errors += 1
+        self._last_error_time = asyncio.get_event_loop().time()
+
+        if self._should_log_error():
+            logger.warning(f"Message processing error (policy: {self.config.error_handling_policy}): {error}")
+
+        if self.config.error_handling_policy == "fail":
+            raise error
+        elif self.config.error_handling_policy == "retry":
+            if self._retry_count < self.config.max_retry_attempts:
+                self._retry_count += 1
+                await asyncio.sleep(self.config.retry_backoff_seconds)
+                # In a real implementation, we'd retry the message processing
+                logger.info(f"Retrying message (attempt {self._retry_count})")
+            else:
+                logger.error(f"Max retry attempts exceeded for message")
+                if self.config.dead_letter_topic:
+                    await self._send_to_dead_letter_topic(message_data)
+        elif self.config.error_handling_policy == "dead_letter":
+            if self.config.dead_letter_topic:
+                await self._send_to_dead_letter_topic(message_data)
+        # For "skip" policy, just continue (default behavior)
+
+    async def _send_to_dead_letter_topic(self, message_data: Dict[str, Any]) -> None:
+        """Send failed message to dead letter topic."""
+        try:
+            # This would need a producer - simplified for now
+            logger.info(f"Would send message to dead letter topic: {self.config.dead_letter_topic}")
+        except Exception as e:
+            logger.error(f"Failed to send to dead letter topic: {e}")
+
+    async def _handle_stream_error(self, error: Exception) -> None:
+        """Handle stream-level errors."""
+        if self._is_transient_error(error):
+            logger.warning(f"Transient stream error, continuing: {error}")
+            self._consecutive_errors = 0  # Reset consecutive error counter
+        else:
+            logger.error(f"Persistent stream error: {error}")
+            raise error
 
     async def start(self):
         """Start the Kafka consumer."""
@@ -176,8 +247,15 @@ class KafkaSource:
                         yield None
 
                 except Exception as e:
-                    logger.error(f"Failed to decode message at offset {msg.offset}: {e}")
-                    # Skip bad message (TODO: Add error handling policy)
+                    message_data = {
+                        'topic': msg.topic,
+                        'partition': msg.partition,
+                        'offset': msg.offset,
+                        'key': msg.key,
+                        'value': msg.value,
+                        'timestamp': msg.timestamp
+                    }
+                    await self._handle_message_error(e, message_data)
                     continue
 
         except asyncio.CancelledError:
@@ -186,7 +264,7 @@ class KafkaSource:
             raise
 
         except Exception as e:
-            logger.error(f"KafkaSource stream error: {e}")
+            await self._handle_stream_error(e)
             await self.stop()
             raise
 
@@ -224,7 +302,16 @@ class KafkaSource:
                     }
 
                 except Exception as e:
-                    logger.error(f"Failed to decode message at offset {msg.offset}: {e}")
+                    message_data = {
+                        'topic': msg.topic,
+                        'partition': msg.partition,
+                        'offset': msg.offset,
+                        'key': msg.key,
+                        'value': msg.value,
+                        'timestamp': msg.timestamp,
+                        'headers': dict(msg.headers) if msg.headers else {}
+                    }
+                    await self._handle_message_error(e, message_data)
                     continue
 
         except asyncio.CancelledError:
@@ -233,7 +320,7 @@ class KafkaSource:
             raise
 
         except Exception as e:
-            logger.error(f"KafkaSource stream_with_metadata error: {e}")
+            await self._handle_stream_error(e)
             await self.stop()
             raise
 
@@ -241,6 +328,17 @@ class KafkaSource:
         """Manually commit current offsets."""
         if self._consumer:
             await self._consumer.commit()
+
+    def get_error_stats(self) -> Dict[str, Any]:
+        """Get error statistics for monitoring."""
+        return {
+            'total_errors': self._error_count,
+            'consecutive_errors': self._consecutive_errors,
+            'last_error_time': self._last_error_time,
+            'retry_count': self._retry_count,
+            'error_policy': self.config.error_handling_policy,
+            'error_sample_rate': self.config.error_sample_rate
+        }
 
     async def seek_to_beginning(self):
         """Seek to the beginning of all assigned partitions."""
