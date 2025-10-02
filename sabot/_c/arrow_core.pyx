@@ -257,8 +257,7 @@ cdef class ArrowComputeEngine:
     No Python function calls in hot paths.
     """
 
-    @staticmethod
-    cpdef object filter_batch(pa.RecordBatch batch, str condition):
+    cpdef object filter_batch(self, pa.RecordBatch batch, str condition):
         """
         Filter batch using Arrow compute (SIMD accelerated).
 
@@ -283,8 +282,7 @@ cdef class ArrowComputeEngine:
         else:
             raise ValueError(f"Unsupported condition: {condition}")
 
-    @staticmethod
-    cpdef object hash_join(pa.RecordBatch left, pa.RecordBatch right,
+    cpdef object hash_join(self, pa.RecordBatch left, pa.RecordBatch right,
                           str left_key, str right_key, str join_type="inner"):
         """
         Join two batches using Arrow's hash join.
@@ -317,8 +315,8 @@ cdef class ArrowMemoryPool:
     """
 
     def __cinit__(self):
-        """Use default Arrow memory pool."""
-        self._pool = pa.default_memory_pool()
+        """Initialize memory pool (not actually used - Arrow manages its own memory)."""
+        self._pool = NULL
 
     def __dealloc__(self):
         """Memory pool is managed by Arrow."""
