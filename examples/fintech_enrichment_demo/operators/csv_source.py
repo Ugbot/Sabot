@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Optional, AsyncGenerator
 
 # Use Sabot's Arrow API
-from sabot import arrow as pa
+from sabot import cyarrow as pa
 import pyarrow.csv as pa_csv  # CSV not yet in sabot.arrow
 import pyarrow.flight as flight  # Flight not yet in sabot.arrow
 

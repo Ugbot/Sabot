@@ -22,8 +22,8 @@ from pathlib import Path
 from typing import Optional, List, AsyncGenerator
 
 # Use Sabot's Arrow API
-from sabot import arrow as pa
-from sabot.arrow import compute as pc
+from sabot import cyarrow as pa
+from sabot.cyarrow import compute as pc
 import pyarrow.flight as flight  # Flight not yet in sabot.arrow
 
 # Import Sabot's Cython compute functions

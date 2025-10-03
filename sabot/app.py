@@ -3,7 +3,7 @@
 
 import asyncio
 import logging
-from typing import Any, Dict, List, Optional, Union, Callable, AsyncGenerator
+from typing import Any, Dict, List, Optional, Union, Callable, AsyncGenerator, Type
 from pathlib import Path
 
 from .sabot_types import AppT, AgentT, TopicT, StreamT, TableT, AgentFun, SinkT
@@ -109,6 +109,7 @@ class App(AppT):
         self._topics = {}
         self._tables = {}
         self._agents = {}
+        self._channels = {}
 
         # Configuration
         from .config import SabotConfig
@@ -300,109 +301,137 @@ class App(AppT):
         self,
         name: Optional[str] = None,
         *,
-        backend: Optional[ChannelBackend] = None,
-        policy: Optional[ChannelPolicy] = None,
-        schema=None,
-        key_type=None,
-        value_type=None,
-        maxsize=None,
-        loop=None,
-        **kwargs
+        key_type: Optional[Type] = None,
+        value_type: Optional[Type] = None,
+        maxsize: int = 1000,
     ) -> ChannelT:
-        """Create new channel for streaming using DBOS-managed backend selection.
+        """
+        Create a memory channel (synchronous).
 
-        Channels provide the data source for streams and support Arrow-native
-        processing with high-performance buffering and subscriber patterns.
-        The channel manager automatically selects the appropriate backend based
-        on DBOS guidance and policies.
+        For Kafka/Redis/Flight channels, use async_channel() instead.
 
         Args:
             name: Channel name (auto-generated if None)
-            backend: Specific backend to use (auto-selected if None)
-            policy: Channel policy for backend selection
-            schema: Schema for serialization/deserialization
-            key_type: Type/Model for message keys
-            value_type: Type/Model for message values
-            maxsize: Maximum queue size (default: from config)
-            loop: Asyncio event loop
-            **kwargs: Additional backend-specific options
+            key_type: Type for keys (optional)
+            value_type: Type for values (optional)
+            maxsize: Max channel size
 
         Returns:
-            Channel instance for streaming data
+            MemoryChannel instance
 
         Example:
-            # Auto-selected backend
-            channel = app.channel("user-events", policy=ChannelPolicy.SCALABILITY)
-
-            # Specific backend
-            memory_channel = app.channel(backend=ChannelBackend.MEMORY, maxsize=1000)
-
-            stream = channel.stream()
-
-            @app.agent(stream)
-            async def process(stream):
-                async for event in stream:
-                    # Process event.value (Arrow data)
-                    yield result
+            channel = app.channel(name='my-channel', maxsize=5000)
         """
-        # For synchronous creation, we need to handle this differently
-        # For now, create synchronously with fallback logic
+        from sabot.channels import Channel
+
+        # Generate name if not provided
         if name is None:
-            import uuid
-            name = f"channel-{uuid.uuid4().hex[:8]}"
+            name = f"channel-{len(self._channels)}"
 
-        manager = get_channel_manager(self)
-
-        # Synchronous backend selection for common cases
-        if backend is None:
-            backend = self._select_channel_backend_sync(name, policy, **kwargs)
-
-        # Get backend factory
-        if backend not in manager._backends:
-            raise ValueError(f"Backend {backend} not available. Registered: {list(manager._backends.keys())}")
-
-        factory = manager._backends[backend]
-
-        # Create configuration
-        from .channel_manager import ChannelConfig
-        config = ChannelConfig(
-            name=name,
-            backend=backend,
-            policy=policy or ChannelPolicy.PERFORMANCE,
-            schema=schema,
+        # Create memory channel
+        channel = Channel(
+            app=self,
+            maxsize=maxsize,
             key_type=key_type,
             value_type=value_type,
-            maxsize=maxsize,
-            **kwargs
         )
 
-        # For memory channels, create synchronously
-        if backend == ChannelBackend.MEMORY:
-            # Create memory channel synchronously
-            from .channels import Channel
-            return Channel(
-                app=self,
-                maxsize=config.maxsize,
-                schema=config.schema,
-                key_type=config.key_type,
-                value_type=config.value_type,
+        # Register channel
+        self._channels[name] = channel
+
+        return channel
+
+    async def async_channel(
+        self,
+        name: Optional[str] = None,
+        *,
+        backend: str = "memory",
+        key_type: Optional[Type] = None,
+        value_type: Optional[Type] = None,
+        maxsize: int = 1000,
+        **backend_options
+    ) -> ChannelT:
+        """
+        Create a channel asynchronously (for Kafka/Redis backends).
+
+        Args:
+            name: Channel name (auto-generated if None)
+            backend: Backend type ('memory', 'kafka', 'redis', 'flight')
+            key_type: Type for keys (optional)
+            value_type: Type for values (optional)
+            maxsize: Max channel size (for memory backend)
+            **backend_options: Backend-specific options
+
+        Returns:
+            Channel instance
+
+        Example:
+            # Create Kafka channel
+            channel = await app.async_channel(
+                name='my-topic',
+                backend='kafka',
+                broker='localhost:9092'
             )
+        """
+        from sabot.channels import Channel
+
+        # Generate name if not provided
+        if name is None:
+            name = f"channel-{len(self._channels)}"
+
+        # Create based on backend
+        if backend == "memory":
+            channel = Channel(
+                app=self,
+                maxsize=maxsize,
+                key_type=key_type,
+                value_type=value_type,
+            )
+
+        elif backend == "kafka":
+            # Import here to avoid dependency if not using Kafka
+            broker = backend_options.get('broker', self.broker)
+            topic = backend_options.get('topic', name)
+
+            channel = await self._create_kafka_channel(
+                topic=topic,
+                broker=broker,
+                key_type=key_type,
+                value_type=value_type,
+                **backend_options
+            )
+
+        elif backend == "redis":
+            redis_url = backend_options.get('redis_url', 'redis://localhost:6379')
+
+            channel = await self._create_redis_channel(
+                name=name,
+                redis_url=redis_url,
+                key_type=key_type,
+                value_type=value_type,
+                **backend_options
+            )
+
+        elif backend == "flight":
+            flight_url = backend_options.get('flight_url')
+            if not flight_url:
+                raise ValueError("flight_url required for Flight backend")
+
+            channel = await self._create_flight_channel(
+                name=name,
+                flight_url=flight_url,
+                key_type=key_type,
+                value_type=value_type,
+                **backend_options
+            )
+
         else:
-            # For other backends, run async creation in sync context
-            try:
-                # Try to get existing event loop (in async context)
-                loop = asyncio.get_running_loop()
-                # If we're in an async context, this will raise RuntimeError
-                # and we'll need to tell the user to use create_channel_async
-                raise NotImplementedError("Cannot create non-memory channels in async context. Use await app.create_channel_async(...)")
-            except RuntimeError:
-                # Not in async context, can run async creation synchronously
-                return asyncio.run(self.create_channel_async(
-                    name=name,
-                    backend=backend,
-                    policy=policy,
-                    **kwargs
-                ))
+            raise ValueError(f"Unknown backend: {backend}")
+
+        # Register channel
+        self._channels[name] = channel
+
+        return channel
 
     def _select_channel_backend_sync(
         self,
@@ -1402,6 +1431,145 @@ class App(AppT):
             }
         )
         return True
+
+    async def _create_kafka_channel(
+        self,
+        topic: str,
+        broker: str,
+        key_type: Optional[Type] = None,
+        value_type: Optional[Type] = None,
+        **options
+    ):
+        """
+        Create and initialize a Kafka channel.
+
+        Args:
+            topic: Kafka topic name
+            broker: Kafka broker URL
+            key_type: Type for keys
+            value_type: Type for values
+            **options: Additional Kafka options
+
+        Returns:
+            Initialized KafkaChannel
+        """
+        from .kafka.source import KafkaSource
+        from .kafka.sink import KafkaSink
+
+        # Create source and sink
+        source = KafkaSource(
+            topic=topic,
+            broker=broker,
+            **options
+        )
+
+        sink = KafkaSink(
+            topic=topic,
+            broker=broker,
+            **options
+        )
+
+        # Initialize connection
+        await source.start()
+        await sink.start()
+
+        # Create channel wrapper
+        from .channels_kafka import KafkaChannel
+        channel = KafkaChannel(
+            name=topic,
+            source=source,
+            sink=sink,
+            key_type=key_type,
+            value_type=value_type
+        )
+
+        return channel
+
+    async def _create_redis_channel(
+        self,
+        name: str,
+        redis_url: str,
+        key_type: Optional[Type] = None,
+        value_type: Optional[Type] = None,
+        **options
+    ):
+        """
+        Create and initialize a Redis channel.
+
+        Args:
+            name: Redis channel name
+            redis_url: Redis connection URL
+            key_type: Type for keys
+            value_type: Type for values
+            **options: Additional Redis options
+
+        Returns:
+            Initialized RedisChannel
+        """
+        from .channels_redis import RedisChannel
+
+        # Get maxsize from options
+        maxsize = options.get('maxsize', 1000)
+
+        # Create Redis channel
+        channel = RedisChannel(
+            app=self,
+            channel_name=name,
+            maxsize=maxsize,
+            key_type=key_type,
+            value_type=value_type,
+            **options
+        )
+
+        # Redis channels don't require explicit start() method
+        # The connection is lazy-initialized on first use
+
+        return channel
+
+    async def _create_flight_channel(
+        self,
+        name: str,
+        flight_url: str,
+        key_type: Optional[Type] = None,
+        value_type: Optional[Type] = None,
+        **options
+    ):
+        """
+        Create and initialize an Arrow Flight channel.
+
+        Args:
+            name: Flight channel name (used as path)
+            flight_url: Flight server URL
+            key_type: Type for keys
+            value_type: Type for values
+            **options: Additional Flight options
+
+        Returns:
+            Initialized FlightChannel
+        """
+        from .channels_flight import FlightChannel
+
+        # Get maxsize from options
+        maxsize = options.get('maxsize', 1000)
+
+        # Get or construct path
+        path = options.get('path', f"/sabot/channels/{name}")
+
+        # Create Flight channel
+        channel = FlightChannel(
+            app=self,
+            location=flight_url,
+            path=path,
+            maxsize=maxsize,
+            key_type=key_type,
+            value_type=value_type,
+            **options
+        )
+
+        # Flight channels don't require explicit start() method
+        # The connection is established on first use
+
+        return channel
 
 
 class Topic(TopicT):

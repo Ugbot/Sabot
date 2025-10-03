@@ -1,11 +1,18 @@
 # Sabot Stub Implementation Inventory
 
-**Generated:** October 2, 2025
-**Version:** 0.1.0-alpha
-**Total NotImplementedError Count:** ~1,450 (reduced after P0/P1 completion)
-**Total TODO/FIXME Comments:** ~5,650 (reduced after P0/P1 completion)
+**⚠️ THIS DOCUMENT IS OUTDATED**
+**See [REALITY_CHECK.md](REALITY_CHECK.md) for current ground truth status**
 
-This document catalogs all stub implementations, TODOs, and incomplete features in the Sabot codebase to provide transparency about what's working and what needs completion.
+**Generated:** October 2, 2025 (Outdated)
+**Version:** 0.1.0-alpha
+**Status:** Historical - Many claims of completion are aspirational
+
+**Actual Current Status (October 2, 2025):**
+- **NotImplementedError Count:** **84** (in actual sabot code, excluding vendor)
+- **TODO/FIXME Comments:** **4,209** (actual count)
+- **Mock/Stub References:** **1,080**
+
+This document catalogs stub implementations but contains outdated "completion" claims. See [REALITY_CHECK.md](REALITY_CHECK.md) for accurate status.
 
 ---
 
