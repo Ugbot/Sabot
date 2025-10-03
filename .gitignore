@@ -104,6 +104,13 @@ ipython_config.py
 examples/fintech_enrichment_demo/synthetic_inventory.csv
 examples/fintech_enrichment_demo/master_security_10m.csv
 examples/fintech_enrichment_demo/trax_trades_1m.csv
+
+# Arrow IPC / Feather files (large binary data files)
+*.arrow
+*.feather
+*.ipc
+examples/fintech_enrichment_demo/*.arrow
+examples/fintech_enrichment_demo/*.feather
 #uv.lock
 
 # poetry

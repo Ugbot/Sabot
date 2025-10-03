@@ -163,6 +163,7 @@ def find_pyx_files():
 
         # Zero-copy Arrow compute functions
         "sabot/_c/arrow_core.pyx",  # Core zero-copy compute functions (window_ids, sort_and_take, hash_join)
+        "sabot/_c/data_loader.pyx",  # High-performance data loader (CSV, Arrow IPC)
 
         # Zero-copy Arrow operators (using cimport pyarrow.lib)
         "sabot/core/_ops.pyx",  # Core zero-copy stream operators

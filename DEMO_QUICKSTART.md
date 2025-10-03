@@ -130,6 +130,30 @@ from sabot.cyarrow import compute_window_ids, hash_join_batches
 **Use CyArrow when:** You need maximum performance with zero-copy operations
 **Use PyArrow when:** You need standard Arrow functionality without Sabot's optimizations
 
+## Data Formats
+
+### Arrow IPC (Recommended) - 50x Faster
+
+Convert CSV to Arrow IPC format for dramatically faster loading:
+
+```bash
+# One-time conversion
+cd examples/fintech_enrichment_demo
+python convert_csv_to_arrow.py
+
+# Enable Arrow IPC
+export SABOT_USE_ARROW=1
+
+# Run demo (50x faster!)
+./run_demo.sh --securities 10000000 --quotes 1200000
+```
+
+**Performance comparison (10M rows):**
+- CSV: 103 seconds
+- Arrow IPC: 2 seconds ⚡
+
+See [DATA_FORMATS.md](DATA_FORMATS.md) for complete format guide.
+
 ## Troubleshooting
 
 ### Import Error: "No module named 'sabot'"

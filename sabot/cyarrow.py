@@ -394,3 +394,12 @@ if USING_ZERO_COPY:
         'hash_join_batches',
         'sort_and_take',
     ])
+
+# High-performance data loader (always try to import)
+try:
+    from ._c.data_loader import DataLoader, load_data, convert_csv_to_arrow
+    DATA_LOADER_AVAILABLE = True
+    __all__.extend(['DataLoader', 'load_data', 'convert_csv_to_arrow', 'DATA_LOADER_AVAILABLE'])
+except ImportError as e:
+    logger.debug(f"Cython DataLoader not available: {e}")
+    DATA_LOADER_AVAILABLE = False
