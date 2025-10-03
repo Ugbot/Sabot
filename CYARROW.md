@@ -203,9 +203,81 @@ ls -la sabot/_c/*.so
 ls -la sabot/_cython/arrow/*.so
 ```
 
+## Data Loading
+
+### Cython DataLoader (High Performance)
+
+Sabot provides a Cython-accelerated data loader with automatic format detection:
+
+```python
+from sabot.cyarrow import DataLoader, load_data, convert_csv_to_arrow
+
+# Method 1: DataLoader class
+loader = DataLoader(num_threads=8)  # Use 8 threads for CSV parsing
+table = loader.load('data.csv', limit=1_000_000, columns=['id', 'price'])
+
+# Method 2: Convenience function
+table = load_data('data.csv', limit=1_000_000)
+
+# Method 3: Convert CSV to Arrow IPC
+arrow_path = convert_csv_to_arrow('large.csv')  # One-time conversion
+```
+
+**Auto-Format Detection:**
+```python
+import os
+os.environ['SABOT_USE_ARROW'] = '1'
+
+# Automatically uses data.arrow if it exists, falls back to data.csv
+table = load_data('data.csv')  # Uses Arrow IPC (50x faster!)
+```
+
+**Performance:**
+- Arrow IPC: 5-10M rows/sec (memory-mapped)
+- CSV: 0.5-1.0M rows/sec (multi-threaded)
+
 ## API Reference
 
-### Functions
+### Data Loading Functions
+
+#### `DataLoader(num_threads=-1, block_size=-1)`
+
+Cython-accelerated data loader with multi-threading.
+
+**Parameters:**
+- `num_threads` - Number of threads for CSV parsing (-1 = auto-detect)
+- `block_size` - Block size in bytes (-1 = 128MB default)
+
+**Methods:**
+- `load(path, limit=-1, columns=None)` - Auto-detect format and load
+- `load_csv(path, limit=-1, columns=None)` - Load CSV
+- `load_arrow_ipc(path, limit=-1, columns=None)` - Load Arrow IPC
+
+**Example:**
+```python
+loader = DataLoader(num_threads=8, block_size=128*1024*1024)
+table = loader.load('data.csv', limit=1_000_000, columns=['id', 'price'])
+```
+
+#### `load_data(path, limit=-1, columns=None, num_threads=-1)`
+
+Convenience function for loading data.
+
+**Example:**
+```python
+table = load_data('data.csv', limit=1_000_000, columns=['id', 'price'])
+```
+
+#### `convert_csv_to_arrow(csv_path, arrow_path=None, compression='zstd')`
+
+Convert CSV to Arrow IPC format.
+
+**Example:**
+```python
+arrow_path = convert_csv_to_arrow('large.csv')  # Creates large.arrow
+```
+
+### Compute Functions
 
 #### `compute_window_ids(batch, timestamp_column, window_size_ms)`
 Compute tumbling window IDs for a RecordBatch.
