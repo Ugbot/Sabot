@@ -2,6 +2,7 @@
 """Sabot Command Line Interface - High-performance streaming with Arrow + Faust-inspired agents."""
 
 import asyncio
+import importlib
 import json
 import os
 import sys
@@ -41,24 +42,58 @@ except ImportError:
 
 # from .app import create_app  # Temporarily commented out to avoid import issues
 
-# Mock create_app for CLI testing
-def create_app(id: str = "sabot", broker: str = "memory://", **kwargs):
-    """Mock create_app function for CLI testing."""
-    class MockApp:
-        def __init__(self, app_id, broker):
-            self.id = app_id
-            self.broker = broker
+def load_app_from_spec(app_spec: str):
+    """
+    Load Sabot App from module:attribute specification.
 
-        async def run(self):
-            console.print(f"[bold green]Mock app '{self.id}' running with broker '{self.broker}'[/bold green]")
-            console.print("[dim]Press Ctrl+C to stop...[/dim]")
-            try:
-                while True:
-                    await asyncio.sleep(1)
-            except KeyboardInterrupt:
-                console.print("\n[dim]Mock app stopped[/dim]")
+    Args:
+        app_spec: String in format 'module.path:app_name'
+                  Example: 'examples.fraud_app:app'
 
-    return MockApp(id, broker)
+    Returns:
+        App instance
+
+    Raises:
+        ValueError: If app_spec format is invalid
+        ImportError: If module cannot be imported
+        AttributeError: If app attribute doesn't exist
+    """
+    if ':' not in app_spec:
+        raise ValueError(
+            f"Invalid app specification '{app_spec}'. "
+            "Expected format: 'module.path:attribute'"
+        )
+
+    module_name, app_name = app_spec.split(':', 1)
+
+    # Add current directory to path for local imports
+    cwd = Path.cwd()
+    if str(cwd) not in sys.path:
+        sys.path.insert(0, str(cwd))
+
+    try:
+        module = importlib.import_module(module_name)
+    except ImportError as e:
+        raise ImportError(
+            f"Cannot import module '{module_name}': {e}"
+        ) from e
+
+    try:
+        app = getattr(module, app_name)
+    except AttributeError as e:
+        raise AttributeError(
+            f"Module '{module_name}' has no attribute '{app_name}'"
+        ) from e
+
+    # Verify it's an App instance
+    from sabot.app import App
+    if not isinstance(app, App):
+        raise TypeError(
+            f"'{app_name}' is not a Sabot App instance. "
+            f"Got {type(app).__name__}"
+        )
+
+    return app
 
 # Console for rich output
 console = Console()
@@ -75,6 +110,7 @@ workers_app = typer.Typer(help="Worker process management")
 agents_app = typer.Typer(help="Agent lifecycle management")
 streams_app = typer.Typer(help="Stream and topic management")
 tables_app = typer.Typer(help="Table and state management")
+jobs_app = typer.Typer(help="Durable job management with DBOS")
 monitoring_app = typer.Typer(help="Monitoring and metrics")
 telemetry_app = typer.Typer(help="OpenTelemetry tracing and metrics")
 benchmarks_app = typer.Typer(help="Performance benchmarking")
@@ -86,6 +122,7 @@ app.add_typer(workers_app, name="workers")
 app.add_typer(agents_app, name="agents")
 app.add_typer(streams_app, name="streams")
 app.add_typer(tables_app, name="tables")
+app.add_typer(jobs_app, name="jobs")
 app.add_typer(monitoring_app, name="monitoring")
 app.add_typer(telemetry_app, name="telemetry")
 app.add_typer(benchmarks_app, name="benchmarks")
@@ -119,19 +156,102 @@ def worker(
     workers: int = typer.Option(1, "-c", "--concurrency", help="Number of worker processes"),
     broker: Optional[str] = typer.Option(None, "-b", "--broker", help="Override broker URL"),
     log_level: str = typer.Option("INFO", "-l", "--loglevel", help="Logging level"),
+    durable: bool = typer.Option(True, "--durable/--no-durable", help="Use DBOS durable execution"),
+    job_id: Optional[str] = typer.Option(None, help="Custom job ID (auto-generated if not provided)"),
 ):
     """Start Sabot worker (Faust-style: sabot -A myapp:app worker)."""
-    # Delegate to workers_start
-    workers_start(
-        app_module=None,
-        app_flag=app_spec,
-        workers=workers,
-        broker=broker,
-        redis=None,
-        rocksdb=None,
-        daemon=False,
-        log_level=log_level
+    import logging
+    import uuid
+
+    # Configure logging
+    logging.basicConfig(
+        level=getattr(logging, log_level.upper()),
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
+    logger = logging.getLogger(__name__)
+
+    try:
+        if durable:
+            # Use DBOS orchestrator for durable execution
+            from .dbos_orchestrator import init_orchestrator, JobSpec
+
+            # Initialize orchestrator
+            orchestrator = init_orchestrator()
+
+            # Generate job ID if not provided
+            if job_id is None:
+                job_id = f"worker-{uuid.uuid4().hex[:8]}"
+
+            # Create job specification
+            job_spec = JobSpec(
+                job_id=job_id,
+                job_type="worker",
+                app_spec=app_spec,
+                command="worker",
+                args={
+                    "workers": workers,
+                    "broker": broker,
+                    "log_level": log_level,
+                }
+            )
+
+            # Display durable execution info
+            console.print(Panel(
+                f"[bold green]Starting Sabot Worker (Durable)[/bold green]\n"
+                f"Job ID: {job_id}\n"
+                f"App: {app_spec}\n"
+                f"Broker: {broker or 'default'}\n"
+                f"Workers: {workers}\n"
+                f"Log Level: {log_level}\n"
+                f"Database: {orchestrator.get_database_path()}",
+                title="Durable Worker Configuration"
+            ))
+
+            # Submit durable job
+            logger.info(f"Submitting durable worker job {job_id}")
+            workflow_handle = asyncio.run(orchestrator.submit_job(job_spec))
+
+            console.print(f"[bold green]✓[/bold green] Durable job submitted: {workflow_handle}")
+            console.print(f"[dim]Use 'sabot jobs status {job_id}' to check status[/dim]")
+            console.print(f"[dim]Use 'sabot jobs cancel {job_id}' to cancel if needed[/dim]")
+
+        else:
+            # Use direct execution (legacy mode)
+            console.print("[yellow]⚠️  Using non-durable execution mode[/yellow]")
+
+            # Load the app
+            logger.info(f"Loading app from: {app_spec}")
+            app_instance = load_app_from_spec(app_spec)
+
+            # Override broker if specified
+            if broker:
+                app_instance.broker = broker
+                logger.info(f"Broker overridden to: {broker}")
+
+            # Display app info
+            console.print(Panel(
+                f"[bold green]Starting Sabot Worker (Direct)[/bold green]\n"
+                f"App: {app_instance.id}\n"
+                f"Broker: {app_instance.broker}\n"
+                f"Workers: {workers}\n"
+                f"Log Level: {log_level}",
+                title="Worker Configuration"
+            ))
+
+            # Start the app
+            import asyncio
+            asyncio.run(app_instance.run())
+
+    except (ValueError, ImportError, AttributeError, TypeError) as e:
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        raise typer.Exit(code=1)
+    except KeyboardInterrupt:
+        console.print("\n[dim]Worker stopped by user[/dim]")
+        raise typer.Exit(code=0)
+    except Exception as e:
+        logger.exception("Unexpected error starting worker")
+        console.print(f"[bold red]Unexpected error:[/bold red] {e}")
+        raise typer.Exit(code=1)
 
 
 @app.command()
@@ -349,7 +469,8 @@ def shell(
     console.print("[bold blue]Starting Sabot interactive shell...[/bold blue]")
 
     # Create app instance
-    app = create_app(app_id, broker=broker)
+    from sabot.app import App
+    app = App(app_id, broker=broker)
 
     # Make app available in shell
     IPython.embed(
@@ -404,19 +525,9 @@ def workers_start(
     console.print(f"[dim]Loading {app_spec}[/dim]")
 
     try:
-        # Import the application
-        if ":" not in app_spec:
-            console.print(f"[bold red]Error:[/bold red] App spec must be 'module:app', got: {app_spec}")
-            raise typer.Exit(1)
-
-        module_name, app_name = app_spec.split(":", 1)
-
-        # Import module
-        import importlib
-        module = importlib.import_module(module_name)
-        sabot_app = getattr(module, app_name)
-
-        console.print(f"[green]✓[/green] Loaded {module_name}:{app_name}")
+        # Load the application using the standard loader
+        sabot_app = load_app_from_spec(app_spec)
+        console.print(f"[green]✓[/green] Loaded {app_spec}")
 
         # Override configuration if provided
         if broker:
@@ -441,12 +552,9 @@ def workers_start(
         console.print(f"\n[bold green]Starting Sabot application...[/bold green]")
         asyncio.run(sabot_app.run())
 
-    except ImportError as e:
-        console.print(f"[bold red]✗[/bold red] Failed to import module: {e}")
-        console.print(f"[dim]Make sure the module is in your PYTHONPATH[/dim]")
-        raise typer.Exit(1)
-    except AttributeError as e:
-        console.print(f"[bold red]✗[/bold red] App '{app_name}' not found in module '{module_name}'")
+    except (ValueError, ImportError, AttributeError, TypeError) as e:
+        console.print(f"[bold red]✗[/bold red] Failed to load app: {e}")
+        console.print(f"[dim]Make sure the module is in your PYTHONPATH and the app is a Sabot App instance[/dim]")
         raise typer.Exit(1)
     except KeyboardInterrupt:
         console.print("\n[yellow]⚠[/yellow] Interrupted by user")
@@ -1439,6 +1547,209 @@ def agents():
     console.print("[dim]Use 'sabot agents' for agent management[/dim]")
     # For now, just delegate to the main CLI
     main()
+
+
+# ============================================================================
+# DURABLE JOB MANAGEMENT (DBOS-based)
+# ============================================================================
+
+@jobs_app.command("submit")
+def jobs_submit(
+    job_type: str = typer.Argument(..., help="Job type (worker, agent, stream, table)"),
+    app_spec: str = typer.Option(..., "-A", "--app", help="App module specification"),
+    job_id: Optional[str] = typer.Option(None, help="Custom job ID (auto-generated if not provided)"),
+    priority: str = typer.Option("normal", help="Job priority (low, normal, high)"),
+    timeout: Optional[int] = typer.Option(None, help="Job timeout in seconds"),
+):
+    """Submit a durable job for execution."""
+    import uuid
+    from .dbos_orchestrator import init_orchestrator, JobSpec
+
+    try:
+        # Initialize orchestrator
+        orchestrator = init_orchestrator()
+
+        # Generate job ID if not provided
+        if job_id is None:
+            job_id = f"{job_type}-{uuid.uuid4().hex[:8]}"
+
+        # Create job specification
+        job_spec = JobSpec(
+            job_id=job_id,
+            job_type=job_type,
+            app_spec=app_spec,
+            command=job_type,
+            args={},
+            priority=priority,
+            timeout_seconds=timeout,
+        )
+
+        # Submit job
+        import asyncio
+        from .dbos_orchestrator import submit_job
+        workflow_handle = asyncio.run(submit_job(job_spec))
+
+        console.print(f"[bold green]✓[/bold green] Job submitted successfully")
+        console.print(f"Job ID: {job_id}")
+        console.print(f"Job Type: {job_type}")
+        console.print(f"Workflow Handle: {workflow_handle}")
+
+    except Exception as e:
+        console.print(f"[bold red]Error submitting job:[/bold red] {e}")
+        raise typer.Exit(code=1)
+
+
+@jobs_app.command("list")
+def jobs_list(
+    status: Optional[str] = typer.Option(None, help="Filter by status"),
+    job_type: Optional[str] = typer.Option(None, help="Filter by job type"),
+    limit: int = typer.Option(50, help="Maximum number of jobs to show"),
+):
+    """List durable jobs."""
+    from .dbos_orchestrator import init_orchestrator
+
+    try:
+        # Initialize orchestrator
+        orchestrator = init_orchestrator()
+
+        # Get jobs
+        import asyncio
+        jobs = asyncio.run(orchestrator.list_jobs(status=status))
+
+        if not jobs:
+            console.print("[dim]No jobs found[/dim]")
+            return
+
+        # Display jobs table
+        table = Table(title="Durable Jobs")
+        table.add_column("Job ID", style="cyan")
+        table.add_column("Type", style="green")
+        table.add_column("Status", style="yellow")
+        table.add_column("Created", style="blue")
+
+        for job in jobs[:limit]:
+            table.add_row(
+                job.get("job_id", "unknown"),
+                job.get("job_type", "unknown"),
+                job.get("status", "unknown"),
+                job.get("created_at", "unknown")
+            )
+
+        console.print(table)
+        console.print(f"\n[dim]Showing {min(len(jobs), limit)} of {len(jobs)} jobs[/dim]")
+        console.print(f"[dim]Database: {orchestrator.get_database_path()}[/dim]")
+
+    except Exception as e:
+        console.print(f"[bold red]Error listing jobs:[/bold red] {e}")
+        raise typer.Exit(code=1)
+
+
+@jobs_app.command("status")
+def jobs_status(
+    job_id: str = typer.Argument(..., help="Job ID to check"),
+):
+    """Get status of a specific job."""
+    from .dbos_orchestrator import init_orchestrator
+
+    try:
+        # Initialize orchestrator
+        orchestrator = init_orchestrator()
+
+        # Get job status
+        import asyncio
+        status = asyncio.run(orchestrator.get_job_status(job_id))
+
+        if not status:
+            console.print(f"[bold red]Job not found:[/bold red] {job_id}")
+            raise typer.Exit(code=1)
+
+        # Display status
+        console.print(f"[bold blue]Job Status: {job_id}[/bold blue]")
+        console.print(f"Status: {status.get('status', 'unknown')}")
+        console.print(f"Progress: {status.get('progress', 0)}%")
+
+        if 'result' in status:
+            console.print(f"Result: {status['result']}")
+        if 'error' in status:
+            console.print(f"[bold red]Error:[/bold red] {status['error']}")
+
+    except Exception as e:
+        console.print(f"[bold red]Error getting job status:[/bold red] {e}")
+        raise typer.Exit(code=1)
+
+
+@jobs_app.command("cancel")
+def jobs_cancel(
+    job_id: str = typer.Argument(..., help="Job ID to cancel"),
+    force: bool = typer.Option(False, help="Force cancel without confirmation"),
+):
+    """Cancel a running job."""
+    if not force:
+        if not Confirm.ask(f"Are you sure you want to cancel job '{job_id}'?"):
+            raise typer.Abort()
+
+    from .dbos_orchestrator import init_orchestrator
+
+    try:
+        # Initialize orchestrator
+        orchestrator = init_orchestrator()
+
+        # Cancel job
+        import asyncio
+        success = asyncio.run(orchestrator.cancel_job(job_id))
+
+        if success:
+            console.print(f"[bold green]✓[/bold green] Job cancelled: {job_id}")
+        else:
+            console.print(f"[bold red]Failed to cancel job:[/bold red] {job_id}")
+
+    except Exception as e:
+        console.print(f"[bold red]Error cancelling job:[/bold red] {e}")
+        raise typer.Exit(code=1)
+
+
+@jobs_app.command("db")
+def jobs_db(
+    show_path: bool = typer.Option(False, "--path", help="Show database path only"),
+    info: bool = typer.Option(False, "--info", help="Show database information"),
+):
+    """Show information about the DBOS database."""
+    from .dbos_orchestrator import init_orchestrator
+
+    try:
+        # Initialize orchestrator
+        orchestrator = init_orchestrator()
+
+        db_path = orchestrator.get_database_path()
+        db_url = orchestrator.get_database_url()
+
+        if show_path:
+            console.print(db_path)
+            return
+
+        if info:
+            from pathlib import Path
+            db_file = Path(db_path)
+            if db_file.exists():
+                size_mb = db_file.stat().st_size / (1024 * 1024)
+                console.print(f"[bold blue]DBOS Database Information[/bold blue]")
+                console.print(f"Path: {db_path}")
+                console.print(f"URL: {db_url}")
+                console.print(f"Size: {size_mb:.2f} MB")
+                console.print(f"Exists: ✅")
+            else:
+                console.print(f"[bold yellow]Database not yet created[/bold yellow]")
+                console.print(f"Path: {db_path}")
+                console.print(f"URL: {db_url}")
+        else:
+            console.print(f"[bold blue]DBOS Database[/bold blue]")
+            console.print(f"Path: {db_path}")
+            console.print(f"URL: {db_url}")
+            console.print(f"\n[dim]Use --info for detailed information[/dim]")
+
+    except Exception as e:
+        console.print(f"[bold red]Error accessing database:[/bold red] {e}")
+        raise typer.Exit(code=1)
 
 
 def interactive():

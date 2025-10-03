@@ -1,37 +1,68 @@
-# Sabot Development Roadmap: Detailed Implementation Plan
-## Goal: Production-Ready Streaming Engine to Surpass Faust & Compete with Flink
+# Sabot Development Roadmap - Reality-Based Update
+**Last Updated:** October 2, 2025
+**Status:** OUTDATED - See updated roadmaps
 
 ---
 
-## 🎯 **Mission Statement**
-Build the definitive Python streaming engine with:
-- **Arrow-Native Performance**: True zero-copy columnar processing
-- **Enterprise Features**: Exactly-once semantics, fault tolerance, auto-scaling
-- **Developer Excellence**: Superior DX with rich tooling and debugging
-- **Production Hardened**: Battle-tested reliability and observability
+## ⚠️ **THIS DOCUMENT IS OUTDATED**
+
+**Original claims were aspirational. See these updated documents for realistic roadmaps:**
+
+1. **[NEXT_IMPLEMENTATION_GUIDE.md](NEXT_IMPLEMENTATION_GUIDE.md)** - Immediate 3-month plan
+2. **[FLINK_PARITY_ROADMAP.md](FLINK_PARITY_ROADMAP.md)** - Long-term Flink comparison
+3. **[CURRENT_PRIORITIES.md](../../CURRENT_PRIORITIES.md)** - Week-by-week priorities
+4. **[REALITY_CHECK.md](../../REALITY_CHECK.md)** - Current ground truth status
 
 ---
 
-## 📊 **Current State Analysis (After 1 Day)**
+## Quick Reality Check
 
-### Implemented Components ✅
-```
-CLI System & TUI           ████████████████████ 95%  - Rich interface, comprehensive commands
-Project Structure          ████████████████████ 90%  - Proper packaging, Docker, tests
-Examples & Documentation   ████████████████████ 85%  - 21 examples, fallback modes
-Type System               ███████████████████  80%  - Strong typing, proper abstractions
-Configuration             ███████████████████  80%  - pyproject.toml, requirements, setup
-```
+**Original Goal:** "Production-Ready Streaming Engine to Surpass Faust & Compete with Flink"
 
-### Critical Missing Components ❌
-```
-Stream Processing Engine  ████                 20%  - Architecture only, no execution
-Arrow Columnar Operations ██                   10%  - Types defined, operations mocked
-Agent Runtime System      ███                  15%  - Framework exists, no deployment
-Distributed Coordination  ██                   10%  - Basic structure, no real clustering
-State Management          ███                  15%  - Interfaces exist, backends incomplete
-Production Features       ██                   10%  - No monitoring, error handling basic
-```
+**Actual Status:**
+- **vs. Faust:** Behind in maturity (Faust is production-ready, Sabot is alpha)
+- **vs. Flink:** 15-20% of Flink's capabilities
+- **Production-Ready:** No - 5% test coverage, CLI mocked, agent runtime incomplete
+
+**Realistic Goals:**
+1. **Short term (3 months):** Get basic features working
+2. **Medium term (6-9 months):** Match Faust capabilities
+3. **Long term (18-24 months):** Selective Flink parity
+
+---
+
+## Corrected Mission Statement
+
+Build a **Python-native streaming engine** with:
+- **Cython Acceleration**: Performance where it matters
+- **Honest Capabilities**: Document what actually works
+- **Python Strengths**: Better DX than Java/Scala frameworks
+- **Realistic Scope**: Focus on core streaming, not everything
+
+---
+
+## 📊 **Actual Current State (October 2, 2025)**
+
+**Original claims vs. reality:**
+
+### What Actually Works ✅
+- **Cython Build:** 31 modules compile
+- **Checkpoint Primitives:** Chandy-Lamport in Cython (<10μs)
+- **State Backends:** Memory + RocksDB complete
+- **Watermark Tracking:** Cython primitives (not integrated)
+- **Basic Kafka:** JSON/Avro deserialization
+- **Fraud Demo:** 3K-6K txn/s measured
+
+### What's Not Working ❌
+- **CLI:** Uses mock App (can't run real apps)
+- **Agent Runtime:** 657 LOC structure, no execution
+- **Arrow Module:** 32 NotImplementedError (stub)
+- **Stream API:** 7 NotImplementedError
+- **Execution Layer:** Designed, not wired
+- **Cluster Coordination:** Not functional
+- **Test Coverage:** ~5%
+
+**Honest Assessment:** ~20-25% functional, not 60-95%
 
 ---
 

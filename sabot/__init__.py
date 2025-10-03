@@ -47,8 +47,8 @@ except ImportError:
     AsyncRedis = None
     StreamManager = None
 
-# Internal Arrow implementation (preferred)
-from . import arrow
+# CyArrow - Sabot's Cython-accelerated Arrow wrapper (preferred over pyarrow)
+from . import cyarrow
 
 # High-level API (new userspace API)
 from .api import Stream, OutputStream, tumbling, sliding, session
@@ -117,8 +117,8 @@ __all__ = [
     "StreamManager",
     "REDIS_AVAILABLE",
 
-    # Arrow (internal implementation)
-    "arrow",
+    # CyArrow (Cython-accelerated Arrow wrapper)
+    "cyarrow",
 
     # High-level API
     "Stream",

@@ -29,8 +29,8 @@ import time
 import random
 
 # Import Sabot Arrow (uses internal or external PyArrow)
-from sabot import arrow as pa
-from sabot.arrow import compute as pc
+from sabot import cyarrow as pa
+from sabot.cyarrow import compute as pc
 
 # Import Sabot Stream API
 from sabot.api import Stream

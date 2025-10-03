@@ -11,7 +11,7 @@ Performance characteristics:
 """
 
 # Import Sabot Arrow (uses internal or external PyArrow)
-from sabot import arrow as pa
+from sabot import cyarrow as pa
 import time
 from datetime import datetime
 
@@ -46,7 +46,7 @@ def demo_basic_stream():
 
     # Map: Add 10% fee to each amount
     def add_fee(batch):
-        from sabot.arrow import compute as pc
+        from sabot.cyarrow import compute as pc
         amounts = batch.column('amount')
         fees = pc.multiply(amounts, 0.1)
         total = pc.add(amounts, fees)

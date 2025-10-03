@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+"""
+Quick launcher for fintech enrichment demo
+Usage: ./demo --securities 500000 --quotes 500000
+"""
+import sys
+import os
+
+# Add Sabot to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Run the demo
+exec(open('examples/fintech_enrichment_demo/arrow_optimized_enrichment.py').read())

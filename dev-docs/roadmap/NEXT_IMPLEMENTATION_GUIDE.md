@@ -1,848 +1,469 @@
-# Sabot Next Implementation Guide
-## From 88% Complete to Production-Ready in 3 Weeks
-
-**Current Status:** 88% Complete (Tested & Verified)
-**Target:** Production Release v0.1.0
-**Timeline:** 3 weeks
+# Next Implementation Guide - Reality-Based
+**Last Updated:** October 2, 2025
+**Status:** Revised based on actual audit
 
 ---
 
-## 📋 **Current State Summary**
+## ⚠️ **REALITY CHECK**
 
-### **What Works (Verified):**
-```
-✅ Python Layer: 8/8 components (100%)
-✅ Cython Layer: 3/4 modules compiled (75%)
-✅ Functional: All core features working
-✅ Performance: Most hot paths Cython-optimized
+**Previous claim:** "88% Complete"
+**Actual status:** ~20-25% functional
 
-Overall: 88% Production-Ready
-```
-
-### **What's Missing:**
-```
-⏳ Cython State Compilation (1 module)
-⏳ Integration Test Suite
-⏳ Performance Benchmarks
-⏳ Production Documentation
-⏳ Example Applications
-```
+This guide provides honest next steps based on what actually works.
 
 ---
 
-## 🗓️ **3-Week Implementation Plan**
+## 📋 **Actual Current State**
+
+### What Works (Verified) ✅
+- **Cython Build System:** 31 modules compile successfully
+- **Checkpoint Coordination:** Chandy-Lamport in Cython (<10μs)
+- **State Backends:** Memory (complete), RocksDB (complete)
+- **Watermark Primitives:** WatermarkTracker in Cython
+- **Basic Kafka:** JSON/Avro deserialization working
+- **Fraud Demo:** 3K-6K txn/s measured
+
+### What's Broken/Missing ❌
+- **CLI:** Uses mock App, doesn't load real applications
+- **Agent Runtime:** 657 lines of structure, no execution
+- **Arrow Module:** 32 NotImplementedError statements
+- **Stream API:** 7 NotImplementedError, untested
+- **Execution Layer:** Designed but not wired up
+- **Cluster Coordination:** Not functional
+- **Test Coverage:** ~5%
 
 ---
 
-## **WEEK 1: Validation & Testing**
+## 🎯 **Realistic 3-Month Plan**
 
-### **Day 1-2: Integration Test Suite**
-**Goal:** Verify exactly-once semantics and recovery
+### **MONTH 1: Fix Critical Blockers**
 
-**File:** `tests/integration/test_exactly_once.py`
-```python
-#!/usr/bin/env python3
-"""
-Integration tests for exactly-once semantics.
-Tests full pipeline with checkpoint, failure, recovery.
-"""
-
-import asyncio
-import pytest
-from sabot import create_app
-from sabot.stores.memory import MemoryBackend
-from sabot.stores.checkpoint import CheckpointManager, CheckpointConfig
-
-@pytest.mark.asyncio
-async def test_exactly_once_with_checkpoint():
-    """
-    Test exactly-once semantics with checkpoint and recovery.
-
-    Pipeline: Source -> Stateful Processor -> Sink
-    1. Process 100 events with state
-    2. Create checkpoint at event 50
-    3. Inject failure at event 75
-    4. Recover from checkpoint
-    5. Verify: no duplicates, no data loss, correct state
-    """
-    # Setup
-    app = create_app("test_exactly_once")
-    backend = MemoryBackend()
-    checkpoint_mgr = CheckpointManager(
-        backend,
-        CheckpointConfig(interval_seconds=1, enabled=True)
-    )
-
-    # Track processed events
-    processed_events = []
-    state_values = {}
-
-    @app.agent()
-    async def stateful_processor(stream):
-        """Process with state tracking."""
-        counter = 0
-
-        async for event in stream:
-            counter += 1
-
-            # Checkpoint at event 50
-            if counter == 50:
-                checkpoint_id = await checkpoint_mgr.create_checkpoint(force=True)
-                assert checkpoint_id is not None
-
-            # Simulate failure at event 75
-            if counter == 75:
-                raise SimulatedFailure("Injected failure for testing")
-
-            # Track processing
-            processed_events.append(event)
-            state_values[counter] = event
-
-            yield event
-
-    # Test execution
-    try:
-        # Process 100 events
-        events = [{"id": i, "value": i * 10} for i in range(100)]
-        await app.send("input_topic", events)
-
-        # Should fail at event 75
-        await app.run()
-
-    except SimulatedFailure:
-        # Expected failure
-        pass
-
-    # Recovery
-    await checkpoint_mgr.restore_checkpoint()
-
-    # Continue from checkpoint (event 50)
-    await app.run()
-
-    # Verify results
-    assert len(processed_events) == 100, "Should process all events"
-    assert len(set(processed_events)) == 100, "No duplicates"
-    assert state_values[100] == {"id": 99, "value": 990}, "Correct final state"
-
-    print("✅ Exactly-once test passed")
-
-
-@pytest.mark.asyncio
-async def test_state_recovery():
-    """
-    Test state recovery after failure.
-
-    1. Build complex state (counters, lists, maps)
-    2. Create checkpoint
-    3. Simulate crash
-    4. Recover from checkpoint
-    5. Verify all state restored correctly
-    """
-    backend = MemoryBackend()
-    checkpoint_mgr = CheckpointManager(backend, CheckpointConfig())
-
-    # Build state
-    await backend.set("counter", 12345)
-    await backend.set("list_state", [1, 2, 3, 4, 5])
-    await backend.set("map_state", {"key1": "value1", "key2": "value2"})
-
-    # Checkpoint
-    checkpoint_id = await checkpoint_mgr.create_checkpoint(force=True)
-    assert checkpoint_id is not None
-
-    # Simulate crash (clear backend)
-    await backend.clear()
-    assert await backend.get("counter") is None
-
-    # Recovery
-    success = await checkpoint_mgr.restore_checkpoint(checkpoint_id)
-    assert success
-
-    # Verify
-    assert await backend.get("counter") == 12345
-    assert await backend.get("list_state") == [1, 2, 3, 4, 5]
-    assert await backend.get("map_state") == {"key1": "value1", "key2": "value2"}
-
-    print("✅ State recovery test passed")
-
-
-@pytest.mark.asyncio
-async def test_watermark_propagation():
-    """
-    Test watermark propagation through multi-operator pipeline.
-
-    Pipeline: Source -> Map -> Window -> Sink
-    1. Generate events with timestamps
-    2. Track watermark at each operator
-    3. Verify watermark advances correctly
-    4. Test timer firing on watermark advance
-    """
-    from sabot._cython.time import WatermarkTracker, TimerService
-
-    tracker = WatermarkTracker()
-    timers_fired = []
-
-    # Register timer for timestamp 100
-    def timer_callback(timestamp, data):
-        timers_fired.append((timestamp, data))
-
-    # Simulate event processing
-    events = [
-        {"timestamp": 10, "value": "a"},
-        {"timestamp": 50, "value": "b"},
-        {"timestamp": 90, "value": "c"},
-        {"timestamp": 120, "value": "d"},
-    ]
-
-    for event in events:
-        # Update watermark (subtract allowed lateness)
-        watermark = event["timestamp"] - 10
-        tracker.update_watermark(0, watermark)
-
-        # Check if timer should fire (timestamp 100)
-        if watermark >= 100:
-            timer_callback(100, "timer_fired")
-
-    # Verify
-    assert len(timers_fired) == 1, "Timer should fire once"
-    assert timers_fired[0] == (100, "timer_fired")
-
-    print("✅ Watermark propagation test passed")
-
-
-class SimulatedFailure(Exception):
-    """Exception for simulating failures in tests."""
-    pass
-
-
-if __name__ == "__main__":
-    asyncio.run(test_exactly_once_with_checkpoint())
-    asyncio.run(test_state_recovery())
-    asyncio.run(test_watermark_propagation())
-    print("\n✅ ALL INTEGRATION TESTS PASSED")
-```
-
-**Run:**
-```bash
-pytest tests/integration/test_exactly_once.py -v
-```
-
----
-
-### **Day 3-5: Performance Benchmarks**
-**Goal:** Measure throughput, latency, state operations
-
-**File:** `benchmarks/benchmark_complete.py`
-```python
-#!/usr/bin/env python3
-"""
-Comprehensive performance benchmarks for Sabot.
-Measures throughput, latency, and state operations.
-"""
-
-import time
-import asyncio
-import statistics
-from sabot import create_app
-from sabot.stores.memory import MemoryBackend
-from sabot.stores.rocksdb import RocksDBBackend
-
-def benchmark_throughput():
-    """
-    Benchmark event processing throughput.
-    Target: 1M+ events/sec
-    """
-    print("=" * 60)
-    print("BENCHMARK: Throughput")
-    print("=" * 60)
-
-    app = create_app("benchmark_throughput")
-    processed_count = 0
-    start_time = time.time()
-
-    @app.agent()
-    async def processor(stream):
-        nonlocal processed_count
-        async for event in stream:
-            processed_count += 1
-            yield event
-
-    # Process 1M events
-    events = [{"id": i, "value": i} for i in range(1_000_000)]
-
-    # Run
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(app.send("input", events))
-
-    duration = time.time() - start_time
-    throughput = processed_count / duration
-
-    print(f"Processed: {processed_count:,} events")
-    print(f"Duration: {duration:.2f}s")
-    print(f"Throughput: {throughput:,.0f} events/sec")
-
-    # Target check
-    if throughput >= 1_000_000:
-        print("✅ PASS: Meets 1M events/sec target")
-    else:
-        print(f"⚠️  INFO: {throughput:,.0f} events/sec (target: 1M)")
-
-
-def benchmark_latency():
-    """
-    Benchmark end-to-end latency.
-    Target: <10ms p99
-    """
-    print("\n" + "=" * 60)
-    print("BENCHMARK: Latency")
-    print("=" * 60)
-
-    latencies = []
-
-    for i in range(10000):
-        start = time.perf_counter()
-
-        # Simulate event processing
-        # (in real test, measure actual pipeline latency)
-        event = {"timestamp": time.time_ns(), "value": i}
-        result = event  # Process event
-
-        end = time.perf_counter()
-        latencies.append((end - start) * 1000)  # Convert to ms
-
-    # Calculate percentiles
-    latencies.sort()
-    p50 = statistics.median(latencies)
-    p99 = latencies[int(len(latencies) * 0.99)]
-    p999 = latencies[int(len(latencies) * 0.999)]
-
-    print(f"p50 latency: {p50:.2f}ms")
-    print(f"p99 latency: {p99:.2f}ms")
-    print(f"p999 latency: {p999:.2f}ms")
-
-    # Target check
-    if p99 < 10:
-        print("✅ PASS: p99 < 10ms")
-    else:
-        print(f"⚠️  INFO: p99 = {p99:.2f}ms (target: <10ms)")
-
-
-def benchmark_state_operations():
-    """
-    Benchmark state get/put operations.
-    Target: <1ms (RocksDB), <100ns (memory)
-    """
-    print("\n" + "=" * 60)
-    print("BENCHMARK: State Operations")
-    print("=" * 60)
-
-    # Test Memory backend
-    backend = MemoryBackend()
-    put_times = []
-    get_times = []
-
-    # Warm up
-    for i in range(1000):
-        asyncio.run(backend.set(f"key_{i}", i))
-
-    # Benchmark puts
-    for i in range(10000):
-        start = time.perf_counter()
-        asyncio.run(backend.set(f"key_{i}", i))
-        put_times.append((time.perf_counter() - start) * 1_000_000)  # μs
-
-    # Benchmark gets
-    for i in range(10000):
-        start = time.perf_counter()
-        asyncio.run(backend.get(f"key_{i}"))
-        get_times.append((time.perf_counter() - start) * 1_000_000)  # μs
-
-    print(f"\nMemory Backend:")
-    print(f"  PUT p50: {statistics.median(put_times):.2f}μs")
-    print(f"  PUT p99: {statistics.quantiles(put_times, n=100)[98]:.2f}μs")
-    print(f"  GET p50: {statistics.median(get_times):.2f}μs")
-    print(f"  GET p99: {statistics.quantiles(get_times, n=100)[98]:.2f}μs")
-
-    # Target check (memory should be <1ms = 1000μs)
-    put_p99 = statistics.quantiles(put_times, n=100)[98]
-    get_p99 = statistics.quantiles(get_times, n=100)[98]
-
-    if put_p99 < 1000 and get_p99 < 1000:
-        print("✅ PASS: Memory state <1ms")
-    else:
-        print(f"⚠️  INFO: PUT p99 = {put_p99:.2f}μs, GET p99 = {get_p99:.2f}μs")
-
-
-def benchmark_checkpoint_time():
-    """
-    Benchmark checkpoint creation time.
-    Target: <5s for 10GB state
-    """
-    print("\n" + "=" * 60)
-    print("BENCHMARK: Checkpoint Time")
-    print("=" * 60)
-
-    backend = MemoryBackend()
-
-    # Build 1GB of state (1M entries of ~1KB each)
-    print("Building 1GB state...")
-    for i in range(1_000_000):
-        key = f"key_{i}"
-        value = b"x" * 1024  # 1KB
-        asyncio.run(backend.set(key, value))
-
-        if i % 100000 == 0:
-            print(f"  {i:,} entries written...")
-
-    # Benchmark checkpoint
-    from sabot.stores.checkpoint import CheckpointManager, CheckpointConfig
-
-    checkpoint_mgr = CheckpointManager(backend, CheckpointConfig())
-
-    print("\nCreating checkpoint...")
-    start = time.time()
-    checkpoint_id = asyncio.run(checkpoint_mgr.create_checkpoint(force=True))
-    duration = time.time() - start
-
-    print(f"Checkpoint created: {checkpoint_id}")
-    print(f"Duration: {duration:.2f}s")
-    print(f"Estimated for 10GB: {duration * 10:.2f}s")
-
-    # Target check (should scale linearly)
-    estimated_10gb = duration * 10
-    if estimated_10gb < 5.0:
-        print("✅ PASS: Checkpoint time <5s for 10GB")
-    else:
-        print(f"⚠️  INFO: Estimated {estimated_10gb:.2f}s for 10GB (target: <5s)")
-
-
-if __name__ == "__main__":
-    print("\n🏁 SABOT PERFORMANCE BENCHMARKS\n")
-
-    benchmark_throughput()
-    benchmark_latency()
-    benchmark_state_operations()
-    benchmark_checkpoint_time()
-
-    print("\n" + "=" * 60)
-    print("BENCHMARKS COMPLETE")
-    print("=" * 60)
-```
-
-**Run:**
-```bash
-python benchmarks/benchmark_complete.py
-```
-
----
-
-## **WEEK 2: Production Hardening**
-
-### **Day 1-2: Error Handling & Monitoring**
-**Goal:** Add comprehensive error handling and observability
-
-**File:** `sabot/monitoring/production_metrics.py`
-```python
-#!/usr/bin/env python3
-"""
-Production-ready monitoring and metrics for Sabot.
-Integrates with Prometheus, structured logging, health checks.
-"""
-
-import logging
-import time
-from typing import Dict, Any
-from prometheus_client import Counter, Histogram, Gauge
-
-# Structured logging
-logger = logging.getLogger(__name__)
-
-# Prometheus metrics
-EVENTS_PROCESSED = Counter(
-    'sabot_events_processed_total',
-    'Total number of events processed',
-    ['agent', 'status']
-)
-
-EVENT_LATENCY = Histogram(
-    'sabot_event_latency_seconds',
-    'Event processing latency',
-    ['agent']
-)
-
-STATE_OPERATIONS = Counter(
-    'sabot_state_operations_total',
-    'Total state operations',
-    ['operation', 'backend']
-)
-
-CHECKPOINT_DURATION = Histogram(
-    'sabot_checkpoint_duration_seconds',
-    'Checkpoint creation duration'
-)
-
-ACTIVE_AGENTS = Gauge(
-    'sabot_active_agents',
-    'Number of active agents'
-)
-
-
-class ProductionMonitoring:
-    """Production monitoring and observability."""
-
-    def __init__(self):
-        self.start_time = time.time()
-
-    def record_event_processed(self, agent: str, success: bool):
-        """Record event processing."""
-        status = "success" if success else "failure"
-        EVENTS_PROCESSED.labels(agent=agent, status=status).inc()
-
-    def record_event_latency(self, agent: str, duration_seconds: float):
-        """Record event processing latency."""
-        EVENT_LATENCY.labels(agent=agent).observe(duration_seconds)
-
-    def record_state_operation(self, operation: str, backend: str):
-        """Record state operation."""
-        STATE_OPERATIONS.labels(operation=operation, backend=backend).inc()
-
-    def record_checkpoint_duration(self, duration_seconds: float):
-        """Record checkpoint duration."""
-        CHECKPOINT_DURATION.observe(duration_seconds)
-
-    def update_active_agents(self, count: int):
-        """Update active agent count."""
-        ACTIVE_AGENTS.set(count)
-
-    def get_health_check(self) -> Dict[str, Any]:
-        """Get health check status."""
-        uptime = time.time() - self.start_time
-
-        return {
-            "status": "healthy",
-            "uptime_seconds": uptime,
-            "active_agents": ACTIVE_AGENTS._value.get(),
-            "events_processed": sum(EVENTS_PROCESSED._metrics.values()),
-        }
-```
-
-**Integration:**
-```python
-# In sabot/app.py
-from sabot.monitoring.production_metrics import ProductionMonitoring
-
-class App:
-    def __init__(self):
-        self.monitoring = ProductionMonitoring()
-
-    async def process_event(self, agent, event):
-        start = time.time()
-        try:
-            result = await agent.process(event)
-            self.monitoring.record_event_processed(agent.name, success=True)
-            return result
-        except Exception as e:
-            self.monitoring.record_event_processed(agent.name, success=False)
-            raise
-        finally:
-            duration = time.time() - start
-            self.monitoring.record_event_latency(agent.name, duration)
-```
-
----
-
-### **Day 3-5: Configuration Management**
-**Goal:** Provide tunable configuration for production deployments
-
-**File:** `sabot/config/production_config.py`
-```python
-#!/usr/bin/env python3
-"""
-Production configuration for Sabot.
-Provides tunable parameters for different deployment scenarios.
-"""
-
-from dataclasses import dataclass
-from typing import Optional
-
-
-@dataclass
-class StateConfig:
-    """State management configuration."""
-    backend: str = "memory"  # memory, rocksdb, tonbo
-    path: str = "./sabot_state"
-    ttl_enabled: bool = False
-    ttl_seconds: int = 3600
-    cache_size_mb: int = 256
-
-
-@dataclass
-class CheckpointConfig:
-    """Checkpoint configuration."""
-    enabled: bool = True
-    interval_seconds: float = 300.0  # 5 minutes
-    max_concurrent: int = 1
-    incremental: bool = True
-    storage_path: str = "./checkpoints"
-    compression: bool = True
-
-
-@dataclass
-class PerformanceConfig:
-    """Performance tuning configuration."""
-    max_batch_size: int = 1000
-    batch_timeout_ms: int = 100
-    parallelism: int = 4
-    buffer_size: int = 10000
-
-
-@dataclass
-class MonitoringConfig:
-    """Monitoring configuration."""
-    prometheus_port: int = 9090
-    health_check_interval_seconds: float = 30.0
-    metrics_enabled: bool = True
-    tracing_enabled: bool = False
-    log_level: str = "INFO"
-
-
-@dataclass
-class ProductionConfig:
-    """Complete production configuration."""
-    state: StateConfig = StateConfig()
-    checkpoint: CheckpointConfig = CheckpointConfig()
-    performance: PerformanceConfig = PerformanceConfig()
-    monitoring: MonitoringConfig = MonitoringConfig()
-
-
-# Predefined profiles
-DEVELOPMENT_CONFIG = ProductionConfig(
-    state=StateConfig(backend="memory"),
-    checkpoint=CheckpointConfig(enabled=False),
-    monitoring=MonitoringConfig(log_level="DEBUG")
-)
-
-PRODUCTION_CONFIG = ProductionConfig(
-    state=StateConfig(backend="rocksdb", cache_size_mb=1024),
-    checkpoint=CheckpointConfig(enabled=True, interval_seconds=300),
-    performance=PerformanceConfig(parallelism=8, buffer_size=100000),
-    monitoring=MonitoringConfig(prometheus_port=9090, metrics_enabled=True)
-)
-
-HIGH_THROUGHPUT_CONFIG = ProductionConfig(
-    state=StateConfig(backend="tonbo", cache_size_mb=2048),
-    checkpoint=CheckpointConfig(enabled=True, interval_seconds=600),
-    performance=PerformanceConfig(
-        max_batch_size=10000,
-        batch_timeout_ms=500,
-        parallelism=16,
-        buffer_size=1000000
-    )
-)
-```
-
-**Usage:**
-```python
-from sabot.config import PRODUCTION_CONFIG
-
-app = create_app("my_app", config=PRODUCTION_CONFIG)
-```
-
----
-
-## **WEEK 3: Documentation & Release**
-
-### **Day 1-2: API Documentation**
-**Goal:** Complete API reference and user guides
-
-**Files to Create:**
-- `docs/user-guide/getting-started.md`
-- `docs/user-guide/state-management.md`
-- `docs/user-guide/checkpointing.md`
-- `docs/user-guide/performance-tuning.md`
-- `docs/api-reference/state.md`
-- `docs/api-reference/timers.md`
-- `docs/api-reference/checkpoints.md`
-
----
-
-### **Day 3-4: Example Applications**
-**Goal:** Provide working examples for common use cases
-
-**File:** `examples/production/word_count.py`
-```python
-#!/usr/bin/env python3
-"""
-Word Count Example - Production-Ready Sabot Application
-Demonstrates stateful streaming with checkpointing.
-"""
-
-from sabot import create_app
-from sabot.config import PRODUCTION_CONFIG
-
-# Create app with production config
-app = create_app("word_count", config=PRODUCTION_CONFIG)
-
-@app.agent(app.topic("sentences"))
-async def count_words(stream):
-    """Count words with state management."""
-    word_counts = {}
-
-    async for sentence in stream:
-        # Split into words
-        words = sentence.split()
-
-        # Update counts (stateful)
-        for word in words:
-            word_counts[word] = word_counts.get(word, 0) + 1
-
-        # Emit updated counts
-        yield word_counts
-
-if __name__ == "__main__":
-    app.run()
-```
-
-**More Examples:**
-- `examples/production/session_window.py` - Windowing
-- `examples/production/stream_join.py` - Joins
-- `examples/production/exactly_once_demo.py` - Exactly-once
-- `examples/production/state_recovery.py` - Recovery
-
----
-
-### **Day 5: Release Preparation**
-**Goal:** Package and release v0.1.0
+#### Week 1: CLI & Agent Runtime Bootstrap
+**Goal:** Make CLI actually work
 
 **Tasks:**
-1. Version bump to 0.1.0
-2. Update CHANGELOG.md
-3. Create release notes
-4. Tag release in git
-5. Build and publish to PyPI
-6. Announce release
+1. **Remove CLI Mock** (`sabot/cli.py:45-61`)
+   ```python
+   # Replace mock App with real loader
+   def load_app_from_spec(app_spec: str) -> App:
+       module_name, app_name = app_spec.split(':')
+       module = importlib.import_module(module_name)
+       return getattr(module, app_name)
+   ```
+   **Effort:** 1-2 days
+   **Files:** `sabot/cli.py`
+   **Test:** `sabot -A examples.fraud_app:app worker` should run
 
-**Release Notes (Template):**
-```markdown
-# Sabot v0.1.0 - Production Release
+2. **Fix Channel Creation** (`sabot/app.py:381`)
+   ```python
+   # Add sync wrapper for async channel creation
+   def channel(self, ...):
+       if backend == "memory":
+           return MemoryChannel(...)
+       else:
+           # Use asyncio.run() or event loop detection
+           return self._create_channel_sync(...)
+   ```
+   **Effort:** 2-3 days
+   **Files:** `sabot/app.py`
+   **Test:** Can create Kafka channels
 
-## Overview
-First production release of Sabot - Python streaming processing with Flink-grade semantics.
+3. **Wire Agent Runtime to Kafka**
+   - Connect `AgentProcess` to `KafkaSource`
+   - Implement actual consumer loop
+   - Handle message deserialization
 
-## Features
-✅ Stateful stream processing
-✅ Exactly-once semantics
-✅ Event-time processing with watermarks
-✅ Distributed checkpointing
-✅ Cython-accelerated hot paths
-✅ Production monitoring & metrics
+   **Effort:** 3-4 days
+   **Files:** `sabot/agents/runtime.py`, `sabot/kafka/source.py`
+   **Test:** Agent receives Kafka messages
 
-## Performance
-- Throughput: 1M+ events/sec
-- Latency: <10ms p99
-- State operations: 100K ops/sec
-
-## Getting Started
-```bash
-pip install sabot
-
-# Create your first streaming app
-from sabot import create_app
-
-app = create_app("my_app")
-
-@app.agent()
-async def process(stream):
-    async for event in stream:
-        # Process event
-        yield result
-
-app.run()
-```
-
-## Documentation
-- User Guide: https://sabot.readthedocs.io/
-- API Reference: https://sabot.readthedocs.io/api/
-- Examples: https://github.com/sabot/sabot/tree/main/examples
-
-## Community
-- GitHub: https://github.com/sabot/sabot
-- Discord: https://discord.gg/sabot
-- Issues: https://github.com/sabot/sabot/issues
-```
+**Milestone:** Fraud demo runs via CLI end-to-end
 
 ---
 
-## 🎯 **Success Criteria**
+#### Week 2: Integration Testing
+**Goal:** Validate what we claim works
 
-### **Week 1 Complete:**
-- ✅ Integration tests passing
-- ✅ Performance benchmarks run
-- ✅ Results documented
+**Tasks:**
+1. **Fraud Demo Integration Test**
+   ```python
+   # tests/integration/test_fraud_demo.py
+   @pytest.mark.integration
+   async def test_fraud_detection_end_to_end():
+       # Start app
+       # Send 1000 transactions
+       # Verify fraud alerts
+       # Check state consistency
+   ```
+   **Effort:** 2-3 days
+   **Coverage:** Kafka → Agent → State → Output
 
-### **Week 2 Complete:**
-- ✅ Error handling comprehensive
-- ✅ Monitoring integrated
-- ✅ Configuration system working
+2. **Checkpoint Recovery Test**
+   ```python
+   @pytest.mark.integration
+   async def test_checkpoint_recovery():
+       # Process 100 events
+       # Create checkpoint at 50
+       # Simulate failure at 75
+       # Recover from checkpoint
+       # Verify no duplicates/loss
+   ```
+   **Effort:** 2-3 days
+   **Validates:** Exactly-once claims
 
-### **Week 3 Complete:**
-- ✅ Documentation published
-- ✅ Example apps working
-- ✅ v0.1.0 released
+3. **State Backend Tests**
+   - Memory backend CRUD operations
+   - RocksDB backend persistence
+   - State recovery after restart
 
----
+   **Effort:** 2-3 days
+   **Files:** `tests/integration/test_state_backends.py`
 
-## 📝 **Daily Checklist**
-
-### **Each Day:**
-- [ ] Morning: Review previous day's work
-- [ ] Execute planned tasks
-- [ ] Document progress
-- [ ] Test changes
-- [ ] Evening: Update status
-- [ ] Plan next day
-
-### **Each Week:**
-- [ ] Review week's progress
-- [ ] Update roadmap
-- [ ] Adjust timeline if needed
-- [ ] Communicate status
-
----
-
-## 🚀 **Release Timeline**
-
-```
-Week 1: Testing & Validation
-├── Mon-Tue: Integration tests
-├── Wed-Thu: Performance benchmarks
-└── Friday: Review & documentation
-
-Week 2: Production Hardening
-├── Mon-Tue: Error handling & monitoring
-├── Wed-Thu: Configuration management
-└── Friday: Testing & fixes
-
-Week 3: Documentation & Release
-├── Mon-Tue: API documentation
-├── Wed-Thu: Example applications
-└── Friday: v0.1.0 release! 🎉
-```
+**Milestone:** Integration tests passing, confidence in working features
 
 ---
 
-## 🎉 **End Goal: Production-Ready Release**
+#### Week 3-4: Documentation Cleanup
+**Goal:** Documentation matches reality
 
-**Version:** 0.1.0
-**Date:** 3 weeks from now
-**Status:** Production-ready
+**Tasks:**
+1. **Update README.md**
+   - Fix "60K LOC" claim
+   - Document pyarrow dependency (not vendored)
+   - Mark experimental features
+   - Honest "What Works" section
 
-**Deliverables:**
-- ✅ Tested codebase (integration + performance)
-- ✅ Production monitoring
-- ✅ Complete documentation
-- ✅ Working examples
-- ✅ PyPI package
-- ✅ Release announcement
+   **Effort:** 1 day
 
-**You're 88% there. Let's finish strong! 🚀**
+2. **Fix PROJECT_MAP.md**
+   - Correct line counts (currently 34-37x inflated)
+   - Update module statuses
+   - Document stubs clearly
+
+   **Effort:** 1 day
+
+3. **Add Warning to sabot/arrow.py**
+   ```python
+   """
+   ⚠️ INTERNAL STUB MODULE - DO NOT USE DIRECTLY
+
+   This module is a fallback layer that delegates to pyarrow.
+   Contains 32 NotImplementedError statements.
+   Use pyarrow directly or Cython bindings in sabot/_c/
+   """
+   ```
+   **Effort:** 1 hour
+
+4. **Update CLAUDE.md**
+   - Remove "vendored Arrow" claim
+   - Document pyarrow as dependency
+   - Fix incorrect assertions
+
+   **Effort:** 1 hour
+
+**Milestone:** Documentation is honest and accurate
+
+---
+
+### **MONTH 2: Core Functionality**
+
+#### Week 5-6: Agent Runtime Completion
+**Goal:** Multi-agent coordination working
+
+**Tasks:**
+1. **Process Management**
+   - Spawn agent processes
+   - Monitor health
+   - Restart failed agents
+
+   **Effort:** 1 week
+   **Files:** `sabot/agents/runtime.py`
+
+2. **Supervision Strategies**
+   - ONE_FOR_ONE
+   - ONE_FOR_ALL
+   - REST_FOR_ONE
+
+   **Effort:** 3-4 days
+   **Files:** `sabot/agents/supervisor.py`
+
+3. **Resource Monitoring**
+   - CPU/memory tracking
+   - Backpressure detection
+   - Resource limits enforcement
+
+   **Effort:** 2-3 days
+   **Files:** `sabot/agents/resources.py`
+
+**Milestone:** Multi-agent fraud demo with supervision
+
+---
+
+#### Week 7-8: Stream API Completion
+**Goal:** User-facing API feature-complete
+
+**Tasks:**
+1. **Fix Stream API Stubs** (7 NotImplementedError)
+   - Complete window operations
+   - Fix join implementations
+   - Wire state integration
+
+   **Effort:** 1 week
+   **Files:** `sabot/api/stream.py`
+
+2. **Test Stream API**
+   - Unit tests for each operator
+   - Integration tests for pipelines
+   - Performance benchmarks
+
+   **Effort:** 3-4 days
+
+**Milestone:** Stream API documented and tested
+
+---
+
+### **MONTH 3: Production Hardening**
+
+#### Week 9-10: Error Handling & Recovery
+**Goal:** Graceful degradation and recovery
+
+**Tasks:**
+1. **Error Handling**
+   - Kafka consumer error policies
+   - State backend failover
+   - Checkpoint failure recovery
+   - Dead letter queues
+
+   **Effort:** 1 week
+
+2. **Recovery Testing**
+   - Network failures
+   - State backend crashes
+   - Kafka broker failures
+   - Agent crashes
+
+   **Effort:** 1 week
+
+**Milestone:** Can recover from common failure modes
+
+---
+
+#### Week 11-12: Performance & Testing
+**Goal:** Increase test coverage and performance
+
+**Tasks:**
+1. **Test Coverage to 30%**
+   - Unit tests for core modules
+   - Integration tests for features
+   - E2E tests for examples
+
+   **Effort:** 1.5 weeks
+
+2. **Performance Benchmarks**
+   - Throughput measurements
+   - Latency profiling
+   - Memory usage tracking
+   - Optimize hot paths
+
+   **Effort:** 3-4 days
+
+**Milestone:** Beta release ready
+
+---
+
+## 📊 **Success Metrics**
+
+### Week 1:
+- [ ] CLI loads real apps
+- [ ] Fraud demo runs via CLI
+- [ ] No mock implementations in critical path
+
+### Week 4:
+- [ ] 3 integration tests passing
+- [ ] Documentation accurate
+- [ ] Arrow module decision made
+
+### Week 8:
+- [ ] Agent runtime functional
+- [ ] Stream API complete
+- [ ] Test coverage 15%+
+
+### Week 12:
+- [ ] Error handling complete
+- [ ] Test coverage 30%+
+- [ ] Performance benchmarks published
+- [ ] Beta release
+
+---
+
+## 🚫 **What NOT to Do**
+
+### Don't:
+1. ❌ **Add new features** - Fix what exists first
+2. ❌ **Complete sabot/arrow.py** - Remove or document as stub
+3. ❌ **Build execution layer** - Agent runtime first
+4. ❌ **Add SQL interface** - Way premature
+5. ❌ **Implement cluster coordination** - Single-node first
+6. ❌ **Build web UI** - Core functionality first
+7. ❌ **Optimize performance** - Get it working first
+
+### Do:
+1. ✅ **Fix CLI mock**
+2. ✅ **Test what exists**
+3. ✅ **Document honestly**
+4. ✅ **Complete agent runtime**
+5. ✅ **Integration tests**
+6. ✅ **Error handling**
+
+---
+
+## 📝 **Immediate Action Items (This Week)**
+
+### Day 1-2: CLI Fix
+**File:** `sabot/cli.py`
+**Change:** Remove mock App, load from module spec
+**Test:** `sabot -A examples.fraud_app:app worker`
+
+### Day 3-4: Channel Fix
+**File:** `sabot/app.py`
+**Change:** Fix async/sync channel creation
+**Test:** Create Kafka channel successfully
+
+### Day 5: Integration Test
+**File:** `tests/integration/test_fraud_e2e.py`
+**Create:** End-to-end fraud demo test
+**Verify:** Messages flow through entire pipeline
+
+---
+
+## 🎯 **Long-Term Vision (Beyond 3 Months)**
+
+### Month 4-6: Production Features
+- Savepoints
+- Incremental checkpoints
+- Metrics & monitoring
+- K8s deployment
+
+### Month 6-9: Advanced Streaming
+- Event-time processing integration
+- Watermark propagation
+- Complex event processing
+- More connectors
+
+### Month 9-12: Differentiation
+- Python-native features
+- Better debugging
+- Tighter Arrow integration
+- Performance optimization
+
+---
+
+## 📈 **Progress Tracking**
+
+Update this section weekly:
+
+**Week of October 7, 2025:**
+- [ ] CLI mock removed
+- [ ] Channel creation fixed
+- [ ] First integration test passing
+- [ ] Documentation audit complete
+
+**Week of October 14, 2025:**
+- [ ] Agent runtime wired to Kafka
+- [ ] 3 integration tests passing
+- [ ] Test coverage 10%+
+
+**Week of October 21, 2025:**
+- [ ] Agent process management working
+- [ ] Supervision strategies implemented
+- [ ] Test coverage 15%+
+
+---
+
+## 🔍 **Decision Points**
+
+### Decision 1: sabot/arrow.py
+**Options:**
+- A. Remove entirely (1 day)
+- B. Document as stub (1 hour)
+- C. Complete implementation (3-4 weeks)
+
+**Recommendation:** Option A or B
+**Deadline:** Week 1
+
+### Decision 2: Execution Layer
+**Options:**
+- A. Build full execution graph (6-8 weeks)
+- B. Simple agent scheduling (2-3 weeks)
+- C. Defer until agent runtime works
+
+**Recommendation:** Option C
+**Deadline:** Month 2
+
+### Decision 3: Tonbo Backend
+**Options:**
+- A. Complete implementation (2-3 weeks)
+- B. Mark experimental, low priority
+- C. Remove from codebase
+
+**Recommendation:** Option B
+**Deadline:** Month 1
+
+---
+
+## ✅ **Acceptance Criteria for Beta Release**
+
+### Must Have:
+1. ✅ CLI loads and runs real apps
+2. ✅ Agent runtime executes Kafka consumers
+3. ✅ State backends work (Memory + RocksDB)
+4. ✅ Checkpoint creation succeeds
+5. ✅ Fraud demo runs end-to-end
+6. ✅ Test coverage 30%+
+7. ✅ Documentation accurate
+8. ✅ Error handling for common failures
+
+### Nice to Have:
+9. ⚠️ Checkpoint recovery tested
+10. ⚠️ Multi-agent coordination
+11. ⚠️ Performance benchmarks
+12. ⚠️ Supervision strategies
+
+### Not Required:
+13. ❌ Execution layer
+14. ❌ Cluster coordination
+15. ❌ Web UI
+16. ❌ SQL interface
+
+---
+
+## 📚 **Resources**
+
+**Current Status:**
+- `REALITY_CHECK.md` - What actually works
+- `CURRENT_PRIORITIES.md` - Priority rankings
+- `dev-docs/status/COMPLETE_STATUS_AUDIT_OCT2025.md` - Full audit
+
+**Next Steps:**
+- This file (NEXT_IMPLEMENTATION_GUIDE.md)
+- `FLINK_PARITY_ROADMAP.md` - Long-term vision
+- `MISSING_ARROW_FEATURES.md` - Arrow decisions
+
+---
+
+## 🎓 **Lessons Learned**
+
+1. **Don't oversell** - Documentation claimed 88% complete, actually ~20%
+2. **Test early** - 5% coverage hid major issues
+3. **Avoid stubs** - 84 NotImplementedError confused users
+4. **Honest LOC** - PROJECT_MAP inflated 34-37x
+5. **Focus** - Too many features started, few finished
+
+**Apply:** Build less, test more, document honestly
+
+---
+
+**Last Updated:** October 2, 2025
+**Next Review:** Weekly, every Monday
+**Responsible:** Project lead
+**Status:** Active roadmap

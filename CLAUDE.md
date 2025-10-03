@@ -6,3 +6,6 @@
 - use UV for all venv and pip stuff
 - check @PROJECT_MAP.md  before working on somthing and udpate it afterwards
 - always use local arrow.
+- in planning and roadmap docs, dont use time just steps in order.
+- be accurate not optimistic about statements of progress. also there is no need to bash previous statements just corrrect them
+- this is professional project, avoid emotion in descriptions.

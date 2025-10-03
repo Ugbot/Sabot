@@ -4,8 +4,9 @@ This directory contains internal development documentation for the Sabot project
 
 **Note:** This documentation reflects the development journey and may contain outdated information. For current project status, see:
 - [README.md](../README.md) - Current project overview
-- [PROJECT_MAP.md](../PROJECT_MAP.md) - Codebase structure
-- [STUB_INVENTORY.md](../STUB_INVENTORY.md) - Incomplete features
+- [REALITY_CHECK.md](../REALITY_CHECK.md) - **Ground truth status** (October 2, 2025)
+- [PROJECT_MAP.md](../PROJECT_MAP.md) - Codebase structure (⚠️ line counts inflated)
+- [STUB_INVENTORY.md](../STUB_INVENTORY.md) - Incomplete features (outdated)
 
 ---
 
@@ -36,8 +37,9 @@ Track implementation progress and completion milestones.
 | [AGENT_RUNTIME_COMPLETION.md](status/AGENT_RUNTIME_COMPLETION.md) | Agent runtime status | Sep 30 | Historical |
 | [CYTHON_BUILD_PROGRESS.md](status/CYTHON_BUILD_PROGRESS.md) | Cython build progress | Sep 30 | Historical |
 | [CYTHON_BUILD_SUMMARY.md](status/CYTHON_BUILD_SUMMARY.md) | Cython build summary | Sep 30 | Historical |
+| [COMPLETE_STATUS_AUDIT_OCT2025.md](status/COMPLETE_STATUS_AUDIT_OCT2025.md) | **Ground truth audit** | Oct 2 | **CURRENT** |
 
-**Note:** Many "completion" documents are aspirational. See [STUB_INVENTORY.md](../STUB_INVENTORY.md) for actual completion status.
+**Note:** Many "completion" documents are aspirational. See [REALITY_CHECK.md](../REALITY_CHECK.md) for actual ground truth status.
 
 ---
 
