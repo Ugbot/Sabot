@@ -99,6 +99,7 @@ def build_arrow_cpp():
         str(arrow_source_dir),
         f"-DCMAKE_INSTALL_PREFIX={arrow_install_dir}",
         "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_POLICY_VERSION_MINIMUM=3.5",  # Fix RapidJSON CMake version issue
         "-DARROW_BUILD_STATIC=OFF",
         "-DARROW_BUILD_SHARED=ON",
         "-DARROW_COMPUTE=ON",

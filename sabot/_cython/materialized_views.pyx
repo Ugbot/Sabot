@@ -8,8 +8,12 @@ from libcpp.string cimport string as cpp_string
 from libcpp.vector cimport vector
 from libcpp.unordered_map cimport unordered_map
 from libcpp.utility cimport pair
-from cpython.ref cimport PyObject
-from cython.operator cimport dereference as deref
+from cpython.ref cimport PyObject, Py_INCREF, Py_DECREF
+from cython.operator cimport dereference as deref, preincrement as inc
+
+# Type aliases - use void* instead of PyObject* for Cython compatibility
+ctypedef pair[cpp_string, void*] RecordEntry
+ctypedef vector[RecordEntry] RecordEntries
 
 import json
 import time
@@ -28,14 +32,14 @@ cdef extern from "<rocksdb/db.h>" namespace "rocksdb" nogil:
         bint ok()
         cpp_string ToString()
 
+    cdef cppclass DB:
+        Status Get(const cpp_string& key, cpp_string* value)
+        Status Put(const cpp_string& key, const cpp_string& value)
+
     cdef cppclass WriteBatch:
         WriteBatch()
 
-    Status DB_Open "DB::Open"(const Options& options, const cpp_string& name, DB** db)
-    Status DB_Get "DB::Get"(DB* db, const string& key, string* value)
-    Status DB_Put "DB::Put"(DB* db, const string& key, const string& value)
-    Status DB_Write "DB::Write"(DB* db, const Options& options, WriteBatch* batch)
-    void DB_Close "DB::Close"(DB* db)
+    Status DB_Open "rocksdb::DB::Open"(const Options& options, const cpp_string& name, DB** db)
 
 # Forward declarations
 cdef class RocksDBBackend
@@ -86,9 +90,9 @@ cdef class RocksDBBackend:
     async def close(self) -> None:
         """Close RocksDB database."""
         if self._is_open and self._db != NULL:
-            DB_Close(self._db)
+            del self._db  # C++ delete operator
             self._db = NULL
-            self._is_open = False
+            self._is_running = False
 
     async def get(self, str key) -> Optional[str]:
         """Get value by key."""
@@ -100,7 +104,7 @@ cdef class RocksDBBackend:
             cpp_string c_value
             Status status
 
-        status = DB_Get(self._db, c_key, &c_value)
+        status = self._db.Get(c_key, &c_value)
         if status.ok():
             return c_value.decode('utf-8')
         return None
@@ -115,7 +119,7 @@ cdef class RocksDBBackend:
             cpp_string c_value = value.encode('utf-8')
             Status status
 
-        status = DB_Put(self._db, c_key, c_value)
+        status = self._db.Put(c_key, c_value)
         if not status.ok():
             raise RuntimeError(f"RocksDB put failed: {status.ToString().decode('utf-8')}")
 
@@ -153,7 +157,7 @@ cdef class ViewDefinition:
 
     cdef:
         cpp_string _name
-        ViewType _view_type
+        object _view_type  # ViewType Enum
         cpp_string _source_topic
         cpp_string _key_field
         vector[cpp_string] _group_by_fields
@@ -164,7 +168,7 @@ cdef class ViewDefinition:
     def __cinit__(
         self,
         str name,
-        ViewType view_type,
+        object view_type,
         str source_topic,
         str key_field = "id",
         list group_by_fields = None,
@@ -191,7 +195,7 @@ cdef class ViewDefinition:
     cpdef str get_name(self):
         return self._name.decode('utf-8')
 
-    cpdef ViewType get_view_type(self):
+    cpdef object get_view_type(self):
         return self._view_type
 
     cpdef str get_source_topic(self):
@@ -205,7 +209,7 @@ cdef class ViewState:
     """State of a materialized view."""
 
     cdef:
-        unordered_map[cpp_string, PyObject*] _data
+        unordered_map[cpp_string, void*] _data
         uint64_t _record_count
         double _last_updated
         bint _is_consistent
@@ -215,13 +219,13 @@ cdef class ViewState:
         self._last_updated = time.time()
         self._is_consistent = True
 
-    cdef void add_record(self, cpp_string key, PyObject* record):
+    cdef void add_record(self, cpp_string key, void* record):
         """Add or update a record in the view."""
-        Py_INCREF(record)
+        Py_INCREF(<object><PyObject*>record)
 
-        cdef unordered_map[cpp_string, PyObject*].iterator it = self._data.find(key)
+        cdef unordered_map[cpp_string, void*].iterator it = self._data.find(key)
         if it != self._data.end():
-            Py_DECREF(deref(it).second)
+            Py_DECREF(<object>deref(it).second)
         else:
             self._record_count += 1
 
@@ -230,36 +234,36 @@ cdef class ViewState:
 
     cdef void remove_record(self, cpp_string key):
         """Remove a record from the view."""
-        cdef unordered_map[cpp_string, PyObject*].iterator it = self._data.find(key)
+        cdef unordered_map[cpp_string, void*].iterator it = self._data.find(key)
         if it != self._data.end():
-            Py_DECREF(deref(it).second)
+            Py_DECREF(<object>deref(it).second)
             self._data.erase(it)
             self._record_count -= 1
             self._last_updated = time.time()
 
-    cdef PyObject* get_record(self, cpp_string key):
+    cdef void* get_record(self, cpp_string key):
         """Get a record by key."""
-        cdef unordered_map[cpp_string, PyObject*].iterator it = self._data.find(key)
+        cdef unordered_map[cpp_string, void*].iterator it = self._data.find(key)
         if it != self._data.end():
             return deref(it).second
         return NULL
 
-    cdef vector[pair[cpp_string, PyObject*]] get_all_records(self):
+    cdef RecordEntries get_all_records(self):
         """Get all records."""
-        cdef vector[pair[cpp_string, PyObject*]] result
-        cdef unordered_map[cpp_string, PyObject*].iterator it = self._data.begin()
+        cdef RecordEntries result
+        cdef unordered_map[cpp_string, void*].iterator it = self._data.begin()
 
         while it != self._data.end():
-            result.push_back(pair[cpp_string, PyObject*](deref(it).first, deref(it).second))
+            result.push_back(RecordEntry(deref(it).first, deref(it).second))
             inc(it)
 
         return result
 
     cdef void clear(self):
         """Clear all data."""
-        cdef unordered_map[cpp_string, PyObject*].iterator it = self._data.begin()
+        cdef unordered_map[cpp_string, void*].iterator it = self._data.begin()
         while it != self._data.end():
-            Py_DECREF(deref(it).second)
+            Py_DECREF(<object>deref(it).second)
             inc(it)
         self._data.clear()
         self._record_count = 0
@@ -314,41 +318,44 @@ cdef class MaterializedView:
             else:
                 await self._process_custom_event(change_type, record, old_record)
 
-    cdef async def _process_aggregation_event(self, ChangeType change_type, dict record, dict old_record):
+    async def _process_aggregation_event(self, object change_type, dict record, dict old_record):
         """Process aggregation view changes."""
         key_field = self._definition.get_key_field()
         key = str(record.get(key_field, 'default'))
 
         if change_type == ChangeType.INSERT:
-            self._state.add_record(key.encode('utf-8'), <PyObject*>record)
+            self._state.add_record(key.encode('utf-8'), <void*><PyObject*>record)
         elif change_type == ChangeType.UPDATE:
-            self._state.add_record(key.encode('utf-8'), <PyObject*>record)
+            self._state.add_record(key.encode('utf-8'), <void*><PyObject*>record)
         elif change_type == ChangeType.DELETE:
             self._state.remove_record(key.encode('utf-8'))
 
-    cdef async def _process_join_event(self, ChangeType change_type, dict record, dict old_record):
+    async def _process_join_event(self, object change_type, dict record, dict old_record):
         """Process join view changes."""
         # TODO: Implement join logic
         pass
 
-    cdef async def _process_filter_event(self, ChangeType change_type, dict record, dict old_record):
+    async def _process_filter_event(self, object change_type, dict record, dict old_record):
         """Process filter view changes."""
         # TODO: Implement filter logic
         pass
 
-    cdef async def _process_custom_event(self, ChangeType change_type, dict record, dict old_record):
+    async def _process_custom_event(self, object change_type, dict record, dict old_record):
         """Process custom view changes."""
         # TODO: Implement custom logic
         pass
 
     async def query(self, str key = None, dict filters = None) -> List[dict]:
         """Query the materialized view."""
+        cdef RecordEntries all_records
+        cdef size_t i
+
         async with self._lock:
             if key:
                 # Single key lookup
-                record = self._state.get_record(key.encode('utf-8'))
-                if record != NULL:
-                    return [<object>record]
+                record_ptr = self._state.get_record(key.encode('utf-8'))
+                if record_ptr != NULL:
+                    return [<object>record_ptr]
                 return []
             else:
                 # Scan all records with optional filters
@@ -393,7 +400,7 @@ cdef class DebeziumEvent:
     cdef:
         cpp_string _topic
         cpp_string _key
-        ChangeType _operation
+        object _operation  # ChangeType Enum
         dict _data
         dict _old_data
         uint64_t _timestamp
@@ -423,7 +430,7 @@ cdef class DebeziumEvent:
     cpdef str get_key(self):
         return self._key.decode('utf-8')
 
-    cpdef ChangeType get_operation(self):
+    cpdef object get_operation(self):
         return self._operation
 
     cpdef dict get_data(self):
@@ -437,13 +444,14 @@ cdef class DebeziumConsumer:
     """Native Debezium change event consumer."""
 
     cdef:
-        unordered_map[cpp_string, vector[MaterializedView]] _topic_views
+        dict _topic_views  # Dict[str, List[MaterializedView]] - Python-managed
         object _lock
         bint _is_running
 
     def __cinit__(self):
         self._is_running = False
         self._lock = asyncio.Lock()
+        self._topic_views = {}
 
     async def start(self) -> None:
         """Start the Debezium consumer."""
@@ -461,23 +469,19 @@ cdef class DebeziumConsumer:
         """Register a materialized view to receive change events."""
         async with self._lock:
             topic = view._definition.get_source_topic()
-            cdef cpp_string c_topic = topic.encode('utf-8')
 
-            if self._topic_views.find(c_topic) == self._topic_views.end():
-                self._topic_views[c_topic] = vector[MaterializedView]()
+            if topic not in self._topic_views:
+                self._topic_views[topic] = []
 
-            self._topic_views[c_topic].push_back(view)
+            self._topic_views[topic].append(view)
 
     async def process_debezium_event(self, DebeziumEvent event) -> None:
         """Process a Debezium change event."""
         async with self._lock:
-            cdef cpp_string c_topic = event.get_topic().encode('utf-8')
-            cdef unordered_map[cpp_string, vector[MaterializedView]].iterator it
-
-            it = self._topic_views.find(c_topic)
-            if it != self._topic_views.end():
-                views = deref(it).second
-                for i in range(views.size()):
+            topic = event.get_topic()
+            if topic in self._topic_views:
+                views = self._topic_views[topic]
+                for view in views:
                     change_event = {
                         'operation': event.get_operation().value,
                         'data': event.get_data(),
@@ -485,7 +489,7 @@ cdef class DebeziumConsumer:
                         'timestamp': event._timestamp,
                         'source': event._source.decode('utf-8')
                     }
-                    await views[i].process_change_event(change_event)
+                    await view.process_change_event(change_event)
 
     async def consume_from_kafka(self, str bootstrap_servers, str group_id) -> None:
         """Consume Debezium events from Kafka."""
@@ -503,9 +507,9 @@ cpdef DebeziumConsumer get_debezium_consumer():
 
 
 # Factory functions
-cpdef MaterializedView create_materialized_view(
+def create_materialized_view(
     str name,
-    ViewType view_type,
+    object view_type,
     str source_topic,
     str db_path,
     **kwargs

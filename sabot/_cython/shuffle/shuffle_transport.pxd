@@ -66,3 +66,9 @@ cdef class ShuffleTransport:
                                 ca.RecordBatch batch)
     cdef ca.RecordBatch fetch_partition_from_agent(self, bytes agent_address,
                                                    bytes shuffle_id, int32_t partition_id)
+
+    # Shuffle coordination methods (Phase 4)
+    cpdef void start_shuffle(self, bytes shuffle_id, int32_t num_partitions, list downstream_agents)
+    cpdef void send_partition(self, bytes shuffle_id, int32_t partition_id, ca.RecordBatch batch, bytes target_agent)
+    cpdef list receive_partitions(self, bytes shuffle_id, int32_t partition_id)
+    cpdef void end_shuffle(self, bytes shuffle_id)

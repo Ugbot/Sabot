@@ -27,6 +27,7 @@ from pyarrow.includes.libarrow cimport (
 # For Python API access when needed
 # Python-level imports - use vendored Arrow
 from sabot import cyarrow
+import pyarrow as pa
 
 from .types cimport ShuffleMetadata, PartitionInfo, ShuffleEdgeType
 from .partitioner cimport Partitioner, create_partitioner
@@ -205,7 +206,7 @@ cdef class ShuffleManager:
         # Merge batches (using Python API)
         if len(batches) == 0:
             # Return empty batch
-            result_obj = pyarrow.RecordBatch.from_arrays([], names=[])
+            result_obj = pa.RecordBatch.from_arrays([], names=[])
             result = result_obj
             return result
 
@@ -213,7 +214,7 @@ cdef class ShuffleManager:
             return batches[0]
 
         # Concatenate multiple batches
-        table_obj = pyarrow.Table.from_batches(batches)
+        table_obj = pa.Table.from_batches(batches)
         result_obj = table_obj.to_batches()[0] if table_obj.num_rows > 0 else batches[0]
         result = result_obj
         return result

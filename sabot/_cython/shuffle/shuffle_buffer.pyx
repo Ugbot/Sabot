@@ -30,6 +30,7 @@ from pyarrow.includes.libarrow cimport (
 # Python-level imports - use vendored Arrow
 from sabot import cyarrow
 # TODO: Add ipc to cyarrow wrapper
+import pyarrow as pa
 import pyarrow.ipc as ipc
 
 
@@ -89,7 +90,7 @@ cdef class ShuffleBuffer:
             self.schema_cpp = schema_cython.sp_schema
         else:
             # Already Cython ca.Schema
-            self.schema_cpp = (<pa.Schema>schema).sp_schema
+            self.schema_cpp = (<ca.Schema>schema).sp_schema
 
         # Initialize state
         self.batches_cpp.clear()
@@ -137,8 +138,8 @@ cdef class ShuffleBuffer:
         if self.batches_cpp.size() == 0:
             # Return empty batch
             schema_cython = _wrap_schema(self.schema_cpp)
-            merged_batch_obj = pyarrow.RecordBatch.from_arrays(
-                [pyarrow.array([], type=field.type) for field in schema_cython],
+            merged_batch_obj = pa.RecordBatch.from_arrays(
+                [pa.array([], type=field.type) for field in schema_cython],
                 schema=schema_cython
             )
             result = merged_batch_obj
@@ -157,7 +158,7 @@ cdef class ShuffleBuffer:
             py_batches.append(_wrap_batch(self.batches_cpp[i]))
 
         # Use Python API for concatenation
-        merged_table_obj = pyarrow.Table.from_batches(py_batches, schema=schema_cython)
+        merged_table_obj = pa.Table.from_batches(py_batches, schema=schema_cython)
         merged_batch_obj = merged_table_obj.to_batches(max_chunksize=self.total_rows)[0]
 
         # Clear buffer

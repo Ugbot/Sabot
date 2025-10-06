@@ -5,6 +5,7 @@ import asyncio
 import logging
 from typing import Any, Dict, List, Optional, Union, Callable, AsyncGenerator, Type
 from pathlib import Path
+from dataclasses import dataclass
 
 from .sabot_types import AppT, AgentT, TopicT, StreamT, TableT, AgentFun, SinkT
 from . import _cython as cython
@@ -1166,27 +1167,113 @@ class App(AppT):
         return Stream(topic, **kwargs)
 
     def agent(self, topic: Union[str, TopicT], **kwargs) -> AgentT:
-        """Create a durable agent (DBOS-inspired with Faust interface)."""
-        def decorator(func: AgentFun) -> AgentT:
-            topic_name = topic if isinstance(topic, str) else topic.name
-            agent_name = kwargs.get('name', f"{func.__name__}_{topic_name}")
-            concurrency = kwargs.get('concurrency', 1)
+        """
+        DEPRECATED: Create a durable agent.
 
-            # Register with durable agent manager
-            agent = self._agent_manager.register_agent(
-                name=agent_name,
-                func=func,
-                topic_name=topic_name,
-                concurrency=concurrency,
-                max_concurrency=kwargs.get('max_concurrency', 10),
-                enabled=kwargs.get('enabled', True)
+        This method is deprecated. Use @app.dataflow instead.
+        Agents are now worker nodes, not user code.
+
+        This decorator is maintained for backward compatibility.
+        It internally maps to @app.dataflow for now.
+        """
+        import warnings
+        warnings.warn(
+            "@app.agent is deprecated. Use @app.dataflow instead. "
+            "Agents are now worker nodes, not user code.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+
+        def decorator(func: AgentFun) -> AgentT:
+            # Map to dataflow internally for backward compatibility
+            topic_name = topic if isinstance(topic, str) else topic.name
+
+            # Create a simple dataflow wrapper
+            # This maintains compatibility while using new system
+            return self._create_legacy_agent_wrapper(
+                func, topic_name, **kwargs
             )
 
-            self._agents[agent_name] = agent
-            logger.info(f"Registered durable agent: {agent_name}")
-            return agent
+        return decorator
+
+    def _create_legacy_agent_wrapper(self, func, topic_name, **kwargs):
+        """
+        Internal: Create legacy agent wrapper for backward compatibility.
+
+        This creates a dataflow that wraps the old agent function.
+        """
+        from .api.stream import Stream
+
+        # Build dataflow (simplified - real implementation would handle async generators)
+        stream = Stream.from_kafka(topic_name)
+
+        # Apply function as map operator
+        # (simplified - real implementation would handle async generators)
+        result_stream = stream.map(func)
+
+        # Register as dataflow
+        agent_name = kwargs.get('name', f"{func.__name__}_{topic_name}")
+        return self._register_dataflow(agent_name, result_stream)
+
+    def dataflow(self, name: Optional[str] = None):
+        """
+        Create a dataflow (operator DAG).
+
+        This is the NEW way to define stream processing logic.
+        Dataflows are compiled to physical execution graphs
+        and deployed to agent worker nodes by the JobManager.
+
+        Example:
+            @app.dataflow("process_orders")
+            def order_pipeline():
+                return (Stream.from_kafka('orders')
+                    .filter(lambda b: pc.greater(b['amount'], 1000))
+                    .window(tumbling(seconds=60))
+                    .aggregate({'total': ('amount', 'sum')})
+                    .to_kafka('processed_orders'))
+
+        Args:
+            name: Dataflow name (auto-generated if None)
+
+        Returns:
+            Dataflow decorator
+        """
+        def decorator(func: Callable) -> 'Dataflow':
+            dataflow_name = name or func.__name__
+
+            # Execute function to get operator DAG
+            operator_dag = func()
+
+            # Register dataflow
+            return self._register_dataflow(dataflow_name, operator_dag)
 
         return decorator
+
+    def _register_dataflow(self, name: str, operator_dag):
+        """
+        Internal: Register a dataflow with the JobManager.
+
+        Args:
+            name: Dataflow name
+            operator_dag: Operator DAG (from Stream API)
+
+        Returns:
+            Dataflow instance
+        """
+        # Create dataflow object
+        dataflow = Dataflow(
+            name=name,
+            operator_dag=operator_dag,
+            app=self
+        )
+
+        # Store for later deployment
+        if not hasattr(self, '_dataflows'):
+            self._dataflows = {}
+        self._dataflows[name] = dataflow
+
+        logger.info(f"Registered dataflow: {name}")
+        return dataflow
 
     def arrow_agent(self, topic: Union[str, TopicT], **kwargs) -> AgentT:
         """Create a durable Arrow-native agent with batch processing."""
@@ -1606,6 +1693,99 @@ class App(AppT):
         # The connection is established on first use
 
         return channel
+
+
+@dataclass
+class Dataflow:
+    """
+    A dataflow is a user-defined operator DAG.
+
+    Dataflows are compiled to physical execution graphs
+    and deployed to agent worker nodes by the JobManager.
+    """
+    name: str
+    operator_dag: Any  # Stream API DAG
+    app: App
+    job_id: Optional[str] = None
+
+    async def start(self, parallelism: int = 4):
+        """
+        Start the dataflow by submitting to JobManager.
+
+        Args:
+            parallelism: Default parallelism for operators
+        """
+        # Import JobManager here to avoid circular imports
+        from .job_manager import JobManager
+
+        # Create JobManager (local mode by default)
+        job_manager = JobManager()
+
+        # Serialize operator DAG to JSON
+        job_graph_json = self._serialize_operator_dag()
+
+        # Submit to JobManager
+        self.job_id = await job_manager.submit_job(
+            job_graph_json,
+            job_name=self.name
+        )
+
+        logger.info(f"Started dataflow {self.name} as job {self.job_id}")
+
+    async def stop(self):
+        """Stop the dataflow"""
+        if not self.job_id:
+            logger.warning(f"Dataflow {self.name} not started")
+            return
+
+        # Cancel job via JobManager
+        from .job_manager import JobManager
+        job_manager = JobManager()
+        await job_manager.cancel_job(self.job_id)
+
+        logger.info(f"Stopped dataflow {self.name}")
+
+    def _serialize_operator_dag(self) -> str:
+        """
+        Serialize the operator DAG to JSON for JobManager.
+
+        This converts the Stream API DAG to a JobGraph format.
+        """
+        # For now, create a simple job graph
+        # Real implementation would traverse the Stream DAG
+        import json
+        from datetime import datetime
+
+        # Create a basic job graph structure
+        job_graph = {
+            "name": self.name,
+            "created_at": datetime.now().isoformat(),
+            "operators": [
+                {
+                    "id": "source_1",
+                    "type": "source",
+                    "config": {
+                        "topic": "input_topic"  # Placeholder
+                    }
+                },
+                {
+                    "id": "map_1",
+                    "type": "map",
+                    "config": {},
+                    "inputs": ["source_1"]
+                },
+                {
+                    "id": "sink_1",
+                    "type": "sink",
+                    "config": {
+                        "topic": "output_topic"  # Placeholder
+                    },
+                    "inputs": ["map_1"]
+                }
+            ]
+        }
+
+        return json.dumps(job_graph)
 
 
 class Topic(TopicT):

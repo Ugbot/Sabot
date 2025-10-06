@@ -27,6 +27,7 @@ from typing import Optional, List
 from sabot import cyarrow as ca
 # For now, still import specialized modules from pyarrow directly
 # TODO: Add csv, feather, compute to cyarrow wrapper
+import pyarrow as pa
 import pyarrow.csv as pa_csv
 import pyarrow.feather as feather
 import pyarrow.compute as pc

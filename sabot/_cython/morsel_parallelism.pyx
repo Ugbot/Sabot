@@ -33,27 +33,25 @@ cdef class AtomicCounter:
         self._value = 0
         self._lock = threading.Lock()
 
-    cdef inline void increment(self) nogil:
+    cdef inline void increment(self):
         """Atomically increment counter."""
-        with gil:
-            with self._lock:
-                self._value += 1
+        with self._lock:
+            self._value += 1
 
-    cdef inline void decrement(self) nogil:
+    cdef inline void decrement(self):
         """Atomically decrement counter."""
-        with gil:
-            with self._lock:
-                self._value -= 1
+        with self._lock:
+            self._value -= 1
 
-    cpdef inline long long get_value(self):
+    cdef inline long long get_value(self):
         """Get current value."""
-        return self._value
+        with self._lock:
+            return self._value
 
-    cdef inline void set_value(self, long long value) nogil:
+    cdef inline void set_value(self, long long value):
         """Set value."""
-        with gil:
-            with self._lock:
-                self._value = value
+        with self._lock:
+            self._value = value
 
 cdef class FastMorsel:
     """Cython-optimized morsel with zero-copy operations."""
@@ -87,27 +85,25 @@ cdef class FastMorsel:
         if self._data is not None:
             Py_DECREF(self._data)
 
-    cdef inline void mark_processed(self) nogil:
+    cdef inline void mark_processed(self):
         """Mark morsel as processed."""
-        with gil:
-            self._processed_at = time.time()
-            self._processed = True
-            if self._created_at > 0:
-                self._processing_time = self._processed_at - self._created_at
+        self._processed_at = time.time()
+        self._processed = True
+        if self._created_at > 0:
+            self._processing_time = self._processed_at - self._created_at
 
-    cdef inline bint is_processed(self) nogil:
+    cdef inline bint is_processed(self):
         """Check if morsel is processed."""
         return self._processed
 
-    cdef inline long long size_bytes(self) nogil:
+    cdef inline long long size_bytes(self):
         """Estimate memory size."""
-        with gil:
-            if hasattr(self._data, 'nbytes'):
-                return (<object>self._data).nbytes
-            elif hasattr(self._data, '__sizeof__'):
-                return (<object>self._data).__sizeof__()
-            else:
-                return len(str(self._data).encode('utf-8'))
+        if hasattr(self._data, 'nbytes'):
+            return (<object>self._data).nbytes
+        elif hasattr(self._data, '__sizeof__'):
+            return (<object>self._data).__sizeof__()
+        else:
+            return len(str(self._data).encode('utf-8'))
 
     # Property accessors
     @property
@@ -147,10 +143,10 @@ cdef class FastMorsel:
         return self._metadata
 
 cdef class FastWorkStealingQueue:
-    """Cython-optimized work-stealing queue."""
+    """Cython-optimized work-stealing queue using C++ array with void* pointers."""
 
     cdef:
-        FastMorsel** _buffer
+        void** _buffer  # C array of void* pointers to Python objects
         long long _capacity
         long long _size
         long long _head
@@ -164,28 +160,34 @@ cdef class FastWorkStealingQueue:
         self._tail = 0
         self._lock = threading.RLock()
 
-        # Allocate buffer
-        self._buffer = <FastMorsel**>malloc(capacity * sizeof(FastMorsel*))
+        # Allocate C array
+        self._buffer = <void**>malloc(capacity * sizeof(void*))
         if self._buffer == NULL:
-            raise MemoryError("Failed to allocate work queue buffer")
+            raise MemoryError("Failed to allocate work-stealing queue buffer")
 
-        # Initialize to NULL
+        # Initialize all slots to NULL
         cdef long long i
         for i in range(capacity):
             self._buffer[i] = NULL
 
     def __dealloc__(self):
+        cdef long long i
+
         if self._buffer != NULL:
+            # Decrement refcounts for any remaining objects
+            for i in range(self._capacity):
+                if self._buffer[i] != NULL:
+                    Py_DECREF(<object>self._buffer[i])
             free(self._buffer)
 
-    cdef inline bint _ensure_capacity(self, long long required_capacity) nogil:
+    cdef inline bint _ensure_capacity(self, long long required_capacity):
         """Ensure queue has enough capacity."""
         if required_capacity <= self._capacity:
             return True
 
         cdef long long new_capacity = max(required_capacity, self._capacity * 2)
-        cdef FastMorsel** new_buffer = <FastMorsel**>realloc(
-            self._buffer, new_capacity * sizeof(FastMorsel*)
+        cdef void** new_buffer = <void**>realloc(
+            self._buffer, new_capacity * sizeof(void*)
         )
 
         if new_buffer == NULL:
@@ -200,66 +202,69 @@ cdef class FastWorkStealingQueue:
         self._capacity = new_capacity
         return True
 
-    cdef inline bint push(self, FastMorsel* morsel) nogil:
+    cdef inline bint push(self, FastMorsel morsel):
         """Push morsel to queue."""
-        with gil:
-            with self._lock:
-                if not self._ensure_capacity(self._size + 1):
-                    return False
+        with self._lock:
+            if not self._ensure_capacity(self._size + 1):
+                return False
 
-                self._buffer[self._tail] = morsel
-                self._tail = (self._tail + 1) % self._capacity
-                self._size += 1
-                Py_INCREF(morsel)  # Keep reference
-                return True
+            # Store as void* and increment refcount
+            self._buffer[self._tail] = <void*>morsel
+            Py_INCREF(morsel)
+            self._tail = (self._tail + 1) % self._capacity
+            self._size += 1
+            return True
 
-    cdef inline FastMorsel* pop(self) nogil:
+    cdef inline FastMorsel pop(self):
         """Pop morsel from queue."""
-        cdef FastMorsel* result = NULL
+        cdef FastMorsel result = None
 
-        with gil:
-            with self._lock:
-                if self._size == 0:
-                    return NULL
+        with self._lock:
+            if self._size == 0:
+                return None
 
-                result = self._buffer[self._head]
-                self._buffer[self._head] = NULL
-                self._head = (self._head + 1) % self._capacity
-                self._size -= 1
+            # Cast void* back to FastMorsel
+            result = <FastMorsel>self._buffer[self._head]
+            self._buffer[self._head] = NULL
+            self._head = (self._head + 1) % self._capacity
+            self._size -= 1
 
+        # Note: refcount is already correct (transferred from queue to caller)
         return result
 
-    cdef inline FastMorsel* steal(self) nogil:
+    cdef inline FastMorsel steal(self):
         """Attempt to steal work from opposite end."""
-        cdef FastMorsel* result = NULL
+        cdef FastMorsel result = None
 
-        with gil:
-            with self._lock:
-                if self._size <= 1:  # Don't steal if queue is too small
-                    return NULL
+        with self._lock:
+            if self._size <= 1:  # Don't steal if queue is too small
+                return None
 
-                # Steal from head (opposite of pop)
-                result = self._buffer[self._head]
-                self._buffer[self._head] = NULL
-                self._head = (self._head + 1) % self._capacity
-                self._size -= 1
+            # Steal from head (opposite of pop)
+            result = <FastMorsel>self._buffer[self._head]
+            self._buffer[self._head] = NULL
+            self._head = (self._head + 1) % self._capacity
+            self._size -= 1
 
+        # Note: refcount is already correct (transferred from queue to caller)
         return result
 
-    cdef inline long long size(self) nogil:
+    cdef inline long long size(self):
         """Get current queue size."""
-        return self._size
+        with self._lock:
+            return self._size
 
-    cdef inline bint is_empty(self) nogil:
+    cdef inline bint is_empty(self):
         """Check if queue is empty."""
-        return self._size == 0
+        with self._lock:
+            return self._size == 0
 
 cdef class FastWorker:
     """Cython-optimized worker with DBOS-controlled execution."""
 
     cdef:
         int _worker_id
-        FastWorkStealingQueue* _local_queue
+        FastWorkStealingQueue _local_queue
         object _dbos_controller
         AtomicCounter _processed_count
         double _last_heartbeat
@@ -270,7 +275,7 @@ cdef class FastWorker:
     def __cinit__(self, int worker_id, object dbos_controller, object loop=None):
         self._worker_id = worker_id
         self._dbos_controller = dbos_controller
-        self._local_queue = new FastWorkStealingQueue(1024)
+        self._local_queue = FastWorkStealingQueue(1024)
         self._processed_count = AtomicCounter()
         self._last_heartbeat = time.time()
         self._is_running = False
@@ -278,9 +283,8 @@ cdef class FastWorker:
         self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix=f"worker-{worker_id}")
 
     def __dealloc__(self):
-        if self._local_queue != NULL:
-            del self._local_queue
-        # AtomicCounter is automatically managed
+        # Python objects are automatically managed
+        pass
 
     cdef inline void update_heartbeat(self):
         """Update worker heartbeat."""
@@ -296,12 +300,12 @@ cdef class FastWorker:
 
     async def submit_morsel(self, FastMorsel morsel):
         """Submit morsel for processing."""
-        if not self._local_queue.push(&morsel):
+        if not self._local_queue.push(morsel):
             logger.warning(f"Worker {self._worker_id} queue full, morsel dropped")
 
     async def process_queue(self, object processor_func):
         """Process items in queue using DBOS-controlled execution."""
-        cdef FastMorsel* morsel
+        cdef FastMorsel morsel
 
         if self._is_running:
             return
@@ -313,11 +317,11 @@ cdef class FastWorker:
                 # Get work from local queue
                 morsel = self._local_queue.pop()
 
-                if morsel == NULL:
+                if morsel is None:
                     # Try work stealing from DBOS coordinator
                     morsel = await self._steal_work_from_dbos()
 
-                if morsel != NULL:
+                if morsel is not None:
                     # Process morsel
                     await self._process_morsel(morsel, processor_func)
                     self._processed_count.increment()
@@ -341,7 +345,7 @@ cdef class FastWorker:
             logger.debug(f"DBOS work stealing failed: {e}")
         return None
 
-    async def _process_morsel(self, FastMorsel* morsel, object processor_func):
+    async def _process_morsel(self, FastMorsel morsel, object processor_func):
         """Process a single morsel."""
         try:
             # Call processing function

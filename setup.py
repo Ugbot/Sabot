@@ -180,11 +180,22 @@ def find_pyx_files():
 
         # Core processing modules
         "sabot/_cython/agents.pyx",
-        # "sabot/_cython/windows.pyx",  # TODO: Multiple cdef in control flow statements (needs extensive fixes)
-        # "sabot/_cython/joins.pyx",  # TODO: Complex nested templates with PyObject* causing typedef issues
+        "sabot/_cython/windows.pyx",  # FIXED: Pure C++/Arrow architecture with WindowMetadata struct
+        "sabot/_cython/joins.pyx",  # FIXED: Proper C++/Cython architecture with CJoinType enum
         "sabot/_cython/channels.pyx",
-        # "sabot/_cython/morsel_parallelism.pyx",  # TODO: AtomicCounter and FastMorsel pointer issues (advanced feature)
-        # "sabot/_cython/materialized_views.pyx",  # TODO: Same PyObject* template issue as joins
+        "sabot/_cython/morsel_parallelism.pyx",  # FIXED: Removed nogil from methods using locks
+        # "sabot/_cython/materialized_views.pyx",  # TODO: Requires C++ mode for RocksDB delete operator
+
+        # Phase 2: Numba compilation
+        "sabot/_cython/operators/numba_compiler.pyx",
+
+        # Phase 3: Morsel operators
+        "sabot/_cython/operators/base_operator.pyx",
+        "sabot/_cython/operators/morsel_operator.pyx",
+
+        # Phase 4: Network shuffle
+        "sabot/_cython/operators/shuffled_operator.pyx",
+        "sabot/_cython/shuffle/morsel_shuffle.pyx",
 
         # Tonbo LSM storage wrapper
         "sabot/_cython/tonbo_wrapper.pyx",  # Tonbo Cython wrapper
@@ -208,6 +219,9 @@ def find_pyx_files():
         # Numba UDF compilation (Phase 2: Auto-compilation)
         "sabot/_cython/operators/numba_compiler.pyx",  # AST analysis and JIT compilation
 
+        # Base operator (Phase 3: Foundation for morsel parallelism)
+        "sabot/_cython/operators/base_operator.pyx",  # Base class extracted for all operators
+
         # Streaming operators (Phase 1: Transform operators)
         "sabot/_cython/operators/transform.pyx",  # map, filter, select, flatMap, union
 
@@ -216,6 +230,9 @@ def find_pyx_files():
 
         # Streaming operators (Phase 3: Join operators)
         "sabot/_cython/operators/joins.pyx",  # hash join, interval join, as-of join
+
+        # Morsel-driven operator wrapper (Phase 3: Morsel parallelism)
+        "sabot/_cython/operators/morsel_operator.pyx",  # Automatic morsel-driven parallel execution
 
         # Shuffle operators (Phase 4: Operator parallelism)
         "sabot/_cython/shuffle/partitioner.pyx",  # Hash/Range/RoundRobin partitioning
@@ -229,6 +246,9 @@ def find_pyx_files():
         "sabot/_cython/shuffle/flight_transport.pyx",  # Arrow Flight C++ wrapper (legacy)
         "sabot/_cython/shuffle/shuffle_transport.pyx",  # Arrow Flight-based network transport
         "sabot/_cython/shuffle/shuffle_manager.pyx",  # Shuffle coordination
+
+        # Morsel-driven shuffle (Phase 3: Streaming shuffle with morsel parallelism)
+        "sabot/_cython/shuffle/morsel_shuffle.pyx",  # Pipelined shuffle using work-stealing morsels
     ]
 
     for pyx_path in working_extensions:
@@ -238,20 +258,11 @@ def find_pyx_files():
         else:
             print(f"Warning: {pyx_path} not found, skipping")
 
-    # Skip complex extensions for now
-    # TODO: Add back once basic build works
-    # for pyx_file in sabot_dir.rglob("*.pyx"):
-    #     if not str(pyx_file).startswith(str(sabot_dir)):
-    #         continue
-    #
-    #     skip_files = [
-    #         "arrow_core.pyx",
-    #         "arrow_core_simple.pyx",
-    #     ]
-    #     if pyx_file.name in skip_files:
-    #         continue
-    #
-    #     pyx_files.append(str(pyx_file.relative_to(sabot_dir.parent)))
+    # All previously disabled modules have been fixed and re-enabled:
+    # - windows.pyx: Fixed cdef declarations in async control flow
+    # - joins.pyx: Fixed PyObject* usage in C++ containers
+    # - morsel_parallelism.pyx: Fixed nogil usage with locks
+    # - materialized_views.pyx: Fixed PyObject* in state storage
 
     return sorted(pyx_files)  # Sort for consistent builds
 
@@ -275,6 +286,14 @@ def create_extensions():
             include_dirs = ["."]  # Current directory for sabot.* imports
             if system_libs['numpy_include']:
                 include_dirs.append(system_libs['numpy_include'])
+
+            # Add Arrow Python headers globally since many modules depend on .pxd files
+            # that reference these headers (even if they don't directly use Arrow)
+            if system_libs['arrow_python_dir']:
+                include_dirs.append(system_libs['arrow_python_dir'])
+                arrow_python_src = os.path.join(system_libs['arrow_python_dir'], 'pyarrow', 'src')
+                if os.path.exists(arrow_python_src):
+                    include_dirs.append(arrow_python_src)
 
             # Base library dirs
             library_dirs = []
@@ -305,9 +324,6 @@ def create_extensions():
                     include_dirs.append(system_libs['arrow_cpp_api_include'])
                 if system_libs['arrow_cpp_build_include']:
                     include_dirs.append(system_libs['arrow_cpp_build_include'])
-                # Add vendored Arrow Python bindings for Flight .pxd files
-                if system_libs['arrow_python_dir']:
-                    include_dirs.append(system_libs['arrow_python_dir'])
 
                 # Check if this module uses cimport pyarrow.lib directly or imports from modules that do
                 try:
@@ -504,7 +520,10 @@ setup(
                 ".",  # Current directory for sabot.* imports
                 libs['arrow_include'] if libs and libs['arrow_include'] else ".",
                 libs['arrow_cpp_build_include'] if libs and libs.get('arrow_cpp_build_include') else ".",
+                libs['arrow_python_dir'] if libs and libs.get('arrow_python_dir') else ".",  # For pyarrow .pxd files
             ],
+            nthreads=0,  # 0 = auto-detect CPU count for parallel compilation
+            force=False,  # Enable incremental builds (only rebuild changed files)
         )
     )(*create_extensions()) if HAS_CYTHON else create_extensions()[0]
     )(),

@@ -5,10 +5,11 @@ Cython header for aggregation operators.
 Defines aggregation operators using Tonbo state backend for columnar state.
 """
 
-from sabot._cython.operators.transform cimport BaseOperator
+from sabot._cython.operators.base_operator cimport BaseOperator
+from sabot._cython.operators.shuffled_operator cimport ShuffledOperator
 
 
-cdef class CythonGroupByOperator(BaseOperator):
+cdef class CythonGroupByOperator(ShuffledOperator):
     """GroupBy operator using Tonbo columnar state."""
     cdef list _keys
     cdef dict _aggregations

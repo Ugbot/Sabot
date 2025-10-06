@@ -31,6 +31,7 @@ from .types cimport ShuffleEdgeType
 # Python-level imports - use vendored Arrow
 from sabot import cyarrow
 # TODO: Add compute to cyarrow wrapper
+import pyarrow as pa
 import pyarrow.compute as pc
 
 
@@ -179,7 +180,8 @@ cdef class HashPartitioner(Partitioner):
             hash_array_obj = pc.hash(key_arrays[0])
         else:
             # Multiple columns - combine with struct
-            struct_array = pyarrow.StructArray.from_arrays(
+            import pyarrow as pa
+            struct_array = pa.StructArray.from_arrays(
                 key_arrays,
                 names=[self.key_columns[i].decode('utf-8') for i in range(self.key_columns.size())]
             )
@@ -254,13 +256,13 @@ cdef class HashPartitioner(Partitioner):
         for partition_id in range(self.num_partitions):
             if len(partition_indices[partition_id]) == 0:
                 # Empty partition - create empty batch with same schema
-                partition_batch_obj = pyarrow.RecordBatch.from_arrays(
-                    [pyarrow.array([], type=field.type) for field in py_batch_obj.schema],
+                partition_batch_obj = pa.RecordBatch.from_arrays(
+                    [pa.array([], type=field.type) for field in py_batch_obj.schema],
                     schema=py_batch_obj.schema
                 )
             else:
                 # Use take kernel to select rows for this partition (zero-copy)
-                indices_array_obj = pyarrow.array(partition_indices[partition_id], type=pyarrow.int64())
+                indices_array_obj = pa.array(partition_indices[partition_id], type=pa.int64())
                 partition_batch_obj = pc.take(py_batch_obj, indices_array_obj)
 
             # Convert back to Cython type and store C++ shared_ptr
@@ -372,12 +374,12 @@ cdef class RangePartitioner(Partitioner):
         for partition_id in range(self.num_partitions):
             if len(partition_indices[partition_id]) == 0:
                 # Empty partition
-                partition_batch_obj = pyarrow.RecordBatch.from_arrays(
-                    [pyarrow.array([], type=field.type) for field in py_batch_obj.schema],
+                partition_batch_obj = pa.RecordBatch.from_arrays(
+                    [pa.array([], type=field.type) for field in py_batch_obj.schema],
                     schema=py_batch_obj.schema
                 )
             else:
-                indices_array_obj = pyarrow.array(partition_indices[partition_id], type=pyarrow.int64())
+                indices_array_obj = pa.array(partition_indices[partition_id], type=pa.int64())
                 partition_batch_obj = pc.take(py_batch_obj, indices_array_obj)
 
             partition_batch_cython = partition_batch_obj
@@ -441,12 +443,12 @@ cdef class RoundRobinPartitioner(Partitioner):
         for partition_id in range(self.num_partitions):
             if len(partition_indices[partition_id]) == 0:
                 # Empty partition
-                partition_batch_obj = pyarrow.RecordBatch.from_arrays(
-                    [pyarrow.array([], type=field.type) for field in py_batch_obj.schema],
+                partition_batch_obj = pa.RecordBatch.from_arrays(
+                    [pa.array([], type=field.type) for field in py_batch_obj.schema],
                     schema=py_batch_obj.schema
                 )
             else:
-                indices_array_obj = pyarrow.array(partition_indices[partition_id], type=pyarrow.int64())
+                indices_array_obj = pa.array(partition_indices[partition_id], type=pa.int64())
                 partition_batch_obj = pc.take(py_batch_obj, indices_array_obj)
 
             partition_batch_cython = partition_batch_obj
