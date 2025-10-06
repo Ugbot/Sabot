@@ -9,3 +9,5 @@
 - in planning and roadmap docs, dont use time just steps in order.
 - be accurate not optimistic about statements of progress. also there is no need to bash previous statements just corrrect them
 - this is professional project, avoid emotion in descriptions.
+- any time we are testing sabot it  has to use cyarrow not pyarrow.
+- the goal is to build an intergrated system so a user does not need a million imports. sabot should feel like one thing not a box of bits.

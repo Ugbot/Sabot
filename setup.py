@@ -98,6 +98,29 @@ def detect_system_libs():
                 rocksdb_lib = rocksdb_lib_path
                 break
 
+    # Tonbo FFI (vendored Rust library)
+    tonbo_include = None
+    tonbo_lib = None
+    tonbo_ffi_dir = os.path.join(os.path.dirname(__file__), "tonbo", "tonbo-ffi")
+    tonbo_header = os.path.join(tonbo_ffi_dir, "tonbo_ffi.h")
+    tonbo_lib_dir = os.path.join(tonbo_ffi_dir, "target", "release")
+
+    if os.path.exists(tonbo_header) and os.path.exists(tonbo_lib_dir):
+        # Check for libtonbo_ffi
+        tonbo_libs = (
+            glob.glob(os.path.join(tonbo_lib_dir, "libtonbo_ffi.so")) +
+            glob.glob(os.path.join(tonbo_lib_dir, "libtonbo_ffi.dylib")) +
+            glob.glob(os.path.join(tonbo_lib_dir, "libtonbo_ffi.a"))
+        )
+        if tonbo_libs:
+            tonbo_include = tonbo_ffi_dir
+            tonbo_lib = tonbo_lib_dir
+            print(f"✅ Found Tonbo FFI library: {tonbo_libs[0]}")
+        else:
+            print(f"⚠️  Tonbo FFI not built yet - run: cd tonbo/tonbo-ffi && cargo build --release")
+    else:
+        print("⚠️  Tonbo FFI directory not found")
+
     return {
         'numpy_include': numpy_include,
         'arrow_include': arrow_include,
@@ -107,6 +130,8 @@ def detect_system_libs():
         'arrow_libs': arrow_libs,
         'rocksdb_include': rocksdb_include,
         'rocksdb_lib': rocksdb_lib,
+        'tonbo_include': tonbo_include,
+        'tonbo_lib': tonbo_lib,
     }
 
 # Check for existing .pyx files
@@ -164,6 +189,7 @@ def find_pyx_files():
         # Zero-copy Arrow compute functions
         "sabot/_c/arrow_core.pyx",  # Core zero-copy compute functions (window_ids, sort_and_take, hash_join)
         "sabot/_c/data_loader.pyx",  # High-performance data loader (CSV, Arrow IPC)
+        "sabot/_c/materialization_engine.pyx",  # Unified materialization (dimension tables + analytical views)
 
         # Zero-copy Arrow operators (using cimport pyarrow.lib)
         "sabot/core/_ops.pyx",  # Core zero-copy stream operators
@@ -180,6 +206,19 @@ def find_pyx_files():
 
         # Streaming operators (Phase 3: Join operators)
         "sabot/_cython/operators/joins.pyx",  # hash join, interval join, as-of join
+
+        # Shuffle operators (Phase 4: Operator parallelism)
+        "sabot/_cython/shuffle/partitioner.pyx",  # Hash/Range/RoundRobin partitioning
+        "sabot/_cython/shuffle/shuffle_buffer.pyx",  # Buffer management with spill-to-disk
+
+        # Lock-free shuffle transport (LMAX Disruptor-style)
+        "sabot/_cython/shuffle/lock_free_queue.pyx",  # SPSC/MPSC lock-free ring buffers
+        "sabot/_cython/shuffle/atomic_partition_store.pyx",  # Atomic hash table
+        "sabot/_cython/shuffle/flight_transport_lockfree.pyx",  # Lock-free Flight transport
+
+        "sabot/_cython/shuffle/flight_transport.pyx",  # Arrow Flight C++ wrapper (legacy)
+        "sabot/_cython/shuffle/shuffle_transport.pyx",  # Arrow Flight-based network transport
+        "sabot/_cython/shuffle/shuffle_manager.pyx",  # Shuffle coordination
     ]
 
     for pyx_path in working_extensions:
@@ -246,7 +285,7 @@ def create_extensions():
                 print(f"  Include dirs: {include_dirs}")
                 print(f"  Library dirs: {library_dirs}")
 
-            elif "arrow" in pyx_file.lower() or "core/_ops" in pyx_file:
+            elif "arrow" in pyx_file.lower() or "core/_ops" in pyx_file or "materialization_engine" in pyx_file or "shuffle" in pyx_file.lower():
                 # Arrow extensions - different handling based on implementation
                 if system_libs['arrow_include']:
                     include_dirs.append(system_libs['arrow_include'])
@@ -267,6 +306,12 @@ def create_extensions():
                             # Uses cimport pyarrow.lib directly or imports from modules that do - no external Arrow libs needed
                             libraries = []
                             print(f"Configuring Arrow extension (cimport pyarrow.lib, no external linking): {module_name}")
+                        elif "flight_transport" in pyx_file:
+                            # Flight transport uses C++ Flight API - needs arrow_flight library
+                            if system_libs['arrow_libs']:
+                                library_dirs.extend(system_libs['arrow_libs'])
+                            libraries = ["arrow", "arrow_flight"]
+                            print(f"Configuring Arrow Flight extension (linking arrow_flight): {module_name}")
                         elif ("import pyarrow" in content and "cimport pyarrow" not in content):
                             # Uses Python-level pyarrow imports only - no external linking needed
                             libraries = []
@@ -292,11 +337,19 @@ def create_extensions():
                 print(f"Configuring Redis extension: {module_name}")
 
             elif "tonbo" in pyx_file.lower():
-                # Tonbo extensions (Rust, but C bindings)
-                # Tonbo typically provides its own C API, so minimal config needed
-                language = "c++"
+                # Tonbo extensions (Rust FFI via C bindings)
+                if system_libs['tonbo_include']:
+                    include_dirs.append(system_libs['tonbo_include'])
+                if system_libs['tonbo_lib']:
+                    library_dirs.append(system_libs['tonbo_lib'])
+                    libraries = ["tonbo_ffi"]
+                    print(f"Configuring Tonbo extension with FFI: {module_name}")
+                    print(f"  Include dirs: {include_dirs}")
+                    print(f"  Library dirs: {library_dirs}")
+                else:
+                    print(f"⚠️  Configuring Tonbo extension WITHOUT FFI (not built): {module_name}")
 
-                print(f"Configuring Tonbo extension: {module_name}")
+                language = "c++"
 
             else:
                 # Standard Cython extension - use C++ since we use libcpp everywhere

@@ -316,7 +316,10 @@ class JobGraph:
 
             operator_to_tasks[operator.operator_id] = task_ids
 
-        # Create task edges (connect parallel instances)
+        # Create task edges and shuffle edges (connect parallel instances)
+        from .execution_graph import ShuffleEdge, ShuffleEdgeType
+        import uuid
+
         for operator in self.operators.values():
             upstream_tasks = operator_to_tasks[operator.operator_id]
 
@@ -324,15 +327,54 @@ class JobGraph:
                 downstream_op = self.operators[downstream_op_id]
                 downstream_tasks = operator_to_tasks[downstream_op_id]
 
-                # Strategy: Hash partition by key (if stateful), else round-robin
-                if downstream_op.stateful and downstream_op.key_by:
-                    # All upstream tasks connect to all downstream tasks
-                    # (hash partitioning happens at runtime)
+                # Detect shuffle type based on operator characteristics
+                shuffle_type = exec_graph.detect_shuffle_edge_type(
+                    operator.operator_id,
+                    downstream_op_id,
+                    downstream_op.stateful,
+                    downstream_op.key_by
+                )
+
+                # Create shuffle edge metadata
+                shuffle_edge = ShuffleEdge(
+                    shuffle_id=f"shuffle_{operator.operator_id}_{downstream_op_id}_{str(uuid.uuid4())[:8]}",
+                    upstream_operator_id=operator.operator_id,
+                    downstream_operator_id=downstream_op_id,
+                    edge_type=shuffle_type,
+                    partition_keys=downstream_op.key_by if downstream_op.stateful else None,
+                    num_partitions=len(downstream_tasks),
+                    upstream_task_ids=upstream_tasks.copy(),
+                    downstream_task_ids=downstream_tasks.copy(),
+                )
+                exec_graph.add_shuffle_edge(shuffle_edge)
+
+                # Connect tasks based on shuffle type
+                if shuffle_type == ShuffleEdgeType.FORWARD:
+                    # 1:1 mapping (operator chaining, no shuffle)
+                    for i in range(min(len(upstream_tasks), len(downstream_tasks))):
+                        exec_graph.connect_tasks(upstream_tasks[i], downstream_tasks[i])
+
+                elif shuffle_type == ShuffleEdgeType.HASH:
+                    # Hash partition: All upstream connect to all downstream (N×M)
+                    # Data will be partitioned by key at runtime
                     for up_task in upstream_tasks:
                         for down_task in downstream_tasks:
                             exec_graph.connect_tasks(up_task, down_task)
+
+                elif shuffle_type == ShuffleEdgeType.REBALANCE:
+                    # Round-robin: Each upstream connects to subset of downstream
+                    for i, up_task in enumerate(upstream_tasks):
+                        down_task = downstream_tasks[i % len(downstream_tasks)]
+                        exec_graph.connect_tasks(up_task, down_task)
+
+                elif shuffle_type == ShuffleEdgeType.BROADCAST:
+                    # Broadcast: All upstream connect to all downstream
+                    for up_task in upstream_tasks:
+                        for down_task in downstream_tasks:
+                            exec_graph.connect_tasks(up_task, down_task)
+
                 else:
-                    # Round-robin: each upstream connects to subset of downstream
+                    # Default: round-robin
                     for i, up_task in enumerate(upstream_tasks):
                         down_task = downstream_tasks[i % len(downstream_tasks)]
                         exec_graph.connect_tasks(up_task, down_task)

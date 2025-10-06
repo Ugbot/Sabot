@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-Header file for High-Performance Tonbo Cython Wrapper
+Header file for High-Performance Tonbo Cython Wrapper (FFI version)
 """
 
-from libc.stdint cimport int64_t, int32_t
+from libc.stdint cimport int64_t, int32_t, uint8_t, uintptr_t
+from sabot._cython.tonbo_ffi cimport TonboDb
 
 cdef class FastTonboBackend:
     cdef:
-        object _db_path
-        object _tonbo_db
-        object _event_loop
+        TonboDb* _db
+        bytes _db_path_bytes
         bint _initialized
         object _logger
-
-    cdef int64_t _get_current_timestamp_ns(self)
 
 cdef class TonboCythonWrapper:
     cdef:

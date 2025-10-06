@@ -1,0 +1,50 @@
+# Build directories
+build/
+cmake-build-*/
+out/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test databases and temporary files
+*.db
+*.tmp
+/tmp/*
+/tmp/marble*
+
+# Compiled libraries and executables
+*.so
+*.dylib
+*.dll
+*.exe
+*.a
+*.lib
+
+# Generated files
+*.pb.h
+*.pb.cc
+*_pb2.py
+
+# Log files
+*.log
+
+# Coverage reports
+coverage.xml
+*.gcda
+*.gcno
+*.gcov
+
+# Dependencies (if using git submodules)
+vendor/
+third_party/
+
+# Local configuration
+.config

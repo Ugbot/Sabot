@@ -116,10 +116,10 @@ class TonboBackend(StoreBackend):
 
     async def start(self) -> None:
         """Initialize the Tonbo backend with optimal performance settings."""
-        if not TONBO_AVAILABLE and not (CYTHON_TONBO_AVAILABLE or ARROW_TONBO_AVAILABLE):
+        if not CYTHON_TONBO_AVAILABLE and not TONBO_AVAILABLE and not ARROW_TONBO_AVAILABLE:
             raise RuntimeError(
-                "Tonbo backend requires Tonbo Python bindings or Cython/Arrow backends. "
-                "Install from: pip install tonbo"
+                "Tonbo backend requires Tonbo Cython FFI or Python bindings. "
+                "Build with: python setup.py build_ext --inplace"
             )
 
         try:
@@ -129,11 +129,12 @@ class TonboBackend(StoreBackend):
                 await self._arrow_store.initialize()
                 self.logger.info(f"Tonbo Arrow backend initialized at {self.db_path}")
 
-            # Use Cython backend for maximum performance if available and Tonbo is installed
-            if self._use_cython and CYTHON_TONBO_AVAILABLE and TONBO_AVAILABLE:
+            # Use Cython FFI backend for maximum performance (synchronous, no async needed)
+            if self._use_cython and CYTHON_TONBO_AVAILABLE:
                 self._cython_backend = FastTonboBackend(str(self.db_path))
-                await self._cython_backend.initialize()
-                self.logger.info(f"Tonbo Cython backend initialized at {self.db_path}")
+                # FFI backend is synchronous, call initialize() directly
+                self._cython_backend.initialize()
+                self.logger.info(f"Tonbo Cython FFI backend initialized at {self.db_path}")
 
             else:
                 # No Tonbo backends available, use file-based fallback
@@ -181,10 +182,10 @@ class TonboBackend(StoreBackend):
                     self.logger.error(f"Error closing Arrow store: {e}")
                 self._arrow_store = None
 
-            # Close Cython backend
+            # Close Cython FFI backend (synchronous)
             if self._cython_backend:
                 try:
-                    await self._cython_backend.close()
+                    self._cython_backend.close()
                 except Exception as e:
                     self.logger.error(f"Error closing Cython backend: {e}")
                 self._cython_backend = None
@@ -232,11 +233,11 @@ class TonboBackend(StoreBackend):
 
     async def get(self, key: Any) -> Optional[Any]:
         """Get a value by key using Tonbo's efficient lookup."""
-        # Use Cython backend for maximum performance if available
+        # Use Cython FFI backend for maximum performance (synchronous call)
         if self._cython_backend:
             try:
                 key_str = self._key_to_string(key)
-                value_bytes = await self._cython_backend.fast_get(key_str)
+                value_bytes = self._cython_backend.fast_get(key_str)
                 return self._bytes_to_value(value_bytes) if value_bytes else None
             except Exception as e:
                 self.logger.error(f"Tonbo Cython get error for key {key}: {e}")
@@ -268,12 +269,12 @@ class TonboBackend(StoreBackend):
 
     async def set(self, key: Any, value: Any) -> None:
         """Set a value by key using Tonbo's insert operation."""
-        # Use Cython backend for maximum performance if available
+        # Use Cython FFI backend for maximum performance (synchronous call)
         if self._cython_backend:
             try:
                 key_str = self._key_to_string(key)
                 value_bytes = self._value_to_bytes(value)
-                await self._cython_backend.fast_insert(key_str, value_bytes)
+                self._cython_backend.fast_insert(key_str, value_bytes)
                 return
             except Exception as e:
                 self.logger.error(f"Tonbo Cython set error for key {key}: {e}")
@@ -298,11 +299,11 @@ class TonboBackend(StoreBackend):
 
     async def delete(self, key: Any) -> bool:
         """Delete a value by key using Tonbo's remove operation."""
-        # Use Cython backend for maximum performance if available
+        # Use Cython FFI backend for maximum performance (synchronous call)
         if self._cython_backend:
             try:
                 key_str = self._key_to_string(key)
-                return await self._cython_backend.fast_delete(key_str)
+                return self._cython_backend.fast_delete(key_str)
             except Exception as e:
                 self.logger.error(f"Tonbo Cython delete error for key {key}: {e}")
                 return False
@@ -509,16 +510,12 @@ class TonboBackend(StoreBackend):
 
         async with self._lock:
             try:
-                # Use Cython backend for maximum performance
+                # Use Cython backend with individual inserts (FFI doesn't have batch yet)
                 if self._cython_backend:
-                    # Convert items to the format expected by Cython backend
-                    key_value_pairs = []
                     for key, value in items.items():
                         key_str = self._key_to_string(key)
                         value_bytes = self._value_to_bytes(value)
-                        key_value_pairs.append((key_str, value_bytes))
-
-                    await self._cython_backend.fast_batch_insert(key_value_pairs)
+                        self._cython_backend.fast_insert(key_str, value_bytes)
                     self.logger.debug(f"Batch inserted {len(items)} items")
 
                 elif self._arrow_store:
@@ -540,17 +537,14 @@ class TonboBackend(StoreBackend):
 
         async with self._lock:
             try:
-                # Use Cython backend for maximum performance
+                # Use Cython FFI backend with individual deletes
                 if self._cython_backend:
-                    # Convert keys to strings
-                    key_strings = [self._key_to_string(key) for key in keys]
                     deleted_count = 0
-
-                    # Delete each key (in real Tonbo, this would be a batch operation)
-                    for key_str in key_strings:
-                        if await self._cython_backend.fast_exists(key_str):
-                            await self._cython_backend.fast_delete(key_str)
-                            deleted_count += 1
+                    for key in keys:
+                        key_str = self._key_to_string(key)
+                        if self._cython_backend.fast_exists(key_str):
+                            if self._cython_backend.fast_delete(key_str):
+                                deleted_count += 1
 
                     self.logger.debug(f"Batch deleted {deleted_count} items")
                     return deleted_count
