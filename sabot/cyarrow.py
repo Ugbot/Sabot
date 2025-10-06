@@ -156,9 +156,8 @@ except ImportError as e:
 
 # Additional compute functions (use internal or fall back)
 try:
-    if USING_INTERNAL:
-        from ._cython.arrow_core_simple import compute
-    elif USING_EXTERNAL:
+    if USING_INTERNAL or USING_ZERO_COPY:
+        # Import pyarrow.compute for now - TODO: implement our own compute wrappers
         import pyarrow.compute as compute
     else:
         compute = None

@@ -6,6 +6,7 @@
 #include <functional>
 #include <marble/status.h>
 #include <marble/record.h>
+#include <marble/db.h>
 #include <marble/task_scheduler.h>
 #include <marble/query.h>
 #include <arrow/api.h>
@@ -102,6 +103,24 @@ public:
 class SSTable {
 public:
     SSTable() = default;
+
+    // Block-level statistics for ClickHouse-style indexing
+    struct BlockStats {
+        std::shared_ptr<Key> min_key;
+        std::shared_ptr<Key> max_key;
+        uint64_t row_count = 0;
+        uint64_t block_offset = 0;  // Offset in the SSTable file
+        uint64_t block_size = 0;    // Size of the block in bytes
+        uint64_t first_row_index = 0; // Index of first row in this block
+    };
+
+    // Sparse index entry for fast key lookup
+    struct SparseIndexEntry {
+        std::shared_ptr<Key> key;
+        uint64_t block_index = 0;   // Which block this key belongs to
+        uint64_t row_index = 0;     // Row index within the block
+    };
+
     struct Metadata {
         std::string filename;
         uint64_t file_size = 0;
@@ -110,6 +129,14 @@ public:
         uint64_t num_entries = 0;
         int level = 0;  // LSM level
         uint64_t sequence_number = 0;
+
+        // ClickHouse-style indexing
+        uint32_t block_size = 8192;  // Target block size in rows
+        uint32_t index_granularity = 8192;  // Sparse index every N rows
+        bool has_bloom_filter = false;
+        bool has_sparse_index = false;
+        std::vector<BlockStats> block_stats;
+        std::vector<SparseIndexEntry> sparse_index;
     };
 
     virtual ~SSTable() = default;
@@ -117,10 +144,6 @@ public:
     // Open an existing SSTable
     static Status Open(const std::string& filename, std::unique_ptr<SSTable>* table);
 
-    // Create a new SSTable from RecordBatch
-    static Status Create(const std::string& filename,
-                        const std::shared_ptr<arrow::RecordBatch>& batch,
-                        std::unique_ptr<SSTable>* table);
 
     // Get metadata
     virtual const Metadata& GetMetadata() const = 0;
@@ -140,12 +163,52 @@ public:
     // Get bloom filter (if available)
     virtual Status GetBloomFilter(std::string* bloom_filter) const = 0;
 
+    // Get block-level statistics for query optimization
+    virtual Status GetBlockStats(std::vector<BlockStats>* stats) const = 0;
+
     // Read the entire SSTable as RecordBatch
     virtual Status ReadRecordBatch(std::shared_ptr<arrow::RecordBatch>* batch) const = 0;
 
     // Disable copying
     SSTable(const SSTable&) = delete;
     SSTable& operator=(const SSTable&) = delete;
+};
+
+// Factory function for creating SSTables with ClickHouse-style indexing
+Status CreateSSTable(const std::string& filename,
+                    const std::shared_ptr<arrow::RecordBatch>& batch,
+                    const DBOptions& options,
+                    std::unique_ptr<SSTable>* table);
+
+// Simple Bloom Filter implementation for ClickHouse-style indexing
+class BloomFilter {
+public:
+    BloomFilter(size_t bits_per_key, size_t num_keys);
+    ~BloomFilter();
+
+    // Add a key to the filter
+    void Add(const Key& key);
+
+    // Check if a key might be in the filter
+    bool MayContain(const Key& key) const;
+
+    // Get the size of the filter in bytes
+    size_t Size() const { return bits_.size() / 8; }
+
+    // Serialize the filter
+    Status Serialize(std::string* data) const;
+
+    // Deserialize the filter
+    static Status Deserialize(const std::string& data, std::unique_ptr<BloomFilter>* filter);
+
+private:
+    std::vector<uint8_t> bits_;
+    size_t num_hashes_;
+
+    // Hash functions for Bloom filter
+    uint64_t Hash1(const std::string& key) const;
+    uint64_t Hash2(const std::string& key) const;
+    size_t NthHash(uint64_t hash1, uint64_t hash2, size_t n) const;
 };
 
 // LSM Tree configuration

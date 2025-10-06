@@ -32,7 +32,7 @@ from libcpp.memory cimport shared_ptr, unique_ptr, make_shared
 from libcpp.string cimport string
 
 # Use SABOT's cyarrow, NOT pyarrow
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.libarrow cimport (
     CRecordBatch as PCRecordBatch,
     CSchema as PCSchema,

@@ -23,7 +23,10 @@ import os
 from pathlib import Path
 from typing import Optional, List
 
-import pyarrow as pa
+# Use vendored Arrow via cyarrow wrapper
+from sabot import cyarrow as ca
+# For now, still import specialized modules from pyarrow directly
+# TODO: Add csv, feather, compute to cyarrow wrapper
 import pyarrow.csv as pa_csv
 import pyarrow.feather as feather
 import pyarrow.compute as pc

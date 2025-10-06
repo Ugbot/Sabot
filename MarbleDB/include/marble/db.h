@@ -42,6 +42,13 @@ struct DBOptions {
     size_t max_level_files_base = 8;
     size_t level_multiplier = 2;
 
+    // ClickHouse-style indexing options
+    bool enable_sparse_index = true;
+    size_t index_granularity = 8192;  // Index every N rows (sparse index)
+    size_t target_block_size = 8192;  // Target rows per block
+    bool enable_bloom_filter = true;
+    size_t bloom_filter_bits_per_key = 10;  // Bloom filter size
+
     // Threading options
     size_t max_background_threads = 4;
 };

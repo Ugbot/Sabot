@@ -437,7 +437,7 @@ if __name__ == "__main__":
     async def test_ranking():
         """Test ranking operator locally."""
         # Create test data with multiple instruments and windows
-        import pyarrow as pa
+        # Using cyarrow already imported at top of file
 
         instrument_ids = ['BOND_1', 'BOND_1', 'BOND_1', 'BOND_1', 'BOND_1',
                           'BOND_2', 'BOND_2', 'BOND_2']

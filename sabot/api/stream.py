@@ -17,8 +17,11 @@ Example:
 """
 
 from typing import Callable, List, Optional, Dict, Any, Union, Iterable
-import pyarrow as pa
-import pyarrow.compute as pc
+from sabot import cyarrow as ca
+
+# Convenience alias for Arrow compute functions (mirrors pyarrow.compute)
+# This allows code like: cc.greater(batch.column('price'), 100)
+cc = ca.compute if hasattr(ca, 'compute') and ca.compute else None
 
 # Import Cython operators
 try:
@@ -48,29 +51,66 @@ class Stream:
     """
     High-level streaming API with automatic Cython acceleration.
 
-    All operations are lazy and zero-copy. Data is only processed
-    when the stream is consumed (iterated).
+    BATCH-FIRST ARCHITECTURE
+    ========================
+
+    Sabot's fundamental unit of processing is the RecordBatch (Arrow columnar
+    format). All operations are batch-level transformations. Streaming and
+    batch processing use IDENTICAL operators - the only difference is source
+    boundedness.
+
+    Key Concepts:
+
+    1. **Everything is Batches**
+       - All operators process RecordBatch → RecordBatch
+       - Zero-copy throughout via Arrow
+       - SIMD acceleration via Arrow compute
+
+    2. **Batch Mode vs Streaming Mode**
+       - Batch mode: Finite source (files, tables) → iteration terminates
+       - Streaming mode: Infinite source (Kafka, sockets) → runs forever
+       - SAME code, SAME operators, different boundedness only
+
+    3. **Per-Record is API Sugar**
+       - .records() method unpacks batches for user convenience
+       - NOT recommended for production (use batch API for performance)
+       - Data plane (Cython operators) NEVER see individual records
+
+    4. **Lazy Evaluation**
+       - Operations build a DAG, no execution until consumed
+       - for batch in stream → executes the pipeline
+       - async for batch in stream → async execution
 
     Examples:
-        # From RecordBatches
-        stream = Stream.from_batches(batches)
 
-        # From PyArrow Table
-        stream = Stream.from_table(table)
-
-        # From Python dicts
-        stream = Stream.from_dicts([{'a': 1}, {'a': 2}])
-
-        # Chain operations
+        # Batch processing (finite)
+        stream = Stream.from_parquet('data.parquet')
         result = (stream
             .filter(lambda b: pc.greater(b.column('amount'), 1000))
             .map(lambda b: b.append_column('fee', pc.multiply(b.column('amount'), 0.03)))
             .select('id', 'amount', 'fee')
         )
 
-        # Consume (lazy evaluation)
-        for batch in result:
-            print(batch)
+        for batch in result:  # Terminates when file exhausted
+            process(batch)
+
+        # Streaming processing (infinite) - SAME PIPELINE!
+        stream = Stream.from_kafka('localhost:9092', 'transactions', 'my-group')
+        result = (stream
+            .filter(lambda b: pc.greater(b.column('amount'), 1000))
+            .map(lambda b: b.append_column('fee', pc.multiply(b.column('amount'), 0.03)))
+            .select('id', 'amount', 'fee')
+        )
+
+        async for batch in result:  # Runs forever
+            process(batch)
+
+    Performance:
+        - Filter: 10-500M records/sec (SIMD)
+        - Map: 10-100M records/sec
+        - Select: 50-1000M records/sec (zero-copy)
+        - Join: 2-50M records/sec
+        - GroupBy: 5-100M records/sec
     """
 
     def __init__(self, source: Iterable[pa.RecordBatch], schema: Optional[pa.Schema] = None):

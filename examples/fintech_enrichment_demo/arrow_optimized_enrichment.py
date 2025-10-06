@@ -25,10 +25,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
-import pyarrow as pa
-import pyarrow.csv as pa_csv
-import pyarrow.compute as pc
-import pyarrow.feather as feather
+from sabot import cyarrow as ca
 import numpy as np
 
 # Sabot zero-copy Arrow functions (CyArrow - our Cython wrapper)
@@ -39,6 +36,10 @@ from sabot.cyarrow import (
     ArrowComputeEngine,
     USING_ZERO_COPY,
 )
+
+# Specialized modules not yet in cyarrow wrapper
+import pyarrow.csv as pa_csv
+import pyarrow.feather as feather
 
 print(f"Zero-copy Arrow enabled: {USING_ZERO_COPY}")
 assert USING_ZERO_COPY, "Zero-copy Arrow required for optimal performance"

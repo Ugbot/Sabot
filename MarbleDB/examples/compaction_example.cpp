@@ -65,6 +65,11 @@ public:
         return Status::NotImplemented("Mock SSTable");
     }
 
+    Status GetBlockStats(std::vector<BlockStats>* stats) const override {
+        stats->clear();
+        return Status::OK();
+    }
+
     Status ReadRecordBatch(std::shared_ptr<arrow::RecordBatch>* batch) const override {
         return Status::NotImplemented("Mock SSTable");
     }

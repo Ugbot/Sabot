@@ -6,7 +6,7 @@ Tonbo columnar storage for Flink-level performance.
 """
 
 from typing import Optional, Any, List
-import pyarrow as pa
+from sabot import cyarrow as ca
 
 
 class State:

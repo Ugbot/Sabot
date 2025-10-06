@@ -13,7 +13,7 @@ from libcpp.memory cimport shared_ptr
 from libcpp.unordered_map cimport unordered_map
 
 # Import Cython Arrow types
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.libarrow cimport (
     CRecordBatch as PCRecordBatch,
     CSchema as PCSchema,
@@ -51,17 +51,17 @@ cdef class ShuffleManager:
     cpdef bytes register_shuffle(
         self, bytes operator_id, int32_t num_partitions,
         vector[string] partition_keys, ShuffleEdgeType edge_type,
-        pa.Schema schema
+        ca.Schema schema
     ) except *
 
     # Write side (upstream tasks)
     cdef void write_partition(
         self, bytes shuffle_id, int32_t partition_id,
-        pa.RecordBatch batch
+        ca.RecordBatch batch
     )
 
     # Read side (downstream tasks)
-    cdef pa.RecordBatch read_partition(
+    cdef ca.RecordBatch read_partition(
         self, bytes shuffle_id, int32_t partition_id,
         list upstream_agents
     )

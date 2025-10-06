@@ -18,14 +18,15 @@ from libcpp.unordered_map cimport unordered_map
 import uuid
 
 # Import Cython Arrow types
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.libarrow cimport (
     CRecordBatch as PCRecordBatch,
     CSchema as PCSchema,
 )
 
 # For Python API access when needed
-import pyarrow
+# Python-level imports - use vendored Arrow
+from sabot import cyarrow
 
 from .types cimport ShuffleMetadata, PartitionInfo, ShuffleEdgeType
 from .partitioner cimport Partitioner, create_partitioner
@@ -37,15 +38,15 @@ from .shuffle_transport cimport ShuffleTransport
 # Helper Functions
 # ============================================================================
 
-cdef inline pa.RecordBatch _wrap_batch(shared_ptr[PCRecordBatch] batch_cpp):
-    """Wrap C++ RecordBatch as Cython pa.RecordBatch (zero-copy)."""
-    cdef pa.RecordBatch result = pa.RecordBatch.__new__(pa.RecordBatch)
+cdef inline ca.RecordBatch _wrap_batch(shared_ptr[PCRecordBatch] batch_cpp):
+    """Wrap C++ RecordBatch as Cython ca.RecordBatch (zero-copy)."""
+    cdef ca.RecordBatch result = ca.RecordBatch.__new__(ca.RecordBatch)
     result.init(batch_cpp)
     return result
 
 
-cdef inline shared_ptr[PCRecordBatch] _unwrap_batch(pa.RecordBatch batch):
-    """Unwrap Cython pa.RecordBatch to C++ shared_ptr (zero-copy)."""
+cdef inline shared_ptr[PCRecordBatch] _unwrap_batch(ca.RecordBatch batch):
+    """Unwrap Cython ca.RecordBatch to C++ shared_ptr (zero-copy)."""
     return batch.sp_batch
 
 
@@ -93,7 +94,7 @@ cdef class ShuffleManager:
         int32_t num_partitions,
         vector[string] partition_keys,
         ShuffleEdgeType edge_type,
-        pa.Schema schema
+        ca.Schema schema
     ) except *:
         """
         Register a new shuffle operation.
@@ -103,7 +104,7 @@ cdef class ShuffleManager:
             num_partitions: Number of output partitions
             partition_keys: Column names to partition by
             edge_type: Type of shuffle (HASH, RANGE, REBALANCE)
-            schema: Arrow schema (Cython pa.Schema)
+            schema: Arrow schema (Cython ca.Schema)
 
         Returns:
             Shuffle ID
@@ -136,7 +137,7 @@ cdef class ShuffleManager:
         self,
         bytes shuffle_id,
         int32_t partition_id,
-        pa.RecordBatch batch
+        ca.RecordBatch batch
     ):
         """
         Write batch to partition (with partitioning and buffering).
@@ -144,7 +145,7 @@ cdef class ShuffleManager:
         Args:
             shuffle_id: Shuffle identifier
             partition_id: Target partition ID
-            batch: Batch to write (Cython pa.RecordBatch)
+            batch: Batch to write (Cython ca.RecordBatch)
         """
         # Get partitioner
         cdef Partitioner partitioner = self._partitioners.get(shuffle_id)
@@ -169,7 +170,7 @@ cdef class ShuffleManager:
                     self.transport.publish_partition(shuffle_id, i, merged)
                     buffer.clear()
 
-    cdef pa.RecordBatch read_partition(
+    cdef ca.RecordBatch read_partition(
         self,
         bytes shuffle_id,
         int32_t partition_id,
@@ -184,12 +185,12 @@ cdef class ShuffleManager:
             upstream_agents: List of upstream agent addresses
 
         Returns:
-            Merged batch from all upstream agents (Cython pa.RecordBatch)
+            Merged batch from all upstream agents (Cython ca.RecordBatch)
         """
         cdef:
             list batches = []
             object batch_obj
-            pa.RecordBatch result
+            ca.RecordBatch result
 
         # Fetch from each upstream agent
         for agent_address in upstream_agents:

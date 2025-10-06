@@ -13,7 +13,7 @@ from libcpp.memory cimport shared_ptr, unique_ptr
 from libcpp.queue cimport queue
 
 # Import Cython Arrow types
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.libarrow cimport (
     CRecordBatch as PCRecordBatch,
     CSchema as PCSchema,
@@ -46,8 +46,8 @@ cdef class ShuffleBuffer:
         string spill_path
         object spill_store  # Tonbo store handle
 
-    cdef void add_batch(self, pa.RecordBatch batch)
-    cdef pa.RecordBatch get_merged_batch(self)
+    cdef void add_batch(self, ca.RecordBatch batch)
+    cdef ca.RecordBatch get_merged_batch(self)
     cdef cbool should_flush(self) nogil
     cpdef void clear(self) except *
     cdef int64_t num_rows(self) nogil
@@ -103,6 +103,6 @@ cdef class SpillManager:
         int64_t total_spilled_bytes
 
     cdef string spill_batch(self, bytes shuffle_id, int32_t partition_id,
-                            pa.RecordBatch batch)
+                            ca.RecordBatch batch)
     cdef vector[shared_ptr[PCRecordBatch]] read_spilled(self, bytes spill_path)
     cpdef void cleanup_spill(self, bytes spill_path) except *

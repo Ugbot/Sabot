@@ -5,6 +5,8 @@
 **Total LOC:** ~60,000 lines
 **Status:** Experimental / Alpha
 
+**🎯 KEY CHANGE:** Sabot now uses **vendored Apache Arrow C++** - NO pip pyarrow dependency!
+
 This document provides a comprehensive map of the Sabot codebase structure, explaining the purpose of each directory and key files.
 
 ---
@@ -44,6 +46,11 @@ sabot/
 ├── rocksdb/               # Vendored RocksDB Python bindings
 ├── tonbo/                 # Vendored Tonbo (Rust embedded DB)
 ├── docs/                  # Documentation
+│   ├── design/            # Design documents
+│   │   └── UNIFIED_BATCH_ARCHITECTURE.md  # Core architecture spec
+│   ├── implementation/    # Implementation plans
+│   │   └── PHASE2_AUTO_NUMBA_COMPILATION.md  # Numba UDF compilation plan
+│   └── ...                # Other documentation
 ├── docker-compose.yml     # Infrastructure (Kafka, Postgres, Redis)
 ├── setup.py               # Build configuration
 └── pyproject.toml         # Project metadata
@@ -601,11 +608,18 @@ Runtime monitoring and dashboards.
 
 ---
 
-### `third-party/arrow/` (Vendored Apache Arrow)
-**Purpose:** Columnar in-memory format and compute engine
+### `vendor/arrow/` (Vendored Apache Arrow C++)
+**Purpose:** Self-contained Arrow C++ library - zero pip dependencies
 
-**Status:** ⚠️ **Claimed but not actually used**
-**Issue:** setup.py looks for vendored Arrow, but pyproject.toml uses `pyarrow>=10.0.0` from pip
+**Structure:**
+- `cpp/` - Arrow C++ source code (upstream Apache Arrow)
+- `cpp/build/install/` - Built Arrow libraries and headers (created by build.py)
+- `python/pyarrow/` - Cython .pxd bindings for Arrow C++ API
+
+**Status:** ✅ **ACTIVE - Primary Arrow implementation**
+**Build:** Built via `python build.py` or automatically during `pip install`
+**Usage:** All Cython modules use `cimport pyarrow.lib as ca` → resolves to vendored bindings
+**Why:** Full version control, optimized builds, no pip dependency conflicts
 
 ---
 
@@ -618,7 +632,28 @@ Runtime monitoring and dashboards.
 - Roadmaps (Flink parity)
 - Getting started guides
 
-**Status:** ✅ Extensive documentation (sometimes aspirational)
+**Key Design Documents:**
+- `docs/design/UNIFIED_BATCH_ARCHITECTURE.md` - **NEW**: Complete unified streaming/batch architecture
+  - Everything is batches (streaming = infinite batching)
+  - Auto-Numba UDF compilation
+  - Morsel-driven parallelism
+  - DBOS control plane
+  - Agents as worker nodes
+  - Clean data/control plane separation
+
+**Implementation Plans:**
+- `docs/implementation/PHASE7_PLAN_OPTIMIZATION.md` - **NEW**: Query optimization implementation guide
+  - Filter pushdown (2-5x speedup on filtered joins)
+  - Projection pushdown (20-40% memory reduction)
+  - Join reordering (10-30% speedup on multi-join queries)
+  - Operator fusion (5-15% speedup on chained transforms)
+  - Based on DuckDB optimizer architecture
+  - 44 hours estimated effort (3 weeks)
+
+**Status:** ✅ Extensive documentation
+**New (Oct 2025):**
+- ✅ Unified architecture design specification
+- ✅ Phase 7 plan optimization implementation guide
 
 ---
 

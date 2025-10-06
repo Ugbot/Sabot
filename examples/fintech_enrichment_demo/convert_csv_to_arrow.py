@@ -14,7 +14,8 @@ Usage:
 
 import time
 from pathlib import Path
-import pyarrow as pa
+from sabot import cyarrow as ca
+import pyarrow as pa  # For specialized types
 import pyarrow.csv as pa_csv
 import pyarrow.feather as feather
 

@@ -8,19 +8,19 @@ Header declarations for zero-copy ArrowBatchProcessor using pyarrow.lib.
 from libc.stdint cimport int64_t
 from libcpp cimport bool as cbool
 
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 
 
 cdef class ArrowBatchProcessor:
     cdef:
-        pa.RecordBatch _batch  # Cython-level RecordBatch
+        ca.RecordBatch _batch  # Cython-level RecordBatch
         int64_t _num_rows
         int64_t _num_columns
         dict _column_indices
         cbool _initialized
 
     # Core operations
-    cpdef void initialize_batch(self, pa.RecordBatch batch) except *
+    cpdef void initialize_batch(self, ca.RecordBatch batch) except *
     cdef inline int64_t _get_column_index(self, str column_name) except -1
     cdef int64_t _get_int64_value_nogil(self, int64_t col_idx, int64_t row_idx) nogil
     cdef double _get_float64_value_nogil(self, int64_t col_idx, int64_t row_idx) nogil
@@ -33,7 +33,7 @@ cdef class ArrowBatchProcessor:
                                        object watermark_tracker,
                                        object window_assigner) except *
     cpdef dict get_batch_info(self)
-    cpdef pa.RecordBatch get_batch(self)
+    cpdef ca.RecordBatch get_batch(self)
 
 
 cdef class ArrowComputeEngine:

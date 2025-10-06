@@ -7,7 +7,7 @@ Access C++ objects without Python wrapping for maximum performance.
 """
 
 # Import PyArrow's Cython API for direct C++ access
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.common cimport *
 from pyarrow.includes.libarrow cimport (
     CArray as PCArray,
@@ -33,21 +33,21 @@ cimport cython
 # ============================================================================
 
 # Provide the functions that batch_processor.pyx expects
-cdef inline const int64_t* get_int64_data_ptr(pa.Array arr) nogil:
+cdef inline const int64_t* get_int64_data_ptr(ca.Array arr) nogil:
     """Get int64 data pointer from PyArrow Array."""
     cdef shared_ptr[PCArrayData] array_data = arr.ap.data()
     cdef const uint8_t* addr = array_data.get().buffers[1].get().data()
     return <const int64_t*>addr
 
 
-cdef inline const double* get_float64_data_ptr(pa.Array arr) nogil:
+cdef inline const double* get_float64_data_ptr(ca.Array arr) nogil:
     """Get float64 data pointer from PyArrow Array."""
     cdef shared_ptr[PCArrayData] array_data = arr.ap.data()
     cdef const uint8_t* addr = array_data.get().buffers[1].get().data()
     return <const double*>addr
 
 
-cdef inline const uint8_t* get_validity_bitmap(pa.Array arr) nogil:
+cdef inline const uint8_t* get_validity_bitmap(ca.Array arr) nogil:
     """Get validity bitmap from PyArrow Array."""
     cdef shared_ptr[PCArrayData] array_data = arr.ap.data()
     if array_data.get().buffers.size() > 0 and array_data.get().buffers[0].get() != NULL:
@@ -55,30 +55,30 @@ cdef inline const uint8_t* get_validity_bitmap(pa.Array arr) nogil:
     return NULL
 
 
-cdef inline int64_t get_array_length(pa.Array arr) nogil:
+cdef inline int64_t get_array_length(ca.Array arr) nogil:
     """Get array length."""
     return arr.ap.length()
 
 
-cdef inline int64_t get_batch_num_rows(pa.RecordBatch batch) nogil:
+cdef inline int64_t get_batch_num_rows(ca.RecordBatch batch) nogil:
     """Get RecordBatch row count."""
     return batch.batch.num_rows()
 
 
-cdef inline int64_t get_batch_num_columns(pa.RecordBatch batch) nogil:
+cdef inline int64_t get_batch_num_columns(ca.RecordBatch batch) nogil:
     """Get RecordBatch column count."""
     return batch.batch.num_columns()
 
 
-cdef inline pa.Array get_batch_column(pa.RecordBatch batch, int64_t i):
+cdef inline ca.Array get_batch_column(ca.RecordBatch batch, int64_t i):
     """Get column array from RecordBatch."""
     cdef shared_ptr[PCArray] cpp_array = batch.batch.column(i)
-    cdef pa.Array result = pa.Array.__new__(pa.Array)
+    cdef ca.Array result = ca.Array.__new__(ca.Array)
     result.init(cpp_array)
     return result
 
 
-cdef inline shared_ptr[PCArray] get_batch_column_cpp(pa.RecordBatch batch, int64_t i) nogil:
+cdef inline shared_ptr[PCArray] get_batch_column_cpp(ca.RecordBatch batch, int64_t i) nogil:
     """Get C++ shared_ptr to column array."""
     return batch.batch.column(i)
 
@@ -102,13 +102,13 @@ cdef inline int64_t get_array_length_cpp(shared_ptr[PCArray] arr_ptr) nogil:
     return arr_ptr.get().length()
 
 
-cdef inline int64_t find_column_index(pa.RecordBatch batch, str column_name):
+cdef inline int64_t find_column_index(ca.RecordBatch batch, str column_name):
     """Find column index by name."""
-    cdef pa.Schema schema = batch.schema()
+    cdef ca.Schema schema = batch.schema()
     return schema.get_field_index(column_name)
 
 
-cdef inline cbool is_null(pa.Array arr, int64_t i) nogil:
+cdef inline cbool is_null(ca.Array arr, int64_t i) nogil:
     """Check if value at index is null."""
     cdef const uint8_t* bitmap = get_validity_bitmap(arr)
     if bitmap == NULL:
@@ -257,7 +257,7 @@ cdef class ArrowComputeEngine:
     No Python function calls in hot paths.
     """
 
-    cpdef object filter_batch(self, pa.RecordBatch batch, str condition):
+    cpdef object filter_batch(self, ca.RecordBatch batch, str condition):
         """
         Filter batch using Arrow compute (SIMD accelerated).
 
@@ -282,7 +282,7 @@ cdef class ArrowComputeEngine:
         else:
             raise ValueError(f"Unsupported condition: {condition}")
 
-    cpdef object hash_join(self, pa.RecordBatch left, pa.RecordBatch right,
+    cpdef object hash_join(self, ca.RecordBatch left, ca.RecordBatch right,
                           str left_key, str right_key, str join_type="inner"):
         """
         Join two batches using Arrow's hash join.

@@ -381,7 +381,7 @@ if __name__ == "__main__":
     async def test_windowing():
         """Test windowing operator locally."""
         # Create test data
-        import pyarrow as pa
+        # Using cyarrow already imported at top of file
         from datetime import datetime, timedelta
 
         base_time = int(datetime(2025, 1, 1).timestamp() * 1000)

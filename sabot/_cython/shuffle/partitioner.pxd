@@ -12,7 +12,7 @@ from libcpp.vector cimport vector
 from libcpp.memory cimport shared_ptr
 
 # Import Cython Arrow types (not Python!)
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.libarrow cimport (
     CRecordBatch as PCRecordBatch,
     CSchema as PCSchema,
@@ -36,7 +36,7 @@ cdef class Partitioner:
 
     cdef vector[shared_ptr[PCRecordBatch]] partition_batch(
         self,
-        pa.RecordBatch batch  # Cython type, not Python!
+        ca.RecordBatch batch  # Cython type, not Python!
     )
 
     cdef int32_t get_partition_for_row(self, int64_t row_index)
@@ -58,7 +58,7 @@ cdef class HashPartitioner(Partitioner):
         shared_ptr[PCArray] _hash_cache  # Cached hash values for current batch
         cbool _use_murmur3  # Use MurmurHash3 (default true)
 
-    cdef void _compute_hashes(self, pa.RecordBatch batch)
+    cdef void _compute_hashes(self, ca.RecordBatch batch)
 
 
 cdef class RangePartitioner(Partitioner):
@@ -99,5 +99,5 @@ cpdef Partitioner create_partitioner(
     ShuffleEdgeType edge_type,
     int32_t num_partitions,
     vector[string] key_columns,
-    pa.Schema schema  # Cython type
+    ca.Schema schema  # Cython type
 ) except *

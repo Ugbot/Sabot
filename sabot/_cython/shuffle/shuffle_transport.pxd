@@ -12,7 +12,7 @@ from libcpp.vector cimport vector
 from libcpp.memory cimport shared_ptr
 
 # Import Cython Arrow types
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.libarrow cimport (
     CRecordBatch as PCRecordBatch,
 )
@@ -63,6 +63,6 @@ cdef class ShuffleTransport:
     cpdef void start(self) except *
     cpdef void stop(self) except *
     cdef void publish_partition(self, bytes shuffle_id, int32_t partition_id,
-                                pa.RecordBatch batch)
-    cdef pa.RecordBatch fetch_partition_from_agent(self, bytes agent_address,
+                                ca.RecordBatch batch)
+    cdef ca.RecordBatch fetch_partition_from_agent(self, bytes agent_address,
                                                    bytes shuffle_id, int32_t partition_id)
