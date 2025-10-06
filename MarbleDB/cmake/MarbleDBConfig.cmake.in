@@ -1,0 +1,11 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# MarbleDB uses bundled Arrow libraries - no external Arrow dependency required
+find_dependency(Boost COMPONENTS filesystem system)
+find_dependency(Threads)
+
+include("${CMAKE_CURRENT_LIST_DIR}/MarbleDBTargets.cmake")
+
+check_required_components(MarbleDB)

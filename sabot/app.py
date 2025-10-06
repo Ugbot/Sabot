@@ -1121,6 +1121,42 @@ class App(AppT):
         """Create a materialized view manager with RocksDB persistence."""
         return get_materialized_view_manager(db_path)
 
+    def materializations(self, default_backend: str = 'memory'):
+        """
+        Create unified materialization manager (dimension tables + analytical views).
+
+        This is the modern API for creating:
+        - Dimension tables: Lookup-optimized (RocksDB backend)
+        - Analytical views: Scan-optimized (Tonbo backend)
+
+        Both can be populated from streams, files, operators, or CDC.
+
+        Args:
+            default_backend: Default storage backend ('memory', 'rocksdb', 'tonbo')
+
+        Returns:
+            MaterializationManager instance
+
+        Example:
+            mat_mgr = app.materializations()
+
+            # Dimension table from file
+            securities = mat_mgr.dimension_table(
+                'securities',
+                source='data/securities.arrow',
+                key='security_id'
+            )
+
+            # Use with operators
+            if 'SEC123' in securities:
+                print(securities['SEC123'])
+
+            # Enrich stream
+            enriched = securities @ quotes_stream
+        """
+        from .materializations import get_materialization_manager
+        return get_materialization_manager(self, default_backend)
+
     def joins(self) -> JoinBuilder:
         """Create a join builder for stream and table joins."""
         return create_join_builder(self)

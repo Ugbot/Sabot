@@ -1,3 +1,6 @@
 [submodule "vendor/arrow"]
 	path = vendor/arrow
 	url = https://github.com/apache/arrow
+[submodule "vendor/duckdb"]
+	path = vendor/duckdb
+	url = https://github.com/duckdb/duckdb

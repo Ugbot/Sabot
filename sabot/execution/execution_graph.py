@@ -5,6 +5,7 @@ Execution Graph - Physical Execution Plan
 Represents the physical deployment of a streaming job with:
 - Task vertices (parallel instances of logical operators)
 - Task edges (data flow between parallel tasks)
+- Shuffle edges (data redistribution for operator parallelism)
 - Slot assignments (where tasks run on cluster nodes)
 - Task state tracking (CREATED -> RUNNING -> COMPLETED)
 
@@ -20,6 +21,20 @@ import time
 from .job_graph import OperatorType
 
 logger = logging.getLogger(__name__)
+
+
+class ShuffleEdgeType(Enum):
+    """
+    Types of data redistribution between operator tasks.
+
+    Determines how data flows from N upstream tasks to M downstream tasks.
+    """
+    FORWARD = "forward"          # 1:1 mapping, no shuffle (operator chaining)
+    HASH = "hash"                # Hash partition by key (joins, groupBy)
+    BROADCAST = "broadcast"      # Replicate to all downstream (dimension tables)
+    REBALANCE = "rebalance"      # Round-robin redistribution (load balance)
+    RANGE = "range"              # Range partition (sorted data)
+    CUSTOM = "custom"            # User-defined partitioning
 
 
 class TaskState(Enum):
@@ -128,6 +143,63 @@ class TaskVertex:
 
 
 @dataclass
+class ShuffleEdge:
+    """
+    Shuffle edge between operators requiring data redistribution.
+
+    Represents data flow from N upstream tasks to M downstream tasks
+    with repartitioning based on shuffle type.
+    """
+
+    # Identity
+    shuffle_id: str
+    upstream_operator_id: str
+    downstream_operator_id: str
+
+    # Shuffle configuration
+    edge_type: ShuffleEdgeType
+    partition_keys: Optional[List[str]] = None  # For hash/range partitioning
+    num_partitions: int = 1  # Target number of partitions
+
+    # Task mappings (N upstream × M downstream)
+    upstream_task_ids: List[str] = field(default_factory=list)
+    downstream_task_ids: List[str] = field(default_factory=list)
+
+    # Metadata
+    created_at: float = field(default_factory=time.time)
+    rows_shuffled: int = 0
+    bytes_shuffled: int = 0
+
+    def requires_network_shuffle(self) -> bool:
+        """Check if this shuffle requires network transfer."""
+        return self.edge_type != ShuffleEdgeType.FORWARD
+
+    def requires_partitioning(self) -> bool:
+        """Check if this shuffle requires data partitioning."""
+        return self.edge_type in [
+            ShuffleEdgeType.HASH,
+            ShuffleEdgeType.RANGE,
+            ShuffleEdgeType.REBALANCE
+        ]
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize to dictionary."""
+        return {
+            'shuffle_id': self.shuffle_id,
+            'upstream_operator_id': self.upstream_operator_id,
+            'downstream_operator_id': self.downstream_operator_id,
+            'edge_type': self.edge_type.value,
+            'partition_keys': self.partition_keys,
+            'num_partitions': self.num_partitions,
+            'upstream_task_ids': self.upstream_task_ids,
+            'downstream_task_ids': self.downstream_task_ids,
+            'created_at': self.created_at,
+            'rows_shuffled': self.rows_shuffled,
+            'bytes_shuffled': self.bytes_shuffled,
+        }
+
+
+@dataclass
 class ExecutionGraph:
     """
     Physical execution plan for a streaming job.
@@ -144,6 +216,9 @@ class ExecutionGraph:
 
     # Operator grouping (operator_id -> list of task IDs)
     operator_tasks: Dict[str, List[str]] = field(default_factory=dict)
+
+    # Shuffle edges (data redistribution between operators)
+    shuffle_edges: Dict[str, ShuffleEdge] = field(default_factory=dict)
 
     # Configuration
     checkpoint_interval_ms: int = 60000
@@ -192,6 +267,62 @@ class ExecutionGraph:
             downstream.upstream_task_ids.append(upstream_task_id)
 
         logger.debug(f"Connected tasks {upstream_task_id} -> {downstream_task_id}")
+
+    def add_shuffle_edge(self, shuffle_edge: ShuffleEdge) -> None:
+        """
+        Add shuffle edge between operators.
+
+        Args:
+            shuffle_edge: ShuffleEdge to add
+        """
+        self.shuffle_edges[shuffle_edge.shuffle_id] = shuffle_edge
+        logger.debug(
+            f"Added shuffle edge {shuffle_edge.shuffle_id}: "
+            f"{shuffle_edge.upstream_operator_id} -> {shuffle_edge.downstream_operator_id} "
+            f"(type: {shuffle_edge.edge_type.value})"
+        )
+
+    def get_shuffle_edges_for_operator(self, operator_id: str) -> List[ShuffleEdge]:
+        """Get all shuffle edges involving an operator."""
+        edges = []
+        for edge in self.shuffle_edges.values():
+            if edge.upstream_operator_id == operator_id or edge.downstream_operator_id == operator_id:
+                edges.append(edge)
+        return edges
+
+    def detect_shuffle_edge_type(
+        self,
+        upstream_op_id: str,
+        downstream_op_id: str,
+        downstream_stateful: bool,
+        downstream_key_by: Optional[List[str]]
+    ) -> ShuffleEdgeType:
+        """
+        Automatically detect shuffle type based on operator characteristics.
+
+        Args:
+            upstream_op_id: Upstream operator ID
+            downstream_op_id: Downstream operator ID
+            downstream_stateful: Is downstream operator stateful?
+            downstream_key_by: Key columns for downstream operator
+
+        Returns:
+            Appropriate ShuffleEdgeType
+        """
+        upstream_tasks = self.operator_tasks.get(upstream_op_id, [])
+        downstream_tasks = self.operator_tasks.get(downstream_op_id, [])
+
+        # Same parallelism + same physical location → FORWARD (operator chaining)
+        if len(upstream_tasks) == len(downstream_tasks):
+            # TODO: Check if tasks are co-located
+            return ShuffleEdgeType.FORWARD
+
+        # Different parallelism + stateful with keys → HASH
+        if downstream_stateful and downstream_key_by:
+            return ShuffleEdgeType.HASH
+
+        # Different parallelism + stateless → REBALANCE
+        return ShuffleEdgeType.REBALANCE
 
     def get_task_count(self) -> int:
         """Get total number of tasks."""
