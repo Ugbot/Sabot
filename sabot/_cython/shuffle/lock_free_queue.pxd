@@ -22,13 +22,10 @@ from pyarrow.includes.libarrow cimport CRecordBatch as PCRecordBatch
 # Partition Slot Structure
 # ============================================================================
 
+# Single slot in ring buffer holding shuffle partition metadata + batch
+# Uses versioned slots to avoid ABA problem in lock-free operations
+# Cache-line aligned to prevent false sharing
 cdef struct PartitionSlot:
-    """
-    Single slot in ring buffer holding shuffle partition metadata + batch.
-
-    Uses versioned slots to avoid ABA problem in lock-free operations.
-    Cache-line aligned to prevent false sharing.
-    """
     int64_t shuffle_id_hash      # Hash of shuffle ID string
     int32_t partition_id          # Partition ID
     int32_t _padding              # Align to 8-byte boundary
@@ -40,22 +37,10 @@ cdef struct PartitionSlot:
 # SPSC Lock-Free Ring Buffer
 # ============================================================================
 
+# Single Producer Single Consumer lock-free ring buffer
+# Uses atomic head/tail indices with acquire/release memory ordering
+# Producer writes to tail, consumer reads from head
 cdef class SPSCRingBuffer:
-    """
-    Single Producer Single Consumer lock-free ring buffer.
-
-    Uses atomic head/tail indices with acquire/release memory ordering.
-    Producer writes to tail, consumer reads from head.
-
-    Memory layout:
-    - head/tail on separate cache lines (64 bytes apart)
-    - Slots array aligned to cache line boundary
-
-    Performance:
-    - Push: O(1), wait-free
-    - Pop: O(1), wait-free
-    - No locks, no CAS, pure load/store atomics
-    """
     cdef:
         PartitionSlot* slots          # Ring buffer slots
         int64_t capacity              # Capacity (power of 2)
@@ -100,18 +85,10 @@ cdef class SPSCRingBuffer:
 # MPSC Lock-Free Queue (Multi-Producer Single Consumer)
 # ============================================================================
 
+# Multi-Producer Single Consumer lock-free queue
+# Uses CAS (Compare-And-Swap) for producers, lock-free pop for consumer
+# Useful for aggregating partitions from multiple shuffle operators
 cdef class MPSCQueue:
-    """
-    Multi-Producer Single Consumer lock-free queue.
-
-    Uses CAS (Compare-And-Swap) for producers, lock-free pop for consumer.
-    Useful for aggregating partitions from multiple shuffle operators.
-
-    Performance:
-    - Push: O(1) with CAS retry
-    - Pop: O(1), wait-free
-    - Producer contention handled via exponential backoff
-    """
     cdef:
         PartitionSlot* slots
         int64_t capacity

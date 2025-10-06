@@ -17,7 +17,8 @@ All hot paths release GIL.
 """
 
 from libc.stdint cimport int32_t, int64_t
-from libc.stdlib cimport malloc, free, aligned_alloc
+from libc.stdlib cimport malloc, free
+from posix.stdlib cimport posix_memalign
 from libc.string cimport memset, strcpy, strcmp, strlen
 from libcpp cimport bool as cbool
 from libcpp.atomic cimport (
@@ -40,13 +41,17 @@ from pyarrow.includes.libarrow cimport (
 )
 from pyarrow.includes.libarrow_flight cimport (
     CFlightClient,
-    CFlightServerBase,
+    PyFlightServer,
+    PyFlightServerVtable,
     CFlightStreamReader,
     CFlightStreamChunk,
     CLocation,
     CTicket,
     CFlightCallOptions,
     CFlightClientOptions,
+    CFlightServerOptions,
+    CFlightDataStream,
+    CServerCallContext,
 )
 
 # Import our lock-free primitives
@@ -97,13 +102,10 @@ cdef class LockFreeFlightClient:
             timeout_seconds: Request timeout
         """
         # Allocate cache-line aligned connection pool
-        self.connections = <ConnectionSlot*>aligned_alloc(
-            64,
-            max_connections * sizeof(ConnectionSlot)
-        )
-
-        if self.connections == NULL:
+        cdef void* ptr = NULL
+        if posix_memalign(&ptr, 64, max_connections * sizeof(ConnectionSlot)) != 0:
             raise MemoryError("Failed to allocate connection pool")
+        self.connections = <ConnectionSlot*>ptr
 
         self.max_connections = max_connections
         self.max_retries = max_retries
@@ -120,9 +122,9 @@ cdef class LockFreeFlightClient:
 
     def __dealloc__(self):
         """Clean up connections."""
+        cdef int32_t i
         if self.connections != NULL:
             # Reset all shared_ptrs
-            cdef int32_t i
             for i in range(self.max_connections):
                 self.connections[i].client.reset()
             free(self.connections)
@@ -152,6 +154,7 @@ cdef class LockFreeFlightClient:
         cdef int32_t i
         cdef ConnectionSlot* slot
         cdef cbool slot_in_use
+        cdef cbool expected
         cdef shared_ptr[CFlightClient] client
 
         # First pass: find existing connection (lock-free read)
@@ -170,7 +173,7 @@ cdef class LockFreeFlightClient:
 
             if not slot_in_use:
                 # Try to claim this slot (CAS)
-                cdef cbool expected = False
+                expected = False
                 if slot.in_use.compare_exchange_strong(
                     expected,
                     True,
@@ -212,18 +215,20 @@ cdef class LockFreeFlightClient:
         Returns:
             RecordBatch shared_ptr (empty if error)
         """
+        cdef shared_ptr[CFlightClient] client
+        cdef shared_ptr[PCRecordBatch] empty_batch
+        cdef shared_ptr[PCRecordBatch] result
+
         # Get connection (lock-free)
-        cdef shared_ptr[CFlightClient] client = self.get_connection(host, port)
+        client = self.get_connection(host, port)
 
         if not client:
             # No connection available
-            cdef shared_ptr[PCRecordBatch] empty_batch
             empty_batch.reset()
             return empty_batch
 
         # TODO: Implement C++ DoGet() call
         # For now, return empty batch
-        cdef shared_ptr[PCRecordBatch] result
         result.reset()
         return result
 
@@ -267,65 +272,46 @@ cdef class LockFreeFlightServer:
             port: Server port to bind
         """
         # Convert host to C++ string
+        cdef bytes host_bytes
         if isinstance(host, bytes):
-            self.host = string(<const char*>host)
+            host_bytes = host
         else:
-            self.host = string(<const char*>host.encode('utf-8'))
+            host_bytes = host.encode('utf-8')
+        self.host = string(<const char*>host_bytes)
 
         self.port = port
-        self.running.store(False, memory_order_relaxed)
+        self.running = False
 
-        # Create atomic partition store
-        self.store = new AtomicPartitionStore(8192)  # 8K partitions
-        if self.store == NULL:
-            raise MemoryError("Failed to allocate partition store")
+        # Create partition store (Python-managed)
+        self._store_instance = AtomicPartitionStore(size=8192)
 
         self.server_cpp = NULL
 
     def __dealloc__(self):
         """Clean up server resources."""
-        if self.store != NULL:
-            del self.store
-            self.store = NULL
+        # Store cleanup handled by Python GC
+        pass
 
     cdef void start(self) nogil except *:
         """
-        Start Flight server (atomic state transition).
-
-        Uses atomic CAS to ensure only one start() succeeds.
+        Start Flight server.
         """
-        cdef cbool expected = False
-
-        # Try to transition from not-running to running
-        if not self.running.compare_exchange_strong(
-            expected,
-            True,
-            memory_order_seq_cst,
-            memory_order_acquire
-        ):
-            # Already running
+        if self.running:
             return
 
+        self.running = True
         # TODO: Create and start C++ Flight server
-        # For now, just set running flag
         # self.server_cpp = create_cpp_flight_server(...)
 
     cdef void stop(self) nogil:
         """
-        Stop Flight server (atomic state transition).
+        Stop Flight server.
         """
-        cdef cbool expected = True
+        if not self.running:
+            return
 
-        # Try to transition from running to not-running
-        if self.running.compare_exchange_strong(
-            expected,
-            False,
-            memory_order_seq_cst,
-            memory_order_acquire
-        ):
-            # TODO: Stop C++ Flight server
-            # For now, just clear running flag
-            pass
+        self.running = False
+        # TODO: Stop C++ Flight server
 
     cdef cbool register_partition(
         self,
@@ -346,11 +332,8 @@ cdef class LockFreeFlightServer:
         Returns:
             True if registered, False if store full
         """
-        if self.store == NULL:
-            return False
-
         # Lock-free insert into atomic store
-        return self.store.insert(shuffle_id_hash, partition_id, batch)
+        return self._store_instance.insert(shuffle_id_hash, partition_id, batch)
 
     cdef shared_ptr[PCRecordBatch] get_partition(
         self,
@@ -367,13 +350,8 @@ cdef class LockFreeFlightServer:
         Returns:
             RecordBatch shared_ptr (empty if not found)
         """
-        if self.store == NULL:
-            cdef shared_ptr[PCRecordBatch] empty_result
-            empty_result.reset()
-            return empty_result
-
         # Lock-free lookup in atomic store
-        return self.store.get(shuffle_id_hash, partition_id)
+        return self._store_instance.get(shuffle_id_hash, partition_id)
 
 
 # ============================================================================

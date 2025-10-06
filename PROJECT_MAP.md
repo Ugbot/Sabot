@@ -1,7 +1,7 @@
 # Sabot Project Map
 
 **Version:** 0.1.0-alpha
-**Last Updated:** October 2, 2025
+**Last Updated:** October 6, 2025
 **Total LOC:** ~60,000 lines
 **Status:** Experimental / Alpha
 
@@ -15,6 +15,12 @@ This document provides a comprehensive map of the Sabot codebase structure, expl
 sabot/
 ├── sabot/                 # Main package (~60K LOC)
 │   ├── _cython/           # Cython-accelerated modules
+│   │   ├── checkpoint/    # Distributed snapshot coordination
+│   │   ├── state/         # State backends (Memory, RocksDB)
+│   │   ├── time/          # Watermark tracking and timers
+│   │   ├── operators/     # Stream transformation operators
+│   │   ├── arrow/         # Arrow columnar processing
+│   │   └── shuffle/       # Network shuffle transport (NEW)
 │   ├── agents/            # Agent runtime system
 │   ├── api/               # High-level user-facing API
 │   ├── checkpoint/        # Checkpoint coordination (Python wrappers)
@@ -202,6 +208,49 @@ Performance-critical modules implemented in Cython for 10-100x speedup over pure
 
 **Status:** 🚧 Experimental, integration incomplete
 **Note:** Claims vendored Arrow but uses pyarrow from pip
+
+---
+
+#### `_cython/shuffle/` (Shuffle Transport)
+**Purpose:** High-performance network shuffle for distributed stream processing
+
+**Files:**
+- `flight_transport_lockfree.pyx` / `flight_transport_lockfree.pxd` - Lock-free Arrow Flight transport
+  - Zero-copy network data transfer using Arrow Flight RPC
+  - Atomic connection pooling with lock-free data structures
+  - Client/Server implementation for distributed shuffle
+  - **Compiled size:** 138KB
+  - **Status:** ✅ Compiled and tested
+
+- `lock_free_queue.pyx` / `lock_free_queue.pxd` - Lock-free queue primitives
+  - SPSC (Single Producer Single Consumer) ring buffers
+  - MPSC (Multi Producer Single Consumer) ring buffers
+  - Lock-free partition queues for concurrent access
+  - **Compiled size:** 118KB
+  - **Status:** ✅ Compiled and tested
+
+- `atomic_partition_store.pyx` / `atomic_partition_store.pxd` - Atomic partition storage
+  - LMAX Disruptor-style lock-free hash table
+  - Atomic operations for partition data management
+  - High-throughput concurrent partition access
+  - **Compiled size:** 113KB
+  - **Status:** ✅ Compiled and tested
+
+- `shuffle_transport.pyx` / `shuffle_transport.pxd` - High-level shuffle API
+  - `ShuffleServer` class for receiving shuffled data
+  - `ShuffleClient` class for sending shuffled data
+  - Integrates Flight transport, queues, and partition store
+  - **Compiled size:** 146KB
+  - **Status:** ✅ Compiled and tested
+
+- `partitioner.pyx` - Partitioning strategies (hash, range, custom)
+- `shuffle_buffer.pyx` - Shuffle buffering and batching
+- `shuffle_manager.pyx` - Shuffle coordination and lifecycle
+- `flight_transport.pyx` - Original Flight transport implementation
+
+**Status:** ✅ Core lock-free transport infrastructure complete
+**Performance:** Zero-copy network transfer, lock-free concurrent access
+**Use Case:** Distributed joins, aggregations, and repartitioning operations
 
 ---
 
@@ -630,7 +679,8 @@ Git ignore patterns.
 3. **Performance:** `sabot/_cython/` for Cython-accelerated code
 4. **User API:** `sabot/api/stream.py` for Stream operations
 5. **Integration:** `sabot/kafka/` for Kafka connectors
-6. **Examples:** `examples/fraud_app.py` for working demo
+6. **Network shuffle:** `sabot/_cython/shuffle/` for distributed data transfer
+7. **Examples:** `examples/fraud_app.py` for working demo
 
 ---
 
@@ -665,7 +715,7 @@ Git ignore patterns.
                     ↓
 ┌─────────────────────────────────────────────────┐
 │  Cython Acceleration (sabot/_cython/)           │
-│  Checkpoint, State, Time, Operators             │
+│  Checkpoint, State, Time, Operators, Shuffle    │
 │  **10-100x faster than pure Python**            │
 └─────────────────────────────────────────────────┘
                     ↓
@@ -703,12 +753,13 @@ Based on code review, the following modules are blocking production use:
 - **"Where is checkpoint coordination?"** → `sabot/_cython/checkpoint/coordinator.pyx`
 - **"How do I create a stream?"** → `sabot/api/stream.py` or `sabot/app.py` (via `@app.agent()`)
 - **"Where are Kafka connectors?"** → `sabot/kafka/source.py` and `sink.py`
+- **"Where is network shuffle?"** → `sabot/_cython/shuffle/` (lock-free Arrow Flight transport)
 - **"Why is performance good?"** → Cython modules in `sabot/_cython/`
 - **"What's not working?"** → See test coverage (~5%), many stubs in `agents/runtime.py`, `cli.py`
 - **"Where are examples?"** → `examples/fraud_app.py` and other files in `examples/`
 
 ---
 
-**Last Updated:** October 2, 2025
+**Last Updated:** October 6, 2025
 **Codebase Version:** v0.1.0-alpha
 **For More Info:** See [README.md](README.md) or [ARCHITECTURE.md](docs/ARCHITECTURE.md)

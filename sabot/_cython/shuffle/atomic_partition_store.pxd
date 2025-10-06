@@ -22,12 +22,9 @@ from pyarrow.includes.libarrow cimport CRecordBatch as PCRecordBatch
 # Hash Table Entry
 # ============================================================================
 
+# Single hash table entry with atomic versioning
+# Uses sequence numbers (LMAX style) instead of traditional locks
 cdef struct HashEntry:
-    """
-    Single hash table entry with atomic versioning.
-
-    Uses sequence numbers (LMAX style) instead of traditional locks.
-    """
     atomic[int64_t] sequence        # Entry sequence (odd=writing, even=ready)
     int64_t shuffle_id_hash          # Shuffle ID hash
     int32_t partition_id             # Partition ID
@@ -110,19 +107,19 @@ cdef class AtomicPartitionStore:
 # Hash Functions
 # ============================================================================
 
+# Combine two hash values (similar to boost::hash_combine)
 cdef inline int64_t hash_combine(int64_t h1, int32_t h2) nogil:
-    """Combine two hash values (similar to boost::hash_combine)."""
-    # Use golden ratio constant for good mixing
-    return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2))
+    # Use golden ratio constant for good mixing (0x9e3779b9 = 2654435769)
+    return h1 ^ (<int64_t>h2 + <int64_t>2654435769 + (h1 << 6) + (h1 >> 2))
 
 
+# FNV-1a hash for strings (fast, good distribution)
 cdef inline int64_t hash_string(const char* s, int64_t len) nogil:
-    """FNV-1a hash for strings (fast, good distribution)."""
-    cdef int64_t hash_val = 14695981039346656037  # FNV offset basis
+    cdef int64_t hash_val = <int64_t>14695981039346656037ULL  # FNV offset basis
     cdef int64_t i
 
     for i in range(len):
         hash_val ^= <int64_t>s[i]
-        hash_val *= 1099511628211  # FNV prime
+        hash_val *= <int64_t>1099511628211ULL  # FNV prime
 
     return hash_val

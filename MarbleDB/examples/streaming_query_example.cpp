@@ -137,11 +137,37 @@ int main() {
     std::cout << "// // Perfect for streaming analytics and ETL pipelines" << std::endl;
     std::cout << "```" << std::endl;
 
+    // Example 6: Reverse Scan Support
+    std::cout << "\n=== Example 6: Reverse Scan Support ===" << std::endl;
+    std::cout << "Scan data in descending order for time-series or ranking queries:" << std::endl;
+    std::cout << "```cpp" << std::endl;
+    std::cout << "// QueryOptions options;" << std::endl;
+    std::cout << "// options.reverse_order = true; // Enable reverse/descending order" << std::endl;
+    std::cout << "// options.limit = 100;" << std::endl;
+    std::cout << "// " << std::endl;
+    std::cout << "// auto query = QueryFrom(db)" << std::endl;
+    std::cout << "//     .Select({\"timestamp\", \"user_id\", \"score\"})" << std::endl;
+    std::cout << "//     .Where(\"timestamp\", PredicateType::kGreaterThan, arrow::MakeScalar(timestamp_min))" << std::endl;
+    std::cout << "//     .Reverse(); // Alternative fluent API for reverse order" << std::endl;
+    std::cout << "// " << std::endl;
+    std::cout << "// std::unique_ptr<QueryResult> result;" << std::endl;
+    std::cout << "// query->Execute(&result);" << std::endl;
+    std::cout << "// " << std::endl;
+    std::cout << "// // Process results in reverse chronological order" << std::endl;
+    std::cout << "// while (result->HasNext()) {" << std::endl;
+    std::cout << "//     std::shared_ptr<arrow::RecordBatch> batch;" << std::endl;
+    std::cout << "//     result->Next(&batch);" << std::endl;
+    std::cout << "//     // Process most recent records first" << std::endl;
+    std::cout << "// }" << std::endl;
+    std::cout << "```" << std::endl;
+    std::cout << "Use cases: Recent activity feeds, leaderboards, time-series analysis." << std::endl;
+
     std::cout << "\n=== Key Features Implemented ===" << std::endl;
     std::cout << "✓ Arrow RecordBatch streaming" << std::endl;
     std::cout << "✓ Synchronous and asynchronous processing" << std::endl;
     std::cout << "✓ Predicate pushdown to key ranges" << std::endl;
     std::cout << "✓ Column projection (SELECT specific columns)" << std::endl;
+    std::cout << "✓ Reverse scan support (descending order)" << std::endl;
     std::cout << "✓ Arrow Dataset-compatible API" << std::endl;
     std::cout << "✓ Memory-efficient batch processing" << std::endl;
     std::cout << "✓ Fluent query builder interface" << std::endl;

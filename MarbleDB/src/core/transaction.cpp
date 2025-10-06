@@ -173,12 +173,42 @@ private:
 };
 
 // Advanced transaction with conflict resolution
-class AdvancedTransactionImpl : public TransactionImpl, public AdvancedTransaction {
+class AdvancedTransactionImpl : public AdvancedTransaction {
 public:
     AdvancedTransactionImpl(std::shared_ptr<VersionSet> version_set,
                            std::shared_ptr<MVCCManager> mvcc_manager,
                            const TransactionOptions& options)
-        : TransactionImpl(version_set, mvcc_manager, options) {}
+        : base_transaction_(std::make_shared<TransactionImpl>(version_set, mvcc_manager, options)) {}
+
+    // Implement Transaction methods by delegating to base_transaction_
+    Status Put(std::shared_ptr<Record> record) override {
+        return base_transaction_->Put(record);
+    }
+
+    Status Get(const Key& key, std::shared_ptr<Record>* record) override {
+        return base_transaction_->Get(key, record);
+    }
+
+    Status Delete(const Key& key) override {
+        return base_transaction_->Delete(key);
+    }
+
+    Status Commit() override {
+        return base_transaction_->Commit();
+    }
+
+    Status Rollback() override {
+        return base_transaction_->Rollback();
+    }
+
+    // Helper method for factory
+    TransactionId GetTransactionId() const {
+        return base_transaction_->GetTransactionId();
+    }
+
+private:
+    std::shared_ptr<TransactionImpl> base_transaction_;
+    ConflictResolver conflict_resolver_;
 
     Status GetWriteConflicts(std::vector<WriteConflict>* conflicts) override {
         conflicts->clear();
@@ -191,7 +221,7 @@ public:
         // Apply the conflict resolution strategy
         switch (resolution) {
             case ConflictResolution::kAbort:
-                return Rollback();
+                return base_transaction_->Rollback();
             case ConflictResolution::kRetry:
                 // Retry logic would be implemented here
                 return Status::NotImplemented("Retry resolution not implemented");
@@ -210,9 +240,6 @@ public:
         conflict_resolver_ = resolver;
         return Status::OK();
     }
-
-private:
-    ConflictResolver conflict_resolver_;
 };
 
 // Transaction factory implementation
@@ -240,7 +267,7 @@ public:
             return Status::InternalError("Failed to create advanced transaction");
         }
 
-        *transaction = std::move(txn);
+        *transaction = std::unique_ptr<AdvancedTransaction>(std::move(txn));
         return Status::OK();
     }
 
@@ -352,7 +379,7 @@ public:
     }
 
     Status Delete(const Key& key) override {
-        deletes_.push_back(std::make_shared<SimpleKey>(key.ToString()));
+        deletes_.push_back(key.Clone());
         return Status::OK();
     }
 
@@ -367,11 +394,11 @@ public:
 
     // Access methods for database implementation
     const std::vector<std::shared_ptr<Record>>& GetPuts() const { return puts_; }
-    const std::vector<Key>& GetDeletes() const { return deletes_; }
+    const std::vector<std::shared_ptr<Key>>& GetDeletes() const { return deletes_; }
 
 private:
     std::vector<std::shared_ptr<Record>> puts_;
-    std::vector<Key> deletes_;
+    std::vector<std::shared_ptr<Key>> deletes_;
 };
 
 // Transaction manager for coordinating multiple transactions
@@ -416,7 +443,8 @@ std::unique_ptr<Transaction> CreateTransaction(std::shared_ptr<VersionSet> versi
 std::unique_ptr<AdvancedTransaction> CreateAdvancedTransaction(std::shared_ptr<VersionSet> version_set,
                                                               std::shared_ptr<MVCCManager> mvcc_manager,
                                                               const TransactionOptions& options) {
-    return std::make_unique<AdvancedTransactionImpl>(version_set, mvcc_manager, options);
+    AdvancedTransactionImpl* impl = new AdvancedTransactionImpl(version_set, mvcc_manager, options);
+    return std::unique_ptr<AdvancedTransaction>(impl);
 }
 
 std::unique_ptr<TransactionFactory> CreateTransactionFactory(std::shared_ptr<VersionSet> version_set,

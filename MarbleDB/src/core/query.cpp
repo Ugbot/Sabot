@@ -240,6 +240,7 @@ StreamingQueryResult::StreamingQueryResult(std::shared_ptr<arrow::Schema> schema
 
     // Initialize iterator for streaming with predicate pushdown
     ReadOptions read_opts;
+    read_opts.reverse_order = options_.reverse_order;
     KeyRange key_range = KeyRange::All();
 
     // Use predicate pushdown to convert key-range predicates to key ranges
@@ -252,11 +253,20 @@ StreamingQueryResult::StreamingQueryResult(std::shared_ptr<arrow::Schema> schema
 
     Status status = db_->NewIterator(read_opts, key_range, &iterator_);
     if (status.ok() && iterator_) {
-        // Seek to the beginning of the key range
-        if (key_range.start()) {
-            iterator_->Seek(*key_range.start());
+        if (options_.reverse_order) {
+            // For reverse order, seek to the end of the key range
+            if (key_range.end()) {
+                iterator_->Seek(*key_range.end());
+            } else {
+                iterator_->SeekToLast();
+            }
         } else {
-            iterator_->Seek(SimpleKey(""));
+            // For forward order, seek to the beginning of the key range
+            if (key_range.start()) {
+                iterator_->Seek(*key_range.start());
+            } else {
+                iterator_->Seek(SimpleKey(""));
+            }
         }
     }
 }
@@ -280,11 +290,23 @@ Status StreamingQueryResult::Next(std::shared_ptr<arrow::RecordBatch>* batch) {
            iterator_->Valid()) {
 
         auto record = iterator_->value();
-        if (!predicate_evaluator_ || predicate_evaluator_->Evaluate(record)) {
+        // Use zero-copy RecordRef if available, otherwise fall back to record copy
+        auto record_ref = iterator_->value_ref();
+        bool matches_predicate = !predicate_evaluator_ ||
+            (record_ref && predicate_evaluator_->Evaluate(record)) ||
+            (!record_ref && predicate_evaluator_->Evaluate(record));
+
+        if (matches_predicate) {
             batch_records.push_back(record);
             collected++;
         }
-        iterator_->Next();
+
+        // Move to next record (Prev for reverse order, Next for forward order)
+        if (options_.reverse_order) {
+            iterator_->Prev();
+        } else {
+            iterator_->Next();
+        }
     }
 
     // Check if we've reached the end

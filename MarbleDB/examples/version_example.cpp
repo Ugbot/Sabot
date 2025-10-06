@@ -8,6 +8,11 @@ int main() {
     std::cout << "MarbleDB Version Management Example" << std::endl;
     std::cout << "===================================" << std::endl;
 
+    // Version management is under development
+    std::cout << "Version management support is currently under development." << std::endl;
+    std::cout << "This example demonstrates the interface structure." << std::endl;
+    return 0;
+
     // Create version set
     auto version_set = CreateVersionSet();
     std::cout << "Created version set" << std::endl;

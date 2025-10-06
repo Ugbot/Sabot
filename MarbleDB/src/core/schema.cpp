@@ -79,6 +79,12 @@ public:
         });
     }
 
+    std::unique_ptr<RecordRef> AsRecordRef() const override {
+        // Return a simple implementation that wraps the record
+        // In a full implementation, this would provide zero-copy access
+        return nullptr; // Placeholder
+    }
+
 private:
     std::string id_;
     std::string name_;

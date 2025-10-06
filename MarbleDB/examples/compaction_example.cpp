@@ -53,6 +53,10 @@ public:
         return nullptr;  // Not implemented for demo
     }
 
+    std::unique_ptr<MemTable::Iterator> NewIterator(const std::vector<ColumnPredicate>& predicates) override {
+        return nullptr;  // Not implemented for demo
+    }
+
     bool KeyMayMatch(const Key& key) const override {
         return true;  // Always say yes for demo
     }

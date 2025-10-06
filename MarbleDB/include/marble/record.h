@@ -10,6 +10,7 @@ namespace marble {
 
 class Key;
 class Record;
+class RecordRef;
 
 // Abstract base class for records
 class Record {
@@ -24,6 +25,27 @@ public:
 
     // Get the Arrow schema for this record type
     virtual std::shared_ptr<arrow::Schema> GetArrowSchema() const = 0;
+
+    // Get a zero-copy reference to this record
+    virtual std::unique_ptr<RecordRef> AsRecordRef() const = 0;
+};
+
+// Zero-copy record reference interface
+class RecordRef {
+public:
+    virtual ~RecordRef() = default;
+
+    // Get the primary key for zero-copy access
+    virtual std::shared_ptr<Key> key() const = 0;
+
+    // Get a field value by name (zero-copy where possible)
+    virtual arrow::Result<std::shared_ptr<arrow::Scalar>> GetField(const std::string& field_name) const = 0;
+
+    // Get all field values as scalars
+    virtual arrow::Result<std::vector<std::shared_ptr<arrow::Scalar>>> GetFields() const = 0;
+
+    // Get the size of this record in bytes
+    virtual size_t Size() const = 0;
 };
 
 // Abstract base class for keys
@@ -124,6 +146,9 @@ public:
 
     // Get the current record
     virtual std::shared_ptr<Record> value() const = 0;
+
+    // Get zero-copy reference to current record
+    virtual std::unique_ptr<RecordRef> value_ref() const = 0;
 
     // Get the status of the iterator
     virtual marble::Status status() const = 0;

@@ -94,6 +94,7 @@ struct QueryOptions {
     std::vector<std::string> projection_columns;  // Empty means all columns
     bool parallel_scan = true;
     int batch_size = 1024;  // Arrow record batch size
+    bool reverse_order = false;  // Scan in reverse order (descending)
 };
 
 // Query result that returns Arrow RecordBatches

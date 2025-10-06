@@ -60,12 +60,13 @@ cdef class ShuffleServer:
 
     def __cinit__(self, host=b"0.0.0.0", int32_t port=8816):
         """Initialize shuffle server (lock-free)."""
-        self.host = host if isinstance(host, bytes) else host.encode('utf-8')
+        cdef bytes host_bytes = host if isinstance(host, bytes) else host.encode('utf-8')
+        self.host = string(<const char*>host_bytes)
         self.port = port
         self.running = False
 
         # Create lock-free Flight server (NO mutexes)
-        self.flight_server = LockFreeFlightServer(host, port)
+        self.flight_server = LockFreeFlightServer(host_bytes, port)
 
     cpdef void start(self) except *:
         """Start the shuffle server."""
@@ -85,7 +86,7 @@ cdef class ShuffleServer:
         self.flight_server.stop()
         self.running = False
 
-    cdef void register_partition(
+    def register_partition(
         self,
         bytes shuffle_id,
         int32_t partition_id,
@@ -111,6 +112,7 @@ cdef class ShuffleServer:
         cdef shared_ptr[PCRecordBatch] batch_cpp = _unwrap_batch(batch)
 
         # Lock-free register with Flight server (atomic insert)
+        # Note: register_partition is declared nogil, so GIL is released automatically
         self.flight_server.register_partition(shuffle_hash, partition_id, batch_cpp)
 
 
@@ -133,7 +135,7 @@ cdef class ShuffleClient:
         # Create lock-free Flight client (NO mutexes, atomic connection pool)
         self.flight_client = LockFreeFlightClient(max_connections, max_retries, timeout_seconds)
 
-    cdef pa.RecordBatch fetch_partition(
+    def fetch_partition(
         self,
         bytes host,
         int32_t port,
@@ -161,6 +163,7 @@ cdef class ShuffleClient:
         )
 
         # Lock-free fetch using Flight client (atomic connection pool)
+        # Note: fetch_partition is declared nogil, so GIL is released automatically
         cdef shared_ptr[PCRecordBatch] batch_cpp = self.flight_client.fetch_partition(
             <const char*>host,
             port,
