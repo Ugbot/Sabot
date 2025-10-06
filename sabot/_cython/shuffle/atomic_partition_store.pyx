@@ -15,8 +15,9 @@ Performance:
 """
 
 from libc.stdint cimport int32_t, int64_t, uint64_t
-from libc.stdlib cimport malloc, free, aligned_alloc
+from libc.stdlib cimport malloc, free
 from libc.string cimport memset
+from posix.stdlib cimport posix_memalign
 from libcpp cimport bool as cbool
 from libcpp.atomic cimport (
     atomic,
@@ -108,9 +109,13 @@ cdef class AtomicPartitionStore:
         self.mask = self.table_size - 1
 
         # Allocate cache-line aligned hash table (64-byte alignment)
-        self.table = <HashEntry*>aligned_alloc(64, self.table_size * sizeof(HashEntry))
-        if self.table == NULL:
+        cdef void* ptr = NULL
+        if posix_memalign(&ptr, 64, self.table_size * sizeof(HashEntry)) != 0:
             return False
+        self.table = <HashEntry*>ptr
+
+        # Zero-initialize memory (posix_memalign doesn't zero)
+        memset(self.table, 0, self.table_size * sizeof(HashEntry))
 
         # Initialize all entries
         cdef int64_t i
@@ -118,7 +123,7 @@ cdef class AtomicPartitionStore:
             self.table[i].sequence.store(SEQUENCE_UNCOMMITTED, memory_order_relaxed)
             self.table[i].shuffle_id_hash = 0
             self.table[i].partition_id = -1
-            self.table[i].batch.reset()
+            # Note: batch shared_ptr is zero-initialized by memset above
 
         # Initialize LMAX sequences
         self.cursor.store(0, memory_order_relaxed)
@@ -130,9 +135,9 @@ cdef class AtomicPartitionStore:
 
     cdef void destroy(self) nogil:
         """Free allocated memory."""
+        cdef int64_t i
         if self.table != NULL:
             # Reset all shared_ptrs to release Arrow batches
-            cdef int64_t i
             for i in range(self.table_size):
                 self.table[i].batch.reset()
             free(self.table)
@@ -163,11 +168,13 @@ cdef class AtomicPartitionStore:
         Returns:
             True if inserted, False if table full
         """
-        # Combine hashes for final key
+        # Declare all variables at top
         cdef int64_t key_hash = hash_combine(shuffle_id_hash, partition_id)
         cdef int64_t index = key_hash & self.mask
         cdef int64_t probe = 0
         cdef int64_t current_seq
+        cdef int64_t new_seq
+        cdef int64_t old_seq
         cdef HashEntry* entry
 
         # Linear probing with max attempts
@@ -192,7 +199,7 @@ cdef class AtomicPartitionStore:
                     entry.batch = batch
 
                     # Publish with release barrier (even sequence = committed)
-                    cdef int64_t new_seq = self.cursor.fetch_add(1, memory_order_relaxed)
+                    new_seq = self.cursor.fetch_add(1, memory_order_relaxed)
                     entry.sequence.store(new_seq, memory_order_release)
 
                     self.num_entries.fetch_add(1, memory_order_relaxed)
@@ -203,7 +210,7 @@ cdef class AtomicPartitionStore:
                   entry.partition_id == partition_id):
                 # Update existing entry
                 # Mark as writing (odd sequence)
-                cdef int64_t old_seq = current_seq
+                old_seq = current_seq
                 if entry.sequence.compare_exchange_strong(
                     old_seq,
                     old_seq | 1,  # Make odd (writing)
@@ -214,7 +221,7 @@ cdef class AtomicPartitionStore:
                     entry.batch = batch
 
                     # Publish update (new even sequence)
-                    cdef int64_t new_seq = self.cursor.fetch_add(1, memory_order_relaxed)
+                    new_seq = self.cursor.fetch_add(1, memory_order_relaxed)
                     entry.sequence.store(new_seq, memory_order_release)
                     return True
 

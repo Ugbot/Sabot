@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Options
 option(MARBLE_BUILD_TESTS "Build MarbleDB tests" ON)
 option(MARBLE_BUILD_EXAMPLES "Build MarbleDB examples" ON)
+option(MARBLE_BUILD_BENCHMARKS "Build MarbleDB benchmarks" OFF)
 option(MARBLE_USE_ASAN "Enable AddressSanitizer" OFF)
 option(MARBLE_USE_TSAN "Enable ThreadSanitizer" OFF)
 option(MARBLE_USE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
@@ -155,6 +156,13 @@ if(MARBLE_BUILD_EXAMPLES)
             endif()
         endif()
     endforeach()
+endif()
+
+# Benchmarks
+if(MARBLE_BUILD_BENCHMARKS)
+    # Benchmarks are under development
+    message(STATUS "Benchmarks are currently under development - skipping")
+    # add_subdirectory(benchmarks)
 endif()
 
 # Installation

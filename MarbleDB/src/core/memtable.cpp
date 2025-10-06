@@ -72,6 +72,14 @@ public:
             return nullptr;
         }
 
+        std::unique_ptr<RecordRef> ValueRef() const override {
+            // Return zero-copy reference if available
+            if (Valid() && it_->second.second) {
+                return it_->second.second->AsRecordRef();
+            }
+            return nullptr;
+        }
+
         marble::Status GetStatus() const override {
             return Status::OK();
         }
@@ -287,6 +295,99 @@ std::unique_ptr<ImmutableMemTable> SkipListMemTable::Freeze() {
     return immutable;
 }
 
+// Simple key implementation for benchmarks
+class BenchKey : public marble::Key {
+public:
+    explicit BenchKey(int64_t id) : id_(id) {}
+    explicit BenchKey(const std::string& str) : id_(std::stoll(str)) {}
+
+    int Compare(const marble::Key& other) const override {
+        const auto& other_key = static_cast<const BenchKey&>(other);
+        if (id_ < other_key.id_) return -1;
+        if (id_ > other_key.id_) return 1;
+        return 0;
+    }
+
+    std::shared_ptr<marble::Key> Clone() const override {
+        return std::make_shared<BenchKey>(id_);
+    }
+
+    std::string ToString() const override {
+        return std::to_string(id_);
+    }
+
+    size_t Hash() const override {
+        return std::hash<int64_t>()(id_);
+    }
+
+    arrow::Result<std::shared_ptr<arrow::Scalar>> ToArrowScalar() const override {
+        return arrow::MakeScalar(id_);
+    }
+
+private:
+    int64_t id_;
+};
+
+// Simple record implementation for benchmarks
+struct BenchRecord {
+    int64_t id;
+    std::string name;
+    std::string value;
+    int32_t category;
+};
+
+class BenchRecordImpl : public marble::Record {
+public:
+    explicit BenchRecordImpl(BenchRecord record) : record_(std::move(record)) {}
+
+    std::shared_ptr<marble::Key> GetKey() const override {
+        return std::make_shared<BenchKey>(record_.id);
+    }
+
+    std::shared_ptr<arrow::Schema> GetArrowSchema() const override {
+        return arrow::schema({
+            arrow::field("id", arrow::int64()),
+            arrow::field("name", arrow::utf8()),
+            arrow::field("value", arrow::utf8()),
+            arrow::field("category", arrow::int32())
+        });
+    }
+
+    arrow::Result<std::shared_ptr<arrow::RecordBatch>> ToRecordBatch() const override {
+        arrow::Int64Builder id_builder;
+        arrow::StringBuilder name_builder;
+        arrow::StringBuilder value_builder;
+        arrow::Int32Builder category_builder;
+
+        id_builder.Append(record_.id).ok();
+        name_builder.Append(record_.name).ok();
+        value_builder.Append(record_.value).ok();
+        category_builder.Append(record_.category).ok();
+
+        std::shared_ptr<arrow::Array> id_array, name_array, value_array, category_array;
+        id_builder.Finish(&id_array).ok();
+        name_builder.Finish(&name_array).ok();
+        value_builder.Finish(&value_array).ok();
+        category_builder.Finish(&category_array).ok();
+
+        return arrow::RecordBatch::Make(GetArrowSchema(), 1,
+            {id_array, name_array, value_array, category_array});
+    }
+
+    size_t Size() const {
+        return sizeof(BenchRecord) + record_.name.size() + record_.value.size();
+    }
+
+    std::unique_ptr<RecordRef> AsRecordRef() const override {
+        // Return a simple implementation - in practice this would provide
+        // zero-copy access to the underlying data
+        return nullptr; // Placeholder
+    }
+
+private:
+    BenchRecord record_;
+};
+
 // Iterator for ArrowSSTable with predicate filtering
 class ArrowSSTableIterator : public MemTable::Iterator {
 public:
@@ -301,6 +402,22 @@ public:
 
     bool Valid() const override {
         return batch_ && current_row_ < static_cast<size_t>(batch_->num_rows());
+    }
+
+    void SeekToFirst() override {
+        current_row_ = 0;
+        // Skip to first matching row if predicates exist
+        while (Valid() && !MatchesPredicates()) {
+            ++current_row_;
+        }
+    }
+
+    void SeekToLast() override {
+        current_row_ = batch_->num_rows() - 1;
+        // Skip to last matching row if predicates exist
+        while (current_row_ > 0 && !MatchesPredicates()) {
+            --current_row_;
+        }
     }
 
     void Seek(const Key& target) override {
@@ -321,16 +438,42 @@ public:
         }
     }
 
-    std::shared_ptr<Record> value() const override {
+    void Prev() override {
+        if (current_row_ > 0) {
+            --current_row_;
+            // Skip rows that don't match predicates
+            while (current_row_ > 0 && !MatchesPredicates()) {
+                --current_row_;
+            }
+        }
+    }
+
+    std::shared_ptr<marble::Key> GetKey() const override {
+        if (!Valid()) return nullptr;
+        // Simplified - return a key based on row index
+        return std::make_shared<BenchKey>(static_cast<int64_t>(current_row_));
+    }
+
+    std::shared_ptr<Record> Value() const override {
         if (!Valid()) return nullptr;
 
         // Create a record from the current row
         // This is simplified - real implementation would extract proper data
-        return std::make_shared<UserRecord>(current_row_, "record_" + std::to_string(current_row_));
+        BenchRecord record{static_cast<int64_t>(current_row_),
+                          "record_" + std::to_string(current_row_),
+                          "value_" + std::to_string(current_row_),
+                          static_cast<int32_t>(current_row_ % 100)};
+        return std::make_shared<BenchRecordImpl>(record);
     }
 
-    Status status() const override {
-        return Status::OK();
+    marble::Status GetStatus() const override {
+        return marble::Status::OK();
+    }
+
+    std::unique_ptr<RecordRef> ValueRef() const override {
+        // Return a simple implementation that wraps the record
+        // In a full implementation, this would provide zero-copy access
+        return nullptr; // Placeholder
     }
 
 private:

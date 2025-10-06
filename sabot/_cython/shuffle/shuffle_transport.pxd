@@ -17,40 +17,36 @@ from pyarrow.includes.libarrow cimport (
     CRecordBatch as PCRecordBatch,
 )
 
-# Import Flight transport
-from .flight_transport cimport ShuffleFlightServer, ShuffleFlightClient
+# Import lock-free Flight transport
+from .flight_transport_lockfree cimport LockFreeFlightServer, LockFreeFlightClient
 
 
 cdef class ShuffleServer:
     """
-    Shuffle server using Arrow Flight for zero-copy IPC.
+    Shuffle server using Arrow Flight for zero-copy IPC (lock-free).
     """
     cdef:
         string host
         int32_t port
         cbool running
-        ShuffleFlightServer flight_server
-        dict _partition_store  # (shuffle_id, partition_id) -> pa.RecordBatch
+        LockFreeFlightServer flight_server  # Lock-free Flight server
 
     cpdef void start(self) except *
     cpdef void stop(self) except *
-    cdef void register_partition(self, bytes shuffle_id, int32_t partition_id,
-                                 pa.RecordBatch batch)
+    # register_partition now exposed as Python def method
 
 
 cdef class ShuffleClient:
     """
-    Shuffle client using Arrow Flight for zero-copy IPC.
+    Shuffle client using Arrow Flight for zero-copy IPC (lock-free).
     """
     cdef:
-        ShuffleFlightClient flight_client
-        dict _connection_pool
+        LockFreeFlightClient flight_client  # Lock-free Flight client
         int32_t max_connections
         int32_t max_retries
         double timeout_seconds
 
-    cdef pa.RecordBatch fetch_partition(self, bytes host, int32_t port,
-                                        bytes shuffle_id, int32_t partition_id)
+    # fetch_partition now exposed as Python def method
 
 
 cdef class ShuffleTransport:

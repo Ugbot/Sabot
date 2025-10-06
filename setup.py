@@ -49,9 +49,9 @@ def detect_system_libs():
     arrow_cpp_build_dir = os.path.join(os.path.dirname(__file__), "vendor", "arrow", "cpp", "build", "install", "include")
     arrow_lib_dir = os.path.join(os.path.dirname(__file__), "vendor", "arrow", "cpp", "build", "install", "lib")
 
-    # For PyArrow compatibility (legacy), check if PyArrow is available
-    arrow_python_dir = None
-    arrow_cpp_src_dir = None
+    # Vendored Arrow Python bindings (.pxd files for Flight, etc)
+    arrow_python_dir = os.path.join(os.path.dirname(__file__), "vendor", "arrow", "python")
+    arrow_cpp_src_dir = arrow_cpp_api_dir
 
     # Check for our vendored Arrow C++ build first (preferred)
     if os.path.exists(arrow_lib_dir) and os.path.exists(arrow_cpp_build_dir):
@@ -127,6 +127,7 @@ def detect_system_libs():
         'arrow_cpp_include': arrow_cpp_include,
         'arrow_cpp_api_include': arrow_cpp_api_include,
         'arrow_cpp_build_include': arrow_cpp_build_include,
+        'arrow_python_dir': arrow_python_dir,
         'arrow_libs': arrow_libs,
         'rocksdb_include': rocksdb_include,
         'rocksdb_lib': rocksdb_lib,
@@ -214,7 +215,7 @@ def find_pyx_files():
         # Lock-free shuffle transport (LMAX Disruptor-style)
         "sabot/_cython/shuffle/lock_free_queue.pyx",  # SPSC/MPSC lock-free ring buffers
         "sabot/_cython/shuffle/atomic_partition_store.pyx",  # Atomic hash table
-        "sabot/_cython/shuffle/flight_transport_lockfree.pyx",  # Lock-free Flight transport
+        "sabot/_cython/shuffle/flight_transport_lockfree.pyx",  # Lock-free Flight transport (uses vendored Arrow)
 
         "sabot/_cython/shuffle/flight_transport.pyx",  # Arrow Flight C++ wrapper (legacy)
         "sabot/_cython/shuffle/shuffle_transport.pyx",  # Arrow Flight-based network transport
@@ -295,6 +296,9 @@ def create_extensions():
                     include_dirs.append(system_libs['arrow_cpp_api_include'])
                 if system_libs['arrow_cpp_build_include']:
                     include_dirs.append(system_libs['arrow_cpp_build_include'])
+                # Add vendored Arrow Python bindings for Flight .pxd files
+                if system_libs['arrow_python_dir']:
+                    include_dirs.append(system_libs['arrow_python_dir'])
 
                 # Check if this module uses cimport pyarrow.lib directly or imports from modules that do
                 try:

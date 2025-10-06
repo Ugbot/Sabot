@@ -12,7 +12,8 @@ Performance:
 """
 
 from libc.stdint cimport int32_t, int64_t, uint64_t
-from libc.stdlib cimport malloc, free, aligned_alloc
+from libc.stdlib cimport malloc, free
+from posix.stdlib cimport posix_memalign
 from libc.string cimport memset
 from libcpp cimport bool as cbool
 from libcpp.atomic cimport (
@@ -109,9 +110,10 @@ cdef class SPSCRingBuffer:
         self.mask = self.capacity - 1
 
         # Allocate cache-line aligned slots (64-byte alignment)
-        self.slots = <PartitionSlot*>aligned_alloc(64, self.capacity * sizeof(PartitionSlot))
-        if self.slots == NULL:
+        cdef void* ptr = NULL
+        if posix_memalign(&ptr, 64, self.capacity * sizeof(PartitionSlot)) != 0:
             return False
+        self.slots = <PartitionSlot*>ptr
 
         # Zero-initialize slots
         memset(self.slots, 0, self.capacity * sizeof(PartitionSlot))
@@ -277,9 +279,10 @@ cdef class MPSCQueue:
         self.mask = self.capacity - 1
 
         # Allocate aligned slots
-        self.slots = <PartitionSlot*>aligned_alloc(64, self.capacity * sizeof(PartitionSlot))
-        if self.slots == NULL:
+        cdef void* ptr = NULL
+        if posix_memalign(&ptr, 64, self.capacity * sizeof(PartitionSlot)) != 0:
             return False
+        self.slots = <PartitionSlot*>ptr
 
         memset(self.slots, 0, self.capacity * sizeof(PartitionSlot))
 

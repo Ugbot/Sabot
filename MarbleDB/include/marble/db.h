@@ -59,6 +59,9 @@ struct ReadOptions {
 
     // Fill cache
     bool fill_cache = true;
+
+    // Scan in reverse order (descending)
+    bool reverse_order = false;
 };
 
 // Main MarbleDB class

@@ -159,13 +159,13 @@ int main() {
     std::cout << "\n=== Example 5: File Operations with Buffers ===" << std::endl;
 
     // Create file operations wrapper
-    auto file_ops = std::make_shared<FileOperations>(memory_fs);
+    auto file_ops = std::make_shared<FileOperations>(std::shared_ptr<FileSystem>(memory_fs.release()));
 
     // Create a test buffer
     std::string test_content = "This is test content for file operations with potential compression!";
     auto buffer_result = arrow::AllocateBuffer(test_content.size());
     if (buffer_result.ok()) {
-        auto buffer = buffer_result.ValueUnsafe();
+        std::shared_ptr<arrow::Buffer> buffer = std::shared_ptr<arrow::Buffer>(buffer_result.ValueUnsafe().release());
         std::memcpy(buffer->mutable_data(), test_content.data(), test_content.size());
 
         // Write buffer to file

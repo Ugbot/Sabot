@@ -60,8 +60,9 @@ public:
         virtual void Next() = 0;
         virtual void Prev() = 0;
         virtual std::shared_ptr<marble::Key> GetKey() const = 0;
-        virtual std::shared_ptr<Record> Value() const = 0;
-        virtual marble::Status GetStatus() const = 0;
+    virtual std::shared_ptr<Record> Value() const = 0;
+    virtual std::unique_ptr<RecordRef> ValueRef() const = 0;
+    virtual marble::Status GetStatus() const = 0;
     };
 
     virtual std::unique_ptr<Iterator> NewIterator() = 0;

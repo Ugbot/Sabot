@@ -11,3 +11,4 @@
 - this is professional project, avoid emotion in descriptions.
 - any time we are testing sabot it  has to use cyarrow not pyarrow.
 - the goal is to build an intergrated system so a user does not need a million imports. sabot should feel like one thing not a box of bits.
+- tests live in the test folder.

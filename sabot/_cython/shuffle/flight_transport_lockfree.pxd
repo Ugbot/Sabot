@@ -20,10 +20,14 @@ from libcpp.memory cimport shared_ptr, unique_ptr
 from pyarrow.includes.libarrow cimport CRecordBatch as PCRecordBatch
 from pyarrow.includes.libarrow_flight cimport (
     CFlightClient,
-    CFlightServerBase,
+    PyFlightServer,
+    PyFlightServerVtable,
     CLocation,
     CTicket,
     CFlightCallOptions,
+    CFlightServerOptions,
+    CFlightDataStream,
+    CServerCallContext,
 )
 
 # Import our lock-free primitives
@@ -35,8 +39,8 @@ from .lock_free_queue cimport SPSCRingBuffer
 # Connection Slot (Lock-Free Pool)
 # ============================================================================
 
+# Lock-free connection pool slot
 cdef struct ConnectionSlot:
-    """Lock-free connection pool slot."""
     atomic[cbool] in_use               # Slot occupied flag
     char host[256]                     # Host string
     int32_t port                       # Port number
@@ -106,11 +110,11 @@ cdef class LockFreeFlightServer:
         string host
         int32_t port
 
-        atomic[cbool] running          # Server state (atomic)
-        AtomicPartitionStore* store    # Lock-free partition storage
+        cbool running                          # Server state (simple bool - single threaded init/stop)
+        AtomicPartitionStore _store_instance   # Python-managed store instance
 
         # C++ Flight server (will be implemented via C++ header)
-        void* server_cpp               # CFlightServerBase* (opaque for now)
+        void* server_cpp               # PyFlightServer* (opaque for now)
 
         char _padding[64]
 
@@ -139,11 +143,11 @@ cdef class LockFreeFlightServer:
 
 cdef inline int64_t hash_shuffle_id(const char* shuffle_id, int64_t len) nogil:
     """Hash shuffle ID string (FNV-1a)."""
-    cdef int64_t hash_val = 14695981039346656037
+    cdef int64_t hash_val = <int64_t>14695981039346656037ULL
     cdef int64_t i
 
     for i in range(len):
         hash_val ^= <int64_t>shuffle_id[i]
-        hash_val *= 1099511628211
+        hash_val *= <int64_t>1099511628211ULL
 
     return hash_val

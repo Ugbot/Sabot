@@ -74,6 +74,12 @@ public:
         });
     }
 
+    std::unique_ptr<marble::RecordRef> AsRecordRef() const override {
+        // Return a simple implementation that wraps the record
+        // In a full implementation, this would provide zero-copy access
+        return nullptr; // Placeholder
+    }
+
     // Getters
     int64_t id() const { return id_; }
     const std::string& name() const { return name_; }
