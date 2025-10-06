@@ -24,7 +24,7 @@ from libcpp.memory cimport shared_ptr, unique_ptr
 from libcpp.vector cimport vector
 
 cimport cython
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 
 
 # ==============================================================================
@@ -92,7 +92,7 @@ cdef class TonboStore:
         os.makedirs(self._path, exist_ok=True)
         self._opened = True
 
-    cpdef void put(self, str key, pa.RecordBatch batch) except *:
+    cpdef void put(self, str key, ca.RecordBatch batch) except *:
         """
         Store RecordBatch under key.
 
@@ -109,7 +109,7 @@ cdef class TonboStore:
         # For now: Store in memory
         self._memory_store[key] = batch
 
-    cpdef pa.RecordBatch get(self, str key):
+    cpdef ca.RecordBatch get(self, str key):
         """
         Retrieve RecordBatch by key.
 
@@ -290,12 +290,12 @@ cdef class TonboStateBackend:
         self._store = create_tonbo_store(full_path)
         self._operator_name = operator_name
 
-    cpdef void put_state(self, str key, pa.RecordBatch batch) except *:
+    cpdef void put_state(self, str key, ca.RecordBatch batch) except *:
         """Store operator state."""
         namespaced_key = f"{self._operator_name}:{key}"
         self._store.put(namespaced_key, batch)
 
-    cpdef pa.RecordBatch get_state(self, str key):
+    cpdef ca.RecordBatch get_state(self, str key):
         """Retrieve operator state."""
         namespaced_key = f"{self._operator_name}:{key}"
         return self._store.get(namespaced_key)

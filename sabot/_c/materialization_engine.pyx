@@ -14,7 +14,7 @@ Key Features:
 """
 
 # Import PyArrow's Cython API for direct C++ access
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.common cimport *
 from pyarrow.includes.libarrow cimport (
     CArray as PCArray,
@@ -111,7 +111,7 @@ cdef class StreamingAggregator:
 
         self._initialized = True
 
-    cpdef void update(self, pa.RecordBatch batch):
+    cpdef void update(self, ca.RecordBatch batch):
         """
         Update aggregation state with new batch.
 
@@ -146,7 +146,7 @@ cdef class StreamingAggregator:
         # Store back
         self._state[global_key] = state
 
-    cpdef pa.RecordBatch finalize(self):
+    cpdef ca.RecordBatch finalize(self):
         """
         Convert C++ aggregation state to Arrow RecordBatch.
 
@@ -212,7 +212,7 @@ cdef class Materialization:
 
     # === Population Methods ===
 
-    cpdef void populate_from_arrow_batch(self, pa.RecordBatch batch):
+    cpdef void populate_from_arrow_batch(self, ca.RecordBatch batch):
         """
         Populate from Arrow RecordBatch.
 
@@ -280,7 +280,7 @@ cdef class Materialization:
             raise RuntimeError("Cannot build index: no key column specified")
 
         # Get key column from cached batch
-        cdef pa.RecordBatch batch_wrapper = pa.RecordBatch.__new__(pa.RecordBatch)
+        cdef ca.RecordBatch batch_wrapper = ca.RecordBatch.__new__(ca.RecordBatch)
         batch_wrapper.init(self._cached_batch)
 
         # Find key column index
@@ -291,7 +291,7 @@ cdef class Materialization:
             raise ValueError(f"Key column '{key_col_name}' not found in schema")
 
         # Get key array
-        cdef pa.Array key_array = batch_wrapper.column(key_col_idx)
+        cdef ca.Array key_array = batch_wrapper.column(key_col_idx)
 
         # Build hash index
         # For now, assume int64 keys (extend for other types later)
@@ -333,16 +333,16 @@ cdef class Materialization:
             return None  # Not found
 
         # Extract row from cached batch
-        cdef pa.RecordBatch batch_wrapper = pa.RecordBatch.__new__(pa.RecordBatch)
+        cdef ca.RecordBatch batch_wrapper = ca.RecordBatch.__new__(ca.RecordBatch)
         batch_wrapper.init(self._cached_batch)
 
         # Slice to get single row
-        cdef pa.RecordBatch row_batch = batch_wrapper.slice(row_idx, 1)
+        cdef ca.RecordBatch row_batch = batch_wrapper.slice(row_idx, 1)
 
         # Convert to dict
         return row_batch.to_pydict()
 
-    cpdef pa.RecordBatch scan(self, str filter_expr=None, int64_t limit=-1):
+    cpdef ca.RecordBatch scan(self, str filter_expr=None, int64_t limit=-1):
         """
         Scan materialization (analytical access).
 
@@ -356,7 +356,7 @@ cdef class Materialization:
         if not self._has_cached_batch:
             raise RuntimeError("No data cached")
 
-        cdef pa.RecordBatch batch_wrapper = pa.RecordBatch.__new__(pa.RecordBatch)
+        cdef ca.RecordBatch batch_wrapper = ca.RecordBatch.__new__(ca.RecordBatch)
         batch_wrapper.init(self._cached_batch)
 
         # Apply limit
@@ -367,7 +367,7 @@ cdef class Materialization:
 
         return batch_wrapper
 
-    cpdef pa.RecordBatch enrich_batch(self, pa.RecordBatch stream_batch, str join_key):
+    cpdef ca.RecordBatch enrich_batch(self, ca.RecordBatch stream_batch, str join_key):
         """
         Enrich stream batch with materialized data (join operation).
 
@@ -384,7 +384,7 @@ cdef class Materialization:
             raise RuntimeError("No data cached for enrichment")
 
         # Get dimension batch
-        cdef pa.RecordBatch dim_batch = self._to_arrow_batch()
+        cdef ca.RecordBatch dim_batch = self._to_arrow_batch()
 
         # Use CyArrow hash join (104M rows/sec)
         if CYARROW_AVAILABLE and hash_join_batches:
@@ -427,7 +427,7 @@ cdef class Materialization:
 
     # === Update Methods ===
 
-    cpdef void update_batch(self, pa.RecordBatch batch):
+    cpdef void update_batch(self, ca.RecordBatch batch):
         """
         Update materialization with new batch (upsert).
 
@@ -457,7 +457,7 @@ cdef class Materialization:
         """Get version number."""
         return self._version
 
-    cpdef pa.Schema schema(self):
+    cpdef ca.Schema schema(self):
         """Get Arrow schema."""
         return self._schema
 
@@ -477,16 +477,16 @@ cdef class Materialization:
             return deref(it).second
         return -1
 
-    cdef pa.RecordBatch _to_arrow_batch(self):
+    cdef ca.RecordBatch _to_arrow_batch(self):
         """Convert cached data to Arrow RecordBatch."""
         if not self._has_cached_batch:
             return None
 
-        cdef pa.RecordBatch batch_wrapper = pa.RecordBatch.__new__(pa.RecordBatch)
+        cdef ca.RecordBatch batch_wrapper = ca.RecordBatch.__new__(ca.RecordBatch)
         batch_wrapper.init(self._cached_batch)
         return batch_wrapper
 
-    cdef void _upsert_batch(self, pa.RecordBatch batch):
+    cdef void _upsert_batch(self, ca.RecordBatch batch):
         """Upsert batch into storage."""
         # TODO: Implement actual upsert
         # For now, just overwrite

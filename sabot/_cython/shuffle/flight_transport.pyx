@@ -20,7 +20,7 @@ from libcpp.unordered_map cimport unordered_map
 import threading
 
 # Cython Arrow types
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.libarrow cimport (
     CRecordBatch as PCRecordBatch,
     CSchema as PCSchema,
@@ -40,6 +40,7 @@ from pyarrow.includes.libarrow_flight cimport (
 )
 
 # Python Flight (for server implementation - will be replaced with C++ in future)
+# TODO: Add flight to cyarrow wrapper
 import pyarrow.flight as flight
 
 
@@ -98,15 +99,15 @@ def _create_flight_server(location, partition_store, lock):
 # Helper Functions
 # ============================================================================
 
-cdef inline pa.RecordBatch _wrap_batch(shared_ptr[PCRecordBatch] batch_cpp):
-    """Wrap C++ RecordBatch as Cython pa.RecordBatch (zero-copy)."""
-    cdef pa.RecordBatch result = pa.RecordBatch.__new__(pa.RecordBatch)
+cdef inline ca.RecordBatch _wrap_batch(shared_ptr[PCRecordBatch] batch_cpp):
+    """Wrap C++ RecordBatch as Cython ca.RecordBatch (zero-copy)."""
+    cdef ca.RecordBatch result = ca.RecordBatch.__new__(ca.RecordBatch)
     result.init(batch_cpp)
     return result
 
 
-cdef inline shared_ptr[PCRecordBatch] _unwrap_batch(pa.RecordBatch batch):
-    """Unwrap Cython pa.RecordBatch to C++ shared_ptr (zero-copy)."""
+cdef inline shared_ptr[PCRecordBatch] _unwrap_batch(ca.RecordBatch batch):
+    """Unwrap Cython ca.RecordBatch to C++ shared_ptr (zero-copy)."""
     return batch.sp_batch
 
 
@@ -167,7 +168,7 @@ cdef class ShuffleFlightClient:
         # For now, return NULL - handled in fetch_partition
         return NULL
 
-    cpdef pa.RecordBatch fetch_partition(
+    cpdef ca.RecordBatch fetch_partition(
         self,
         bytes host,
         int32_t port,
@@ -194,7 +195,7 @@ cdef class ShuffleFlightClient:
             object ticket_py
             object reader_py
             object batch_obj
-            pa.RecordBatch result
+            ca.RecordBatch result
             bytes ticket_data
 
         # Get connection
@@ -318,7 +319,7 @@ cdef class ShuffleFlightServer:
         self,
         bytes shuffle_id,
         int32_t partition_id,
-        pa.RecordBatch batch
+        ca.RecordBatch batch
     ) except *:
         """
         Register partition for serving (zero-copy).
@@ -326,7 +327,7 @@ cdef class ShuffleFlightServer:
         Args:
             shuffle_id: Shuffle identifier
             partition_id: Partition ID
-            batch: Batch to serve (Cython pa.RecordBatch)
+            batch: Batch to serve (Cython ca.RecordBatch)
 
         Stores C++ shared_ptr, no copy made.
         """
@@ -336,7 +337,7 @@ cdef class ShuffleFlightServer:
             # Store batch (zero-copy - just shared_ptr reference)
             self._partition_store[key] = batch
 
-    cpdef pa.RecordBatch get_partition(
+    cpdef ca.RecordBatch get_partition(
         self,
         bytes shuffle_id,
         int32_t partition_id

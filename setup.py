@@ -2,6 +2,11 @@
 """
 Setup script for Sabot - High-performance columnar streaming engine.
 
+This setup script:
+1. Builds vendored Apache Arrow C++ library (if not already built)
+2. Builds Cython extensions using vendored Arrow
+3. No dependency on pip pyarrow - fully self-contained
+
 This setup script provides a traditional setuptools-based installation
 while pyproject.toml provides the modern configuration.
 """
@@ -11,6 +16,7 @@ import sys
 from pathlib import Path
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
+from setuptools.command.build_py import build_py
 import subprocess
 import glob
 
@@ -198,6 +204,9 @@ def find_pyx_files():
         "sabot/_cython/arrow/window_processor.pyx",  # Window processing
         "sabot/_cython/arrow/join_processor.pyx",  # Join operations
         # "sabot/_cython/arrow/flight_client.pyx",  # Arrow Flight client - needs fixes
+
+        # Numba UDF compilation (Phase 2: Auto-compilation)
+        "sabot/_cython/operators/numba_compiler.pyx",  # AST analysis and JIT compilation
 
         # Streaming operators (Phase 1: Transform operators)
         "sabot/_cython/operators/transform.pyx",  # map, filter, select, flatMap, union
@@ -401,8 +410,49 @@ def create_extensions():
 
     return extensions, system_libs
 
+class BuildArrow(build_py):
+    """Custom build command to build vendored Arrow C++ before Cython modules."""
+
+    def run(self):
+        """Build Arrow C++ library before building Python package."""
+        print("\n" + "=" * 60)
+        print("Building vendored Apache Arrow C++ library...")
+        print("=" * 60 + "\n")
+
+        # Import and run Arrow build script
+        from build import build_arrow_cpp
+        build_arrow_cpp()
+
+        print("\n" + "=" * 60)
+        print("Arrow C++ build complete - proceeding with Cython build")
+        print("=" * 60 + "\n")
+
+        # Continue with normal build
+        super().run()
+
+
 class BuildExt(build_ext):
     """Custom build_ext command to handle Cython compilation."""
+
+    def run(self):
+        """Build Arrow first, then Cython extensions."""
+        # Ensure Arrow is built before Cython modules
+        if not self._arrow_is_built():
+            print("\n⚠️  Arrow C++ not found - building now...\n")
+            from build import build_arrow_cpp
+            build_arrow_cpp()
+
+        super().run()
+
+    def _arrow_is_built(self):
+        """Check if Arrow C++ is already built."""
+        arrow_lib_dir = Path(__file__).parent / "vendor" / "arrow" / "cpp" / "build" / "install" / "lib"
+        if not arrow_lib_dir.exists():
+            return False
+
+        # Check for Arrow library files
+        lib_extensions = [".so", ".dylib", ".dll", ".a"]
+        return any((arrow_lib_dir / f"libarrow{ext}").exists() for ext in lib_extensions)
 
     def build_extensions(self):
         # Set compiler flags for optimization
@@ -460,7 +510,8 @@ setup(
     )(),
 
     cmdclass={
-        'build_ext': BuildExt,
+        'build_py': BuildArrow,  # Build Arrow before Python modules
+        'build_ext': BuildExt,   # Build Cython after Arrow
     },
 
     classifiers=[

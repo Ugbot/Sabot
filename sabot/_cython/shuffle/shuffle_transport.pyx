@@ -20,7 +20,7 @@ from libcpp.vector cimport vector
 from libcpp.memory cimport shared_ptr
 
 # Use Sabot's cyarrow, NOT pyarrow
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.libarrow cimport (
     CRecordBatch as PCRecordBatch,
 )
@@ -37,15 +37,15 @@ from .flight_transport_lockfree cimport (
 # Helper Functions
 # ============================================================================
 
-cdef inline pa.RecordBatch _wrap_batch(shared_ptr[PCRecordBatch] batch_cpp):
-    """Wrap C++ RecordBatch as Cython pa.RecordBatch (zero-copy)."""
-    cdef pa.RecordBatch result = pa.RecordBatch.__new__(pa.RecordBatch)
+cdef inline ca.RecordBatch _wrap_batch(shared_ptr[PCRecordBatch] batch_cpp):
+    """Wrap C++ RecordBatch as Cython ca.RecordBatch (zero-copy)."""
+    cdef ca.RecordBatch result = ca.RecordBatch.__new__(ca.RecordBatch)
     result.init(batch_cpp)
     return result
 
 
-cdef inline shared_ptr[PCRecordBatch] _unwrap_batch(pa.RecordBatch batch):
-    """Unwrap Cython pa.RecordBatch to C++ shared_ptr (zero-copy)."""
+cdef inline shared_ptr[PCRecordBatch] _unwrap_batch(ca.RecordBatch batch):
+    """Unwrap Cython ca.RecordBatch to C++ shared_ptr (zero-copy)."""
     return batch.sp_batch
 
 
@@ -90,7 +90,7 @@ cdef class ShuffleServer:
         self,
         bytes shuffle_id,
         int32_t partition_id,
-        pa.RecordBatch batch
+        ca.RecordBatch batch
     ):
         """
         Register partition data for serving (lock-free, <100ns).
@@ -98,7 +98,7 @@ cdef class ShuffleServer:
         Args:
             shuffle_id: Shuffle identifier
             partition_id: Partition ID
-            batch: Batch to serve (Cython pa.RecordBatch)
+            batch: Batch to serve (Cython ca.RecordBatch)
 
         Uses atomic CAS-based insertion, no locks.
         """
@@ -152,7 +152,7 @@ cdef class ShuffleClient:
             partition_id: Partition ID
 
         Returns:
-            Fetched batch (Cython pa.RecordBatch)
+            Fetched batch (Cython ca.RecordBatch)
 
         Uses lock-free Flight client with atomic connection pooling.
         """
@@ -218,7 +218,7 @@ cdef class ShuffleTransport:
         self,
         bytes shuffle_id,
         int32_t partition_id,
-        pa.RecordBatch batch
+        ca.RecordBatch batch
     ):
         """
         Publish partition data to server for remote fetching.
@@ -226,11 +226,11 @@ cdef class ShuffleTransport:
         Args:
             shuffle_id: Shuffle identifier
             partition_id: Partition ID
-            batch: Batch to publish (Cython pa.RecordBatch)
+            batch: Batch to publish (Cython ca.RecordBatch)
         """
         self.server.register_partition(shuffle_id, partition_id, batch)
 
-    cdef pa.RecordBatch fetch_partition_from_agent(
+    cdef ca.RecordBatch fetch_partition_from_agent(
         self,
         bytes agent_address,
         bytes shuffle_id,
@@ -245,7 +245,7 @@ cdef class ShuffleTransport:
             partition_id: Partition ID
 
         Returns:
-            Fetched batch (Cython pa.RecordBatch)
+            Fetched batch (Cython ca.RecordBatch)
         """
         # Parse agent address
         parts = agent_address.decode('utf-8').split(':')

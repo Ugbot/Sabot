@@ -18,7 +18,7 @@ import os
 import threading
 
 # Import Cython Arrow types
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.libarrow cimport (
     CRecordBatch as PCRecordBatch,
     CSchema as PCSchema,
@@ -27,7 +27,9 @@ from pyarrow.includes.libarrow cimport (
 )
 
 # For Python API access when needed
-import pyarrow
+# Python-level imports - use vendored Arrow
+from sabot import cyarrow
+# TODO: Add ipc to cyarrow wrapper
 import pyarrow.ipc as ipc
 
 
@@ -35,21 +37,21 @@ import pyarrow.ipc as ipc
 # Helper Functions
 # ============================================================================
 
-cdef inline pa.RecordBatch _wrap_batch(shared_ptr[PCRecordBatch] batch_cpp):
-    """Wrap C++ RecordBatch as Cython pa.RecordBatch (zero-copy)."""
-    cdef pa.RecordBatch result = pa.RecordBatch.__new__(pa.RecordBatch)
+cdef inline ca.RecordBatch _wrap_batch(shared_ptr[PCRecordBatch] batch_cpp):
+    """Wrap C++ RecordBatch as Cython ca.RecordBatch (zero-copy)."""
+    cdef ca.RecordBatch result = ca.RecordBatch.__new__(ca.RecordBatch)
     result.init(batch_cpp)
     return result
 
 
-cdef inline shared_ptr[PCRecordBatch] _unwrap_batch(pa.RecordBatch batch):
-    """Unwrap Cython pa.RecordBatch to C++ shared_ptr (zero-copy)."""
+cdef inline shared_ptr[PCRecordBatch] _unwrap_batch(ca.RecordBatch batch):
+    """Unwrap Cython ca.RecordBatch to C++ shared_ptr (zero-copy)."""
     return batch.sp_batch
 
 
-cdef inline pa.Schema _wrap_schema(shared_ptr[PCSchema] schema_cpp):
-    """Wrap C++ Schema as Cython pa.Schema (zero-copy)."""
-    cdef pa.Schema result = pa.Schema.__new__(pa.Schema)
+cdef inline ca.Schema _wrap_schema(shared_ptr[PCSchema] schema_cpp):
+    """Wrap C++ Schema as Cython ca.Schema (zero-copy)."""
+    cdef ca.Schema result = ca.Schema.__new__(ca.Schema)
     result.init_schema(schema_cpp)
     return result
 
@@ -72,21 +74,21 @@ cdef class ShuffleBuffer:
             partition_id: Partition ID this buffer serves
             max_rows: Maximum rows before flush
             max_bytes: Maximum bytes before flush
-            schema: Arrow schema (Cython pa.Schema or Python pyarrow.Schema)
+            schema: Arrow schema (Cython ca.Schema or Python pyarrow.Schema)
         """
-        cdef pa.Schema schema_cython
+        cdef ca.Schema schema_cython
 
         self.partition_id = partition_id
         self.max_rows = max_rows
         self.max_bytes = max_bytes
 
         # Handle schema - accept both Cython and Python types
-        if not isinstance(schema, pa.Schema):
+        if not isinstance(schema, ca.Schema):
             # Python pyarrow.Schema - convert to Cython type
             schema_cython = schema
             self.schema_cpp = schema_cython.sp_schema
         else:
-            # Already Cython pa.Schema
+            # Already Cython ca.Schema
             self.schema_cpp = (<pa.Schema>schema).sp_schema
 
         # Initialize state
@@ -97,12 +99,12 @@ cdef class ShuffleBuffer:
         self.spill_path = b""
         self.spill_store = None
 
-    cdef void add_batch(self, pa.RecordBatch batch):
+    cdef void add_batch(self, ca.RecordBatch batch):
         """
         Add batch to buffer (zero-copy).
 
         Args:
-            batch: RecordBatch to buffer (Cython pa.RecordBatch)
+            batch: RecordBatch to buffer (Cython ca.RecordBatch)
 
         Automatically spills to disk if memory pressure detected.
         """
@@ -115,21 +117,21 @@ cdef class ShuffleBuffer:
         # Each column has data + validity buffer
         self.total_bytes += batch.sp_batch.get().num_rows() * batch.sp_batch.get().num_columns() * 8  # Rough estimate
 
-    cdef pa.RecordBatch get_merged_batch(self):
+    cdef ca.RecordBatch get_merged_batch(self):
         """
         Merge all buffered batches into single batch.
 
         Returns:
-            Merged RecordBatch (Cython pa.RecordBatch)
+            Merged RecordBatch (Cython ca.RecordBatch)
 
         Clears buffer after merging.
         """
         cdef:
-            pa.Schema schema_cython
+            ca.Schema schema_cython
             list py_batches = []
             object merged_table_obj
             object merged_batch_obj
-            pa.RecordBatch result
+            ca.RecordBatch result
             int i
 
         if self.batches_cpp.size() == 0:
@@ -358,7 +360,7 @@ cdef class SpillManager:
         self,
         bytes shuffle_id,
         int32_t partition_id,
-        pa.RecordBatch batch
+        ca.RecordBatch batch
     ):
         """
         Spill batch to disk using Arrow IPC.
@@ -366,7 +368,7 @@ cdef class SpillManager:
         Args:
             shuffle_id: Shuffle identifier
             partition_id: Partition ID
-            batch: Batch to spill (Cython pa.RecordBatch)
+            batch: Batch to spill (Cython ca.RecordBatch)
 
         Returns:
             Path to spilled file
@@ -380,7 +382,7 @@ cdef class SpillManager:
         spill_path = os.path.join(self.base_path.decode('utf-8'), spill_filename.decode('utf-8'))
 
         # Convert to Python for IPC operations
-        # The Cython pa.RecordBatch can be used directly as Python object
+        # The Cython ca.RecordBatch can be used directly as Python object
         py_batch_obj = batch
 
         # Write using Arrow IPC (zero-copy to disk)
@@ -405,7 +407,7 @@ cdef class SpillManager:
             vector[shared_ptr[PCRecordBatch]] result
             object reader_obj
             object batch_obj
-            pa.RecordBatch batch_cython
+            ca.RecordBatch batch_cython
 
         # Read using Arrow IPC
         with ipc.open_file(spill_path.decode('utf-8')) as reader_obj:

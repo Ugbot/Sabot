@@ -449,7 +449,7 @@ if __name__ == "__main__":
     async def test_enrichment():
         """Test enrichment operator locally."""
         # Create test quote data
-        import pyarrow as pa
+        # Using cyarrow already imported at top of file
 
         quote_batch = pa.RecordBatch.from_arrays([
             pa.array(['BOND_12345', 'BOND_67890', 'BOND_11111']),

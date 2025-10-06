@@ -15,7 +15,7 @@ from libcpp.memory cimport shared_ptr, make_shared
 from cython.operator cimport dereference as deref
 
 # Import Cython Arrow types (not Python pyarrow!)
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.libarrow cimport (
     CRecordBatch as PCRecordBatch,
     CSchema as PCSchema,
@@ -28,7 +28,9 @@ from pyarrow.includes.libarrow cimport (
 from .types cimport ShuffleEdgeType
 
 # For Python API access when needed
-import pyarrow
+# Python-level imports - use vendored Arrow
+from sabot import cyarrow
+# TODO: Add compute to cyarrow wrapper
 import pyarrow.compute as pc
 
 
@@ -36,33 +38,33 @@ import pyarrow.compute as pc
 # Helper Functions
 # ============================================================================
 
-cdef inline pa.RecordBatch _wrap_batch(shared_ptr[PCRecordBatch] batch_cpp):
-    """Wrap C++ RecordBatch as Cython pa.RecordBatch (zero-copy)."""
-    cdef pa.RecordBatch result = pa.RecordBatch.__new__(pa.RecordBatch)
+cdef inline ca.RecordBatch _wrap_batch(shared_ptr[PCRecordBatch] batch_cpp):
+    """Wrap C++ RecordBatch as Cython ca.RecordBatch (zero-copy)."""
+    cdef ca.RecordBatch result = ca.RecordBatch.__new__(ca.RecordBatch)
     result.init(batch_cpp)
     return result
 
 
-cdef inline shared_ptr[PCRecordBatch] _unwrap_batch(pa.RecordBatch batch):
-    """Unwrap Cython pa.RecordBatch to C++ shared_ptr (zero-copy)."""
+cdef inline shared_ptr[PCRecordBatch] _unwrap_batch(ca.RecordBatch batch):
+    """Unwrap Cython ca.RecordBatch to C++ shared_ptr (zero-copy)."""
     return batch.sp_batch
 
 
-cdef inline pa.Array _wrap_array(shared_ptr[PCArray] array_cpp):
-    """Wrap C++ Array as Cython pa.Array (zero-copy)."""
-    cdef pa.Array result = pa.Array.__new__(pa.Array)
+cdef inline ca.Array _wrap_array(shared_ptr[PCArray] array_cpp):
+    """Wrap C++ Array as Cython ca.Array (zero-copy)."""
+    cdef ca.Array result = ca.Array.__new__(ca.Array)
     result.init(array_cpp)
     return result
 
 
-cdef inline shared_ptr[PCArray] _unwrap_array(pa.Array arr):
-    """Unwrap Cython pa.Array to C++ shared_ptr (zero-copy)."""
+cdef inline shared_ptr[PCArray] _unwrap_array(ca.Array arr):
+    """Unwrap Cython ca.Array to C++ shared_ptr (zero-copy)."""
     return arr.sp_array
 
 
-cdef inline pa.Schema _wrap_schema(shared_ptr[PCSchema] schema_cpp):
-    """Wrap C++ Schema as Cython pa.Schema (zero-copy)."""
-    cdef pa.Schema result = pa.Schema.__new__(pa.Schema)
+cdef inline ca.Schema _wrap_schema(shared_ptr[PCSchema] schema_cpp):
+    """Wrap C++ Schema as Cython ca.Schema (zero-copy)."""
+    cdef ca.Schema result = ca.Schema.__new__(ca.Schema)
     result.init_schema(schema_cpp)
     return result
 
@@ -93,32 +95,32 @@ cdef class Partitioner:
         Args:
             num_partitions: Number of output partitions
             key_columns: Column names to partition by
-            schema: Arrow schema (pa.Schema Cython type or Python pyarrow.Schema)
+            schema: Arrow schema (ca.Schema Cython type or Python pyarrow.Schema)
         """
-        cdef pa.Schema schema_cython
+        cdef ca.Schema schema_cython
 
         self.num_partitions = num_partitions
         self.key_columns = key_columns
 
         # Store schema C++ pointer
         # Convert to Cython type if necessary
-        if not isinstance(schema, pa.Schema):
+        if not isinstance(schema, ca.Schema):
             # Python pyarrow.Schema - convert to Cython type
             schema_cython = schema
             self.schema_cpp = schema_cython.sp_schema
         else:
-            # Already Cython pa.Schema
-            self.schema_cpp = (<pa.Schema>schema).sp_schema
+            # Already Cython ca.Schema
+            self.schema_cpp = (<ca.Schema>schema).sp_schema
 
     cdef vector[shared_ptr[PCRecordBatch]] partition_batch(
         self,
-        pa.RecordBatch batch
+        ca.RecordBatch batch
     ):
         """
         Partition RecordBatch into N output batches.
 
         Args:
-            batch: Input RecordBatch (Cython pa.RecordBatch)
+            batch: Input RecordBatch (Cython ca.RecordBatch)
 
         Returns:
             Vector of N RecordBatches (one per partition)
@@ -147,7 +149,7 @@ cdef class HashPartitioner(Partitioner):
         self._use_murmur3 = True
         self._hash_cache.reset()
 
-    cdef void _compute_hashes(self, pa.RecordBatch batch):
+    cdef void _compute_hashes(self, ca.RecordBatch batch):
         """
         Compute hash values for all rows in batch.
 
@@ -161,7 +163,7 @@ cdef class HashPartitioner(Partitioner):
             object hash_array_obj
 
         # Need to use Python API for hash computation
-        # The Cython pa.RecordBatch can be used directly as Python object
+        # The Cython ca.RecordBatch can be used directly as Python object
         py_batch_obj = batch
 
         # Extract key columns
@@ -184,7 +186,7 @@ cdef class HashPartitioner(Partitioner):
             hash_array_obj = pc.hash(struct_array)
 
         # Store as C++ array (zero-copy)
-        cdef pa.Array hash_array_cython = hash_array_obj
+        cdef ca.Array hash_array_cython = hash_array_obj
         self._hash_cache = hash_array_cython.sp_array
 
     cdef int32_t get_partition_for_row(self, int64_t row_index):
@@ -206,7 +208,7 @@ cdef class HashPartitioner(Partitioner):
 
     cdef vector[shared_ptr[PCRecordBatch]] partition_batch(
         self,
-        pa.RecordBatch batch
+        ca.RecordBatch batch
     ):
         """
         Partition batch using hash-based distribution.
@@ -227,7 +229,7 @@ cdef class HashPartitioner(Partitioner):
             object py_batch_obj
             object indices_array_obj
             object partition_batch_obj
-            pa.RecordBatch partition_batch_cython
+            ca.RecordBatch partition_batch_cython
 
         # Compute hashes for all rows
         self._compute_hashes(batch)
@@ -246,7 +248,7 @@ cdef class HashPartitioner(Partitioner):
         result.reserve(self.num_partitions)
 
         # Convert to Python batch for take operations
-        # The Cython pa.RecordBatch can be used directly as Python object
+        # The Cython ca.RecordBatch can be used directly as Python object
         py_batch_obj = batch
 
         for partition_id in range(self.num_partitions):
@@ -325,7 +327,7 @@ cdef class RangePartitioner(Partitioner):
 
     cdef vector[shared_ptr[PCRecordBatch]] partition_batch(
         self,
-        pa.RecordBatch batch
+        ca.RecordBatch batch
     ):
         """
         Partition batch using range-based distribution.
@@ -345,7 +347,7 @@ cdef class RangePartitioner(Partitioner):
             object key_array_obj
             object indices_array_obj
             object partition_batch_obj
-            pa.RecordBatch partition_batch_cython
+            ca.RecordBatch partition_batch_cython
 
         # Get first key column (range partitioning uses single column)
         if self.key_columns.size() == 0:
@@ -354,7 +356,7 @@ cdef class RangePartitioner(Partitioner):
         col_name = self.key_columns[0]
 
         # Convert to Python for column access
-        # The Cython pa.RecordBatch can be used directly as Python object
+        # The Cython ca.RecordBatch can be used directly as Python object
         py_batch_obj = batch
         key_array_obj = py_batch_obj.column(col_name.decode('utf-8'))
 
@@ -406,7 +408,7 @@ cdef class RoundRobinPartitioner(Partitioner):
 
     cdef vector[shared_ptr[PCRecordBatch]] partition_batch(
         self,
-        pa.RecordBatch batch
+        ca.RecordBatch batch
     ):
         """
         Partition batch using round-robin distribution.
@@ -422,7 +424,7 @@ cdef class RoundRobinPartitioner(Partitioner):
             object py_batch_obj
             object indices_array_obj
             object partition_batch_obj
-            pa.RecordBatch partition_batch_cython
+            ca.RecordBatch partition_batch_cython
 
         # Distribute rows round-robin
         for i in range(num_rows):
@@ -433,7 +435,7 @@ cdef class RoundRobinPartitioner(Partitioner):
         result.reserve(self.num_partitions)
 
         # Convert to Python batch for take operations
-        # The Cython pa.RecordBatch can be used directly as Python object
+        # The Cython ca.RecordBatch can be used directly as Python object
         py_batch_obj = batch
 
         for partition_id in range(self.num_partitions):
@@ -461,7 +463,7 @@ cpdef Partitioner create_partitioner(
     ShuffleEdgeType edge_type,
     int32_t num_partitions,
     vector[string] key_columns,
-    pa.Schema schema  # Cython type
+    ca.Schema schema  # Cython type
 ) except *:
     """
     Factory function to create appropriate partitioner based on edge type.
@@ -470,7 +472,7 @@ cpdef Partitioner create_partitioner(
         edge_type: Type of shuffle edge (HASH, RANGE, REBALANCE, etc.)
         num_partitions: Number of output partitions
         key_columns: Column names to partition by
-        schema: Arrow schema (Cython pa.Schema)
+        schema: Arrow schema (Cython ca.Schema)
 
     Returns:
         Partitioner instance

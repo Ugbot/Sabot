@@ -18,7 +18,7 @@ from libcpp.memory cimport shared_ptr, unique_ptr, make_shared
 from libcpp.vector cimport vector
 
 cimport cython
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 
 # Arrow Flight C++ API
 from pyarrow.includes.libarrow_flight cimport (
@@ -53,11 +53,11 @@ cdef class FlightDataStream:
     """
 
     cdef:
-        pa.Schema _schema
+        ca.Schema _schema
         object _iterator  # Python iterator/generator
         cbool _exhausted
 
-    def __cinit__(self, pa.Schema schema, iterator):
+    def __cinit__(self, ca.Schema schema, iterator):
         """
         Initialize Flight data stream.
 
@@ -69,11 +69,11 @@ cdef class FlightDataStream:
         self._iterator = iterator
         self._exhausted = False
 
-    cpdef pa.Schema schema(self):
+    cpdef ca.Schema schema(self):
         """Get the schema for this stream."""
         return self._schema
 
-    cpdef pa.RecordBatch next_batch(self):
+    cpdef ca.RecordBatch next_batch(self):
         """
         Get next RecordBatch from iterator.
 
@@ -130,7 +130,7 @@ cdef class FlightServer:
         self._streams = {}
         self._running = False
 
-    cpdef void register_stream(self, str path, pa.Schema schema, iterator) except *:
+    cpdef void register_stream(self, str path, ca.Schema schema, iterator) except *:
         """
         Register a data stream with the server.
 

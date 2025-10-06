@@ -23,8 +23,9 @@ Usage:
 """
 
 import sabot as sb
-import pyarrow as pa
-import pyarrow.compute as pc
+from sabot import cyarrow as ca
+import pyarrow as pa  # For specialized types
+import pyarrow.compute as pc  # For compute functions
 import time
 
 # Create Sabot application
@@ -270,8 +271,6 @@ if __name__ == "__main__":
 
 Example Arrow Operations:
 -------------------------
-import pyarrow as pa
-import pyarrow.compute as pc
 
 # Create table
 table = pa.table({'col': [1, 2, 3, 4, 5]})

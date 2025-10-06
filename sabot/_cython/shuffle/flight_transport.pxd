@@ -12,7 +12,7 @@ from libcpp.memory cimport unique_ptr, shared_ptr
 from libcpp.unordered_map cimport unordered_map
 
 # Cython Arrow types
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 
 # Arrow Flight C++ API
 from pyarrow.includes.libarrow_flight cimport (
@@ -40,7 +40,7 @@ cdef class ShuffleFlightClient:
     cdef public double timeout_seconds
 
     cdef unique_ptr[CFlightClient]* _get_connection(self, bytes host, int32_t port) except NULL
-    cpdef pa.RecordBatch fetch_partition(
+    cpdef ca.RecordBatch fetch_partition(
         self,
         bytes host,
         int32_t port,
@@ -60,7 +60,7 @@ cdef class ShuffleFlightServer:
     cdef:
         string host
         int32_t port
-        dict _partition_store  # (shuffle_id, partition_id) -> pa.RecordBatch
+        dict _partition_store  # (shuffle_id, partition_id) -> ca.RecordBatch
         object _server_thread  # threading.Thread
         object _server  # PyArrow FlightServerBase (for now)
         object _lock  # threading.Lock
@@ -73,9 +73,9 @@ cdef class ShuffleFlightServer:
         self,
         bytes shuffle_id,
         int32_t partition_id,
-        pa.RecordBatch batch
+        ca.RecordBatch batch
     ) except *
-    cpdef pa.RecordBatch get_partition(
+    cpdef ca.RecordBatch get_partition(
         self,
         bytes shuffle_id,
         int32_t partition_id

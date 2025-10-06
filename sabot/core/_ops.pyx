@@ -15,7 +15,7 @@ from libc.stdint cimport int64_t, int32_t, uint8_t
 from libcpp cimport bool as cbool
 
 cimport cython
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 
 # Import our Arrow shims for zero-copy access
 from sabot._c.arrow_core cimport (
@@ -40,7 +40,7 @@ from libcpp.memory cimport shared_ptr
 # ============================================================================
 
 @cython.cfunc
-cdef int64_t _sum_int64_column_nogil(pa.Array arr) nogil:
+cdef int64_t _sum_int64_column_nogil(ca.Array arr) nogil:
     """
     Sum int64 column - pure C with no Python overhead.
 
@@ -65,7 +65,7 @@ cdef int64_t _sum_int64_column_nogil(pa.Array arr) nogil:
 
 
 @cython.cfunc
-cdef int64_t _sum_int64_column_with_nulls_nogil(pa.Array arr) nogil:
+cdef int64_t _sum_int64_column_with_nulls_nogil(ca.Array arr) nogil:
     """
     Sum int64 column handling nulls.
 
@@ -100,7 +100,7 @@ cdef int64_t _sum_int64_column_with_nulls_nogil(pa.Array arr) nogil:
 
 
 @cython.cfunc
-cdef double _mean_float64_column_nogil(pa.Array arr) nogil:
+cdef double _mean_float64_column_nogil(ca.Array arr) nogil:
     """
     Calculate mean of float64 column.
 
@@ -118,7 +118,7 @@ cdef double _mean_float64_column_nogil(pa.Array arr) nogil:
 
 
 @cython.cfunc
-cdef int64_t _count_where_int64_nogil(pa.Array arr, int64_t threshold) nogil:
+cdef int64_t _count_where_int64_nogil(ca.Array arr, int64_t threshold) nogil:
     """
     Count elements greater than threshold.
 
@@ -142,7 +142,7 @@ cdef int64_t _count_where_int64_nogil(pa.Array arr, int64_t threshold) nogil:
 # ============================================================================
 
 @cython.cfunc
-cdef int64_t _sum_batch_column_nogil(pa.RecordBatch batch, int64_t col_idx) nogil:
+cdef int64_t _sum_batch_column_nogil(ca.RecordBatch batch, int64_t col_idx) nogil:
     """
     Sum a column in a RecordBatch.
 
@@ -172,14 +172,14 @@ cdef int64_t _sum_batch_column_nogil(pa.RecordBatch batch, int64_t col_idx) nogi
 # Public Python API
 # ============================================================================
 
-def sum_int64_column(pa.Array arr, bint handle_nulls=False):
+def sum_int64_column(ca.Array arr, bint handle_nulls=False):
     """
     Sum int64 Arrow array.
 
     Python-callable wrapper that releases GIL for hot computation.
 
     Args:
-        arr: PyArrow Int64Array (or Cython pa.Array)
+        arr: PyArrow Int64Array (or Cython ca.Array)
         handle_nulls: Whether to check validity bitmap
 
     Returns:
@@ -200,7 +200,7 @@ def sum_int64_column(pa.Array arr, bint handle_nulls=False):
     return result
 
 
-def mean_float64_column(pa.Array arr):
+def mean_float64_column(ca.Array arr):
     """
     Calculate mean of float64 Arrow array.
 
@@ -214,7 +214,7 @@ def mean_float64_column(pa.Array arr):
     return result
 
 
-def count_where_int64(pa.Array arr, int64_t threshold):
+def count_where_int64(ca.Array arr, int64_t threshold):
     """
     Count elements greater than threshold.
 
@@ -257,7 +257,7 @@ def sum_batch_column(batch, col_name: str):
         raise ValueError(f"Column '{col_name}' not found in batch")
 
     # Convert to Cython types for nogil operation
-    cdef pa.RecordBatch cython_batch = batch
+    cdef ca.RecordBatch cython_batch = batch
     cdef int64_t col_idx = col_idx_py
 
     # Sum column (release GIL)
@@ -279,7 +279,7 @@ cdef class StreamOperator:
     Subclass this to implement custom operators with zero-copy semantics.
     """
 
-    cpdef pa.RecordBatch process(self, batch):
+    cpdef ca.RecordBatch process(self, batch):
         """
         Process a RecordBatch and return result.
 
@@ -307,7 +307,7 @@ cdef class SumOperator(StreamOperator):
         self._running_sum = 0
         self._initialized = False
 
-    cpdef pa.RecordBatch process(self, batch):
+    cpdef ca.RecordBatch process(self, batch):
         """
         Process batch and update running sum.
 
@@ -315,7 +315,7 @@ cdef class SumOperator(StreamOperator):
         """
         # Declare all cdef variables at function start
         cdef int64_t batch_sum
-        cdef pa.RecordBatch cython_batch
+        cdef ca.RecordBatch cython_batch
 
         # Initialize column index on first batch
         if not self._initialized:

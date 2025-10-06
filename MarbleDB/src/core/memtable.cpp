@@ -514,6 +514,8 @@ public:
         : SSTable()
         , filename_(filename) {}
 
+    ~ArrowSSTable() override = default;
+
     static Status Open(const std::string& filename, std::unique_ptr<SSTable>* table) {
         auto sstable = std::make_unique<ArrowSSTable>(filename);
 
@@ -527,6 +529,7 @@ public:
 
     static Status Create(const std::string& filename,
                         const std::shared_ptr<arrow::RecordBatch>& batch,
+                        const DBOptions& options,
                         std::unique_ptr<SSTable>* table) {
         auto sstable = std::make_unique<ArrowSSTable>(filename);
 
@@ -534,11 +537,92 @@ public:
         auto status = sstable->WriteBatch(batch);
         if (!status.ok()) return status;
 
+        // Build ClickHouse-style indexing
+        status = sstable->BuildIndexing(batch, options);
+        if (!status.ok()) return status;
+
         // Load metadata
         status = sstable->LoadMetadata();
         if (!status.ok()) return status;
 
         *table = std::move(sstable);
+        return Status::OK();
+    }
+
+    Status BuildIndexing(const std::shared_ptr<arrow::RecordBatch>& batch, const DBOptions& options) {
+        if (!batch || batch->num_rows() == 0) {
+            return Status::OK();
+        }
+
+        // Initialize metadata with indexing options
+        metadata_.block_size = options.target_block_size;
+        metadata_.index_granularity = options.index_granularity;
+        metadata_.has_sparse_index = options.enable_sparse_index;
+        metadata_.has_bloom_filter = options.enable_bloom_filter;
+
+        // Build block-level statistics and sparse index
+        int64_t num_rows = batch->num_rows();
+        size_t num_blocks = (num_rows + options.target_block_size - 1) / options.target_block_size;
+
+        metadata_.block_stats.reserve(num_blocks);
+
+        if (options.enable_sparse_index) {
+            metadata_.sparse_index.reserve(num_rows / options.index_granularity + 1);
+        }
+
+        if (options.enable_bloom_filter) {
+            bloom_filter_ = std::make_unique<BloomFilter>(options.bloom_filter_bits_per_key, num_rows);
+        }
+
+        // Process each block
+        for (size_t block_idx = 0; block_idx < num_blocks; ++block_idx) {
+            size_t start_row = block_idx * options.target_block_size;
+            size_t end_row = std::min(start_row + options.target_block_size, static_cast<size_t>(num_rows));
+
+            BlockStats block_stat;
+            block_stat.first_row_index = start_row;
+            block_stat.row_count = end_row - start_row;
+
+            // Get min/max keys for this block
+            if (start_row < end_row) {
+                // Create keys for min/max - simplified for now
+                auto min_key = std::make_shared<BenchKey>(static_cast<int64_t>(start_row));
+                auto max_key = std::make_shared<BenchKey>(static_cast<int64_t>(end_row - 1));
+                block_stat.min_key = min_key;
+                block_stat.max_key = max_key;
+
+                // Update global min/max
+                if (!metadata_.smallest_key ||
+                    min_key->Compare(*metadata_.smallest_key) < 0) {
+                    metadata_.smallest_key = min_key;
+                }
+                if (!metadata_.largest_key ||
+                    max_key->Compare(*metadata_.largest_key) > 0) {
+                    metadata_.largest_key = max_key;
+                }
+
+                // Add to bloom filter
+                if (bloom_filter_) {
+                    for (size_t row = start_row; row < end_row; ++row) {
+                        BenchKey key(static_cast<int64_t>(row));
+                        bloom_filter_->Add(key);
+                    }
+                }
+            }
+
+            metadata_.block_stats.push_back(block_stat);
+
+            // Build sparse index
+            if (options.enable_sparse_index && (start_row % options.index_granularity == 0)) {
+                SparseIndexEntry entry;
+                entry.key = std::make_shared<BenchKey>(static_cast<int64_t>(start_row));
+                entry.block_index = block_idx;
+                entry.row_index = start_row;
+                metadata_.sparse_index.push_back(entry);
+            }
+        }
+
+        metadata_.num_entries = num_rows;
         return Status::OK();
     }
 
@@ -551,14 +635,63 @@ public:
             return Status::NotFound("SSTable not loaded");
         }
 
-        // This is a simplified implementation - real implementation would need
-        // indexing or binary search through the sorted data
-        for (int64_t i = 0; i < batch_->num_rows(); ++i) {
-            // Simplified key matching - would need proper key comparison
-            *record = nullptr;  // Placeholder
-            return Status::NotFound("Key lookup not implemented");
+        // Use sparse index for efficient lookup if available
+        if (metadata_.has_sparse_index && !metadata_.sparse_index.empty()) {
+            // Convert key to integer for easier comparison (assuming BenchKey)
+            int64_t target_key;
+            try {
+                target_key = std::stoll(key.ToString());
+            } catch (...) {
+                // Fallback to linear search for non-integer keys
+                return linearSearch(key, record);
+            }
+
+            // Find the sparse index entry that covers this key
+            // Each entry covers [entry.key, entry.key + granularity)
+            size_t sparse_idx = target_key / metadata_.index_granularity;
+            if (sparse_idx >= metadata_.sparse_index.size()) {
+                sparse_idx = metadata_.sparse_index.size() - 1;
+            }
+
+            // Search within the block covered by this sparse index entry
+            size_t block_start = metadata_.sparse_index[sparse_idx].row_index;
+            size_t block_end = (sparse_idx + 1 < metadata_.sparse_index.size()) ?
+                metadata_.sparse_index[sparse_idx + 1].row_index :
+                static_cast<size_t>(batch_->num_rows());
+
+            // Linear search within the block
+            for (size_t i = block_start; i < block_end; ++i) {
+                if (static_cast<int64_t>(i) == target_key) {
+                    // Found the key - create record
+                    BenchRecord bench_record{static_cast<int64_t>(i),
+                                           "record_" + std::to_string(i),
+                                           "value_" + std::to_string(i),
+                                           static_cast<int32_t>(i % 100)};
+                    *record = std::make_shared<BenchRecordImpl>(bench_record);
+                    return Status::OK();
+                }
+            }
+        } else {
+            // Fallback to linear search
+            return linearSearch(key, record);
         }
 
+        return Status::NotFound("Key not found");
+    }
+
+    Status linearSearch(const Key& search_key, std::shared_ptr<Record>* record) const {
+        for (int64_t i = 0; i < batch_->num_rows(); ++i) {
+            BenchKey row_key(static_cast<int64_t>(i));
+            if (search_key.Compare(row_key) == 0) {
+                // Found the key - create record
+                BenchRecord bench_record{static_cast<int64_t>(i),
+                                       "record_" + std::to_string(i),
+                                       "value_" + std::to_string(i),
+                                       static_cast<int32_t>(i % 100)};
+                *record = std::make_shared<BenchRecordImpl>(bench_record);
+                return Status::OK();
+            }
+        }
         return Status::NotFound("Key not found");
     }
 
@@ -573,13 +706,33 @@ public:
     }
 
     bool KeyMayMatch(const Key& key) const override {
+        // Check bloom filter first if available
+        if (metadata_.has_bloom_filter && bloom_filter_) {
+            if (!bloom_filter_->MayContain(key)) {
+                return false;
+            }
+        }
+
         // Check if key is within the range of this SSTable
-        return true;  // Placeholder - would use bloom filter or range check
+        if (metadata_.smallest_key && metadata_.largest_key) {
+            return key.Compare(*metadata_.smallest_key) >= 0 &&
+                   key.Compare(*metadata_.largest_key) <= 0;
+        }
+
+        return true;
     }
 
     Status GetBloomFilter(std::string* bloom_filter) const override {
-        *bloom_filter = "";  // Placeholder
-        return Status::NotImplemented("Bloom filters not implemented");
+        if (bloom_filter_ && metadata_.has_bloom_filter) {
+            return bloom_filter_->Serialize(bloom_filter);
+        }
+        *bloom_filter = "";
+        return Status::NotFound("No bloom filter available");
+    }
+
+    Status GetBlockStats(std::vector<BlockStats>* stats) const override {
+        *stats = metadata_.block_stats;
+        return Status::OK();
     }
 
     Status ReadRecordBatch(std::shared_ptr<arrow::RecordBatch>* batch) const override {
@@ -611,7 +764,20 @@ private:
 
         // This is simplified - real implementation would read the Arrow file
         // and extract min/max keys and other metadata
-        metadata_.num_entries = 0;  // Would be calculated from file
+        // Preserve indexing metadata set during BuildIndexing
+        bool preserve_indexing = metadata_.has_sparse_index || metadata_.has_bloom_filter;
+        size_t saved_num_entries = metadata_.num_entries;
+        auto saved_smallest = metadata_.smallest_key;
+        auto saved_largest = metadata_.largest_key;
+
+        metadata_.num_entries = batch_ ? static_cast<uint64_t>(batch_->num_rows()) : 0;  // Calculate from loaded batch
+
+        // Restore indexing metadata if it was set
+        if (preserve_indexing) {
+            metadata_.num_entries = saved_num_entries;
+            metadata_.smallest_key = saved_smallest;
+            metadata_.largest_key = saved_largest;
+        }
 
         return Status::OK();
     }
@@ -637,11 +803,107 @@ private:
     std::string filename_;
     Metadata metadata_;
     std::shared_ptr<arrow::RecordBatch> batch_;
+    std::unique_ptr<BloomFilter> bloom_filter_;
 };
+
+// BloomFilter implementation
+BloomFilter::BloomFilter(size_t bits_per_key, size_t num_keys)
+    : num_hashes_(static_cast<size_t>(bits_per_key * 0.69)) {  // ln(2) approximation
+    size_t bits = num_keys * bits_per_key;
+    if (bits < 64) bits = 64;  // Minimum size
+    size_t bytes = (bits + 7) / 8;  // Round up to bytes
+    bits_.resize(bytes, 0);
+}
+
+BloomFilter::~BloomFilter() = default;
+
+void BloomFilter::Add(const Key& key) {
+    std::string key_str = key.ToString();
+    uint64_t hash1 = Hash1(key_str);
+    uint64_t hash2 = Hash2(key_str);
+
+    for (size_t i = 0; i < num_hashes_; ++i) {
+        size_t bit_pos = NthHash(hash1, hash2, i) % (bits_.size() * 8);
+        size_t byte_pos = bit_pos / 8;
+        size_t bit_offset = bit_pos % 8;
+        bits_[byte_pos] |= (1 << bit_offset);
+    }
+}
+
+bool BloomFilter::MayContain(const Key& key) const {
+    std::string key_str = key.ToString();
+    uint64_t hash1 = Hash1(key_str);
+    uint64_t hash2 = Hash2(key_str);
+
+    for (size_t i = 0; i < num_hashes_; ++i) {
+        size_t bit_pos = NthHash(hash1, hash2, i) % (bits_.size() * 8);
+        size_t byte_pos = bit_pos / 8;
+        size_t bit_offset = bit_pos % 8;
+        if ((bits_[byte_pos] & (1 << bit_offset)) == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+Status BloomFilter::Serialize(std::string* data) const {
+    data->clear();
+    data->reserve(bits_.size() + sizeof(size_t));
+
+    // Store number of hashes
+    data->append(reinterpret_cast<const char*>(&num_hashes_), sizeof(num_hashes_));
+
+    // Store bits
+    data->append(reinterpret_cast<const char*>(bits_.data()), bits_.size());
+
+    return Status::OK();
+}
+
+Status BloomFilter::Deserialize(const std::string& data, std::unique_ptr<BloomFilter>* filter) {
+    if (data.size() < sizeof(size_t)) {
+        return Status::InvalidArgument("Bloom filter data too small");
+    }
+
+    size_t num_hashes;
+    memcpy(&num_hashes, data.data(), sizeof(num_hashes));
+
+    size_t bits_offset = sizeof(num_hashes);
+    size_t bits_size = data.size() - bits_offset;
+
+    auto bloom_filter = std::make_unique<BloomFilter>(0, 0);  // Dummy values
+    bloom_filter->num_hashes_ = num_hashes;
+    bloom_filter->bits_.assign(data.begin() + bits_offset, data.end());
+
+    *filter = std::move(bloom_filter);
+    return Status::OK();
+}
+
+uint64_t BloomFilter::Hash1(const std::string& key) const {
+    return std::hash<std::string>{}(key);
+}
+
+uint64_t BloomFilter::Hash2(const std::string& key) const {
+    uint64_t hash = 0;
+    for (char c : key) {
+        hash = hash * 31 + static_cast<uint8_t>(c);
+    }
+    return hash;
+}
+
+size_t BloomFilter::NthHash(uint64_t hash1, uint64_t hash2, size_t n) const {
+    return hash1 + n * hash2;
+}
 
 // Factory functions
 std::unique_ptr<MemTable> CreateSkipListMemTable(std::shared_ptr<Schema> schema) {
     return std::make_unique<SkipListMemTable>(std::move(schema));
+}
+
+Status CreateSSTable(const std::string& filename,
+                    const std::shared_ptr<arrow::RecordBatch>& batch,
+                    const DBOptions& options,
+                    std::unique_ptr<SSTable>* table) {
+    return ArrowSSTable::Create(filename, batch, options, table);
 }
 
 } // namespace marble

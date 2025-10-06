@@ -18,7 +18,7 @@ from libcpp.memory cimport shared_ptr, unique_ptr
 from libcpp.vector cimport vector
 
 cimport cython
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 
 # Arrow Flight C++ API
 from pyarrow.includes.libarrow_flight cimport (
@@ -48,10 +48,10 @@ cdef class FlightStreamReader:
 
     cdef:
         object _reader  # PyArrow FlightStreamReader
-        pa.Schema _schema
+        ca.Schema _schema
         cbool _exhausted
 
-    def __cinit__(self, reader, pa.Schema schema):
+    def __cinit__(self, reader, ca.Schema schema):
         """
         Initialize stream reader.
 
@@ -63,11 +63,11 @@ cdef class FlightStreamReader:
         self._schema = schema
         self._exhausted = False
 
-    cpdef pa.Schema schema(self):
+    cpdef ca.Schema schema(self):
         """Get the schema for this stream."""
         return self._schema
 
-    cpdef pa.RecordBatch read_next(self):
+    cpdef ca.RecordBatch read_next(self):
         """
         Read next RecordBatch from stream.
 
@@ -193,7 +193,7 @@ cdef class FlightClient:
         schema = reader.schema
         return FlightStreamReader(reader, schema)
 
-    cpdef pa.RecordBatch get_batch(self, str path):
+    cpdef ca.RecordBatch get_batch(self, str path):
         """
         Get a single RecordBatch from stream.
 
@@ -229,7 +229,7 @@ cdef class FlightClient:
             batches.append(batch)
         return batches
 
-    cpdef pa.Table get_table(self, str path):
+    cpdef ca.Table get_table(self, str path):
         """
         Get entire stream as Arrow Table.
 

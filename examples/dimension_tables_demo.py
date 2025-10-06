@@ -24,7 +24,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import sabot as sb
-import pyarrow as pa
+from sabot import cyarrow as ca
 
 print("=" * 70)
 print("Sabot Dimension Tables Demo")

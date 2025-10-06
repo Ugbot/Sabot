@@ -14,7 +14,7 @@ from libcpp.memory cimport shared_ptr
 from libcpp cimport bool as cbool
 
 # Import Arrow C++ types
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.libarrow cimport (
     CRecordBatch as PCRecordBatch,
     CSchema as PCSchema,
@@ -65,8 +65,8 @@ cdef class StreamingAggregator:
 
     # Methods
     cpdef void initialize(self, list group_by_keys, dict aggregations)
-    cpdef void update(self, pa.RecordBatch batch)
-    cpdef pa.RecordBatch finalize(self)
+    cpdef void update(self, ca.RecordBatch batch)
+    cpdef ca.RecordBatch finalize(self)
     cdef void _reset(self)
 
 
@@ -106,36 +106,36 @@ cdef class Materialization:
         cbool _has_cached_batch
 
         # Metadata
-        object _schema  # Python pa.Schema object
+        object _schema  # Python ca.Schema object
         int64_t _version
         cbool _is_kv_backend
         cbool _indexed
         int64_t _num_rows
 
     # Population methods
-    cpdef void populate_from_arrow_batch(self, pa.RecordBatch batch)
+    cpdef void populate_from_arrow_batch(self, ca.RecordBatch batch)
     cpdef void populate_from_arrow_file(self, str path)
     cpdef void build_index(self)
 
     # Access methods
     cpdef object lookup(self, object key)
-    cpdef pa.RecordBatch scan(self, str filter_expr=*, int64_t limit=*)
-    cpdef pa.RecordBatch enrich_batch(self, pa.RecordBatch stream_batch, str join_key)
+    cpdef ca.RecordBatch scan(self, str filter_expr=*, int64_t limit=*)
+    cpdef ca.RecordBatch enrich_batch(self, ca.RecordBatch stream_batch, str join_key)
     cpdef cbool contains(self, object key)
 
     # Update methods
-    cpdef void update_batch(self, pa.RecordBatch batch)
+    cpdef void update_batch(self, ca.RecordBatch batch)
     cpdef void refresh(self)
 
     # Metadata
     cpdef int64_t num_rows(self)
     cpdef int64_t version(self)
-    cpdef pa.Schema schema(self)
+    cpdef ca.Schema schema(self)
 
     # Internal helpers
     cdef int64_t _lookup_row(self, int64_t key_hash) nogil
-    cdef pa.RecordBatch _to_arrow_batch(self)
-    cdef void _upsert_batch(self, pa.RecordBatch batch)
+    cdef ca.RecordBatch _to_arrow_batch(self)
+    cdef void _upsert_batch(self, ca.RecordBatch batch)
     cdef int64_t _hash_key(self, object key)
 
 

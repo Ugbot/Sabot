@@ -10,7 +10,7 @@ from libcpp cimport bool as cbool
 from libcpp.memory cimport shared_ptr
 
 # Import PyArrow's C++ types directly
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 from pyarrow.includes.libarrow cimport (
     CArray as PCArray,
     CArrayData as PCArrayData,
@@ -46,32 +46,32 @@ cdef class ArrowRecordBatch:
 
 
 cdef class ArrowComputeEngine:
-    cpdef object filter_batch(self, pa.RecordBatch batch, str condition)
-    cpdef object hash_join(self, pa.RecordBatch left, pa.RecordBatch right,
+    cpdef object filter_batch(self, ca.RecordBatch batch, str condition)
+    cpdef object hash_join(self, ca.RecordBatch left, ca.RecordBatch right,
                           str left_key, str right_key, str join_type=*)
 
 
 cdef class ArrowMemoryPool:
-    cdef pa.CMemoryPool* _pool
+    cdef ca.CMemoryPool* _pool
 
 
 # ============================================================================
 # Compatibility Functions (for existing batch_processor.pyx)
 # ============================================================================
 
-cdef const int64_t* get_int64_data_ptr(pa.Array arr) nogil
-cdef const double* get_float64_data_ptr(pa.Array arr) nogil
-cdef const uint8_t* get_validity_bitmap(pa.Array arr) nogil
-cdef int64_t get_array_length(pa.Array arr) nogil
-cdef int64_t get_batch_num_rows(pa.RecordBatch batch) nogil
-cdef int64_t get_batch_num_columns(pa.RecordBatch batch) nogil
-cdef pa.Array get_batch_column(pa.RecordBatch batch, int64_t i)
-cdef shared_ptr[PCArray] get_batch_column_cpp(pa.RecordBatch batch, int64_t i) nogil
+cdef const int64_t* get_int64_data_ptr(ca.Array arr) nogil
+cdef const double* get_float64_data_ptr(ca.Array arr) nogil
+cdef const uint8_t* get_validity_bitmap(ca.Array arr) nogil
+cdef int64_t get_array_length(ca.Array arr) nogil
+cdef int64_t get_batch_num_rows(ca.RecordBatch batch) nogil
+cdef int64_t get_batch_num_columns(ca.RecordBatch batch) nogil
+cdef ca.Array get_batch_column(ca.RecordBatch batch, int64_t i)
+cdef shared_ptr[PCArray] get_batch_column_cpp(ca.RecordBatch batch, int64_t i) nogil
 cdef const int64_t* get_int64_data_ptr_cpp(shared_ptr[PCArray] arr_ptr) nogil
 cdef const double* get_float64_data_ptr_cpp(shared_ptr[PCArray] arr_ptr) nogil
 cdef int64_t get_array_length_cpp(shared_ptr[PCArray] arr_ptr) nogil
-cdef int64_t find_column_index(pa.RecordBatch batch, str column_name)
-cdef cbool is_null(pa.Array arr, int64_t i) nogil
+cdef int64_t find_column_index(ca.RecordBatch batch, str column_name)
+cdef cbool is_null(ca.Array arr, int64_t i) nogil
 
 
 # ============================================================================

@@ -17,7 +17,7 @@ from libc.stdint cimport int64_t, int32_t, uint8_t
 from libcpp cimport bool as cbool
 
 cimport cython
-cimport pyarrow.lib as pa
+cimport pyarrow.lib as ca
 
 # Import our Arrow shims for zero-copy access
 from sabot._c.arrow_core cimport (
@@ -69,14 +69,14 @@ cdef class ArrowBatchProcessor:
         self._column_indices = {}
         self._initialized = False
 
-    cpdef void initialize_batch(self, pa.RecordBatch batch) except *:
+    cpdef void initialize_batch(self, ca.RecordBatch batch) except *:
         """
         Initialize processor with Arrow RecordBatch.
 
-        ZERO-COPY: Stores reference to Cython pa.RecordBatch, not Python object.
+        ZERO-COPY: Stores reference to Cython ca.RecordBatch, not Python object.
 
         Args:
-            batch: PyArrow RecordBatch (or Cython pa.RecordBatch)
+            batch: PyArrow RecordBatch (or Cython ca.RecordBatch)
 
         Performance: ~1μs setup time
         """
@@ -242,7 +242,7 @@ cdef class ArrowBatchProcessor:
             raise RuntimeError("Batch not initialized")
 
         cdef int64_t ts_col_idx = self._get_column_index(timestamp_column)
-        cdef pa.Array ts_array = get_batch_column(self._batch, ts_col_idx)
+        cdef ca.Array ts_array = get_batch_column(self._batch, ts_col_idx)
         cdef const int64_t* timestamp_data = get_int64_data_ptr(ts_array)
         cdef int64_t i
         cdef int64_t timestamp
@@ -275,7 +275,7 @@ cdef class ArrowBatchProcessor:
             'columns': list(self._column_indices.keys())
         }
 
-    cpdef pa.RecordBatch get_batch(self):
+    cpdef ca.RecordBatch get_batch(self):
         """Get the underlying RecordBatch (zero-copy)."""
         return self._batch
 
@@ -293,7 +293,7 @@ cdef class ArrowComputeEngine:
     """
 
     @staticmethod
-    def filter_batch(pa.RecordBatch batch, str condition):
+    def filter_batch(ca.RecordBatch batch, str condition):
         """
         Filter batch using Arrow compute (SIMD accelerated).
 
@@ -319,7 +319,7 @@ cdef class ArrowComputeEngine:
             raise ValueError(f"Unsupported condition: {condition}")
 
     @staticmethod
-    def hash_join(pa.RecordBatch left, pa.RecordBatch right,
+    def hash_join(ca.RecordBatch left, ca.RecordBatch right,
                   str left_key, str right_key, str join_type="inner"):
         """
         Join two batches using Arrow's hash join.
