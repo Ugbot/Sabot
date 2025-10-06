@@ -8,10 +8,11 @@ Defines streaming join operators with smart state backend selection:
 - Time-based joins: RocksDB timers + state
 """
 
-from sabot._cython.operators.transform cimport BaseOperator
+from sabot._cython.operators.base_operator cimport BaseOperator
+from sabot._cython.operators.shuffled_operator cimport ShuffledOperator
 
 
-cdef class CythonHashJoinOperator(BaseOperator):
+cdef class CythonHashJoinOperator(ShuffledOperator):
     """Vectorized hash join operator using Arrow C++ compute kernels."""
     cdef object _right_source
     cdef object _hash_builder
@@ -21,7 +22,7 @@ cdef class CythonHashJoinOperator(BaseOperator):
 
 
 
-cdef class CythonIntervalJoinOperator(BaseOperator):
+cdef class CythonIntervalJoinOperator(ShuffledOperator):
     """Interval join operator for time-based joins."""
     cdef object _right_source
     cdef str _time_column
@@ -32,7 +33,7 @@ cdef class CythonIntervalJoinOperator(BaseOperator):
 
 
 
-cdef class CythonAsofJoinOperator(BaseOperator):
+cdef class CythonAsofJoinOperator(ShuffledOperator):
     """As-of join operator (sorted merge join)."""
     cdef object _right_source
     cdef str _time_column

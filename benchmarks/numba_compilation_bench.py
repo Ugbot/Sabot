@@ -147,14 +147,14 @@ def bench_compilation_overhead():
     compiled = auto_compile(test_func)
     compile_time = (time.perf_counter() - start) * 1000
 
-    print(".2f")
+    print(f"Compilation time: {compile_time:.2f}ms")
 
     # Measure cache hit time
     start = time.perf_counter()
     cached = auto_compile(test_func)
     cache_time = (time.perf_counter() - start) * 1000
 
-    print(".3f")
+    print(f"Cache hit time: {cache_time:.3f}ms")
 
     return {'compile_ms': compile_time, 'cache_ms': cache_time}
 

@@ -29,7 +29,7 @@ except ImportError:
     pc = None
 
 # Import base operator
-from sabot._cython.operators.transform cimport BaseOperator
+from sabot._cython.operators.shuffled_operator cimport ShuffledOperator
 
 
 # ============================================================================
@@ -37,7 +37,7 @@ from sabot._cython.operators.transform cimport BaseOperator
 # ============================================================================
 
 @cython.final
-cdef class CythonGroupByOperator(BaseOperator):
+cdef class CythonGroupByOperator(ShuffledOperator):
     """
     GroupBy operator: partition stream by keys and apply aggregations.
 
@@ -73,17 +73,23 @@ cdef class CythonGroupByOperator(BaseOperator):
 
     def __init__(self, source, keys: List[str], aggregations: Dict[str, tuple], schema=None):
         """
-        Initialize groupBy operator.
+        Initialize groupBy operator with shuffle support.
 
         Args:
             source: Input stream/iterator
-            keys: List of column names to group by
+            keys: List of column names to group by (also used for partitioning)
             aggregations: Dict mapping output name to (column, function) tuple
                          Functions: sum, mean, count, min, max, stddev, variance
             schema: Output schema (inferred if None)
         """
-        self._source = source
-        self._schema = schema
+        # Initialize ShuffledOperator with group keys as partition keys
+        super().__init__(
+            source=source,
+            partition_keys=keys,  # Group keys are partition keys for shuffle
+            num_partitions=4,  # Will be overridden by JobManager
+            schema=schema
+        )
+
         self._keys = keys
         self._aggregations = aggregations
         # In-memory aggregation state (will use Tonbo for persistence)
@@ -163,6 +169,43 @@ cdef class CythonGroupByOperator(BaseOperator):
         # TODO: Retrieve from Tonbo state
         # For now, return current state as RecordBatch
         return None
+
+    def __iter__(self):
+        """Execute groupBy with shuffle-aware logic."""
+        if self._shuffle_transport is not None:
+            # Distributed: receive shuffled data for this partition
+            yield from self._execute_with_shuffle()
+        else:
+            # Local: process all data
+            yield from self._execute_local()
+
+    def _execute_with_shuffle(self):
+        """Execute groupBy with shuffled inputs."""
+        # Receive shuffled batches for this partition
+        for batch in self._receive_shuffled():
+            self.process_batch(batch)
+
+        # Yield final aggregated result for this partition
+        result = self.get_result()
+        if result is not None:
+            yield result
+
+    def _execute_local(self):
+        """Execute groupBy locally (current logic)."""
+        # Process all batches
+        for batch in self._source:
+            self.process_batch(batch)
+
+        # Yield final aggregated result
+        result = self.get_result()
+        if result is not None:
+            yield result
+
+    def _receive_shuffled(self):
+        """Receive shuffled batches for this partition."""
+        # TODO: Implement shuffle receive
+        # For now, return empty (placeholder)
+        return []
 
 
 # ============================================================================

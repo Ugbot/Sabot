@@ -32,7 +32,7 @@ except ImportError:
     pc = None
 
 # Import base operator
-from sabot._cython.operators.transform cimport BaseOperator
+from sabot._cython.operators.shuffled_operator cimport ShuffledOperator
 
 
 # ============================================================================
@@ -274,7 +274,7 @@ cdef class StreamingHashTableBuilder:
 # ============================================================================
 
 @cython.final
-cdef class CythonHashJoinOperator(BaseOperator):
+cdef class CythonHashJoinOperator(ShuffledOperator):
     """
     Vectorized hash join operator using Arrow C++ compute kernels.
 
@@ -312,7 +312,7 @@ cdef class CythonHashJoinOperator(BaseOperator):
     def __init__(self, left_source, right_source, left_keys: List[str],
                  right_keys: List[str], join_type: str = 'inner', schema=None):
         """
-        Initialize vectorized hash join operator.
+        Initialize vectorized hash join operator with shuffle support.
 
         Args:
             left_source: Left (probe) stream
@@ -322,9 +322,16 @@ cdef class CythonHashJoinOperator(BaseOperator):
             join_type: 'inner', 'left', 'right', or 'outer'
             schema: Output schema (inferred)
         """
-        self._source = left_source
+        # Initialize ShuffledOperator with left keys as partition keys
+        # (left side gets shuffled to co-locate with right side)
+        super().__init__(
+            source=left_source,
+            partition_keys=left_keys,  # Left keys for partitioning
+            num_partitions=4,  # Will be overridden by JobManager
+            schema=schema
+        )
+
         self._right_source = right_source
-        self._schema = schema
         self._left_keys = left_keys
         self._right_keys = right_keys
         self._join_type = join_type.lower()
@@ -337,30 +344,73 @@ cdef class CythonHashJoinOperator(BaseOperator):
             raise ValueError(f"Invalid join type: {join_type}")
 
     def __iter__(self):
-        """Process streams with vectorized operations."""
-        if self._source is None:
-            return
+        """
+        Execute hash join with shuffle-aware logic.
 
-        # Build phase: Accumulate right side batches
-        for batch in self._right_source:
-            if batch is not None and batch.num_rows > 0:
-                self._hash_builder.add_batch(batch)
+        If shuffle is enabled:
+        1. Both left and right sides are shuffled by join key
+        2. This task receives only rows for its partition
+        3. Build local hash table (guaranteed to have all matches)
+        4. Probe with local left side
 
-        # Build hash index (vectorized)
+        If no shuffle (single agent):
+        1. Same as current logic (build full table, probe full stream)
+        """
+        if self._shuffle_transport is not None:
+            # Distributed shuffle mode
+            yield from self._execute_with_shuffle()
+        else:
+            # Local mode (current logic)
+            yield from self._execute_local()
+
+    def _execute_with_shuffle(self):
+        """Execute join with shuffled inputs."""
+        # Build phase: receive shuffled right side for this partition
+        for right_batch in self._receive_right_shuffled():
+            self._hash_builder.add_batch(right_batch)
+
         self._hash_builder.build_index()
 
-        # Probe phase: Process left stream
-        for batch in self._source:
-            if batch is None or batch.num_rows == 0:
+        # Probe phase: receive shuffled left side for this partition
+        for left_batch in self._receive_left_shuffled():
+            result = self._hash_builder.probe_batch_vectorized(
+                left_batch, self._left_keys, self._join_type
+            )
+            if result is not None:
+                yield result
+
+    def _execute_local(self):
+        """Execute join locally (current logic)."""
+        # Build phase
+        for right_batch in self._right_source:
+            if right_batch is not None and right_batch.num_rows > 0:
+                self._hash_builder.add_batch(right_batch)
+
+        self._hash_builder.build_index()
+
+        # Probe phase
+        for left_batch in self._source:
+            if left_batch is None or left_batch.num_rows == 0:
                 continue
 
-            # Vectorized probe using Arrow take() kernel
             result = self._hash_builder.probe_batch_vectorized(
-                batch, self._left_keys, self._join_type
+                left_batch, self._left_keys, self._join_type
             )
 
             if result is not None and result.num_rows > 0:
                 yield result
+
+    def _receive_right_shuffled(self):
+        """Receive shuffled right side batches for this partition."""
+        # TODO: Implement shuffle receive for right side
+        # For now, return empty (placeholder)
+        return []
+
+    def _receive_left_shuffled(self):
+        """Receive shuffled left side batches for this partition."""
+        # TODO: Implement shuffle receive for left side
+        # For now, return empty (placeholder)
+        return []
 
 
 # ============================================================================
@@ -368,7 +418,7 @@ cdef class CythonHashJoinOperator(BaseOperator):
 # ============================================================================
 
 @cython.final
-cdef class CythonIntervalJoinOperator(BaseOperator):
+cdef class CythonIntervalJoinOperator(ShuffledOperator):
     """
     Interval join operator: join rows within a time interval.
 
@@ -469,7 +519,7 @@ cdef class CythonIntervalJoinOperator(BaseOperator):
 # ============================================================================
 
 @cython.final
-cdef class CythonAsofJoinOperator(BaseOperator):
+cdef class CythonAsofJoinOperator(ShuffledOperator):
     """
     As-of join operator: join with most recent matching row.
 

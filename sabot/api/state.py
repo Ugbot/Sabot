@@ -62,10 +62,10 @@ class ValueState(State):
         full_key = f"{self.name}:{key}"
 
         # Convert scalar to RecordBatch for columnar storage
-        if not isinstance(value, pa.RecordBatch):
+        if not isinstance(value, ca.RecordBatch):
             # Wrap scalar in single-row RecordBatch
             if isinstance(value, (int, float, str, bool)):
-                value = pa.RecordBatch.from_pydict({
+                value = ca.RecordBatch.from_pydict({
                     'value': [value]
                 })
             else:
@@ -125,7 +125,7 @@ class ListState(State):
         all_events = state.get_all(user_id)
     """
 
-    def add(self, key: str, value: pa.RecordBatch):
+    def add(self, key: str, value: ca.RecordBatch):
         """
         Append value to list for key.
 
@@ -146,12 +146,12 @@ class ListState(State):
         # Store updated list
         if hasattr(self._backend, 'put_state'):
             # Concatenate batches for columnar storage
-            combined = pa.Table.from_batches(existing).to_batches()[0] if existing else value
+            combined = ca.Table.from_batches(existing).to_batches()[0] if existing else value
             self._backend.put_state(full_key, combined)
         elif isinstance(self._backend, dict):
             self._backend[full_key] = existing
 
-    def get(self, key: str) -> List[pa.RecordBatch]:
+    def get(self, key: str) -> List[ca.RecordBatch]:
         """
         Get list of batches for key.
 
@@ -166,7 +166,7 @@ class ListState(State):
         full_key = f"{self.name}:{key}"
         return self._get_list(full_key)
 
-    def get_all(self, key: str) -> Optional[pa.Table]:
+    def get_all(self, key: str) -> Optional[ca.Table]:
         """
         Get all values as single Table.
 
@@ -179,9 +179,9 @@ class ListState(State):
         batches = self.get(key)
         if not batches:
             return None
-        return pa.Table.from_batches(batches)
+        return ca.Table.from_batches(batches)
 
-    def update(self, key: str, values: List[pa.RecordBatch]):
+    def update(self, key: str, values: List[ca.RecordBatch]):
         """
         Replace list for key.
 
@@ -192,13 +192,13 @@ class ListState(State):
         full_key = f"{self.name}:{key}"
 
         if hasattr(self._backend, 'put_state'):
-            combined = pa.Table.from_batches(values).to_batches()[0] if values else None
+            combined = ca.Table.from_batches(values).to_batches()[0] if values else None
             if combined:
                 self._backend.put_state(full_key, combined)
         elif isinstance(self._backend, dict):
             self._backend[full_key] = values
 
-    def _get_list(self, full_key: str) -> List[pa.RecordBatch]:
+    def _get_list(self, full_key: str) -> List[ca.RecordBatch]:
         """Internal: Get list from backend."""
         if hasattr(self._backend, 'get_state'):
             batch = self._backend.get_state(full_key)
@@ -236,9 +236,9 @@ class MapState(State):
         full_key = f"{self.name}:{key}:{map_key}"
 
         # Convert to RecordBatch
-        if not isinstance(value, pa.RecordBatch):
+        if not isinstance(value, ca.RecordBatch):
             if isinstance(value, (int, float, str, bool)):
-                value = pa.RecordBatch.from_pydict({'value': [value]})
+                value = ca.RecordBatch.from_pydict({'value': [value]})
             else:
                 raise ValueError(f"Cannot store value of type {type(value)}")
 
@@ -375,9 +375,9 @@ class ReducingState(State):
         full_key = f"{self.name}:{key}"
 
         # Convert to RecordBatch
-        if not isinstance(new_value, pa.RecordBatch):
+        if not isinstance(new_value, ca.RecordBatch):
             if isinstance(new_value, (int, float, str, bool)):
-                new_value = pa.RecordBatch.from_pydict({'value': [new_value]})
+                new_value = ca.RecordBatch.from_pydict({'value': [new_value]})
 
         if hasattr(self._backend, 'put_state'):
             self._backend.put_state(full_key, new_value)

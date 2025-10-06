@@ -253,3 +253,102 @@ cdef class ShuffleTransport:
         port = int(parts[1]) if len(parts) > 1 else 8816
 
         return self.client.fetch_partition(host, port, shuffle_id, partition_id)
+
+    # ========================================================================
+    # Shuffle Orchestration (Phase 4)
+    # ========================================================================
+
+    cpdef void start_shuffle(
+        self,
+        bytes shuffle_id,
+        int32_t num_partitions,
+        list downstream_agents
+    ):
+        """
+        Initialize shuffle for operator.
+
+        Args:
+            shuffle_id: Unique shuffle identifier
+            num_partitions: Number of downstream partitions
+            downstream_agents: List of "host:port" for downstream tasks
+        """
+        # Store shuffle metadata
+        if not hasattr(self, '_active_shuffles'):
+            self._active_shuffles = {}
+
+        self._active_shuffles[shuffle_id] = {
+            'num_partitions': num_partitions,
+            'downstream_agents': downstream_agents
+        }
+
+    cpdef void send_partition(
+        self,
+        bytes shuffle_id,
+        int32_t partition_id,
+        ca.RecordBatch batch,
+        bytes target_agent
+    ):
+        """
+        Send partition to downstream agent via Arrow Flight.
+
+        Uses zero-copy Arrow Flight transfer.
+
+        Args:
+            shuffle_id: Shuffle identifier
+            partition_id: Partition ID within shuffle
+            batch: Batch to send (Cython ca.RecordBatch)
+            target_agent: "host:port" of target agent
+        """
+        # First publish locally for remote fetching
+        self.publish_partition(shuffle_id, partition_id, batch)
+
+        # Parse target agent
+        agent_str = target_agent.decode('utf-8')
+        parts = agent_str.split(':')
+        host = parts[0].encode('utf-8')
+        port = int(parts[1]) if len(parts) > 1 else 8816
+
+        # Send notification to target agent
+        # TODO: Implement notification mechanism
+        # For now, rely on pull-based fetching
+        pass
+
+    cpdef list receive_partitions(
+        self,
+        bytes shuffle_id,
+        int32_t partition_id
+    ):
+        """
+        Receive all partitions for a shuffle operation.
+
+        Args:
+            shuffle_id: Shuffle identifier
+            partition_id: This agent's partition ID
+
+        Returns:
+            List of RecordBatches for this partition
+        """
+        cdef list result = []
+        cdef ca.RecordBatch batch
+
+        # Get shuffle metadata
+        if not hasattr(self, '_active_shuffles') or shuffle_id not in self._active_shuffles:
+            return result
+
+        shuffle_info = self._active_shuffles[shuffle_id]
+        num_partitions = shuffle_info['num_partitions']
+        downstream_agents = shuffle_info['downstream_agents']
+
+        # For now, return empty list (placeholder for actual implementation)
+        # TODO: Implement proper partition receiving
+        return result
+
+    cpdef void end_shuffle(self, bytes shuffle_id):
+        """
+        Clean up shuffle resources.
+
+        Args:
+            shuffle_id: Shuffle identifier to clean up
+        """
+        if hasattr(self, '_active_shuffles'):
+            self._active_shuffles.pop(shuffle_id, None)

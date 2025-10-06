@@ -8,8 +8,8 @@ from libcpp.string cimport string as cpp_string
 from libcpp.vector cimport vector
 from libcpp.unordered_map cimport unordered_map
 from libcpp.utility cimport pair
-from cpython.ref cimport PyObject
-from cython.operator cimport dereference as deref
+from cpython.ref cimport PyObject, Py_INCREF, Py_DECREF
+from cython.operator cimport dereference as deref, preincrement as inc
 
 # Type aliases - use void* instead of PyObject* for Cython compatibility
 # Cast to <object><PyObject*> when reading, <void*><PyObject*> when writing
@@ -22,79 +22,25 @@ import time
 from typing import Any, Dict, List, Optional, Callable, AsyncIterator
 from enum import Enum
 
-# Arrow imports
-cdef extern from "arrow/api.h" namespace "arrow":
-    cdef cppclass CStatus:
-        bint ok()
-        CStatus& operator=(CStatus&)
+# Arrow imports - commented out as not used, causes template compilation issues
+# All Arrow operations use Python-level pyarrow API instead of C++ bindings
+# cdef extern from "arrow/api.h" namespace "arrow":
+#     cdef cppclass CStatus, CDataType, CField, CSchema, CArray, CRecordBatch, CTable, etc...
+# cdef extern from "arrow/compute/api.h" namespace "arrow::compute":
+#     cdef cppclass CFunctionOptions, CExpression, CHashJoinOptions, etc...
 
-    cdef cppclass CDataType:
-        pass
+# Arrow C++ bindings commented out - these are not used in the current implementation
+# All Arrow operations use Python-level pyarrow API instead
+# cdef extern from "arrow/python/pyarrow.h" namespace "arrow::py":
+#     cdef object wrap_array "arrow::py::wrap_array"(...)
+#     etc...
 
-    cdef cppclass CField:
-        pass
+# cdef extern from "<memory>" namespace "std":
+#     cdef cppclass shared_ptr[T]:
+#         T* get()
+#         bint operator bool()
 
-    cdef cppclass CSchema:
-        pass
-
-    cdef cppclass CArray:
-        pass
-
-    cdef cppclass CRecordBatch:
-        pass
-
-    cdef cppclass CTable:
-        pass
-
-    cdef cppclass CBuffer:
-        pass
-
-    cdef cppclass CMemoryPool:
-        pass
-
-cdef extern from "arrow/compute/api.h" namespace "arrow::compute":
-    cdef cppclass CFunctionOptions:
-        pass
-
-    cdef cppclass CExpression:
-        pass
-
-    cdef CStatus CallFunction "arrow::compute::CallFunction"(
-        const c_string& func_name,
-        const vector[CDatum]& args,
-        const CFunctionOptions& options,
-        CDatum* out
-    )
-
-    cdef cppclass CHashJoinOptions:
-        pass
-
-    cdef CStatus HashJoin "arrow::compute::HashJoin"(
-        const vector[CDatum]& left_keys,
-        const vector[CDatum]& right_keys,
-        CHashJoinOptions options,
-        vector[pair[uint64_t, uint64_t]]* result_ids
-    )
-
-cdef extern from "arrow/python/pyarrow.h" namespace "arrow::py":
-    cdef object wrap_array "arrow::py::wrap_array"(const shared_ptr[CArray]& arr)
-    cdef object wrap_table "arrow::py::wrap_table"(const shared_ptr[CTable]& table)
-    cdef object wrap_record_batch "arrow::py::wrap_record_batch"(const shared_ptr[CRecordBatch]& batch)
-    cdef object wrap_schema "arrow::py::wrap_schema"(const shared_ptr[CSchema]& schema)
-
-    cdef CStatus unwrap_array "arrow::py::unwrap_array"(object obj, shared_ptr[CArray]* out)
-    cdef CStatus unwrap_table "arrow::py::unwrap_table"(object obj, shared_ptr[CTable]* out)
-    cdef CStatus unwrap_record_batch "arrow::py::unwrap_record_batch"(object obj, shared_ptr[CRecordBatch]* out)
-    cdef CStatus unwrap_schema "arrow::py::unwrap_schema"(object obj, shared_ptr[CSchema]* out)
-
-cdef extern from "<memory>" namespace "std":
-    cdef cppclass shared_ptr[T]:
-        T* get()
-        bint operator bool()
-
-cdef extern from "<vector>" namespace "std":
-    cdef cppclass vector[T]:
-        pass
+# vector is already imported from libcpp.vector above
 
 cdef extern from "<string>" namespace "std":
     cdef cppclass c_string:
@@ -109,8 +55,16 @@ cdef extern from "arrow/type.h" namespace "arrow":
         pass
 
 
+# C++ enum for high-performance join type checks (integer comparisons)
+cdef enum CJoinType:
+    INNER = 0
+    LEFT_OUTER = 1
+    RIGHT_OUTER = 2
+    FULL_OUTER = 3
+
+
 class JoinType(Enum):
-    """Join types supported by Sabot (Flink-compatible)."""
+    """Join types supported by Sabot (Flink-compatible) - Python API."""
     INNER = "inner"
     LEFT_OUTER = "left_outer"
     RIGHT_OUTER = "right_outer"
@@ -132,6 +86,36 @@ class JoinStrategy(Enum):
     HASH = "hash"
     MERGE = "merge"
     NESTED_LOOP = "nested_loop"
+
+
+# Helper function to convert Python JoinType to C++ CJoinType
+cdef inline CJoinType _to_c_join_type(object py_join_type):
+    """Convert Python JoinType enum to C++ CJoinType for performance."""
+    if py_join_type == JoinType.INNER:
+        return INNER
+    elif py_join_type == JoinType.LEFT_OUTER:
+        return LEFT_OUTER
+    elif py_join_type == JoinType.RIGHT_OUTER:
+        return RIGHT_OUTER
+    elif py_join_type == JoinType.FULL_OUTER:
+        return FULL_OUTER
+    else:
+        return INNER  # Default fallback
+
+
+# Helper function to convert C++ CJoinType back to string for stats/logging
+cdef inline str _c_join_type_to_str(CJoinType c_join_type):
+    """Convert C++ CJoinType to string for stats and logging."""
+    if c_join_type == INNER:
+        return "inner"
+    elif c_join_type == LEFT_OUTER:
+        return "left_outer"
+    elif c_join_type == RIGHT_OUTER:
+        return "right_outer"
+    elif c_join_type == FULL_OUTER:
+        return "full_outer"
+    else:
+        return "inner"  # Default fallback
 
 
 cdef class JoinCondition:
@@ -166,29 +150,30 @@ cdef class StreamTableJoinProcessor:
     """Cython-optimized stream-table join processor."""
 
     cdef:
-        JoinType _join_type
-        vector[JoinCondition*] _conditions
+        CJoinType _join_type  # C++ enum for performance
+        list _conditions  # List of JoinCondition objects (Python-managed for safety)
         unordered_map[cpp_string, void*] _table_data
         object _lock
         double _last_cleanup
 
-    def __cinit__(self, JoinType join_type, list conditions):
-        self._join_type = join_type
+    def __cinit__(self, object join_type, list conditions):
+        self._join_type = _to_c_join_type(join_type)
         self._lock = asyncio.Lock()
         self._last_cleanup = time.time()
+        self._conditions = []
 
-        # Convert conditions
+        # Convert conditions - store as Python list
         for condition in conditions:
             if isinstance(condition, dict):
-                join_cond = new JoinCondition(
+                join_cond = JoinCondition(
                     condition['left_field'],
                     condition['right_field'],
                     condition.get('left_alias', ''),
                     condition.get('right_alias', '')
                 )
-                self._conditions.push_back(join_cond)
+                self._conditions.append(join_cond)
             elif isinstance(condition, JoinCondition):
-                self._conditions.push_back(<JoinCondition*>condition)
+                self._conditions.append(condition)
 
     async def load_table_data(self, table_data: Dict[str, Any]) -> None:
         """Load table data for joins."""
@@ -198,14 +183,14 @@ cdef class StreamTableJoinProcessor:
             # Clear existing data
             it = self._table_data.begin()
             while it != self._table_data.end():
-                Py_DECREF(<PyObject*>deref(it).second)
+                Py_DECREF(<object>deref(it).second)
                 inc(it)
             self._table_data.clear()
 
             # Load new data
             for key, value in table_data.items():
                 c_key = str(key).encode('utf-8')
-                Py_INCREF(<PyObject*>value)
+                Py_INCREF(value)
                 self._table_data[c_key] = <void*><PyObject*>value
 
     async def process_stream_record(self, object stream_record) -> List[dict]:
@@ -243,7 +228,7 @@ cdef class StreamTableJoinProcessor:
 
     cdef str _extract_join_key(self, dict record):
         """Extract join key from record."""
-        if not self._conditions.empty():
+        if not self._conditions == []:
             condition = self._conditions[0]  # Use first condition for key
             field_name = condition.get_right_field()  # Stream record uses right side
             return str(record.get(field_name, ''))
@@ -268,9 +253,9 @@ cdef class StreamTableJoinProcessor:
         """Get join processor statistics."""
         async with self._lock:
             return {
-                'join_type': self._join_type.value,
+                'join_type': _c_join_type_to_str(self._join_type),
                 'table_size': self._table_data.size(),
-                'conditions_count': self._conditions.size(),
+                'conditions_count': len(self._conditions),
                 'last_cleanup': self._last_cleanup,
             }
 
@@ -279,30 +264,35 @@ cdef class StreamStreamJoinProcessor:
     """Cython-optimized stream-stream join processor with windowing."""
 
     cdef:
-        JoinType _join_type
-        vector[JoinCondition*] _conditions
+        CJoinType _join_type  # C++ enum for performance
+        list _conditions  # List of JoinCondition objects (Python-managed for safety)
         unordered_map[cpp_string, WindowEntries] _left_window
         unordered_map[cpp_string, WindowEntries] _right_window
         double _window_size_seconds
         object _lock
         uint64_t _max_window_size
 
-    def __cinit__(self, JoinType join_type, list conditions, double window_size_seconds = 300.0, uint64_t max_window_size = 10000):
-        self._join_type = join_type
+    def __cinit__(self, object join_type, list conditions, double window_size_seconds = 300.0, uint64_t max_window_size = 10000):
+        self._join_type = _to_c_join_type(join_type)
         self._window_size_seconds = window_size_seconds
         self._lock = asyncio.Lock()
+        self._conditions = []
         self._max_window_size = max_window_size
 
-        # Convert conditions
+        # Convert conditions - store pointers in C++ vector
+        cdef JoinCondition join_cond
         for condition in conditions:
             if isinstance(condition, dict):
-                join_cond = new JoinCondition(
+                join_cond = JoinCondition(
                     condition['left_field'],
                     condition['right_field'],
                     condition.get('left_alias', ''),
                     condition.get('right_alias', '')
                 )
-                self._conditions.push_back(join_cond)
+                self._conditions.append(join_cond)
+            elif isinstance(condition, JoinCondition):
+                self._conditions.append(condition)
+
 
     async def process_left_stream(self, object record) -> List[dict]:
         """Process a record from the left stream."""
@@ -314,6 +304,11 @@ cdef class StreamStreamJoinProcessor:
 
     async def _process_stream_record(self, object record, bint is_left) -> List[dict]:
         """Process a stream record and find joins within the window."""
+        cdef cpp_string c_join_key
+        cdef WindowEntries *target_window
+        cdef WindowEntries *other_window
+        cdef size_t i
+
         async with self._lock:
             results = []
 
@@ -326,9 +321,7 @@ cdef class StreamStreamJoinProcessor:
             if not join_key:
                 return results
 
-            cdef cpp_string c_join_key = join_key.encode('utf-8')
-            cdef WindowEntries *target_window
-            cdef WindowEntries *other_window
+            c_join_key = join_key.encode('utf-8')
 
             if is_left:
                 target_window = &self._left_window[c_join_key]
@@ -338,17 +331,16 @@ cdef class StreamStreamJoinProcessor:
                 other_window = &self._left_window[c_join_key]
 
             # Add current record to window
-            Py_INCREF(<PyObject*>record)
-            target_window.push_back(pair[PyObject*, double](<PyObject*>record, current_time))
+            Py_INCREF(record)
+            target_window.push_back(WindowEntry(<void*><PyObject*>record, current_time))
 
             # Clean old records from target window
             self._cleanup_window(target_window, current_time)
 
             # Find matches in the other window
-            cdef size_t i
             for i in range(other_window.size()):
-                other_record = <object>other_window[i].first
-                other_time = other_window[i].second
+                other_record = <object>(deref(other_window)[i].first)
+                other_time = deref(other_window)[i].second
 
                 # Check if within window
                 if abs(current_time - other_time) <= self._window_size_seconds:
@@ -369,7 +361,7 @@ cdef class StreamStreamJoinProcessor:
 
     cdef str _extract_join_key(self, dict record, bint is_left):
         """Extract join key from record."""
-        if not self._conditions.empty():
+        if not self._conditions == []:
             condition = self._conditions[0]
             if is_left:
                 field_name = condition.get_left_field()
@@ -403,38 +395,41 @@ cdef class StreamStreamJoinProcessor:
         """Clean old records from a window."""
         cdef size_t i = 0
         while i < window.size():
-            record_time = window[i].second
+            record_time = deref(window)[i].second
             if current_time - record_time > self._window_size_seconds:
                 # Remove old record
-                Py_DECREF(window[i].first)
+                Py_DECREF(<object>deref(window)[i].first)
                 window.erase(window.begin() + i)
             else:
                 i += 1
 
         # Limit window size
         while window.size() > self._max_window_size:
-            Py_DECREF(window[0].first)
+            Py_DECREF(<object>deref(window)[0].first)
             window.erase(window.begin())
 
     async def get_stats(self) -> Dict[str, Any]:
         """Get join processor statistics."""
+        cdef size_t left_total
+        cdef size_t right_total
+        cdef unordered_map[cpp_string, WindowEntries].iterator it
+
         async with self._lock:
-            cdef size_t left_total = 0
-            cdef unordered_map[cpp_string, WindowEntries].iterator it
+            left_total = 0
 
             it = self._left_window.begin()
             while it != self._left_window.end():
                 left_total += deref(it).second.size()
                 inc(it)
 
-            cdef size_t right_total = 0
+            right_total = 0
             it = self._right_window.begin()
             while it != self._right_window.end():
                 right_total += deref(it).second.size()
                 inc(it)
 
             return {
-                'join_type': self._join_type.value,
+                'join_type': _c_join_type_to_str(self._join_type),
                 'window_size_seconds': self._window_size_seconds,
                 'left_window_size': left_total,
                 'right_window_size': right_total,
@@ -447,8 +442,8 @@ cdef class IntervalJoinProcessor:
     """Cython-optimized interval join processor (Flink-style)."""
 
     cdef:
-        JoinType _join_type
-        vector[JoinCondition*] _conditions
+        CJoinType _join_type  # C++ enum for performance
+        list _conditions  # List of JoinCondition objects (Python-managed for safety)
         unordered_map[cpp_string, WindowEntries] _left_buffer
         unordered_map[cpp_string, WindowEntries] _right_buffer
         double _left_lower_bound
@@ -460,7 +455,7 @@ cdef class IntervalJoinProcessor:
 
     def __cinit__(
         self,
-        JoinType join_type,
+        object join_type,
         list conditions,
         double left_lower_bound,
         double left_upper_bound,
@@ -468,24 +463,29 @@ cdef class IntervalJoinProcessor:
         double right_upper_bound,
         uint64_t max_buffer_size = 10000
     ):
-        self._join_type = join_type
+        self._join_type = _to_c_join_type(join_type)
         self._left_lower_bound = left_lower_bound
         self._left_upper_bound = left_upper_bound
         self._right_lower_bound = right_lower_bound
         self._right_upper_bound = right_upper_bound
         self._max_buffer_size = max_buffer_size
         self._lock = asyncio.Lock()
+        self._conditions = []
 
-        # Convert conditions
+        # Convert conditions - store pointers in C++ vector
+        cdef JoinCondition join_cond
         for condition in conditions:
             if isinstance(condition, dict):
-                join_cond = new JoinCondition(
+                join_cond = JoinCondition(
                     condition['left_field'],
                     condition['right_field'],
                     condition.get('left_alias', ''),
                     condition.get('right_alias', '')
                 )
-                self._conditions.push_back(join_cond)
+                self._conditions.append(join_cond)
+            elif isinstance(condition, JoinCondition):
+                self._conditions.append(condition)
+
 
     async def process_left_record(self, object record) -> List[dict]:
         """Process a record from the left stream."""
@@ -497,6 +497,12 @@ cdef class IntervalJoinProcessor:
 
     async def _process_record(self, object record, bint is_left) -> List[dict]:
         """Process a record and find interval joins."""
+        cdef cpp_string c_join_key
+        cdef WindowEntries *source_buffer
+        cdef WindowEntries *target_buffer
+        cdef double lower_bound, upper_bound
+        cdef size_t i
+
         async with self._lock:
             results = []
 
@@ -509,10 +515,7 @@ cdef class IntervalJoinProcessor:
             if not join_key:
                 return results
 
-            cdef cpp_string c_join_key = join_key.encode('utf-8')
-            cdef WindowEntries *source_buffer
-            cdef WindowEntries *target_buffer
-            cdef double lower_bound, upper_bound
+            c_join_key = join_key.encode('utf-8')
 
             if is_left:
                 source_buffer = &self._left_buffer[c_join_key]
@@ -526,18 +529,17 @@ cdef class IntervalJoinProcessor:
                 upper_bound = self._right_upper_bound
 
             # Add current record to source buffer
-            Py_INCREF(<PyObject*>record)
-            source_buffer.push_back(pair[PyObject*, double](<PyObject*>record, current_time))
+            Py_INCREF(record)
+            source_buffer.push_back(WindowEntry(<void*><PyObject*>record, current_time))
 
             # Clean old records
             self._cleanup_buffer(source_buffer, current_time, abs(lower_bound))
             self._cleanup_buffer(target_buffer, current_time, abs(upper_bound))
 
             # Find matches within the interval
-            cdef size_t i
             for i in range(target_buffer.size()):
-                target_record = <object>target_buffer[i].first
-                target_time = target_buffer[i].second
+                target_record = <object>deref(target_buffer)[i].first
+                target_time = deref(target_buffer)[i].second
 
                 time_diff = current_time - target_time
 
@@ -555,21 +557,21 @@ cdef class IntervalJoinProcessor:
         """Clean old records from buffer."""
         cdef size_t i = 0
         while i < buffer.size():
-            record_time = buffer[i].second
+            record_time = deref(buffer)[i].second
             if current_time - record_time > max_age:
-                Py_DECREF(buffer[i].first)
+                Py_DECREF(<object>deref(buffer)[i].first)
                 buffer.erase(buffer.begin() + i)
             else:
                 i += 1
 
         # Limit buffer size
         while buffer.size() > self._max_buffer_size:
-            Py_DECREF(buffer[0].first)
+            Py_DECREF(<object>deref(buffer)[0].first)
             buffer.erase(buffer.begin())
 
     cdef str _extract_join_key(self, dict record, bint is_left):
         """Extract join key from record."""
-        if not self._conditions.empty():
+        if not self._conditions == []:
             condition = self._conditions[0]
             if is_left:
                 field_name = condition.get_left_field()
@@ -594,23 +596,26 @@ cdef class IntervalJoinProcessor:
 
     async def get_stats(self) -> Dict[str, Any]:
         """Get interval join processor statistics."""
+        cdef size_t left_total
+        cdef size_t right_total
+        cdef unordered_map[cpp_string, WindowEntries].iterator it
+
         async with self._lock:
-            cdef size_t left_total = 0
-            cdef unordered_map[cpp_string, WindowEntries].iterator it
+            left_total = 0
 
             it = self._left_buffer.begin()
             while it != self._left_buffer.end():
                 left_total += deref(it).second.size()
                 inc(it)
 
-            cdef size_t right_total = 0
+            right_total = 0
             it = self._right_buffer.begin()
             while it != self._right_buffer.end():
                 right_total += deref(it).second.size()
                 inc(it)
 
             return {
-                'join_type': self._join_type.value,
+                'join_type': _c_join_type_to_str(self._join_type),
                 'join_mode': 'interval',
                 'left_buffer_size': left_total,
                 'right_buffer_size': right_total,
@@ -625,41 +630,49 @@ cdef class TemporalJoinProcessor:
     """Cython-optimized temporal table join processor (Flink-style)."""
 
     cdef:
-        JoinType _join_type
-        vector[JoinCondition*] _conditions
+        CJoinType _join_type  # C++ enum for performance
+        list _conditions  # List of JoinCondition objects (Python-managed for safety)
         unordered_map[cpp_string, VersionedEntries] _temporal_table
         object _lock
         uint64_t _current_version
 
-    def __cinit__(self, JoinType join_type, list conditions):
-        self._join_type = join_type
+    def __cinit__(self, object join_type, list conditions):
+        self._join_type = _to_c_join_type(join_type)
         self._current_version = 0
         self._lock = asyncio.Lock()
+        self._conditions = []
 
         # Convert conditions
         for condition in conditions:
             if isinstance(condition, dict):
-                join_cond = new JoinCondition(
+                join_cond = JoinCondition(
                     condition['left_field'],
                     condition['right_field'],
                     condition.get('left_alias', ''),
                     condition.get('right_alias', '')
                 )
-                self._conditions.push_back(join_cond)
+                self._conditions.append(join_cond)
+            elif isinstance(condition, JoinCondition):
+                self._conditions.append(condition)
+
 
     async def update_temporal_table(self, table_data: Dict[str, Any], version: uint64_t) -> None:
         """Update the temporal table with new version."""
+        cdef unordered_map[cpp_string, VersionedEntries].iterator table_it
+        cdef VersionedEntries *versions
+        cdef size_t i
+        cdef cpp_string c_key
+        cdef VersionedEntries ver_entries
+
         async with self._lock:
             self._current_version = version
 
             # Clear previous version
-            cdef unordered_map[cpp_string, VersionedEntries].iterator table_it
             table_it = self._temporal_table.begin()
             while table_it != self._temporal_table.end():
-                cdef VersionedEntries *versions = &deref(table_it).second
-                cdef size_t i
+                versions = &deref(table_it).second
                 for i in range(versions.size()):
-                    Py_DECREF(versions[i].first)
+                    Py_DECREF(<object>deref(versions)[i].first)
                 versions.clear()
                 inc(table_it)
 
@@ -667,14 +680,21 @@ cdef class TemporalJoinProcessor:
 
             # Add new version data
             for key, value in table_data.items():
-                cdef cpp_string c_key = str(key).encode('utf-8')
-                cdef VersionedEntries versions
-                Py_INCREF(<PyObject*>value)
-                versions.push_back(pair[PyObject*, uint64_t](<PyObject*>value, version))
-                self._temporal_table[c_key] = versions
+                c_key = str(key).encode('utf-8')
+                ver_entries = VersionedEntries()
+                Py_INCREF(value)
+                ver_entries.push_back(VersionedEntry(<void*><PyObject*>value, version))
+                self._temporal_table[c_key] = ver_entries
 
     async def process_stream_record(self, object record, version: uint64_t = 0) -> List[dict]:
         """Process a stream record with temporal join."""
+        cdef cpp_string c_join_key
+        cdef unordered_map[cpp_string, VersionedEntries].iterator it
+        cdef VersionedEntries *versions
+        cdef void* matched_record
+        cdef uint64_t matched_version
+        cdef size_t i
+
         async with self._lock:
             results = []
 
@@ -689,22 +709,20 @@ cdef class TemporalJoinProcessor:
                     results.append(record)
                 return results
 
-            cdef cpp_string c_join_key = join_key.encode('utf-8')
-            cdef unordered_map[cpp_string, VersionedEntries].iterator it
+            c_join_key = join_key.encode('utf-8')
             it = self._temporal_table.find(c_join_key)
 
             if it != self._temporal_table.end():
                 # Find the appropriate version
-                cdef vector[pair[PyObject*, uint64_t]] *versions = &deref(it).second
-                cdef PyObject* matched_record = NULL
-                cdef uint64_t matched_version = 0
+                versions = &deref(it).second
+                matched_record = NULL
+                matched_version = 0
 
                 # Find the latest version <= requested version
-                cdef size_t i
                 for i in range(versions.size()):
-                    ver = versions[i].second
+                    ver = deref(versions)[i].second
                     if ver <= version and ver > matched_version:
-                        matched_record = versions[i].first
+                        matched_record = deref(versions)[i].first
                         matched_version = ver
 
                 if matched_record != NULL:
@@ -720,7 +738,7 @@ cdef class TemporalJoinProcessor:
 
     cdef str _extract_join_key(self, dict record, bint is_left):
         """Extract join key from record."""
-        if not self._conditions.empty():
+        if not self._conditions == []:
             condition = self._conditions[0]
             if is_left:
                 field_name = condition.get_left_field()
@@ -743,16 +761,18 @@ cdef class TemporalJoinProcessor:
 
     async def get_stats(self) -> Dict[str, Any]:
         """Get temporal join processor statistics."""
+        cdef size_t total_versions
+        cdef unordered_map[cpp_string, VersionedEntries].iterator it
+
         async with self._lock:
-            cdef size_t total_versions = 0
-            cdef unordered_map[cpp_string, VersionedEntries].iterator it
+            total_versions = 0
             it = self._temporal_table.begin()
             while it != self._temporal_table.end():
                 total_versions += deref(it).second.size()
                 inc(it)
 
             return {
-                'join_type': self._join_type.value,
+                'join_type': _c_join_type_to_str(self._join_type),
                 'join_mode': 'temporal',
                 'current_version': self._current_version,
                 'unique_keys': self._temporal_table.size(),
@@ -764,8 +784,8 @@ cdef class LookupJoinProcessor:
     """Cython-optimized lookup join processor (Flink-style)."""
 
     cdef:
-        JoinType _join_type
-        vector[JoinCondition*] _conditions
+        CJoinType _join_type  # C++ enum for performance
+        list _conditions  # List of JoinCondition objects (Python-managed for safety)
         object _lookup_func
         object _lock
         unordered_map[cpp_string, void*] _cache
@@ -773,27 +793,36 @@ cdef class LookupJoinProcessor:
         uint64_t _cache_hits
         uint64_t _cache_misses
 
-    def __cinit__(self, JoinType join_type, list conditions, object lookup_func, uint64_t cache_size = 1000):
-        self._join_type = join_type
+    def __cinit__(self, object join_type, list conditions, object lookup_func, uint64_t cache_size = 1000):
+        self._join_type = _to_c_join_type(join_type)
         self._lookup_func = lookup_func
         self._cache_size = cache_size
         self._lock = asyncio.Lock()
+        self._conditions = []
         self._cache_hits = 0
         self._cache_misses = 0
 
         # Convert conditions
         for condition in conditions:
             if isinstance(condition, dict):
-                join_cond = new JoinCondition(
+                join_cond = JoinCondition(
                     condition['left_field'],
                     condition['right_field'],
                     condition.get('left_alias', ''),
                     condition.get('right_alias', '')
                 )
-                self._conditions.push_back(join_cond)
+                self._conditions.append(join_cond)
+            elif isinstance(condition, JoinCondition):
+                self._conditions.append(condition)
+
 
     async def process_stream_record(self, object record) -> List[dict]:
         """Process a stream record with lookup join."""
+        cdef cpp_string c_join_key
+        cdef unordered_map[cpp_string, void*].iterator cache_it
+        cdef object lookup_result
+        cdef unordered_map[cpp_string, void*].iterator first_it
+
         async with self._lock:
             results = []
 
@@ -809,10 +838,10 @@ cdef class LookupJoinProcessor:
                 return results
 
             # Check cache first
-            cdef cpp_string c_join_key = join_key.encode('utf-8')
-            cdef unordered_map[cpp_string, void*].iterator cache_it = self._cache.find(c_join_key)
+            c_join_key = join_key.encode('utf-8')
+            cache_it = self._cache.find(c_join_key)
 
-            cdef object lookup_result = None
+            lookup_result = None
             if cache_it != self._cache.end():
                 self._cache_hits += 1
                 lookup_result = <object>deref(cache_it).second
@@ -823,14 +852,14 @@ cdef class LookupJoinProcessor:
                     lookup_result = await self._lookup_func(join_key)
                     if lookup_result is not None:
                         # Cache the result
-                        Py_INCREF(<PyObject*>lookup_result)
-                        self._cache[c_join_key] = <PyObject*>lookup_result
+                        Py_INCREF(lookup_result)
+                        self._cache[c_join_key] = <void*><PyObject*>lookup_result
 
                         # Evict old cache entries if needed
                         while self._cache.size() > self._cache_size:
                             # Simple LRU eviction - remove first entry
-                            cdef unordered_map[cpp_string, void*].iterator first_it = self._cache.begin()
-                            Py_DECREF(deref(first_it).second)
+                            first_it = self._cache.begin()
+                            Py_DECREF(<object>deref(first_it).second)
                             self._cache.erase(first_it)
                 except Exception as e:
                     # Lookup failed
@@ -846,7 +875,7 @@ cdef class LookupJoinProcessor:
 
     cdef str _extract_join_key(self, dict record):
         """Extract join key from record."""
-        if not self._conditions.empty():
+        if not self._conditions == []:
             condition = self._conditions[0]
             field_name = condition.get_left_field()
             return str(record.get(field_name, ''))
@@ -866,13 +895,15 @@ cdef class LookupJoinProcessor:
 
     async def get_stats(self) -> Dict[str, Any]:
         """Get lookup join processor statistics."""
+        cdef double hit_rate
+
         async with self._lock:
-            cdef double hit_rate = 0.0
+            hit_rate = 0.0
             if self._cache_hits + self._cache_misses > 0:
                 hit_rate = float(self._cache_hits) / float(self._cache_hits + self._cache_misses)
 
             return {
-                'join_type': self._join_type.value,
+                'join_type': _c_join_type_to_str(self._join_type),
                 'join_mode': 'lookup',
                 'cache_size': self._cache.size(),
                 'max_cache_size': self._cache_size,
@@ -886,8 +917,8 @@ cdef class WindowJoinProcessor:
     """Cython-optimized window join processor (Flink-style)."""
 
     cdef:
-        JoinType _join_type
-        vector[JoinCondition*] _conditions
+        CJoinType _join_type  # C++ enum for performance
+        list _conditions  # List of JoinCondition objects (Python-managed for safety)
         unordered_map[cpp_string, WindowEntries] _left_windows
         unordered_map[cpp_string, WindowEntries] _right_windows
         double _window_size
@@ -897,28 +928,32 @@ cdef class WindowJoinProcessor:
 
     def __cinit__(
         self,
-        JoinType join_type,
+        object join_type,
         list conditions,
         double window_size,
         double window_slide = 0.0,
         uint64_t max_window_size = 10000
     ):
-        self._join_type = join_type
+        self._join_type = _to_c_join_type(join_type)
         self._window_size = window_size
         self._window_slide = window_slide if window_slide > 0 else window_size
         self._max_window_size = max_window_size
         self._lock = asyncio.Lock()
+        self._conditions = []
 
         # Convert conditions
         for condition in conditions:
             if isinstance(condition, dict):
-                join_cond = new JoinCondition(
+                join_cond = JoinCondition(
                     condition['left_field'],
                     condition['right_field'],
                     condition.get('left_alias', ''),
                     condition.get('right_alias', '')
                 )
-                self._conditions.push_back(join_cond)
+                self._conditions.append(join_cond)
+            elif isinstance(condition, JoinCondition):
+                self._conditions.append(condition)
+
 
     async def process_left_record(self, object record) -> List[dict]:
         """Process a record from the left stream."""
@@ -930,6 +965,11 @@ cdef class WindowJoinProcessor:
 
     async def _process_window_record(self, object record, bint is_left) -> List[dict]:
         """Process a record through window join."""
+        cdef cpp_string c_join_key
+        cdef WindowEntries *source_windows
+        cdef WindowEntries *target_windows
+        cdef size_t i
+
         async with self._lock:
             results = []
 
@@ -942,9 +982,7 @@ cdef class WindowJoinProcessor:
             if not join_key:
                 return results
 
-            cdef cpp_string c_join_key = join_key.encode('utf-8')
-            cdef vector[pair[PyObject*, double]] *source_windows
-            cdef vector[pair[PyObject*, double]] *target_windows
+            c_join_key = join_key.encode('utf-8')
 
             if is_left:
                 source_windows = &self._left_windows[c_join_key]
@@ -954,18 +992,17 @@ cdef class WindowJoinProcessor:
                 target_windows = &self._left_windows[c_join_key]
 
             # Add record to source window
-            Py_INCREF(<PyObject*>record)
-            source_windows.push_back(pair[PyObject*, double](<PyObject*>record, current_time))
+            Py_INCREF(record)
+            source_windows.push_back(WindowEntry(<void*><PyObject*>record, current_time))
 
             # Clean old records from both windows
             self._cleanup_window(source_windows, current_time)
             self._cleanup_window(target_windows, current_time)
 
             # Join with records in target window
-            cdef size_t i
             for i in range(target_windows.size()):
-                target_record = <object>target_windows[i].first
-                target_time = target_windows[i].second
+                target_record = <object>deref(target_windows)[i].first
+                target_time = deref(target_windows)[i].second
 
                 # Check if within same window
                 if self._same_window(current_time, target_time):
@@ -981,16 +1018,16 @@ cdef class WindowJoinProcessor:
         """Clean old records from window."""
         cdef size_t i = 0
         while i < window.size():
-            record_time = window[i].second
+            record_time = deref(window)[i].second
             if current_time - record_time > self._window_size:
-                Py_DECREF(window[i].first)
+                Py_DECREF(<object>deref(window)[i].first)
                 window.erase(window.begin() + i)
             else:
                 i += 1
 
         # Limit window size
         while window.size() > self._max_window_size:
-            Py_DECREF(window[0].first)
+            Py_DECREF(<object>deref(window)[0].first)
             window.erase(window.begin())
 
     cdef bint _same_window(self, double time1, double time2):
@@ -1006,7 +1043,7 @@ cdef class WindowJoinProcessor:
 
     cdef str _extract_join_key(self, dict record, bint is_left):
         """Extract join key from record."""
-        if not self._conditions.empty():
+        if not self._conditions == []:
             condition = self._conditions[0]
             if is_left:
                 field_name = condition.get_left_field()
@@ -1031,23 +1068,26 @@ cdef class WindowJoinProcessor:
 
     async def get_stats(self) -> Dict[str, Any]:
         """Get window join processor statistics."""
+        cdef size_t left_total
+        cdef size_t right_total
+        cdef unordered_map[cpp_string, WindowEntries].iterator it
+
         async with self._lock:
-            cdef size_t left_total = 0
-            cdef unordered_map[cpp_string, WindowEntries].iterator it
+            left_total = 0
 
             it = self._left_windows.begin()
             while it != self._left_windows.end():
                 left_total += deref(it).second.size()
                 inc(it)
 
-            cdef size_t right_total = 0
+            right_total = 0
             it = self._right_windows.begin()
             while it != self._right_windows.end():
                 right_total += deref(it).second.size()
                 inc(it)
 
             return {
-                'join_type': self._join_type.value,
+                'join_type': _c_join_type_to_str(self._join_type),
                 'join_mode': 'window',
                 'window_size': self._window_size,
                 'window_slide': self._window_slide,
@@ -1061,73 +1101,88 @@ cdef class TableTableJoinProcessor:
     """Cython-optimized table-table join processor."""
 
     cdef:
-        JoinType _join_type
-        vector[JoinCondition*] _conditions
+        CJoinType _join_type  # C++ enum for performance
+        list _conditions  # List of JoinCondition objects (Python-managed for safety)
         unordered_map[cpp_string, PyObject*] _left_table
         unordered_map[cpp_string, PyObject*] _right_table
         object _lock
 
-    def __cinit__(self, JoinType join_type, list conditions):
-        self._join_type = join_type
+    def __cinit__(self, object join_type, list conditions):
+        self._join_type = _to_c_join_type(join_type)
         self._lock = asyncio.Lock()
+        self._conditions = []
 
         # Convert conditions
         for condition in conditions:
             if isinstance(condition, dict):
-                join_cond = new JoinCondition(
+                join_cond = JoinCondition(
                     condition['left_field'],
                     condition['right_field'],
                     condition.get('left_alias', ''),
                     condition.get('right_alias', '')
                 )
-                self._conditions.push_back(join_cond)
+                self._conditions.append(join_cond)
+            elif isinstance(condition, JoinCondition):
+                self._conditions.append(condition)
+
 
     async def load_left_table(self, table_data: Dict[str, Any]) -> None:
         """Load left table data."""
+        cdef unordered_map[cpp_string, PyObject*].iterator it
+        cdef cpp_string c_key
+
         async with self._lock:
             # Clear existing data
-            cdef unordered_map[cpp_string, PyObject*].iterator it = self._left_table.begin()
+            it = self._left_table.begin()
             while it != self._left_table.end():
-                Py_DECREF(deref(it).second)
+                Py_DECREF(<object><PyObject*>deref(it).second)
                 inc(it)
             self._left_table.clear()
 
             # Load new data
             for key, value in table_data.items():
-                cdef cpp_string c_key = str(key).encode('utf-8')
-                Py_INCREF(<PyObject*>value)
+                c_key = str(key).encode('utf-8')
+                Py_INCREF(value)
                 self._left_table[c_key] = <PyObject*>value
 
     async def load_right_table(self, table_data: Dict[str, Any]) -> None:
         """Load right table data."""
+        cdef unordered_map[cpp_string, PyObject*].iterator it
+        cdef cpp_string c_key
+
         async with self._lock:
             # Clear existing data
-            cdef unordered_map[cpp_string, PyObject*].iterator it = self._right_table.begin()
+            it = self._right_table.begin()
             while it != self._right_table.end():
-                Py_DECREF(deref(it).second)
+                Py_DECREF(<object><PyObject*>deref(it).second)
                 inc(it)
             self._right_table.clear()
 
             # Load new data
             for key, value in table_data.items():
-                cdef cpp_string c_key = str(key).encode('utf-8')
-                Py_INCREF(<PyObject*>value)
+                c_key = str(key).encode('utf-8')
+                Py_INCREF(value)
                 self._right_table[c_key] = <PyObject*>value
 
     async def execute_join(self) -> List[dict]:
         """Execute the table-table join."""
+        cdef unordered_map[cpp_string, PyObject*].iterator left_it
+        cdef unordered_map[cpp_string, PyObject*].iterator right_it
+        cdef cpp_string c_left_key
+        cdef cpp_string c_right_key
+
         async with self._lock:
             results = []
 
             # Simple nested loop join (can be optimized with hash join)
-            cdef unordered_map[cpp_string, PyObject*].iterator left_it = self._left_table.begin()
+            left_it = self._left_table.begin()
             while left_it != self._left_table.end():
                 left_record = <object>deref(left_it).second
                 left_key = self._extract_join_key(left_record, True)
 
                 if left_key:
-                    cdef cpp_string c_left_key = left_key.encode('utf-8')
-                    cdef unordered_map[cpp_string, PyObject*].iterator right_it = self._right_table.find(c_left_key)
+                    c_left_key = left_key.encode('utf-8')
+                    right_it = self._right_table.find(c_left_key)
 
                     if right_it != self._right_table.end():
                         # Found match
@@ -1142,14 +1197,14 @@ cdef class TableTableJoinProcessor:
 
             # Handle right outer joins
             if self._join_type in (JoinType.RIGHT_OUTER, JoinType.FULL_OUTER):
-                cdef unordered_map[cpp_string, PyObject*].iterator right_it = self._right_table.begin()
+                right_it = self._right_table.begin()
                 while right_it != self._right_table.end():
                     right_record = <object>deref(right_it).second
                     right_key = self._extract_join_key(right_record, False)
 
                     if right_key:
-                        cdef cpp_string c_right_key = right_key.encode('utf-8')
-                        cdef unordered_map[cpp_string, PyObject*].iterator left_it = self._left_table.find(c_right_key)
+                        c_right_key = right_key.encode('utf-8')
+                        left_it = self._left_table.find(c_right_key)
 
                         if left_it == self._left_table.end():
                             # No match found, include right record
@@ -1161,7 +1216,7 @@ cdef class TableTableJoinProcessor:
 
     cdef str _extract_join_key(self, dict record, bint is_left):
         """Extract join key from record."""
-        if not self._conditions.empty():
+        if not self._conditions == []:
             condition = self._conditions[0]
             if is_left:
                 field_name = condition.get_left_field()
@@ -1189,15 +1244,15 @@ cdef class TableTableJoinProcessor:
         """Get join processor statistics."""
         async with self._lock:
             return {
-                'join_type': self._join_type.value,
+                'join_type': _c_join_type_to_str(self._join_type),
                 'left_table_size': self._left_table.size(),
                 'right_table_size': self._right_table.size(),
-                'conditions_count': self._conditions.size(),
+                'conditions_count': len(self._conditions),
             }
 
 
 # Factory functions
-cpdef StreamTableJoinProcessor create_stream_table_join(
+def create_stream_table_join(
     str join_type,
     list conditions,
     **kwargs
@@ -1207,7 +1262,7 @@ cpdef StreamTableJoinProcessor create_stream_table_join(
     return StreamTableJoinProcessor(jt, conditions)
 
 
-cpdef StreamStreamJoinProcessor create_stream_stream_join(
+def create_stream_stream_join(
     str join_type,
     list conditions,
     **kwargs
@@ -1216,10 +1271,10 @@ cpdef StreamStreamJoinProcessor create_stream_stream_join(
     jt = JoinType(join_type)
     window_size = kwargs.get('window_size_seconds', 300.0)
     max_window_size = kwargs.get('max_window_size', 10000)
-    return StreamStreamJoinProcessor(jt, window_size, max_window_size)
+    return StreamStreamJoinProcessor(jt, conditions, window_size, max_window_size)
 
 
-cpdef IntervalJoinProcessor create_interval_join(
+def create_interval_join(
     str join_type,
     list conditions,
     double left_lower_bound,
@@ -1237,7 +1292,7 @@ cpdef IntervalJoinProcessor create_interval_join(
     )
 
 
-cpdef TemporalJoinProcessor create_temporal_join(
+def create_temporal_join(
     str join_type,
     list conditions,
     **kwargs
@@ -1247,7 +1302,7 @@ cpdef TemporalJoinProcessor create_temporal_join(
     return TemporalJoinProcessor(jt, conditions)
 
 
-cpdef LookupJoinProcessor create_lookup_join(
+def create_lookup_join(
     str join_type,
     list conditions,
     object lookup_func,
@@ -1259,7 +1314,7 @@ cpdef LookupJoinProcessor create_lookup_join(
     return LookupJoinProcessor(jt, conditions, lookup_func, cache_size)
 
 
-cpdef WindowJoinProcessor create_window_join(
+def create_window_join(
     str join_type,
     list conditions,
     double window_size,
@@ -1276,28 +1331,32 @@ cdef class ArrowTableJoinProcessor:
     """Arrow-native table-table join processor using pyarrow.compute."""
 
     cdef:
-        JoinType _join_type
-        vector[JoinCondition*] _conditions
+        CJoinType _join_type  # C++ enum for performance
+        list _conditions  # List of JoinCondition objects (Python-managed for safety)
         object _left_table
         object _right_table
         object _lock
 
-    def __cinit__(self, JoinType join_type, list conditions):
-        self._join_type = join_type
+    def __cinit__(self, object join_type, list conditions):
+        self._join_type = _to_c_join_type(join_type)
         self._lock = asyncio.Lock()
+        self._conditions = []
         self._left_table = None
         self._right_table = None
 
         # Convert conditions
         for condition in conditions:
             if isinstance(condition, dict):
-                join_cond = new JoinCondition(
+                join_cond = JoinCondition(
                     condition['left_field'],
                     condition['right_field'],
                     condition.get('left_alias', ''),
                     condition.get('right_alias', '')
                 )
-                self._conditions.push_back(join_cond)
+                self._conditions.append(join_cond)
+            elif isinstance(condition, JoinCondition):
+                self._conditions.append(condition)
+
 
     async def load_left_table(self, table_data) -> None:
         """Load left table (Arrow Table or convertible data)."""
@@ -1335,7 +1394,7 @@ cdef class ArrowTableJoinProcessor:
             if self._left_table is None or self._right_table is None:
                 raise ValueError("Both tables must be loaded before joining")
 
-            if not self._conditions.empty():
+            if not self._conditions == []:
                 condition = self._conditions[0]
                 left_key = condition.get_left_field()
                 right_key = condition.get_right_field()
@@ -1347,7 +1406,7 @@ cdef class ArrowTableJoinProcessor:
                         self._right_table,
                         keys=[left_key],
                         right_keys=[right_key],
-                        join_type=self._join_type.value,
+                        join_type=_c_join_type_to_str(self._join_type),
                         use_threads=True
                     )
                     return result
@@ -1367,7 +1426,7 @@ cdef class ArrowTableJoinProcessor:
                         right_df,
                         left_on=left_key,
                         right_on=right_key,
-                        how=how_map.get(self._join_type.value, 'inner'),
+                        how=how_map.get(_c_join_type_to_str(self._join_type), 'inner'),
                         suffixes=('', '_right')
                     )
 
@@ -1380,11 +1439,11 @@ cdef class ArrowTableJoinProcessor:
         """Get join processor statistics."""
         async with self._lock:
             return {
-                'join_type': self._join_type.value,
+                'join_type': _c_join_type_to_str(self._join_type),
                 'join_mode': 'arrow_native',
                 'left_table_loaded': self._left_table is not None,
                 'right_table_loaded': self._right_table is not None,
-                'conditions_count': self._conditions.size(),
+                'conditions_count': len(self._conditions),
             }
 
 
@@ -1392,28 +1451,32 @@ cdef class ArrowDatasetJoinProcessor:
     """Arrow-native dataset join processor using pyarrow.dataset."""
 
     cdef:
-        JoinType _join_type
-        vector[JoinCondition*] _conditions
+        CJoinType _join_type  # C++ enum for performance
+        list _conditions  # List of JoinCondition objects (Python-managed for safety)
         object _left_dataset
         object _right_dataset
         object _lock
 
-    def __cinit__(self, JoinType join_type, list conditions):
-        self._join_type = join_type
+    def __cinit__(self, object join_type, list conditions):
+        self._join_type = _to_c_join_type(join_type)
         self._lock = asyncio.Lock()
+        self._conditions = []
         self._left_dataset = None
         self._right_dataset = None
 
         # Convert conditions
         for condition in conditions:
             if isinstance(condition, dict):
-                join_cond = new JoinCondition(
+                join_cond = JoinCondition(
                     condition['left_field'],
                     condition['right_field'],
                     condition.get('left_alias', ''),
                     condition.get('right_alias', '')
                 )
-                self._conditions.push_back(join_cond)
+                self._conditions.append(join_cond)
+            elif isinstance(condition, JoinCondition):
+                self._conditions.append(condition)
+
 
     async def load_left_dataset(self, dataset) -> None:
         """Load left dataset."""
@@ -1451,7 +1514,7 @@ cdef class ArrowDatasetJoinProcessor:
             if self._left_dataset is None or self._right_dataset is None:
                 raise ValueError("Both datasets must be loaded before joining")
 
-            if not self._conditions.empty():
+            if not self._conditions == []:
                 condition = self._conditions[0]
                 left_key = condition.get_left_field()
                 right_key = condition.get_right_field()
@@ -1462,7 +1525,7 @@ cdef class ArrowDatasetJoinProcessor:
                         self._right_dataset,
                         keys=[left_key],
                         right_keys=[right_key],
-                        join_type=self._join_type.value,
+                        join_type=_c_join_type_to_str(self._join_type),
                         use_threads=True
                     )
                     return result
@@ -1475,7 +1538,7 @@ cdef class ArrowDatasetJoinProcessor:
                         right_table,
                         keys=[left_key],
                         right_keys=[right_key],
-                        join_type=self._join_type.value,
+                        join_type=_c_join_type_to_str(self._join_type),
                         use_threads=True
                     )
                     return result
@@ -1486,11 +1549,11 @@ cdef class ArrowDatasetJoinProcessor:
         """Get dataset join processor statistics."""
         async with self._lock:
             return {
-                'join_type': self._join_type.value,
+                'join_type': _c_join_type_to_str(self._join_type),
                 'join_mode': 'arrow_dataset',
                 'left_dataset_loaded': self._left_dataset is not None,
                 'right_dataset_loaded': self._right_dataset is not None,
-                'conditions_count': self._conditions.size(),
+                'conditions_count': len(self._conditions),
             }
 
 
@@ -1498,7 +1561,7 @@ cdef class ArrowAsofJoinProcessor:
     """Arrow-native as-of join processor using pyarrow.dataset.join_asof."""
 
     cdef:
-        JoinType _join_type
+        CJoinType _join_type  # C++ enum for performance
         str _left_key
         str _right_key
         str _left_by_key
@@ -1516,7 +1579,7 @@ cdef class ArrowAsofJoinProcessor:
         str right_by_key = None,
         double tolerance = 0.0
     ):
-        self._join_type = JoinType.INNER  # As-of joins are typically inner
+        self._join_type = INNER  # As-of joins are typically inner
         self._left_key = left_key
         self._right_key = right_key
         self._left_by_key = left_by_key
@@ -1606,7 +1669,7 @@ cdef class ArrowAsofJoinProcessor:
             }
 
 
-cpdef TableTableJoinProcessor create_table_table_join(
+def create_table_table_join(
     str join_type,
     list conditions,
     **kwargs
@@ -1616,7 +1679,7 @@ cpdef TableTableJoinProcessor create_table_table_join(
     return TableTableJoinProcessor(jt, conditions)
 
 
-cpdef ArrowTableJoinProcessor create_arrow_table_join(
+def create_arrow_table_join(
     str join_type,
     list conditions,
     **kwargs
@@ -1626,7 +1689,7 @@ cpdef ArrowTableJoinProcessor create_arrow_table_join(
     return ArrowTableJoinProcessor(jt, conditions)
 
 
-cpdef ArrowDatasetJoinProcessor create_arrow_dataset_join(
+def create_arrow_dataset_join(
     str join_type,
     list conditions,
     **kwargs

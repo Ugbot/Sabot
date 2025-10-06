@@ -5,12 +5,7 @@ Cython header for stateless transform operators.
 Defines operator classes for zero-copy Arrow-based transformations.
 """
 
-cdef class BaseOperator:
-    """Base class for all Cython operators."""
-    cdef object _source
-    cdef object _schema
-
-    cpdef object process_batch(self, object batch)
+from sabot._cython.operators.base_operator cimport BaseOperator
 
 
 cdef class CythonMapOperator(BaseOperator):
