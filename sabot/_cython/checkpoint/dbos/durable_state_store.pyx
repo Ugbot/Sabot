@@ -255,10 +255,19 @@ cdef class DBOSDurableStateStore:
         checkpoints = self.list_workflow_checkpoints(workflow_id)
 
         if len(checkpoints) > keep_count:
-            # Sort by timestamp and delete oldest
-            checkpoints.sort(key=lambda x: x.get('timestamp', 0), reverse=True)
+            # Sort by timestamp - extract timestamps first to avoid closure
+            checkpoint_times = []
+            for cp in checkpoints:
+                checkpoint_times.append((cp.get('timestamp', 0), cp))
 
-            for checkpoint in checkpoints[keep_count:]:
+            checkpoint_times.sort(reverse=True)
+
+            # Extract sorted checkpoints without list comprehension
+            sorted_checkpoints = []
+            for _, cp in checkpoint_times:
+                sorted_checkpoints.append(cp)
+
+            for checkpoint in sorted_checkpoints[keep_count:]:
                 checkpoint_id = checkpoint.get('checkpoint_id')
                 if checkpoint_id:
                     self.delete_value(f"checkpoint_{workflow_id}_{checkpoint_id}")

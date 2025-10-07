@@ -401,16 +401,46 @@ cdef class CythonHashJoinOperator(ShuffledOperator):
                 yield result
 
     def _receive_right_shuffled(self):
-        """Receive shuffled right side batches for this partition."""
-        # TODO: Implement shuffle receive for right side
-        # For now, return empty (placeholder)
-        return []
+        """
+        Receive shuffled right side batches for this partition.
+
+        Uses ShuffleTransport to fetch partitions that have been
+        shuffled by key to this task.
+        """
+        if self._shuffle_transport is None:
+            return []
+
+        # Right side uses a separate shuffle ID (append "_right" to distinguish)
+        right_shuffle_id = self._shuffle_id + b"_right"
+
+        # Receive partitions for this task
+        batches = self._shuffle_transport.receive_partitions(
+            right_shuffle_id,
+            self._task_id
+        )
+
+        return batches
 
     def _receive_left_shuffled(self):
-        """Receive shuffled left side batches for this partition."""
-        # TODO: Implement shuffle receive for left side
-        # For now, return empty (placeholder)
-        return []
+        """
+        Receive shuffled left side batches for this partition.
+
+        Uses ShuffleTransport to fetch partitions that have been
+        shuffled by key to this task.
+        """
+        if self._shuffle_transport is None:
+            return []
+
+        # Left side uses a separate shuffle ID (append "_left" to distinguish)
+        left_shuffle_id = self._shuffle_id + b"_left"
+
+        # Receive partitions for this task
+        batches = self._shuffle_transport.receive_partitions(
+            left_shuffle_id,
+            self._task_id
+        )
+
+        return batches
 
 
 # ============================================================================

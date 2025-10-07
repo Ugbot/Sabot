@@ -138,14 +138,30 @@ class TaskExecutor:
 
     async def _execute_with_shuffle(self):
         """Execute operator with network shuffle"""
-        # Receive partitions assigned to this task
-        async for batch in self.shuffle_server.receive_batches(self.task.task_id):
-            # Process batch (via morsel parallelism)
-            result = await self._process_batch_with_morsels(batch)
+        # Get shuffle configuration from task
+        shuffle_config = getattr(self.task, 'parameters', {}).get('shuffle_config', {})
+        shuffle_id = shuffle_config.get('shuffle_id', '').encode('utf-8')
+        partition_id = getattr(self.task, 'task_index', 0)
 
-            # Send result downstream (may require re-shuffling)
-            if result is not None:
-                await self._send_downstream(result)
+        if not shuffle_id:
+            logger.warning(f"Task {self.task.task_id} requires shuffle but no shuffle_id configured")
+            return
+
+        # Receive partitions for this task from shuffle transport
+        # The operator's __iter__ will use shuffle_transport.receive_partitions()
+        try:
+            # Execute operator - it will internally use shuffle transport to receive data
+            for batch in self.operator:
+                if batch is not None and batch.num_rows > 0:
+                    # Process batch (via morsel parallelism if configured)
+                    result = await self._process_batch_with_morsels(batch)
+
+                    # Send result downstream
+                    if result is not None:
+                        await self._send_downstream(result)
+        except Exception as e:
+            logger.error(f"Shuffle execution failed for task {self.task.task_id}: {e}")
+            raise
 
     async def _execute_local(self):
         """Execute operator without shuffle"""
@@ -245,17 +261,23 @@ class Agent:
         # Start morsel processor
         await self.morsel_processor.start()
 
-        # Start shuffle transport
-        await self.shuffle_transport.start()
+        # Start shuffle transport with agent's address
+        self.shuffle_transport.start(
+            self.config.host.encode('utf-8'),
+            self.config.port
+        )
 
         if not self.is_local_mode:
+            # Start HTTP server for task deployment
+            await self._start_http_server()
+
             # Register with JobManager (distributed mode)
             await self._register_with_job_manager()
 
             # Start heartbeat loop
             asyncio.create_task(self._heartbeat_loop())
 
-        logger.info(f"Agent started: {self.agent_id}")
+        logger.info(f"Agent started: {self.agent_id} at {self.config.host}:{self.config.port}")
 
     async def stop(self):
         """Stop agent and cleanup"""
@@ -270,7 +292,7 @@ class Agent:
 
         # Stop services
         await self.morsel_processor.stop()
-        await self.shuffle_transport.stop()
+        self.shuffle_transport.stop()  # Synchronous Cython method
 
         logger.info(f"Agent stopped: {self.agent_id}")
 
@@ -289,6 +311,39 @@ class Agent:
             shuffle_client=self.shuffle_transport,
             is_local_mode=self.is_local_mode
         )
+
+        # Configure shuffle if operator requires it
+        if hasattr(task, 'parameters') and task.parameters.get('shuffle_config'):
+            shuffle_config = task.parameters['shuffle_config']
+            if hasattr(executor.operator, 'set_shuffle_config'):
+                # Wire up shuffle transport to operator
+                shuffle_id = shuffle_config['shuffle_id'].encode('utf-8')
+                task_id = task.task_index if hasattr(task, 'task_index') else 0
+                num_partitions = shuffle_config['num_partitions']
+
+                # Get agent addresses from config
+                upstream_agents = shuffle_config.get('upstream_agents', [])
+                downstream_agents = shuffle_config.get('downstream_agents', [])
+
+                # Start shuffle in transport with agent addresses
+                self.shuffle_transport.start_shuffle(
+                    shuffle_id,
+                    num_partitions,
+                    [a.encode('utf-8') if isinstance(a, str) else a for a in downstream_agents],
+                    [a.encode('utf-8') if isinstance(a, str) else a for a in upstream_agents]
+                )
+
+                executor.operator.set_shuffle_config(
+                    self.shuffle_transport,
+                    shuffle_id,
+                    task_id,
+                    num_partitions
+                )
+                logger.info(
+                    f"Configured shuffle for task {task.task_id}: "
+                    f"shuffle_id={shuffle_id}, partition={task_id}, "
+                    f"upstream={len(upstream_agents)}, downstream={len(downstream_agents)}"
+                )
 
         # Start execution
         await executor.start()
@@ -393,3 +448,101 @@ class Agent:
                 slot.assign(task)
                 return slot
         return None
+
+    # ========================================================================
+    # HTTP API for Task Deployment (Distributed Mode)
+    # ========================================================================
+
+    async def _start_http_server(self):
+        """Start HTTP server for receiving task deployments from JobManager"""
+        from aiohttp import web
+
+        app = web.Application()
+        app.router.add_post('/deploy_task', self._handle_deploy_task)
+        app.router.add_post('/heartbeat', self._handle_heartbeat_request)
+        app.router.add_post('/stop_task', self._handle_stop_task_request)
+        app.router.add_get('/status', self._handle_status_request)
+
+        # Start server
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, self.config.host, self.config.port)
+        await site.start()
+
+        self._http_runner = runner
+        logger.info(f"Agent HTTP server started on {self.config.host}:{self.config.port}")
+
+    async def _handle_deploy_task(self, request):
+        """Handle task deployment request from JobManager"""
+        from aiohttp import web
+
+        try:
+            data = await request.json()
+            task_id = data.get('task_id')
+            job_id = data.get('job_id')
+            operator_type = data.get('operator_type')
+            parameters = data.get('parameters', {})
+
+            logger.info(f"Received deploy_task request: {task_id}")
+
+            # Create task object from parameters
+            from .execution import TaskVertex, OperatorType
+            task = TaskVertex(
+                task_id=task_id,
+                operator_id=data.get('operator_id', task_id),
+                operator_type=OperatorType(operator_type),
+                operator_name=data.get('operator_name', ''),
+                task_index=data.get('task_index', 0),
+                parallelism=data.get('parallelism', 1),
+                state='scheduled',
+                stateful=data.get('stateful', False),
+                key_by=data.get('key_by_columns', []),
+                memory_mb=data.get('memory_mb', 256),
+                cpu_cores=data.get('cpu_cores', 0.5),
+                parameters=parameters
+            )
+
+            # Deploy task
+            await self.deploy_task(task)
+
+            return web.json_response({'status': 'success', 'task_id': task_id})
+
+        except Exception as e:
+            logger.error(f"Failed to deploy task: {e}")
+            return web.json_response(
+                {'status': 'error', 'message': str(e)},
+                status=500
+            )
+
+    async def _handle_heartbeat_request(self, request):
+        """Handle heartbeat request (just respond with OK)"""
+        from aiohttp import web
+        return web.json_response({'status': 'alive', 'agent_id': self.agent_id})
+
+    async def _handle_stop_task_request(self, request):
+        """Handle stop task request from JobManager"""
+        from aiohttp import web
+
+        try:
+            data = await request.json()
+            task_id = data.get('task_id')
+
+            logger.info(f"Received stop_task request: {task_id}")
+
+            await self.stop_task(task_id)
+
+            return web.json_response({'status': 'success', 'task_id': task_id})
+
+        except Exception as e:
+            logger.error(f"Failed to stop task: {e}")
+            return web.json_response(
+                {'status': 'error', 'message': str(e)},
+                status=500
+            )
+
+    async def _handle_status_request(self, request):
+        """Handle status request"""
+        from aiohttp import web
+
+        status = self.get_status()
+        return web.json_response(status)

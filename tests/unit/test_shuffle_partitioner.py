@@ -6,8 +6,12 @@ Tests hash/range/round-robin partitioning with Arrow RecordBatches.
 """
 
 import pytest
-import pyarrow as pa
-import pyarrow.compute as pc
+# Use Sabot's vendored Arrow (NOT pip pyarrow)
+from sabot import cyarrow as pa
+try:
+    from sabot.cyarrow import compute as pc
+except (ImportError, AttributeError):
+    pc = None
 
 # Import shuffle components
 try:
@@ -17,7 +21,7 @@ try:
         RoundRobinPartitioner,
         create_partitioner,
     )
-    from sabot._cython.shuffle.types import ShuffleEdgeType
+    from sabot._cython.shuffle.types import ShuffleEdgeType  # Python enum wrapper
     SHUFFLE_AVAILABLE = True
 except ImportError as e:
     SHUFFLE_AVAILABLE = False
@@ -50,19 +54,19 @@ class TestHashPartitioner:
         )
 
         # Partition the batch
-        partitioned = partitioner.partition_batch(pa._c.unwrap_batch(batch))
+        partitioned = partitioner.partition(batch)
 
         # Verify we got 4 batches
         assert len(partitioned) == 4
 
         # Verify total rows match
-        total_rows = sum(pa._c.wrap_batch(partitioned[i]).num_rows for i in range(4))
+        total_rows = sum(partitioned[i].num_rows for i in range(4))
         assert total_rows == 10
 
         # Verify same user_id goes to same partition
         user_to_partition = {}
         for partition_id in range(4):
-            part_batch = pa._c.wrap_batch(partitioned[partition_id])
+            part_batch = partitioned[partition_id]
             if part_batch.num_rows > 0:
                 for user_id in part_batch.column('user_id').to_pylist():
                     if user_id in user_to_partition:
@@ -91,10 +95,10 @@ class TestHashPartitioner:
             schema=schema
         )
 
-        partitioned = partitioner.partition_batch(pa._c.unwrap_batch(batch))
+        partitioned = partitioner.partition(batch)
 
         assert len(partitioned) == 3
-        total_rows = sum(pa._c.wrap_batch(partitioned[i]).num_rows for i in range(3))
+        total_rows = sum(partitioned[i].num_rows for i in range(3))
         assert total_rows == 5
 
 
@@ -120,18 +124,18 @@ class TestRoundRobinPartitioner:
             schema=schema
         )
 
-        partitioned = partitioner.partition_batch(pa._c.unwrap_batch(batch))
+        partitioned = partitioner.partition(batch)
 
         # Verify we got 3 partitions
         assert len(partitioned) == 3
 
         # Verify even distribution (12 rows / 3 partitions = 4 rows each)
         for i in range(3):
-            part_batch = pa._c.wrap_batch(partitioned[i])
+            part_batch = partitioned[i]
             assert part_batch.num_rows == 4
 
         # Total rows preserved
-        total_rows = sum(pa._c.wrap_batch(partitioned[i]).num_rows for i in range(3))
+        total_rows = sum(partitioned[i].num_rows for i in range(3))
         assert total_rows == 12
 
 
@@ -163,22 +167,22 @@ class TestRangePartitioner:
         # Partition 2: >= 200
         partitioner.set_ranges([100, 200])
 
-        partitioned = partitioner.partition_batch(pa._c.unwrap_batch(batch))
+        partitioned = partitioner.partition(batch)
 
         assert len(partitioned) == 3
 
         # Verify partition 0: < 100 (should have 50, 75)
-        part0 = pa._c.wrap_batch(partitioned[0])
+        part0 = partitioned[0]
         assert part0.num_rows == 2
         assert set(part0.column('timestamp').to_pylist()) == {50, 75}
 
         # Verify partition 1: [100, 200) (should have 150, 175)
-        part1 = pa._c.wrap_batch(partitioned[1])
+        part1 = partitioned[1]
         assert part1.num_rows == 2
         assert set(part1.column('timestamp').to_pylist()) == {150, 175}
 
         # Verify partition 2: >= 200 (should have 250)
-        part2 = pa._c.wrap_batch(partitioned[2])
+        part2 = partitioned[2]
         assert part2.num_rows == 1
         assert part2.column('timestamp').to_pylist() == [250]
 
@@ -195,7 +199,7 @@ class TestPartitionerFactory:
             ShuffleEdgeType.HASH,
             4,
             [b'key'],
-            pa._c.unwrap_schema(schema)
+            schema
         )
 
         assert isinstance(partitioner, HashPartitioner)
@@ -209,7 +213,7 @@ class TestPartitionerFactory:
             ShuffleEdgeType.REBALANCE,
             3,
             [],
-            pa._c.unwrap_schema(schema)
+            schema
         )
 
         assert isinstance(partitioner, RoundRobinPartitioner)
@@ -223,7 +227,7 @@ class TestPartitionerFactory:
             ShuffleEdgeType.RANGE,
             2,
             [b'key'],
-            pa._c.unwrap_schema(schema)
+            schema
         )
 
         assert isinstance(partitioner, RangePartitioner)

@@ -13,3 +13,7 @@
 - the goal is to build an intergrated system so a user does not need a million imports. sabot should feel like one thing not a box of bits.
 - tests live in the test folder.
 - we build arrow and use our own. we do not import the system arrow ever
+- dont build simplfied versions that work with missing components, this are not helpful.
+- dont use pyarrow. use cyarrow
+- if we are missing functinos in cyarrow we should build them in rather than do without.
+- use inbuilt arrow functions from the vendored arrow lib @vendor/arrow/  if we can to get the perf we want

@@ -58,23 +58,31 @@ cdef class ShuffleServer:
     Shuffle server using Arrow Flight for zero-copy transport.
     """
 
-    def __cinit__(self, host=b"0.0.0.0", int32_t port=8816):
+    def __cinit__(self):
         """Initialize shuffle server (lock-free)."""
-        cdef bytes host_bytes = host if isinstance(host, bytes) else host.encode('utf-8')
-        self.host = string(<const char*>host_bytes)
-        self.port = port
         self.running = False
+        # Flight server will be created in start()
 
-        # Create lock-free Flight server (NO mutexes)
-        self.flight_server = LockFreeFlightServer(host_bytes, port)
+    cpdef void start(self, string host, int32_t port) except *:
+        """
+        Start the shuffle server on specified address.
 
-    cpdef void start(self) except *:
-        """Start the shuffle server."""
+        Args:
+            host: Server hostname/IP (e.g., "0.0.0.0")
+            port: Server port (e.g., 8816)
+        """
         if self.running:
             return
 
-        # Start Flight server
+        # Store configuration
+        self.host = host
+        self.port = port
+
+        # Create and start Flight server
+        cdef bytes host_bytes = host.decode('utf-8').encode('utf-8')
+        self.flight_server = LockFreeFlightServer(host_bytes, port)
         self.flight_server.start()
+
         self.running = True
 
     cpdef void stop(self) except *:
@@ -188,22 +196,32 @@ cdef class ShuffleTransport:
     Unified shuffle transport managing both server and client.
     """
 
-    def __cinit__(self, agent_host=b"0.0.0.0", int32_t agent_port=8816):
+    def __cinit__(self):
         """Initialize shuffle transport."""
-        self.agent_host = agent_host if isinstance(agent_host, bytes) else agent_host.encode('utf-8')
-        self.agent_port = agent_port
         self.initialized = False
 
-        # Create server and client components
-        self.server = ShuffleServer(agent_host, agent_port)
+        # Create server and client components (configured in start())
+        self.server = ShuffleServer()
         self.client = ShuffleClient()
 
-    cpdef void start(self) except *:
-        """Start server and client."""
+    cpdef void start(self, string host, int32_t port) except *:
+        """
+        Start shuffle transport on agent's address.
+
+        Args:
+            host: Agent hostname/IP
+            port: Agent port
+        """
         if self.initialized:
             return
 
-        self.server.start()
+        # Store agent address
+        self.agent_host = host
+        self.agent_port = port
+
+        # Start server on agent's address
+        self.server.start(host, port)
+
         self.initialized = True
 
     cpdef void stop(self) except *:
@@ -262,7 +280,8 @@ cdef class ShuffleTransport:
         self,
         bytes shuffle_id,
         int32_t num_partitions,
-        list downstream_agents
+        list downstream_agents,
+        list upstream_agents=None
     ):
         """
         Initialize shuffle for operator.
@@ -271,6 +290,7 @@ cdef class ShuffleTransport:
             shuffle_id: Unique shuffle identifier
             num_partitions: Number of downstream partitions
             downstream_agents: List of "host:port" for downstream tasks
+            upstream_agents: List of "host:port" for upstream tasks (optional)
         """
         # Store shuffle metadata
         if not hasattr(self, '_active_shuffles'):
@@ -278,7 +298,8 @@ cdef class ShuffleTransport:
 
         self._active_shuffles[shuffle_id] = {
             'num_partitions': num_partitions,
-            'downstream_agents': downstream_agents
+            'downstream_agents': downstream_agents,
+            'upstream_agents': upstream_agents if upstream_agents is not None else []
         }
 
     cpdef void send_partition(
@@ -321,6 +342,8 @@ cdef class ShuffleTransport:
         """
         Receive all partitions for a shuffle operation.
 
+        Pulls data from upstream agents that have sent partitions for this task.
+
         Args:
             shuffle_id: Shuffle identifier
             partition_id: This agent's partition ID
@@ -330,17 +353,41 @@ cdef class ShuffleTransport:
         """
         cdef list result = []
         cdef ca.RecordBatch batch
+        cdef bytes agent_addr
+        cdef object parts
+        cdef bytes host
+        cdef int32_t port
 
         # Get shuffle metadata
         if not hasattr(self, '_active_shuffles') or shuffle_id not in self._active_shuffles:
             return result
 
         shuffle_info = self._active_shuffles[shuffle_id]
-        num_partitions = shuffle_info['num_partitions']
-        downstream_agents = shuffle_info['downstream_agents']
 
-        # For now, return empty list (placeholder for actual implementation)
-        # TODO: Implement proper partition receiving
+        # Get upstream agents (agents that will send data to us)
+        # For now, we assume all agents in the shuffle are upstream
+        # In a real implementation, this would come from JobManager
+        upstream_agents = shuffle_info.get('upstream_agents', [])
+
+        if not upstream_agents:
+            # No upstream agents specified - try to fetch from all known agents
+            # This is a fallback for testing
+            upstream_agents = shuffle_info.get('downstream_agents', [])
+
+        # Fetch partition from each upstream agent
+        for agent_addr in upstream_agents:
+            # Parse agent address (host:port format)
+            agent_str = agent_addr.decode('utf-8') if isinstance(agent_addr, bytes) else agent_addr
+            parts = agent_str.split(':')
+            host = parts[0].encode('utf-8')
+            port = int(parts[1]) if len(parts) > 1 else 8816
+
+            # Fetch partition from this agent
+            batch = self.client.fetch_partition(host, port, shuffle_id, partition_id)
+
+            if batch is not None:
+                result.append(batch)
+
         return result
 
     cpdef void end_shuffle(self, bytes shuffle_id):

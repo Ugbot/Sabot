@@ -263,6 +263,10 @@ class JobManager:
 
         # Compile to execution graph
         exec_graph = job_graph.to_execution_graph()
+
+        # Detect and configure shuffle edges (Phase 4)
+        await self._configure_shuffle_edges(job_id, exec_graph)
+
         exec_graph_json = json.dumps(exec_graph.to_dict())
 
         # Persist execution graph (idempotent)
@@ -298,6 +302,89 @@ class JobManager:
         )
 
         return exec_graph_json
+
+    async def _configure_shuffle_edges(self, job_id: str, exec_graph):
+        """
+        Detect operators requiring shuffle and configure shuffle edges.
+
+        Args:
+            job_id: Job identifier
+            exec_graph: ExecutionGraph to modify
+        """
+        logger.info(f"Configuring shuffle edges for job {job_id}")
+
+        # Iterate through tasks to find operators requiring shuffle
+        for task in exec_graph.tasks.values():
+            # Check if task operator requires shuffle
+            # This would call operator.requires_shuffle()
+            requires_shuffle = getattr(task, 'requires_shuffle', lambda: False)()
+
+            if requires_shuffle:
+                # Get partition keys
+                partition_keys = getattr(task, 'get_partition_keys', lambda: [])()
+
+                # Get number of partitions (use parallelism as default)
+                num_partitions = task.parallelism if hasattr(task, 'parallelism') else 4
+
+                # Create shuffle metadata
+                shuffle_id = f"{job_id}_{task.task_id}_shuffle".encode('utf-8')
+
+                # Query agent addresses for tasks that will receive shuffled data
+                # For now, get all agents in the job
+                agent_addresses = await self._get_agent_addresses_for_job(job_id)
+
+                # Store shuffle configuration in task parameters
+                if not hasattr(task, 'parameters'):
+                    task.parameters = {}
+
+                task.parameters['shuffle_config'] = {
+                    'shuffle_id': shuffle_id.decode('utf-8'),
+                    'partition_keys': partition_keys,
+                    'num_partitions': num_partitions,
+                    'requires_shuffle': True,
+                    'agent_addresses': agent_addresses,
+                    'upstream_agents': agent_addresses,  # For receiving data
+                    'downstream_agents': agent_addresses  # For sending data
+                }
+
+                logger.info(
+                    f"Configured shuffle for task {task.task_id}: "
+                    f"keys={partition_keys}, partitions={num_partitions}, "
+                    f"agents={len(agent_addresses)}"
+                )
+
+        return exec_graph
+
+    async def _get_agent_addresses_for_job(self, job_id: str) -> List[str]:
+        """
+        Get agent addresses for all agents involved in a job.
+
+        Returns:
+            List of "host:port" strings
+        """
+        # Query agents that have tasks for this job
+        agents = await self.dbos.query(
+            """
+            SELECT DISTINCT a.host, a.port
+            FROM agents a
+            JOIN tasks t ON a.agent_id = t.agent_id
+            WHERE t.job_id = ?
+            """,
+            job_id
+        )
+
+        if not agents:
+            # Fallback: get all alive agents
+            agents = await self.dbos.query(
+                """
+                SELECT host, port
+                FROM agents
+                WHERE status = 'alive'
+                """
+            )
+
+        # Format as "host:port" strings
+        return [f"{agent[0]}:{agent[1]}" for agent in agents]
 
     @transaction
     async def _assign_tasks_to_agents(self, job_id: str, exec_graph_json: str) -> Dict[str, str]:
@@ -520,16 +607,11 @@ class JobManager:
         """Deploy tasks to distributed agents via HTTP."""
         import aiohttp
 
-        # Group tasks by agent
-        agent_tasks = {}
-        for task_id, agent_id in assignments.items():
-            if agent_id not in agent_tasks:
-                agent_tasks[agent_id] = []
-            agent_tasks[agent_id].append(task_id)
+        logger.info(f"Deploying {len(assignments)} tasks to distributed agents")
 
-        # Deploy to each agent
+        # Deploy tasks to agents
         async with aiohttp.ClientSession() as session:
-            for agent_id, task_ids in agent_tasks.items():
+            for task_id, agent_id in assignments.items():
                 # Get agent connection info
                 agent_info = await self.dbos.query_one(
                     """
@@ -542,15 +624,60 @@ class JobManager:
                     logger.error(f"Agent {agent_id} not found")
                     continue
 
-                # Deploy tasks to this agent
-                url = f"http://{agent_info['host']}:{agent_info['port']}/deploy_tasks"
-                async with session.post(url, json={
+                # Get full task details
+                task_data = await self.dbos.query_one(
+                    """
+                    SELECT task_id, operator_id, operator_type, operator_name, task_index,
+                           parallelism, stateful, key_by_columns, memory_mb, cpu_cores,
+                           parameters_json
+                    FROM tasks WHERE task_id = ?
+                    """,
+                    task_id
+                )
+
+                if not task_data:
+                    logger.error(f"Task {task_id} not found in database")
+                    continue
+
+                # Parse task data
+                task_payload = {
+                    'task_id': task_data[0],
                     'job_id': job_id,
-                    'task_ids': task_ids
-                }) as response:
-                    if response.status != 200:
-                        logger.error(f"Failed to deploy tasks to agent {agent_id}")
-                        raise RuntimeError(f"Task deployment failed for agent {agent_id}")
+                    'operator_id': task_data[1],
+                    'operator_type': task_data[2],
+                    'operator_name': task_data[3],
+                    'task_index': task_data[4],
+                    'parallelism': task_data[5],
+                    'stateful': task_data[6],
+                    'key_by_columns': json.loads(task_data[7]) if task_data[7] else [],
+                    'memory_mb': task_data[8],
+                    'cpu_cores': task_data[9],
+                    'parameters': json.loads(task_data[10]) if task_data[10] else {}
+                }
+
+                # Deploy task to agent via HTTP
+                url = f"http://{agent_info[0]}:{agent_info[1]}/deploy_task"
+
+                try:
+                    async with session.post(url, json=task_payload, timeout=aiohttp.ClientTimeout(total=30)) as response:
+                        if response.status == 200:
+                            # Update task state
+                            await self.dbos.execute(
+                                """
+                                UPDATE tasks
+                                SET state = 'running', state_updated_at = datetime('now')
+                                WHERE task_id = ?
+                                """,
+                                task_id
+                            )
+                            logger.info(f"Deployed task {task_id} to agent {agent_id}")
+                        else:
+                            error_text = await response.text()
+                            logger.error(f"Failed to deploy task {task_id} to agent {agent_id}: {error_text}")
+                            raise RuntimeError(f"Task deployment failed: {task_id}")
+                except Exception as e:
+                    logger.error(f"Error deploying task {task_id}: {e}")
+                    raise
 
         # Update job status
         await self.dbos.execute(

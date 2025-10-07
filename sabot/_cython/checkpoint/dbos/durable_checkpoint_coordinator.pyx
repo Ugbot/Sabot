@@ -31,13 +31,6 @@ cdef class DurableCheckpointCoordinator:
     - Recovery orchestration with DBOS guarantees
     """
 
-    cdef:
-        CheckpointCoordinator checkpoint_coordinator
-        object dbos_controller  # DBOS parallel controller
-        object workflow_registry  # Tracks active workflows
-        object durable_state_store  # DBOS-compatible state storage
-        bint durability_enabled
-
     def __cinit__(self):
         """Initialize durable checkpoint coordinator."""
         self.checkpoint_coordinator = CheckpointCoordinator()
@@ -326,15 +319,18 @@ cdef class DurableCheckpointCoordinator:
         # Get checkpoint coordinator stats
         coordinator_stats = self.checkpoint_coordinator.get_coordinator_stats()
 
+        # Calculate total checkpoints without closure
+        operators = workflow_state.get('operators', {})
+        checkpoint_count = 0
+        for op in operators.values():
+            checkpoint_count += op.get('checkpoint_count', 0)
+
         return {
             'workflow_id': workflow_id,
             'status': workflow_state.get('status'),
             'start_time': workflow_state.get('start_time'),
-            'operators': len(workflow_state.get('operators', {})),
-            'checkpoints_triggered': sum(
-                op.get('checkpoint_count', 0)
-                for op in workflow_state.get('operators', {}).values()
-            ),
+            'operators': len(operators),
+            'checkpoints_triggered': checkpoint_count,
             'recovery_attempts': workflow_state.get('recovery_attempts', 0),
             'coordinator_stats': coordinator_stats,
             'durability_enabled': self.durability_enabled,
@@ -342,30 +338,36 @@ cdef class DurableCheckpointCoordinator:
 
     cpdef object list_active_workflows(self):
         """List all active workflows."""
-        return {
-            workflow_id: {
-                'status': state.get('status'),
-                'type': state.get('workflow_type'),
-                'operators': len(state.get('operators', {})),
-                'checkpoints': sum(
-                    op.get('checkpoint_count', 0)
-                    for op in state.get('operators', {}).values()
-                ),
-            }
-            for workflow_id, state in self.workflow_registry.items()
-            if state.get('status') == 'running'
-        }
+        result = {}
+        for workflow_id, state in self.workflow_registry.items():
+            if state.get('status') == 'running':
+                # Calculate checkpoints without closure
+                operators = state.get('operators', {})
+                checkpoint_count = 0
+                for op in operators.values():
+                    checkpoint_count += op.get('checkpoint_count', 0)
+
+                result[workflow_id] = {
+                    'status': state.get('status'),
+                    'type': state.get('workflow_type'),
+                    'operators': len(operators),
+                    'checkpoints': checkpoint_count,
+                }
+        return result
 
     cpdef object get_system_health(self):
         """Get overall system health including durability status."""
+        # Count active workflows without closure
+        active_count = 0
+        for wid, state in self.workflow_registry.items():
+            if state.get('status') == 'running':
+                active_count += 1
+
         return {
             'durability_enabled': self.durability_enabled,
             'dbos_controller_available': self.dbos_controller is not None,
             'durable_storage_available': self.durable_state_store is not None,
-            'active_workflows': len([
-                wid for wid, state in self.workflow_registry.items()
-                if state.get('status') == 'running'
-            ]),
+            'active_workflows': active_count,
             'checkpoint_coordinator_healthy': True,  # Would check actual health
             'recovery_manager_available': True,  # Would check actual availability
         }

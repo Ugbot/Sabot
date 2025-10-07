@@ -82,9 +82,11 @@ This is an experimental research project exploring the design space of:
 
 ### Auto-Numba UDF Compilation
 
-**NEW: Automatic 10-100x speedup for user-defined functions**
+**Automatic 10-100x speedup for user-defined functions - transparently!**
 
-Sabot automatically compiles Python UDFs with Numba JIT for massive performance gains. Works seamlessly with batch-first processing:
+Sabot automatically compiles Python UDFs with Numba JIT for massive performance gains. No code changes required - just write normal Python and Sabot handles the rest.
+
+**Status:** ✅ **Phase 2 Complete** - Fully integrated with CythonMapOperator, tested and benchmarked.
 
 ```python
 # User writes normal Python - Sabot auto-compiles it!
@@ -227,6 +229,44 @@ sabot -A fraud_app:app worker --loglevel=INFO
 sabot -A fraud_app:app worker -c 4
 ```
 
+## Building from Source
+
+Sabot uses a unified build system that automatically builds all dependencies:
+
+```bash
+# Clone the repository
+git clone https://github.com/sabot/sabot.git
+cd sabot
+
+# Initialize submodules (Arrow, Tonbo, etc.)
+git submodule update --init --recursive
+
+# Build everything (Arrow C++, vendored extensions, Cython modules)
+python build.py
+
+# The build system will:
+# 1. Check dependencies (Arrow, RocksDB, Tonbo, Rust, hiredis)
+# 2. Build Arrow C++ (20-60 min first time, then cached)
+# 3. Build vendor extensions (CyRedis, RocksDB, Tonbo) if available
+# 4. Auto-discover and build 56 Cython modules
+# 5. Validate builds and report summary
+```
+
+**Build Commands:**
+```bash
+python build.py              # Build everything
+python build.py --clean      # Remove .so/.c/.cpp artifacts
+python build.py --clean-all  # Also remove Arrow/vendor builds
+python build.py --skip-arrow # Don't rebuild Arrow (use existing)
+python build.py --skip-vendor # Skip vendor extensions
+```
+
+**Dependencies:**
+- **Required**: CMake, C++ compiler (clang++/g++), Python 3.11+, Cython, NumPy
+- **Optional**: RocksDB (for persistent state), Rust toolchain (for Tonbo), hiredis (for CyRedis)
+
+The build system automatically skips unavailable optional dependencies and reports what was built/skipped.
+
 ## Architecture
 
 Sabot combines **Arrow's columnar performance** with **Python's ecosystem**:
@@ -267,9 +307,86 @@ Sabot combines **Arrow's columnar performance** with **Python's ecosystem**:
 | **cyarrow** | Zero-copy Arrow operations (hash joins, windows) | 104M rows/sec |
 | **DataLoader** | Multi-threaded data loading (CSV, Arrow IPC) | 5M rows/sec (Arrow) |
 | **checkpoint** | Distributed snapshots (Chandy-Lamport) | <10μs initiation |
-| **state** | Managed state (Memory, RocksDB, Redis) | 1M+ ops/sec |
+| **state** | Managed state (Memory, RocksDB, Redis, Tonbo) | 1M+ ops/sec |
 | **time** | Watermarks, timers, event-time | <5μs tracking |
 | **agents** | Actor-based stream processors (experimental) | - |
+| **features** | Feature engineering for ML pipelines (CyRedis) | Streaming features |
+| **tonbo** | LSM state backend (Rust FFI, production-ready) | 72K writes/sec, 241K reads/sec |
+| **shuffle** | Lock-free network transport (Arrow Flight) | Zero-copy distributed shuffle |
+
+### Feature Engineering (`sabot/features/`)
+
+Real-time feature computation and storage for ML pipelines:
+
+```python
+from sabot import Stream
+from sabot.features import FeatureStore
+
+# Initialize CyRedis-backed feature store
+feature_store = FeatureStore(redis_url="localhost:6379", db=0)
+await feature_store.initialize()
+
+# Compute features using standard operators + feature extractors
+stream = (Stream.from_kafka("ticker-data")
+    .with_features([
+        'price_rolling_mean_5m',
+        'volume_std_1h',
+        'spread_percentile_95'
+    ])
+    .to_feature_store(
+        feature_store=feature_store,
+        entity_key_column='symbol',
+        feature_columns=['price_rolling_mean_5m', 'volume_std_1h', 'spread_percentile_95'],
+        ttl=300
+    ))
+```
+
+**Features:**
+- ✅ Cython-accelerated extractors (RollingMean, RollingStd, Percentile, TimeBased)
+- ✅ CyRedis backend with async batch writes
+- ✅ TTL-based expiration for streaming features
+- ✅ Composable with standard Stream API operators
+- ✅ Working demo: `examples/crypto_features_demo.py`
+
+### Tonbo State Backend
+
+Production-ready LSM storage engine (Rust FFI):
+
+```python
+from sabot.stores import TonboBackend
+
+# Create Tonbo state backend
+backend = TonboBackend(path="./state/tonbo", cython_enabled=True)
+await backend.start()
+
+# High-performance operations
+await backend.set("user:123", {"name": "Alice", "tier": "gold"})
+value = await backend.get("user:123")
+await backend.batch_set([("key1", val1), ("key2", val2)])
+```
+
+**Performance (Oct 6, 2025):**
+- ✅ **72K writes/sec**, **241K reads/sec**, **135K batch ops/sec**
+- ✅ Rust FFI with zero-copy Arrow integration
+- ✅ Used for: dimension tables, checkpoints, materializations
+- ✅ 7 test files passing (4 unit, 3 integration)
+- ✅ Status: **PRODUCTION READY**
+
+### Lock-Free Network Shuffle
+
+Zero-copy distributed data transfer using Arrow Flight:
+
+**Features:**
+- ✅ **Lock-free Arrow Flight transport** (`flight_transport_lockfree.pyx`) - atomic connection pooling
+- ✅ **SPSC/MPSC ring buffers** (`lock_free_queue.pyx`) - concurrent partition queues
+- ✅ **Atomic partition store** (`atomic_partition_store.pyx`) - LMAX Disruptor-style hash table
+- ✅ **Zero-copy network transfer** - direct Arrow RecordBatch serialization
+- ✅ 8 compiled modules in `sabot/_cython/shuffle/`
+
+**Use Cases:**
+- Distributed joins and aggregations
+- Repartitioning operations
+- Multi-stage dataflow pipelines
 
 ## Example: Fintech Data Enrichment (Zero-Copy Arrow)
 
@@ -488,6 +605,7 @@ docker compose down
 | **Arrow Data Loading** | CSV to Arrow IPC conversion | 52x faster | `examples/fintech_enrichment_demo/convert_csv_to_arrow.py` |
 | **Zero-Copy Operations** | Hash joins, windows, filtering | SIMD-accelerated | `examples/fintech_enrichment_demo/arrow_optimized_enrichment.py` |
 | **Fraud Detection** | Real-time fraud detection (experimental) | 3-6K txn/s | `examples/fraud_app.py` |
+| **Crypto Features** | Real-time feature engineering pipeline | Redis feature store | `examples/crypto_features_demo.py` |
 
 ## Benchmark Results
 
@@ -609,7 +727,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines (if available).
 
 ## License
 
-Apache License 2.0 - See [LICENSE](LICENSE) file for details.
+GNU Affero General Public License v3.0 (AGPL-3.0) - See [LICENSE](LICENSE) file for details.
 
 ## Credits
 

@@ -20,6 +20,7 @@ from libc.stdint cimport int32_t, int64_t
 from libc.stdlib cimport malloc, free
 from posix.stdlib cimport posix_memalign
 from libc.string cimport memset, strcpy, strcmp, strlen
+from libc.stdio cimport sprintf
 from libcpp cimport bool as cbool
 from libcpp.atomic cimport (
     atomic,
@@ -52,6 +53,7 @@ from pyarrow.includes.libarrow_flight cimport (
     CFlightServerOptions,
     CFlightDataStream,
     CServerCallContext,
+    CRecordBatchStream,
 )
 
 # Import our lock-free primitives
@@ -73,6 +75,258 @@ cdef inline void cpu_pause() nogil:
 cdef inline cbool strings_equal(const char* s1, const char* s2) nogil:
     """Compare C strings."""
     return strcmp(s1, s2) == 0
+
+
+# ============================================================================
+# C++ Flight Server Implementation
+# ============================================================================
+
+cdef extern from * nogil:
+    """
+    #include <arrow/flight/api.h>
+    #include <arrow/status.h>
+    #include <arrow/record_batch.h>
+    #include <arrow/table.h>
+    #include <sstream>
+
+    using namespace arrow;
+    using namespace arrow::flight;
+
+    // Forward declare classes and functions
+    class ShuffleFlightServer;
+
+    // Forward declare Cython functions for C++ to call
+    extern "C" {
+        // Get partition from Cython AtomicPartitionStore
+        void* sabot_get_partition_cpp(void* store_ptr, int64_t shuffle_id_hash, int32_t partition_id);
+
+        // Insert partition into Cython AtomicPartitionStore
+        bool sabot_insert_partition_cpp(void* store_ptr, int64_t shuffle_id_hash, int32_t partition_id, void* batch_ptr);
+    }
+
+    // Custom Flight server for agent-based shuffle
+    class ShuffleFlightServer : public FlightServerBase {
+    private:
+        void* partition_store_ptr;  // Pointer to Cython AtomicPartitionStore
+
+    public:
+        ShuffleFlightServer(void* store_ptr) : partition_store_ptr(store_ptr) {}
+
+        // Serve partition data via DoGet (shuffle consumer requests partition)
+        Status DoGet(const ServerCallContext& context,
+                     const Ticket& request,
+                     std::unique_ptr<FlightDataStream>* stream) override {
+            // Parse ticket: "shuffle_id_hash:partition_id"
+            std::string ticket_str = request.ticket;
+            size_t colon_pos = ticket_str.find(':');
+            if (colon_pos == std::string::npos) {
+                return Status::Invalid("Invalid ticket format, expected 'shuffle_id_hash:partition_id'");
+            }
+
+            int64_t shuffle_id_hash;
+            int32_t partition_id;
+            try {
+                shuffle_id_hash = std::stoll(ticket_str.substr(0, colon_pos));
+                partition_id = std::stoi(ticket_str.substr(colon_pos + 1));
+            } catch (...) {
+                return Status::Invalid("Failed to parse ticket: ", ticket_str);
+            }
+
+            // Fetch partition from store via extern "C" wrapper
+            void* batch_ptr = sabot_get_partition_cpp(partition_store_ptr, shuffle_id_hash, partition_id);
+
+            if (batch_ptr == nullptr) {
+                return Status::KeyError("Partition not found: ", ticket_str);
+            }
+
+            // Cast to shared_ptr<RecordBatch>
+            auto batch = *static_cast<std::shared_ptr<RecordBatch>*>(batch_ptr);
+
+            // Create Flight stream from batch
+            std::vector<std::shared_ptr<RecordBatch>> batches = {batch};
+            ARROW_ASSIGN_OR_RAISE(auto reader, RecordBatchReader::Make(batches, batch->schema()));
+
+            *stream = std::make_unique<RecordBatchStream>(std::move(reader));
+
+            // Clean up wrapper-allocated pointer
+            delete static_cast<std::shared_ptr<RecordBatch>*>(batch_ptr);
+
+            return Status::OK();
+        }
+
+        // Receive partition data via DoPut (shuffle producer sends partition)
+        Status DoPut(const ServerCallContext& context,
+                     std::unique_ptr<FlightMessageReader> reader,
+                     std::unique_ptr<FlightMetadataWriter> writer) override {
+            // Parse descriptor: "shuffle_id_hash:partition_id"
+            const FlightDescriptor& descriptor = reader->descriptor();
+            if (descriptor.type != FlightDescriptor::CMD) {
+                return Status::Invalid("Expected CMD descriptor for DoPut");
+            }
+
+            std::string cmd = descriptor.cmd;
+            size_t colon_pos = cmd.find(':');
+            if (colon_pos == std::string::npos) {
+                return Status::Invalid("Invalid command format, expected 'shuffle_id_hash:partition_id'");
+            }
+
+            int64_t shuffle_id_hash;
+            int32_t partition_id;
+            try {
+                shuffle_id_hash = std::stoll(cmd.substr(0, colon_pos));
+                partition_id = std::stoi(cmd.substr(colon_pos + 1));
+            } catch (...) {
+                return Status::Invalid("Failed to parse command: ", cmd);
+            }
+
+            // Read all batches from stream
+            ARROW_ASSIGN_OR_RAISE(auto table, reader->ToTable());
+
+            // Convert table to single batch
+            ARROW_ASSIGN_OR_RAISE(auto batch, table->CombineChunksToBatch());
+
+            // Insert into store via extern "C" wrapper
+            // Allocate shared_ptr on heap for wrapper
+            auto* batch_ptr = new std::shared_ptr<RecordBatch>(batch);
+
+            bool success = sabot_insert_partition_cpp(
+                partition_store_ptr,
+                shuffle_id_hash,
+                partition_id,
+                static_cast<void*>(batch_ptr)
+            );
+
+            // Clean up wrapper-allocated pointer (wrapper copies the shared_ptr)
+            delete batch_ptr;
+
+            if (!success) {
+                return Status::CapacityError("Store full, could not insert partition");
+            }
+
+            return Status::OK();
+        }
+    };
+    """
+
+    cppclass ShuffleFlightServer(PyFlightServer):
+        ShuffleFlightServer(void* store_ptr)
+
+
+# ============================================================================
+# Extern "C" Wrapper Functions (C++ calls Cython)
+# ============================================================================
+
+cdef extern from *:
+    """
+    // Implementation of extern "C" functions declared in C++ block above
+    // These bridge C++ ShuffleFlightServer to Cython AtomicPartitionStore
+
+    void* sabot_get_partition_cpp(void* store_ptr, int64_t shuffle_id_hash, int32_t partition_id) {
+        // This function is implemented in Cython below
+        // C++ declaration allows it to be called from ShuffleFlightServer
+        return NULL;  // Placeholder - actual implementation in Cython
+    }
+
+    bool sabot_insert_partition_cpp(void* store_ptr, int64_t shuffle_id_hash, int32_t partition_id, void* batch_ptr) {
+        // This function is implemented in Cython below
+        return false;  // Placeholder - actual implementation in Cython
+    }
+
+    // ========================================================================
+    // Server Lifecycle Functions
+    // ========================================================================
+
+    // Start the Flight server (creates and initializes)
+    Status StartServer(void* store_ptr, const char* host, int port,
+                      ShuffleFlightServer** out_server) {
+        // Create server instance
+        auto server = new ShuffleFlightServer(store_ptr);
+
+        // Create location for gRPC TCP
+        ARROW_ASSIGN_OR_RAISE(auto location, Location::ForGrpcTcp(host, port));
+
+        // Create server options
+        FlightServerOptions options(location);
+
+        // Initialize server - this starts the gRPC server listening
+        ARROW_RETURN_NOT_OK(server->Init(options));
+
+        *out_server = server;
+        return Status::OK();
+    }
+
+    // Stop and cleanup the Flight server
+    void StopServer(ShuffleFlightServer* server) {
+        if (server) {
+            server->Shutdown();
+            delete server;
+        }
+    }
+    """
+
+    # Cython declarations for C++ functions
+    ctypedef struct ShuffleFlightServer:
+        pass
+
+    CStatus StartServer(void* store_ptr, const char* host, int port, ShuffleFlightServer** out_server)
+    void StopServer(ShuffleFlightServer* server)
+
+
+# Cython implementations of extern "C" functions
+cdef api void* sabot_get_partition_cpp(void* store_ptr, int64_t shuffle_id_hash, int32_t partition_id) with gil:
+    """
+    C API: Get partition from AtomicPartitionStore.
+
+    Called by C++ ShuffleFlightServer::DoGet().
+
+    Args:
+        store_ptr: Pointer to Cython AtomicPartitionStore object
+        shuffle_id_hash: Hash of shuffle ID
+        partition_id: Partition ID
+
+    Returns:
+        Pointer to heap-allocated shared_ptr<RecordBatch>, or NULL if not found
+    """
+    # Cast void* to Cython object pointer
+    cdef AtomicPartitionStore store = <AtomicPartitionStore>store_ptr
+
+    # Call Cython method
+    cdef shared_ptr[PCRecordBatch] batch = store.get(shuffle_id_hash, partition_id)
+
+    # Check if found
+    if batch.get() == NULL:
+        return NULL
+
+    # Allocate shared_ptr on heap and return (caller must delete)
+    cdef shared_ptr[PCRecordBatch]* batch_heap = new shared_ptr[PCRecordBatch](batch)
+    return <void*>batch_heap
+
+
+cdef api cbool sabot_insert_partition_cpp(void* store_ptr, int64_t shuffle_id_hash,
+                                          int32_t partition_id, void* batch_ptr) with gil:
+    """
+    C API: Insert partition into AtomicPartitionStore.
+
+    Called by C++ ShuffleFlightServer::DoPut().
+
+    Args:
+        store_ptr: Pointer to Cython AtomicPartitionStore object
+        shuffle_id_hash: Hash of shuffle ID
+        partition_id: Partition ID
+        batch_ptr: Pointer to shared_ptr<RecordBatch>
+
+    Returns:
+        True if inserted, False if store full
+    """
+    # Cast void* to Cython object pointer
+    cdef AtomicPartitionStore store = <AtomicPartitionStore>store_ptr
+
+    # Cast batch pointer
+    cdef shared_ptr[PCRecordBatch]* batch_heap = <shared_ptr[PCRecordBatch]*>batch_ptr
+    cdef shared_ptr[PCRecordBatch] batch = batch_heap[0]  # Dereference
+
+    # Call Cython method
+    return store.insert(shuffle_id_hash, partition_id, batch)
 
 
 # ============================================================================
@@ -151,11 +405,17 @@ cdef class LockFreeFlightClient:
         Returns:
             Flight client shared_ptr
         """
+        # Declare all variables at function scope (Cython requirement)
         cdef int32_t i
         cdef ConnectionSlot* slot
         cdef cbool slot_in_use
         cdef cbool expected
         cdef shared_ptr[CFlightClient] client
+        cdef CLocation location
+        cdef CResult[CLocation] location_result
+        cdef CFlightClientOptions client_options
+        cdef CResult[unique_ptr[CFlightClient]] client_result
+        cdef unique_ptr[CFlightClient] client_unique
 
         # First pass: find existing connection (lock-free read)
         for i in range(self.max_connections):
@@ -185,8 +445,12 @@ cdef class LockFreeFlightClient:
                     strcpy(slot.host, host)
                     slot.port = port
 
-                    # TODO: Create C++ FlightClient here
-                    # For now, just increment counter
+                    # Create C++ FlightClient using Arrow Flight API
+                    # For now, stub this out - will use Python pyarrow.flight
+                    # TODO: Implement full C++ Flight client creation
+                    # This requires proper error handling of CResult types
+
+                    # Increment connection count
                     self.connection_count.fetch_add(1, memory_order_relaxed)
 
                     # Return the client
@@ -215,9 +479,17 @@ cdef class LockFreeFlightClient:
         Returns:
             RecordBatch shared_ptr (empty if error)
         """
+        # Declare all variables at function scope (Cython requirement)
         cdef shared_ptr[CFlightClient] client
         cdef shared_ptr[PCRecordBatch] empty_batch
         cdef shared_ptr[PCRecordBatch] result
+        cdef CTicket ticket
+        cdef CFlightCallOptions call_options
+        cdef CResult[unique_ptr[CFlightStreamReader]] stream_result
+        cdef unique_ptr[CFlightStreamReader] stream_reader
+        cdef CResult[CFlightStreamChunk] chunk_result
+        cdef CFlightStreamChunk chunk
+        cdef char ticket_str[256]
 
         # Get connection (lock-free)
         client = self.get_connection(host, port)
@@ -227,8 +499,12 @@ cdef class LockFreeFlightClient:
             empty_batch.reset()
             return empty_batch
 
-        # TODO: Implement C++ DoGet() call
-        # For now, return empty batch
+        # Implement C++ DoGet() RPC call
+        # For now, stub this out - will use Python pyarrow.flight
+        # TODO: Implement full C++ DoGet() RPC call
+        # This requires proper error handling of CResult types and Flight API
+
+        # Return empty batch (stub)
         result.reset()
         return result
 
@@ -295,13 +571,49 @@ cdef class LockFreeFlightServer:
     cdef void start(self) nogil except *:
         """
         Start Flight server.
+
+        Note: Starting the server requires Python interaction,
+        so we temporarily acquire GIL.
         """
         if self.running:
             return
 
+        # Acquire GIL to start Python-based server
+        with gil:
+            self._start_python_server()
+
         self.running = True
-        # TODO: Create and start C++ Flight server
-        # self.server_cpp = create_cpp_flight_server(...)
+
+    def _start_python_server(self):
+        """
+        Start C++ Flight server (called with GIL).
+
+        Creates ShuffleFlightServer and initializes it on configured host:port.
+        """
+        if self.server_cpp != NULL:
+            return  # Already started
+
+        # Get store pointer for C++ server
+        cdef void* store_ptr = <void*>self._store_instance
+
+        # Convert host to C string
+        cdef string host_str = self.host
+        cdef const char* host_cstr = host_str.c_str()
+
+        # Declare variables for C++ call
+        cdef CStatus status
+        cdef ShuffleFlightServer* server_ptr = NULL
+
+        # Call C++ StartServer function
+        status = StartServer(store_ptr, host_cstr, self.port, &server_ptr)
+
+        # Check if server started successfully
+        if not status.ok():
+            error_msg = status.ToString().decode('utf-8')
+            raise RuntimeError(f"Failed to start Flight server: {error_msg}")
+
+        # Store the server pointer
+        self.server_cpp = <void*>server_ptr
 
     cdef void stop(self) nogil:
         """
@@ -311,7 +623,24 @@ cdef class LockFreeFlightServer:
             return
 
         self.running = False
-        # TODO: Stop C++ Flight server
+
+        # Acquire GIL to stop Python-based server
+        with gil:
+            self._stop_python_server()
+
+    def _stop_python_server(self):
+        """
+        Stop C++ Flight server (called with GIL).
+
+        Shuts down the server and cleans up resources.
+        """
+        if self.server_cpp == NULL:
+            return  # Not started
+
+        # Cast to proper type and call C++ StopServer
+        cdef ShuffleFlightServer* server_ptr = <ShuffleFlightServer*>self.server_cpp
+        StopServer(server_ptr)
+        self.server_cpp = NULL
 
     cdef cbool register_partition(
         self,
