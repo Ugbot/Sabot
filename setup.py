@@ -380,6 +380,21 @@ def create_extensions():
 
                 language = "c++"
 
+            elif "features" in pyx_file.lower() and "extractor" in pyx_file.lower():
+                # Feature extractors - use Arrow for zero-copy operations
+                if system_libs['arrow_include']:
+                    include_dirs.append(system_libs['arrow_include'])
+                if system_libs['arrow_cpp_include']:
+                    include_dirs.append(system_libs['arrow_cpp_include'])
+                if system_libs['arrow_cpp_build_include']:
+                    include_dirs.append(system_libs['arrow_cpp_build_include'])
+
+                # No external linking needed - uses cimport pyarrow.lib
+                libraries = []
+                language = "c++"
+
+                print(f"Configuring Feature Extractor extension: {module_name}")
+
             else:
                 # Standard Cython extension - use C++ since we use libcpp everywhere
                 language = "c++"

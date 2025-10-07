@@ -155,7 +155,7 @@ def create_app(
         gpu_device: GPU device ID to use
         redis_host: Redis host for distributed state
         redis_port: Redis port for distributed state
-        enable_distributed_state: Enable FastRedis distributed state management
+        enable_distributed_state: Enable CyRedis distributed state management
         database_url: Database URL for durable agent execution
         **kwargs: Additional application configuration
 

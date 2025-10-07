@@ -40,6 +40,7 @@ from sabot.cyarrow import (
 # Specialized modules not yet in cyarrow wrapper
 import pyarrow.csv as pa_csv
 import pyarrow.feather as feather
+import pyarrow.compute as pc
 
 print(f"Zero-copy Arrow enabled: {USING_ZERO_COPY}")
 assert USING_ZERO_COPY, "Zero-copy Arrow required for optimal performance"
@@ -69,28 +70,26 @@ DEFAULT_TRADES_LIMIT = 100_000      # Process 100K trades
 # Zero-Copy Data Loading
 # ============================================================================
 
-def _convert_null_columns(table: pa.Table) -> pa.Table:
-    """Convert NULL type columns to string for join compatibility."""
-    new_columns = []
-    new_schema_fields = []
+def _convert_null_columns(table: ca.Table) -> ca.Table:
+    """Drop NULL type columns for join compatibility (they're unused anyway)."""
+    # Find non-null columns
+    columns_to_keep = []
+    schema_fields = []
 
     for i, field in enumerate(table.schema):
-        col = table.column(i)
-        if pa.types.is_null(field.type):
-            # Convert NULL columns to string type
-            col = pc.cast(col, pa.string())
-            new_schema_fields.append(pa.field(field.name, pa.string()))
-        else:
-            new_schema_fields.append(field)
-        new_columns.append(col)
+        if str(field.type) != 'null':
+            columns_to_keep.append(i)
+            schema_fields.append(field)
 
-    if any(pa.types.is_null(field.type) for field in table.schema):
-        return pa.Table.from_arrays(new_columns, schema=pa.schema(new_schema_fields))
+    # If all columns are non-null, return original table
+    if len(columns_to_keep) == len(table.schema):
+        return table
 
-    return table
+    # Select only non-null columns
+    return table.select(columns_to_keep)
 
 
-def load_csv_arrow(csv_path: Path, limit: Optional[int] = None, columns: Optional[list] = None) -> pa.Table:
+def load_csv_arrow(csv_path: Path, limit: Optional[int] = None, columns: Optional[list] = None) -> ca.Table:
     """
     Load data using Arrow IPC format (if available) or CSV fallback.
 
@@ -183,7 +182,7 @@ def load_csv_arrow(csv_path: Path, limit: Optional[int] = None, columns: Optiona
                 rows_read += batch.num_rows
 
             # Combine batches into table
-            table = pa.Table.from_batches(batches)
+            table = ca.Table.from_batches(batches)
     else:
         # Load entire file (no limit)
         table = pa_csv.read_csv(
@@ -212,7 +211,7 @@ def load_csv_arrow(csv_path: Path, limit: Optional[int] = None, columns: Optiona
 # Zero-Copy Enrichment Pipeline
 # ============================================================================
 
-def enrich_quotes_with_securities(quotes: pa.Table, securities: pa.Table) -> pa.Table:
+def enrich_quotes_with_securities(quotes: ca.Table, securities: ca.Table) -> ca.Table:
     """
     Enrich quotes with security master data using zero-copy hash join.
 
@@ -245,7 +244,7 @@ def enrich_quotes_with_securities(quotes: pa.Table, securities: pa.Table) -> pa.
     end = time.perf_counter()
 
     # Convert back to table
-    joined = pa.Table.from_batches([joined_batch])
+    joined = ca.Table.from_batches([joined_batch])
 
     elapsed_ms = (end - start) * 1000
     input_rows = quotes.num_rows + securities.num_rows
@@ -258,7 +257,7 @@ def enrich_quotes_with_securities(quotes: pa.Table, securities: pa.Table) -> pa.
 
     return joined
 
-def compute_spreads(enriched: pa.Table) -> pa.Table:
+def compute_spreads(enriched: ca.Table) -> ca.Table:
     """
     Compute bid/offer spreads using Arrow compute kernels.
 
@@ -304,7 +303,7 @@ def compute_spreads(enriched: pa.Table) -> pa.Table:
 
     return enriched
 
-def filter_tight_spreads(enriched: pa.Table, max_spread_pct: float = 0.5) -> pa.Table:
+def filter_tight_spreads(enriched: ca.Table, max_spread_pct: float = 0.5) -> ca.Table:
     """
     Filter quotes with tight spreads using zero-copy filter.
 
@@ -326,7 +325,7 @@ def filter_tight_spreads(enriched: pa.Table, max_spread_pct: float = 0.5) -> pa.
     end = time.perf_counter()
 
     # Convert back to table
-    filtered = pa.Table.from_batches([filtered_batch])
+    filtered = ca.Table.from_batches([filtered_batch])
 
     elapsed_ms = (end - start) * 1000
     throughput = enriched.num_rows / (end - start) / 1e6
@@ -339,7 +338,7 @@ def filter_tight_spreads(enriched: pa.Table, max_spread_pct: float = 0.5) -> pa.
 
     return filtered
 
-def compute_time_windows(quotes: pa.Table, window_size_ms: int = 60000) -> pa.Table:
+def compute_time_windows(quotes: ca.Table, window_size_ms: int = 60000) -> ca.Table:
     """
     Assign time windows using zero-copy window computation.
 
@@ -365,7 +364,7 @@ def compute_time_windows(quotes: pa.Table, window_size_ms: int = 60000) -> pa.Ta
     end = time.perf_counter()
 
     # Convert back to table
-    windowed = pa.Table.from_batches([windowed_batch])
+    windowed = ca.Table.from_batches([windowed_batch])
 
     elapsed_ms = (end - start) * 1000
     throughput = quotes.num_rows / (end - start) / 1e6
@@ -376,7 +375,7 @@ def compute_time_windows(quotes: pa.Table, window_size_ms: int = 60000) -> pa.Ta
 
     return windowed
 
-def compute_top_instruments(enriched: pa.Table, limit: int = 10) -> pa.Table:
+def compute_top_instruments(enriched: ca.Table, limit: int = 10) -> ca.Table:
     """
     Find top instruments by quote volume using zero-copy sort.
 
@@ -409,7 +408,7 @@ def compute_top_instruments(enriched: pa.Table, limit: int = 10) -> pa.Table:
     end = time.perf_counter()
 
     # Convert back to table
-    top = pa.Table.from_batches([top_batch])
+    top = ca.Table.from_batches([top_batch])
 
     elapsed_ms = (end - start) * 1000
     throughput = enriched.num_rows / (end - start) / 1e6

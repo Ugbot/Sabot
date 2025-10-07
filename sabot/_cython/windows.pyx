@@ -558,15 +558,15 @@ def create_window_processor(str window_type, double size_seconds, **kwargs):
         config = WindowConfig(WindowType.TUMBLING, size_seconds, **kwargs)
         return TumblingWindowProcessor(config, kwargs.get('aggregations'))
     elif window_type == "sliding":
-        slide_seconds = kwargs.get('slide_seconds', size_seconds / 2.0)
+        slide_seconds = kwargs.pop('slide_seconds', size_seconds / 2.0)
         config = WindowConfig(WindowType.SLIDING, size_seconds, slide_seconds=slide_seconds, **kwargs)
         return SlidingWindowProcessor(config, kwargs.get('aggregations'))
     elif window_type == "hopping":
-        hop_seconds = kwargs.get('hop_seconds', size_seconds / 2.0)
+        hop_seconds = kwargs.pop('hop_seconds', size_seconds / 2.0)
         config = WindowConfig(WindowType.HOPPING, size_seconds, hop_seconds=hop_seconds, **kwargs)
         return HoppingWindowProcessor(config, kwargs.get('aggregations'))
     elif window_type == "session":
-        timeout_seconds = kwargs.get('timeout_seconds', 30.0)
+        timeout_seconds = kwargs.pop('timeout_seconds', 30.0)
         config = WindowConfig(WindowType.SESSION, size_seconds, timeout_seconds=timeout_seconds, **kwargs)
         return SessionWindowProcessor(config, kwargs.get('aggregations'))
     else:
