@@ -40,7 +40,7 @@ ARROW_SOURCE = PROJECT_ROOT / "vendor" / "arrow" / "cpp"
 ARROW_INSTALL = ARROW_SOURCE / "build" / "install"
 CYREDIS_DIR = PROJECT_ROOT / "vendor" / "cyredis"
 ROCKSDB_VENDOR_DIR = PROJECT_ROOT / "vendor" / "rocksdb"
-ROCKSDB_INSTALL = ROCKSDB_VENDOR_DIR / "build" / "install"
+ROCKSDB_INSTALL = ROCKSDB_VENDOR_DIR / "install"
 TONBO_DIR = PROJECT_ROOT / "vendor" / "tonbo" / "bindings" / "python"
 TONBO_FFI_DIR = PROJECT_ROOT / "vendor" / "tonbo" / "tonbo-ffi"
 SABOT_CYTHON_DIR = PROJECT_ROOT / "sabot" / "_cython"
@@ -533,6 +533,22 @@ def build_sabot_extensions(deps, vendor_results, modules):
         "-Wno-deprecated-declarations",
     ]
 
+    # Add rpath for runtime library loading (use @loader_path relative rpath on macOS)
+    import sys
+    if sys.platform == "darwin":
+        # On macOS, use @loader_path relative paths for portability
+        # and add headerpad for install_name_tool compatibility
+        rel_path_to_arrow = os.path.relpath(arrow_lib, SABOT_CYTHON_DIR)
+        common_link_args = [
+            "-Wl,-headerpad_max_install_names",  # Allow rpath modification later
+            f"-Wl,-rpath,@loader_path/{rel_path_to_arrow}",
+            f"-Wl,-rpath,{arrow_lib}",  # Also add absolute path as fallback
+        ]
+    else:
+        common_link_args = [
+            f"-Wl,-rpath,{arrow_lib}",
+        ]
+
     # Build modules by category
     results = {'built': [], 'skipped': [], 'failed': []}
 
@@ -550,6 +566,7 @@ def build_sabot_extensions(deps, vendor_results, modules):
             library_dirs=common_library_dirs,
             libraries=common_libraries,
             extra_compile_args=common_compile_args,
+            extra_link_args=common_link_args,
             language="c++",
         ))
 
@@ -562,6 +579,7 @@ def build_sabot_extensions(deps, vendor_results, modules):
             # Add vendored RocksDB paths
             rocksdb_include_dirs = common_include_dirs + [str(ROCKSDB_INSTALL / "include")]
             rocksdb_library_dirs = common_library_dirs + [str(ROCKSDB_INSTALL / "lib")]
+            rocksdb_link_args = common_link_args + [f"-Wl,-rpath,{str(ROCKSDB_INSTALL / 'lib')}"]
 
             extensions_to_build.append(Extension(
                 module_name,
@@ -570,6 +588,7 @@ def build_sabot_extensions(deps, vendor_results, modules):
                 library_dirs=rocksdb_library_dirs,
                 libraries=common_libraries + ["rocksdb"],
                 extra_compile_args=common_compile_args,
+                extra_link_args=rocksdb_link_args,
                 language="c++",
             ))
     else:
@@ -584,6 +603,7 @@ def build_sabot_extensions(deps, vendor_results, modules):
             # Add Tonbo FFI paths
             tonbo_include_dirs = common_include_dirs + [str(TONBO_FFI_DIR)]
             tonbo_library_dirs = common_library_dirs + [str(TONBO_FFI_DIR / "target" / "release")]
+            tonbo_link_args = common_link_args + [f"-Wl,-rpath,{str(TONBO_FFI_DIR / 'target' / 'release')}"]
 
             extensions_to_build.append(Extension(
                 module_name,
@@ -592,6 +612,7 @@ def build_sabot_extensions(deps, vendor_results, modules):
                 library_dirs=tonbo_library_dirs,
                 libraries=common_libraries + ["tonbo_ffi"],
                 extra_compile_args=common_compile_args,
+                extra_link_args=tonbo_link_args,
                 language="c++",
             ))
     else:
@@ -612,6 +633,10 @@ def build_sabot_extensions(deps, vendor_results, modules):
                 str(ROCKSDB_INSTALL / "lib"),
                 str(TONBO_FFI_DIR / "target" / "release")
             ]
+            mixed_link_args = common_link_args + [
+                f"-Wl,-rpath,{str(ROCKSDB_INSTALL / 'lib')}",
+                f"-Wl,-rpath,{str(TONBO_FFI_DIR / 'target' / 'release')}"
+            ]
 
             extensions_to_build.append(Extension(
                 module_name,
@@ -620,6 +645,7 @@ def build_sabot_extensions(deps, vendor_results, modules):
                 library_dirs=mixed_library_dirs,
                 libraries=common_libraries + ["rocksdb", "tonbo_ffi"],
                 extra_compile_args=common_compile_args,
+                extra_link_args=mixed_link_args,
                 language="c++",
             ))
     else:

@@ -4,7 +4,7 @@
 {
     "distutils": {
         "depends": [
-            "/opt/homebrew/include/rocksdb/c.h"
+            "/Users/bengamble/Sabot/vendor/rocksdb/install/include/rocksdb/c.h"
         ],
         "extra_compile_args": [
             "-O3",
@@ -12,13 +12,19 @@
             "-Wno-unused-function",
             "-Wno-deprecated-declarations"
         ],
+        "extra_link_args": [
+            "-Wl,-headerpad_max_install_names",
+            "-Wl,-rpath,@loader_path/../../vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/rocksdb/install/lib"
+        ],
         "include_dirs": [
             "/Users/bengamble/Sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
             "/Users/bengamble/Sabot/vendor/arrow/python",
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow",
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src",
-            "/opt/homebrew/include"
+            "/Users/bengamble/Sabot/vendor/rocksdb/install/include"
         ],
         "language": "c++",
         "libraries": [
@@ -28,7 +34,7 @@
         ],
         "library_dirs": [
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib",
-            "/opt/homebrew/lib"
+            "/Users/bengamble/Sabot/vendor/rocksdb/install/lib"
         ],
         "name": "sabot._cython.state.rocksdb_state",
         "sources": [
@@ -1402,6 +1408,7 @@ static const char *__pyx_filename;
 static const char* const __pyx_f[] = {
   "sabot/_cython/state/rocksdb_state.pyx",
   "<stringsource>",
+  "sabot/_cython/cyrocks.pxd",
 };
 /* #### Code section: utility_code_proto_before_types ### */
 /* Atomics.proto */
@@ -1569,6 +1576,8 @@ static const char* const __pyx_f[] = {
 
 /*--- Type declarations ---*/
 struct __pyx_obj_5sabot_7_cython_5state_13state_backend_StateBackend;
+struct __pyx_obj_5sabot_7_cython_7cyrocks_CyOptions;
+struct __pyx_obj_5sabot_7_cython_7cyrocks_CyDB;
 struct __pyx_obj_5sabot_7_cython_5state_13rocksdb_state_RocksDBStateBackend;
 struct __pyx_t_5sabot_7_cython_5state_13state_backend_StateDescriptor;
 struct __pyx_t_5sabot_7_cython_5state_13state_backend_KeyScope;
@@ -1724,6 +1733,29 @@ struct __pyx_obj_5sabot_7_cython_5state_13state_backend_StateBackend {
   std::unordered_map<std::string,uint64_t>  operation_counts;
   double total_operation_time_ms;
   uint64_t operation_count;
+};
+
+
+/* "cyrocks.pxd":10
+ * 
+ * # Declare classes without internal details to avoid header dependency propagation
+ * cdef class CyOptions:             # <<<<<<<<<<<<<<
+ *     pass
+ * 
+*/
+struct __pyx_obj_5sabot_7_cython_7cyrocks_CyOptions {
+  PyObject_HEAD
+};
+
+
+/* "cyrocks.pxd":13
+ *     pass
+ * 
+ * cdef class CyDB:             # <<<<<<<<<<<<<<
+ *     pass
+*/
+struct __pyx_obj_5sabot_7_cython_7cyrocks_CyDB {
+  PyObject_HEAD
 };
 
 
@@ -2858,6 +2890,10 @@ static uint64_t __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBac
 
 /* Module declarations from "sabot._cython.state.state_backend" */
 
+/* Module declarations from "sabot._cython" */
+
+/* Module declarations from "sabot._cython.cyrocks" */
+
 /* Module declarations from "sabot._cython.state.rocksdb_state" */
 static CYTHON_INLINE PyObject *__pyx_convert_PyObject_string_to_py_6libcpp_6string_std__in_string(std::string const &); /*proto*/
 static CYTHON_INLINE PyObject *__pyx_convert_PyUnicode_string_to_py_6libcpp_6string_std__in_string(std::string const &); /*proto*/
@@ -2878,7 +2914,6 @@ static PyObject *__pyx_builtin_TypeError;
 /* #### Code section: string_decls ### */
 static const char __pyx_k_[] = "";
 static const char __pyx_k_Q[] = "\200\001\330\004\n\210+\220Q";
-static const char __pyx_k_DB[] = "DB";
 static const char __pyx_k__2[] = "|";
 static const char __pyx_k__3[] = ": ";
 static const char __pyx_k__4[] = "?";
@@ -2929,13 +2964,12 @@ static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_remove[] = "remove";
 static const char __pyx_k_values[] = "values";
 static const char __pyx_k_LA_t_Ql[] = "\320\004L\310A\340\010\017\210t\220:\230Q\230l\250!";
-static const char __pyx_k_Options[] = "Options";
 static const char __pyx_k_connect[] = "connect";
+static const char __pyx_k_cyrocks[] = "cyrocks";
 static const char __pyx_k_db_path[] = "db_path";
 static const char __pyx_k_disable[] = "disable";
 static const char __pyx_k_execute[] = "execute";
 static const char __pyx_k_logging[] = "logging";
-static const char __pyx_k_rocksdb[] = "rocksdb";
 static const char __pyx_k_sqlite3[] = "sqlite3";
 static const char __pyx_k_warning[] = "warning";
 static const char __pyx_k_add_note[] = "add_note";
@@ -3045,6 +3079,7 @@ static const char __pyx_k_RocksDBStateBackend_put_value[] = "RocksDBStateBackend
 static const char __pyx_k_DELETE_FROM_kv_store_WHERE_key[] = "DELETE FROM kv_store WHERE key = ?";
 static const char __pyx_k_RocksDBStateBackend_clear_list[] = "RocksDBStateBackend.clear_list";
 static const char __pyx_k_RocksDBStateBackend_put_to_map[] = "RocksDBStateBackend.put_to_map";
+static const char __pyx_k_A_4q_q_j_31_q_7q_2_a_N_q_Kq_e1B[] = "\200A\340\010\013\2104\210q\330\014\r\340\010\t\330\014\017\210q\360\006\000\021\037\230j\250\001\330\020\024\320\024)\250\021\330\020\024\320\0243\2601\330\020\024\320\024/\250q\330\020\024\320\0247\260q\330\020\024\320\0242\260!\330\020\024\320\024.\250a\360\006\000\021\025\220N\240%\240q\250\004\250K\260q\330\020\026\220e\2301\230B\320\036L\310D\320PQ\360\006\000\021\033\230\"\230D\240\004\240A\330\020\024\320\024&\240g\250X\260Q\260i\320?Q\320QR\330\020\024\220O\2408\2501\250A\360\014\000\021\025\220O\2407\250!\330\020\026\220e\2301\230B\320\036J\310!\340\014\020\220\014\230A\340\010\017\210}\230A\330\014\022\220&\230\001\230\022\320\0338\270\001\330\014\022\220,\230a\230r\320!;\2701";
 static const char __pyx_k_A_4t1_T_D_a_G1_e1A_Q_O6_a_e1A_A[] = "\200A\340\010\013\2104\210t\2201\330\014\r\340\010\t\330\014\017\320\017!\240\024\240T\250\021\340\020\024\220D\230\006\230a\330\020\024\220G\2301\330\020\026\220e\2301\230A\330\021\025\220Q\340\020\024\220O\2406\250\021\330\020\024\320\024&\240a\330\020\026\220e\2301\230A\340\014\020\220\014\230A\340\010\017\210}\230A\330\014\022\220&\230\001\230\022\320\0337\260q";
 static const char __pyx_k_A_K_XV1_z_a_HA_A_1L_E_F_1KuA_Ja[] = "\200A\340\010\014\210K\220~\240X\250V\2601\330\014\017\210z\230\021\230,\240a\340\020\024\220H\230A\330\024\030\230\014\240A\240[\260\001\330\021\033\2301\230L\250\001\340\020\024\220E\230\031\240*\250F\260!\330\024\030\230\013\2401\240K\250u\260A\360\006\000\021\025\220J\230a\230{\250!";
 static const char __pyx_k_CREATE_TABLE_IF_NOT_EXISTS_kv_s[] = "\n                    CREATE TABLE IF NOT EXISTS kv_store (\n                        key TEXT PRIMARY KEY,\n                        value BLOB\n                    )\n                ";
@@ -3056,11 +3091,12 @@ static const char __pyx_k_RocksDBStateBackend_clear_value[] = "RocksDBStateBacke
 static const char __pyx_k_RocksDBStateBackend_remove_from[] = "RocksDBStateBackend.remove_from_list";
 static const char __pyx_k_RocksDBStateBackend_restore_all[] = "RocksDBStateBackend.restore_all_states";
 static const char __pyx_k_RocksDB_State_Backend_Implement[] = "\nRocksDB State Backend Implementation\n\nCython implementation of RocksDB state backend for Flink-compatible state management.\nUses the python-rocksdb library for efficient persistent storage with <1ms latency.\n";
-static const char __pyx_k_RocksDB_state_backend_opened_at[] = "RocksDB state backend opened at ";
-static const char __pyx_k_A_4q_q_wha_31_q_7q_2_a_G7_Qd_Q_e[] = "\200A\340\010\013\2104\210q\330\014\r\340\010\t\330\014\017\210q\360\006\000\021\030\220w\230h\240a\330\020\024\320\024)\250\021\330\020\024\320\0243\2601\330\020\024\320\024/\250q\330\020\024\320\0247\260q\330\020\024\320\0242\260!\330\020\024\320\024.\250a\360\006\000\021\025\220G\2307\240#\240Q\240d\250+\260Q\330\020\026\220e\2301\230B\320\036B\300$\300a\360\006\000\021\033\230\"\230D\240\004\240A\330\020\024\320\024&\240g\250X\260Q\260i\320?Q\320QR\330\020\024\220O\2408\2501\250A\360\014\000\021\025\220O\2407\250!\330\020\026\220e\2301\230B\320\036J\310!\340\014\020\220\014\230A\340\010\017\210}\230A\330\014\022\220&\230\001\230\022\320\0338\270\001\330\014\022\220,\230a\230r\320!;\2701";
 static const char __pyx_k_A_4t1_Rq_j_T_D_q_7_1_Q_xq_t_2U_A[] = "\200A\340\010\013\2104\210t\2201\330\014\r\340\010!\240\024\240]\260#\260R\260q\340\010\t\330\014\022\220$\220j\240\001\240\021\340\014\017\320\017!\240\024\240T\250\021\340\020\024\220D\230\007\230q\240\003\2407\250!\2501\330\021\025\220Q\340\025\031\230\021\330\024\030\230\017\240x\250q\330\030\031\330\031\032\360\006\000\r\030\220t\230=\250\003\2502\250U\260\"\260A\330\014\020\320\020\"\240!\240?\260!\340\010\017\210}\230A\330\014\022\220&\230\001\230\022\320\033?\270~\310Q";
 static const char __pyx_k_A_4t1_aq_Rq_j_vV1A_T_D_AS_q_Q_xq[] = "\200A\340\010\013\2104\210t\2201\330\014\022\220,\230a\230q\340\010!\240\024\240]\260#\260R\260q\340\010\t\330\014\022\220$\220j\240\001\240\021\330\014\037\230v\240V\2501\250A\340\014\017\320\017!\240\024\240T\250\021\340\020\024\220D\230\004\230A\230S\240\007\240q\250\n\260!\330\021\025\220Q\340\025\031\230\021\330\024\030\230\017\240x\250q\330\030\031\330\031\036\230a\360\006\000\021\027\220l\240!\2401\340\014\027\220t\230=\250\003\2502\250U\260\"\260A\330\014\020\320\020\"\240!\240=\260\001\340\010\017\210}\230A\330\014\022\220&\230\001\230\022\320\033=\270^\3101\330\014\r";
 static const char __pyx_k_A_D_dBTTYY_eef_d_gQl_l_s_GST_r_q[] = "\200A\340\010\024\220D\320\030*\250'\260\021\260,\270d\320BT\320TY\320Y\\\320\\^\320^e\320ef\330\010\016\210d\220,\230g\240Q\240l\260$\260l\300%\300s\310\"\310G\320ST\360\006\000\t\020\210r\220\024\220\\\240\026\240q";
+static const char __pyx_k_CyRocks_RocksDB_library_loaded_s[] = "CyRocks (RocksDB) library loaded successfully";
+static const char __pyx_k_CyRocks_RocksDB_library_not_avai[] = "CyRocks (RocksDB) library not available - using fallback implementation";
+static const char __pyx_k_CyRocks_RocksDB_state_backend_op[] = "CyRocks (RocksDB) state backend opened at ";
 static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.";
 static const char __pyx_k_RocksDBStateBackend___reduce_cyt[] = "RocksDBStateBackend.__reduce_cython__";
 static const char __pyx_k_RocksDBStateBackend___setstate_c[] = "RocksDBStateBackend.__setstate_cython__";
@@ -3079,8 +3115,6 @@ static const char __pyx_k_RocksDBStateBackend_get_reducing[] = "RocksDBStateBack
 static const char __pyx_k_RocksDBStateBackend_list_contain[] = "RocksDBStateBackend.list_contains";
 static const char __pyx_k_RocksDBStateBackend_map_contains[] = "RocksDBStateBackend.map_contains";
 static const char __pyx_k_RocksDBStateBackend_snapshot_all[] = "RocksDBStateBackend.snapshot_all_states";
-static const char __pyx_k_RocksDB_library_loaded_successfu[] = "RocksDB library loaded successfully";
-static const char __pyx_k_RocksDB_library_not_available_us[] = "RocksDB library not available - using fallback implementation";
 static const char __pyx_k_SELECT_value_FROM_kv_store_WHERE[] = "SELECT value FROM kv_store WHERE key = ?";
 static const char __pyx_k_SQLite_fallback_state_backend_cl[] = "SQLite fallback state backend closed";
 static const char __pyx_k_SQLite_fallback_state_backend_op[] = "SQLite fallback state backend opened at ";
@@ -3162,12 +3196,14 @@ typedef struct {
   PyTypeObject *__pyx_CoroutineType;
   #endif
   PyTypeObject *__pyx_ptype_5sabot_7_cython_5state_13state_backend_StateBackend;
+  PyTypeObject *__pyx_ptype_5sabot_7_cython_7cyrocks_CyOptions;
+  PyTypeObject *__pyx_ptype_5sabot_7_cython_7cyrocks_CyDB;
   PyObject *__pyx_type_5sabot_7_cython_5state_13rocksdb_state_RocksDBStateBackend;
   PyTypeObject *__pyx_ptype_5sabot_7_cython_5state_13rocksdb_state_RocksDBStateBackend;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
   PyObject *__pyx_tuple[2];
   PyObject *__pyx_codeobj_tab[32];
-  PyObject *__pyx_string_tab[181];
+  PyObject *__pyx_string_tab[179];
   PyObject *__pyx_int_0;
   PyObject *__pyx_int_2;
   PyObject *__pyx_int_3;
@@ -3213,185 +3249,183 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 /* #### Code section: constant_name_defines ### */
 #define __pyx_kp_u_ __pyx_string_tab[0]
 #define __pyx_kp_u_CREATE_TABLE_IF_NOT_EXISTS_kv_s __pyx_string_tab[1]
-#define __pyx_n_u_DB __pyx_string_tab[2]
-#define __pyx_kp_u_DELETE_FROM_kv_store_WHERE_key __pyx_string_tab[3]
-#define __pyx_kp_u_Database_backend_not_open __pyx_string_tab[4]
-#define __pyx_kp_u_Database_open_failed __pyx_string_tab[5]
-#define __pyx_kp_u_Error_closing_database __pyx_string_tab[6]
-#define __pyx_kp_u_Failed_to_clear_value_for_state __pyx_string_tab[7]
-#define __pyx_kp_u_Failed_to_get_value_for_state __pyx_string_tab[8]
-#define __pyx_kp_u_Failed_to_open_database __pyx_string_tab[9]
-#define __pyx_kp_u_Failed_to_put_value_for_state __pyx_string_tab[10]
-#define __pyx_kp_u_Flush_failed __pyx_string_tab[11]
-#define __pyx_kp_u_INSERT_OR_REPLACE_INTO_kv_store __pyx_string_tab[12]
-#define __pyx_n_u_ImportError __pyx_string_tab[13]
-#define __pyx_n_u_Lock __pyx_string_tab[14]
-#define __pyx_kp_u_No_database_backend_available __pyx_string_tab[15]
-#define __pyx_kp_u_None __pyx_string_tab[16]
-#define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[17]
-#define __pyx_n_u_Options __pyx_string_tab[18]
-#define __pyx_n_u_ROCKSDB_AVAILABLE __pyx_string_tab[19]
-#define __pyx_n_u_RocksDBStateBackend __pyx_string_tab[20]
-#define __pyx_n_u_RocksDBStateBackend___reduce_cyt __pyx_string_tab[21]
-#define __pyx_n_u_RocksDBStateBackend___setstate_c __pyx_string_tab[22]
-#define __pyx_n_u_RocksDBStateBackend__make_key __pyx_string_tab[23]
-#define __pyx_n_u_RocksDBStateBackend_add_to_aggre __pyx_string_tab[24]
-#define __pyx_n_u_RocksDBStateBackend_add_to_list __pyx_string_tab[25]
-#define __pyx_n_u_RocksDBStateBackend_add_to_reduc __pyx_string_tab[26]
-#define __pyx_n_u_RocksDBStateBackend_clear_aggreg __pyx_string_tab[27]
-#define __pyx_n_u_RocksDBStateBackend_clear_all_st __pyx_string_tab[28]
-#define __pyx_n_u_RocksDBStateBackend_clear_list __pyx_string_tab[29]
-#define __pyx_n_u_RocksDBStateBackend_clear_map __pyx_string_tab[30]
-#define __pyx_n_u_RocksDBStateBackend_clear_reduci __pyx_string_tab[31]
-#define __pyx_n_u_RocksDBStateBackend_clear_value __pyx_string_tab[32]
-#define __pyx_n_u_RocksDBStateBackend_close __pyx_string_tab[33]
-#define __pyx_n_u_RocksDBStateBackend_flush __pyx_string_tab[34]
-#define __pyx_n_u_RocksDBStateBackend_get_aggregat __pyx_string_tab[35]
-#define __pyx_n_u_RocksDBStateBackend_get_from_map __pyx_string_tab[36]
-#define __pyx_n_u_RocksDBStateBackend_get_list __pyx_string_tab[37]
-#define __pyx_n_u_RocksDBStateBackend_get_map_entr __pyx_string_tab[38]
-#define __pyx_n_u_RocksDBStateBackend_get_map_keys __pyx_string_tab[39]
-#define __pyx_n_u_RocksDBStateBackend_get_map_valu __pyx_string_tab[40]
-#define __pyx_n_u_RocksDBStateBackend_get_memory_u __pyx_string_tab[41]
-#define __pyx_n_u_RocksDBStateBackend_get_reducing __pyx_string_tab[42]
-#define __pyx_n_u_RocksDBStateBackend_get_value __pyx_string_tab[43]
-#define __pyx_n_u_RocksDBStateBackend_list_contain __pyx_string_tab[44]
-#define __pyx_n_u_RocksDBStateBackend_map_contains __pyx_string_tab[45]
-#define __pyx_n_u_RocksDBStateBackend_open __pyx_string_tab[46]
-#define __pyx_n_u_RocksDBStateBackend_put_to_map __pyx_string_tab[47]
-#define __pyx_n_u_RocksDBStateBackend_put_value __pyx_string_tab[48]
-#define __pyx_n_u_RocksDBStateBackend_remove_from __pyx_string_tab[49]
-#define __pyx_n_u_RocksDBStateBackend_remove_from_2 __pyx_string_tab[50]
-#define __pyx_n_u_RocksDBStateBackend_restore_all __pyx_string_tab[51]
-#define __pyx_n_u_RocksDBStateBackend_snapshot_all __pyx_string_tab[52]
-#define __pyx_kp_u_RocksDB_library_loaded_successfu __pyx_string_tab[53]
-#define __pyx_kp_u_RocksDB_library_not_available_us __pyx_string_tab[54]
-#define __pyx_kp_u_RocksDB_state_backend_closed __pyx_string_tab[55]
-#define __pyx_kp_u_RocksDB_state_backend_opened_at __pyx_string_tab[56]
-#define __pyx_n_u_RuntimeError __pyx_string_tab[57]
-#define __pyx_kp_u_SELECT_value_FROM_kv_store_WHERE __pyx_string_tab[58]
-#define __pyx_kp_u_SQLite_fallback_state_backend_cl __pyx_string_tab[59]
-#define __pyx_kp_u_SQLite_fallback_state_backend_op __pyx_string_tab[60]
-#define __pyx_n_u_TypeError __pyx_string_tab[61]
-#define __pyx_n_u_ValueError __pyx_string_tab[62]
-#define __pyx_kp_u__2 __pyx_string_tab[63]
-#define __pyx_kp_u__3 __pyx_string_tab[64]
-#define __pyx_kp_u__4 __pyx_string_tab[65]
-#define __pyx_kp_u_add_note __pyx_string_tab[66]
-#define __pyx_n_u_add_to_aggregating __pyx_string_tab[67]
-#define __pyx_n_u_add_to_list __pyx_string_tab[68]
-#define __pyx_n_u_add_to_reducing __pyx_string_tab[69]
-#define __pyx_n_u_append __pyx_string_tab[70]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[71]
-#define __pyx_n_u_check_same_thread __pyx_string_tab[72]
-#define __pyx_n_u_class_getitem __pyx_string_tab[73]
-#define __pyx_n_u_clear __pyx_string_tab[74]
-#define __pyx_n_u_clear_aggregating __pyx_string_tab[75]
-#define __pyx_n_u_clear_all_states __pyx_string_tab[76]
-#define __pyx_n_u_clear_list __pyx_string_tab[77]
-#define __pyx_n_u_clear_map __pyx_string_tab[78]
-#define __pyx_n_u_clear_reducing __pyx_string_tab[79]
-#define __pyx_n_u_clear_value __pyx_string_tab[80]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[81]
-#define __pyx_n_u_close __pyx_string_tab[82]
-#define __pyx_n_u_commit __pyx_string_tab[83]
-#define __pyx_n_u_connect __pyx_string_tab[84]
-#define __pyx_n_u_copy __pyx_string_tab[85]
-#define __pyx_n_u_create_if_missing __pyx_string_tab[86]
-#define __pyx_kp_u_db __pyx_string_tab[87]
-#define __pyx_n_u_db_path __pyx_string_tab[88]
-#define __pyx_n_u_default_value __pyx_string_tab[89]
-#define __pyx_n_u_delete __pyx_string_tab[90]
-#define __pyx_kp_u_disable __pyx_string_tab[91]
-#define __pyx_n_u_dumps __pyx_string_tab[92]
-#define __pyx_kp_u_enable __pyx_string_tab[93]
-#define __pyx_n_u_encode __pyx_string_tab[94]
-#define __pyx_n_u_enter __pyx_string_tab[95]
-#define __pyx_n_u_error __pyx_string_tab[96]
-#define __pyx_n_u_execute __pyx_string_tab[97]
-#define __pyx_n_u_exit __pyx_string_tab[98]
-#define __pyx_n_u_fetchone __pyx_string_tab[99]
-#define __pyx_n_u_flush __pyx_string_tab[100]
-#define __pyx_n_u_func __pyx_string_tab[101]
-#define __pyx_kp_u_gc __pyx_string_tab[102]
-#define __pyx_n_u_get __pyx_string_tab[103]
-#define __pyx_n_u_getLogger __pyx_string_tab[104]
-#define __pyx_n_u_get_aggregating __pyx_string_tab[105]
-#define __pyx_n_u_get_from_map __pyx_string_tab[106]
-#define __pyx_n_u_get_list __pyx_string_tab[107]
-#define __pyx_n_u_get_map_entries __pyx_string_tab[108]
-#define __pyx_n_u_get_map_keys __pyx_string_tab[109]
-#define __pyx_n_u_get_map_values __pyx_string_tab[110]
-#define __pyx_n_u_get_memory_usage_bytes __pyx_string_tab[111]
-#define __pyx_n_u_get_reducing __pyx_string_tab[112]
-#define __pyx_n_u_get_value __pyx_string_tab[113]
-#define __pyx_n_u_get_value_hit __pyx_string_tab[114]
-#define __pyx_n_u_get_value_miss __pyx_string_tab[115]
-#define __pyx_n_u_getstate __pyx_string_tab[116]
-#define __pyx_n_u_info __pyx_string_tab[117]
-#define __pyx_n_u_initializing __pyx_string_tab[118]
-#define __pyx_n_u_input_value __pyx_string_tab[119]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[120]
-#define __pyx_kp_u_isenabled __pyx_string_tab[121]
-#define __pyx_n_u_items __pyx_string_tab[122]
-#define __pyx_n_u_key __pyx_string_tab[123]
-#define __pyx_n_u_keys __pyx_string_tab[124]
-#define __pyx_n_u_list_contains __pyx_string_tab[125]
-#define __pyx_n_u_loads __pyx_string_tab[126]
-#define __pyx_n_u_logger __pyx_string_tab[127]
-#define __pyx_n_u_logging __pyx_string_tab[128]
-#define __pyx_n_u_main __pyx_string_tab[129]
-#define __pyx_n_u_make_key __pyx_string_tab[130]
-#define __pyx_n_u_map_contains __pyx_string_tab[131]
-#define __pyx_n_u_max_background_compactions __pyx_string_tab[132]
-#define __pyx_n_u_max_background_flushes __pyx_string_tab[133]
-#define __pyx_n_u_max_write_buffer_number __pyx_string_tab[134]
-#define __pyx_n_u_module __pyx_string_tab[135]
-#define __pyx_n_u_name __pyx_string_tab[136]
-#define __pyx_n_u_namespace __pyx_string_tab[137]
-#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[138]
-#define __pyx_n_u_open __pyx_string_tab[139]
-#define __pyx_n_u_os __pyx_string_tab[140]
-#define __pyx_n_u_perf_counter __pyx_string_tab[141]
-#define __pyx_n_u_pickle __pyx_string_tab[142]
-#define __pyx_n_u_pop __pyx_string_tab[143]
-#define __pyx_n_u_put __pyx_string_tab[144]
-#define __pyx_n_u_put_to_map __pyx_string_tab[145]
-#define __pyx_n_u_put_value __pyx_string_tab[146]
-#define __pyx_n_u_pyx_state __pyx_string_tab[147]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[148]
-#define __pyx_n_u_qualname __pyx_string_tab[149]
-#define __pyx_n_u_reduce __pyx_string_tab[150]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[151]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[152]
-#define __pyx_n_u_remove __pyx_string_tab[153]
-#define __pyx_n_u_remove_from_list __pyx_string_tab[154]
-#define __pyx_n_u_remove_from_map __pyx_string_tab[155]
-#define __pyx_n_u_restore_all_states __pyx_string_tab[156]
-#define __pyx_n_u_rocksdb __pyx_string_tab[157]
-#define __pyx_n_u_sabot__cython_state_rocksdb_stat __pyx_string_tab[158]
-#define __pyx_kp_u_sabot__cython_state_rocksdb_stat_2 __pyx_string_tab[159]
-#define __pyx_kp_u_sabot_rocksdb_state __pyx_string_tab[160]
-#define __pyx_n_u_self __pyx_string_tab[161]
-#define __pyx_n_u_set_name __pyx_string_tab[162]
-#define __pyx_n_u_setstate __pyx_string_tab[163]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[164]
-#define __pyx_n_u_snapshot __pyx_string_tab[165]
-#define __pyx_n_u_snapshot_all_states __pyx_string_tab[166]
-#define __pyx_n_u_spec __pyx_string_tab[167]
-#define __pyx_n_u_sqlite3 __pyx_string_tab[168]
-#define __pyx_n_u_state_name __pyx_string_tab[169]
-#define __pyx_kp_u_stringsource __pyx_string_tab[170]
-#define __pyx_n_u_sys __pyx_string_tab[171]
-#define __pyx_n_u_target_file_size_base __pyx_string_tab[172]
-#define __pyx_n_u_test __pyx_string_tab[173]
-#define __pyx_n_u_threading __pyx_string_tab[174]
-#define __pyx_n_u_time __pyx_string_tab[175]
-#define __pyx_kp_u_utf_8 __pyx_string_tab[176]
-#define __pyx_n_u_value __pyx_string_tab[177]
-#define __pyx_n_u_values __pyx_string_tab[178]
-#define __pyx_n_u_warning __pyx_string_tab[179]
-#define __pyx_n_u_write_buffer_size __pyx_string_tab[180]
+#define __pyx_kp_u_CyRocks_RocksDB_library_loaded_s __pyx_string_tab[2]
+#define __pyx_kp_u_CyRocks_RocksDB_library_not_avai __pyx_string_tab[3]
+#define __pyx_kp_u_CyRocks_RocksDB_state_backend_op __pyx_string_tab[4]
+#define __pyx_kp_u_DELETE_FROM_kv_store_WHERE_key __pyx_string_tab[5]
+#define __pyx_kp_u_Database_backend_not_open __pyx_string_tab[6]
+#define __pyx_kp_u_Database_open_failed __pyx_string_tab[7]
+#define __pyx_kp_u_Error_closing_database __pyx_string_tab[8]
+#define __pyx_kp_u_Failed_to_clear_value_for_state __pyx_string_tab[9]
+#define __pyx_kp_u_Failed_to_get_value_for_state __pyx_string_tab[10]
+#define __pyx_kp_u_Failed_to_open_database __pyx_string_tab[11]
+#define __pyx_kp_u_Failed_to_put_value_for_state __pyx_string_tab[12]
+#define __pyx_kp_u_Flush_failed __pyx_string_tab[13]
+#define __pyx_kp_u_INSERT_OR_REPLACE_INTO_kv_store __pyx_string_tab[14]
+#define __pyx_n_u_ImportError __pyx_string_tab[15]
+#define __pyx_n_u_Lock __pyx_string_tab[16]
+#define __pyx_kp_u_No_database_backend_available __pyx_string_tab[17]
+#define __pyx_kp_u_None __pyx_string_tab[18]
+#define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[19]
+#define __pyx_n_u_ROCKSDB_AVAILABLE __pyx_string_tab[20]
+#define __pyx_n_u_RocksDBStateBackend __pyx_string_tab[21]
+#define __pyx_n_u_RocksDBStateBackend___reduce_cyt __pyx_string_tab[22]
+#define __pyx_n_u_RocksDBStateBackend___setstate_c __pyx_string_tab[23]
+#define __pyx_n_u_RocksDBStateBackend__make_key __pyx_string_tab[24]
+#define __pyx_n_u_RocksDBStateBackend_add_to_aggre __pyx_string_tab[25]
+#define __pyx_n_u_RocksDBStateBackend_add_to_list __pyx_string_tab[26]
+#define __pyx_n_u_RocksDBStateBackend_add_to_reduc __pyx_string_tab[27]
+#define __pyx_n_u_RocksDBStateBackend_clear_aggreg __pyx_string_tab[28]
+#define __pyx_n_u_RocksDBStateBackend_clear_all_st __pyx_string_tab[29]
+#define __pyx_n_u_RocksDBStateBackend_clear_list __pyx_string_tab[30]
+#define __pyx_n_u_RocksDBStateBackend_clear_map __pyx_string_tab[31]
+#define __pyx_n_u_RocksDBStateBackend_clear_reduci __pyx_string_tab[32]
+#define __pyx_n_u_RocksDBStateBackend_clear_value __pyx_string_tab[33]
+#define __pyx_n_u_RocksDBStateBackend_close __pyx_string_tab[34]
+#define __pyx_n_u_RocksDBStateBackend_flush __pyx_string_tab[35]
+#define __pyx_n_u_RocksDBStateBackend_get_aggregat __pyx_string_tab[36]
+#define __pyx_n_u_RocksDBStateBackend_get_from_map __pyx_string_tab[37]
+#define __pyx_n_u_RocksDBStateBackend_get_list __pyx_string_tab[38]
+#define __pyx_n_u_RocksDBStateBackend_get_map_entr __pyx_string_tab[39]
+#define __pyx_n_u_RocksDBStateBackend_get_map_keys __pyx_string_tab[40]
+#define __pyx_n_u_RocksDBStateBackend_get_map_valu __pyx_string_tab[41]
+#define __pyx_n_u_RocksDBStateBackend_get_memory_u __pyx_string_tab[42]
+#define __pyx_n_u_RocksDBStateBackend_get_reducing __pyx_string_tab[43]
+#define __pyx_n_u_RocksDBStateBackend_get_value __pyx_string_tab[44]
+#define __pyx_n_u_RocksDBStateBackend_list_contain __pyx_string_tab[45]
+#define __pyx_n_u_RocksDBStateBackend_map_contains __pyx_string_tab[46]
+#define __pyx_n_u_RocksDBStateBackend_open __pyx_string_tab[47]
+#define __pyx_n_u_RocksDBStateBackend_put_to_map __pyx_string_tab[48]
+#define __pyx_n_u_RocksDBStateBackend_put_value __pyx_string_tab[49]
+#define __pyx_n_u_RocksDBStateBackend_remove_from __pyx_string_tab[50]
+#define __pyx_n_u_RocksDBStateBackend_remove_from_2 __pyx_string_tab[51]
+#define __pyx_n_u_RocksDBStateBackend_restore_all __pyx_string_tab[52]
+#define __pyx_n_u_RocksDBStateBackend_snapshot_all __pyx_string_tab[53]
+#define __pyx_kp_u_RocksDB_state_backend_closed __pyx_string_tab[54]
+#define __pyx_n_u_RuntimeError __pyx_string_tab[55]
+#define __pyx_kp_u_SELECT_value_FROM_kv_store_WHERE __pyx_string_tab[56]
+#define __pyx_kp_u_SQLite_fallback_state_backend_cl __pyx_string_tab[57]
+#define __pyx_kp_u_SQLite_fallback_state_backend_op __pyx_string_tab[58]
+#define __pyx_n_u_TypeError __pyx_string_tab[59]
+#define __pyx_n_u_ValueError __pyx_string_tab[60]
+#define __pyx_kp_u__2 __pyx_string_tab[61]
+#define __pyx_kp_u__3 __pyx_string_tab[62]
+#define __pyx_kp_u__4 __pyx_string_tab[63]
+#define __pyx_kp_u_add_note __pyx_string_tab[64]
+#define __pyx_n_u_add_to_aggregating __pyx_string_tab[65]
+#define __pyx_n_u_add_to_list __pyx_string_tab[66]
+#define __pyx_n_u_add_to_reducing __pyx_string_tab[67]
+#define __pyx_n_u_append __pyx_string_tab[68]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[69]
+#define __pyx_n_u_check_same_thread __pyx_string_tab[70]
+#define __pyx_n_u_class_getitem __pyx_string_tab[71]
+#define __pyx_n_u_clear __pyx_string_tab[72]
+#define __pyx_n_u_clear_aggregating __pyx_string_tab[73]
+#define __pyx_n_u_clear_all_states __pyx_string_tab[74]
+#define __pyx_n_u_clear_list __pyx_string_tab[75]
+#define __pyx_n_u_clear_map __pyx_string_tab[76]
+#define __pyx_n_u_clear_reducing __pyx_string_tab[77]
+#define __pyx_n_u_clear_value __pyx_string_tab[78]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[79]
+#define __pyx_n_u_close __pyx_string_tab[80]
+#define __pyx_n_u_commit __pyx_string_tab[81]
+#define __pyx_n_u_connect __pyx_string_tab[82]
+#define __pyx_n_u_copy __pyx_string_tab[83]
+#define __pyx_n_u_create_if_missing __pyx_string_tab[84]
+#define __pyx_n_u_cyrocks __pyx_string_tab[85]
+#define __pyx_kp_u_db __pyx_string_tab[86]
+#define __pyx_n_u_db_path __pyx_string_tab[87]
+#define __pyx_n_u_default_value __pyx_string_tab[88]
+#define __pyx_n_u_delete __pyx_string_tab[89]
+#define __pyx_kp_u_disable __pyx_string_tab[90]
+#define __pyx_n_u_dumps __pyx_string_tab[91]
+#define __pyx_kp_u_enable __pyx_string_tab[92]
+#define __pyx_n_u_encode __pyx_string_tab[93]
+#define __pyx_n_u_enter __pyx_string_tab[94]
+#define __pyx_n_u_error __pyx_string_tab[95]
+#define __pyx_n_u_execute __pyx_string_tab[96]
+#define __pyx_n_u_exit __pyx_string_tab[97]
+#define __pyx_n_u_fetchone __pyx_string_tab[98]
+#define __pyx_n_u_flush __pyx_string_tab[99]
+#define __pyx_n_u_func __pyx_string_tab[100]
+#define __pyx_kp_u_gc __pyx_string_tab[101]
+#define __pyx_n_u_get __pyx_string_tab[102]
+#define __pyx_n_u_getLogger __pyx_string_tab[103]
+#define __pyx_n_u_get_aggregating __pyx_string_tab[104]
+#define __pyx_n_u_get_from_map __pyx_string_tab[105]
+#define __pyx_n_u_get_list __pyx_string_tab[106]
+#define __pyx_n_u_get_map_entries __pyx_string_tab[107]
+#define __pyx_n_u_get_map_keys __pyx_string_tab[108]
+#define __pyx_n_u_get_map_values __pyx_string_tab[109]
+#define __pyx_n_u_get_memory_usage_bytes __pyx_string_tab[110]
+#define __pyx_n_u_get_reducing __pyx_string_tab[111]
+#define __pyx_n_u_get_value __pyx_string_tab[112]
+#define __pyx_n_u_get_value_hit __pyx_string_tab[113]
+#define __pyx_n_u_get_value_miss __pyx_string_tab[114]
+#define __pyx_n_u_getstate __pyx_string_tab[115]
+#define __pyx_n_u_info __pyx_string_tab[116]
+#define __pyx_n_u_initializing __pyx_string_tab[117]
+#define __pyx_n_u_input_value __pyx_string_tab[118]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[119]
+#define __pyx_kp_u_isenabled __pyx_string_tab[120]
+#define __pyx_n_u_items __pyx_string_tab[121]
+#define __pyx_n_u_key __pyx_string_tab[122]
+#define __pyx_n_u_keys __pyx_string_tab[123]
+#define __pyx_n_u_list_contains __pyx_string_tab[124]
+#define __pyx_n_u_loads __pyx_string_tab[125]
+#define __pyx_n_u_logger __pyx_string_tab[126]
+#define __pyx_n_u_logging __pyx_string_tab[127]
+#define __pyx_n_u_main __pyx_string_tab[128]
+#define __pyx_n_u_make_key __pyx_string_tab[129]
+#define __pyx_n_u_map_contains __pyx_string_tab[130]
+#define __pyx_n_u_max_background_compactions __pyx_string_tab[131]
+#define __pyx_n_u_max_background_flushes __pyx_string_tab[132]
+#define __pyx_n_u_max_write_buffer_number __pyx_string_tab[133]
+#define __pyx_n_u_module __pyx_string_tab[134]
+#define __pyx_n_u_name __pyx_string_tab[135]
+#define __pyx_n_u_namespace __pyx_string_tab[136]
+#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[137]
+#define __pyx_n_u_open __pyx_string_tab[138]
+#define __pyx_n_u_os __pyx_string_tab[139]
+#define __pyx_n_u_perf_counter __pyx_string_tab[140]
+#define __pyx_n_u_pickle __pyx_string_tab[141]
+#define __pyx_n_u_pop __pyx_string_tab[142]
+#define __pyx_n_u_put __pyx_string_tab[143]
+#define __pyx_n_u_put_to_map __pyx_string_tab[144]
+#define __pyx_n_u_put_value __pyx_string_tab[145]
+#define __pyx_n_u_pyx_state __pyx_string_tab[146]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[147]
+#define __pyx_n_u_qualname __pyx_string_tab[148]
+#define __pyx_n_u_reduce __pyx_string_tab[149]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[150]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[151]
+#define __pyx_n_u_remove __pyx_string_tab[152]
+#define __pyx_n_u_remove_from_list __pyx_string_tab[153]
+#define __pyx_n_u_remove_from_map __pyx_string_tab[154]
+#define __pyx_n_u_restore_all_states __pyx_string_tab[155]
+#define __pyx_n_u_sabot__cython_state_rocksdb_stat __pyx_string_tab[156]
+#define __pyx_kp_u_sabot__cython_state_rocksdb_stat_2 __pyx_string_tab[157]
+#define __pyx_kp_u_sabot_rocksdb_state __pyx_string_tab[158]
+#define __pyx_n_u_self __pyx_string_tab[159]
+#define __pyx_n_u_set_name __pyx_string_tab[160]
+#define __pyx_n_u_setstate __pyx_string_tab[161]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[162]
+#define __pyx_n_u_snapshot __pyx_string_tab[163]
+#define __pyx_n_u_snapshot_all_states __pyx_string_tab[164]
+#define __pyx_n_u_spec __pyx_string_tab[165]
+#define __pyx_n_u_sqlite3 __pyx_string_tab[166]
+#define __pyx_n_u_state_name __pyx_string_tab[167]
+#define __pyx_kp_u_stringsource __pyx_string_tab[168]
+#define __pyx_n_u_sys __pyx_string_tab[169]
+#define __pyx_n_u_target_file_size_base __pyx_string_tab[170]
+#define __pyx_n_u_test __pyx_string_tab[171]
+#define __pyx_n_u_threading __pyx_string_tab[172]
+#define __pyx_n_u_time __pyx_string_tab[173]
+#define __pyx_kp_u_utf_8 __pyx_string_tab[174]
+#define __pyx_n_u_value __pyx_string_tab[175]
+#define __pyx_n_u_values __pyx_string_tab[176]
+#define __pyx_n_u_warning __pyx_string_tab[177]
+#define __pyx_n_u_write_buffer_size __pyx_string_tab[178]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -3413,11 +3447,13 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   __Pyx_State_RemoveModule(NULL);
   #endif
   Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_5state_13state_backend_StateBackend);
+  Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_7cyrocks_CyOptions);
+  Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_7cyrocks_CyDB);
   Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_5state_13rocksdb_state_RocksDBStateBackend);
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_5state_13rocksdb_state_RocksDBStateBackend);
   for (int i=0; i<2; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
   for (int i=0; i<32; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<181; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<179; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   Py_CLEAR(clear_module_state->__pyx_int_0);
   Py_CLEAR(clear_module_state->__pyx_int_2);
   Py_CLEAR(clear_module_state->__pyx_int_3);
@@ -3445,11 +3481,13 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_FusedFunctionType);
   #endif
   Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_5state_13state_backend_StateBackend);
+  Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_7cyrocks_CyOptions);
+  Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_7cyrocks_CyDB);
   Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_5state_13rocksdb_state_RocksDBStateBackend);
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_5state_13rocksdb_state_RocksDBStateBackend);
   for (int i=0; i<2; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
   for (int i=0; i<32; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<181; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<179; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_2);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_3);
@@ -4039,7 +4077,7 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
  * 
  *         try:             # <<<<<<<<<<<<<<
  *             if ROCKSDB_AVAILABLE:
- *                 # Use RocksDB
+ *                 # Use CyRocks (RocksDB)
 */
   {
     __Pyx_PyThreadState_declare
@@ -4054,7 +4092,7 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
  * 
  *         try:
  *             if ROCKSDB_AVAILABLE:             # <<<<<<<<<<<<<<
- *                 # Use RocksDB
+ *                 # Use CyRocks (RocksDB)
  *                 # Configure RocksDB options for optimal performance
 */
       __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_ROCKSDB_AVAILABLE); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 60, __pyx_L4_error)
@@ -4064,44 +4102,30 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
       if (__pyx_t_9) {
 
         /* "sabot/_cython/state/rocksdb_state.pyx":63
- *                 # Use RocksDB
+ *                 # Use CyRocks (RocksDB)
  *                 # Configure RocksDB options for optimal performance
- *                 opts = rocksdb.Options()             # <<<<<<<<<<<<<<
+ *                 opts = cyrocks.CyOptions()             # <<<<<<<<<<<<<<
  *                 opts.create_if_missing = True
  *                 opts.write_buffer_size = 64 * 1024 * 1024  # 64MB write buffer
 */
         __pyx_t_2 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_rocksdb); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 63, __pyx_L4_error)
-        __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_Options); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 63, __pyx_L4_error)
-        __Pyx_GOTREF(__pyx_t_3);
-        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7cyrocks_CyOptions);
+        __pyx_t_4 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7cyrocks_CyOptions); 
         __pyx_t_5 = 1;
-        #if CYTHON_UNPACK_METHODS
-        if (unlikely(PyMethod_Check(__pyx_t_3))) {
-          __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-          assert(__pyx_t_2);
-          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
-          __Pyx_INCREF(__pyx_t_2);
-          __Pyx_INCREF(__pyx__function);
-          __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
-          __pyx_t_5 = 0;
-        }
-        #endif
         {
           PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
-          __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 63, __pyx_L4_error)
-          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_GOTREF((PyObject *)__pyx_t_1);
         }
-        __pyx_v_opts = __pyx_t_1;
+        __pyx_v_opts = ((PyObject *)__pyx_t_1);
         __pyx_t_1 = 0;
 
         /* "sabot/_cython/state/rocksdb_state.pyx":64
  *                 # Configure RocksDB options for optimal performance
- *                 opts = rocksdb.Options()
+ *                 opts = cyrocks.CyOptions()
  *                 opts.create_if_missing = True             # <<<<<<<<<<<<<<
  *                 opts.write_buffer_size = 64 * 1024 * 1024  # 64MB write buffer
  *                 opts.max_write_buffer_number = 3
@@ -4109,7 +4133,7 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
         if (__Pyx_PyObject_SetAttrStr(__pyx_v_opts, __pyx_mstate_global->__pyx_n_u_create_if_missing, Py_True) < 0) __PYX_ERR(0, 64, __pyx_L4_error)
 
         /* "sabot/_cython/state/rocksdb_state.pyx":65
- *                 opts = rocksdb.Options()
+ *                 opts = cyrocks.CyOptions()
  *                 opts.create_if_missing = True
  *                 opts.write_buffer_size = 64 * 1024 * 1024  # 64MB write buffer             # <<<<<<<<<<<<<<
  *                 opts.max_write_buffer_number = 3
@@ -4156,78 +4180,64 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
         /* "sabot/_cython/state/rocksdb_state.pyx":72
  * 
  *                 # Open database
- *                 self._db = rocksdb.DB(self._db_path, opts)             # <<<<<<<<<<<<<<
- *                 logger.info(f"RocksDB state backend opened at {self._db_path}")
+ *                 self._db = cyrocks.CyDB(self._db_path, opts)             # <<<<<<<<<<<<<<
+ *                 logger.info(f"CyRocks (RocksDB) state backend opened at {self._db_path}")
  *             else:
 */
-        __pyx_t_3 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_rocksdb); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 72, __pyx_L4_error)
-        __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_DB); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 72, __pyx_L4_error)
-        __Pyx_GOTREF(__pyx_t_4);
-        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __pyx_t_4 = NULL;
+        __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7cyrocks_CyDB);
+        __pyx_t_2 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7cyrocks_CyDB); 
         __pyx_t_5 = 1;
-        #if CYTHON_UNPACK_METHODS
-        if (unlikely(PyMethod_Check(__pyx_t_4))) {
-          __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
-          assert(__pyx_t_3);
-          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
-          __Pyx_INCREF(__pyx_t_3);
-          __Pyx_INCREF(__pyx__function);
-          __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
-          __pyx_t_5 = 0;
-        }
-        #endif
         {
-          PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_v_self->_db_path, __pyx_v_opts};
-          __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          PyObject *__pyx_callargs[3] = {__pyx_t_4, __pyx_v_self->_db_path, __pyx_v_opts};
+          __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 72, __pyx_L4_error)
-          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_GOTREF((PyObject *)__pyx_t_1);
         }
-        __Pyx_GIVEREF(__pyx_t_1);
+        __Pyx_GIVEREF((PyObject *)__pyx_t_1);
         __Pyx_GOTREF(__pyx_v_self->_db);
         __Pyx_DECREF(__pyx_v_self->_db);
-        __pyx_v_self->_db = __pyx_t_1;
+        __pyx_v_self->_db = ((PyObject *)__pyx_t_1);
         __pyx_t_1 = 0;
 
         /* "sabot/_cython/state/rocksdb_state.pyx":73
  *                 # Open database
- *                 self._db = rocksdb.DB(self._db_path, opts)
- *                 logger.info(f"RocksDB state backend opened at {self._db_path}")             # <<<<<<<<<<<<<<
+ *                 self._db = cyrocks.CyDB(self._db_path, opts)
+ *                 logger.info(f"CyRocks (RocksDB) state backend opened at {self._db_path}")             # <<<<<<<<<<<<<<
  *             else:
  *                 # Use SQLite fallback
 */
-        __pyx_t_4 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 73, __pyx_L4_error)
+        __pyx_t_2 = NULL;
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 73, __pyx_L4_error)
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 73, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L4_error)
-        __Pyx_GOTREF(__pyx_t_2);
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyUnicode_Unicode(__pyx_v_self->_db_path); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 73, __pyx_L4_error)
-        __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_10 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_RocksDB_state_backend_opened_at, __pyx_t_3); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 73, __pyx_L4_error)
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __pyx_t_4 = __Pyx_PyUnicode_Unicode(__pyx_v_self->_db_path); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 73, __pyx_L4_error)
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_10 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_CyRocks_RocksDB_state_backend_op, __pyx_t_4); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 73, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_10);
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_t_5 = 1;
         #if CYTHON_UNPACK_METHODS
-        if (unlikely(PyMethod_Check(__pyx_t_2))) {
-          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-          assert(__pyx_t_4);
-          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_2);
-          __Pyx_INCREF(__pyx_t_4);
+        if (unlikely(PyMethod_Check(__pyx_t_3))) {
+          __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+          assert(__pyx_t_2);
+          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
+          __Pyx_INCREF(__pyx_t_2);
           __Pyx_INCREF(__pyx__function);
-          __Pyx_DECREF_SET(__pyx_t_2, __pyx__function);
+          __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
           __pyx_t_5 = 0;
         }
         #endif
         {
-          PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_t_10};
-          __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-          __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+          PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_t_10};
+          __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_1);
         }
@@ -4237,7 +4247,7 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
  * 
  *         try:
  *             if ROCKSDB_AVAILABLE:             # <<<<<<<<<<<<<<
- *                 # Use RocksDB
+ *                 # Use CyRocks (RocksDB)
  *                 # Configure RocksDB options for optimal performance
 */
         goto __pyx_L10;
@@ -4253,11 +4263,11 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
       /*else*/ {
         __pyx_t_1 = __Pyx_PyUnicode_Unicode(__pyx_v_self->_db_path); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_2 = __Pyx_PyUnicode_ConcatInPlace(__pyx_t_1, __pyx_mstate_global->__pyx_kp_u_db); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L4_error)
-        __Pyx_GOTREF(__pyx_t_2);
+        __pyx_t_3 = __Pyx_PyUnicode_ConcatInPlace(__pyx_t_1, __pyx_mstate_global->__pyx_kp_u_db); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 76, __pyx_L4_error)
+        __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_v_db_file = ((PyObject*)__pyx_t_2);
-        __pyx_t_2 = 0;
+        __pyx_v_db_file = ((PyObject*)__pyx_t_3);
+        __pyx_t_3 = 0;
 
         /* "sabot/_cython/state/rocksdb_state.pyx":77
  *                 # Use SQLite fallback
@@ -4269,18 +4279,18 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
         __pyx_t_1 = NULL;
         __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_sqlite3); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 77, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_10);
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_connect); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 77, __pyx_L4_error)
-        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_connect); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L4_error)
+        __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
         __pyx_t_5 = 1;
         #if CYTHON_UNPACK_METHODS
-        if (unlikely(PyMethod_Check(__pyx_t_4))) {
-          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+        if (unlikely(PyMethod_Check(__pyx_t_2))) {
+          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
           assert(__pyx_t_1);
-          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_2);
           __Pyx_INCREF(__pyx_t_1);
           __Pyx_INCREF(__pyx__function);
-          __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
+          __Pyx_DECREF_SET(__pyx_t_2, __pyx__function);
           __pyx_t_5 = 0;
         }
         #endif
@@ -4289,18 +4299,18 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
           __pyx_t_10 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 77, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_10);
           if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_check_same_thread, Py_False, __pyx_t_10, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 77, __pyx_L4_error)
-          __pyx_t_2 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_10);
+          __pyx_t_3 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_2, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_10);
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L4_error)
-          __Pyx_GOTREF(__pyx_t_2);
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 77, __pyx_L4_error)
+          __Pyx_GOTREF(__pyx_t_3);
         }
-        __Pyx_GIVEREF(__pyx_t_2);
+        __Pyx_GIVEREF(__pyx_t_3);
         __Pyx_GOTREF(__pyx_v_self->_fallback_conn);
         __Pyx_DECREF(__pyx_v_self->_fallback_conn);
-        __pyx_v_self->_fallback_conn = __pyx_t_2;
-        __pyx_t_2 = 0;
+        __pyx_v_self->_fallback_conn = __pyx_t_3;
+        __pyx_t_3 = 0;
 
         /* "sabot/_cython/state/rocksdb_state.pyx":78
  *                 db_file = f"{self._db_path}.db"
@@ -4309,17 +4319,17 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
  *                     CREATE TABLE IF NOT EXISTS kv_store (
  *                         key TEXT PRIMARY KEY,
 */
-        __pyx_t_4 = __pyx_v_self->_fallback_conn;
-        __Pyx_INCREF(__pyx_t_4);
+        __pyx_t_2 = __pyx_v_self->_fallback_conn;
+        __Pyx_INCREF(__pyx_t_2);
         __pyx_t_5 = 0;
         {
-          PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_mstate_global->__pyx_kp_u_CREATE_TABLE_IF_NOT_EXISTS_kv_s};
-          __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_execute, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-          __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 78, __pyx_L4_error)
-          __Pyx_GOTREF(__pyx_t_2);
+          PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_mstate_global->__pyx_kp_u_CREATE_TABLE_IF_NOT_EXISTS_kv_s};
+          __pyx_t_3 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_execute, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 78, __pyx_L4_error)
+          __Pyx_GOTREF(__pyx_t_3);
         }
-        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
         /* "sabot/_cython/state/rocksdb_state.pyx":84
  *                     )
@@ -4328,17 +4338,17 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
  *                 logger.info(f"SQLite fallback state backend opened at {db_file}")
  * 
 */
-        __pyx_t_4 = __pyx_v_self->_fallback_conn;
-        __Pyx_INCREF(__pyx_t_4);
+        __pyx_t_2 = __pyx_v_self->_fallback_conn;
+        __Pyx_INCREF(__pyx_t_2);
         __pyx_t_5 = 0;
         {
-          PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
-          __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_commit, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-          __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 84, __pyx_L4_error)
-          __Pyx_GOTREF(__pyx_t_2);
+          PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
+          __pyx_t_3 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_commit, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 84, __pyx_L4_error)
+          __Pyx_GOTREF(__pyx_t_3);
         }
-        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
         /* "sabot/_cython/state/rocksdb_state.pyx":85
  *                 """)
@@ -4347,7 +4357,7 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
  * 
  *             self._is_open = True
 */
-        __pyx_t_4 = NULL;
+        __pyx_t_2 = NULL;
         __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 85, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_10);
         __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 85, __pyx_L4_error)
@@ -4358,25 +4368,25 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
         __pyx_t_5 = 1;
         #if CYTHON_UNPACK_METHODS
         if (unlikely(PyMethod_Check(__pyx_t_1))) {
-          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_1);
-          assert(__pyx_t_4);
+          __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
+          assert(__pyx_t_2);
           PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_1);
-          __Pyx_INCREF(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_2);
           __Pyx_INCREF(__pyx__function);
           __Pyx_DECREF_SET(__pyx_t_1, __pyx__function);
           __pyx_t_5 = 0;
         }
         #endif
         {
-          PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_t_10};
-          __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-          __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+          PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_t_10};
+          __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 85, __pyx_L4_error)
-          __Pyx_GOTREF(__pyx_t_2);
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 85, __pyx_L4_error)
+          __Pyx_GOTREF(__pyx_t_3);
         }
-        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       }
       __pyx_L10:;
 
@@ -4394,7 +4404,7 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
  * 
  *         try:             # <<<<<<<<<<<<<<
  *             if ROCKSDB_AVAILABLE:
- *                 # Use RocksDB
+ *                 # Use CyRocks (RocksDB)
 */
     }
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -4418,8 +4428,8 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
     __pyx_t_11 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_11) {
       __Pyx_AddTraceback("sabot._cython.state.rocksdb_state.RocksDBStateBackend.open", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_10) < 0) __PYX_ERR(0, 89, __pyx_L6_except_error)
-      __Pyx_XGOTREF(__pyx_t_2);
+      if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_1, &__pyx_t_10) < 0) __PYX_ERR(0, 89, __pyx_L6_except_error)
+      __Pyx_XGOTREF(__pyx_t_3);
       __Pyx_XGOTREF(__pyx_t_1);
       __Pyx_XGOTREF(__pyx_t_10);
       __Pyx_INCREF(__pyx_t_1);
@@ -4433,7 +4443,7 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
  *             raise RuntimeError(f"Database open failed: {e}")
  * 
 */
-        __pyx_t_3 = NULL;
+        __pyx_t_4 = NULL;
         __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 90, __pyx_L16_error)
         __Pyx_GOTREF(__pyx_t_12);
         __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 90, __pyx_L16_error)
@@ -4447,25 +4457,25 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
         __pyx_t_5 = 1;
         #if CYTHON_UNPACK_METHODS
         if (unlikely(PyMethod_Check(__pyx_t_13))) {
-          __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_13);
-          assert(__pyx_t_3);
+          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_13);
+          assert(__pyx_t_4);
           PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_13);
-          __Pyx_INCREF(__pyx_t_3);
+          __Pyx_INCREF(__pyx_t_4);
           __Pyx_INCREF(__pyx__function);
           __Pyx_DECREF_SET(__pyx_t_13, __pyx__function);
           __pyx_t_5 = 0;
         }
         #endif
         {
-          PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_t_14};
-          __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_13, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+          PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_t_14};
+          __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_13, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 90, __pyx_L16_error)
-          __Pyx_GOTREF(__pyx_t_4);
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 90, __pyx_L16_error)
+          __Pyx_GOTREF(__pyx_t_2);
         }
-        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
         /* "sabot/_cython/state/rocksdb_state.pyx":91
  *         except Exception as e:
@@ -4477,23 +4487,23 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
         __pyx_t_13 = NULL;
         __Pyx_INCREF(__pyx_builtin_RuntimeError);
         __pyx_t_14 = __pyx_builtin_RuntimeError; 
-        __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 91, __pyx_L16_error)
-        __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Database_open_failed, __pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 91, __pyx_L16_error)
+        __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 91, __pyx_L16_error)
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Database_open_failed, __pyx_t_4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 91, __pyx_L16_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_t_5 = 1;
         {
           PyObject *__pyx_callargs[2] = {__pyx_t_13, __pyx_t_12};
-          __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 91, __pyx_L16_error)
-          __Pyx_GOTREF(__pyx_t_4);
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 91, __pyx_L16_error)
+          __Pyx_GOTREF(__pyx_t_2);
         }
-        __Pyx_Raise(__pyx_t_4, 0, 0, 0);
-        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __PYX_ERR(0, 91, __pyx_L16_error)
       }
 
@@ -4513,7 +4523,7 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
           __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
           __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
           __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
            __Pyx_ExceptionSwap(&__pyx_t_20, &__pyx_t_21, &__pyx_t_22);
           if ( unlikely(__Pyx_GetException(&__pyx_t_17, &__pyx_t_18, &__pyx_t_19) < 0)) __Pyx_ErrFetch(&__pyx_t_17, &__pyx_t_18, &__pyx_t_19);
@@ -4548,7 +4558,7 @@ static void __pyx_f_5sabot_7_cython_5state_13rocksdb_state_19RocksDBStateBackend
  * 
  *         try:             # <<<<<<<<<<<<<<
  *             if ROCKSDB_AVAILABLE:
- *                 # Use RocksDB
+ *                 # Use CyRocks (RocksDB)
 */
     __pyx_L6_except_error:;
     __Pyx_XGIVEREF(__pyx_t_6);
@@ -16132,10 +16142,39 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
 static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   __Pyx_RefNannyDeclarations
   CYTHON_UNUSED_VAR(__pyx_mstate);
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_import_code", 0);
   /*--- Type import code ---*/
+  __pyx_t_1 = PyImport_ImportModule("sabot._cython.cyrocks"); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 10, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_7cyrocks_CyOptions = __Pyx_ImportType_3_1_4(__pyx_t_1, "sabot._cython.cyrocks", "CyOptions",
+  #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
+  sizeof(struct __pyx_obj_5sabot_7_cython_7cyrocks_CyOptions), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7cyrocks_CyOptions),
+  #elif CYTHON_COMPILING_IN_LIMITED_API
+  sizeof(struct __pyx_obj_5sabot_7_cython_7cyrocks_CyOptions), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7cyrocks_CyOptions),
+  #else
+  sizeof(struct __pyx_obj_5sabot_7_cython_7cyrocks_CyOptions), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7cyrocks_CyOptions),
+  #endif
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7cyrocks_CyOptions) __PYX_ERR(2, 10, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_7cyrocks_CyDB = __Pyx_ImportType_3_1_4(__pyx_t_1, "sabot._cython.cyrocks", "CyDB",
+  #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
+  sizeof(struct __pyx_obj_5sabot_7_cython_7cyrocks_CyDB), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7cyrocks_CyDB),
+  #elif CYTHON_COMPILING_IN_LIMITED_API
+  sizeof(struct __pyx_obj_5sabot_7_cython_7cyrocks_CyDB), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7cyrocks_CyDB),
+  #else
+  sizeof(struct __pyx_obj_5sabot_7_cython_7cyrocks_CyDB), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7cyrocks_CyDB),
+  #endif
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7cyrocks_CyDB) __PYX_ERR(2, 13, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_RefNannyFinishContext();
+  return -1;
 }
 
 static int __Pyx_modinit_variable_import_code(__pyx_mstatetype *__pyx_mstate) {
@@ -16443,7 +16482,7 @@ __Pyx_RefNannySetupContext("PyInit_rocksdb_state", 0);
   (void)__Pyx_modinit_variable_export_code(__pyx_mstate);
   (void)__Pyx_modinit_function_export_code(__pyx_mstate);
   if (unlikely((__Pyx_modinit_type_init_code(__pyx_mstate) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
-  (void)__Pyx_modinit_type_import_code(__pyx_mstate);
+  if (unlikely((__Pyx_modinit_type_import_code(__pyx_mstate) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
   (void)__Pyx_modinit_variable_import_code(__pyx_mstate);
   (void)__Pyx_modinit_function_import_code(__pyx_mstate);
   /*--- Execution code ---*/
@@ -16513,7 +16552,7 @@ __Pyx_RefNannySetupContext("PyInit_rocksdb_state", 0);
  * 
  * logger = logging.getLogger(__name__)             # <<<<<<<<<<<<<<
  * 
- * # Try to import rocksdb - use fallback if not available
+ * # Try to import cyrocks - use fallback if not available
 */
   __pyx_t_3 = NULL;
   __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logging); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 17, __pyx_L1_error)
@@ -16538,9 +16577,9 @@ __Pyx_RefNannySetupContext("PyInit_rocksdb_state", 0);
 
   /* "sabot/_cython/state/rocksdb_state.pyx":20
  * 
- * # Try to import rocksdb - use fallback if not available
+ * # Try to import cyrocks - use fallback if not available
  * try:             # <<<<<<<<<<<<<<
- *     import rocksdb
+ *     from .. cimport cyrocks
  *     ROCKSDB_AVAILABLE = True
 */
   {
@@ -16552,31 +16591,19 @@ __Pyx_RefNannySetupContext("PyInit_rocksdb_state", 0);
     __Pyx_XGOTREF(__pyx_t_8);
     /*try:*/ {
 
-      /* "sabot/_cython/state/rocksdb_state.pyx":21
- * # Try to import rocksdb - use fallback if not available
- * try:
- *     import rocksdb             # <<<<<<<<<<<<<<
- *     ROCKSDB_AVAILABLE = True
- *     logger.info("RocksDB library loaded successfully")
-*/
-      __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_rocksdb, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L2_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_rocksdb, __pyx_t_2) < 0) __PYX_ERR(0, 21, __pyx_L2_error)
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
       /* "sabot/_cython/state/rocksdb_state.pyx":22
  * try:
- *     import rocksdb
+ *     from .. cimport cyrocks
  *     ROCKSDB_AVAILABLE = True             # <<<<<<<<<<<<<<
- *     logger.info("RocksDB library loaded successfully")
+ *     logger.info("CyRocks (RocksDB) library loaded successfully")
  * except ImportError:
 */
       if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_ROCKSDB_AVAILABLE, Py_True) < 0) __PYX_ERR(0, 22, __pyx_L2_error)
 
       /* "sabot/_cython/state/rocksdb_state.pyx":23
- *     import rocksdb
+ *     from .. cimport cyrocks
  *     ROCKSDB_AVAILABLE = True
- *     logger.info("RocksDB library loaded successfully")             # <<<<<<<<<<<<<<
+ *     logger.info("CyRocks (RocksDB) library loaded successfully")             # <<<<<<<<<<<<<<
  * except ImportError:
  *     ROCKSDB_AVAILABLE = False
 */
@@ -16588,7 +16615,7 @@ __Pyx_RefNannySetupContext("PyInit_rocksdb_state", 0);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_t_6 = 1;
       {
-        PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_mstate_global->__pyx_kp_u_RocksDB_library_loaded_successfu};
+        PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_mstate_global->__pyx_kp_u_CyRocks_RocksDB_library_loaded_s};
         __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -16599,9 +16626,9 @@ __Pyx_RefNannySetupContext("PyInit_rocksdb_state", 0);
 
       /* "sabot/_cython/state/rocksdb_state.pyx":20
  * 
- * # Try to import rocksdb - use fallback if not available
+ * # Try to import cyrocks - use fallback if not available
  * try:             # <<<<<<<<<<<<<<
- *     import rocksdb
+ *     from .. cimport cyrocks
  *     ROCKSDB_AVAILABLE = True
 */
     }
@@ -16617,10 +16644,10 @@ __Pyx_RefNannySetupContext("PyInit_rocksdb_state", 0);
 
     /* "sabot/_cython/state/rocksdb_state.pyx":24
  *     ROCKSDB_AVAILABLE = True
- *     logger.info("RocksDB library loaded successfully")
+ *     logger.info("CyRocks (RocksDB) library loaded successfully")
  * except ImportError:             # <<<<<<<<<<<<<<
  *     ROCKSDB_AVAILABLE = False
- *     rocksdb = None
+ *     cyrocks = None
 */
     __pyx_t_9 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_ImportError);
     if (__pyx_t_9) {
@@ -16631,27 +16658,27 @@ __Pyx_RefNannySetupContext("PyInit_rocksdb_state", 0);
       __Pyx_XGOTREF(__pyx_t_5);
 
       /* "sabot/_cython/state/rocksdb_state.pyx":25
- *     logger.info("RocksDB library loaded successfully")
+ *     logger.info("CyRocks (RocksDB) library loaded successfully")
  * except ImportError:
  *     ROCKSDB_AVAILABLE = False             # <<<<<<<<<<<<<<
- *     rocksdb = None
- *     logger.warning("RocksDB library not available - using fallback implementation")
+ *     cyrocks = None
+ *     logger.warning("CyRocks (RocksDB) library not available - using fallback implementation")
 */
       if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_ROCKSDB_AVAILABLE, Py_False) < 0) __PYX_ERR(0, 25, __pyx_L4_except_error)
 
       /* "sabot/_cython/state/rocksdb_state.pyx":26
  * except ImportError:
  *     ROCKSDB_AVAILABLE = False
- *     rocksdb = None             # <<<<<<<<<<<<<<
- *     logger.warning("RocksDB library not available - using fallback implementation")
+ *     cyrocks = None             # <<<<<<<<<<<<<<
+ *     logger.warning("CyRocks (RocksDB) library not available - using fallback implementation")
  * 
 */
-      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_rocksdb, Py_None) < 0) __PYX_ERR(0, 26, __pyx_L4_except_error)
+      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_cyrocks, Py_None) < 0) __PYX_ERR(0, 26, __pyx_L4_except_error)
 
       /* "sabot/_cython/state/rocksdb_state.pyx":27
  *     ROCKSDB_AVAILABLE = False
- *     rocksdb = None
- *     logger.warning("RocksDB library not available - using fallback implementation")             # <<<<<<<<<<<<<<
+ *     cyrocks = None
+ *     logger.warning("CyRocks (RocksDB) library not available - using fallback implementation")             # <<<<<<<<<<<<<<
  * 
  * # Fallback implementation using sqlite3
 */
@@ -16663,7 +16690,7 @@ __Pyx_RefNannySetupContext("PyInit_rocksdb_state", 0);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __pyx_t_6 = 1;
       {
-        PyObject *__pyx_callargs[2] = {__pyx_t_10, __pyx_mstate_global->__pyx_kp_u_RocksDB_library_not_available_us};
+        PyObject *__pyx_callargs[2] = {__pyx_t_10, __pyx_mstate_global->__pyx_kp_u_CyRocks_RocksDB_library_not_avai};
         __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
@@ -16680,9 +16707,9 @@ __Pyx_RefNannySetupContext("PyInit_rocksdb_state", 0);
 
     /* "sabot/_cython/state/rocksdb_state.pyx":20
  * 
- * # Try to import rocksdb - use fallback if not available
+ * # Try to import cyrocks - use fallback if not available
  * try:             # <<<<<<<<<<<<<<
- *     import rocksdb
+ *     from .. cimport cyrocks
  *     ROCKSDB_AVAILABLE = True
 */
     __pyx_L4_except_error:;
@@ -17184,7 +17211,9 @@ static const char * const __pyx_string_tab_encodings[] = { 0 };
 static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_, sizeof(__pyx_k_), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_ */
   {__pyx_k_CREATE_TABLE_IF_NOT_EXISTS_kv_s, sizeof(__pyx_k_CREATE_TABLE_IF_NOT_EXISTS_kv_s), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_CREATE_TABLE_IF_NOT_EXISTS_kv_s */
-  {__pyx_k_DB, sizeof(__pyx_k_DB), 0, 1, 1}, /* PyObject cname: __pyx_n_u_DB */
+  {__pyx_k_CyRocks_RocksDB_library_loaded_s, sizeof(__pyx_k_CyRocks_RocksDB_library_loaded_s), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_CyRocks_RocksDB_library_loaded_s */
+  {__pyx_k_CyRocks_RocksDB_library_not_avai, sizeof(__pyx_k_CyRocks_RocksDB_library_not_avai), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_CyRocks_RocksDB_library_not_avai */
+  {__pyx_k_CyRocks_RocksDB_state_backend_op, sizeof(__pyx_k_CyRocks_RocksDB_state_backend_op), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_CyRocks_RocksDB_state_backend_op */
   {__pyx_k_DELETE_FROM_kv_store_WHERE_key, sizeof(__pyx_k_DELETE_FROM_kv_store_WHERE_key), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_DELETE_FROM_kv_store_WHERE_key */
   {__pyx_k_Database_backend_not_open, sizeof(__pyx_k_Database_backend_not_open), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Database_backend_not_open */
   {__pyx_k_Database_open_failed, sizeof(__pyx_k_Database_open_failed), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Database_open_failed */
@@ -17200,7 +17229,6 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_No_database_backend_available, sizeof(__pyx_k_No_database_backend_available), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_No_database_backend_available */
   {__pyx_k_None, sizeof(__pyx_k_None), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_None */
   {__pyx_k_Note_that_Cython_is_deliberately, sizeof(__pyx_k_Note_that_Cython_is_deliberately), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Note_that_Cython_is_deliberately */
-  {__pyx_k_Options, sizeof(__pyx_k_Options), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Options */
   {__pyx_k_ROCKSDB_AVAILABLE, sizeof(__pyx_k_ROCKSDB_AVAILABLE), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ROCKSDB_AVAILABLE */
   {__pyx_k_RocksDBStateBackend, sizeof(__pyx_k_RocksDBStateBackend), 0, 1, 1}, /* PyObject cname: __pyx_n_u_RocksDBStateBackend */
   {__pyx_k_RocksDBStateBackend___reduce_cyt, sizeof(__pyx_k_RocksDBStateBackend___reduce_cyt), 0, 1, 1}, /* PyObject cname: __pyx_n_u_RocksDBStateBackend___reduce_cyt */
@@ -17235,10 +17263,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_RocksDBStateBackend_remove_from_2, sizeof(__pyx_k_RocksDBStateBackend_remove_from_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_RocksDBStateBackend_remove_from_2 */
   {__pyx_k_RocksDBStateBackend_restore_all, sizeof(__pyx_k_RocksDBStateBackend_restore_all), 0, 1, 1}, /* PyObject cname: __pyx_n_u_RocksDBStateBackend_restore_all */
   {__pyx_k_RocksDBStateBackend_snapshot_all, sizeof(__pyx_k_RocksDBStateBackend_snapshot_all), 0, 1, 1}, /* PyObject cname: __pyx_n_u_RocksDBStateBackend_snapshot_all */
-  {__pyx_k_RocksDB_library_loaded_successfu, sizeof(__pyx_k_RocksDB_library_loaded_successfu), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_RocksDB_library_loaded_successfu */
-  {__pyx_k_RocksDB_library_not_available_us, sizeof(__pyx_k_RocksDB_library_not_available_us), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_RocksDB_library_not_available_us */
   {__pyx_k_RocksDB_state_backend_closed, sizeof(__pyx_k_RocksDB_state_backend_closed), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_RocksDB_state_backend_closed */
-  {__pyx_k_RocksDB_state_backend_opened_at, sizeof(__pyx_k_RocksDB_state_backend_opened_at), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_RocksDB_state_backend_opened_at */
   {__pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_RuntimeError */
   {__pyx_k_SELECT_value_FROM_kv_store_WHERE, sizeof(__pyx_k_SELECT_value_FROM_kv_store_WHERE), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_SELECT_value_FROM_kv_store_WHERE */
   {__pyx_k_SQLite_fallback_state_backend_cl, sizeof(__pyx_k_SQLite_fallback_state_backend_cl), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_SQLite_fallback_state_backend_cl */
@@ -17269,6 +17294,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_connect, sizeof(__pyx_k_connect), 0, 1, 1}, /* PyObject cname: __pyx_n_u_connect */
   {__pyx_k_copy, sizeof(__pyx_k_copy), 0, 1, 1}, /* PyObject cname: __pyx_n_u_copy */
   {__pyx_k_create_if_missing, sizeof(__pyx_k_create_if_missing), 0, 1, 1}, /* PyObject cname: __pyx_n_u_create_if_missing */
+  {__pyx_k_cyrocks, sizeof(__pyx_k_cyrocks), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cyrocks */
   {__pyx_k_db, sizeof(__pyx_k_db), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_db */
   {__pyx_k_db_path, sizeof(__pyx_k_db_path), 0, 1, 1}, /* PyObject cname: __pyx_n_u_db_path */
   {__pyx_k_default_value, sizeof(__pyx_k_default_value), 0, 1, 1}, /* PyObject cname: __pyx_n_u_default_value */
@@ -17339,7 +17365,6 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_remove_from_list, sizeof(__pyx_k_remove_from_list), 0, 1, 1}, /* PyObject cname: __pyx_n_u_remove_from_list */
   {__pyx_k_remove_from_map, sizeof(__pyx_k_remove_from_map), 0, 1, 1}, /* PyObject cname: __pyx_n_u_remove_from_map */
   {__pyx_k_restore_all_states, sizeof(__pyx_k_restore_all_states), 0, 1, 1}, /* PyObject cname: __pyx_n_u_restore_all_states */
-  {__pyx_k_rocksdb, sizeof(__pyx_k_rocksdb), 0, 1, 1}, /* PyObject cname: __pyx_n_u_rocksdb */
   {__pyx_k_sabot__cython_state_rocksdb_stat, sizeof(__pyx_k_sabot__cython_state_rocksdb_stat), 0, 1, 1}, /* PyObject cname: __pyx_n_u_sabot__cython_state_rocksdb_stat */
   {__pyx_k_sabot__cython_state_rocksdb_stat_2, sizeof(__pyx_k_sabot__cython_state_rocksdb_stat_2), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_sabot__cython_state_rocksdb_stat_2 */
   {__pyx_k_sabot_rocksdb_state, sizeof(__pyx_k_sabot_rocksdb_state), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_sabot_rocksdb_state */
@@ -17457,9 +17482,9 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 54, 225};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 54, 222};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_state_rocksdb_stat_2, __pyx_mstate->__pyx_n_u_open, __pyx_k_A_4q_q_wha_31_q_7q_2_a_G7_Qd_Q_e, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_state_rocksdb_stat_2, __pyx_mstate->__pyx_n_u_open, __pyx_k_A_4q_q_j_31_q_7q_2_a_N_q_Kq_e1B, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 93, 113};
