@@ -16,15 +16,15 @@ from .state_backend cimport StateBackend
 
 logger = logging.getLogger(__name__)
 
-# Try to import rocksdb - use fallback if not available
+# Try to import cyrocks - use fallback if not available
 try:
-    import rocksdb
+    from .. cimport cyrocks
     ROCKSDB_AVAILABLE = True
-    logger.info("RocksDB library loaded successfully")
+    logger.info("CyRocks (RocksDB) library loaded successfully")
 except ImportError:
     ROCKSDB_AVAILABLE = False
-    rocksdb = None
-    logger.warning("RocksDB library not available - using fallback implementation")
+    cyrocks = None
+    logger.warning("CyRocks (RocksDB) library not available - using fallback implementation")
 
 # Fallback implementation using sqlite3
 import sqlite3
@@ -58,9 +58,9 @@ cdef class RocksDBStateBackend(StateBackend):
 
         try:
             if ROCKSDB_AVAILABLE:
-                # Use RocksDB
+                # Use CyRocks (RocksDB)
                 # Configure RocksDB options for optimal performance
-                opts = rocksdb.Options()
+                opts = cyrocks.CyOptions()
                 opts.create_if_missing = True
                 opts.write_buffer_size = 64 * 1024 * 1024  # 64MB write buffer
                 opts.max_write_buffer_number = 3
@@ -69,8 +69,8 @@ cdef class RocksDBStateBackend(StateBackend):
                 opts.max_background_flushes = 2
 
                 # Open database
-                self._db = rocksdb.DB(self._db_path, opts)
-                logger.info(f"RocksDB state backend opened at {self._db_path}")
+                self._db = cyrocks.CyDB(self._db_path, opts)
+                logger.info(f"CyRocks (RocksDB) state backend opened at {self._db_path}")
             else:
                 # Use SQLite fallback
                 db_file = f"{self._db_path}.db"
