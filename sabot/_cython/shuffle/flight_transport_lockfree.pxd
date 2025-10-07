@@ -28,7 +28,22 @@ from pyarrow.includes.libarrow_flight cimport (
     CFlightServerOptions,
     CFlightDataStream,
     CServerCallContext,
+    CFlightDescriptor,
+    CFlightInfo,
+    CFlightMessageReader,
+    CFlightMetadataWriter,
+    CFlightStreamReader,
 )
+
+# Import Arrow C++ types for Flight implementation
+from pyarrow.includes.libarrow cimport (
+    CStatus,
+    CResult,
+    CTable,
+    CRecordBatchReader,
+)
+
+from libcpp.string cimport string as cpp_string
 
 # Import our lock-free primitives
 from .atomic_partition_store cimport AtomicPartitionStore
@@ -113,8 +128,8 @@ cdef class LockFreeFlightServer:
         cbool running                          # Server state (simple bool - single threaded init/stop)
         AtomicPartitionStore _store_instance   # Python-managed store instance
 
-        # C++ Flight server (will be implemented via C++ header)
-        void* server_cpp               # PyFlightServer* (opaque for now)
+        # C++ Flight server
+        void* server_cpp               # ShuffleFlightServer* (typed in .pyx)
 
         char _padding[64]
 

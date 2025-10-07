@@ -26,3 +26,14 @@ cdef class DBOSDurableStateStore:
                                    int64_t checkpoint_id)
     cpdef void cleanup_old_checkpoints(self, str workflow_id, int32_t keep_count)
     cpdef object get_storage_stats(self)
+
+    # Private cdef methods
+    cdef void _put_value_dbos_transaction(self, str key, object value)
+    cdef object _get_value_dbos_transaction(self, str key)
+    cdef bint _delete_value_dbos_transaction(self, str key) except -1
+    cdef bint _exists_value_dbos_transaction(self, str key) except -1
+    cdef void _put_value_direct(self, str key, object value)
+    cdef object _get_value_direct(self, str key)
+    cdef bint _delete_value_direct(self, str key) except -1
+    cdef bint _exists_value_direct(self, str key) except -1
+    cdef int64_t _get_timestamp_ns(self)

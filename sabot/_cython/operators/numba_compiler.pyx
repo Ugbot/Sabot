@@ -14,6 +14,7 @@ import logging
 import inspect
 import ast
 import hashlib
+import dis
 
 logger = logging.getLogger(__name__)
 
@@ -50,9 +51,16 @@ cdef class NumbaCompiler:
         Args:
             max_cache_size: Maximum number of compiled functions to cache
         """
-        # Initialize attributes - we'll check for numba at runtime
-        self._numba_module = None
-        self._numba_available = False
+        # Try to import Numba
+        try:
+            import numba
+            self._numba_module = numba
+            self._numba_available = True
+            logger.info("Numba available - UDF compilation enabled")
+        except ImportError:
+            self._numba_module = None
+            self._numba_available = False
+            logger.warning("Numba not available - UDFs will be interpreted")
 
         # Compilation cache
         self._compilation_cache = {}
@@ -68,14 +76,8 @@ cdef class NumbaCompiler:
         Returns:
             Compiled function or original if compilation not beneficial
         """
-        # Check numba availability at runtime
         if not self._numba_available:
-            try:
-                import numba
-                self._numba_module = numba
-                self._numba_available = True
-            except ImportError:
-                return func
+            return func
 
         # Check cache first
         cache_key = self._get_cache_key(func)
@@ -116,39 +118,52 @@ cdef class NumbaCompiler:
             # If we can't get source, use function name + id
             return f"{func.__name__}_{id(func)}"
 
-    cdef FunctionPattern _analyze_function(self, object func):
+    cpdef FunctionPattern _analyze_function(self, object func):
         """
-        Analyze function source to detect patterns.
+        Analyze function using hybrid bytecode + AST approach.
+
+        Strategy:
+        1. Always try bytecode analysis first (works for all functions)
+        2. If AST analysis is available, merge results (more detailed)
+        3. Return combined pattern
 
         Returns:
             FunctionPattern object with detected patterns
         """
-        pattern = FunctionPattern()
+        # Start with bytecode analysis (always works)
+        pattern = self._analyze_function_bytecode(func)
 
+        # Try to enhance with AST analysis (more detailed but limited availability)
         try:
             source = inspect.getsource(func)
         except:
-            # Can't analyze - return empty pattern
+            # Source not available - bytecode analysis is sufficient
+            logger.debug(f"AST analysis unavailable for {getattr(func, '__name__', '<lambda>')}, using bytecode only")
             return pattern
 
-        # Parse AST
+        # Parse AST to get more detailed patterns
         try:
             tree = ast.parse(source)
         except:
+            # AST parsing failed - bytecode analysis is sufficient
             return pattern
 
-        # Walk AST and detect patterns
+        # Walk AST and merge patterns with bytecode results
+        # AST provides more accurate counts
+        ast_loop_count = 0
+        ast_numpy_call_count = 0
+
         for node in ast.walk(tree):
             # Loops
             if isinstance(node, (ast.For, ast.While)):
                 pattern.has_loops = True
-                pattern.loop_count += 1
+                ast_loop_count += 1
 
             # NumPy usage
             elif isinstance(node, ast.Attribute):
                 if 'np.' in ast.unparse(node):
                     pattern.has_numpy = True
-                    pattern.numpy_call_count += 1
+                    ast_numpy_call_count += 1
 
             # Dict access (record['key'])
             elif isinstance(node, ast.Subscript):
@@ -158,13 +173,94 @@ cdef class NumbaCompiler:
             elif isinstance(node, ast.List):
                 pattern.has_list_ops = True
 
-        # String-based detection for libraries
-        pattern.has_pandas = 'pandas' in source or 'pd.' in source
-        pattern.has_arrow = 'pyarrow' in source or 'pa.' in source or 'pc.' in source
+        # Use AST counts if available (more accurate)
+        if ast_loop_count > 0:
+            pattern.loop_count = ast_loop_count
+        if ast_numpy_call_count > 0:
+            pattern.numpy_call_count = ast_numpy_call_count
+
+        # String-based detection for libraries (AST enhancement)
+        if 'pandas' in source or 'pd.' in source:
+            pattern.has_pandas = True
+        if 'pyarrow' in source or 'pa.' in source or 'pc.' in source:
+            pattern.has_arrow = True
 
         return pattern
 
-    cdef CompilationStrategy _choose_strategy(self, FunctionPattern pattern):
+    cdef FunctionPattern _analyze_function_bytecode(self, object func):
+        """
+        Analyze function bytecode to detect patterns.
+
+        Works for ALL functions (inline, lambda, file-defined, __main__ scope).
+        Uses Python bytecode inspection via dis module.
+
+        Returns:
+            FunctionPattern object with detected patterns
+        """
+        pattern = FunctionPattern()
+
+        try:
+            # Get bytecode instructions
+            instructions = list(dis.get_instructions(func))
+        except Exception as e:
+            logger.debug(f"Bytecode analysis failed for {getattr(func, '__name__', '<lambda>')}: {e}")
+            return pattern
+
+        # Track imported modules
+        imported_modules = set()
+
+        # Analyze bytecode opcodes
+        for instr in instructions:
+            opname = instr.opname
+            argval = instr.argval
+
+            # Loop detection
+            if opname == 'FOR_ITER':
+                pattern.has_loops = True
+                pattern.loop_count += 1
+            elif opname == 'JUMP_BACKWARD':
+                # While loops use JUMP_BACKWARD
+                if not pattern.has_loops:
+                    pattern.has_loops = True
+                    pattern.loop_count += 1
+
+            # Import detection
+            elif opname == 'IMPORT_NAME':
+                if argval:
+                    imported_modules.add(str(argval))
+
+            # Dict/subscript access
+            elif opname in ('BINARY_SUBSCR', 'STORE_SUBSCR'):
+                pattern.has_dict_access = True
+
+            # List operations
+            elif opname in ('BUILD_LIST', 'LIST_APPEND', 'LIST_EXTEND'):
+                pattern.has_list_ops = True
+
+            # NumPy detection (from loaded globals)
+            elif opname == 'LOAD_GLOBAL' or opname == 'LOAD_FAST':
+                if argval and isinstance(argval, str):
+                    argval_lower = argval.lower()
+                    if 'np' in argval_lower or 'numpy' in argval_lower:
+                        pattern.has_numpy = True
+                        pattern.numpy_call_count += 1
+
+        # Analyze imported modules
+        for module in imported_modules:
+            module_lower = module.lower()
+
+            if 'numpy' in module_lower or module == 'np':
+                pattern.has_numpy = True
+
+            if 'pandas' in module_lower or module == 'pd':
+                pattern.has_pandas = True
+
+            if 'pyarrow' in module_lower or module in ('pa', 'pc'):
+                pattern.has_arrow = True
+
+        return pattern
+
+    cpdef CompilationStrategy _choose_strategy(self, FunctionPattern pattern):
         """
         Choose compilation strategy based on detected patterns.
 
@@ -195,21 +291,14 @@ cdef class NumbaCompiler:
         Compile with @njit (scalar JIT).
 
         Good for: loops, conditionals, simple math
+
+        Note: Numba uses lazy compilation - actual compilation happens
+        on first call with concrete types. We don't test-execute here
+        because we can't reliably infer argument types.
         """
         try:
             compiled = self._numba_module.njit(func)
-
-            # Test compilation (trigger actual JIT)
-            test_args = self._generate_test_args(func)
-            if test_args is not None:
-                try:
-                    _ = compiled(*test_args)
-                except:
-                    # Test execution failed - return original
-                    logger.debug(f"Test execution failed for {func.__name__}, using Python")
-                    return func
-
-            logger.info(f"Compiled {func.__name__} with @njit")
+            logger.info(f"Compiled {func.__name__} with @njit (lazy compilation)")
             return compiled
 
         except Exception as e:
@@ -241,30 +330,6 @@ cdef class NumbaCompiler:
             return self._numba_module.njit(func)
         except:
             return func
-
-    cdef tuple _generate_test_args(self, object func):
-        """
-        Generate test arguments for function.
-
-        Used to trigger JIT compilation and verify it works.
-        For batch-first processing, we need RecordBatch test data.
-        """
-        import inspect
-        sig = inspect.signature(func)
-
-        # Single argument: likely a RecordBatch for batch-first processing
-        if len(sig.parameters) == 1:
-            # Create a small test RecordBatch
-            import pyarrow as pa
-            test_batch = pa.RecordBatch.from_pydict({
-                'value': [1.0, 2.0, 3.0],
-                'id': [1, 2, 3],
-                'timestamp': [1000, 1001, 1002]
-            })
-            return (test_batch,)
-
-        # Can't infer - skip test
-        return None
 
     cdef void _add_to_cache(self, str key, object func):
         """
@@ -298,3 +363,11 @@ cpdef object auto_compile(object func):
         Compiled function (or original if compilation not beneficial)
     """
     return _global_compiler.compile_udf(func)
+
+
+# Export CompilationStrategy enum values as module constants
+#  (Python can't access cdef enums directly)
+STRATEGY_SKIP = 0      # Skip compilation (already fast)
+STRATEGY_NJIT = 1      # @njit (scalar JIT)
+STRATEGY_VECTORIZE = 2 # @vectorize (array JIT)
+STRATEGY_AUTO = 3      # Auto-detect best strategy

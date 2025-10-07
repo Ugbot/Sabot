@@ -4,10 +4,11 @@ Header file for DBOS-Enhanced Durable Checkpoint Coordinator
 """
 
 from libc.stdint cimport int64_t, int32_t
+from ..coordinator cimport CheckpointCoordinator
 
 cdef class DurableCheckpointCoordinator:
     cdef:
-        object checkpoint_coordinator
+        CheckpointCoordinator checkpoint_coordinator
         object dbos_controller
         object workflow_registry
         object durable_state_store
@@ -28,3 +29,9 @@ cdef class DurableCheckpointCoordinator:
     cpdef object get_workflow_stats(self, str workflow_id)
     cpdef object list_active_workflows(self)
     cpdef object get_system_health(self)
+
+    # Private cdef methods
+    cdef void _setup_dbos_callbacks(self)
+    cdef void _persist_workflow_state(self, str workflow_id, object workflow_state)
+    cdef object _load_workflow_state(self, str workflow_id)
+    cdef int64_t _get_timestamp_ns(self)

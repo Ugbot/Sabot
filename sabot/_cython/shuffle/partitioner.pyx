@@ -28,11 +28,13 @@ from pyarrow.includes.libarrow cimport (
 from .types cimport ShuffleEdgeType
 
 # For Python API access when needed
-# Python-level imports - use vendored Arrow
-from sabot import cyarrow
-# TODO: Add compute to cyarrow wrapper
-import pyarrow as pa
-import pyarrow.compute as pc
+# Python-level imports - use vendored Arrow (NOT pip pyarrow)
+from sabot import cyarrow as pa
+try:
+    from sabot.cyarrow import compute as pc
+except (ImportError, AttributeError):
+    # Fallback if compute not available in cyarrow
+    pc = None
 
 
 # ============================================================================
@@ -135,6 +137,26 @@ cdef class Partitioner:
         """Get partition ID for a specific row."""
         raise NotImplementedError("Subclasses must implement get_partition_for_row")
 
+    def partition(self, batch):
+        """
+        Python-accessible wrapper for partition_batch.
+
+        Args:
+            batch: Input RecordBatch (Python pa.RecordBatch)
+
+        Returns:
+            List of RecordBatches (one per partition)
+        """
+        cdef ca.RecordBatch batch_cython = batch
+        cdef vector[shared_ptr[PCRecordBatch]] partitions_cpp = self.partition_batch(batch_cython)
+        cdef list result = []
+        cdef int i
+
+        for i in range(<int>partitions_cpp.size()):
+            result.append(_wrap_batch(partitions_cpp[i]))
+
+        return result
+
 
 # ============================================================================
 # Hash Partitioner
@@ -154,7 +176,7 @@ cdef class HashPartitioner(Partitioner):
         """
         Compute hash values for all rows in batch.
 
-        Uses pyarrow.compute for hash computation (fast, SIMD-optimized).
+        Uses CyArrow compute module for fast, SIMD-accelerated hashing.
         Caches hash array for partition assignment.
         """
         cdef:
@@ -174,18 +196,27 @@ cdef class HashPartitioner(Partitioner):
                 raise ValueError(f"Key column '{col_name}' not found in batch")
             key_arrays.append(py_batch_obj.column(col_name))
 
-        # Compute hash using Arrow compute
-        if len(key_arrays) == 1:
-            # Single column - direct hash
-            hash_array_obj = pc.hash(key_arrays[0])
+        # Compute hash using CyArrow compute module
+        if pc is not None:
+            # Use CyArrow compute.hash
+            if len(key_arrays) == 1:
+                # Single column - direct hash
+                hash_array_obj = pc.hash_array(key_arrays[0])
+            else:
+                # Multiple columns - combined hash
+                hash_array_obj = pc.hash_combine(*key_arrays)
         else:
-            # Multiple columns - combine with struct
-            import pyarrow as pa
-            struct_array = pa.StructArray.from_arrays(
-                key_arrays,
-                names=[self.key_columns[i].decode('utf-8') for i in range(self.key_columns.size())]
-            )
-            hash_array_obj = pc.hash(struct_array)
+            # Fallback: Python hash (slower but works)
+            import pyarrow as _pa
+            hash_values = []
+            num_rows = py_batch_obj.num_rows
+            for j in range(num_rows):
+                if len(key_arrays) == 1:
+                    row_tuple = (key_arrays[0][j].as_py(),)
+                else:
+                    row_tuple = tuple(arr[j].as_py() for arr in key_arrays)
+                hash_values.append(hash(row_tuple) & 0xFFFFFFFFFFFFFFFF)
+            hash_array_obj = _pa.array(hash_values, type=_pa.uint64())
 
         # Store as C++ array (zero-copy)
         cdef ca.Array hash_array_cython = hash_array_obj

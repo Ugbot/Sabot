@@ -239,7 +239,9 @@ cdef class ShuffleManager:
 
     cpdef void start(self) except *:
         """Start shuffle manager (start transport)."""
-        self.transport.start()
+        # Convert bytes to string for C++ interface
+        cdef string host_str = self.agent_host
+        self.transport.start(host_str, self.agent_port)
 
     cpdef void stop(self) except *:
         """Stop shuffle manager (stop transport)."""

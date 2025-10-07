@@ -26,18 +26,18 @@ cdef class FunctionPattern:
 cdef class NumbaCompiler:
     cdef:
         object _numba_module
-        bint _numba_available
-        dict _compilation_cache
+        public bint _numba_available
+        public dict _compilation_cache
         int _max_cache_size
 
     cpdef object compile_udf(self, object func)
     cdef str _get_cache_key(self, object func)
-    cdef FunctionPattern _analyze_function(self, object func)
-    cdef CompilationStrategy _choose_strategy(self, FunctionPattern pattern)
+    cpdef FunctionPattern _analyze_function(self, object func)
+    cdef FunctionPattern _analyze_function_bytecode(self, object func)
+    cpdef CompilationStrategy _choose_strategy(self, FunctionPattern pattern)
     cdef object _compile_njit(self, object func)
     cdef object _compile_vectorize(self, object func)
     cdef object _try_compile_best_effort(self, object func)
-    cdef tuple _generate_test_args(self, object func)
     cdef void _add_to_cache(self, str key, object func)
 
 # Public API

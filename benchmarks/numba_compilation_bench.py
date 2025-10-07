@@ -66,9 +66,9 @@ def bench_simple_loop():
 
     results = benchmark_function(loop_func, compiled, test_data)
 
-    print(".2f")
-    print(".2f")
-    print(".1f")
+    print(f"Interpreted: {results['interpreted_ms']:.2f}ms")
+    print(f"Compiled:    {results['compiled_ms']:.2f}ms")
+    print(f"Speedup:     {results['speedup']:.1f}x")
 
     return results
 
@@ -90,9 +90,9 @@ def bench_complex_computation():
 
     results = benchmark_function(complex_func, compiled, test_data)
 
-    print(".2f")
-    print(".2f")
-    print(".1f")
+    print(f"Interpreted: {results['interpreted_ms']:.2f}ms")
+    print(f"Compiled:    {results['compiled_ms']:.2f}ms")
+    print(f"Speedup:     {results['speedup']:.1f}x")
 
     return results
 
@@ -126,7 +126,7 @@ def bench_batch_processing():
 
     print(f"Processed {n:,} rows in {elapsed:.2f}ms")
     print(f"Throughput: {n / (elapsed / 1000) / 1_000_000:.2f}M rows/sec")
-    print(f"Compilation: Auto-compilation enabled (Numba {'available' if SABOT_AVAILABLE else 'not available'})")
+    print(f"Compilation: {'Skipped (Arrow already fast)' if not map_op._is_compiled else 'Compiled'}")
 
     return {'elapsed_ms': elapsed, 'rows': n}
 
@@ -154,7 +154,7 @@ def bench_compilation_overhead():
     cached = auto_compile(test_func)
     cache_time = (time.perf_counter() - start) * 1000
 
-    print(f"Cache hit time: {cache_time:.3f}ms")
+    print(f"Cache hit time:   {cache_time:.3f}ms")
 
     return {'compile_ms': compile_time, 'cache_ms': cache_time}
 
@@ -180,9 +180,9 @@ def run_all_benchmarks():
         print(f"\n{name}:")
         for key, value in result.items():
             if key == 'speedup':
-                print(".1f")
+                print(f"  {key}: {value:.1f}x")
             elif 'ms' in key:
-                print(".2f")
+                print(f"  {key}: {value:.2f}ms")
             else:
                 print(f"  {key}: {value}")
 

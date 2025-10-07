@@ -48,11 +48,13 @@ cdef class SPSCRingBuffer:
 
         # Producer-side (aligned to cache line)
         atomic[int64_t] tail          # Write index (producer)
-        char _padding1[56]            # Cache line padding (64 - 8 bytes)
+        int64_t cached_head           # Locally cached head (rigtorp optimization)
+        char _padding1[48]            # Cache line padding (64 - 16 bytes)
 
         # Consumer-side (separate cache line)
         atomic[int64_t] head          # Read index (consumer)
-        char _padding2[56]            # Cache line padding
+        int64_t cached_tail           # Locally cached tail (rigtorp optimization)
+        char _padding2[48]            # Cache line padding
 
         cbool _initialized
 

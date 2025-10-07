@@ -30,7 +30,7 @@ cdef class Partitioner:
     batches (one per partition) for redistribution to downstream tasks.
     """
     cdef:
-        int32_t num_partitions
+        readonly int32_t num_partitions
         vector[string] key_columns
         shared_ptr[PCSchema] schema_cpp
 

@@ -7,3 +7,6 @@
 [submodule "vendor/cyredis"]
 	path = vendor/cyredis
 	url = https://github.com/Ugbot/CyRedis
+[submodule "vendor/rocksdb"]
+	path = vendor/rocksdb
+	url = https://github.com/facebook/rocksdb.git

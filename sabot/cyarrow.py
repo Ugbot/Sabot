@@ -155,18 +155,51 @@ except ImportError as e:
 
 
 # Additional compute functions (use internal or fall back)
+compute = None
 try:
-    if USING_INTERNAL or USING_ZERO_COPY:
-        # Import pyarrow.compute for now - TODO: implement our own compute wrappers
-        import pyarrow.compute as compute
-    else:
+    # Try to import our custom Cython compute module first
+    from ._cython.arrow import compute as _cycompute
+
+    # Create a compute namespace that combines our custom functions with pyarrow
+    class ComputeNamespace:
+        """Compute namespace that wraps both custom and pyarrow compute functions."""
+        def __init__(self):
+            # Import pyarrow compute for standard functions
+            try:
+                import pyarrow.compute as _pc
+                self._pc = _pc
+            except ImportError:
+                self._pc = None
+
+            # Add our custom functions
+            self.hash_array = _cycompute.hash_array
+            self.hash_struct = _cycompute.hash_struct
+            self.hash_combine = _cycompute.hash_combine
+
+        def __getattr__(self, name):
+            # Delegate to pyarrow.compute for standard functions
+            if self._pc is not None:
+                return getattr(self._pc, name)
+            raise AttributeError(f"compute.{name} not available")
+
+    compute = ComputeNamespace()
+    logger.info("Using custom CyArrow compute module with pyarrow fallback")
+except ImportError as e:
+    logger.debug(f"Custom compute module not available: {e}")
+    # Fall back to pyarrow compute
+    try:
+        if USING_INTERNAL or USING_ZERO_COPY or USING_EXTERNAL:
+            import pyarrow.compute as compute
+        else:
+            compute = None
+    except ImportError:
         compute = None
-except ImportError:
-    compute = None
 
 
 # Export full PyArrow-compatible API
-if USING_EXTERNAL:
+if USING_EXTERNAL or USING_ZERO_COPY:
+    # If we're using external pyarrow OR zero-copy (which uses pyarrow underneath),
+    # we need to export pyarrow's type constructors
     import pyarrow as _pa
 
     # Type constructors

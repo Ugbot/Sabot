@@ -31,7 +31,7 @@ cdef class ShuffleServer:
         cbool running
         LockFreeFlightServer flight_server  # Lock-free Flight server
 
-    cpdef void start(self) except *
+    cpdef void start(self, string host, int32_t port) except *
     cpdef void stop(self) except *
     # register_partition now exposed as Python def method
 
@@ -60,7 +60,7 @@ cdef class ShuffleTransport:
         int32_t agent_port
         cbool initialized
 
-    cpdef void start(self) except *
+    cpdef void start(self, string host, int32_t port) except *
     cpdef void stop(self) except *
     cdef void publish_partition(self, bytes shuffle_id, int32_t partition_id,
                                 ca.RecordBatch batch)
@@ -68,7 +68,7 @@ cdef class ShuffleTransport:
                                                    bytes shuffle_id, int32_t partition_id)
 
     # Shuffle coordination methods (Phase 4)
-    cpdef void start_shuffle(self, bytes shuffle_id, int32_t num_partitions, list downstream_agents)
+    cpdef void start_shuffle(self, bytes shuffle_id, int32_t num_partitions, list downstream_agents, list upstream_agents=?)
     cpdef void send_partition(self, bytes shuffle_id, int32_t partition_id, ca.RecordBatch batch, bytes target_agent)
     cpdef list receive_partitions(self, bytes shuffle_id, int32_t partition_id)
     cpdef void end_shuffle(self, bytes shuffle_id)

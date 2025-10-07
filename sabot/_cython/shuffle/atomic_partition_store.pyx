@@ -28,6 +28,7 @@ from libcpp.atomic cimport (
 )
 from libcpp.memory cimport shared_ptr
 from pyarrow.includes.libarrow cimport CRecordBatch as PCRecordBatch
+from pyarrow.lib cimport pyarrow_unwrap_batch, pyarrow_wrap_batch
 
 cimport cython
 
@@ -60,6 +61,32 @@ cdef inline int64_t next_power_of_two(int64_t n) nogil:
 cdef inline void cpu_pause() nogil:
     """CPU pause for spin loops."""
     pass
+
+
+cdef inline void exponential_backoff(int32_t attempt) nogil:
+    """
+    Exponential backoff for CAS retry loops.
+
+    Uses CPU pause for first few attempts, then yields.
+    Prevents live-lock in high contention scenarios.
+
+    Args:
+        attempt: Current retry attempt number
+    """
+    cdef int32_t i
+    cdef int32_t pause_count
+
+    if attempt < 10:
+        # First 10 attempts: busy-wait with CPU pause
+        pause_count = 1 << attempt  # 2^attempt
+        for i in range(pause_count):
+            cpu_pause()
+    else:
+        # After 10 attempts: yield to OS scheduler
+        # Note: In nogil context, we can't call Python's time.sleep()
+        # Instead, do more CPU pauses
+        for i in range(1000):
+            cpu_pause()
 
 
 # ============================================================================
@@ -151,12 +178,12 @@ cdef class AtomicPartitionStore:
         shared_ptr[PCRecordBatch] batch
     ) nogil:
         """
-        Insert partition using LMAX claim/publish protocol.
+        Insert partition using LMAX claim/publish protocol with retry.
 
         Protocol:
         1. Compute hash and probe sequence
         2. Find empty or matching slot
-        3. Claim slot (mark sequence as writing)
+        3. Claim slot (mark sequence as writing) with CAS retry
         4. Write data
         5. Publish (mark sequence as committed with release barrier)
 
@@ -176,60 +203,77 @@ cdef class AtomicPartitionStore:
         cdef int64_t new_seq
         cdef int64_t old_seq
         cdef HashEntry* entry
+        cdef int32_t retry_count = 0
+        cdef int32_t max_retries = 10
 
         # Linear probing with max attempts
         while probe < self.table_size:
             entry = &self.table[index]
+            retry_count = 0  # Reset retry count for each slot
 
-            # Load sequence with acquire barrier
-            current_seq = entry.sequence.load(memory_order_acquire)
+            # Retry CAS on same slot before moving to next
+            while retry_count < max_retries:
+                # Load sequence with acquire barrier
+                current_seq = entry.sequence.load(memory_order_acquire)
 
-            # Check if slot is empty or uncommitted
-            if current_seq == SEQUENCE_UNCOMMITTED or current_seq == SEQUENCE_DELETED:
-                # Try to claim slot (mark as writing with odd sequence)
-                if entry.sequence.compare_exchange_strong(
-                    current_seq,
-                    -1,  # Temporary uncommitted marker during write
-                    memory_order_seq_cst,
-                    memory_order_acquire
-                ):
-                    # Claimed successfully - write data
-                    entry.shuffle_id_hash = shuffle_id_hash
-                    entry.partition_id = partition_id
-                    entry.batch = batch
+                # Check if slot is empty or uncommitted
+                if current_seq == SEQUENCE_UNCOMMITTED or current_seq == SEQUENCE_DELETED:
+                    # Try to claim slot (mark as writing with odd sequence)
+                    if entry.sequence.compare_exchange_strong(
+                        current_seq,
+                        -1,  # Temporary uncommitted marker during write
+                        memory_order_seq_cst,
+                        memory_order_acquire
+                    ):
+                        # Claimed successfully - write data
+                        entry.shuffle_id_hash = shuffle_id_hash
+                        entry.partition_id = partition_id
+                        entry.batch = batch
 
-                    # Publish with release barrier (even sequence = committed)
-                    new_seq = self.cursor.fetch_add(1, memory_order_relaxed)
-                    entry.sequence.store(new_seq, memory_order_release)
+                        # Publish with release barrier (even sequence = committed)
+                        new_seq = self.cursor.fetch_add(1, memory_order_relaxed)
+                        entry.sequence.store(new_seq, memory_order_release)
 
-                    self.num_entries.fetch_add(1, memory_order_relaxed)
-                    return True
+                        self.num_entries.fetch_add(1, memory_order_relaxed)
+                        return True
 
-            # Check if this is an update (same key)
-            elif (entry.shuffle_id_hash == shuffle_id_hash and
-                  entry.partition_id == partition_id):
-                # Update existing entry
-                # Mark as writing (odd sequence)
-                old_seq = current_seq
-                if entry.sequence.compare_exchange_strong(
-                    old_seq,
-                    old_seq | 1,  # Make odd (writing)
-                    memory_order_seq_cst,
-                    memory_order_acquire
-                ):
-                    # Update batch
-                    entry.batch = batch
+                    # CAS failed - backoff and retry same slot
+                    exponential_backoff(retry_count)
+                    retry_count += 1
 
-                    # Publish update (new even sequence)
-                    new_seq = self.cursor.fetch_add(1, memory_order_relaxed)
-                    entry.sequence.store(new_seq, memory_order_release)
-                    return True
+                # Check if this is an update (same key)
+                elif (entry.shuffle_id_hash == shuffle_id_hash and
+                      entry.partition_id == partition_id):
+                    # Update existing entry
+                    # Mark as writing (odd sequence)
+                    old_seq = current_seq
+                    if entry.sequence.compare_exchange_strong(
+                        old_seq,
+                        old_seq | 1,  # Make odd (writing)
+                        memory_order_seq_cst,
+                        memory_order_acquire
+                    ):
+                        # Update batch
+                        entry.batch = batch
+
+                        # Publish update (new even sequence)
+                        new_seq = self.cursor.fetch_add(1, memory_order_relaxed)
+                        entry.sequence.store(new_seq, memory_order_release)
+                        return True
+
+                    # CAS failed - backoff and retry same slot
+                    exponential_backoff(retry_count)
+                    retry_count += 1
+
+                else:
+                    # Slot occupied by different key - move to next slot
+                    break
 
             # Probe next slot
             probe += 1
             index = (index + 1) & self.mask
 
-        # Table full (no empty slots found)
+        # Table full (no empty slots found after all probes and retries)
         return False
 
     cdef shared_ptr[PCRecordBatch] get(
@@ -359,3 +403,92 @@ cdef class AtomicPartitionStore:
         """Get load factor (entries / table_size)."""
         cdef int64_t entries = self.num_entries.load(memory_order_acquire)
         return <double>entries / <double>self.table_size
+
+    # ========================================================================
+    # Python API Wrappers
+    # ========================================================================
+
+    def py_insert(self, int64_t shuffle_id_hash, int32_t partition_id, batch):
+        """
+        Insert partition from Python.
+
+        Args:
+            shuffle_id_hash: Hash of shuffle ID
+            partition_id: Partition ID
+            batch: PyArrow RecordBatch
+
+        Returns:
+            True if inserted successfully, False if table full
+        """
+        if not self._initialized:
+            return False
+
+        # Convert PyArrow RecordBatch to C++
+        cdef shared_ptr[PCRecordBatch] c_batch
+        cdef cbool result
+        try:
+            import pyarrow as pa
+            # Get C++ pointer from PyArrow batch
+            c_batch = pyarrow_unwrap_batch(batch)
+            # Call the C-level insert directly (it's already nogil)
+            result = self.insert(shuffle_id_hash, partition_id, c_batch)
+            return result
+        except Exception as e:
+            return False
+
+    def py_get(self, int64_t shuffle_id_hash, int32_t partition_id):
+        """
+        Get partition from Python.
+
+        Args:
+            shuffle_id_hash: Hash of shuffle ID
+            partition_id: Partition ID
+
+        Returns:
+            PyArrow RecordBatch if found, None otherwise
+        """
+        if not self._initialized:
+            return None
+
+        # Call C-level get (it's already nogil)
+        cdef shared_ptr[PCRecordBatch] c_batch = self.get(shuffle_id_hash, partition_id)
+
+        # Check if found
+        if c_batch.get() == NULL:
+            return None
+
+        # Wrap C++ batch in PyArrow
+        return pyarrow_wrap_batch(c_batch)
+
+    def py_remove(self, int64_t shuffle_id_hash, int32_t partition_id):
+        """
+        Remove partition from Python.
+
+        Args:
+            shuffle_id_hash: Hash of shuffle ID
+            partition_id: Partition ID
+
+        Returns:
+            True if removed, False if not found
+        """
+        if not self._initialized:
+            return False
+        # Call C-level remove (it's already nogil)
+        cdef cbool result = self.remove(shuffle_id_hash, partition_id)
+        return result
+
+    def py_size(self):
+        """Get number of entries (approximate)."""
+        if not self._initialized:
+            return 0
+        # Call C-level size (it's already nogil)
+        cdef int64_t result = self.size()
+        return result
+
+    def py_load_factor(self):
+        """Get load factor (entries / table_size)."""
+        if not self._initialized:
+            return 0.0
+        # Call C-level load_factor (it's already nogil)
+        cdef double result = self.load_factor()
+        return result
