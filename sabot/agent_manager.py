@@ -163,7 +163,7 @@ class DurableAgentManager:
     - Actual streaming data flows through Arrow/RAFT pipelines
     - High-throughput via Kafka, Arrow Flight, or in-memory channels
     - GPU acceleration for data processing
-    - FastRedis for distributed state (not workflow state)
+    - CyRedis for distributed state (not workflow state)
 
     This separation ensures:
     - Control plane reliability through DBOS durability

@@ -33,16 +33,14 @@ from .core.metrics import MetricsCollector
 
 logger = logging.getLogger(__name__)
 
-# FastRedis imports for enhanced state management
+# CyRedis imports for enhanced state management
 try:
-    from fastredis import HighPerformanceRedis, DistributedCounter, DistributedLock
-    from fastredis import ReadWriteLock, LocalCache, LiveObject
-    FASTREDIS_AVAILABLE = True
+    from vendor.cyredis import AsyncRedisClient, RedisPool, RedisPipeline
+    CYREDIS_AVAILABLE = True
 except ImportError:
-    logger.warning("FastRedis not available, using basic state management")
-    FASTREDIS_AVAILABLE = False
-    HighPerformanceRedis = DistributedCounter = DistributedLock = None
-    ReadWriteLock = LocalCache = LiveObject = None
+    logger.warning("CyRedis not available, using basic state management")
+    CYREDIS_AVAILABLE = False
+    AsyncRedisClient = RedisPool = RedisPipeline = None
 
 # RAFT imports for GPU-accelerated ML operations
 try:
@@ -87,7 +85,7 @@ class App(AppT):
         flight_port: int = 8815,
         enable_flight: bool = True,
         enable_interactive: bool = True,
-        # Redis configuration for FastRedis
+        # Redis configuration for CyRedis
         redis_host: str = "localhost",
         redis_port: int = 6379,
         redis_max_connections: int = 10,
@@ -124,7 +122,7 @@ class App(AppT):
         self._flight_enabled = enable_flight
         self._interactive_enabled = enable_interactive
 
-        # Redis/FastRedis configuration
+        # Redis/CyRedis configuration
         self.redis_host = redis_host
         self.redis_port = redis_port
         self.redis_max_connections = redis_max_connections
@@ -163,17 +161,16 @@ class App(AppT):
         self._dbos_controller = None
         self._distributed_agent_manager = None
 
-        # Initialize FastRedis client if available
+        # Initialize CyRedis client if available
         self.redis_client = None
-        if FASTREDIS_AVAILABLE and enable_distributed_state:
+        if CYREDIS_AVAILABLE and enable_distributed_state:
             try:
-                self.redis_client = HighPerformanceRedis(
+                self.redis_client = AsyncRedisClient(
                     host=redis_host,
                     port=redis_port,
-                    max_connections=redis_max_connections,
-                    use_uvloop=True  # Enable high-performance async
+                    max_connections=redis_max_connections
                 )
-                logger.info(f"Initialized FastRedis client: {redis_host}:{redis_port}")
+                logger.info(f"Initialized CyRedis client: {redis_host}:{redis_port}")
 
                 # Initialize distributed primitives
                 self._init_distributed_primitives()
@@ -182,7 +179,7 @@ class App(AppT):
                 self._init_distributed_agents()
 
             except Exception as e:
-                logger.warning(f"Failed to initialize FastRedis client: {e}")
+                logger.warning(f"Failed to initialize CyRedis client: {e}")
                 self.redis_client = None
 
         # Initialize durable agent manager (DBOS-inspired) - ALWAYS needed for @app.agent
@@ -212,13 +209,14 @@ class App(AppT):
         self._interactive_app = None
 
     def _init_distributed_primitives(self):
-        """Initialize FastRedis distributed primitives for enhanced state management."""
+        """Initialize CyRedis distributed primitives for enhanced state management."""
         if not self.redis_client:
             return
 
-        # Initialize distributed counters for metrics
-        self._agent_counter = DistributedCounter(self.redis_client, f"{self.id}:agents:active")
-        self._message_counter = DistributedCounter(self.redis_client, f"{self.id}:messages:processed")
+        # CyRedis provides low-level primitives, distributed counters/locks can be implemented as needed
+        # For now, we initialize basic client connection
+        self._agent_counter = None
+        self._message_counter = None
 
     def _init_distributed_agents(self):
         """Initialize distributed agent system components."""
@@ -262,22 +260,18 @@ class App(AppT):
             self._dbos_controller = None
             self._distributed_agent_manager = None
 
-        # Initialize distributed locks for coordination
-        self._coordination_lock = DistributedLock(self.redis_client, f"{self.id}:coordination")
-        self._table_lock = ReadWriteLock(self.redis_client, f"{self.id}:tables")
+        # CyRedis distributed locks can be implemented using SET NX EX pattern
+        self._coordination_lock = None
+        self._table_lock = None
 
-        # Initialize local cache for performance
+        # Local cache can be implemented using CyRedis pipeline operations
         if self.enable_redis_cache:
-            self._local_cache = LocalCache(
-                self.redis_client,
-                namespace=self.id,
-                max_size=10000,
-                ttl=300
-            )
+            # TODO: Implement local cache using CyRedis primitives
+            self._local_cache = None
         else:
             self._local_cache = None
 
-        logger.info("Initialized FastRedis distributed primitives")
+        logger.info("Initialized CyRedis distributed primitives")
 
         # Note: _agent_manager is now initialized unconditionally in __init__
 

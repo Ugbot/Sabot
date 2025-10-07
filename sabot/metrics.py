@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Sabot Metrics - Monitoring and observability using FastRedis."""
+"""Sabot Metrics - Monitoring and observability using CyRedis."""
 
 import asyncio
 import time
@@ -34,28 +34,22 @@ except ImportError:
     CONTENT_TYPE_LATEST = "text/plain"
     make_wsgi_app = lambda: None
 
-# FastRedis imports
-try:
-    from fastredis import ObservabilityManager
-    FASTREDIS_AVAILABLE = True
-except ImportError:
-    logger.warning("FastRedis not available, falling back to basic Prometheus metrics")
-    FASTREDIS_AVAILABLE = False
+# CyRedis imports
+# Note: CyRedis provides low-level Redis primitives, observability can be built on top
+CYREDIS_AVAILABLE = False  # ObservabilityManager can be implemented later using CyRedis
 
 
 class SabotMetrics:
-    """Comprehensive metrics collection for Sabot using FastRedis observability."""
+    """Comprehensive metrics collection for Sabot using CyRedis observability."""
 
     def __init__(self, app_id: str = "sabot", redis_client=None):
         self.app_id = app_id
         self.redis_client = redis_client
         self.registry = CollectorRegistry()
 
-        # Initialize FastRedis observability if available
-        if FASTREDIS_AVAILABLE and redis_client:
-            self.observability = ObservabilityManager(redis_client, metrics_prefix="sabot")
-        else:
-            self.observability = None
+        # CyRedis observability can be implemented using low-level primitives
+        # For now, use Prometheus metrics only
+        self.observability = None
 
         # Core Prometheus metrics (fallback/compatibility)
         self.messages_processed = Counter(
@@ -189,14 +183,8 @@ class SabotMetrics:
         """Record a processed message."""
         self.messages_processed.labels(agent=agent, topic=topic).inc()
 
-        # Record in FastRedis observability if available
-        if self.observability:
-            self.observability.record_operation(
-                f"agent_{agent}",
-                processing_time * 1000 if processing_time else 1.0,  # Convert to ms
-                success=True,
-                metadata={"topic": topic, "operation": "message_processed"}
-            )
+        # CyRedis observability can be implemented here if needed
+        # For now, Prometheus metrics are sufficient
 
         if processing_time is not None:
             self.message_processing_time.labels(agent=agent, topic=topic).observe(processing_time)
@@ -205,14 +193,7 @@ class SabotMetrics:
         """Record an agent error."""
         self.agent_errors.labels(agent=agent, error_type=error_type).inc()
 
-        # Record in FastRedis observability
-        if self.observability:
-            self.observability.record_operation(
-                f"agent_{agent}",
-                0.0,  # Error duration
-                success=False,
-                metadata={"error_type": error_type, "operation": "agent_error"}
-            )
+        # CyRedis observability can be implemented here if needed
 
     def set_active_agents(self, count: int):
         """Set the number of active agents."""
@@ -222,14 +203,7 @@ class SabotMetrics:
         """Record an Arrow operation."""
         self.arrow_operations.labels(operation_type=operation_type).inc()
 
-        # Record in FastRedis observability
-        if self.observability:
-            self.observability.record_operation(
-                f"arrow_{operation_type}",
-                duration * 1000 if duration else 1.0,  # Convert to ms
-                success=True,
-                metadata={"operation": operation_type, "type": "arrow"}
-            )
+        # CyRedis observability can be implemented here if needed
 
         if duration is not None:
             self.arrow_operation_time.labels(operation_type=operation_type).observe(duration)
@@ -246,14 +220,7 @@ class SabotMetrics:
         """Record pipeline execution time."""
         self.pipeline_execution_time.labels(pipeline_name=pipeline_name).observe(duration)
 
-        # Record in FastRedis observability
-        if self.observability:
-            self.observability.record_operation(
-                f"pipeline_{pipeline_name}",
-                duration * 1000,  # Convert to ms
-                success=True,
-                metadata={"pipeline": pipeline_name, "operation": "pipeline_execution"}
-            )
+        # CyRedis observability can be implemented here if needed
 
     def record_flight_request(self, method: str, status: str, duration: float = None):
         """Record an Arrow Flight request."""
@@ -276,18 +243,7 @@ class SabotMetrics:
             'system_memory_percent': self.system_memory_percent._value,
         }
 
-        # Add FastRedis observability metrics if available
-        if self.observability:
-            try:
-                fastredis_metrics = self.observability.get_all_metrics()
-                metrics_dict['fastredis'] = fastredis_metrics
-
-                # Add health check
-                health = self.observability.health_check()
-                metrics_dict['health'] = health
-
-            except Exception as e:
-                logger.warning(f"Failed to get FastRedis metrics: {e}")
+        # CyRedis observability metrics can be added here if implemented
 
         return metrics_dict
 
@@ -300,7 +256,7 @@ def get_metrics(redis_client=None) -> SabotMetrics:
     """Get the global metrics instance.
 
     Args:
-        redis_client: Optional FastRedis client for observability features
+        redis_client: Optional CyRedis client for observability features
     """
     global _metrics_instance
     if _metrics_instance is None:

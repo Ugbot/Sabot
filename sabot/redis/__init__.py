@@ -46,8 +46,8 @@ try:
         RedisPluginManager,
     )
 
-    # Backwards compatibility aliases
-    FastRedisClient = RedisClient
+    # Backwards compatibility aliases (legacy names)
+    CyRedisClient = RedisClient
     ThreadedStreamManager = StreamManager
     ThreadedStreamConsumer = StreamConsumer
     HighPerformanceRedis = AsyncRedis
@@ -144,8 +144,8 @@ __all__ = [
     "RedisPluginManager",
     "get_pgcache_module_path",
 
-    # Backwards compatibility
-    "FastRedisClient",
+    # Backwards compatibility (legacy names)
+    "CyRedisClient",
     "ThreadedStreamManager",
     "ThreadedStreamConsumer",
     "HighPerformanceRedis",

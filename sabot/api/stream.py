@@ -908,6 +908,107 @@ class Stream:
 
         return OutputStream(sink=sink, stream=self)
 
+    def with_features(self, feature_names: List[str]) -> 'Stream':
+        """
+        Apply feature extractors using standard map operator.
+
+        Args:
+            feature_names: List of feature names from FeatureRegistry
+
+        Returns:
+            Stream with added feature columns
+
+        Example:
+            stream.with_features([
+                'price_rolling_mean_5m',
+                'volume_std_1h',
+                'spread_percentile_95'
+            ])
+        """
+        from sabot.features import FeatureRegistry, create_feature_map
+
+        # Create extractors from registry
+        registry = FeatureRegistry()
+        extractors = []
+        for name in feature_names:
+            try:
+                extractor = registry.create_extractor(name)
+                extractors.append(extractor)
+            except ValueError as e:
+                import logging
+                logging.warning(f"Feature '{name}' not found in registry: {e}")
+
+        if not extractors:
+            raise ValueError("No valid feature extractors found")
+
+        # Create map function and apply
+        feature_func = create_feature_map(extractors)
+        return self.map(feature_func)
+
+    def to_feature_store(
+        self,
+        feature_store: 'FeatureStore',
+        entity_key_column: str,
+        feature_columns: List[str],
+        ttl: Optional[int] = None,
+        batch_size: int = 1000
+    ) -> 'OutputStream':
+        """
+        Write computed features to CyRedis feature store.
+
+        Args:
+            feature_store: FeatureStore instance
+            entity_key_column: Column name containing entity ID
+            feature_columns: List of column names to write as features
+            ttl: Time-to-live in seconds (None = no expiration)
+            batch_size: Rows per Redis pipeline write
+
+        Returns:
+            OutputStream for execution control
+
+        Example:
+            from sabot.features import FeatureStore
+
+            feature_store = FeatureStore(redis_url="localhost:6379")
+            await feature_store.initialize()
+
+            stream.with_features([
+                'price_rolling_mean_5m',
+                'volume_std_1h'
+            ]).to_feature_store(
+                feature_store=feature_store,
+                entity_key_column='symbol',
+                feature_columns=['price_rolling_mean_5m', 'volume_std_1h'],
+                ttl=300
+            )
+        """
+        from sabot.features import to_feature_store as write_to_store
+        import asyncio
+
+        # Write features async
+        async def write():
+            stats = await write_to_store(
+                self._source,
+                feature_store=feature_store,
+                entity_key_column=entity_key_column,
+                feature_columns=feature_columns,
+                ttl=ttl,
+                batch_size=batch_size
+            )
+            return stats
+
+        # Run async writer
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            stats = loop.run_until_complete(write())
+            import logging
+            logging.info(f"Feature store write complete: {stats}")
+        finally:
+            loop.close()
+
+        return OutputStream(sink=feature_store, stream=self)
+
     def __iter__(self):
         """Iterate over batches in stream."""
         return iter(self._source)

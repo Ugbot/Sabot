@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Redis store backend for Sabot tables using FastRedis."""
+"""Redis store backend for Sabot tables using CyRedis."""
 
 import asyncio
 import json
@@ -33,7 +33,7 @@ class RedisTransaction(Transaction):
 
 
 class RedisBackend(StoreBackend):
-    """Redis store backend using FastRedis.
+    """Redis store backend using CyRedis.
 
     Persistent, distributed, and fast. Good for production use.
     """
@@ -48,21 +48,20 @@ class RedisBackend(StoreBackend):
     async def start(self) -> None:
         """Initialize the Redis backend."""
         try:
-            from fastredis import HighPerformanceRedis
-            self.redis_client = HighPerformanceRedis(
+            from vendor.cyredis import AsyncRedisClient
+            self.redis_client = AsyncRedisClient(
                 host=self.config.options.get('host', 'localhost'),
                 port=self.config.options.get('port', 6379),
-                max_connections=self.config.options.get('max_connections', 10),
-                use_uvloop=True
+                max_connections=self.config.options.get('max_connections', 10)
             )
+            await self.redis_client.connect()
         except ImportError:
-            raise RuntimeError("FastRedis not available. Install with: pip install fastredis")
+            raise RuntimeError("CyRedis not available. Check vendor/cyredis/ submodule.")
 
     async def stop(self) -> None:
         """Clean up the Redis backend."""
         if self.redis_client:
-            # FastRedis client cleanup if needed
-            pass
+            await self.redis_client.close()
 
     def _make_key(self, key: Any) -> str:
         """Create a namespaced Redis key."""

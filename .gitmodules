@@ -4,3 +4,6 @@
 [submodule "vendor/duckdb"]
 	path = vendor/duckdb
 	url = https://github.com/duckdb/duckdb
+[submodule "vendor/cyredis"]
+	path = vendor/cyredis
+	url = https://github.com/Ugbot/CyRedis
