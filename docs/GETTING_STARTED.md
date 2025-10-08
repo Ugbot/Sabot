@@ -247,19 +247,35 @@ await backend.set("user:123", {"name": "Alice", "score": 100})
 user_data = await backend.get("user:123")
 ```
 
-### RocksDB Backend (Persistent)
+### RocksDB Backend (Metadata Only)
 
 ```python
-# Configure RocksDB (for larger state)
+# Configure RocksDB (for checkpoint metadata and coordination)
+# Note: Application data uses Tonbo (columnar storage)
 rocksdb_config = sb.BackendConfig(
     backend_type="rocksdb",
     path="./state/rocksdb"
 )
 rocksdb = sb.RocksDBBackend(rocksdb_config)
 
-# Same API as memory backend
+# RocksDB stores: checkpoint manifests, timers, watermarks, barriers
 await rocksdb.set("key", "value")
 value = await rocksdb.get("key")
+```
+
+### Tonbo Backend (Columnar Data)
+
+```python
+# Configure Tonbo (for application data and aggregations)
+tonbo_config = sb.BackendConfig(
+    backend_type="tonbo",
+    path="./state/tonbo"
+)
+tonbo = sb.TonboBackend(tonbo_config)
+
+# Tonbo stores: Arrow batches, aggregations, join state, shuffle buffers
+await tonbo.put_batch(batch)
+result = await tonbo.get_batch(key)
 ```
 
 ### State Types
