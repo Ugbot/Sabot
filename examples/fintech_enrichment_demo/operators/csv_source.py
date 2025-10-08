@@ -23,8 +23,8 @@ from typing import Optional, AsyncGenerator
 
 # Use Sabot's Arrow API
 from sabot import cyarrow as pa
-import pyarrow.csv as pa_csv  # CSV not yet in sabot.arrow
-import pyarrow.flight as flight  # Flight not yet in sabot.arrow
+from sabot.cyarrow import csv as pa_csv  # CSV from vendored Arrow
+from sabot.cyarrow import flight  # Flight from vendored Arrow
 
 import sys
 from pathlib import Path
@@ -137,7 +137,7 @@ class CSVSourceOperator:
             table = table.slice(0, self.batch_size)
 
         # Cast null-type columns to string to avoid join errors
-        import pyarrow.types as pa_types  # types module not in sabot.arrow yet
+        from sabot.cyarrow import types as pa_types  # types from vendored Arrow
         schema_fields = []
         for field in table.schema:
             if pa_types.is_null(field.type):

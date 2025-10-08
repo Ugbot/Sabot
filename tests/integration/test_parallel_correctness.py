@@ -13,8 +13,8 @@ Verifies:
 """
 
 import pytest
-import pyarrow as pa
-import pyarrow.compute as pc
+from sabot import cyarrow as pa
+from sabot.cyarrow import compute as pc
 import numpy as np
 from sabot._cython.operators.transform import CythonMapOperator, CythonFilterOperator
 from sabot._cython.operators.morsel_operator import MorselDrivenOperator

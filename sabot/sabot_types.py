@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 if TYPE_CHECKING:
-    import pyarrow as pa
+    from sabot import cyarrow as pa
 else:
     pa = None
 

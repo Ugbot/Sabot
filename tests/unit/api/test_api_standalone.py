@@ -34,7 +34,7 @@ tumbling = window_module.tumbling
 sliding = window_module.sliding
 ValueState = state_module.ValueState
 
-import pyarrow as pa
+from sabot import cyarrow as pa
 import time
 
 

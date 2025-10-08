@@ -24,8 +24,8 @@ Usage:
 
 import sabot as sb
 from sabot import cyarrow as ca
-import pyarrow as pa  # For specialized types
-import pyarrow.compute as pc  # For compute functions
+from sabot import cyarrow as pa  # For specialized types (vendored Arrow)
+from sabot.cyarrow import compute as pc  # For compute functions (vendored Arrow)
 import time
 
 # Create Sabot application

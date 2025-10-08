@@ -59,6 +59,11 @@
             "-Wno-unused-function",
             "-Wno-deprecated-declarations"
         ],
+        "extra_link_args": [
+            "-Wl,-headerpad_max_install_names",
+            "-Wl,-rpath,@loader_path/../../vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib"
+        ],
         "include_dirs": [
             "/Users/bengamble/Sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
@@ -3584,7 +3589,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_9transform_CythonUnionOperator {
 };
 
 
-/* "sabot/_cython/operators/transform.pyx":398
+/* "sabot/_cython/operators/transform.pyx":414
  *             raise RuntimeError(f"Error in flatMap operator: {e}")
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -3606,7 +3611,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_9transform___pyx_scope_struct____ite
 };
 
 
-/* "sabot/_cython/operators/transform.pyx":484
+/* "sabot/_cython/operators/transform.pyx":500
  *         return valid_batches
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -5037,7 +5042,7 @@ struct __pyx_vtabstruct_5sabot_7_cython_9operators_9transform_CythonMapOperator 
 static struct __pyx_vtabstruct_5sabot_7_cython_9operators_9transform_CythonMapOperator *__pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonMapOperator;
 
 
-/* "sabot/_cython/operators/transform.pyx":167
+/* "sabot/_cython/operators/transform.pyx":183
  * # ============================================================================
  * 
  * @cython.final             # <<<<<<<<<<<<<<
@@ -5051,7 +5056,7 @@ struct __pyx_vtabstruct_5sabot_7_cython_9operators_9transform_CythonFilterOperat
 static struct __pyx_vtabstruct_5sabot_7_cython_9operators_9transform_CythonFilterOperator *__pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonFilterOperator;
 
 
-/* "sabot/_cython/operators/transform.pyx":255
+/* "sabot/_cython/operators/transform.pyx":271
  * # ============================================================================
  * 
  * @cython.final             # <<<<<<<<<<<<<<
@@ -5065,7 +5070,7 @@ struct __pyx_vtabstruct_5sabot_7_cython_9operators_9transform_CythonSelectOperat
 static struct __pyx_vtabstruct_5sabot_7_cython_9operators_9transform_CythonSelectOperator *__pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonSelectOperator;
 
 
-/* "sabot/_cython/operators/transform.pyx":322
+/* "sabot/_cython/operators/transform.pyx":338
  * # ============================================================================
  * 
  * @cython.final             # <<<<<<<<<<<<<<
@@ -5079,7 +5084,7 @@ struct __pyx_vtabstruct_5sabot_7_cython_9operators_9transform_CythonFlatMapOpera
 static struct __pyx_vtabstruct_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator *__pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator;
 
 
-/* "sabot/_cython/operators/transform.pyx":415
+/* "sabot/_cython/operators/transform.pyx":431
  * # ============================================================================
  * 
  * @cython.final             # <<<<<<<<<<<<<<
@@ -5525,6 +5530,16 @@ static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject 
 #else
 static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
 #endif
+
+/* PyObject_Unicode.proto */
+#define __Pyx_PyObject_Unicode(obj)\
+    (likely(PyUnicode_CheckExact(obj)) ? __Pyx_NewRef(obj) : PyObject_Str(obj))
+
+/* PyUnicodeContains.proto */
+static CYTHON_INLINE int __Pyx_PyUnicode_ContainsTF(PyObject* substring, PyObject* text, int eq) {
+    int result = PyUnicode_Contains(text, substring);
+    return unlikely(result < 0) ? result : (result == (eq == Py_EQ));
+}
 
 /* RaiseException.proto */
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
@@ -6303,6 +6318,8 @@ static const char __pyx_k_time[] = "time";
 static const char __pyx_k_batch[] = "batch";
 static const char __pyx_k_chain[] = "chain";
 static const char __pyx_k_close[] = "close";
+static const char __pyx_k_lower[] = "lower";
+static const char __pyx_k_numba[] = "numba";
 static const char __pyx_k_state[] = "state";
 static const char __pyx_k_throw[] = "throw";
 static const char __pyx_k_value[] = "value";
@@ -6326,6 +6343,7 @@ static const char __pyx_k_disable[] = "disable";
 static const char __pyx_k_logging[] = "logging";
 static const char __pyx_k_results[] = "results";
 static const char __pyx_k_sources[] = "sources";
+static const char __pyx_k_warning[] = "warning";
 static const char __pyx_k_Callable[] = "Callable";
 static const char __pyx_k_Iterator[] = "Iterator";
 static const char __pyx_k_Optional[] = "Optional";
@@ -6350,6 +6368,7 @@ static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static const char __pyx_k_vectorized[] = "vectorized";
 static const char __pyx_k_ImportError[] = "ImportError";
 static const char __pyx_k_PickleError[] = "PickleError";
+static const char __pyx_k_TypingError[] = "TypingError";
 static const char __pyx_k_zip_longest[] = "zip_longest";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
 static const char __pyx_k_initializing[] = "_initializing";
@@ -6371,7 +6390,6 @@ static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_CythonUnionOperator[] = "CythonUnionOperator";
 static const char __pyx_k_create_map_operator[] = "create_map_operator";
-static const char __pyx_k_A_4_s_1_1_T_1_A_ar_A[] = "\200A\360\010\000\t\014\2104\320\017\037\230s\240&\250\003\2501\330\014\023\2201\340\010\t\340\014\025\220T\230\037\250\001\250\021\360\014\000\r\024\2201\340\010\017\210}\230A\330\014\022\220,\230a\230r\320!<\270A";
 static const char __pyx_k_CythonFilterOperator[] = "CythonFilterOperator";
 static const char __pyx_k_CythonSelectOperator[] = "CythonSelectOperator";
 static const char __pyx_k_CythonFlatMapOperator[] = "CythonFlatMapOperator";
@@ -6391,6 +6409,7 @@ static const char __pyx_k_hk_A_1_x_x_z_z_7_7q8PP___1[] = "\200\001\360\006\000\0
 static const char __pyx_k_Numba_compiled_map_function[] = "Numba-compiled map function '";
 static const char __pyx_k_A_4_s_1_1_d_t_Qj_a_aq_1_A_ar[] = "\200A\360\014\000\t\014\2104\320\017\037\230s\240&\250\003\2501\330\014\023\2201\340\010\t\330\014\026\220d\230/\250\021\250!\340\014\017\210t\220:\230Q\230j\250\006\250a\330\020\032\230$\230a\230q\330\014\023\2201\340\010\017\210}\230A\330\014\022\220,\230a\230r\320!@\300\001";
 static const char __pyx_k_CythonFlatMapOperator___iter[] = "CythonFlatMapOperator.__iter__";
+static const char __pyx_k_A_4_s_1_1_T_1_A_t_nCs_4q_SPXX[] = "\200A\360\010\000\t\014\2104\320\017\037\230s\240&\250\003\2501\330\014\023\2201\340\010\t\340\014\025\220T\230\037\250\001\250\021\360\014\000\r\024\2201\340\010\017\210}\230A\360\006\000\r\020\210t\220>\240\025\240n\260C\260s\270!\2704\270q\300\002\300+\310S\320PX\320X[\320[^\320^_\320_a\320ag\320gh\330\027\030\330\020\031\230\027\240\n\250!\2501\330\020\026\220h\230a\330\024\026\320\026C\3007\310!\3104\310|\320[g\320gh\330\026D\300D\310\001\310\022\3101\360\006\000\021\025\320\024&\240d\250!\330\020\024\320\024$\240A\340\020\031\230\024\230_\250A\250Q\330\020\027\220q\340\020\026\220l\240!\2402\320%@\300\001";
 static const char __pyx_k_hk_A_1_r_r_t_t_u_xq_7_6a7Nn_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"r\002\360\000\000r\002t\002\360\000\000t\002u\002\330\004\023\320\023'\240x\250q\260\001\330\004\007\200|\2207\230!\330\0106\260a\3207N\310n\320\\]\330\004\013\2101";
 static const char __pyx_k_hk_A_1_t_t_v_v_w_xq_7_6a7Nn_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"t\002\360\000\000t\002v\002\360\000\000v\002w\002\330\004\023\320\023'\240x\250q\260\001\330\004\007\200|\2207\230!\330\0106\260a\3207N\310n\320\\]\330\004\013\2101";
 static const char __pyx_k_T_8_M_ZW_eeiij_G1F_a_vWA_q_t_S[] = "\200\001\360\010\000\005\016\210T\220\037\240\004\320$8\270\004\270M\310\024\310Z\320W[\320[e\320ei\320ij\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230>\250\027\260\005\260S\270\004\270L\310\007\310u\320TW\320W[\320[d\320dk\320kp\320ps\320sw\360\000\000x\001A\002\360\000\000A\002H\002\360\000\000H\002I\002\330\004\007\200q\330\010\017\320\0175\260T\270\021\270'\300\033\310G\320ST\340\010\017\320\0175\260T\270\021\270'\300\033\310A";
@@ -6409,6 +6428,7 @@ static const char __pyx_k_T_8_Jd_TXXccggh_G1F_a_vWA_q_t_S[] = "\200\001\360\010\
 static const char __pyx_k_T_D_t3Gt_UYYccggh_G1F_a_vWA_q_t[] = "\200\001\360\010\000\005\016\210T\220\033\230D\240\017\250t\3203G\300t\310:\320UY\320Yc\320cg\320gh\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230:\240W\250E\260\023\260D\270\016\300g\310U\320RU\320UY\320Yb\320bi\320in\320nq\320qu\320u~\360\000\000\177\001F\002\360\000\000F\002G\002\330\004\007\200q\330\010\017\320\0175\260T\270\021\270'\300\033\310G\320ST\340\010\017\320\0175\260T\270\021\270'\300\033\310A";
 static const char __pyx_k_can_auto_convert_predicate_erro[] = "_can_auto_convert_predicate_error";
 static const char __pyx_k_evaluate_predicate_with_auto_co[] = "_evaluate_predicate_with_auto_conversion";
+static const char __pyx_k_falling_back_to_original_functi[] = "', falling back to original function. Error: ";
 static const char __pyx_k_hk_A_1_r_r_t_t_u_haq_7_5Q6LNZ_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"r\002\360\000\000r\002t\002\360\000\000t\002u\002\330\004\023\320\023&\240h\250a\250q\330\004\007\200|\2207\230!\330\0105\260Q\3206L\310N\320Z[\330\004\013\2101";
 static const char __pyx_k_A_4_s_5_5_Q_1_t_aq_4_9_4_H_z_y_u[] = "\200A\360\010\000\t\014\2104\320\017\037\230s\240&\250\003\2505\260\003\2605\270\n\300#\300Q\330\014\023\2201\340\010\t\340\014\r\330\020\027\220t\230;\240a\240q\330\014\023\220=\240\001\340\020\023\2204\320\0279\270\021\270!\330\024\033\2304\320\037H\310\001\310\021\340\024\025\360\006\000\r\020\210z\230\021\230&\240\001\340\020\027\220y\240\n\250!\360\010\000\021\030\220u\230G\2401\240A\340\010\017\210}\230A\330\014\022\220,\230a\230r\320!?\270q";
 static const char __pyx_k_A_4_s_a_1_4uHCr_T_Ba_4q_1_3a_c_q[] = "\200A\360\016\000\t\014\2104\320\017\037\230s\240$\240a\330\014\023\2201\360\006\000\t\031\230\001\230\022\2304\230u\240H\250C\250r\260\027\270\005\270T\300\021\300*\310B\310a\340\010\013\2104\210q\330\014\023\2201\340\010\013\2103\210a\210\177\230c\240\021\330\014\023\220=\240\001\240\021\360\010\000\t\020\210q";
@@ -6426,6 +6446,7 @@ static const char __pyx_k_CythonUnionOperator___setstate_c[] = "CythonUnionOpera
 static const char __pyx_k_CythonUnionOperator_process_batc[] = "CythonUnionOperator.process_batches";
 static const char __pyx_k_Incompatible_checksums_0x_x_vs_0[] = "Incompatible checksums (0x%x vs (0x2a520f4, 0xbd9aba3, 0xf8e8eb6) = (_compiled_func, _is_compiled, _key_columns, _map_func, _parallelism_hint, _schema, _source, _stateful, _vectorized))";
 static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.";
+static const char __pyx_k_Numba_compilation_failed_at_runt[] = "Numba compilation failed at runtime for '";
 static const char __pyx_k_sabot__cython_operators_transfor[] = "sabot._cython.operators.transform";
 static const char __pyx_k_Incompatible_checksums_0x_x_vs_0_2[] = "Incompatible checksums (0x%x vs (0x87a9e20, 0x694da9f, 0x03ce18e) = (_key_columns, _parallelism_hint, _predicate, _schema, _source, _stateful))";
 static const char __pyx_k_Incompatible_checksums_0x_x_vs_0_3[] = "Incompatible checksums (0x%x vs (0xad15a8e, 0x7b75792, 0x843ed1a) = (_columns, _key_columns, _parallelism_hint, _schema, _source, _stateful))";
@@ -6642,7 +6663,7 @@ typedef struct {
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
   PyObject *__pyx_tuple[5];
   PyObject *__pyx_codeobj_tab[27];
-  PyObject *__pyx_string_tab[137];
+  PyObject *__pyx_string_tab[143];
   PyObject *__pyx_int_0;
   PyObject *__pyx_int_1000;
   PyObject *__pyx_int_3989902;
@@ -6751,104 +6772,110 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_List __pyx_string_tab[36]
 #define __pyx_n_u_NUMBA_COMPILER_AVAILABLE __pyx_string_tab[37]
 #define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[38]
-#define __pyx_kp_u_Numba_compiled_map_function __pyx_string_tab[39]
-#define __pyx_n_u_Optional __pyx_string_tab[40]
-#define __pyx_n_u_PickleError __pyx_string_tab[41]
-#define __pyx_n_u_RuntimeError __pyx_string_tab[42]
-#define __pyx_n_u_TypeError __pyx_string_tab[43]
-#define __pyx_kp_u__2 __pyx_string_tab[44]
-#define __pyx_kp_u_add_note __pyx_string_tab[45]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[46]
-#define __pyx_n_u_batch __pyx_string_tab[47]
-#define __pyx_n_u_batches __pyx_string_tab[48]
-#define __pyx_n_u_can_auto_convert_predicate_erro __pyx_string_tab[49]
-#define __pyx_n_u_chain __pyx_string_tab[50]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[51]
-#define __pyx_n_u_close __pyx_string_tab[52]
-#define __pyx_n_u_columns __pyx_string_tab[53]
-#define __pyx_n_u_create_filter_operator __pyx_string_tab[54]
-#define __pyx_n_u_create_flatmap_operator __pyx_string_tab[55]
-#define __pyx_n_u_create_map_operator __pyx_string_tab[56]
-#define __pyx_n_u_create_select_operator __pyx_string_tab[57]
-#define __pyx_n_u_create_union_operator __pyx_string_tab[58]
-#define __pyx_n_u_dict __pyx_string_tab[59]
-#define __pyx_n_u_dict_2 __pyx_string_tab[60]
-#define __pyx_kp_u_disable __pyx_string_tab[61]
-#define __pyx_kp_u_enable __pyx_string_tab[62]
-#define __pyx_n_u_evaluate_predicate_with_auto_co __pyx_string_tab[63]
-#define __pyx_n_u_filter __pyx_string_tab[64]
-#define __pyx_n_u_flat_map_func __pyx_string_tab[65]
-#define __pyx_n_u_from_iterable __pyx_string_tab[66]
-#define __pyx_n_u_func __pyx_string_tab[67]
-#define __pyx_n_u_func_2 __pyx_string_tab[68]
-#define __pyx_kp_u_gc __pyx_string_tab[69]
-#define __pyx_n_u_getLogger __pyx_string_tab[70]
-#define __pyx_n_u_getstate __pyx_string_tab[71]
-#define __pyx_kp_u_in __pyx_string_tab[72]
-#define __pyx_n_u_info __pyx_string_tab[73]
-#define __pyx_n_u_initializing __pyx_string_tab[74]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[75]
-#define __pyx_kp_u_isenabled __pyx_string_tab[76]
-#define __pyx_n_u_iter __pyx_string_tab[77]
-#define __pyx_n_u_iterators __pyx_string_tab[78]
-#define __pyx_n_u_itertools __pyx_string_tab[79]
-#define __pyx_n_u_kwargs __pyx_string_tab[80]
-#define __pyx_kp_u_lambda __pyx_string_tab[81]
-#define __pyx_n_u_logging __pyx_string_tab[82]
-#define __pyx_n_u_main __pyx_string_tab[83]
-#define __pyx_n_u_map_func __pyx_string_tab[84]
-#define __pyx_n_u_module __pyx_string_tab[85]
-#define __pyx_n_u_ms __pyx_string_tab[86]
-#define __pyx_n_u_name __pyx_string_tab[87]
-#define __pyx_n_u_new __pyx_string_tab[88]
-#define __pyx_n_u_next __pyx_string_tab[89]
-#define __pyx_n_u_num_rows __pyx_string_tab[90]
-#define __pyx_n_u_perf_counter __pyx_string_tab[91]
-#define __pyx_n_u_pickle __pyx_string_tab[92]
-#define __pyx_n_u_pop __pyx_string_tab[93]
-#define __pyx_n_u_predicate __pyx_string_tab[94]
-#define __pyx_n_u_process_batch __pyx_string_tab[95]
-#define __pyx_n_u_process_batches __pyx_string_tab[96]
-#define __pyx_n_u_pyx_PickleError __pyx_string_tab[97]
-#define __pyx_n_u_pyx_checksum __pyx_string_tab[98]
-#define __pyx_n_u_pyx_result __pyx_string_tab[99]
-#define __pyx_n_u_pyx_state __pyx_string_tab[100]
-#define __pyx_n_u_pyx_type __pyx_string_tab[101]
-#define __pyx_n_u_pyx_unpickle_CythonFilterOpera __pyx_string_tab[102]
-#define __pyx_n_u_pyx_unpickle_CythonFlatMapOper __pyx_string_tab[103]
-#define __pyx_n_u_pyx_unpickle_CythonMapOperator __pyx_string_tab[104]
-#define __pyx_n_u_pyx_unpickle_CythonSelectOpera __pyx_string_tab[105]
-#define __pyx_n_u_pyx_unpickle_CythonUnionOperat __pyx_string_tab[106]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[107]
-#define __pyx_n_u_qualname __pyx_string_tab[108]
-#define __pyx_n_u_reduce __pyx_string_tab[109]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[110]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[111]
-#define __pyx_n_u_result_batch __pyx_string_tab[112]
-#define __pyx_n_u_results __pyx_string_tab[113]
-#define __pyx_n_u_sabot__cython_operators_transfor __pyx_string_tab[114]
-#define __pyx_kp_u_sabot__cython_operators_transfor_2 __pyx_string_tab[115]
-#define __pyx_n_u_schema __pyx_string_tab[116]
-#define __pyx_n_u_select __pyx_string_tab[117]
-#define __pyx_n_u_self __pyx_string_tab[118]
-#define __pyx_n_u_send __pyx_string_tab[119]
-#define __pyx_n_u_set_name __pyx_string_tab[120]
-#define __pyx_n_u_setstate __pyx_string_tab[121]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[122]
-#define __pyx_n_u_source __pyx_string_tab[123]
-#define __pyx_n_u_sources __pyx_string_tab[124]
-#define __pyx_n_u_spec __pyx_string_tab[125]
-#define __pyx_n_u_state __pyx_string_tab[126]
-#define __pyx_kp_u_stringsource __pyx_string_tab[127]
-#define __pyx_n_u_test __pyx_string_tab[128]
-#define __pyx_n_u_throw __pyx_string_tab[129]
-#define __pyx_n_u_time __pyx_string_tab[130]
-#define __pyx_n_u_typing __pyx_string_tab[131]
-#define __pyx_n_u_update __pyx_string_tab[132]
-#define __pyx_n_u_use_setstate __pyx_string_tab[133]
-#define __pyx_n_u_value __pyx_string_tab[134]
-#define __pyx_n_u_vectorized __pyx_string_tab[135]
-#define __pyx_n_u_zip_longest __pyx_string_tab[136]
+#define __pyx_kp_u_Numba_compilation_failed_at_runt __pyx_string_tab[39]
+#define __pyx_kp_u_Numba_compiled_map_function __pyx_string_tab[40]
+#define __pyx_n_u_Optional __pyx_string_tab[41]
+#define __pyx_n_u_PickleError __pyx_string_tab[42]
+#define __pyx_n_u_RuntimeError __pyx_string_tab[43]
+#define __pyx_n_u_TypeError __pyx_string_tab[44]
+#define __pyx_n_u_TypingError __pyx_string_tab[45]
+#define __pyx_kp_u__2 __pyx_string_tab[46]
+#define __pyx_kp_u_add_note __pyx_string_tab[47]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[48]
+#define __pyx_n_u_batch __pyx_string_tab[49]
+#define __pyx_n_u_batches __pyx_string_tab[50]
+#define __pyx_n_u_can_auto_convert_predicate_erro __pyx_string_tab[51]
+#define __pyx_n_u_chain __pyx_string_tab[52]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[53]
+#define __pyx_n_u_close __pyx_string_tab[54]
+#define __pyx_n_u_columns __pyx_string_tab[55]
+#define __pyx_n_u_create_filter_operator __pyx_string_tab[56]
+#define __pyx_n_u_create_flatmap_operator __pyx_string_tab[57]
+#define __pyx_n_u_create_map_operator __pyx_string_tab[58]
+#define __pyx_n_u_create_select_operator __pyx_string_tab[59]
+#define __pyx_n_u_create_union_operator __pyx_string_tab[60]
+#define __pyx_n_u_dict __pyx_string_tab[61]
+#define __pyx_n_u_dict_2 __pyx_string_tab[62]
+#define __pyx_kp_u_disable __pyx_string_tab[63]
+#define __pyx_kp_u_enable __pyx_string_tab[64]
+#define __pyx_n_u_evaluate_predicate_with_auto_co __pyx_string_tab[65]
+#define __pyx_kp_u_falling_back_to_original_functi __pyx_string_tab[66]
+#define __pyx_n_u_filter __pyx_string_tab[67]
+#define __pyx_n_u_flat_map_func __pyx_string_tab[68]
+#define __pyx_n_u_from_iterable __pyx_string_tab[69]
+#define __pyx_n_u_func __pyx_string_tab[70]
+#define __pyx_n_u_func_2 __pyx_string_tab[71]
+#define __pyx_kp_u_gc __pyx_string_tab[72]
+#define __pyx_n_u_getLogger __pyx_string_tab[73]
+#define __pyx_n_u_getstate __pyx_string_tab[74]
+#define __pyx_kp_u_in __pyx_string_tab[75]
+#define __pyx_n_u_info __pyx_string_tab[76]
+#define __pyx_n_u_initializing __pyx_string_tab[77]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[78]
+#define __pyx_kp_u_isenabled __pyx_string_tab[79]
+#define __pyx_n_u_iter __pyx_string_tab[80]
+#define __pyx_n_u_iterators __pyx_string_tab[81]
+#define __pyx_n_u_itertools __pyx_string_tab[82]
+#define __pyx_n_u_kwargs __pyx_string_tab[83]
+#define __pyx_kp_u_lambda __pyx_string_tab[84]
+#define __pyx_n_u_logging __pyx_string_tab[85]
+#define __pyx_n_u_lower __pyx_string_tab[86]
+#define __pyx_n_u_main __pyx_string_tab[87]
+#define __pyx_n_u_map_func __pyx_string_tab[88]
+#define __pyx_n_u_module __pyx_string_tab[89]
+#define __pyx_n_u_ms __pyx_string_tab[90]
+#define __pyx_n_u_name __pyx_string_tab[91]
+#define __pyx_n_u_new __pyx_string_tab[92]
+#define __pyx_n_u_next __pyx_string_tab[93]
+#define __pyx_n_u_num_rows __pyx_string_tab[94]
+#define __pyx_n_u_numba __pyx_string_tab[95]
+#define __pyx_n_u_perf_counter __pyx_string_tab[96]
+#define __pyx_n_u_pickle __pyx_string_tab[97]
+#define __pyx_n_u_pop __pyx_string_tab[98]
+#define __pyx_n_u_predicate __pyx_string_tab[99]
+#define __pyx_n_u_process_batch __pyx_string_tab[100]
+#define __pyx_n_u_process_batches __pyx_string_tab[101]
+#define __pyx_n_u_pyx_PickleError __pyx_string_tab[102]
+#define __pyx_n_u_pyx_checksum __pyx_string_tab[103]
+#define __pyx_n_u_pyx_result __pyx_string_tab[104]
+#define __pyx_n_u_pyx_state __pyx_string_tab[105]
+#define __pyx_n_u_pyx_type __pyx_string_tab[106]
+#define __pyx_n_u_pyx_unpickle_CythonFilterOpera __pyx_string_tab[107]
+#define __pyx_n_u_pyx_unpickle_CythonFlatMapOper __pyx_string_tab[108]
+#define __pyx_n_u_pyx_unpickle_CythonMapOperator __pyx_string_tab[109]
+#define __pyx_n_u_pyx_unpickle_CythonSelectOpera __pyx_string_tab[110]
+#define __pyx_n_u_pyx_unpickle_CythonUnionOperat __pyx_string_tab[111]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[112]
+#define __pyx_n_u_qualname __pyx_string_tab[113]
+#define __pyx_n_u_reduce __pyx_string_tab[114]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[115]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[116]
+#define __pyx_n_u_result_batch __pyx_string_tab[117]
+#define __pyx_n_u_results __pyx_string_tab[118]
+#define __pyx_n_u_sabot__cython_operators_transfor __pyx_string_tab[119]
+#define __pyx_kp_u_sabot__cython_operators_transfor_2 __pyx_string_tab[120]
+#define __pyx_n_u_schema __pyx_string_tab[121]
+#define __pyx_n_u_select __pyx_string_tab[122]
+#define __pyx_n_u_self __pyx_string_tab[123]
+#define __pyx_n_u_send __pyx_string_tab[124]
+#define __pyx_n_u_set_name __pyx_string_tab[125]
+#define __pyx_n_u_setstate __pyx_string_tab[126]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[127]
+#define __pyx_n_u_source __pyx_string_tab[128]
+#define __pyx_n_u_sources __pyx_string_tab[129]
+#define __pyx_n_u_spec __pyx_string_tab[130]
+#define __pyx_n_u_state __pyx_string_tab[131]
+#define __pyx_kp_u_stringsource __pyx_string_tab[132]
+#define __pyx_n_u_test __pyx_string_tab[133]
+#define __pyx_n_u_throw __pyx_string_tab[134]
+#define __pyx_n_u_time __pyx_string_tab[135]
+#define __pyx_n_u_typing __pyx_string_tab[136]
+#define __pyx_n_u_update __pyx_string_tab[137]
+#define __pyx_n_u_use_setstate __pyx_string_tab[138]
+#define __pyx_n_u_value __pyx_string_tab[139]
+#define __pyx_n_u_vectorized __pyx_string_tab[140]
+#define __pyx_n_u_warning __pyx_string_tab[141]
+#define __pyx_n_u_zip_longest __pyx_string_tab[142]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -7000,7 +7027,7 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__);
   for (int i=0; i<5; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
   for (int i=0; i<27; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<137; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<143; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   Py_CLEAR(clear_module_state->__pyx_int_0);
   Py_CLEAR(clear_module_state->__pyx_int_1000);
   Py_CLEAR(clear_module_state->__pyx_int_3989902);
@@ -7169,7 +7196,7 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__);
   for (int i=0; i<5; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
   for (int i=0; i<27; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<137; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<143; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_1000);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_3989902);
@@ -10087,6 +10114,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_17CythonMapOperator_process_batch(struct __pyx_obj_5sabot_7_cython_9operators_9transform_CythonMapOperator *__pyx_v_self, PyObject *__pyx_v_batch, CYTHON_UNUSED int __pyx_skip_dispatch) {
   PyObject *__pyx_v_result = NULL;
   PyObject *__pyx_v_e = NULL;
+  PyObject *__pyx_v_logging = NULL;
+  PyObject *__pyx_v_logger = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -10104,14 +10133,15 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_17CythonMapOperat
   PyObject *__pyx_t_13 = NULL;
   PyObject *__pyx_t_14 = NULL;
   PyObject *__pyx_t_15 = NULL;
-  int __pyx_t_16;
-  char const *__pyx_t_17;
-  PyObject *__pyx_t_18 = NULL;
+  PyObject *__pyx_t_16[4];
+  int __pyx_t_17;
+  char const *__pyx_t_18;
   PyObject *__pyx_t_19 = NULL;
   PyObject *__pyx_t_20 = NULL;
   PyObject *__pyx_t_21 = NULL;
   PyObject *__pyx_t_22 = NULL;
   PyObject *__pyx_t_23 = NULL;
+  PyObject *__pyx_t_24 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -10233,8 +10263,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_17CythonMapOperat
  *             return result
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
- *             raise RuntimeError(f"Error in map operator: {e}")
- * 
+ *             # Runtime fallback: If Numba compilation failed at runtime, use original function
+ *             # This handles cases where pattern detection missed Arrow/Pandas usage
 */
     __pyx_t_10 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_10) {
@@ -10247,77 +10277,312 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_17CythonMapOperat
       __pyx_v_e = __pyx_t_8;
       /*try:*/ {
 
-        /* "sabot/_cython/operators/transform.pyx":160
- * 
- *         except Exception as e:
- *             raise RuntimeError(f"Error in map operator: {e}")             # <<<<<<<<<<<<<<
+        /* "sabot/_cython/operators/transform.pyx":162
+ *             # Runtime fallback: If Numba compilation failed at runtime, use original function
+ *             # This handles cases where pattern detection missed Arrow/Pandas usage
+ *             if self._is_compiled and ('TypingError' in str(type(e).__name__) or 'numba' in str(e).lower()):             # <<<<<<<<<<<<<<
+ *                 import logging
+ *                 logger = logging.getLogger(__name__)
+*/
+        if (__pyx_v_self->_is_compiled) {
+        } else {
+          __pyx_t_1 = __pyx_v_self->_is_compiled;
+          goto __pyx_L20_bool_binop_done;
+        }
+        __pyx_t_11 = __Pyx_PyObject_GetAttrStr(((PyObject *)Py_TYPE(__pyx_v_e)), __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 162, __pyx_L17_error)
+        __Pyx_GOTREF(__pyx_t_11);
+        __pyx_t_12 = __Pyx_PyObject_Unicode(__pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 162, __pyx_L17_error)
+        __Pyx_GOTREF(__pyx_t_12);
+        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+        __pyx_t_2 = (__Pyx_PyUnicode_ContainsTF(__pyx_mstate_global->__pyx_n_u_TypingError, __pyx_t_12, Py_EQ)); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 162, __pyx_L17_error)
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        if (!__pyx_t_2) {
+        } else {
+          __pyx_t_1 = __pyx_t_2;
+          goto __pyx_L20_bool_binop_done;
+        }
+        __pyx_t_13 = __Pyx_PyObject_Unicode(__pyx_v_e); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 162, __pyx_L17_error)
+        __Pyx_GOTREF(__pyx_t_13);
+        __pyx_t_11 = __pyx_t_13;
+        __Pyx_INCREF(__pyx_t_11);
+        __pyx_t_9 = 0;
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_11, NULL};
+          __pyx_t_12 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_lower, __pyx_callargs+__pyx_t_9, (1-__pyx_t_9) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+          __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+          if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 162, __pyx_L17_error)
+          __Pyx_GOTREF(__pyx_t_12);
+        }
+        __pyx_t_2 = (__Pyx_PyUnicode_ContainsTF(__pyx_mstate_global->__pyx_n_u_numba, __pyx_t_12, Py_EQ)); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 162, __pyx_L17_error)
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __pyx_t_1 = __pyx_t_2;
+        __pyx_L20_bool_binop_done:;
+        if (likely(__pyx_t_1)) {
+
+          /* "sabot/_cython/operators/transform.pyx":163
+ *             # This handles cases where pattern detection missed Arrow/Pandas usage
+ *             if self._is_compiled and ('TypingError' in str(type(e).__name__) or 'numba' in str(e).lower()):
+ *                 import logging             # <<<<<<<<<<<<<<
+ *                 logger = logging.getLogger(__name__)
+ *                 logger.warning(
+*/
+          __pyx_t_12 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_logging, NULL); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 163, __pyx_L17_error)
+          __Pyx_GOTREF(__pyx_t_12);
+          __pyx_v_logging = __pyx_t_12;
+          __pyx_t_12 = 0;
+
+          /* "sabot/_cython/operators/transform.pyx":164
+ *             if self._is_compiled and ('TypingError' in str(type(e).__name__) or 'numba' in str(e).lower()):
+ *                 import logging
+ *                 logger = logging.getLogger(__name__)             # <<<<<<<<<<<<<<
+ *                 logger.warning(
+ *                     f"Numba compilation failed at runtime for '{getattr(self._map_func, '__name__', '<lambda>')}', "
+*/
+          __pyx_t_13 = __pyx_v_logging;
+          __Pyx_INCREF(__pyx_t_13);
+          __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 164, __pyx_L17_error)
+          __Pyx_GOTREF(__pyx_t_11);
+          __pyx_t_9 = 0;
+          {
+            PyObject *__pyx_callargs[2] = {__pyx_t_13, __pyx_t_11};
+            __pyx_t_12 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_getLogger, __pyx_callargs+__pyx_t_9, (2-__pyx_t_9) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+            __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
+            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+            if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 164, __pyx_L17_error)
+            __Pyx_GOTREF(__pyx_t_12);
+          }
+          __pyx_v_logger = __pyx_t_12;
+          __pyx_t_12 = 0;
+
+          /* "sabot/_cython/operators/transform.pyx":165
+ *                 import logging
+ *                 logger = logging.getLogger(__name__)
+ *                 logger.warning(             # <<<<<<<<<<<<<<
+ *                     f"Numba compilation failed at runtime for '{getattr(self._map_func, '__name__', '<lambda>')}', "
+ *                     f"falling back to original function. Error: {type(e).__name__}"
+*/
+          __pyx_t_11 = __pyx_v_logger;
+          __Pyx_INCREF(__pyx_t_11);
+
+          /* "sabot/_cython/operators/transform.pyx":166
+ *                 logger = logging.getLogger(__name__)
+ *                 logger.warning(
+ *                     f"Numba compilation failed at runtime for '{getattr(self._map_func, '__name__', '<lambda>')}', "             # <<<<<<<<<<<<<<
+ *                     f"falling back to original function. Error: {type(e).__name__}"
+ *                 )
+*/
+          __pyx_t_13 = __pyx_v_self->_map_func;
+          __Pyx_INCREF(__pyx_t_13);
+          __pyx_t_14 = __Pyx_GetAttr3(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_name, __pyx_mstate_global->__pyx_kp_u_lambda); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 166, __pyx_L17_error)
+          __Pyx_GOTREF(__pyx_t_14);
+          __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+          __pyx_t_13 = __Pyx_PyObject_FormatSimple(__pyx_t_14, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 166, __pyx_L17_error)
+          __Pyx_GOTREF(__pyx_t_13);
+          __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+
+          /* "sabot/_cython/operators/transform.pyx":167
+ *                 logger.warning(
+ *                     f"Numba compilation failed at runtime for '{getattr(self._map_func, '__name__', '<lambda>')}', "
+ *                     f"falling back to original function. Error: {type(e).__name__}"             # <<<<<<<<<<<<<<
+ *                 )
+ *                 # Fallback to original function permanently
+*/
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(((PyObject *)Py_TYPE(__pyx_v_e)), __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 167, __pyx_L17_error)
+          __Pyx_GOTREF(__pyx_t_14);
+          __pyx_t_15 = __Pyx_PyObject_FormatSimple(__pyx_t_14, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 167, __pyx_L17_error)
+          __Pyx_GOTREF(__pyx_t_15);
+          __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+          __pyx_t_16[0] = __pyx_mstate_global->__pyx_kp_u_Numba_compilation_failed_at_runt;
+          __pyx_t_16[1] = __pyx_t_13;
+          __pyx_t_16[2] = __pyx_mstate_global->__pyx_kp_u_falling_back_to_original_functi;
+          __pyx_t_16[3] = __pyx_t_15;
+
+          /* "sabot/_cython/operators/transform.pyx":166
+ *                 logger = logging.getLogger(__name__)
+ *                 logger.warning(
+ *                     f"Numba compilation failed at runtime for '{getattr(self._map_func, '__name__', '<lambda>')}', "             # <<<<<<<<<<<<<<
+ *                     f"falling back to original function. Error: {type(e).__name__}"
+ *                 )
+*/
+          __pyx_t_14 = __Pyx_PyUnicode_Join(__pyx_t_16, 4, 41 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_13) + 45 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_15), 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_13) | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_15));
+          if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 166, __pyx_L17_error)
+          __Pyx_GOTREF(__pyx_t_14);
+          __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+          __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+          __pyx_t_9 = 0;
+          {
+            PyObject *__pyx_callargs[2] = {__pyx_t_11, __pyx_t_14};
+            __pyx_t_12 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_warning, __pyx_callargs+__pyx_t_9, (2-__pyx_t_9) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+            __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+            __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+            if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 165, __pyx_L17_error)
+            __Pyx_GOTREF(__pyx_t_12);
+          }
+          __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+
+          /* "sabot/_cython/operators/transform.pyx":170
+ *                 )
+ *                 # Fallback to original function permanently
+ *                 self._compiled_func = self._map_func             # <<<<<<<<<<<<<<
+ *                 self._is_compiled = False
+ *                 # Retry with original function
+*/
+          __pyx_t_12 = __pyx_v_self->_map_func;
+          __Pyx_INCREF(__pyx_t_12);
+          __Pyx_GIVEREF(__pyx_t_12);
+          __Pyx_GOTREF(__pyx_v_self->_compiled_func);
+          __Pyx_DECREF(__pyx_v_self->_compiled_func);
+          __pyx_v_self->_compiled_func = __pyx_t_12;
+          __pyx_t_12 = 0;
+
+          /* "sabot/_cython/operators/transform.pyx":171
+ *                 # Fallback to original function permanently
+ *                 self._compiled_func = self._map_func
+ *                 self._is_compiled = False             # <<<<<<<<<<<<<<
+ *                 # Retry with original function
+ *                 result = self._compiled_func(batch)
+*/
+          __pyx_v_self->_is_compiled = 0;
+
+          /* "sabot/_cython/operators/transform.pyx":173
+ *                 self._is_compiled = False
+ *                 # Retry with original function
+ *                 result = self._compiled_func(batch)             # <<<<<<<<<<<<<<
+ *                 return result
+ *             else:
+*/
+          __pyx_t_14 = NULL;
+          __Pyx_INCREF(__pyx_v_self->_compiled_func);
+          __pyx_t_11 = __pyx_v_self->_compiled_func; 
+          __pyx_t_9 = 1;
+          #if CYTHON_UNPACK_METHODS
+          if (likely(PyMethod_Check(__pyx_t_11))) {
+            __pyx_t_14 = PyMethod_GET_SELF(__pyx_t_11);
+            assert(__pyx_t_14);
+            PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_11);
+            __Pyx_INCREF(__pyx_t_14);
+            __Pyx_INCREF(__pyx__function);
+            __Pyx_DECREF_SET(__pyx_t_11, __pyx__function);
+            __pyx_t_9 = 0;
+          }
+          #endif
+          {
+            PyObject *__pyx_callargs[2] = {__pyx_t_14, __pyx_v_batch};
+            __pyx_t_12 = __Pyx_PyObject_FastCall(__pyx_t_11, __pyx_callargs+__pyx_t_9, (2-__pyx_t_9) | (__pyx_t_9*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+            __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
+            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+            if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 173, __pyx_L17_error)
+            __Pyx_GOTREF(__pyx_t_12);
+          }
+          __Pyx_XDECREF_SET(__pyx_v_result, __pyx_t_12);
+          __pyx_t_12 = 0;
+
+          /* "sabot/_cython/operators/transform.pyx":174
+ *                 # Retry with original function
+ *                 result = self._compiled_func(batch)
+ *                 return result             # <<<<<<<<<<<<<<
+ *             else:
+ *                 raise RuntimeError(f"Error in map operator: {e}")
+*/
+          __Pyx_XDECREF(__pyx_r);
+          __Pyx_INCREF(__pyx_v_result);
+          __pyx_r = __pyx_v_result;
+          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+          goto __pyx_L16_return;
+
+          /* "sabot/_cython/operators/transform.pyx":162
+ *             # Runtime fallback: If Numba compilation failed at runtime, use original function
+ *             # This handles cases where pattern detection missed Arrow/Pandas usage
+ *             if self._is_compiled and ('TypingError' in str(type(e).__name__) or 'numba' in str(e).lower()):             # <<<<<<<<<<<<<<
+ *                 import logging
+ *                 logger = logging.getLogger(__name__)
+*/
+        }
+
+        /* "sabot/_cython/operators/transform.pyx":176
+ *                 return result
+ *             else:
+ *                 raise RuntimeError(f"Error in map operator: {e}")             # <<<<<<<<<<<<<<
  * 
  * 
 */
-        __pyx_t_12 = NULL;
-        __Pyx_INCREF(__pyx_builtin_RuntimeError);
-        __pyx_t_13 = __pyx_builtin_RuntimeError; 
-        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 160, __pyx_L17_error)
-        __Pyx_GOTREF(__pyx_t_14);
-        __pyx_t_15 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Error_in_map_operator, __pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 160, __pyx_L17_error)
-        __Pyx_GOTREF(__pyx_t_15);
-        __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-        __pyx_t_9 = 1;
-        {
-          PyObject *__pyx_callargs[2] = {__pyx_t_12, __pyx_t_15};
-          __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_13, __pyx_callargs+__pyx_t_9, (2-__pyx_t_9) | (__pyx_t_9*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-          __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+        /*else*/ {
+          __pyx_t_11 = NULL;
+          __Pyx_INCREF(__pyx_builtin_RuntimeError);
+          __pyx_t_14 = __pyx_builtin_RuntimeError; 
+          __pyx_t_15 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 176, __pyx_L17_error)
+          __Pyx_GOTREF(__pyx_t_15);
+          __pyx_t_13 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Error_in_map_operator, __pyx_t_15); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 176, __pyx_L17_error)
+          __Pyx_GOTREF(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-          __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 160, __pyx_L17_error)
-          __Pyx_GOTREF(__pyx_t_11);
+          __pyx_t_9 = 1;
+          {
+            PyObject *__pyx_callargs[2] = {__pyx_t_11, __pyx_t_13};
+            __pyx_t_12 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+__pyx_t_9, (2-__pyx_t_9) | (__pyx_t_9*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+            __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+            __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+            __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+            if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 176, __pyx_L17_error)
+            __Pyx_GOTREF(__pyx_t_12);
+          }
+          __Pyx_Raise(__pyx_t_12, 0, 0, 0);
+          __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+          __PYX_ERR(0, 176, __pyx_L17_error)
         }
-        __Pyx_Raise(__pyx_t_11, 0, 0, 0);
-        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __PYX_ERR(0, 160, __pyx_L17_error)
       }
 
       /* "sabot/_cython/operators/transform.pyx":159
  *             return result
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
- *             raise RuntimeError(f"Error in map operator: {e}")
- * 
+ *             # Runtime fallback: If Numba compilation failed at runtime, use original function
+ *             # This handles cases where pattern detection missed Arrow/Pandas usage
 */
       /*finally:*/ {
         __pyx_L17_error:;
         /*exception exit:*/{
           __Pyx_PyThreadState_declare
           __Pyx_PyThreadState_assign
-          __pyx_t_18 = 0; __pyx_t_19 = 0; __pyx_t_20 = 0; __pyx_t_21 = 0; __pyx_t_22 = 0; __pyx_t_23 = 0;
+          __pyx_t_19 = 0; __pyx_t_20 = 0; __pyx_t_21 = 0; __pyx_t_22 = 0; __pyx_t_23 = 0; __pyx_t_24 = 0;
           __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
           __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
           __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
           __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
           __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-           __Pyx_ExceptionSwap(&__pyx_t_21, &__pyx_t_22, &__pyx_t_23);
-          if ( unlikely(__Pyx_GetException(&__pyx_t_18, &__pyx_t_19, &__pyx_t_20) < 0)) __Pyx_ErrFetch(&__pyx_t_18, &__pyx_t_19, &__pyx_t_20);
-          __Pyx_XGOTREF(__pyx_t_18);
+           __Pyx_ExceptionSwap(&__pyx_t_22, &__pyx_t_23, &__pyx_t_24);
+          if ( unlikely(__Pyx_GetException(&__pyx_t_19, &__pyx_t_20, &__pyx_t_21) < 0)) __Pyx_ErrFetch(&__pyx_t_19, &__pyx_t_20, &__pyx_t_21);
           __Pyx_XGOTREF(__pyx_t_19);
           __Pyx_XGOTREF(__pyx_t_20);
           __Pyx_XGOTREF(__pyx_t_21);
           __Pyx_XGOTREF(__pyx_t_22);
           __Pyx_XGOTREF(__pyx_t_23);
-          __pyx_t_10 = __pyx_lineno; __pyx_t_16 = __pyx_clineno; __pyx_t_17 = __pyx_filename;
+          __Pyx_XGOTREF(__pyx_t_24);
+          __pyx_t_10 = __pyx_lineno; __pyx_t_17 = __pyx_clineno; __pyx_t_18 = __pyx_filename;
           {
             __Pyx_DECREF(__pyx_v_e); __pyx_v_e = 0;
           }
-          __Pyx_XGIVEREF(__pyx_t_21);
           __Pyx_XGIVEREF(__pyx_t_22);
           __Pyx_XGIVEREF(__pyx_t_23);
-          __Pyx_ExceptionReset(__pyx_t_21, __pyx_t_22, __pyx_t_23);
-          __Pyx_XGIVEREF(__pyx_t_18);
+          __Pyx_XGIVEREF(__pyx_t_24);
+          __Pyx_ExceptionReset(__pyx_t_22, __pyx_t_23, __pyx_t_24);
           __Pyx_XGIVEREF(__pyx_t_19);
           __Pyx_XGIVEREF(__pyx_t_20);
-          __Pyx_ErrRestore(__pyx_t_18, __pyx_t_19, __pyx_t_20);
-          __pyx_t_18 = 0; __pyx_t_19 = 0; __pyx_t_20 = 0; __pyx_t_21 = 0; __pyx_t_22 = 0; __pyx_t_23 = 0;
-          __pyx_lineno = __pyx_t_10; __pyx_clineno = __pyx_t_16; __pyx_filename = __pyx_t_17;
+          __Pyx_XGIVEREF(__pyx_t_21);
+          __Pyx_ErrRestore(__pyx_t_19, __pyx_t_20, __pyx_t_21);
+          __pyx_t_19 = 0; __pyx_t_20 = 0; __pyx_t_21 = 0; __pyx_t_22 = 0; __pyx_t_23 = 0; __pyx_t_24 = 0;
+          __pyx_lineno = __pyx_t_10; __pyx_clineno = __pyx_t_17; __pyx_filename = __pyx_t_18;
           goto __pyx_L8_except_error;
+        }
+        __pyx_L16_return: {
+          __pyx_t_24 = __pyx_r;
+          __pyx_r = 0;
+          __Pyx_DECREF(__pyx_v_e); __pyx_v_e = 0;
+          __pyx_r = __pyx_t_24;
+          __pyx_t_24 = 0;
+          goto __pyx_L9_except_return;
         }
       }
     }
@@ -10337,6 +10602,12 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_17CythonMapOperat
     __Pyx_ExceptionReset(__pyx_t_3, __pyx_t_4, __pyx_t_5);
     goto __pyx_L1_error;
     __pyx_L10_try_return:;
+    __Pyx_XGIVEREF(__pyx_t_3);
+    __Pyx_XGIVEREF(__pyx_t_4);
+    __Pyx_XGIVEREF(__pyx_t_5);
+    __Pyx_ExceptionReset(__pyx_t_3, __pyx_t_4, __pyx_t_5);
+    goto __pyx_L0;
+    __pyx_L9_except_return:;
     __Pyx_XGIVEREF(__pyx_t_3);
     __Pyx_XGIVEREF(__pyx_t_4);
     __Pyx_XGIVEREF(__pyx_t_5);
@@ -10367,6 +10638,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_17CythonMapOperat
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_result);
   __Pyx_XDECREF(__pyx_v_e);
+  __Pyx_XDECREF(__pyx_v_logging);
+  __Pyx_XDECREF(__pyx_v_logger);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -10938,7 +11211,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_17CythonMapOpera
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":207
+/* "sabot/_cython/operators/transform.pyx":223
  *     """
  * 
  *     def __init__(self, source, predicate, schema=None):             # <<<<<<<<<<<<<<
@@ -10974,41 +11247,41 @@ static int __pyx_pw_5sabot_7_cython_9operators_9transform_20CythonFilterOperator
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_source,&__pyx_mstate_global->__pyx_n_u_predicate,&__pyx_mstate_global->__pyx_n_u_schema,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 207, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 223, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 207, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 223, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 207, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 223, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 207, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 223, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 207, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 223, __pyx_L3_error)
       if (!values[2]) values[2] = __Pyx_NewRef(((PyObject *)Py_None));
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, i); __PYX_ERR(0, 207, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, i); __PYX_ERR(0, 223, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 207, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 223, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 207, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 223, __pyx_L3_error)
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 207, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 223, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
@@ -11020,7 +11293,7 @@ static int __pyx_pw_5sabot_7_cython_9operators_9transform_20CythonFilterOperator
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 207, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 223, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -11046,7 +11319,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_20CythonFilterOperator
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":216
+  /* "sabot/_cython/operators/transform.pyx":232
  *             schema: Schema (passed through from input)
  *         """
  *         self._source = source             # <<<<<<<<<<<<<<
@@ -11059,7 +11332,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_20CythonFilterOperator
   __Pyx_DECREF(__pyx_v_self->__pyx_base._source);
   __pyx_v_self->__pyx_base._source = __pyx_v_source;
 
-  /* "sabot/_cython/operators/transform.pyx":217
+  /* "sabot/_cython/operators/transform.pyx":233
  *         """
  *         self._source = source
  *         self._schema = schema             # <<<<<<<<<<<<<<
@@ -11072,7 +11345,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_20CythonFilterOperator
   __Pyx_DECREF(__pyx_v_self->__pyx_base._schema);
   __pyx_v_self->__pyx_base._schema = __pyx_v_schema;
 
-  /* "sabot/_cython/operators/transform.pyx":218
+  /* "sabot/_cython/operators/transform.pyx":234
  *         self._source = source
  *         self._schema = schema
  *         self._predicate = predicate             # <<<<<<<<<<<<<<
@@ -11085,7 +11358,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_20CythonFilterOperator
   __Pyx_DECREF(__pyx_v_self->_predicate);
   __pyx_v_self->_predicate = __pyx_v_predicate;
 
-  /* "sabot/_cython/operators/transform.pyx":207
+  /* "sabot/_cython/operators/transform.pyx":223
  *     """
  * 
  *     def __init__(self, source, predicate, schema=None):             # <<<<<<<<<<<<<<
@@ -11099,7 +11372,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_20CythonFilterOperator
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":220
+/* "sabot/_cython/operators/transform.pyx":236
  *         self._predicate = predicate
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -11152,7 +11425,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("process_batch", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":224
+  /* "sabot/_cython/operators/transform.pyx":240
  *     cpdef object process_batch(self, object batch):
  *         """Apply filter predicate to batch."""
  *         if not ARROW_AVAILABLE or batch is None or batch.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -11171,15 +11444,15 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
     __pyx_t_1 = __pyx_t_2;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 240, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_3, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_3, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 240, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_1 = __pyx_t_2;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/transform.pyx":225
+    /* "sabot/_cython/operators/transform.pyx":241
  *         """Apply filter predicate to batch."""
  *         if not ARROW_AVAILABLE or batch is None or batch.num_rows == 0:
  *             return None             # <<<<<<<<<<<<<<
@@ -11190,7 +11463,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/transform.pyx":224
+    /* "sabot/_cython/operators/transform.pyx":240
  *     cpdef object process_batch(self, object batch):
  *         """Apply filter predicate to batch."""
  *         if not ARROW_AVAILABLE or batch is None or batch.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -11199,7 +11472,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
 */
   }
 
-  /* "sabot/_cython/operators/transform.pyx":227
+  /* "sabot/_cython/operators/transform.pyx":243
  *             return None
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11215,7 +11488,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
     __Pyx_XGOTREF(__pyx_t_6);
     /*try:*/ {
 
-      /* "sabot/_cython/operators/transform.pyx":229
+      /* "sabot/_cython/operators/transform.pyx":245
  *         try:
  *             # Evaluate predicate - handle common array-scalar comparison errors
  *             try:             # <<<<<<<<<<<<<<
@@ -11231,7 +11504,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
         __Pyx_XGOTREF(__pyx_t_9);
         /*try:*/ {
 
-          /* "sabot/_cython/operators/transform.pyx":230
+          /* "sabot/_cython/operators/transform.pyx":246
  *             # Evaluate predicate - handle common array-scalar comparison errors
  *             try:
  *                 mask = self._predicate(batch)             # <<<<<<<<<<<<<<
@@ -11258,13 +11531,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
             __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_11, __pyx_callargs+__pyx_t_12, (2-__pyx_t_12) | (__pyx_t_12*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
             __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 230, __pyx_L13_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 246, __pyx_L13_error)
             __Pyx_GOTREF(__pyx_t_3);
           }
           __pyx_v_mask = __pyx_t_3;
           __pyx_t_3 = 0;
 
-          /* "sabot/_cython/operators/transform.pyx":229
+          /* "sabot/_cython/operators/transform.pyx":245
  *         try:
  *             # Evaluate predicate - handle common array-scalar comparison errors
  *             try:             # <<<<<<<<<<<<<<
@@ -11281,7 +11554,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
         __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "sabot/_cython/operators/transform.pyx":231
+        /* "sabot/_cython/operators/transform.pyx":247
  *             try:
  *                 mask = self._predicate(batch)
  *             except TypeError as predicate_error:             # <<<<<<<<<<<<<<
@@ -11291,7 +11564,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
         __pyx_t_13 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_TypeError);
         if (__pyx_t_13) {
           __Pyx_AddTraceback("sabot._cython.operators.transform.CythonFilterOperator.process_batch", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_11, &__pyx_t_10) < 0) __PYX_ERR(0, 231, __pyx_L15_except_error)
+          if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_11, &__pyx_t_10) < 0) __PYX_ERR(0, 247, __pyx_L15_except_error)
           __Pyx_XGOTREF(__pyx_t_3);
           __Pyx_XGOTREF(__pyx_t_11);
           __Pyx_XGOTREF(__pyx_t_10);
@@ -11299,7 +11572,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
           __pyx_v_predicate_error = __pyx_t_11;
           /*try:*/ {
 
-            /* "sabot/_cython/operators/transform.pyx":233
+            /* "sabot/_cython/operators/transform.pyx":249
  *             except TypeError as predicate_error:
  *                 # Check if this is a common array-scalar comparison error that we can auto-fix
  *                 if self._can_auto_convert_predicate_error(predicate_error):             # <<<<<<<<<<<<<<
@@ -11313,14 +11586,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
               PyObject *__pyx_callargs[2] = {__pyx_t_15, __pyx_v_predicate_error};
               __pyx_t_14 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_can_auto_convert_predicate_erro, __pyx_callargs+__pyx_t_12, (2-__pyx_t_12) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
               __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-              if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 233, __pyx_L24_error)
+              if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 249, __pyx_L24_error)
               __Pyx_GOTREF(__pyx_t_14);
             }
-            __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_14); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 233, __pyx_L24_error)
+            __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_14); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 249, __pyx_L24_error)
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
             if (likely(__pyx_t_1)) {
 
-              /* "sabot/_cython/operators/transform.pyx":234
+              /* "sabot/_cython/operators/transform.pyx":250
  *                 # Check if this is a common array-scalar comparison error that we can auto-fix
  *                 if self._can_auto_convert_predicate_error(predicate_error):
  *                     mask = self._evaluate_predicate_with_auto_conversion(batch)             # <<<<<<<<<<<<<<
@@ -11334,13 +11607,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
                 PyObject *__pyx_callargs[2] = {__pyx_t_15, __pyx_v_batch};
                 __pyx_t_14 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_evaluate_predicate_with_auto_co, __pyx_callargs+__pyx_t_12, (2-__pyx_t_12) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
                 __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-                if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 234, __pyx_L24_error)
+                if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 250, __pyx_L24_error)
                 __Pyx_GOTREF(__pyx_t_14);
               }
               __Pyx_XDECREF_SET(__pyx_v_mask, __pyx_t_14);
               __pyx_t_14 = 0;
 
-              /* "sabot/_cython/operators/transform.pyx":233
+              /* "sabot/_cython/operators/transform.pyx":249
  *             except TypeError as predicate_error:
  *                 # Check if this is a common array-scalar comparison error that we can auto-fix
  *                 if self._can_auto_convert_predicate_error(predicate_error):             # <<<<<<<<<<<<<<
@@ -11350,7 +11623,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
               goto __pyx_L26;
             }
 
-            /* "sabot/_cython/operators/transform.pyx":236
+            /* "sabot/_cython/operators/transform.pyx":252
  *                     mask = self._evaluate_predicate_with_auto_conversion(batch)
  *                 else:
  *                     raise             # <<<<<<<<<<<<<<
@@ -11363,12 +11636,12 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
               __Pyx_XGIVEREF(__pyx_t_10);
               __Pyx_ErrRestoreWithState(__pyx_t_3, __pyx_t_11, __pyx_t_10);
               __pyx_t_3 = 0;  __pyx_t_11 = 0;  __pyx_t_10 = 0; 
-              __PYX_ERR(0, 236, __pyx_L24_error)
+              __PYX_ERR(0, 252, __pyx_L24_error)
             }
             __pyx_L26:;
           }
 
-          /* "sabot/_cython/operators/transform.pyx":231
+          /* "sabot/_cython/operators/transform.pyx":247
  *             try:
  *                 mask = self._predicate(batch)
  *             except TypeError as predicate_error:             # <<<<<<<<<<<<<<
@@ -11420,7 +11693,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
         }
         goto __pyx_L15_except_error;
 
-        /* "sabot/_cython/operators/transform.pyx":229
+        /* "sabot/_cython/operators/transform.pyx":245
  *         try:
  *             # Evaluate predicate - handle common array-scalar comparison errors
  *             try:             # <<<<<<<<<<<<<<
@@ -11441,7 +11714,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
         __pyx_L18_try_end:;
       }
 
-      /* "sabot/_cython/operators/transform.pyx":239
+      /* "sabot/_cython/operators/transform.pyx":255
  * 
  *             # Handle different mask types - CyArrow only, no pyarrow conversions
  *             if isinstance(mask, bool):             # <<<<<<<<<<<<<<
@@ -11450,11 +11723,11 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
 */
       __pyx_t_10 = ((PyObject*)&PyBool_Type);
       __Pyx_INCREF(__pyx_t_10);
-      __pyx_t_1 = PyObject_IsInstance(__pyx_v_mask, __pyx_t_10); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(0, 239, __pyx_L7_error)
+      __pyx_t_1 = PyObject_IsInstance(__pyx_v_mask, __pyx_t_10); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(0, 255, __pyx_L7_error)
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       if (__pyx_t_1) {
 
-        /* "sabot/_cython/operators/transform.pyx":241
+        /* "sabot/_cython/operators/transform.pyx":257
  *             if isinstance(mask, bool):
  *                 # Boolean scalar - keep or drop entire batch
  *                 return batch if mask else None             # <<<<<<<<<<<<<<
@@ -11462,7 +11735,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
  *                 # Assume mask is CyArrow Array - use SIMD filter directly
 */
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_mask); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 241, __pyx_L7_error)
+        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_mask); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 257, __pyx_L7_error)
         if (__pyx_t_1) {
           __Pyx_INCREF(__pyx_v_batch);
           __pyx_t_10 = __pyx_v_batch;
@@ -11474,7 +11747,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
         __pyx_t_10 = 0;
         goto __pyx_L11_try_return;
 
-        /* "sabot/_cython/operators/transform.pyx":239
+        /* "sabot/_cython/operators/transform.pyx":255
  * 
  *             # Handle different mask types - CyArrow only, no pyarrow conversions
  *             if isinstance(mask, bool):             # <<<<<<<<<<<<<<
@@ -11483,7 +11756,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
 */
       }
 
-      /* "sabot/_cython/operators/transform.pyx":245
+      /* "sabot/_cython/operators/transform.pyx":261
  *                 # Assume mask is CyArrow Array - use SIMD filter directly
  *                 # Users must return proper Arrow boolean arrays
  *                 return batch.filter(mask)             # <<<<<<<<<<<<<<
@@ -11499,7 +11772,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
           PyObject *__pyx_callargs[2] = {__pyx_t_11, __pyx_v_mask};
           __pyx_t_10 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_filter, __pyx_callargs+__pyx_t_12, (2-__pyx_t_12) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 245, __pyx_L7_error)
+          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 261, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_10);
         }
         __pyx_r = __pyx_t_10;
@@ -11507,7 +11780,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
         goto __pyx_L11_try_return;
       }
 
-      /* "sabot/_cython/operators/transform.pyx":227
+      /* "sabot/_cython/operators/transform.pyx":243
  *             return None
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11522,7 +11795,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
     __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "sabot/_cython/operators/transform.pyx":247
+    /* "sabot/_cython/operators/transform.pyx":263
  *                 return batch.filter(mask)
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -11532,7 +11805,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
     __pyx_t_16 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_16) {
       __Pyx_AddTraceback("sabot._cython.operators.transform.CythonFilterOperator.process_batch", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_10, &__pyx_t_11, &__pyx_t_3) < 0) __PYX_ERR(0, 247, __pyx_L9_except_error)
+      if (__Pyx_GetException(&__pyx_t_10, &__pyx_t_11, &__pyx_t_3) < 0) __PYX_ERR(0, 263, __pyx_L9_except_error)
       __Pyx_XGOTREF(__pyx_t_10);
       __Pyx_XGOTREF(__pyx_t_11);
       __Pyx_XGOTREF(__pyx_t_3);
@@ -11540,7 +11813,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
       __pyx_v_e = __pyx_t_11;
       /*try:*/ {
 
-        /* "sabot/_cython/operators/transform.pyx":248
+        /* "sabot/_cython/operators/transform.pyx":264
  * 
  *         except Exception as e:
  *             raise RuntimeError(f"Error in filter operator: {e}")             # <<<<<<<<<<<<<<
@@ -11550,9 +11823,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
         __pyx_t_15 = NULL;
         __Pyx_INCREF(__pyx_builtin_RuntimeError);
         __pyx_t_24 = __pyx_builtin_RuntimeError; 
-        __pyx_t_25 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 248, __pyx_L37_error)
+        __pyx_t_25 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 264, __pyx_L37_error)
         __Pyx_GOTREF(__pyx_t_25);
-        __pyx_t_26 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Error_in_filter_operator, __pyx_t_25); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 248, __pyx_L37_error)
+        __pyx_t_26 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Error_in_filter_operator, __pyx_t_25); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 264, __pyx_L37_error)
         __Pyx_GOTREF(__pyx_t_26);
         __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
         __pyx_t_12 = 1;
@@ -11562,15 +11835,15 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
           __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
           __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
           __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
-          if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 248, __pyx_L37_error)
+          if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 264, __pyx_L37_error)
           __Pyx_GOTREF(__pyx_t_14);
         }
         __Pyx_Raise(__pyx_t_14, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-        __PYX_ERR(0, 248, __pyx_L37_error)
+        __PYX_ERR(0, 264, __pyx_L37_error)
       }
 
-      /* "sabot/_cython/operators/transform.pyx":247
+      /* "sabot/_cython/operators/transform.pyx":263
  *                 return batch.filter(mask)
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -11616,7 +11889,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
     }
     goto __pyx_L9_except_error;
 
-    /* "sabot/_cython/operators/transform.pyx":227
+    /* "sabot/_cython/operators/transform.pyx":243
  *             return None
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11637,7 +11910,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOpe
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/operators/transform.pyx":220
+  /* "sabot/_cython/operators/transform.pyx":236
  *         self._predicate = predicate
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -11706,32 +11979,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 220, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 236, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 220, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 236, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batch", 0) < 0) __PYX_ERR(0, 220, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batch", 0) < 0) __PYX_ERR(0, 236, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, i); __PYX_ERR(0, 220, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, i); __PYX_ERR(0, 236, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 220, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 236, __pyx_L3_error)
     }
     __pyx_v_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 220, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 236, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -11761,7 +12034,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_20CythonFilterOp
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("process_batch", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOperator_process_batch(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOperator_process_batch(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -12209,7 +12482,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_20CythonFilterOp
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":290
+/* "sabot/_cython/operators/transform.pyx":306
  *     """
  * 
  *     def __init__(self, source, columns: List[str], schema=None):             # <<<<<<<<<<<<<<
@@ -12245,41 +12518,41 @@ static int __pyx_pw_5sabot_7_cython_9operators_9transform_20CythonSelectOperator
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_source,&__pyx_mstate_global->__pyx_n_u_columns,&__pyx_mstate_global->__pyx_n_u_schema,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 290, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 306, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 290, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 306, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 290, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 306, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 290, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 306, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 290, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 306, __pyx_L3_error)
       if (!values[2]) values[2] = __Pyx_NewRef(((PyObject *)Py_None));
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, i); __PYX_ERR(0, 290, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, i); __PYX_ERR(0, 306, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 290, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 306, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 290, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 306, __pyx_L3_error)
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 290, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 306, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
@@ -12291,7 +12564,7 @@ static int __pyx_pw_5sabot_7_cython_9operators_9transform_20CythonSelectOperator
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 290, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 306, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -12302,7 +12575,7 @@ static int __pyx_pw_5sabot_7_cython_9operators_9transform_20CythonSelectOperator
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_columns), (&PyList_Type), 0, "columns", 2))) __PYX_ERR(0, 290, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_columns), (&PyList_Type), 0, "columns", 2))) __PYX_ERR(0, 306, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_9operators_9transform_20CythonSelectOperator___init__(((struct __pyx_obj_5sabot_7_cython_9operators_9transform_CythonSelectOperator *)__pyx_v_self), __pyx_v_source, __pyx_v_columns, __pyx_v_schema);
 
   /* function exit code */
@@ -12327,7 +12600,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_20CythonSelectOperator
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":299
+  /* "sabot/_cython/operators/transform.pyx":315
  *             schema: Output schema (derived from input)
  *         """
  *         self._source = source             # <<<<<<<<<<<<<<
@@ -12340,7 +12613,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_20CythonSelectOperator
   __Pyx_DECREF(__pyx_v_self->__pyx_base._source);
   __pyx_v_self->__pyx_base._source = __pyx_v_source;
 
-  /* "sabot/_cython/operators/transform.pyx":300
+  /* "sabot/_cython/operators/transform.pyx":316
  *         """
  *         self._source = source
  *         self._schema = schema             # <<<<<<<<<<<<<<
@@ -12353,7 +12626,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_20CythonSelectOperator
   __Pyx_DECREF(__pyx_v_self->__pyx_base._schema);
   __pyx_v_self->__pyx_base._schema = __pyx_v_schema;
 
-  /* "sabot/_cython/operators/transform.pyx":301
+  /* "sabot/_cython/operators/transform.pyx":317
  *         self._source = source
  *         self._schema = schema
  *         self._columns = columns             # <<<<<<<<<<<<<<
@@ -12366,7 +12639,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_20CythonSelectOperator
   __Pyx_DECREF(__pyx_v_self->_columns);
   __pyx_v_self->_columns = __pyx_v_columns;
 
-  /* "sabot/_cython/operators/transform.pyx":290
+  /* "sabot/_cython/operators/transform.pyx":306
  *     """
  * 
  *     def __init__(self, source, columns: List[str], schema=None):             # <<<<<<<<<<<<<<
@@ -12380,7 +12653,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_20CythonSelectOperator
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":303
+/* "sabot/_cython/operators/transform.pyx":319
  *         self._columns = columns
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -12427,7 +12700,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("process_batch", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":307
+  /* "sabot/_cython/operators/transform.pyx":323
  *     cpdef object process_batch(self, object batch):
  *         """Select columns from batch (zero-copy)."""
  *         if not ARROW_AVAILABLE or batch is None:             # <<<<<<<<<<<<<<
@@ -12445,7 +12718,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/transform.pyx":308
+    /* "sabot/_cython/operators/transform.pyx":324
  *         """Select columns from batch (zero-copy)."""
  *         if not ARROW_AVAILABLE or batch is None:
  *             return None             # <<<<<<<<<<<<<<
@@ -12456,7 +12729,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/transform.pyx":307
+    /* "sabot/_cython/operators/transform.pyx":323
  *     cpdef object process_batch(self, object batch):
  *         """Select columns from batch (zero-copy)."""
  *         if not ARROW_AVAILABLE or batch is None:             # <<<<<<<<<<<<<<
@@ -12465,7 +12738,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
 */
   }
 
-  /* "sabot/_cython/operators/transform.pyx":310
+  /* "sabot/_cython/operators/transform.pyx":326
  *             return None
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -12481,7 +12754,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
     __Pyx_XGOTREF(__pyx_t_5);
     /*try:*/ {
 
-      /* "sabot/_cython/operators/transform.pyx":312
+      /* "sabot/_cython/operators/transform.pyx":328
  *         try:
  *             # Zero-copy column selection
  *             return batch.select(self._columns)             # <<<<<<<<<<<<<<
@@ -12496,14 +12769,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
         PyObject *__pyx_callargs[2] = {__pyx_t_7, __pyx_v_self->_columns};
         __pyx_t_6 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_select, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-        if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 312, __pyx_L6_error)
+        if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 328, __pyx_L6_error)
         __Pyx_GOTREF(__pyx_t_6);
       }
       __pyx_r = __pyx_t_6;
       __pyx_t_6 = 0;
       goto __pyx_L10_try_return;
 
-      /* "sabot/_cython/operators/transform.pyx":310
+      /* "sabot/_cython/operators/transform.pyx":326
  *             return None
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -12515,7 +12788,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "sabot/_cython/operators/transform.pyx":314
+    /* "sabot/_cython/operators/transform.pyx":330
  *             return batch.select(self._columns)
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -12525,7 +12798,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
     __pyx_t_9 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_9) {
       __Pyx_AddTraceback("sabot._cython.operators.transform.CythonSelectOperator.process_batch", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_6, &__pyx_t_7, &__pyx_t_10) < 0) __PYX_ERR(0, 314, __pyx_L8_except_error)
+      if (__Pyx_GetException(&__pyx_t_6, &__pyx_t_7, &__pyx_t_10) < 0) __PYX_ERR(0, 330, __pyx_L8_except_error)
       __Pyx_XGOTREF(__pyx_t_6);
       __Pyx_XGOTREF(__pyx_t_7);
       __Pyx_XGOTREF(__pyx_t_10);
@@ -12533,7 +12806,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
       __pyx_v_e = __pyx_t_7;
       /*try:*/ {
 
-        /* "sabot/_cython/operators/transform.pyx":315
+        /* "sabot/_cython/operators/transform.pyx":331
  * 
  *         except Exception as e:
  *             raise RuntimeError(f"Error in select operator: {e}")             # <<<<<<<<<<<<<<
@@ -12543,9 +12816,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
         __pyx_t_12 = NULL;
         __Pyx_INCREF(__pyx_builtin_RuntimeError);
         __pyx_t_13 = __pyx_builtin_RuntimeError; 
-        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 315, __pyx_L17_error)
+        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 331, __pyx_L17_error)
         __Pyx_GOTREF(__pyx_t_14);
-        __pyx_t_15 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Error_in_select_operator, __pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 315, __pyx_L17_error)
+        __pyx_t_15 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Error_in_select_operator, __pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 331, __pyx_L17_error)
         __Pyx_GOTREF(__pyx_t_15);
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
         __pyx_t_8 = 1;
@@ -12555,15 +12828,15 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
           __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
           __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 315, __pyx_L17_error)
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 331, __pyx_L17_error)
           __Pyx_GOTREF(__pyx_t_11);
         }
         __Pyx_Raise(__pyx_t_11, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __PYX_ERR(0, 315, __pyx_L17_error)
+        __PYX_ERR(0, 331, __pyx_L17_error)
       }
 
-      /* "sabot/_cython/operators/transform.pyx":314
+      /* "sabot/_cython/operators/transform.pyx":330
  *             return batch.select(self._columns)
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -12609,7 +12882,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
     }
     goto __pyx_L8_except_error;
 
-    /* "sabot/_cython/operators/transform.pyx":310
+    /* "sabot/_cython/operators/transform.pyx":326
  *             return None
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -12630,7 +12903,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOpe
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/operators/transform.pyx":303
+  /* "sabot/_cython/operators/transform.pyx":319
  *         self._columns = columns
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -12697,32 +12970,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 303, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 319, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 303, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 319, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batch", 0) < 0) __PYX_ERR(0, 303, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batch", 0) < 0) __PYX_ERR(0, 319, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, i); __PYX_ERR(0, 303, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, i); __PYX_ERR(0, 319, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 303, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 319, __pyx_L3_error)
     }
     __pyx_v_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 303, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 319, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -12752,7 +13025,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_20CythonSelectOp
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("process_batch", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOperator_process_batch(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOperator_process_batch(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 319, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -13200,7 +13473,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_20CythonSelectOp
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":366
+/* "sabot/_cython/operators/transform.pyx":382
  *     """
  * 
  *     def __init__(self, source, flat_map_func, schema=None):             # <<<<<<<<<<<<<<
@@ -13236,41 +13509,41 @@ static int __pyx_pw_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperato
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_source,&__pyx_mstate_global->__pyx_n_u_flat_map_func,&__pyx_mstate_global->__pyx_n_u_schema,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 366, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 382, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 366, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 382, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 366, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 382, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 366, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 382, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 366, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 382, __pyx_L3_error)
       if (!values[2]) values[2] = __Pyx_NewRef(((PyObject *)Py_None));
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, i); __PYX_ERR(0, 366, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, i); __PYX_ERR(0, 382, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 366, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 382, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 366, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 382, __pyx_L3_error)
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 366, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 382, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
@@ -13282,7 +13555,7 @@ static int __pyx_pw_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperato
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 366, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 382, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -13308,7 +13581,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperato
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":375
+  /* "sabot/_cython/operators/transform.pyx":391
  *             schema: Output schema
  *         """
  *         self._source = source             # <<<<<<<<<<<<<<
@@ -13321,7 +13594,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperato
   __Pyx_DECREF(__pyx_v_self->__pyx_base._source);
   __pyx_v_self->__pyx_base._source = __pyx_v_source;
 
-  /* "sabot/_cython/operators/transform.pyx":376
+  /* "sabot/_cython/operators/transform.pyx":392
  *         """
  *         self._source = source
  *         self._schema = schema             # <<<<<<<<<<<<<<
@@ -13334,7 +13607,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperato
   __Pyx_DECREF(__pyx_v_self->__pyx_base._schema);
   __pyx_v_self->__pyx_base._schema = __pyx_v_schema;
 
-  /* "sabot/_cython/operators/transform.pyx":377
+  /* "sabot/_cython/operators/transform.pyx":393
  *         self._source = source
  *         self._schema = schema
  *         self._flat_map_func = flat_map_func             # <<<<<<<<<<<<<<
@@ -13347,7 +13620,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperato
   __Pyx_DECREF(__pyx_v_self->_flat_map_func);
   __pyx_v_self->_flat_map_func = __pyx_v_flat_map_func;
 
-  /* "sabot/_cython/operators/transform.pyx":366
+  /* "sabot/_cython/operators/transform.pyx":382
  *     """
  * 
  *     def __init__(self, source, flat_map_func, schema=None):             # <<<<<<<<<<<<<<
@@ -13361,7 +13634,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperato
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":379
+/* "sabot/_cython/operators/transform.pyx":395
  *         self._flat_map_func = flat_map_func
  * 
  *     cpdef object process_batch(self, object batch):             # <<<<<<<<<<<<<<
@@ -13409,7 +13682,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("process_batch", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":385
+  /* "sabot/_cython/operators/transform.pyx":401
  *         The __iter__ method handles unpacking these.
  *         """
  *         if not ARROW_AVAILABLE or batch is None:             # <<<<<<<<<<<<<<
@@ -13427,7 +13700,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/transform.pyx":386
+    /* "sabot/_cython/operators/transform.pyx":402
  *         """
  *         if not ARROW_AVAILABLE or batch is None:
  *             return []             # <<<<<<<<<<<<<<
@@ -13435,13 +13708,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
  *         try:
 */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 386, __pyx_L1_error)
+    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 402, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_r = __pyx_t_3;
     __pyx_t_3 = 0;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/transform.pyx":385
+    /* "sabot/_cython/operators/transform.pyx":401
  *         The __iter__ method handles unpacking these.
  *         """
  *         if not ARROW_AVAILABLE or batch is None:             # <<<<<<<<<<<<<<
@@ -13450,7 +13723,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
 */
   }
 
-  /* "sabot/_cython/operators/transform.pyx":388
+  /* "sabot/_cython/operators/transform.pyx":404
  *             return []
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -13466,7 +13739,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
     __Pyx_XGOTREF(__pyx_t_6);
     /*try:*/ {
 
-      /* "sabot/_cython/operators/transform.pyx":389
+      /* "sabot/_cython/operators/transform.pyx":405
  * 
  *         try:
  *             results = self._flat_map_func(batch)             # <<<<<<<<<<<<<<
@@ -13493,13 +13766,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
         __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_8, __pyx_callargs+__pyx_t_9, (2-__pyx_t_9) | (__pyx_t_9*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 389, __pyx_L6_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 405, __pyx_L6_error)
         __Pyx_GOTREF(__pyx_t_3);
       }
       __pyx_v_results = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "sabot/_cython/operators/transform.pyx":391
+      /* "sabot/_cython/operators/transform.pyx":407
  *             results = self._flat_map_func(batch)
  *             # Ensure it's a list
  *             if not isinstance(results, (list, tuple)):             # <<<<<<<<<<<<<<
@@ -13518,19 +13791,19 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
       __pyx_t_2 = (!__pyx_t_1);
       if (__pyx_t_2) {
 
-        /* "sabot/_cython/operators/transform.pyx":392
+        /* "sabot/_cython/operators/transform.pyx":408
  *             # Ensure it's a list
  *             if not isinstance(results, (list, tuple)):
  *                 results = list(results)             # <<<<<<<<<<<<<<
  *             return results
  * 
 */
-        __pyx_t_3 = PySequence_List(__pyx_v_results); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 392, __pyx_L6_error)
+        __pyx_t_3 = PySequence_List(__pyx_v_results); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 408, __pyx_L6_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF_SET(__pyx_v_results, __pyx_t_3);
         __pyx_t_3 = 0;
 
-        /* "sabot/_cython/operators/transform.pyx":391
+        /* "sabot/_cython/operators/transform.pyx":407
  *             results = self._flat_map_func(batch)
  *             # Ensure it's a list
  *             if not isinstance(results, (list, tuple)):             # <<<<<<<<<<<<<<
@@ -13539,7 +13812,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
 */
       }
 
-      /* "sabot/_cython/operators/transform.pyx":393
+      /* "sabot/_cython/operators/transform.pyx":409
  *             if not isinstance(results, (list, tuple)):
  *                 results = list(results)
  *             return results             # <<<<<<<<<<<<<<
@@ -13551,7 +13824,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
       __pyx_r = __pyx_v_results;
       goto __pyx_L10_try_return;
 
-      /* "sabot/_cython/operators/transform.pyx":388
+      /* "sabot/_cython/operators/transform.pyx":404
  *             return []
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -13564,7 +13837,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "sabot/_cython/operators/transform.pyx":395
+    /* "sabot/_cython/operators/transform.pyx":411
  *             return results
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -13574,7 +13847,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
     __pyx_t_10 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_10) {
       __Pyx_AddTraceback("sabot._cython.operators.transform.CythonFlatMapOperator.process_batch", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_8, &__pyx_t_7) < 0) __PYX_ERR(0, 395, __pyx_L8_except_error)
+      if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_8, &__pyx_t_7) < 0) __PYX_ERR(0, 411, __pyx_L8_except_error)
       __Pyx_XGOTREF(__pyx_t_3);
       __Pyx_XGOTREF(__pyx_t_8);
       __Pyx_XGOTREF(__pyx_t_7);
@@ -13582,7 +13855,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
       __pyx_v_e = __pyx_t_8;
       /*try:*/ {
 
-        /* "sabot/_cython/operators/transform.pyx":396
+        /* "sabot/_cython/operators/transform.pyx":412
  * 
  *         except Exception as e:
  *             raise RuntimeError(f"Error in flatMap operator: {e}")             # <<<<<<<<<<<<<<
@@ -13592,9 +13865,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
         __pyx_t_12 = NULL;
         __Pyx_INCREF(__pyx_builtin_RuntimeError);
         __pyx_t_13 = __pyx_builtin_RuntimeError; 
-        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 396, __pyx_L20_error)
+        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 412, __pyx_L20_error)
         __Pyx_GOTREF(__pyx_t_14);
-        __pyx_t_15 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Error_in_flatMap_operator, __pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 396, __pyx_L20_error)
+        __pyx_t_15 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Error_in_flatMap_operator, __pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 412, __pyx_L20_error)
         __Pyx_GOTREF(__pyx_t_15);
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
         __pyx_t_9 = 1;
@@ -13604,15 +13877,15 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
           __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
           __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 396, __pyx_L20_error)
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 412, __pyx_L20_error)
           __Pyx_GOTREF(__pyx_t_11);
         }
         __Pyx_Raise(__pyx_t_11, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __PYX_ERR(0, 396, __pyx_L20_error)
+        __PYX_ERR(0, 412, __pyx_L20_error)
       }
 
-      /* "sabot/_cython/operators/transform.pyx":395
+      /* "sabot/_cython/operators/transform.pyx":411
  *             return results
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -13658,7 +13931,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
     }
     goto __pyx_L8_except_error;
 
-    /* "sabot/_cython/operators/transform.pyx":388
+    /* "sabot/_cython/operators/transform.pyx":404
  *             return []
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -13679,7 +13952,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOp
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/operators/transform.pyx":379
+  /* "sabot/_cython/operators/transform.pyx":395
  *         self._flat_map_func = flat_map_func
  * 
  *     cpdef object process_batch(self, object batch):             # <<<<<<<<<<<<<<
@@ -13747,32 +14020,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 379, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 395, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 395, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batch", 0) < 0) __PYX_ERR(0, 379, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batch", 0) < 0) __PYX_ERR(0, 395, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, i); __PYX_ERR(0, 379, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, i); __PYX_ERR(0, 395, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 379, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 395, __pyx_L3_error)
     }
     __pyx_v_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 379, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 395, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -13802,7 +14075,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("process_batch", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_process_batch(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_process_batch(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 395, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -13820,7 +14093,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
 }
 static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_6generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/transform.pyx":398
+/* "sabot/_cython/operators/transform.pyx":414
  *             raise RuntimeError(f"Error in flatMap operator: {e}")
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -13859,7 +14132,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__ *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 398, __pyx_L1_error)
+    __PYX_ERR(0, 414, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -13867,7 +14140,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_6generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_iter, __pyx_mstate_global->__pyx_n_u_CythonFlatMapOperator___iter, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor); if (unlikely(!gen)) __PYX_ERR(0, 398, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_6generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_iter, __pyx_mstate_global->__pyx_n_u_CythonFlatMapOperator___iter, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor); if (unlikely(!gen)) __PYX_ERR(0, 414, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -13912,10 +14185,10 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
-    __PYX_ERR(0, 398, __pyx_L1_error)
+    __PYX_ERR(0, 414, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/transform.pyx":400
+  /* "sabot/_cython/operators/transform.pyx":416
  *     def __iter__(self):
  *         """Iterate and flatten results."""
  *         if self._source is None:             # <<<<<<<<<<<<<<
@@ -13925,7 +14198,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
   __pyx_t_1 = (__pyx_cur_scope->__pyx_v_self->__pyx_base._source == Py_None);
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/transform.pyx":401
+    /* "sabot/_cython/operators/transform.pyx":417
  *         """Iterate and flatten results."""
  *         if self._source is None:
  *             return             # <<<<<<<<<<<<<<
@@ -13936,7 +14209,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/transform.pyx":400
+    /* "sabot/_cython/operators/transform.pyx":416
  *     def __iter__(self):
  *         """Iterate and flatten results."""
  *         if self._source is None:             # <<<<<<<<<<<<<<
@@ -13945,7 +14218,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
 */
   }
 
-  /* "sabot/_cython/operators/transform.pyx":403
+  /* "sabot/_cython/operators/transform.pyx":419
  *             return
  * 
  *         for batch in self._source:             # <<<<<<<<<<<<<<
@@ -13957,9 +14230,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
     __pyx_t_3 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_3 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_self->__pyx_base._source); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 403, __pyx_L1_error)
+    __pyx_t_3 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_self->__pyx_base._source); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 419, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 403, __pyx_L1_error)
+    __pyx_t_4 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 419, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_4)) {
@@ -13967,7 +14240,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 403, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 419, __pyx_L1_error)
           #endif
           if (__pyx_t_3 >= __pyx_temp) break;
         }
@@ -13977,7 +14250,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 403, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 419, __pyx_L1_error)
           #endif
           if (__pyx_t_3 >= __pyx_temp) break;
         }
@@ -13988,13 +14261,13 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
         #endif
         ++__pyx_t_3;
       }
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 403, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 419, __pyx_L1_error)
     } else {
       __pyx_t_5 = __pyx_t_4(__pyx_t_2);
       if (unlikely(!__pyx_t_5)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 403, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 419, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -14006,21 +14279,21 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
     __Pyx_GIVEREF(__pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "sabot/_cython/operators/transform.pyx":404
+    /* "sabot/_cython/operators/transform.pyx":420
  * 
  *         for batch in self._source:
  *             results = self.process_batch(batch)             # <<<<<<<<<<<<<<
  *             # Flatten - yield each result batch
  *             for result_batch in results:
 */
-    __pyx_t_5 = __pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_process_batch(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_batch, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 404, __pyx_L1_error)
+    __pyx_t_5 = __pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_process_batch(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_batch, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 420, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_results);
     __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_results, __pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "sabot/_cython/operators/transform.pyx":406
+    /* "sabot/_cython/operators/transform.pyx":422
  *             results = self.process_batch(batch)
  *             # Flatten - yield each result batch
  *             for result_batch in results:             # <<<<<<<<<<<<<<
@@ -14032,9 +14305,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
       __pyx_t_6 = 0;
       __pyx_t_7 = NULL;
     } else {
-      __pyx_t_6 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_results); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 406, __pyx_L1_error)
+      __pyx_t_6 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_results); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 422, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 406, __pyx_L1_error)
+      __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 422, __pyx_L1_error)
     }
     for (;;) {
       if (likely(!__pyx_t_7)) {
@@ -14042,7 +14315,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
           {
             Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_5);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 406, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 422, __pyx_L1_error)
             #endif
             if (__pyx_t_6 >= __pyx_temp) break;
           }
@@ -14052,7 +14325,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
           {
             Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_5);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 406, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 422, __pyx_L1_error)
             #endif
             if (__pyx_t_6 >= __pyx_temp) break;
           }
@@ -14063,13 +14336,13 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
           #endif
           ++__pyx_t_6;
         }
-        if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 406, __pyx_L1_error)
+        if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 422, __pyx_L1_error)
       } else {
         __pyx_t_8 = __pyx_t_7(__pyx_t_5);
         if (unlikely(!__pyx_t_8)) {
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
-            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 406, __pyx_L1_error)
+            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 422, __pyx_L1_error)
             PyErr_Clear();
           }
           break;
@@ -14081,7 +14354,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
       __Pyx_GIVEREF(__pyx_t_8);
       __pyx_t_8 = 0;
 
-      /* "sabot/_cython/operators/transform.pyx":407
+      /* "sabot/_cython/operators/transform.pyx":423
  *             # Flatten - yield each result batch
  *             for result_batch in results:
  *                 if result_batch is not None and result_batch.num_rows > 0:             # <<<<<<<<<<<<<<
@@ -14094,17 +14367,17 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
         __pyx_t_1 = __pyx_t_9;
         goto __pyx_L10_bool_binop_done;
       }
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_result_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 407, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_result_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 423, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_10 = PyObject_RichCompare(__pyx_t_8, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 407, __pyx_L1_error)
+      __pyx_t_10 = PyObject_RichCompare(__pyx_t_8, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 423, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_10); if (unlikely((__pyx_t_9 < 0))) __PYX_ERR(0, 407, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_10); if (unlikely((__pyx_t_9 < 0))) __PYX_ERR(0, 423, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __pyx_t_1 = __pyx_t_9;
       __pyx_L10_bool_binop_done:;
       if (__pyx_t_1) {
 
-        /* "sabot/_cython/operators/transform.pyx":408
+        /* "sabot/_cython/operators/transform.pyx":424
  *             for result_batch in results:
  *                 if result_batch is not None and result_batch.num_rows > 0:
  *                     yield result_batch             # <<<<<<<<<<<<<<
@@ -14138,9 +14411,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
         __Pyx_XGOTREF(__pyx_t_5);
         __pyx_t_6 = __pyx_cur_scope->__pyx_t_4;
         __pyx_t_7 = __pyx_cur_scope->__pyx_t_5;
-        if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 408, __pyx_L1_error)
+        if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 424, __pyx_L1_error)
 
-        /* "sabot/_cython/operators/transform.pyx":407
+        /* "sabot/_cython/operators/transform.pyx":423
  *             # Flatten - yield each result batch
  *             for result_batch in results:
  *                 if result_batch is not None and result_batch.num_rows > 0:             # <<<<<<<<<<<<<<
@@ -14149,7 +14422,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
 */
       }
 
-      /* "sabot/_cython/operators/transform.pyx":406
+      /* "sabot/_cython/operators/transform.pyx":422
  *             results = self.process_batch(batch)
  *             # Flatten - yield each result batch
  *             for result_batch in results:             # <<<<<<<<<<<<<<
@@ -14159,7 +14432,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
     }
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "sabot/_cython/operators/transform.pyx":403
+    /* "sabot/_cython/operators/transform.pyx":419
  *             return
  * 
  *         for batch in self._source:             # <<<<<<<<<<<<<<
@@ -14170,7 +14443,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "sabot/_cython/operators/transform.pyx":398
+  /* "sabot/_cython/operators/transform.pyx":414
  *             raise RuntimeError(f"Error in flatMap operator: {e}")
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -14632,7 +14905,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_21CythonFlatMapO
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":449
+/* "sabot/_cython/operators/transform.pyx":465
  *     """
  * 
  *     def __init__(self, *sources, schema=None):             # <<<<<<<<<<<<<<
@@ -14669,13 +14942,13 @@ static int __pyx_pw_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_schema,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 449, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 465, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         default:
         case  0: break;
       }
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, 0, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 449, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, 0, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 465, __pyx_L3_error)
       if (!values[0]) values[0] = __Pyx_NewRef(((PyObject *)Py_None));
     } else if (unlikely(__pyx_nargs < 0)) {
       goto __pyx_L5_argtuple_error;
@@ -14686,7 +14959,7 @@ static int __pyx_pw_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 0, __pyx_nargs); __PYX_ERR(0, 449, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 0, __pyx_nargs); __PYX_ERR(0, 465, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -14718,7 +14991,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":457
+  /* "sabot/_cython/operators/transform.pyx":473
  *             schema: Common schema (must match across all sources)
  *         """
  *         self._source = None             # <<<<<<<<<<<<<<
@@ -14731,7 +15004,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_
   __Pyx_DECREF(__pyx_v_self->__pyx_base._source);
   __pyx_v_self->__pyx_base._source = Py_None;
 
-  /* "sabot/_cython/operators/transform.pyx":458
+  /* "sabot/_cython/operators/transform.pyx":474
  *         """
  *         self._source = None
  *         self._schema = schema             # <<<<<<<<<<<<<<
@@ -14744,14 +15017,14 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_
   __Pyx_DECREF(__pyx_v_self->__pyx_base._schema);
   __pyx_v_self->__pyx_base._schema = __pyx_v_schema;
 
-  /* "sabot/_cython/operators/transform.pyx":459
+  /* "sabot/_cython/operators/transform.pyx":475
  *         self._source = None
  *         self._schema = schema
  *         self._sources = list(sources)             # <<<<<<<<<<<<<<
  * 
  *     cpdef object process_batches(self, list batches):
 */
-  __pyx_t_1 = PySequence_List(__pyx_v_sources); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 459, __pyx_L1_error)
+  __pyx_t_1 = PySequence_List(__pyx_v_sources); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 475, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->_sources);
@@ -14759,7 +15032,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_
   __pyx_v_self->_sources = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":449
+  /* "sabot/_cython/operators/transform.pyx":465
  *     """
  * 
  *     def __init__(self, *sources, schema=None):             # <<<<<<<<<<<<<<
@@ -14779,7 +15052,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":461
+/* "sabot/_cython/operators/transform.pyx":477
  *         self._sources = list(sources)
  * 
  *     cpdef object process_batches(self, list batches):             # <<<<<<<<<<<<<<
@@ -14812,7 +15085,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("process_batches", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":468
+  /* "sabot/_cython/operators/transform.pyx":484
  *         if they have the same schema.
  *         """
  *         if not ARROW_AVAILABLE or not batches:             # <<<<<<<<<<<<<<
@@ -14829,7 +15102,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
   else
   {
     Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_batches);
-    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 468, __pyx_L1_error)
+    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 484, __pyx_L1_error)
     __pyx_t_2 = (__pyx_temp != 0);
   }
 
@@ -14838,7 +15111,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/transform.pyx":469
+    /* "sabot/_cython/operators/transform.pyx":485
  *         """
  *         if not ARROW_AVAILABLE or not batches:
  *             return None             # <<<<<<<<<<<<<<
@@ -14849,7 +15122,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/transform.pyx":468
+    /* "sabot/_cython/operators/transform.pyx":484
  *         if they have the same schema.
  *         """
  *         if not ARROW_AVAILABLE or not batches:             # <<<<<<<<<<<<<<
@@ -14858,7 +15131,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
 */
   }
 
-  /* "sabot/_cython/operators/transform.pyx":472
+  /* "sabot/_cython/operators/transform.pyx":488
  * 
  *         # Filter out None/empty batches
  *         valid_batches = [b for b in batches if b is not None and b.num_rows > 0]             # <<<<<<<<<<<<<<
@@ -14866,11 +15139,11 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
  *         if not valid_batches:
 */
   { /* enter inner scope */
-    __pyx_t_4 = PyList_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 472, __pyx_L8_error)
+    __pyx_t_4 = PyList_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 488, __pyx_L8_error)
     __Pyx_GOTREF(__pyx_t_4);
     if (unlikely(__pyx_v_batches == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 472, __pyx_L8_error)
+      __PYX_ERR(0, 488, __pyx_L8_error)
     }
     __pyx_t_5 = __pyx_v_batches; __Pyx_INCREF(__pyx_t_5);
     __pyx_t_6 = 0;
@@ -14878,13 +15151,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
       {
         Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_5);
         #if !CYTHON_ASSUME_SAFE_SIZE
-        if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 472, __pyx_L8_error)
+        if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 488, __pyx_L8_error)
         #endif
         if (__pyx_t_6 >= __pyx_temp) break;
       }
       __pyx_t_7 = __Pyx_PyList_GetItemRef(__pyx_t_5, __pyx_t_6);
       ++__pyx_t_6;
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 472, __pyx_L8_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 488, __pyx_L8_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_XDECREF_SET(__pyx_7genexpr__pyx_v_b, __pyx_t_7);
       __pyx_t_7 = 0;
@@ -14894,16 +15167,16 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
         __pyx_t_1 = __pyx_t_3;
         goto __pyx_L12_bool_binop_done;
       }
-      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_7genexpr__pyx_v_b, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 472, __pyx_L8_error)
+      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_7genexpr__pyx_v_b, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 488, __pyx_L8_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = PyObject_RichCompare(__pyx_t_7, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 472, __pyx_L8_error)
+      __pyx_t_8 = PyObject_RichCompare(__pyx_t_7, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 488, __pyx_L8_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 472, __pyx_L8_error)
+      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 488, __pyx_L8_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_1 = __pyx_t_3;
       __pyx_L12_bool_binop_done:;
       if (__pyx_t_1) {
-        if (unlikely(__Pyx_ListComp_Append(__pyx_t_4, (PyObject*)__pyx_7genexpr__pyx_v_b))) __PYX_ERR(0, 472, __pyx_L8_error)
+        if (unlikely(__Pyx_ListComp_Append(__pyx_t_4, (PyObject*)__pyx_7genexpr__pyx_v_b))) __PYX_ERR(0, 488, __pyx_L8_error)
       }
     }
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -14917,7 +15190,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
   __pyx_v_valid_batches = ((PyObject*)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":474
+  /* "sabot/_cython/operators/transform.pyx":490
  *         valid_batches = [b for b in batches if b is not None and b.num_rows > 0]
  * 
  *         if not valid_batches:             # <<<<<<<<<<<<<<
@@ -14926,14 +15199,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
 */
   {
     Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_valid_batches);
-    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 474, __pyx_L1_error)
+    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 490, __pyx_L1_error)
     __pyx_t_1 = (__pyx_temp != 0);
   }
 
   __pyx_t_3 = (!__pyx_t_1);
   if (__pyx_t_3) {
 
-    /* "sabot/_cython/operators/transform.pyx":475
+    /* "sabot/_cython/operators/transform.pyx":491
  * 
  *         if not valid_batches:
  *             return None             # <<<<<<<<<<<<<<
@@ -14944,7 +15217,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/transform.pyx":474
+    /* "sabot/_cython/operators/transform.pyx":490
  *         valid_batches = [b for b in batches if b is not None and b.num_rows > 0]
  * 
  *         if not valid_batches:             # <<<<<<<<<<<<<<
@@ -14953,18 +15226,18 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
 */
   }
 
-  /* "sabot/_cython/operators/transform.pyx":477
+  /* "sabot/_cython/operators/transform.pyx":493
  *             return None
  * 
  *         if len(valid_batches) == 1:             # <<<<<<<<<<<<<<
  *             return valid_batches[0]
  * 
 */
-  __pyx_t_6 = __Pyx_PyList_GET_SIZE(__pyx_v_valid_batches); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 477, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyList_GET_SIZE(__pyx_v_valid_batches); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 493, __pyx_L1_error)
   __pyx_t_3 = (__pyx_t_6 == 1);
   if (__pyx_t_3) {
 
-    /* "sabot/_cython/operators/transform.pyx":478
+    /* "sabot/_cython/operators/transform.pyx":494
  * 
  *         if len(valid_batches) == 1:
  *             return valid_batches[0]             # <<<<<<<<<<<<<<
@@ -14976,7 +15249,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
     __pyx_r = __Pyx_PyList_GET_ITEM(__pyx_v_valid_batches, 0);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/transform.pyx":477
+    /* "sabot/_cython/operators/transform.pyx":493
  *             return None
  * 
  *         if len(valid_batches) == 1:             # <<<<<<<<<<<<<<
@@ -14985,7 +15258,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
 */
   }
 
-  /* "sabot/_cython/operators/transform.pyx":482
+  /* "sabot/_cython/operators/transform.pyx":498
  *         # CyArrow: Return batches separately to avoid pyarrow table operations
  *         # Users can handle concatenation themselves if needed
  *         return valid_batches             # <<<<<<<<<<<<<<
@@ -14997,7 +15270,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOper
   __pyx_r = __pyx_v_valid_batches;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/transform.pyx":461
+  /* "sabot/_cython/operators/transform.pyx":477
  *         self._sources = list(sources)
  * 
  *     cpdef object process_batches(self, list batches):             # <<<<<<<<<<<<<<
@@ -15061,32 +15334,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batches,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 461, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 477, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 461, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 477, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batches", 0) < 0) __PYX_ERR(0, 461, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batches", 0) < 0) __PYX_ERR(0, 477, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batches", 1, 1, 1, i); __PYX_ERR(0, 461, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batches", 1, 1, 1, i); __PYX_ERR(0, 477, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 461, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 477, __pyx_L3_error)
     }
     __pyx_v_batches = ((PyObject*)values[0]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("process_batches", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 461, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("process_batches", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 477, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -15097,7 +15370,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_batches), (&PyList_Type), 1, "batches", 1))) __PYX_ERR(0, 461, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_batches), (&PyList_Type), 1, "batches", 1))) __PYX_ERR(0, 477, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_2process_batches(((struct __pyx_obj_5sabot_7_cython_9operators_9transform_CythonUnionOperator *)__pyx_v_self), __pyx_v_batches);
 
   /* function exit code */
@@ -15126,7 +15399,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("process_batches", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_process_batches(__pyx_v_self, __pyx_v_batches, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 461, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_process_batches(__pyx_v_self, __pyx_v_batches, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 477, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -15144,7 +15417,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
 }
 static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_6generator1(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/transform.pyx":484
+/* "sabot/_cython/operators/transform.pyx":500
  *         return valid_batches
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -15183,7 +15456,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__ *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 484, __pyx_L1_error)
+    __PYX_ERR(0, 500, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -15191,7 +15464,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_6generator1, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_iter, __pyx_mstate_global->__pyx_n_u_CythonUnionOperator___iter, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor); if (unlikely(!gen)) __PYX_ERR(0, 484, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_6generator1, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_iter, __pyx_mstate_global->__pyx_n_u_CythonUnionOperator___iter, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor); if (unlikely(!gen)) __PYX_ERR(0, 500, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -15236,23 +15509,23 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
-    __PYX_ERR(0, 484, __pyx_L1_error)
+    __PYX_ERR(0, 500, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/transform.pyx":486
+  /* "sabot/_cython/operators/transform.pyx":502
  *     def __iter__(self):
  *         """Iterate over all source streams, interleaving."""
  *         import itertools             # <<<<<<<<<<<<<<
  * 
  *         # Create iterators for all sources
 */
-  __pyx_t_1 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_itertools, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 486, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_itertools, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 502, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_itertools = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":489
+  /* "sabot/_cython/operators/transform.pyx":505
  * 
  *         # Create iterators for all sources
  *         iterators = [iter(source) for source in self._sources]             # <<<<<<<<<<<<<<
@@ -15260,11 +15533,11 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
  *         # Round-robin through sources
 */
   { /* enter inner scope */
-    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 489, __pyx_L1_error)
+    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 505, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     if (unlikely(__pyx_cur_scope->__pyx_v_self->_sources == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 489, __pyx_L1_error)
+      __PYX_ERR(0, 505, __pyx_L1_error)
     }
     __pyx_t_2 = __pyx_cur_scope->__pyx_v_self->_sources; __Pyx_INCREF(__pyx_t_2);
     __pyx_t_3 = 0;
@@ -15272,21 +15545,21 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
       {
         Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
         #if !CYTHON_ASSUME_SAFE_SIZE
-        if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 489, __pyx_L1_error)
+        if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 505, __pyx_L1_error)
         #endif
         if (__pyx_t_3 >= __pyx_temp) break;
       }
       __pyx_t_4 = __Pyx_PyList_GetItemRef(__pyx_t_2, __pyx_t_3);
       ++__pyx_t_3;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 489, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 505, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_XGOTREF(__pyx_cur_scope->__pyx_8genexpr1__pyx_v_source);
       __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_8genexpr1__pyx_v_source, __pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_4 = PyObject_GetIter(__pyx_cur_scope->__pyx_8genexpr1__pyx_v_source); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 489, __pyx_L1_error)
+      __pyx_t_4 = PyObject_GetIter(__pyx_cur_scope->__pyx_8genexpr1__pyx_v_source); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 505, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) __PYX_ERR(0, 489, __pyx_L1_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) __PYX_ERR(0, 505, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -15295,22 +15568,22 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
   __pyx_cur_scope->__pyx_v_iterators = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":492
+  /* "sabot/_cython/operators/transform.pyx":508
  * 
  *         # Round-robin through sources
  *         for batch in itertools.chain.from_iterable(itertools.zip_longest(*iterators)):             # <<<<<<<<<<<<<<
  *             if batch is not None:
  *                 yield batch
 */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_itertools, __pyx_mstate_global->__pyx_n_u_chain); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 492, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_itertools, __pyx_mstate_global->__pyx_n_u_chain); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 508, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_2 = __pyx_t_4;
   __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_itertools, __pyx_mstate_global->__pyx_n_u_zip_longest); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 492, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_itertools, __pyx_mstate_global->__pyx_n_u_zip_longest); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 508, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = PySequence_Tuple(__pyx_cur_scope->__pyx_v_iterators); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 492, __pyx_L1_error)
+  __pyx_t_6 = PySequence_Tuple(__pyx_cur_scope->__pyx_v_iterators); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 508, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 492, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 508, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -15321,7 +15594,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 492, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 508, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
@@ -15329,9 +15602,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
     __pyx_t_3 = 0;
     __pyx_t_9 = NULL;
   } else {
-    __pyx_t_3 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 492, __pyx_L1_error)
+    __pyx_t_3 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 508, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 492, __pyx_L1_error)
+    __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 508, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -15340,7 +15613,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 492, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 508, __pyx_L1_error)
           #endif
           if (__pyx_t_3 >= __pyx_temp) break;
         }
@@ -15350,7 +15623,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 492, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 508, __pyx_L1_error)
           #endif
           if (__pyx_t_3 >= __pyx_temp) break;
         }
@@ -15361,13 +15634,13 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
         #endif
         ++__pyx_t_3;
       }
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 492, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 508, __pyx_L1_error)
     } else {
       __pyx_t_1 = __pyx_t_9(__pyx_t_4);
       if (unlikely(!__pyx_t_1)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 492, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 508, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -15379,7 +15652,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
     __Pyx_GIVEREF(__pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/operators/transform.pyx":493
+    /* "sabot/_cython/operators/transform.pyx":509
  *         # Round-robin through sources
  *         for batch in itertools.chain.from_iterable(itertools.zip_longest(*iterators)):
  *             if batch is not None:             # <<<<<<<<<<<<<<
@@ -15389,7 +15662,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
     __pyx_t_10 = (__pyx_cur_scope->__pyx_v_batch != Py_None);
     if (__pyx_t_10) {
 
-      /* "sabot/_cython/operators/transform.pyx":494
+      /* "sabot/_cython/operators/transform.pyx":510
  *         for batch in itertools.chain.from_iterable(itertools.zip_longest(*iterators)):
  *             if batch is not None:
  *                 yield batch             # <<<<<<<<<<<<<<
@@ -15414,9 +15687,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
       __pyx_cur_scope->__pyx_t_1 = 0;
       __Pyx_XGOTREF(__pyx_t_4);
       __pyx_t_9 = __pyx_cur_scope->__pyx_t_2;
-      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 494, __pyx_L1_error)
+      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 510, __pyx_L1_error)
 
-      /* "sabot/_cython/operators/transform.pyx":493
+      /* "sabot/_cython/operators/transform.pyx":509
  *         # Round-robin through sources
  *         for batch in itertools.chain.from_iterable(itertools.zip_longest(*iterators)):
  *             if batch is not None:             # <<<<<<<<<<<<<<
@@ -15425,7 +15698,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
 */
     }
 
-    /* "sabot/_cython/operators/transform.pyx":492
+    /* "sabot/_cython/operators/transform.pyx":508
  * 
  *         # Round-robin through sources
  *         for batch in itertools.chain.from_iterable(itertools.zip_longest(*iterators)):             # <<<<<<<<<<<<<<
@@ -15436,7 +15709,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "sabot/_cython/operators/transform.pyx":484
+  /* "sabot/_cython/operators/transform.pyx":500
  *         return valid_batches
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -15900,7 +16173,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_19CythonUnionOpe
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":501
+/* "sabot/_cython/operators/transform.pyx":517
  * # ============================================================================
  * 
  * def create_map_operator(source, func, **kwargs):             # <<<<<<<<<<<<<<
@@ -15952,39 +16225,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_source,&__pyx_mstate_global->__pyx_n_u_func,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 501, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 517, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 501, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 517, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 501, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 517, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_map_operator", 1) < 0) __PYX_ERR(0, 501, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_map_operator", 1) < 0) __PYX_ERR(0, 517, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_map_operator", 1, 2, 2, i); __PYX_ERR(0, 501, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_map_operator", 1, 2, 2, i); __PYX_ERR(0, 517, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 501, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 517, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 501, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 517, __pyx_L3_error)
     }
     __pyx_v_source = values[0];
     __pyx_v_func = values[1];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_map_operator", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 501, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_map_operator", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 517, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -16020,7 +16293,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_create_map_opera
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_map_operator", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":503
+  /* "sabot/_cython/operators/transform.pyx":519
  * def create_map_operator(source, func, **kwargs):
  *     """Factory function for map operator."""
  *     return CythonMapOperator(source, func, **kwargs)             # <<<<<<<<<<<<<<
@@ -16031,7 +16304,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_create_map_opera
   __pyx_t_2 = NULL;
   __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonMapOperator);
   __pyx_t_3 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonMapOperator); 
-  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 503, __pyx_L1_error)
+  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 519, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 1;
   {
@@ -16040,14 +16313,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_create_map_opera
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 503, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __pyx_r = ((PyObject *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/transform.pyx":501
+  /* "sabot/_cython/operators/transform.pyx":517
  * # ============================================================================
  * 
  * def create_map_operator(source, func, **kwargs):             # <<<<<<<<<<<<<<
@@ -16069,7 +16342,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_create_map_opera
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":506
+/* "sabot/_cython/operators/transform.pyx":522
  * 
  * 
  * def create_filter_operator(source, predicate, **kwargs):             # <<<<<<<<<<<<<<
@@ -16121,39 +16394,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_source,&__pyx_mstate_global->__pyx_n_u_predicate,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 506, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 522, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 506, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 522, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 506, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 522, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_filter_operator", 1) < 0) __PYX_ERR(0, 506, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_filter_operator", 1) < 0) __PYX_ERR(0, 522, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_filter_operator", 1, 2, 2, i); __PYX_ERR(0, 506, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_filter_operator", 1, 2, 2, i); __PYX_ERR(0, 522, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 506, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 522, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 506, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 522, __pyx_L3_error)
     }
     __pyx_v_source = values[0];
     __pyx_v_predicate = values[1];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_filter_operator", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 506, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_filter_operator", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 522, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -16189,7 +16462,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_2create_filter_o
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_filter_operator", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":508
+  /* "sabot/_cython/operators/transform.pyx":524
  * def create_filter_operator(source, predicate, **kwargs):
  *     """Factory function for filter operator."""
  *     return CythonFilterOperator(source, predicate, **kwargs)             # <<<<<<<<<<<<<<
@@ -16200,7 +16473,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_2create_filter_o
   __pyx_t_2 = NULL;
   __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator);
   __pyx_t_3 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator); 
-  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 508, __pyx_L1_error)
+  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 524, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 1;
   {
@@ -16209,14 +16482,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_2create_filter_o
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 508, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 524, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __pyx_r = ((PyObject *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/transform.pyx":506
+  /* "sabot/_cython/operators/transform.pyx":522
  * 
  * 
  * def create_filter_operator(source, predicate, **kwargs):             # <<<<<<<<<<<<<<
@@ -16238,7 +16511,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_2create_filter_o
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":511
+/* "sabot/_cython/operators/transform.pyx":527
  * 
  * 
  * def create_select_operator(source, columns, **kwargs):             # <<<<<<<<<<<<<<
@@ -16290,39 +16563,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_source,&__pyx_mstate_global->__pyx_n_u_columns,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 511, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 527, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 511, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 527, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 511, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 527, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_select_operator", 1) < 0) __PYX_ERR(0, 511, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_select_operator", 1) < 0) __PYX_ERR(0, 527, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_select_operator", 1, 2, 2, i); __PYX_ERR(0, 511, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_select_operator", 1, 2, 2, i); __PYX_ERR(0, 527, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 511, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 527, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 511, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 527, __pyx_L3_error)
     }
     __pyx_v_source = values[0];
     __pyx_v_columns = values[1];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_select_operator", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 511, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_select_operator", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 527, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -16358,7 +16631,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_4create_select_o
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_select_operator", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":513
+  /* "sabot/_cython/operators/transform.pyx":529
  * def create_select_operator(source, columns, **kwargs):
  *     """Factory function for select operator."""
  *     return CythonSelectOperator(source, columns, **kwargs)             # <<<<<<<<<<<<<<
@@ -16369,7 +16642,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_4create_select_o
   __pyx_t_2 = NULL;
   __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator);
   __pyx_t_3 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator); 
-  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 513, __pyx_L1_error)
+  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 529, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 1;
   {
@@ -16378,14 +16651,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_4create_select_o
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 513, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 529, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __pyx_r = ((PyObject *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/transform.pyx":511
+  /* "sabot/_cython/operators/transform.pyx":527
  * 
  * 
  * def create_select_operator(source, columns, **kwargs):             # <<<<<<<<<<<<<<
@@ -16407,7 +16680,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_4create_select_o
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":516
+/* "sabot/_cython/operators/transform.pyx":532
  * 
  * 
  * def create_flatmap_operator(source, func, **kwargs):             # <<<<<<<<<<<<<<
@@ -16459,39 +16732,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_source,&__pyx_mstate_global->__pyx_n_u_func,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 516, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 532, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 516, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 532, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 516, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 532, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_flatmap_operator", 1) < 0) __PYX_ERR(0, 516, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_flatmap_operator", 1) < 0) __PYX_ERR(0, 532, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_flatmap_operator", 1, 2, 2, i); __PYX_ERR(0, 516, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_flatmap_operator", 1, 2, 2, i); __PYX_ERR(0, 532, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 516, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 532, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 516, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 532, __pyx_L3_error)
     }
     __pyx_v_source = values[0];
     __pyx_v_func = values[1];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_flatmap_operator", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 516, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_flatmap_operator", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 532, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -16527,7 +16800,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_6create_flatmap_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_flatmap_operator", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":518
+  /* "sabot/_cython/operators/transform.pyx":534
  * def create_flatmap_operator(source, func, **kwargs):
  *     """Factory function for flatMap operator."""
  *     return CythonFlatMapOperator(source, func, **kwargs)             # <<<<<<<<<<<<<<
@@ -16538,7 +16811,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_6create_flatmap_
   __pyx_t_2 = NULL;
   __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator);
   __pyx_t_3 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator); 
-  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 518, __pyx_L1_error)
+  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 534, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 1;
   {
@@ -16547,14 +16820,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_6create_flatmap_
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 518, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 534, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __pyx_r = ((PyObject *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/transform.pyx":516
+  /* "sabot/_cython/operators/transform.pyx":532
  * 
  * 
  * def create_flatmap_operator(source, func, **kwargs):             # <<<<<<<<<<<<<<
@@ -16576,7 +16849,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_6create_flatmap_
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/transform.pyx":521
+/* "sabot/_cython/operators/transform.pyx":537
  * 
  * 
  * def create_union_operator(*sources, **kwargs):             # <<<<<<<<<<<<<<
@@ -16635,22 +16908,22 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_9transform_8create_union_op
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_union_operator", 0);
 
-  /* "sabot/_cython/operators/transform.pyx":523
+  /* "sabot/_cython/operators/transform.pyx":539
  * def create_union_operator(*sources, **kwargs):
  *     """Factory function for union operator."""
  *     return CythonUnionOperator(*sources, **kwargs)             # <<<<<<<<<<<<<<
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 523, __pyx_L1_error)
+  __pyx_t_1 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 539, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator), __pyx_v_sources, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 523, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator), __pyx_v_sources, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 539, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/transform.pyx":521
+  /* "sabot/_cython/operators/transform.pyx":537
  * 
  * 
  * def create_union_operator(*sources, **kwargs):             # <<<<<<<<<<<<<<
@@ -20167,12 +20440,12 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_vtable_5sabot_7_cython_9operators_9transform_CythonFilterOperator.__pyx_base = *__pyx_vtabptr_5sabot_7_cython_9operators_13base_operator_BaseOperator;
   __pyx_vtable_5sabot_7_cython_9operators_9transform_CythonFilterOperator.__pyx_base.process_batch = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_13base_operator_BaseOperator *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_9operators_9transform_20CythonFilterOperator_process_batch;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_13base_operator_BaseOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_13base_operator_BaseOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 183, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_9transform_CythonFilterOperator_spec, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator)) __PYX_ERR(0, 167, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_9transform_CythonFilterOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
+  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator)) __PYX_ERR(0, 183, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_9transform_CythonFilterOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator) < 0) __PYX_ERR(0, 183, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator = &__pyx_type_5sabot_7_cython_9operators_9transform_CythonFilterOperator;
   #endif
@@ -20180,7 +20453,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator->tp_base = __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_13base_operator_BaseOperator;
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator) < 0) __PYX_ERR(0, 183, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator->tp_getattro == PyObject_GenericGetAttr)) {
@@ -20189,7 +20462,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 167, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 183, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_9operators_9transform_20CythonFilterOperator___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_9operators_9transform_20CythonFilterOperator___init__.doc = __pyx_doc_5sabot_7_cython_9operators_9transform_20CythonFilterOperator___init__;
@@ -20197,20 +20470,20 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator, __pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonFilterOperator) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonFilterOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator, __pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonFilterOperator) < 0) __PYX_ERR(0, 183, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator) < 0) __PYX_ERR(0, 183, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonFilterOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator) < 0) __PYX_ERR(0, 183, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator) < 0) __PYX_ERR(0, 183, __pyx_L1_error)
   __pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonSelectOperator = &__pyx_vtable_5sabot_7_cython_9operators_9transform_CythonSelectOperator;
   __pyx_vtable_5sabot_7_cython_9operators_9transform_CythonSelectOperator.__pyx_base = *__pyx_vtabptr_5sabot_7_cython_9operators_13base_operator_BaseOperator;
   __pyx_vtable_5sabot_7_cython_9operators_9transform_CythonSelectOperator.__pyx_base.process_batch = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_13base_operator_BaseOperator *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_9operators_9transform_20CythonSelectOperator_process_batch;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_13base_operator_BaseOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 255, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_13base_operator_BaseOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_9transform_CythonSelectOperator_spec, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator)) __PYX_ERR(0, 255, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_9transform_CythonSelectOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator) < 0) __PYX_ERR(0, 255, __pyx_L1_error)
+  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator)) __PYX_ERR(0, 271, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_9transform_CythonSelectOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator) < 0) __PYX_ERR(0, 271, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator = &__pyx_type_5sabot_7_cython_9operators_9transform_CythonSelectOperator;
   #endif
@@ -20218,7 +20491,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator->tp_base = __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_13base_operator_BaseOperator;
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator) < 0) __PYX_ERR(0, 255, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator) < 0) __PYX_ERR(0, 271, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator->tp_getattro == PyObject_GenericGetAttr)) {
@@ -20227,7 +20500,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 255, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 271, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_9operators_9transform_20CythonSelectOperator___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_9operators_9transform_20CythonSelectOperator___init__.doc = __pyx_doc_5sabot_7_cython_9operators_9transform_20CythonSelectOperator___init__;
@@ -20235,20 +20508,20 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator, __pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonSelectOperator) < 0) __PYX_ERR(0, 255, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator) < 0) __PYX_ERR(0, 255, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonSelectOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator) < 0) __PYX_ERR(0, 255, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator) < 0) __PYX_ERR(0, 255, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator, __pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonSelectOperator) < 0) __PYX_ERR(0, 271, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator) < 0) __PYX_ERR(0, 271, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonSelectOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator) < 0) __PYX_ERR(0, 271, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator) < 0) __PYX_ERR(0, 271, __pyx_L1_error)
   __pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator = &__pyx_vtable_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator;
   __pyx_vtable_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator.__pyx_base = *__pyx_vtabptr_5sabot_7_cython_9operators_13base_operator_BaseOperator;
   __pyx_vtable_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator.__pyx_base.process_batch = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_13base_operator_BaseOperator *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_process_batch;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_13base_operator_BaseOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 322, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_13base_operator_BaseOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 338, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator_spec, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator)) __PYX_ERR(0, 322, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator) < 0) __PYX_ERR(0, 322, __pyx_L1_error)
+  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator)) __PYX_ERR(0, 338, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator) < 0) __PYX_ERR(0, 338, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator = &__pyx_type_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator;
   #endif
@@ -20256,7 +20529,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator->tp_base = __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_13base_operator_BaseOperator;
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator) < 0) __PYX_ERR(0, 322, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator) < 0) __PYX_ERR(0, 338, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator->tp_getattro == PyObject_GenericGetAttr)) {
@@ -20265,7 +20538,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 322, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 338, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator___init__.doc = __pyx_doc_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator___init__;
@@ -20275,7 +20548,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator, "__iter__"); if (unlikely(!wrapper)) __PYX_ERR(0, 322, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator, "__iter__"); if (unlikely(!wrapper)) __PYX_ERR(0, 338, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_4__iter__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_4__iter__.doc = __pyx_doc_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_4__iter__;
@@ -20283,20 +20556,20 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator, __pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator) < 0) __PYX_ERR(0, 322, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator) < 0) __PYX_ERR(0, 322, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonFlatMapOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator) < 0) __PYX_ERR(0, 322, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator) < 0) __PYX_ERR(0, 322, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator, __pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator) < 0) __PYX_ERR(0, 338, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator) < 0) __PYX_ERR(0, 338, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonFlatMapOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator) < 0) __PYX_ERR(0, 338, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator) < 0) __PYX_ERR(0, 338, __pyx_L1_error)
   __pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonUnionOperator = &__pyx_vtable_5sabot_7_cython_9operators_9transform_CythonUnionOperator;
   __pyx_vtable_5sabot_7_cython_9operators_9transform_CythonUnionOperator.__pyx_base = *__pyx_vtabptr_5sabot_7_cython_9operators_13base_operator_BaseOperator;
   __pyx_vtable_5sabot_7_cython_9operators_9transform_CythonUnionOperator.process_batches = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_9transform_CythonUnionOperator *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_process_batches;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_13base_operator_BaseOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 415, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_13base_operator_BaseOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 431, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_9transform_CythonUnionOperator_spec, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator)) __PYX_ERR(0, 415, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_9transform_CythonUnionOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator) < 0) __PYX_ERR(0, 415, __pyx_L1_error)
+  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator)) __PYX_ERR(0, 431, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_9transform_CythonUnionOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator) < 0) __PYX_ERR(0, 431, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator = &__pyx_type_5sabot_7_cython_9operators_9transform_CythonUnionOperator;
   #endif
@@ -20304,7 +20577,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator->tp_base = __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_13base_operator_BaseOperator;
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator) < 0) __PYX_ERR(0, 415, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator) < 0) __PYX_ERR(0, 431, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator->tp_getattro == PyObject_GenericGetAttr)) {
@@ -20313,7 +20586,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 415, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 431, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_9operators_9transform_19CythonUnionOperator___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_9operators_9transform_19CythonUnionOperator___init__.doc = __pyx_doc_5sabot_7_cython_9operators_9transform_19CythonUnionOperator___init__;
@@ -20323,7 +20596,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator, "__iter__"); if (unlikely(!wrapper)) __PYX_ERR(0, 415, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator, "__iter__"); if (unlikely(!wrapper)) __PYX_ERR(0, 431, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_4__iter__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_4__iter__.doc = __pyx_doc_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_4__iter__;
@@ -20331,20 +20604,20 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator, __pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonUnionOperator) < 0) __PYX_ERR(0, 415, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator) < 0) __PYX_ERR(0, 415, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonUnionOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator) < 0) __PYX_ERR(0, 415, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator) < 0) __PYX_ERR(0, 415, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator, __pyx_vtabptr_5sabot_7_cython_9operators_9transform_CythonUnionOperator) < 0) __PYX_ERR(0, 431, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator) < 0) __PYX_ERR(0, 431, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonUnionOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator) < 0) __PYX_ERR(0, 431, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator) < 0) __PYX_ERR(0, 431, __pyx_L1_error)
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__ = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter___spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__)) __PYX_ERR(0, 398, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter___spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__) < 0) __PYX_ERR(0, 398, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__ = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter___spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__)) __PYX_ERR(0, 414, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter___spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__) < 0) __PYX_ERR(0, 414, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__ = &__pyx_type_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__) < 0) __PYX_ERR(0, 398, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__) < 0) __PYX_ERR(0, 414, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct____iter__->tp_getattro == PyObject_GenericGetAttr)) {
@@ -20352,15 +20625,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__ = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter___spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__)) __PYX_ERR(0, 484, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter___spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__) < 0) __PYX_ERR(0, 484, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__ = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter___spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__)) __PYX_ERR(0, 500, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter___spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__) < 0) __PYX_ERR(0, 500, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__ = &__pyx_type_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__) < 0) __PYX_ERR(0, 484, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__) < 0) __PYX_ERR(0, 500, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_9transform___pyx_scope_struct_1___iter__->tp_getattro == PyObject_GenericGetAttr)) {
@@ -22017,16 +22290,16 @@ __Pyx_RefNannySetupContext("PyInit_transform", 0);
   if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonMapOperator, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_7) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":220
+  /* "sabot/_cython/operators/transform.pyx":236
  *         self._predicate = predicate
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
  *     cpdef object process_batch(self, object batch):
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_20CythonFilterOperator_3process_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonFilterOperator_process_bat, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_20CythonFilterOperator_3process_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonFilterOperator_process_bat, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator, __pyx_mstate_global->__pyx_n_u_process_batch, __pyx_t_7) < 0) __PYX_ERR(0, 220, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator, __pyx_mstate_global->__pyx_n_u_process_batch, __pyx_t_7) < 0) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
   /* "(tree fragment)":1
@@ -22050,16 +22323,16 @@ __Pyx_RefNannySetupContext("PyInit_transform", 0);
   if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFilterOperator, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_7) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":303
+  /* "sabot/_cython/operators/transform.pyx":319
  *         self._columns = columns
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
  *     cpdef object process_batch(self, object batch):
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_20CythonSelectOperator_3process_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonSelectOperator_process_bat, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 303, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_20CythonSelectOperator_3process_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonSelectOperator_process_bat, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 319, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator, __pyx_mstate_global->__pyx_n_u_process_batch, __pyx_t_7) < 0) __PYX_ERR(0, 303, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator, __pyx_mstate_global->__pyx_n_u_process_batch, __pyx_t_7) < 0) __PYX_ERR(0, 319, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
   /* "(tree fragment)":1
@@ -22083,16 +22356,16 @@ __Pyx_RefNannySetupContext("PyInit_transform", 0);
   if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonSelectOperator, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_7) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":379
+  /* "sabot/_cython/operators/transform.pyx":395
  *         self._flat_map_func = flat_map_func
  * 
  *     cpdef object process_batch(self, object batch):             # <<<<<<<<<<<<<<
  *         """
  *         Apply flatMap - note this returns multiple batches.
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_3process_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonFlatMapOperator_process_ba, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_21CythonFlatMapOperator_3process_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonFlatMapOperator_process_ba, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 395, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator, __pyx_mstate_global->__pyx_n_u_process_batch, __pyx_t_7) < 0) __PYX_ERR(0, 379, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator, __pyx_mstate_global->__pyx_n_u_process_batch, __pyx_t_7) < 0) __PYX_ERR(0, 395, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
   /* "(tree fragment)":1
@@ -22116,16 +22389,16 @@ __Pyx_RefNannySetupContext("PyInit_transform", 0);
   if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonFlatMapOperator, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_7) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":461
+  /* "sabot/_cython/operators/transform.pyx":477
  *         self._sources = list(sources)
  * 
  *     cpdef object process_batches(self, list batches):             # <<<<<<<<<<<<<<
  *         """
  *         Combine multiple batches.
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_3process_batches, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonUnionOperator_process_batc, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[14])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 461, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_19CythonUnionOperator_3process_batches, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonUnionOperator_process_batc, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[14])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 477, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator, __pyx_mstate_global->__pyx_n_u_process_batches, __pyx_t_7) < 0) __PYX_ERR(0, 461, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator, __pyx_mstate_global->__pyx_n_u_process_batches, __pyx_t_7) < 0) __PYX_ERR(0, 477, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
   /* "(tree fragment)":1
@@ -22149,64 +22422,64 @@ __Pyx_RefNannySetupContext("PyInit_transform", 0);
   if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_9transform_CythonUnionOperator, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_7) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":501
+  /* "sabot/_cython/operators/transform.pyx":517
  * # ============================================================================
  * 
  * def create_map_operator(source, func, **kwargs):             # <<<<<<<<<<<<<<
  *     """Factory function for map operator."""
  *     return CythonMapOperator(source, func, **kwargs)
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_1create_map_operator, 0, __pyx_mstate_global->__pyx_n_u_create_map_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[17])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 501, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_1create_map_operator, 0, __pyx_mstate_global->__pyx_n_u_create_map_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[17])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 517, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_map_operator, __pyx_t_7) < 0) __PYX_ERR(0, 501, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_map_operator, __pyx_t_7) < 0) __PYX_ERR(0, 517, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":506
+  /* "sabot/_cython/operators/transform.pyx":522
  * 
  * 
  * def create_filter_operator(source, predicate, **kwargs):             # <<<<<<<<<<<<<<
  *     """Factory function for filter operator."""
  *     return CythonFilterOperator(source, predicate, **kwargs)
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_3create_filter_operator, 0, __pyx_mstate_global->__pyx_n_u_create_filter_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[18])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 506, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_3create_filter_operator, 0, __pyx_mstate_global->__pyx_n_u_create_filter_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[18])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 522, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_filter_operator, __pyx_t_7) < 0) __PYX_ERR(0, 506, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_filter_operator, __pyx_t_7) < 0) __PYX_ERR(0, 522, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":511
+  /* "sabot/_cython/operators/transform.pyx":527
  * 
  * 
  * def create_select_operator(source, columns, **kwargs):             # <<<<<<<<<<<<<<
  *     """Factory function for select operator."""
  *     return CythonSelectOperator(source, columns, **kwargs)
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_5create_select_operator, 0, __pyx_mstate_global->__pyx_n_u_create_select_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[19])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 511, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_5create_select_operator, 0, __pyx_mstate_global->__pyx_n_u_create_select_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[19])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 527, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_select_operator, __pyx_t_7) < 0) __PYX_ERR(0, 511, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_select_operator, __pyx_t_7) < 0) __PYX_ERR(0, 527, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":516
+  /* "sabot/_cython/operators/transform.pyx":532
  * 
  * 
  * def create_flatmap_operator(source, func, **kwargs):             # <<<<<<<<<<<<<<
  *     """Factory function for flatMap operator."""
  *     return CythonFlatMapOperator(source, func, **kwargs)
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_7create_flatmap_operator, 0, __pyx_mstate_global->__pyx_n_u_create_flatmap_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[20])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 516, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_7create_flatmap_operator, 0, __pyx_mstate_global->__pyx_n_u_create_flatmap_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[20])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 532, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_flatmap_operator, __pyx_t_7) < 0) __PYX_ERR(0, 516, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_flatmap_operator, __pyx_t_7) < 0) __PYX_ERR(0, 532, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "sabot/_cython/operators/transform.pyx":521
+  /* "sabot/_cython/operators/transform.pyx":537
  * 
  * 
  * def create_union_operator(*sources, **kwargs):             # <<<<<<<<<<<<<<
  *     """Factory function for union operator."""
  *     return CythonUnionOperator(*sources, **kwargs)
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_9create_union_operator, 0, __pyx_mstate_global->__pyx_n_u_create_union_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[21])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 521, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_9transform_9create_union_operator, 0, __pyx_mstate_global->__pyx_n_u_create_union_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_transfor, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[21])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 537, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_union_operator, __pyx_t_7) < 0) __PYX_ERR(0, 521, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_union_operator, __pyx_t_7) < 0) __PYX_ERR(0, 537, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
   /* "(tree fragment)":1
@@ -22372,11 +22645,13 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_List, sizeof(__pyx_k_List), 0, 1, 1}, /* PyObject cname: __pyx_n_u_List */
   {__pyx_k_NUMBA_COMPILER_AVAILABLE, sizeof(__pyx_k_NUMBA_COMPILER_AVAILABLE), 0, 1, 1}, /* PyObject cname: __pyx_n_u_NUMBA_COMPILER_AVAILABLE */
   {__pyx_k_Note_that_Cython_is_deliberately, sizeof(__pyx_k_Note_that_Cython_is_deliberately), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Note_that_Cython_is_deliberately */
+  {__pyx_k_Numba_compilation_failed_at_runt, sizeof(__pyx_k_Numba_compilation_failed_at_runt), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Numba_compilation_failed_at_runt */
   {__pyx_k_Numba_compiled_map_function, sizeof(__pyx_k_Numba_compiled_map_function), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Numba_compiled_map_function */
   {__pyx_k_Optional, sizeof(__pyx_k_Optional), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Optional */
   {__pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PickleError */
   {__pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_RuntimeError */
   {__pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TypeError */
+  {__pyx_k_TypingError, sizeof(__pyx_k_TypingError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TypingError */
   {__pyx_k__2, sizeof(__pyx_k__2), 0, 1, 0}, /* PyObject cname: __pyx_kp_u__2 */
   {__pyx_k_add_note, sizeof(__pyx_k_add_note), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_add_note */
   {__pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 1, 1}, /* PyObject cname: __pyx_n_u_asyncio_coroutines */
@@ -22397,6 +22672,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_disable, sizeof(__pyx_k_disable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_disable */
   {__pyx_k_enable, sizeof(__pyx_k_enable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_enable */
   {__pyx_k_evaluate_predicate_with_auto_co, sizeof(__pyx_k_evaluate_predicate_with_auto_co), 0, 1, 1}, /* PyObject cname: __pyx_n_u_evaluate_predicate_with_auto_co */
+  {__pyx_k_falling_back_to_original_functi, sizeof(__pyx_k_falling_back_to_original_functi), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_falling_back_to_original_functi */
   {__pyx_k_filter, sizeof(__pyx_k_filter), 0, 1, 1}, /* PyObject cname: __pyx_n_u_filter */
   {__pyx_k_flat_map_func, sizeof(__pyx_k_flat_map_func), 0, 1, 1}, /* PyObject cname: __pyx_n_u_flat_map_func */
   {__pyx_k_from_iterable, sizeof(__pyx_k_from_iterable), 0, 1, 1}, /* PyObject cname: __pyx_n_u_from_iterable */
@@ -22416,6 +22692,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_kwargs, sizeof(__pyx_k_kwargs), 0, 1, 1}, /* PyObject cname: __pyx_n_u_kwargs */
   {__pyx_k_lambda, sizeof(__pyx_k_lambda), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_lambda */
   {__pyx_k_logging, sizeof(__pyx_k_logging), 0, 1, 1}, /* PyObject cname: __pyx_n_u_logging */
+  {__pyx_k_lower, sizeof(__pyx_k_lower), 0, 1, 1}, /* PyObject cname: __pyx_n_u_lower */
   {__pyx_k_main, sizeof(__pyx_k_main), 0, 1, 1}, /* PyObject cname: __pyx_n_u_main */
   {__pyx_k_map_func, sizeof(__pyx_k_map_func), 0, 1, 1}, /* PyObject cname: __pyx_n_u_map_func */
   {__pyx_k_module, sizeof(__pyx_k_module), 0, 1, 1}, /* PyObject cname: __pyx_n_u_module */
@@ -22424,6 +22701,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_new, sizeof(__pyx_k_new), 0, 1, 1}, /* PyObject cname: __pyx_n_u_new */
   {__pyx_k_next, sizeof(__pyx_k_next), 0, 1, 1}, /* PyObject cname: __pyx_n_u_next */
   {__pyx_k_num_rows, sizeof(__pyx_k_num_rows), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_rows */
+  {__pyx_k_numba, sizeof(__pyx_k_numba), 0, 1, 1}, /* PyObject cname: __pyx_n_u_numba */
   {__pyx_k_perf_counter, sizeof(__pyx_k_perf_counter), 0, 1, 1}, /* PyObject cname: __pyx_n_u_perf_counter */
   {__pyx_k_pickle, sizeof(__pyx_k_pickle), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pickle */
   {__pyx_k_pop, sizeof(__pyx_k_pop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pop */
@@ -22469,6 +22747,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_use_setstate, sizeof(__pyx_k_use_setstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_use_setstate */
   {__pyx_k_value, sizeof(__pyx_k_value), 0, 1, 1}, /* PyObject cname: __pyx_n_u_value */
   {__pyx_k_vectorized, sizeof(__pyx_k_vectorized), 0, 1, 1}, /* PyObject cname: __pyx_n_u_vectorized */
+  {__pyx_k_warning, sizeof(__pyx_k_warning), 0, 1, 1}, /* PyObject cname: __pyx_n_u_warning */
   {__pyx_k_zip_longest, sizeof(__pyx_k_zip_longest), 0, 1, 1}, /* PyObject cname: __pyx_n_u_zip_longest */
   {0, 0, 0, 0, 0}
 };
@@ -22480,8 +22759,8 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, c
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(0, 30, __pyx_L1_error)
-  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 160, __pyx_L1_error)
-  __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(0, 231, __pyx_L1_error)
+  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(0, 247, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -22575,19 +22854,19 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 398, 2};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 414, 2};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_results, __pyx_mstate->__pyx_n_u_result_batch};
     __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_iter, __pyx_k_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 484, 2};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 500, 2};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_itertools, __pyx_mstate->__pyx_n_u_iterators, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_source};
     __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_iter, __pyx_k_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 142, 67};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 142, 205};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch};
-    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_4_s_1_1_T_1_A_ar_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_4_s_1_1_T_1_A_t_nCs_4q_SPXX, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 250};
@@ -22600,7 +22879,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_q_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 220, 142};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 236, 142};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch};
     __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_4_s_5_5_Q_1_t_aq_4_9_4_H_z_y_u, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
   }
@@ -22615,7 +22894,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_2_6, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 303, 62};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 319, 62};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch};
     __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_4_s_1_1_5_q_A_A_ar_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
   }
@@ -22630,7 +22909,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_2_6, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 379, 89};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 395, 89};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch};
     __pyx_mstate_global->__pyx_codeobj_tab[11] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_4_s_1_1_d_t_Qj_a_aq_1_A_ar, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[11])) goto bad;
   }
@@ -22645,7 +22924,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[13] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_31F, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[13])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 461, 97};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 477, 97};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batches};
     __pyx_mstate_global->__pyx_codeobj_tab[14] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_process_batches, __pyx_k_A_4_s_a_1_4uHCr_T_Ba_4q_1_3a_c_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[14])) goto bad;
   }
@@ -22660,27 +22939,27 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[16] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[16])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 501, 16};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 517, 16};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_source, __pyx_mstate->__pyx_n_u_func, __pyx_mstate->__pyx_n_u_kwargs};
     __pyx_mstate_global->__pyx_codeobj_tab[17] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_create_map_operator, __pyx_k_AXXQ, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[17])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 506, 16};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 522, 16};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_source, __pyx_mstate->__pyx_n_u_predicate, __pyx_mstate->__pyx_n_u_kwargs};
     __pyx_mstate_global->__pyx_codeobj_tab[18] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_create_filter_operator, __pyx_k_q_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[18])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 511, 16};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 527, 16};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_source, __pyx_mstate->__pyx_n_u_columns, __pyx_mstate->__pyx_n_u_kwargs};
     __pyx_mstate_global->__pyx_codeobj_tab[19] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_create_select_operator, __pyx_k_q_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[19])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 516, 16};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 532, 16};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_source, __pyx_mstate->__pyx_n_u_func, __pyx_mstate->__pyx_n_u_kwargs};
     __pyx_mstate_global->__pyx_codeobj_tab[20] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_create_flatmap_operator, __pyx_k__3, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[20])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS|CO_VARKEYWORDS), 521, 14};
+    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS|CO_VARKEYWORDS), 537, 14};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_sources, __pyx_mstate->__pyx_n_u_kwargs};
     __pyx_mstate_global->__pyx_codeobj_tab[21] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_transfor_2, __pyx_mstate->__pyx_n_u_create_union_operator, __pyx_k_b_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[21])) goto bad;
   }

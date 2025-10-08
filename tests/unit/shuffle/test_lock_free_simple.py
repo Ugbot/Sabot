@@ -5,7 +5,7 @@ Simple test of lock-free primitives without pytest dependency.
 
 import sys
 import time
-import pyarrow as pa
+from sabot import cyarrow as pa
 
 # Import lock-free primitives
 from sabot._cython.shuffle.lock_free_queue import SPSCRingBuffer, MPSCQueue

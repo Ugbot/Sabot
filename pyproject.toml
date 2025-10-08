@@ -2,12 +2,12 @@
 requires = ["setuptools>=61.0", "Cython>=3.0.0", "numpy>=1.21.0"]
 build-backend = "setuptools.build_meta"
 
-# Submodules
-# To use Tonbo backend, clone the submodule:
-# git submodule update --init --recursive tonbo
+# Vendored Dependencies
+# Arrow C++: Built from vendor/arrow/ via `python build.py`
+# Tonbo: Built from vendor/tonbo/ via `python build.py`
+# RocksDB: Built from vendor/rocksdb/ via `python build.py`
 #
-# To use Arrow for development builds, clone the submodule:
-# git submodule update --init --recursive third-party/arrow
+# NO pip dependencies for pyarrow - we use our vendored version!
 
 [project]
 name = "sabot"
@@ -190,13 +190,16 @@ strict_equality = true
 [[tool.mypy.overrides]]
 module = [
     "sabot._cython.*",
-    "pyarrow.*",
+    "sabot.cyarrow.*",
     "confluent_kafka.*",
     "aiokafka.*",
     "prometheus_client.*",
     "datadog.*",
 ]
 ignore_missing_imports = true
+
+# Note: pyarrow is vendored in vendor/arrow/ and built via build.py
+# Type stubs come from vendored Arrow Python bindings
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

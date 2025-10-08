@@ -22,7 +22,7 @@ from typing import Optional, List, Tuple, AsyncGenerator
 # Use Sabot's Arrow API
 from sabot import cyarrow as pa
 from sabot.cyarrow import compute as pc
-import pyarrow.flight as flight  # Flight not yet in sabot.arrow
+from sabot.cyarrow import flight  # Flight from vendored Arrow
 
 # Import Sabot's Cython compute functions
 try:
@@ -248,7 +248,7 @@ class RankingOperator:
             # Concatenate all ranked partitions
             if ranked_batches:
                 # Use pyarrow concat_tables (not yet in sabot.arrow)
-                import pyarrow as _pa  # Only for concat_tables
+                from sabot import cyarrow as _pa  # concat_tables from vendored Arrow
                 tables = [_pa.Table.from_batches([b]) for b in ranked_batches]
                 result_table = _pa.concat_tables(tables)
                 result_batch = result_table.to_batches()[0] if result_table.num_rows > 0 else ranked_batches[0].slice(0, 0)

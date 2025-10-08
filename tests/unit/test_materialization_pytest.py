@@ -5,8 +5,8 @@ Pytest-compatible tests for Materialization Engine
 Integrates with pytest test discovery and reporting.
 """
 import pytest
-import pyarrow as pa
-import pyarrow.feather as feather
+from sabot import cyarrow as pa
+from sabot.cyarrow import feather
 import tempfile
 from pathlib import Path
 import shutil

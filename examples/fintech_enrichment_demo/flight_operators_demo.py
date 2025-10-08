@@ -203,7 +203,7 @@ class FlightOperatorsPipeline:
 
         # Combine all enriched morsels
         if enriched_morsels:
-            import pyarrow as _pa  # Only for concat_tables (not in sabot.arrow yet)
+            from sabot import cyarrow as _pa  # concat_tables from vendored Arrow
             enriched_tables = [_pa.Table.from_batches([m]) for m in enriched_morsels]
             final_table = _pa.concat_tables(enriched_tables)
 

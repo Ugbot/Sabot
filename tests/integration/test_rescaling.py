@@ -7,7 +7,7 @@ and zero-downtime rescaling operations.
 
 import pytest
 import asyncio
-import pyarrow as pa
+from sabot import cyarrow as pa
 from unittest.mock import Mock, AsyncMock, patch
 
 from sabot.job_manager import JobManager

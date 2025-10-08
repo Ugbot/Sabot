@@ -13,7 +13,7 @@ Usage:
 """
 
 import asyncio
-import pyarrow as pa
+from sabot import cyarrow as pa
 from sabot.agent import Agent, AgentConfig
 from sabot.job_manager import JobManager
 

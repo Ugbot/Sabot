@@ -9,6 +9,11 @@
             "-Wno-unused-function",
             "-Wno-deprecated-declarations"
         ],
+        "extra_link_args": [
+            "-Wl,-headerpad_max_install_names",
+            "-Wl,-rpath,@loader_path/../../vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib"
+        ],
         "include_dirs": [
             "/Users/bengamble/Sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
@@ -6135,8 +6140,8 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
   int __pyx_t_26;
   int __pyx_t_27;
   int __pyx_t_28;
-  Py_ssize_t __pyx_t_29;
-  int __pyx_t_30;
+  int __pyx_t_29;
+  Py_ssize_t __pyx_t_30;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -6773,7 +6778,7 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
  *                     if 'np' in argval_lower or 'numpy' in argval_lower:
  *                         pattern.has_numpy = True             # <<<<<<<<<<<<<<
  *                         pattern.numpy_call_count += 1
- * 
+ *                     # PyArrow detection (pa, pc module aliases)
 */
           __pyx_v_pattern->has_numpy = 1;
 
@@ -6781,8 +6786,8 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
  *                     if 'np' in argval_lower or 'numpy' in argval_lower:
  *                         pattern.has_numpy = True
  *                         pattern.numpy_call_count += 1             # <<<<<<<<<<<<<<
- * 
- *         # Analyze imported modules
+ *                     # PyArrow detection (pa, pc module aliases)
+ *                     if argval in ('pa', 'pc') or 'pyarrow' in argval_lower:
 */
           __pyx_v_pattern->numpy_call_count = (__pyx_v_pattern->numpy_call_count + 1);
 
@@ -6792,6 +6797,54 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
  *                     if 'np' in argval_lower or 'numpy' in argval_lower:             # <<<<<<<<<<<<<<
  *                         pattern.has_numpy = True
  *                         pattern.numpy_call_count += 1
+*/
+        }
+
+        /* "sabot/_cython/operators/numba_compiler.pyx":248
+ *                         pattern.numpy_call_count += 1
+ *                     # PyArrow detection (pa, pc module aliases)
+ *                     if argval in ('pa', 'pc') or 'pyarrow' in argval_lower:             # <<<<<<<<<<<<<<
+ *                         pattern.has_arrow = True
+ * 
+*/
+        __Pyx_INCREF(__pyx_v_argval);
+        __pyx_t_1 = __pyx_v_argval;
+        __pyx_t_29 = (__Pyx_PyUnicode_Equals(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_pa_2, Py_EQ)); if (unlikely((__pyx_t_29 < 0))) __PYX_ERR(0, 248, __pyx_L1_error)
+        if (!__pyx_t_29) {
+        } else {
+          __pyx_t_28 = __pyx_t_29;
+          goto __pyx_L41_bool_binop_done;
+        }
+        __pyx_t_29 = (__Pyx_PyUnicode_Equals(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_pc_2, Py_EQ)); if (unlikely((__pyx_t_29 < 0))) __PYX_ERR(0, 248, __pyx_L1_error)
+        __pyx_t_28 = __pyx_t_29;
+        __pyx_L41_bool_binop_done:;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __pyx_t_29 = __pyx_t_28;
+        if (!__pyx_t_29) {
+        } else {
+          __pyx_t_26 = __pyx_t_29;
+          goto __pyx_L39_bool_binop_done;
+        }
+        __pyx_t_29 = (__Pyx_PySequence_ContainsTF(__pyx_mstate_global->__pyx_n_u_pyarrow, __pyx_v_argval_lower, Py_EQ)); if (unlikely((__pyx_t_29 < 0))) __PYX_ERR(0, 248, __pyx_L1_error)
+        __pyx_t_26 = __pyx_t_29;
+        __pyx_L39_bool_binop_done:;
+        if (__pyx_t_26) {
+
+          /* "sabot/_cython/operators/numba_compiler.pyx":249
+ *                     # PyArrow detection (pa, pc module aliases)
+ *                     if argval in ('pa', 'pc') or 'pyarrow' in argval_lower:
+ *                         pattern.has_arrow = True             # <<<<<<<<<<<<<<
+ * 
+ *         # Analyze imported modules
+*/
+          __pyx_v_pattern->has_arrow = 1;
+
+          /* "sabot/_cython/operators/numba_compiler.pyx":248
+ *                         pattern.numpy_call_count += 1
+ *                     # PyArrow detection (pa, pc module aliases)
+ *                     if argval in ('pa', 'pc') or 'pyarrow' in argval_lower:             # <<<<<<<<<<<<<<
+ *                         pattern.has_arrow = True
+ * 
 */
         }
 
@@ -6824,7 +6877,7 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":249
+  /* "sabot/_cython/operators/numba_compiler.pyx":252
  * 
  *         # Analyze imported modules
  *         for module in imported_modules:             # <<<<<<<<<<<<<<
@@ -6832,20 +6885,20 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
  * 
 */
   __pyx_t_25 = 0;
-  __pyx_t_1 = __Pyx_set_iterator(__pyx_v_imported_modules, 1, (&__pyx_t_29), (&__pyx_t_16)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 249, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_set_iterator(__pyx_v_imported_modules, 1, (&__pyx_t_30), (&__pyx_t_16)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_3);
   __pyx_t_3 = __pyx_t_1;
   __pyx_t_1 = 0;
   while (1) {
-    __pyx_t_9 = __Pyx_set_iter_next(__pyx_t_3, __pyx_t_29, &__pyx_t_25, &__pyx_t_1, __pyx_t_16);
+    __pyx_t_9 = __Pyx_set_iter_next(__pyx_t_3, __pyx_t_30, &__pyx_t_25, &__pyx_t_1, __pyx_t_16);
     if (unlikely(__pyx_t_9 == 0)) break;
-    if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 249, __pyx_L1_error)
+    if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 252, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_XDECREF_SET(__pyx_v_module, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":250
+    /* "sabot/_cython/operators/numba_compiler.pyx":253
  *         # Analyze imported modules
  *         for module in imported_modules:
  *             module_lower = module.lower()             # <<<<<<<<<<<<<<
@@ -6859,31 +6912,31 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
       PyObject *__pyx_callargs[2] = {__pyx_t_8, NULL};
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_lower, __pyx_callargs+__pyx_t_4, (1-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 253, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_XDECREF_SET(__pyx_v_module_lower, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":252
+    /* "sabot/_cython/operators/numba_compiler.pyx":255
  *             module_lower = module.lower()
  * 
  *             if 'numpy' in module_lower or module == 'np':             # <<<<<<<<<<<<<<
  *                 pattern.has_numpy = True
  * 
 */
-    __pyx_t_28 = (__Pyx_PySequence_ContainsTF(__pyx_mstate_global->__pyx_n_u_numpy, __pyx_v_module_lower, Py_EQ)); if (unlikely((__pyx_t_28 < 0))) __PYX_ERR(0, 252, __pyx_L1_error)
-    if (!__pyx_t_28) {
+    __pyx_t_29 = (__Pyx_PySequence_ContainsTF(__pyx_mstate_global->__pyx_n_u_numpy, __pyx_v_module_lower, Py_EQ)); if (unlikely((__pyx_t_29 < 0))) __PYX_ERR(0, 255, __pyx_L1_error)
+    if (!__pyx_t_29) {
     } else {
-      __pyx_t_26 = __pyx_t_28;
-      goto __pyx_L42_bool_binop_done;
+      __pyx_t_26 = __pyx_t_29;
+      goto __pyx_L47_bool_binop_done;
     }
-    __pyx_t_28 = (__Pyx_PyUnicode_Equals(__pyx_v_module, __pyx_mstate_global->__pyx_n_u_np_2, Py_EQ)); if (unlikely((__pyx_t_28 < 0))) __PYX_ERR(0, 252, __pyx_L1_error)
-    __pyx_t_26 = __pyx_t_28;
-    __pyx_L42_bool_binop_done:;
+    __pyx_t_29 = (__Pyx_PyUnicode_Equals(__pyx_v_module, __pyx_mstate_global->__pyx_n_u_np_2, Py_EQ)); if (unlikely((__pyx_t_29 < 0))) __PYX_ERR(0, 255, __pyx_L1_error)
+    __pyx_t_26 = __pyx_t_29;
+    __pyx_L47_bool_binop_done:;
     if (__pyx_t_26) {
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":253
+      /* "sabot/_cython/operators/numba_compiler.pyx":256
  * 
  *             if 'numpy' in module_lower or module == 'np':
  *                 pattern.has_numpy = True             # <<<<<<<<<<<<<<
@@ -6892,7 +6945,7 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
 */
       __pyx_v_pattern->has_numpy = 1;
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":252
+      /* "sabot/_cython/operators/numba_compiler.pyx":255
  *             module_lower = module.lower()
  * 
  *             if 'numpy' in module_lower or module == 'np':             # <<<<<<<<<<<<<<
@@ -6901,25 +6954,25 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
 */
     }
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":255
+    /* "sabot/_cython/operators/numba_compiler.pyx":258
  *                 pattern.has_numpy = True
  * 
  *             if 'pandas' in module_lower or module == 'pd':             # <<<<<<<<<<<<<<
  *                 pattern.has_pandas = True
  * 
 */
-    __pyx_t_28 = (__Pyx_PySequence_ContainsTF(__pyx_mstate_global->__pyx_n_u_pandas, __pyx_v_module_lower, Py_EQ)); if (unlikely((__pyx_t_28 < 0))) __PYX_ERR(0, 255, __pyx_L1_error)
-    if (!__pyx_t_28) {
+    __pyx_t_29 = (__Pyx_PySequence_ContainsTF(__pyx_mstate_global->__pyx_n_u_pandas, __pyx_v_module_lower, Py_EQ)); if (unlikely((__pyx_t_29 < 0))) __PYX_ERR(0, 258, __pyx_L1_error)
+    if (!__pyx_t_29) {
     } else {
-      __pyx_t_26 = __pyx_t_28;
-      goto __pyx_L45_bool_binop_done;
+      __pyx_t_26 = __pyx_t_29;
+      goto __pyx_L50_bool_binop_done;
     }
-    __pyx_t_28 = (__Pyx_PyUnicode_Equals(__pyx_v_module, __pyx_mstate_global->__pyx_n_u_pd_2, Py_EQ)); if (unlikely((__pyx_t_28 < 0))) __PYX_ERR(0, 255, __pyx_L1_error)
-    __pyx_t_26 = __pyx_t_28;
-    __pyx_L45_bool_binop_done:;
+    __pyx_t_29 = (__Pyx_PyUnicode_Equals(__pyx_v_module, __pyx_mstate_global->__pyx_n_u_pd_2, Py_EQ)); if (unlikely((__pyx_t_29 < 0))) __PYX_ERR(0, 258, __pyx_L1_error)
+    __pyx_t_26 = __pyx_t_29;
+    __pyx_L50_bool_binop_done:;
     if (__pyx_t_26) {
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":256
+      /* "sabot/_cython/operators/numba_compiler.pyx":259
  * 
  *             if 'pandas' in module_lower or module == 'pd':
  *                 pattern.has_pandas = True             # <<<<<<<<<<<<<<
@@ -6928,7 +6981,7 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
 */
       __pyx_v_pattern->has_pandas = 1;
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":255
+      /* "sabot/_cython/operators/numba_compiler.pyx":258
  *                 pattern.has_numpy = True
  * 
  *             if 'pandas' in module_lower or module == 'pd':             # <<<<<<<<<<<<<<
@@ -6937,37 +6990,37 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
 */
     }
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":258
+    /* "sabot/_cython/operators/numba_compiler.pyx":261
  *                 pattern.has_pandas = True
  * 
  *             if 'pyarrow' in module_lower or module in ('pa', 'pc'):             # <<<<<<<<<<<<<<
  *                 pattern.has_arrow = True
  * 
 */
-    __pyx_t_28 = (__Pyx_PySequence_ContainsTF(__pyx_mstate_global->__pyx_n_u_pyarrow, __pyx_v_module_lower, Py_EQ)); if (unlikely((__pyx_t_28 < 0))) __PYX_ERR(0, 258, __pyx_L1_error)
-    if (!__pyx_t_28) {
+    __pyx_t_29 = (__Pyx_PySequence_ContainsTF(__pyx_mstate_global->__pyx_n_u_pyarrow, __pyx_v_module_lower, Py_EQ)); if (unlikely((__pyx_t_29 < 0))) __PYX_ERR(0, 261, __pyx_L1_error)
+    if (!__pyx_t_29) {
     } else {
-      __pyx_t_26 = __pyx_t_28;
-      goto __pyx_L48_bool_binop_done;
+      __pyx_t_26 = __pyx_t_29;
+      goto __pyx_L53_bool_binop_done;
     }
     __Pyx_INCREF(__pyx_v_module);
     __pyx_t_1 = __pyx_v_module;
-    __pyx_t_30 = (__Pyx_PyUnicode_Equals(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_pa_2, Py_EQ)); if (unlikely((__pyx_t_30 < 0))) __PYX_ERR(0, 258, __pyx_L1_error)
-    if (!__pyx_t_30) {
+    __pyx_t_28 = (__Pyx_PyUnicode_Equals(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_pa_2, Py_EQ)); if (unlikely((__pyx_t_28 < 0))) __PYX_ERR(0, 261, __pyx_L1_error)
+    if (!__pyx_t_28) {
     } else {
-      __pyx_t_28 = __pyx_t_30;
-      goto __pyx_L50_bool_binop_done;
+      __pyx_t_29 = __pyx_t_28;
+      goto __pyx_L55_bool_binop_done;
     }
-    __pyx_t_30 = (__Pyx_PyUnicode_Equals(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_pc_2, Py_EQ)); if (unlikely((__pyx_t_30 < 0))) __PYX_ERR(0, 258, __pyx_L1_error)
-    __pyx_t_28 = __pyx_t_30;
-    __pyx_L50_bool_binop_done:;
+    __pyx_t_28 = (__Pyx_PyUnicode_Equals(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_pc_2, Py_EQ)); if (unlikely((__pyx_t_28 < 0))) __PYX_ERR(0, 261, __pyx_L1_error)
+    __pyx_t_29 = __pyx_t_28;
+    __pyx_L55_bool_binop_done:;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_30 = __pyx_t_28;
-    __pyx_t_26 = __pyx_t_30;
-    __pyx_L48_bool_binop_done:;
+    __pyx_t_28 = __pyx_t_29;
+    __pyx_t_26 = __pyx_t_28;
+    __pyx_L53_bool_binop_done:;
     if (__pyx_t_26) {
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":259
+      /* "sabot/_cython/operators/numba_compiler.pyx":262
  * 
  *             if 'pyarrow' in module_lower or module in ('pa', 'pc'):
  *                 pattern.has_arrow = True             # <<<<<<<<<<<<<<
@@ -6976,7 +7029,7 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
 */
       __pyx_v_pattern->has_arrow = 1;
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":258
+      /* "sabot/_cython/operators/numba_compiler.pyx":261
  *                 pattern.has_pandas = True
  * 
  *             if 'pyarrow' in module_lower or module in ('pa', 'pc'):             # <<<<<<<<<<<<<<
@@ -6987,7 +7040,7 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":261
+  /* "sabot/_cython/operators/numba_compiler.pyx":264
  *                 pattern.has_arrow = True
  * 
  *         return pattern             # <<<<<<<<<<<<<<
@@ -7036,7 +7089,7 @@ static struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPatt
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/numba_compiler.pyx":263
+/* "sabot/_cython/operators/numba_compiler.pyx":266
  *         return pattern
  * 
  *     cpdef CompilationStrategy _choose_strategy(self, FunctionPattern pattern):             # <<<<<<<<<<<<<<
@@ -7082,7 +7135,7 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_choose_strategy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 263, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_choose_strategy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 266, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_9operators_14numba_compiler_13NumbaCompiler_7_choose_strategy)) {
         __pyx_t_3 = NULL;
@@ -7105,10 +7158,10 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 263, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 266, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        __pyx_t_6 = ((enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrategy)__Pyx_PyLong_As_enum____pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrategy(__pyx_t_2)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 263, __pyx_L1_error)
+        __pyx_t_6 = ((enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrategy)__Pyx_PyLong_As_enum____pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrategy(__pyx_t_2)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 266, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_6;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -7127,7 +7180,7 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
     #endif
   }
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":273
+  /* "sabot/_cython/operators/numba_compiler.pyx":276
  *         4. Otherwise  NJIT (simple expressions)
  *         """
  *         if pattern.has_arrow or pattern.has_pandas:             # <<<<<<<<<<<<<<
@@ -7143,7 +7196,7 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_7) {
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":275
+    /* "sabot/_cython/operators/numba_compiler.pyx":278
  *         if pattern.has_arrow or pattern.has_pandas:
  *             # Already using fast libraries - don't compile
  *             return CompilationStrategy.SKIP             # <<<<<<<<<<<<<<
@@ -7153,7 +7206,7 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
     __pyx_r = __pyx_e_5sabot_7_cython_9operators_14numba_compiler_SKIP;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":273
+    /* "sabot/_cython/operators/numba_compiler.pyx":276
  *         4. Otherwise  NJIT (simple expressions)
  *         """
  *         if pattern.has_arrow or pattern.has_pandas:             # <<<<<<<<<<<<<<
@@ -7162,7 +7215,7 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
 */
   }
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":277
+  /* "sabot/_cython/operators/numba_compiler.pyx":280
  *             return CompilationStrategy.SKIP
  * 
  *         elif pattern.has_numpy and pattern.numpy_call_count > 2:             # <<<<<<<<<<<<<<
@@ -7179,7 +7232,7 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
   __pyx_L6_bool_binop_done:;
   if (__pyx_t_7) {
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":279
+    /* "sabot/_cython/operators/numba_compiler.pyx":282
  *         elif pattern.has_numpy and pattern.numpy_call_count > 2:
  *             # Significant NumPy usage - use vectorize
  *             return CompilationStrategy.VECTORIZE             # <<<<<<<<<<<<<<
@@ -7189,7 +7242,7 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
     __pyx_r = __pyx_e_5sabot_7_cython_9operators_14numba_compiler_VECTORIZE;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":277
+    /* "sabot/_cython/operators/numba_compiler.pyx":280
  *             return CompilationStrategy.SKIP
  * 
  *         elif pattern.has_numpy and pattern.numpy_call_count > 2:             # <<<<<<<<<<<<<<
@@ -7198,7 +7251,7 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
 */
   }
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":281
+  /* "sabot/_cython/operators/numba_compiler.pyx":284
  *             return CompilationStrategy.VECTORIZE
  * 
  *         elif pattern.has_loops or pattern.loop_count > 0:             # <<<<<<<<<<<<<<
@@ -7215,7 +7268,7 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
   __pyx_L8_bool_binop_done:;
   if (__pyx_t_7) {
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":283
+    /* "sabot/_cython/operators/numba_compiler.pyx":286
  *         elif pattern.has_loops or pattern.loop_count > 0:
  *             # Pure Python loops - use njit
  *             return CompilationStrategy.NJIT             # <<<<<<<<<<<<<<
@@ -7225,7 +7278,7 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
     __pyx_r = __pyx_e_5sabot_7_cython_9operators_14numba_compiler_NJIT;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":281
+    /* "sabot/_cython/operators/numba_compiler.pyx":284
  *             return CompilationStrategy.VECTORIZE
  * 
  *         elif pattern.has_loops or pattern.loop_count > 0:             # <<<<<<<<<<<<<<
@@ -7234,7 +7287,7 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
 */
   }
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":287
+  /* "sabot/_cython/operators/numba_compiler.pyx":290
  *         else:
  *             # Simple expressions - try njit
  *             return CompilationStrategy.NJIT             # <<<<<<<<<<<<<<
@@ -7246,7 +7299,7 @@ static enum __pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrat
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":263
+  /* "sabot/_cython/operators/numba_compiler.pyx":266
  *         return pattern
  * 
  *     cpdef CompilationStrategy _choose_strategy(self, FunctionPattern pattern):             # <<<<<<<<<<<<<<
@@ -7307,32 +7360,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_pattern,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 263, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 266, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 263, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 266, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_choose_strategy", 0) < 0) __PYX_ERR(0, 263, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_choose_strategy", 0) < 0) __PYX_ERR(0, 266, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_choose_strategy", 1, 1, 1, i); __PYX_ERR(0, 263, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_choose_strategy", 1, 1, 1, i); __PYX_ERR(0, 266, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 263, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 266, __pyx_L3_error)
     }
     __pyx_v_pattern = ((struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_FunctionPattern *)values[0]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_choose_strategy", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 263, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_choose_strategy", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 266, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -7343,7 +7396,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_pattern), __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_14numba_compiler_FunctionPattern, 1, "pattern", 0))) __PYX_ERR(0, 263, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_pattern), __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_14numba_compiler_FunctionPattern, 1, "pattern", 0))) __PYX_ERR(0, 266, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_9operators_14numba_compiler_13NumbaCompiler_6_choose_strategy(((struct __pyx_obj_5sabot_7_cython_9operators_14numba_compiler_NumbaCompiler *)__pyx_v_self), __pyx_v_pattern);
 
   /* function exit code */
@@ -7373,8 +7426,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_14numba_compiler_13NumbaCom
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_choose_strategy", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaCompiler__choose_strategy(__pyx_v_self, __pyx_v_pattern, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 263, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyLong_From_enum____pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrategy(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaCompiler__choose_strategy(__pyx_v_self, __pyx_v_pattern, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 266, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_enum____pyx_t_5sabot_7_cython_9operators_14numba_compiler_CompilationStrategy(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 266, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
@@ -7391,7 +7444,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_14numba_compiler_13NumbaCom
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/numba_compiler.pyx":289
+/* "sabot/_cython/operators/numba_compiler.pyx":292
  *             return CompilationStrategy.NJIT
  * 
  *     cdef object _compile_njit(self, object func):             # <<<<<<<<<<<<<<
@@ -7433,7 +7486,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_compile_njit", 0);
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":299
+  /* "sabot/_cython/operators/numba_compiler.pyx":302
  *         because we can't reliably infer argument types.
  *         """
  *         try:             # <<<<<<<<<<<<<<
@@ -7449,7 +7502,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":300
+      /* "sabot/_cython/operators/numba_compiler.pyx":303
  *         """
  *         try:
  *             compiled = self._numba_module.njit(func)             # <<<<<<<<<<<<<<
@@ -7463,13 +7516,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
         PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_v_func};
         __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_njit, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 300, __pyx_L3_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 303, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
       __pyx_v_compiled = __pyx_t_4;
       __pyx_t_4 = 0;
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":301
+      /* "sabot/_cython/operators/numba_compiler.pyx":304
  *         try:
  *             compiled = self._numba_module.njit(func)
  *             logger.info(f"Compiled {func.__name__} with @njit (lazy compilation)")             # <<<<<<<<<<<<<<
@@ -7477,21 +7530,21 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
  * 
 */
       __pyx_t_5 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 301, __pyx_L3_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 304, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 301, __pyx_L3_error)
+      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 304, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_func, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 301, __pyx_L3_error)
+      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_func, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 304, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_9 = __Pyx_PyObject_FormatSimple(__pyx_t_7, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 301, __pyx_L3_error)
+      __pyx_t_9 = __Pyx_PyObject_FormatSimple(__pyx_t_7, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 304, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __pyx_t_10[0] = __pyx_mstate_global->__pyx_kp_u_Compiled;
       __pyx_t_10[1] = __pyx_t_9;
       __pyx_t_10[2] = __pyx_mstate_global->__pyx_kp_u_with_njit_lazy_compilation;
       __pyx_t_7 = __Pyx_PyUnicode_Join(__pyx_t_10, 3, 9 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_9) + 30, 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_9));
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 301, __pyx_L3_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 304, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_6 = 1;
@@ -7512,12 +7565,12 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 301, __pyx_L3_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 304, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":302
+      /* "sabot/_cython/operators/numba_compiler.pyx":305
  *             compiled = self._numba_module.njit(func)
  *             logger.info(f"Compiled {func.__name__} with @njit (lazy compilation)")
  *             return compiled             # <<<<<<<<<<<<<<
@@ -7529,7 +7582,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
       __pyx_r = __pyx_v_compiled;
       goto __pyx_L7_try_return;
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":299
+      /* "sabot/_cython/operators/numba_compiler.pyx":302
  *         because we can't reliably infer argument types.
  *         """
  *         try:             # <<<<<<<<<<<<<<
@@ -7544,7 +7597,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":304
+    /* "sabot/_cython/operators/numba_compiler.pyx":307
  *             return compiled
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -7554,7 +7607,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     __pyx_t_11 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_11) {
       __Pyx_AddTraceback("sabot._cython.operators.numba_compiler.NumbaCompiler._compile_njit", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_8, &__pyx_t_7) < 0) __PYX_ERR(0, 304, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_8, &__pyx_t_7) < 0) __PYX_ERR(0, 307, __pyx_L5_except_error)
       __Pyx_XGOTREF(__pyx_t_4);
       __Pyx_XGOTREF(__pyx_t_8);
       __Pyx_XGOTREF(__pyx_t_7);
@@ -7562,7 +7615,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
       __pyx_v_e = __pyx_t_8;
       /*try:*/ {
 
-        /* "sabot/_cython/operators/numba_compiler.pyx":305
+        /* "sabot/_cython/operators/numba_compiler.pyx":308
  * 
  *         except Exception as e:
  *             logger.debug(f"NJIT compilation failed for {func.__name__}: {e}")             # <<<<<<<<<<<<<<
@@ -7570,24 +7623,24 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
  * 
 */
         __pyx_t_9 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 305, __pyx_L14_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 308, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_debug); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 305, __pyx_L14_error)
+        __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_debug); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 308, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_13);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_func, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 305, __pyx_L14_error)
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_func, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 308, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_t_12, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 305, __pyx_L14_error)
+        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_t_12, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 308, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_14);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_12 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 305, __pyx_L14_error)
+        __pyx_t_12 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 308, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_12);
         __pyx_t_15[0] = __pyx_mstate_global->__pyx_kp_u_NJIT_compilation_failed_for;
         __pyx_t_15[1] = __pyx_t_14;
         __pyx_t_15[2] = __pyx_mstate_global->__pyx_kp_u__2;
         __pyx_t_15[3] = __pyx_t_12;
         __pyx_t_16 = __Pyx_PyUnicode_Join(__pyx_t_15, 4, 28 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_14) + 2 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_12), 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_14) | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_12));
-        if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 305, __pyx_L14_error)
+        if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 308, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_16);
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
@@ -7609,12 +7662,12 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 305, __pyx_L14_error)
+          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 308, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_5);
         }
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "sabot/_cython/operators/numba_compiler.pyx":306
+        /* "sabot/_cython/operators/numba_compiler.pyx":309
  *         except Exception as e:
  *             logger.debug(f"NJIT compilation failed for {func.__name__}: {e}")
  *             return func             # <<<<<<<<<<<<<<
@@ -7630,7 +7683,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
         goto __pyx_L13_return;
       }
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":304
+      /* "sabot/_cython/operators/numba_compiler.pyx":307
  *             return compiled
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -7685,7 +7738,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     }
     goto __pyx_L5_except_error;
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":299
+    /* "sabot/_cython/operators/numba_compiler.pyx":302
  *         because we can't reliably infer argument types.
  *         """
  *         try:             # <<<<<<<<<<<<<<
@@ -7712,7 +7765,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":289
+  /* "sabot/_cython/operators/numba_compiler.pyx":292
  *             return CompilationStrategy.NJIT
  * 
  *     cdef object _compile_njit(self, object func):             # <<<<<<<<<<<<<<
@@ -7741,7 +7794,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/numba_compiler.pyx":308
+/* "sabot/_cython/operators/numba_compiler.pyx":311
  *             return func
  * 
  *     cdef object _compile_vectorize(self, object func):             # <<<<<<<<<<<<<<
@@ -7783,7 +7836,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_compile_vectorize", 0);
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":314
+  /* "sabot/_cython/operators/numba_compiler.pyx":317
  *         Good for: element-wise array operations
  *         """
  *         try:             # <<<<<<<<<<<<<<
@@ -7799,7 +7852,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":316
+      /* "sabot/_cython/operators/numba_compiler.pyx":319
  *         try:
  *             # Vectorize needs signature - try to infer
  *             compiled = self._numba_module.vectorize(nopython=True)(func)             # <<<<<<<<<<<<<<
@@ -7812,13 +7865,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
       __pyx_t_8 = 0;
       {
         PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_7, NULL};
-        __pyx_t_9 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 316, __pyx_L3_error)
+        __pyx_t_9 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 319, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_9);
-        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_nopython, Py_True, __pyx_t_9, __pyx_callargs+1, 0) < 0) __PYX_ERR(0, 316, __pyx_L3_error)
+        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_nopython, Py_True, __pyx_t_9, __pyx_callargs+1, 0) < 0) __PYX_ERR(0, 319, __pyx_L3_error)
         __pyx_t_6 = __Pyx_Object_VectorcallMethod_CallFromBuilder(__pyx_mstate_global->__pyx_n_u_vectorize, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_9);
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 316, __pyx_L3_error)
+        if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 319, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_6);
       }
       __pyx_t_8 = 1;
@@ -7838,13 +7891,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
         __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_6, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 316, __pyx_L3_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 319, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
       __pyx_v_compiled = __pyx_t_4;
       __pyx_t_4 = 0;
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":317
+      /* "sabot/_cython/operators/numba_compiler.pyx":320
  *             # Vectorize needs signature - try to infer
  *             compiled = self._numba_module.vectorize(nopython=True)(func)
  *             logger.info(f"Compiled {func.__name__} with @vectorize")             # <<<<<<<<<<<<<<
@@ -7852,21 +7905,21 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
  * 
 */
       __pyx_t_6 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 317, __pyx_L3_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 320, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 317, __pyx_L3_error)
+      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 320, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_func, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 317, __pyx_L3_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_func, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 320, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_7 = __Pyx_PyObject_FormatSimple(__pyx_t_5, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 317, __pyx_L3_error)
+      __pyx_t_7 = __Pyx_PyObject_FormatSimple(__pyx_t_5, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 320, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_10[0] = __pyx_mstate_global->__pyx_kp_u_Compiled;
       __pyx_t_10[1] = __pyx_t_7;
       __pyx_t_10[2] = __pyx_mstate_global->__pyx_kp_u_with_vectorize;
       __pyx_t_5 = __Pyx_PyUnicode_Join(__pyx_t_10, 3, 9 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_7) + 16, 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7));
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 317, __pyx_L3_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 320, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __pyx_t_8 = 1;
@@ -7887,12 +7940,12 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
         __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 317, __pyx_L3_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 320, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":318
+      /* "sabot/_cython/operators/numba_compiler.pyx":321
  *             compiled = self._numba_module.vectorize(nopython=True)(func)
  *             logger.info(f"Compiled {func.__name__} with @vectorize")
  *             return compiled             # <<<<<<<<<<<<<<
@@ -7904,7 +7957,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
       __pyx_r = __pyx_v_compiled;
       goto __pyx_L7_try_return;
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":314
+      /* "sabot/_cython/operators/numba_compiler.pyx":317
  *         Good for: element-wise array operations
  *         """
  *         try:             # <<<<<<<<<<<<<<
@@ -7919,7 +7972,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":320
+    /* "sabot/_cython/operators/numba_compiler.pyx":323
  *             return compiled
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -7929,7 +7982,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     __pyx_t_11 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_11) {
       __Pyx_AddTraceback("sabot._cython.operators.numba_compiler.NumbaCompiler._compile_vectorize", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_9, &__pyx_t_5) < 0) __PYX_ERR(0, 320, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_9, &__pyx_t_5) < 0) __PYX_ERR(0, 323, __pyx_L5_except_error)
       __Pyx_XGOTREF(__pyx_t_4);
       __Pyx_XGOTREF(__pyx_t_9);
       __Pyx_XGOTREF(__pyx_t_5);
@@ -7937,7 +7990,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
       __pyx_v_e = __pyx_t_9;
       /*try:*/ {
 
-        /* "sabot/_cython/operators/numba_compiler.pyx":321
+        /* "sabot/_cython/operators/numba_compiler.pyx":324
  * 
  *         except Exception as e:
  *             logger.debug(f"Vectorize compilation failed for {func.__name__}: {e}")             # <<<<<<<<<<<<<<
@@ -7945,24 +7998,24 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
  *             return self._compile_njit(func)
 */
         __pyx_t_7 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 321, __pyx_L14_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 324, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_debug); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 321, __pyx_L14_error)
+        __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_debug); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 324, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_13);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_func, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 321, __pyx_L14_error)
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_func, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 324, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_t_12, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 321, __pyx_L14_error)
+        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_t_12, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 324, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_14);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_12 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 321, __pyx_L14_error)
+        __pyx_t_12 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 324, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_12);
         __pyx_t_15[0] = __pyx_mstate_global->__pyx_kp_u_Vectorize_compilation_failed_for;
         __pyx_t_15[1] = __pyx_t_14;
         __pyx_t_15[2] = __pyx_mstate_global->__pyx_kp_u__2;
         __pyx_t_15[3] = __pyx_t_12;
         __pyx_t_16 = __Pyx_PyUnicode_Join(__pyx_t_15, 4, 33 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_14) + 2 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_12), 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_14) | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_12));
-        if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 321, __pyx_L14_error)
+        if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 324, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_16);
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
@@ -7984,12 +8037,12 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 321, __pyx_L14_error)
+          if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 324, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_6);
         }
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-        /* "sabot/_cython/operators/numba_compiler.pyx":323
+        /* "sabot/_cython/operators/numba_compiler.pyx":326
  *             logger.debug(f"Vectorize compilation failed for {func.__name__}: {e}")
  *             # Fall back to njit
  *             return self._compile_njit(func)             # <<<<<<<<<<<<<<
@@ -7997,7 +8050,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
  *     cdef object _try_compile_best_effort(self, object func):
 */
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_6 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_14numba_compiler_NumbaCompiler *)__pyx_v_self->__pyx_vtab)->_compile_njit(__pyx_v_self, __pyx_v_func); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 323, __pyx_L14_error)
+        __pyx_t_6 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_14numba_compiler_NumbaCompiler *)__pyx_v_self->__pyx_vtab)->_compile_njit(__pyx_v_self, __pyx_v_func); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 326, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_6);
         __pyx_r = __pyx_t_6;
         __pyx_t_6 = 0;
@@ -8007,7 +8060,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
         goto __pyx_L13_return;
       }
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":320
+      /* "sabot/_cython/operators/numba_compiler.pyx":323
  *             return compiled
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -8062,7 +8115,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     }
     goto __pyx_L5_except_error;
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":314
+    /* "sabot/_cython/operators/numba_compiler.pyx":317
  *         Good for: element-wise array operations
  *         """
  *         try:             # <<<<<<<<<<<<<<
@@ -8089,7 +8142,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":308
+  /* "sabot/_cython/operators/numba_compiler.pyx":311
  *             return func
  * 
  *     cdef object _compile_vectorize(self, object func):             # <<<<<<<<<<<<<<
@@ -8118,7 +8171,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/numba_compiler.pyx":325
+/* "sabot/_cython/operators/numba_compiler.pyx":328
  *             return self._compile_njit(func)
  * 
  *     cdef object _try_compile_best_effort(self, object func):             # <<<<<<<<<<<<<<
@@ -8141,7 +8194,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_try_compile_best_effort", 0);
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":329
+  /* "sabot/_cython/operators/numba_compiler.pyx":332
  *         Try compilation, fall back to Python on failure.
  *         """
  *         try:             # <<<<<<<<<<<<<<
@@ -8157,7 +8210,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":330
+      /* "sabot/_cython/operators/numba_compiler.pyx":333
  *         """
  *         try:
  *             return self._numba_module.njit(func)             # <<<<<<<<<<<<<<
@@ -8172,14 +8225,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
         PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_v_func};
         __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_njit, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 330, __pyx_L3_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 333, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
       __pyx_r = __pyx_t_4;
       __pyx_t_4 = 0;
       goto __pyx_L7_try_return;
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":329
+      /* "sabot/_cython/operators/numba_compiler.pyx":332
  *         Try compilation, fall back to Python on failure.
  *         """
  *         try:             # <<<<<<<<<<<<<<
@@ -8191,7 +8244,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":331
+    /* "sabot/_cython/operators/numba_compiler.pyx":334
  *         try:
  *             return self._numba_module.njit(func)
  *         except:             # <<<<<<<<<<<<<<
@@ -8200,12 +8253,12 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
 */
     /*except:*/ {
       __Pyx_AddTraceback("sabot._cython.operators.numba_compiler.NumbaCompiler._try_compile_best_effort", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_5, &__pyx_t_7) < 0) __PYX_ERR(0, 331, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_5, &__pyx_t_7) < 0) __PYX_ERR(0, 334, __pyx_L5_except_error)
       __Pyx_XGOTREF(__pyx_t_4);
       __Pyx_XGOTREF(__pyx_t_5);
       __Pyx_XGOTREF(__pyx_t_7);
 
-      /* "sabot/_cython/operators/numba_compiler.pyx":332
+      /* "sabot/_cython/operators/numba_compiler.pyx":335
  *             return self._numba_module.njit(func)
  *         except:
  *             return func             # <<<<<<<<<<<<<<
@@ -8221,7 +8274,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
       goto __pyx_L6_except_return;
     }
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":329
+    /* "sabot/_cython/operators/numba_compiler.pyx":332
  *         Try compilation, fall back to Python on failure.
  *         """
  *         try:             # <<<<<<<<<<<<<<
@@ -8248,7 +8301,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":325
+  /* "sabot/_cython/operators/numba_compiler.pyx":328
  *             return self._compile_njit(func)
  * 
  *     cdef object _try_compile_best_effort(self, object func):             # <<<<<<<<<<<<<<
@@ -8269,7 +8322,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaComp
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/numba_compiler.pyx":334
+/* "sabot/_cython/operators/numba_compiler.pyx":337
  *             return func
  * 
  *     cdef void _add_to_cache(self, str key, object func):             # <<<<<<<<<<<<<<
@@ -8289,7 +8342,7 @@ static void __pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaCompiler_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_add_to_cache", 0);
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":340
+  /* "sabot/_cython/operators/numba_compiler.pyx":343
  *         Implements simple LRU eviction if cache is full.
  *         """
  *         if len(self._compilation_cache) >= self._max_cache_size:             # <<<<<<<<<<<<<<
@@ -8300,14 +8353,14 @@ static void __pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaCompiler_
   __Pyx_INCREF(__pyx_t_1);
   if (unlikely(__pyx_t_1 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 340, __pyx_L1_error)
+    __PYX_ERR(0, 343, __pyx_L1_error)
   }
-  __pyx_t_2 = PyDict_Size(__pyx_t_1); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 340, __pyx_L1_error)
+  __pyx_t_2 = PyDict_Size(__pyx_t_1); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = (__pyx_t_2 >= __pyx_v_self->_max_cache_size);
   if (__pyx_t_3) {
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":342
+    /* "sabot/_cython/operators/numba_compiler.pyx":345
  *         if len(self._compilation_cache) >= self._max_cache_size:
  *             # Simple eviction: remove first item (not true LRU, but fast)
  *             first_key = next(iter(self._compilation_cache))             # <<<<<<<<<<<<<<
@@ -8316,16 +8369,16 @@ static void __pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaCompiler_
 */
     __pyx_t_1 = __pyx_v_self->_compilation_cache;
     __Pyx_INCREF(__pyx_t_1);
-    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 342, __pyx_L1_error)
+    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 345, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyIter_Next(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 342, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyIter_Next(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 345, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_first_key = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":343
+    /* "sabot/_cython/operators/numba_compiler.pyx":346
  *             # Simple eviction: remove first item (not true LRU, but fast)
  *             first_key = next(iter(self._compilation_cache))
  *             del self._compilation_cache[first_key]             # <<<<<<<<<<<<<<
@@ -8334,11 +8387,11 @@ static void __pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaCompiler_
 */
     if (unlikely(__pyx_v_self->_compilation_cache == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 343, __pyx_L1_error)
+      __PYX_ERR(0, 346, __pyx_L1_error)
     }
-    if (unlikely((PyDict_DelItem(__pyx_v_self->_compilation_cache, __pyx_v_first_key) < 0))) __PYX_ERR(0, 343, __pyx_L1_error)
+    if (unlikely((PyDict_DelItem(__pyx_v_self->_compilation_cache, __pyx_v_first_key) < 0))) __PYX_ERR(0, 346, __pyx_L1_error)
 
-    /* "sabot/_cython/operators/numba_compiler.pyx":340
+    /* "sabot/_cython/operators/numba_compiler.pyx":343
  *         Implements simple LRU eviction if cache is full.
  *         """
  *         if len(self._compilation_cache) >= self._max_cache_size:             # <<<<<<<<<<<<<<
@@ -8347,7 +8400,7 @@ static void __pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaCompiler_
 */
   }
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":345
+  /* "sabot/_cython/operators/numba_compiler.pyx":348
  *             del self._compilation_cache[first_key]
  * 
  *         self._compilation_cache[key] = func             # <<<<<<<<<<<<<<
@@ -8356,11 +8409,11 @@ static void __pyx_f_5sabot_7_cython_9operators_14numba_compiler_13NumbaCompiler_
 */
   if (unlikely(__pyx_v_self->_compilation_cache == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 345, __pyx_L1_error)
+    __PYX_ERR(0, 348, __pyx_L1_error)
   }
-  if (unlikely((PyDict_SetItem(__pyx_v_self->_compilation_cache, __pyx_v_key, __pyx_v_func) < 0))) __PYX_ERR(0, 345, __pyx_L1_error)
+  if (unlikely((PyDict_SetItem(__pyx_v_self->_compilation_cache, __pyx_v_key, __pyx_v_func) < 0))) __PYX_ERR(0, 348, __pyx_L1_error)
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":334
+  /* "sabot/_cython/operators/numba_compiler.pyx":337
  *             return func
  * 
  *     cdef void _add_to_cache(self, str key, object func):             # <<<<<<<<<<<<<<
@@ -8780,7 +8833,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_14numba_compiler_13NumbaCom
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/numba_compiler.pyx":352
+/* "sabot/_cython/operators/numba_compiler.pyx":355
  * 
  * 
  * cpdef object auto_compile(object func):             # <<<<<<<<<<<<<<
@@ -8804,7 +8857,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_auto_compil
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("auto_compile", 0);
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":365
+  /* "sabot/_cython/operators/numba_compiler.pyx":368
  *         Compiled function (or original if compilation not beneficial)
  *     """
  *     return _global_compiler.compile_udf(func)             # <<<<<<<<<<<<<<
@@ -8812,13 +8865,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_14numba_compiler_auto_compil
  * 
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_14numba_compiler_NumbaCompiler *)__pyx_v_5sabot_7_cython_9operators_14numba_compiler__global_compiler->__pyx_vtab)->compile_udf(__pyx_v_5sabot_7_cython_9operators_14numba_compiler__global_compiler, __pyx_v_func, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 365, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_14numba_compiler_NumbaCompiler *)__pyx_v_5sabot_7_cython_9operators_14numba_compiler__global_compiler->__pyx_vtab)->compile_udf(__pyx_v_5sabot_7_cython_9operators_14numba_compiler__global_compiler, __pyx_v_func, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 368, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":352
+  /* "sabot/_cython/operators/numba_compiler.pyx":355
  * 
  * 
  * cpdef object auto_compile(object func):             # <<<<<<<<<<<<<<
@@ -8877,32 +8930,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_func,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 352, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 355, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 352, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 355, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "auto_compile", 0) < 0) __PYX_ERR(0, 352, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "auto_compile", 0) < 0) __PYX_ERR(0, 355, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("auto_compile", 1, 1, 1, i); __PYX_ERR(0, 352, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("auto_compile", 1, 1, 1, i); __PYX_ERR(0, 355, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 352, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 355, __pyx_L3_error)
     }
     __pyx_v_func = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("auto_compile", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 352, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("auto_compile", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 355, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -8932,7 +8985,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_14numba_compiler_auto_compi
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("auto_compile", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_14numba_compiler_auto_compile(__pyx_v_func, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 352, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_14numba_compiler_auto_compile(__pyx_v_func, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -9987,16 +10040,16 @@ __Pyx_RefNannySetupContext("PyInit_numba_compiler", 0);
   if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_14numba_compiler_NumbaCompiler, __pyx_mstate_global->__pyx_n_u_analyze_function, __pyx_t_2) < 0) __PYX_ERR(0, 121, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":263
+  /* "sabot/_cython/operators/numba_compiler.pyx":266
  *         return pattern
  * 
  *     cpdef CompilationStrategy _choose_strategy(self, FunctionPattern pattern):             # <<<<<<<<<<<<<<
  *         """
  *         Choose compilation strategy based on detected patterns.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_14numba_compiler_13NumbaCompiler_7_choose_strategy, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_NumbaCompiler__choose_strategy, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_numba_co, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_14numba_compiler_13NumbaCompiler_7_choose_strategy, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_NumbaCompiler__choose_strategy, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_numba_co, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 266, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_14numba_compiler_NumbaCompiler, __pyx_mstate_global->__pyx_n_u_choose_strategy, __pyx_t_2) < 0) __PYX_ERR(0, 263, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_14numba_compiler_NumbaCompiler, __pyx_mstate_global->__pyx_n_u_choose_strategy, __pyx_t_2) < 0) __PYX_ERR(0, 266, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
@@ -10020,7 +10073,7 @@ __Pyx_RefNannySetupContext("PyInit_numba_compiler", 0);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_2) < 0) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":349
+  /* "sabot/_cython/operators/numba_compiler.pyx":352
  * 
  * # Global compiler instance (singleton)
  * cdef NumbaCompiler _global_compiler = NumbaCompiler()             # <<<<<<<<<<<<<<
@@ -10036,7 +10089,7 @@ __Pyx_RefNannySetupContext("PyInit_numba_compiler", 0);
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 349, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 352, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_2);
   }
   __Pyx_XGOTREF((PyObject *)__pyx_v_5sabot_7_cython_9operators_14numba_compiler__global_compiler);
@@ -10044,50 +10097,50 @@ __Pyx_RefNannySetupContext("PyInit_numba_compiler", 0);
   __Pyx_GIVEREF((PyObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":352
+  /* "sabot/_cython/operators/numba_compiler.pyx":355
  * 
  * 
  * cpdef object auto_compile(object func):             # <<<<<<<<<<<<<<
  *     """
  *     Public API: automatically compile function.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_14numba_compiler_1auto_compile, 0, __pyx_mstate_global->__pyx_n_u_auto_compile, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_numba_co, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 352, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_14numba_compiler_1auto_compile, 0, __pyx_mstate_global->__pyx_n_u_auto_compile, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_numba_co, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_auto_compile, __pyx_t_2) < 0) __PYX_ERR(0, 352, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_auto_compile, __pyx_t_2) < 0) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":370
+  /* "sabot/_cython/operators/numba_compiler.pyx":373
  * # Export CompilationStrategy enum values as module constants
  * #  (Python can't access cdef enums directly)
  * STRATEGY_SKIP = 0      # Skip compilation (already fast)             # <<<<<<<<<<<<<<
  * STRATEGY_NJIT = 1      # @njit (scalar JIT)
  * STRATEGY_VECTORIZE = 2 # @vectorize (array JIT)
 */
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_STRATEGY_SKIP, __pyx_mstate_global->__pyx_int_0) < 0) __PYX_ERR(0, 370, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_STRATEGY_SKIP, __pyx_mstate_global->__pyx_int_0) < 0) __PYX_ERR(0, 373, __pyx_L1_error)
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":371
+  /* "sabot/_cython/operators/numba_compiler.pyx":374
  * #  (Python can't access cdef enums directly)
  * STRATEGY_SKIP = 0      # Skip compilation (already fast)
  * STRATEGY_NJIT = 1      # @njit (scalar JIT)             # <<<<<<<<<<<<<<
  * STRATEGY_VECTORIZE = 2 # @vectorize (array JIT)
  * STRATEGY_AUTO = 3      # Auto-detect best strategy
 */
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_STRATEGY_NJIT, __pyx_mstate_global->__pyx_int_1) < 0) __PYX_ERR(0, 371, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_STRATEGY_NJIT, __pyx_mstate_global->__pyx_int_1) < 0) __PYX_ERR(0, 374, __pyx_L1_error)
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":372
+  /* "sabot/_cython/operators/numba_compiler.pyx":375
  * STRATEGY_SKIP = 0      # Skip compilation (already fast)
  * STRATEGY_NJIT = 1      # @njit (scalar JIT)
  * STRATEGY_VECTORIZE = 2 # @vectorize (array JIT)             # <<<<<<<<<<<<<<
  * STRATEGY_AUTO = 3      # Auto-detect best strategy
 */
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_STRATEGY_VECTORIZE, __pyx_mstate_global->__pyx_int_2) < 0) __PYX_ERR(0, 372, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_STRATEGY_VECTORIZE, __pyx_mstate_global->__pyx_int_2) < 0) __PYX_ERR(0, 375, __pyx_L1_error)
 
-  /* "sabot/_cython/operators/numba_compiler.pyx":373
+  /* "sabot/_cython/operators/numba_compiler.pyx":376
  * STRATEGY_NJIT = 1      # @njit (scalar JIT)
  * STRATEGY_VECTORIZE = 2 # @vectorize (array JIT)
  * STRATEGY_AUTO = 3      # Auto-detect best strategy             # <<<<<<<<<<<<<<
 */
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_STRATEGY_AUTO, __pyx_mstate_global->__pyx_int_3) < 0) __PYX_ERR(0, 373, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_STRATEGY_AUTO, __pyx_mstate_global->__pyx_int_3) < 0) __PYX_ERR(0, 376, __pyx_L1_error)
 
   /* "sabot/_cython/operators/numba_compiler.pyx":1
  * # cython: language_level=3             # <<<<<<<<<<<<<<
@@ -10369,7 +10422,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_numba_co_2, __pyx_mstate->__pyx_n_u_analyze_function, __pyx_k_A_1_WJaq_G1F_VW_1_3fAQ_1_q_HCuAQ, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 263, 70};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 266, 70};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pattern};
     __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_numba_co_2, __pyx_mstate->__pyx_n_u_choose_strategy, __pyx_k_A_7_S_q_a_Kt7_Ba_a_Ks_Rq_a_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
   }
@@ -10384,7 +10437,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 352, 16};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 355, 16};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_func};
     __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_numba_co_2, __pyx_mstate->__pyx_n_u_auto_compile, __pyx_k_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
   }

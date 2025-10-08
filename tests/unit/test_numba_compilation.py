@@ -11,7 +11,7 @@ Verifies:
 
 import pytest
 import numpy as np
-import pyarrow as pa
+from sabot import cyarrow as pa
 import time
 
 try:

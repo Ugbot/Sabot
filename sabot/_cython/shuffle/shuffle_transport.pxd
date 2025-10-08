@@ -29,10 +29,12 @@ cdef class ShuffleServer:
         string host
         int32_t port
         cbool running
+        object task_slot_manager  # TaskSlotManager for unified processing
         LockFreeFlightServer flight_server  # Lock-free Flight server
 
     cpdef void start(self, string host, int32_t port) except *
     cpdef void stop(self) except *
+    cpdef void set_task_slot_manager(self, object task_slot_manager)
     # register_partition now exposed as Python def method
 
 
@@ -62,6 +64,7 @@ cdef class ShuffleTransport:
 
     cpdef void start(self, string host, int32_t port) except *
     cpdef void stop(self) except *
+    cpdef void set_task_slot_manager(self, object task_slot_manager)
     cdef void publish_partition(self, bytes shuffle_id, int32_t partition_id,
                                 ca.RecordBatch batch)
     cdef ca.RecordBatch fetch_partition_from_agent(self, bytes agent_address,

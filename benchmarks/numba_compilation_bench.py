@@ -6,8 +6,8 @@ Demonstrates performance improvement from auto-compilation.
 
 import time
 import numpy as np
-import pyarrow as pa
-import pyarrow.compute as pc
+from sabot import cyarrow as pa
+from sabot.cyarrow import compute as pc
 
 try:
     from sabot._cython.operators.numba_compiler import auto_compile

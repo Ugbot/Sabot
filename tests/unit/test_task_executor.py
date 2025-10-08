@@ -7,7 +7,7 @@ shuffle-aware execution, and error handling.
 
 import pytest
 import asyncio
-import pyarrow as pa
+from sabot import cyarrow as pa
 from unittest.mock import Mock, AsyncMock, patch, MagicMock
 
 from sabot.agent import TaskExecutor, Slot

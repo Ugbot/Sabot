@@ -5,7 +5,7 @@ Verifies zero-copy network transport for shuffle partitions.
 """
 
 import pytest
-import pyarrow as pa
+from sabot import cyarrow as pa
 import time
 import threading
 

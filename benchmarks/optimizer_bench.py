@@ -10,8 +10,8 @@ import time
 import logging
 from typing import Dict, Any
 
-import pyarrow as pa
-import pyarrow.compute as pc
+from sabot import cyarrow as pa
+from sabot.cyarrow import compute as pc
 
 from sabot.execution.job_graph import JobGraph, StreamOperatorNode, OperatorType
 from sabot.compiler.plan_optimizer import PlanOptimizer

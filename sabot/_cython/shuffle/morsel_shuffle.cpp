@@ -61,12 +61,19 @@
             "-Wno-unused-function",
             "-Wno-deprecated-declarations"
         ],
+        "extra_link_args": [
+            "-Wl,-headerpad_max_install_names",
+            "-Wl,-rpath,@loader_path/../../vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib"
+        ],
         "include_dirs": [
-            "/Users/bengamble/Sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
+            "/opt/homebrew/lib/python3.13/site-packages/numpy/_core/include",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
             "/Users/bengamble/Sabot/vendor/arrow/python",
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src"
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src",
+            "/Users/bengamble/Sabot/vendor/duckdb/third_party/concurrentqueue",
+            "/Users/bengamble/Sabot/sabot/_c"
         ],
         "language": "c++",
         "libraries": [
@@ -1625,13 +1632,13 @@ static const char *__pyx_filename;
 static const char* const __pyx_f[] = {
   "sabot/_cython/shuffle/morsel_shuffle.pyx",
   "<stringsource>",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/contextvars.pxd",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/datetime.pxd",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/type.pxd",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/bool.pxd",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/complex.pxd",
+  "cpython/contextvars.pxd",
+  "cpython/datetime.pxd",
+  "cpython/type.pxd",
+  "cpython/bool.pxd",
+  "cpython/complex.pxd",
   "sabot/_cython/shuffle/lock_free_queue.pxd",
-  ".venv/lib/python3.11/site-packages/pyarrow/lib.pxd",
+  "pyarrow/lib.pxd",
   "sabot/_cython/shuffle/atomic_partition_store.pxd",
   "sabot/_cython/shuffle/flight_transport_lockfree.pxd",
   "sabot/_cython/shuffle/shuffle_transport.pxd",
@@ -2257,7 +2264,7 @@ struct __pyx_t_5sabot_7_cython_7shuffle_25flight_transport_lockfree_ConnectionSl
 };
 struct __pyx_opt_args_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start_shuffle;
 
-/* "sabot/_cython/shuffle/shuffle_transport.pxd":71
+/* "sabot/_cython/shuffle/shuffle_transport.pxd":74
  * 
  *     # Shuffle coordination methods (Phase 4)
  *     cpdef void start_shuffle(self, bytes shuffle_id, int32_t num_partitions, list downstream_agents, list upstream_agents=?)             # <<<<<<<<<<<<<<
@@ -3705,11 +3712,12 @@ struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer {
   std::string host;
   int32_t port;
   bool running;
+  PyObject *task_slot_manager;
   struct __pyx_obj_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer *flight_server;
 };
 
 
-/* "sabot/_cython/shuffle/shuffle_transport.pxd":39
+/* "sabot/_cython/shuffle/shuffle_transport.pxd":41
  * 
  * 
  * cdef class ShuffleClient:             # <<<<<<<<<<<<<<
@@ -3725,7 +3733,7 @@ struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient {
 };
 
 
-/* "sabot/_cython/shuffle/shuffle_transport.pxd":52
+/* "sabot/_cython/shuffle/shuffle_transport.pxd":54
  * 
  * 
  * cdef class ShuffleTransport:             # <<<<<<<<<<<<<<
@@ -5167,11 +5175,12 @@ static struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_25flight_transport_lockf
 struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer {
   void (*start)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *, std::string, int32_t, int __pyx_skip_dispatch);
   void (*stop)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *, int __pyx_skip_dispatch);
+  void (*set_task_slot_manager)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *, PyObject *, int __pyx_skip_dispatch);
 };
 static struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer;
 
 
-/* "sabot/_cython/shuffle/shuffle_transport.pxd":52
+/* "sabot/_cython/shuffle/shuffle_transport.pxd":54
  * 
  * 
  * cdef class ShuffleTransport:             # <<<<<<<<<<<<<<
@@ -5182,6 +5191,7 @@ static struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_Shuf
 struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport {
   void (*start)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, std::string, int32_t, int __pyx_skip_dispatch);
   void (*stop)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, int __pyx_skip_dispatch);
+  void (*set_task_slot_manager)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, int __pyx_skip_dispatch);
   void (*publish_partition)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, int32_t, struct __pyx_obj_7pyarrow_3lib_RecordBatch *);
   struct __pyx_obj_7pyarrow_3lib_RecordBatch *(*fetch_partition_from_agent)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, PyObject *, int32_t);
   void (*start_shuffle)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, int32_t, PyObject *, int __pyx_skip_dispatch, struct __pyx_opt_args_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start_shuffle *__pyx_optional_args);
@@ -15349,7 +15359,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient) __PYX_ERR(11, 39, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient) __PYX_ERR(11, 41, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport = __Pyx_ImportType_3_1_4(__pyx_t_1, "sabot._cython.shuffle.shuffle_transport", "ShuffleTransport",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport),
@@ -15358,8 +15368,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) __PYX_ERR(11, 52, __pyx_L1_error)
-  __pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport = (struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport); if (unlikely(!__pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport)) __PYX_ERR(11, 52, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) __PYX_ERR(11, 54, __pyx_L1_error)
+  __pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport = (struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport); if (unlikely(!__pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport)) __PYX_ERR(11, 54, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;

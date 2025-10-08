@@ -12,8 +12,8 @@ from pathlib import Path
 # Add sabot to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import pyarrow as pa
-import pyarrow.feather as feather
+from sabot import cyarrow as pa
+from sabot.cyarrow import feather
 import tempfile
 
 print("=" * 70)

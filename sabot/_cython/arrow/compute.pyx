@@ -199,3 +199,32 @@ def hash_combine(*arrays, seed=0):
         hash_values.append(combined_hash)
 
     return pa.array(hash_values, type=pa.uint64())
+
+
+def modulo(array, divisor):
+    """
+    Compute element-wise modulo (remainder after division).
+
+    Implements: array % divisor
+
+    Args:
+        array: Input Arrow array (numeric)
+        divisor: Divisor (scalar or array)
+
+    Returns:
+        Array of remainders
+    """
+    import pyarrow as pa
+    import pyarrow.compute as pc
+
+    # modulo(x, d) = x - floor(x / d) * d
+    # This works for both integers and floats
+    quotient = pc.floor(pc.divide(array, divisor))
+    product = pc.multiply(quotient, divisor)
+    remainder = pc.subtract(array, product)
+
+    # Cast to int64 if input was integer
+    if pa.types.is_integer(array.type):
+        remainder = pc.cast(remainder, pa.int64())
+
+    return remainder

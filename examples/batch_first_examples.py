@@ -16,7 +16,8 @@ import tempfile
 import time
 
 # For specialized modules not yet in cyarrow wrapper
-import pyarrow.parquet as pq
+# Parquet support via vendored Arrow
+from sabot.cyarrow import parquet as pq
 
 
 # ============================================================================

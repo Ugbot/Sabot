@@ -37,32 +37,32 @@ User Python UDF
        ↓
 ┌──────────────────────────────────────┐
 │  NumbaCompiler (AST Analysis)        │
-│  - Parse function source              │
-│  - Detect patterns (loops/numpy/etc)  │
-│  - Choose compilation strategy        │
+│  - Parse function source             │
+│  - Detect patterns (loops/numpy/etc) │
+│  - Choose compilation strategy       │
 └──────────────────────────────────────┘
        ↓
-┌──────────────────────────────────────┐
+┌───────────────────────────────────────┐
 │  CompilationStrategy Decision         │
 │  - SKIP: Already fast (Arrow/Pandas)  │
 │  - NJIT: Scalar loops/conditionals    │
 │  - VECTORIZE: NumPy array operations  │
 │  - AUTO: Try best option with fallback│
-└──────────────────────────────────────┘
+└───────────────────────────────────────┘
        ↓
-┌──────────────────────────────────────┐
+┌───────────────────────────────────────┐
 │  Numba JIT Compilation                │
 │  - Compile with chosen decorator      │
 │  - Test compilation with sample data  │
 │  - Fallback to Python on failure      │
-└──────────────────────────────────────┘
+└───────────────────────────────────────┘
        ↓
-┌──────────────────────────────────────┐
+┌───────────────────────────────────────┐
 │  Compiled Function Cache              │
 │  - In-memory cache (LRU)              │
 │  - Disk cache (optional, persistent)  │
 │  - Cache key: function source hash    │
-└──────────────────────────────────────┘
+└───────────────────────────────────────┘
        ↓
 CythonMapOperator (uses compiled func)
 ```

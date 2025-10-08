@@ -27,7 +27,7 @@ from sabot._cython.shuffle.flight_transport_lockfree import (
 )
 
 # Need Arrow for RecordBatch
-import pyarrow as pa
+from sabot import cyarrow as pa
 
 
 @pytest.fixture

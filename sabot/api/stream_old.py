@@ -344,7 +344,7 @@ class Stream:
     @staticmethod
     def _apply_filter(iterator: Iterator, predicate: Callable) -> Iterator:
         """Apply filter transformation using Arrow compute."""
-        import pyarrow.compute as pc
+        from sabot.cyarrow import compute as pc
 
         for batch in iterator:
             mask = predicate(batch)
@@ -497,8 +497,8 @@ class AggregatedStream:
                         # Use zero-copy Cython operator
                         total += _ops.sum_batch_column(batch, col_name)
                     else:
-                        # Fallback to PyArrow compute
-                        import pyarrow.compute as pc
+                        # Fallback to Arrow compute
+                        from sabot.cyarrow import compute as pc
                         total += pc.sum(batch.column(col_name)).as_py()
                 results[agg_name] = total
             elif agg_name.startswith('count'):
@@ -518,7 +518,7 @@ class AggregatedStream:
                     if _ops and batch.num_rows > 0:
                         total += _ops.sum_batch_column(batch, col_name)
                     else:
-                        import pyarrow.compute as pc
+                        from sabot.cyarrow import compute as pc
                         total += pc.sum(batch.column(col_name)).as_py()
                     count += batch.num_rows
                 results[agg_name] = total / count if count > 0 else 0
