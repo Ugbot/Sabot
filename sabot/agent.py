@@ -204,7 +204,7 @@ class TaskExecutor:
         """Combine morsel results back into single batch"""
         batches = [m.data for m in morsel_results if hasattr(m, 'data') and m.data is not None]
         if batches:
-            import pyarrow as pa
+            from sabot import cyarrow as pa
             return pa.concat_batches(batches)
         return None
 

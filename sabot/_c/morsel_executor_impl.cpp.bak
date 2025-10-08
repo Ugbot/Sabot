@@ -1,0 +1,253 @@
+//===----------------------------------------------------------------------===//
+//                         Sabot
+//
+// sabot/_c/morsel_executor.cpp
+//
+// C++ Morsel Executor Implementation
+//
+//===----------------------------------------------------------------------===//
+
+#include "morsel_executor.hpp"
+#include <algorithm>
+#include <chrono>
+#include <thread>
+
+namespace sabot {
+
+// Constructor
+MorselExecutor::MorselExecutor(int num_threads)
+    : num_threads_(num_threads),
+      running_(false),
+      shutdown_requested_(false),
+      total_morsels_created_(0),
+      total_morsels_processed_(0),
+      total_batches_executed_(0) {
+
+    // Auto-detect thread count if not specified
+    if (num_threads_ <= 0) {
+        num_threads_ = std::thread::hardware_concurrency();
+        if (num_threads_ <= 0) {
+            num_threads_ = 4;  // Fallback
+        }
+    }
+
+    // Create lock-free queues
+    morsel_queue_ = std::make_unique<LockFreeMPSCQueue<Morsel>>(
+        num_threads_ * 16  // Initial capacity
+    );
+    result_queue_ = std::make_unique<moodycamel::ConcurrentQueue<MorselResult>>(
+        num_threads_ * 16  // Initial capacity
+    );
+
+    // Start worker threads
+    running_ = true;
+    workers_.reserve(num_threads_);
+    for (int i = 0; i < num_threads_; ++i) {
+        workers_.emplace_back(&MorselExecutor::WorkerLoop, this, i);
+    }
+}
+
+// Destructor
+MorselExecutor::~MorselExecutor() {
+    Shutdown();
+}
+
+// Shutdown
+void MorselExecutor::Shutdown() {
+    if (!running_) {
+        return;
+    }
+
+    // Signal shutdown
+    shutdown_requested_ = true;
+    running_ = false;
+
+    // Wait for workers to finish
+    for (auto& worker : workers_) {
+        if (worker.joinable()) {
+            worker.join();
+        }
+    }
+
+    workers_.clear();
+}
+
+// Worker loop - runs in each thread
+void MorselExecutor::WorkerLoop(int worker_id) {
+    Morsel morsel;
+
+    while (running_) {
+        // Try to dequeue morsel (non-blocking, lock-free)
+        if (morsel_queue_->try_dequeue(morsel)) {
+            // Process morsel
+            morsel.worker_id = worker_id;
+
+            // Get morsel slice (zero-copy)
+            auto slice = morsel.GetSlice();
+            if (!slice) {
+                continue;  // Empty morsel
+            }
+
+            // Process using callback function
+            MorselResult result;
+            result.morsel_id = total_morsels_processed_.fetch_add(1, std::memory_order_relaxed);
+
+            try {
+                if (current_processor_) {
+                    result.batch = current_processor_(slice);
+                    result.success = (result.batch != nullptr);
+                } else {
+                    result.success = false;
+                }
+            } catch (...) {
+                result.success = false;
+            }
+
+            // Enqueue result (lock-free)
+            result_queue_->enqueue(result);
+
+        } else {
+            // No work available - yield CPU
+            std::this_thread::yield();
+        }
+    }
+}
+
+// Create morsels from batch (zero-copy)
+std::vector<Morsel> MorselExecutor::CreateMorsels(
+    std::shared_ptr<arrow::RecordBatch> batch,
+    int64_t morsel_size_bytes
+) {
+    std::vector<Morsel> morsels;
+
+    if (!batch || batch->num_rows() == 0) {
+        return morsels;
+    }
+
+    // Calculate rows per morsel based on target byte size
+    int64_t total_bytes = 0;
+    for (int i = 0; i < batch->num_columns(); ++i) {
+        auto column = batch->column(i);
+        if (column && column->data()) {
+            for (auto& buffer : column->data()->buffers) {
+                if (buffer) {
+                    total_bytes += buffer->size();
+                }
+            }
+        }
+    }
+
+    int64_t bytes_per_row = total_bytes / std::max<int64_t>(batch->num_rows(), 1);
+    int64_t rows_per_morsel = morsel_size_bytes / std::max<int64_t>(bytes_per_row, 1);
+
+    // Ensure at least 1 row per morsel, at most batch size
+    rows_per_morsel = std::max<int64_t>(1, rows_per_morsel);
+    rows_per_morsel = std::min<int64_t>(rows_per_morsel, batch->num_rows());
+
+    // Create morsels as (offset, length) pairs - zero-copy!
+    for (int64_t start = 0; start < batch->num_rows(); start += rows_per_morsel) {
+        int64_t length = std::min(rows_per_morsel, batch->num_rows() - start);
+
+        Morsel morsel;
+        morsel.batch = batch;        // Shared pointer - zero-copy
+        morsel.start_row = start;
+        morsel.num_rows = length;
+        morsel.worker_id = -1;       // Unassigned
+
+        morsels.push_back(morsel);
+    }
+
+    total_morsels_created_.fetch_add(morsels.size(), std::memory_order_relaxed);
+
+    return morsels;
+}
+
+// Execute batch locally with morsel parallelism
+std::vector<std::shared_ptr<arrow::RecordBatch>> MorselExecutor::ExecuteLocal(
+    std::shared_ptr<arrow::RecordBatch> batch,
+    int64_t morsel_size_bytes,
+    MorselProcessorFunc processor_func
+) {
+    if (!batch || batch->num_rows() == 0) {
+        return {};
+    }
+
+    // Set current processor function
+    current_processor_ = processor_func;
+
+    // Create morsels (zero-copy slices)
+    auto morsels = CreateMorsels(batch, morsel_size_bytes);
+    if (morsels.empty()) {
+        return {};
+    }
+
+    // Enqueue all morsels (lock-free)
+    for (auto& morsel : morsels) {
+        while (!morsel_queue_->enqueue(morsel)) {
+            // Queue full (unlikely) - yield and retry
+            std::this_thread::yield();
+        }
+    }
+
+    // Collect results
+    std::vector<MorselResult> results;
+    results.reserve(morsels.size());
+
+    size_t collected = 0;
+    while (collected < morsels.size()) {
+        MorselResult result;
+        if (result_queue_->try_dequeue(result)) {
+            if (result.success) {
+                results.push_back(result);
+            }
+            collected++;
+        } else {
+            // No results yet - yield CPU
+            std::this_thread::yield();
+        }
+    }
+
+    // Sort results by morsel ID to maintain order
+    std::sort(results.begin(), results.end(),
+              [](const MorselResult& a, const MorselResult& b) {
+                  return a.morsel_id < b.morsel_id;
+              });
+
+    // Extract batches
+    std::vector<std::shared_ptr<arrow::RecordBatch>> result_batches;
+    result_batches.reserve(results.size());
+    for (const auto& result : results) {
+        if (result.batch) {
+            result_batches.push_back(result.batch);
+        }
+    }
+
+    total_batches_executed_.fetch_add(1, std::memory_order_relaxed);
+
+    return result_batches;
+}
+
+// Execute with C-style callback (for Cython compatibility)
+std::vector<std::shared_ptr<arrow::RecordBatch>> MorselExecutor::ExecuteLocalWithCallback(
+    std::shared_ptr<arrow::RecordBatch> batch,
+    int64_t morsel_size_bytes,
+    std::shared_ptr<arrow::RecordBatch> (*processor)(std::shared_ptr<arrow::RecordBatch>)
+) {
+    // Wrap C function pointer in std::function
+    MorselProcessorFunc wrapped = [processor](std::shared_ptr<arrow::RecordBatch> b) {
+        return processor(b);
+    };
+
+    return ExecuteLocal(batch, morsel_size_bytes, wrapped);
+}
+
+// Get statistics
+MorselExecutor::Stats MorselExecutor::GetStats() const {
+    Stats stats;
+    stats.total_morsels_created = total_morsels_created_.load(std::memory_order_relaxed);
+    stats.total_morsels_processed = total_morsels_processed_.load(std::memory_order_relaxed);
+    stats.total_batches_executed = total_batches_executed_.load(std::memory_order_relaxed);
+    return stats;
+}
+
+} // namespace sabot

@@ -157,7 +157,23 @@ cdef class CythonMapOperator(BaseOperator):
             return result
 
         except Exception as e:
-            raise RuntimeError(f"Error in map operator: {e}")
+            # Runtime fallback: If Numba compilation failed at runtime, use original function
+            # This handles cases where pattern detection missed Arrow/Pandas usage
+            if self._is_compiled and ('TypingError' in str(type(e).__name__) or 'numba' in str(e).lower()):
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(
+                    f"Numba compilation failed at runtime for '{getattr(self._map_func, '__name__', '<lambda>')}', "
+                    f"falling back to original function. Error: {type(e).__name__}"
+                )
+                # Fallback to original function permanently
+                self._compiled_func = self._map_func
+                self._is_compiled = False
+                # Retry with original function
+                result = self._compiled_func(batch)
+                return result
+            else:
+                raise RuntimeError(f"Error in map operator: {e}")
 
 
 # ============================================================================

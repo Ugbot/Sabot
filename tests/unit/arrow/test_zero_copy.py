@@ -4,7 +4,7 @@ Test Zero-Copy Arrow Operations
 
 Validates that our Cython implementations achieve true zero-copy semantics.
 """
-import pyarrow as pa
+from sabot import cyarrow as pa
 import importlib.util
 import sys
 

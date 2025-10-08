@@ -14,8 +14,8 @@ Operators tested:
 
 import time
 import asyncio
-import pyarrow as pa
-import pyarrow.compute as pc
+from sabot import cyarrow as pa
+from sabot.cyarrow import compute as pc
 from typing import List, Dict, Any
 import numpy as np
 

@@ -56,11 +56,14 @@ cdef inline shared_ptr[PCRecordBatch] _unwrap_batch(ca.RecordBatch batch):
 cdef class ShuffleServer:
     """
     Shuffle server using Arrow Flight for zero-copy transport.
+
+    Integrates with TaskSlotManager for unified processing of network morsels.
     """
 
     def __cinit__(self):
         """Initialize shuffle server (lock-free)."""
         self.running = False
+        self.task_slot_manager = None
         # Flight server will be created in start()
 
     cpdef void start(self, string host, int32_t port) except *:
@@ -94,6 +97,15 @@ cdef class ShuffleServer:
         self.flight_server.stop()
         self.running = False
 
+    cpdef void set_task_slot_manager(self, object task_slot_manager):
+        """
+        Wire task slot manager for network morsel processing.
+
+        Args:
+            task_slot_manager: TaskSlotManager instance from sabot._c.task_slot_manager
+        """
+        self.task_slot_manager = task_slot_manager
+
     def register_partition(
         self,
         bytes shuffle_id,
@@ -109,6 +121,8 @@ cdef class ShuffleServer:
             batch: Batch to serve (Cython ca.RecordBatch)
 
         Uses atomic CAS-based insertion, no locks.
+
+        If task_slot_manager is set, also enqueues as network morsel for processing.
         """
         # Hash shuffle ID
         cdef int64_t shuffle_hash = hash_shuffle_id(
@@ -122,6 +136,17 @@ cdef class ShuffleServer:
         # Lock-free register with Flight server (atomic insert)
         # Note: register_partition is declared nogil, so GIL is released automatically
         self.flight_server.register_partition(shuffle_hash, partition_id, batch_cpp)
+
+        # If task slot manager is wired, enqueue as network morsel
+        if self.task_slot_manager is not None:
+            # Enqueue entire batch as network morsel
+            self.task_slot_manager.enqueue_morsel(
+                batch,
+                start_row=0,
+                num_rows=batch.num_rows,
+                partition_id=partition_id,
+                source='network'
+            )
 
 
 # ============================================================================
@@ -223,6 +248,15 @@ cdef class ShuffleTransport:
         self.server.start(host, port)
 
         self.initialized = True
+
+    cpdef void set_task_slot_manager(self, object task_slot_manager):
+        """
+        Wire task slot manager for unified local + network morsel processing.
+
+        Args:
+            task_slot_manager: TaskSlotManager instance from sabot._c.task_slot_manager
+        """
+        self.server.set_task_slot_manager(task_slot_manager)
 
     cpdef void stop(self) except *:
         """Stop server and client."""

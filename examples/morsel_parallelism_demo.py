@@ -6,8 +6,8 @@ Demonstrates that morsel-driven parallelism is now enabled by default.
 """
 
 import time
-import pyarrow as pa
-import pyarrow.compute as pc
+from sabot import cyarrow as pa
+from sabot.cyarrow import compute as pc
 from sabot.api import Stream
 
 

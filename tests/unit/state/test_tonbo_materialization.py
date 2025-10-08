@@ -8,7 +8,7 @@ This tests that Tonbo can be used as a state backend for materialized views.
 import tempfile
 import os
 import sys
-import pyarrow as pa
+from sabot import cyarrow as pa
 
 def test_tonbo_with_materialization():
     """Test Tonbo as a state backend for materialization engine."""

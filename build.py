@@ -44,15 +44,18 @@ ROCKSDB_INSTALL = ROCKSDB_VENDOR_DIR / "install"
 TONBO_DIR = PROJECT_ROOT / "vendor" / "tonbo" / "bindings" / "python"
 TONBO_FFI_DIR = PROJECT_ROOT / "vendor" / "tonbo" / "tonbo-ffi"
 SABOT_CYTHON_DIR = PROJECT_ROOT / "sabot" / "_cython"
+SABOT_C_DIR = PROJECT_ROOT / "sabot" / "_c"  # Additional Cython modules
 
 # Modules to exclude from build (known issues)
 EXCLUDED_MODULES = [
     'arrow/flight_client.pyx',  # Duplicate cdef declarations + closure in cpdef
-    'arrow_core.pyx',  # Compiler crash in AnalyseDeclarationsTransform
+    'arrow_core.pyx',  # Compiler crash in AnalyseDeclarationsTransform (in _cython/)
     'flight/flight_server.pyx',  # Missing Arrow Flight pxd files + nested class in cpdef
     'materialized_views.pyx',  # Incorrect RocksDB API usage (needs vendored bindings)
     'checkpoint/dbos/durable_state_store.pyx',  # Missing stores/base.pxd dependency
 ]
+
+# Modules in _c/ directory are built separately and not excluded
 
 
 def print_phase(num, total, message):
@@ -271,6 +274,83 @@ def build_arrow_cpp(skip=False):
     return ARROW_INSTALL
 
 
+def build_vendored_pyarrow(arrow_home, skip=False):
+    """Build PyArrow from vendored Arrow source."""
+    print_phase("2.5", 8, "Building PyArrow from vendored source...")
+
+    if skip:
+        print_skip("Skipped by user (--skip-arrow)")
+        return False
+
+    pyarrow_src = PROJECT_ROOT / "vendor/arrow/python"
+
+    # Check if already installed by trying to import
+    try:
+        import pyarrow
+        pyarrow_file = Path(pyarrow.__file__)
+        # Check if it's our vendored version
+        if "vendor/arrow/python" in str(pyarrow_file):
+            print_success("Already installed (vendored)")
+            return True
+    except ImportError:
+        pass
+
+    # Check if Arrow Python source exists
+    if not pyarrow_src.exists() or not (pyarrow_src / "setup.py").exists():
+        print_error("PyArrow source not found in vendor/arrow/python")
+        return False
+
+    # Set environment for Arrow location
+    env = os.environ.copy()
+    env["ARROW_HOME"] = str(arrow_home)
+    env["PYARROW_WITH_PARQUET"] = "1"
+    env["PYARROW_WITH_FLIGHT"] = "1"
+    env["PYARROW_WITH_DATASET"] = "1"
+    env["PYARROW_WITH_COMPUTE"] = "1"
+    env["PYARROW_WITH_CSV"] = "1"
+    env["PYARROW_WITH_JSON"] = "1"
+    env["PYARROW_INSTALL_TESTS"] = "0"
+
+    print("Building PyArrow Python bindings...")
+
+    # Build extension modules
+    try:
+        subprocess.run([
+            sys.executable, "setup.py", "build_ext", "--inplace"
+        ], cwd=pyarrow_src, env=env, check=True,
+           stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError as e:
+        print_error(f"PyArrow build_ext failed: {e.stderr.decode()}")
+        return False
+
+    print("Installing PyArrow in development mode...")
+
+    # Install in development mode (no build isolation, no deps)
+    try:
+        subprocess.run([
+            sys.executable, "-m", "pip", "install", "-e", ".",
+            "--no-build-isolation", "--no-deps"
+        ], cwd=pyarrow_src, check=True,
+           stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError as e:
+        print_error(f"PyArrow install failed: {e.stderr.decode()}")
+        return False
+
+    # Verify installation
+    try:
+        import pyarrow
+        pyarrow_file = Path(pyarrow.__file__)
+        if "vendor/arrow/python" in str(pyarrow_file):
+            print_success(f"PyArrow installed from vendored source (v{pyarrow.__version__})")
+            return True
+        else:
+            print_error(f"PyArrow installed but not from vendored source: {pyarrow_file}")
+            return False
+    except ImportError as e:
+        print_error(f"PyArrow import failed after install: {e}")
+        return False
+
+
 def build_rocksdb_cpp(skip=False):
     """Build RocksDB C++ library."""
     print_phase(3, 8, "Building RocksDB C++...")
@@ -437,10 +517,13 @@ def build_vendor_extensions(deps, skip=False):
 # ==============================================================================
 
 def discover_cython_modules():
-    """Discover all .pyx files in sabot/_cython/."""
+    """Discover all .pyx files in sabot/_cython/ and sabot/_c/."""
     print_phase(5, 8, "Discovering Sabot Cython modules...")
 
+    # Scan both _cython and _c directories
     pyx_files = list(SABOT_CYTHON_DIR.rglob("*.pyx"))
+    pyx_files_c = list(SABOT_C_DIR.rglob("*.pyx"))
+    pyx_files.extend(pyx_files_c)
 
     # Categorize by dependencies
     modules = {
@@ -456,7 +539,15 @@ def discover_cython_modules():
     tonbo_keywords = ['tonbo', 'Tonbo']
 
     for pyx_file in pyx_files:
-        rel_path = pyx_file.relative_to(SABOT_CYTHON_DIR)
+        # Get relative path (works for both _cython and _c dirs)
+        if pyx_file.is_relative_to(SABOT_CYTHON_DIR):
+            rel_path = pyx_file.relative_to(SABOT_CYTHON_DIR)
+        elif pyx_file.is_relative_to(SABOT_C_DIR):
+            # For _c/ files, include the _c prefix to make module names unique
+            rel_path = Path("_c") / pyx_file.relative_to(SABOT_C_DIR)
+        else:
+            print_skip(f"Skipping file outside known directories: {pyx_file}")
+            continue
 
         # Skip excluded modules
         if str(rel_path) in EXCLUDED_MODULES:
@@ -521,6 +612,8 @@ def build_sabot_extensions(deps, vendor_results, modules):
         str(PROJECT_ROOT / "vendor" / "arrow" / "python"),
         str(PROJECT_ROOT / "vendor" / "arrow" / "python" / "pyarrow"),
         str(PROJECT_ROOT / "vendor" / "arrow" / "python" / "pyarrow" / "src"),
+        str(PROJECT_ROOT / "vendor" / "duckdb" / "third_party" / "concurrentqueue"),  # Lock-free queue
+        str(SABOT_C_DIR),  # For morsel_executor.hpp
     ]
 
     common_library_dirs = [arrow_lib]
@@ -549,6 +642,20 @@ def build_sabot_extensions(deps, vendor_results, modules):
             f"-Wl,-rpath,{arrow_lib}",
         ]
 
+    # Helper function to get module name and path
+    def get_module_info(module_path):
+        """Get module name and file path for a module_path."""
+        if str(module_path).startswith('_c'):
+            # Module from sabot/_c/
+            rel_module_path = module_path.relative_to(Path("_c"))
+            module_name = f"sabot._c.{str(rel_module_path.with_suffix('')).replace(os.sep, '.')}"
+            pyx_path = str(SABOT_C_DIR / rel_module_path)
+        else:
+            # Module from sabot/_cython/
+            module_name = f"sabot._cython.{str(module_path.with_suffix('')).replace(os.sep, '.')}"
+            pyx_path = str(SABOT_CYTHON_DIR / module_path)
+        return module_name, pyx_path
+
     # Build modules by category
     results = {'built': [], 'skipped': [], 'failed': []}
 
@@ -556,12 +663,24 @@ def build_sabot_extensions(deps, vendor_results, modules):
     extensions_to_build = []
 
     for module_path in modules['core'] + modules['simple']:
-        module_name = f"sabot._cython.{str(module_path.with_suffix('')).replace(os.sep, '.')}"
-        pyx_path = str(SABOT_CYTHON_DIR / module_path)
+        module_name, pyx_path = get_module_info(module_path)
+
+        # Special cases: modules that need their .cpp files included
+        sources = [pyx_path]
+        if 'morsel_executor' in str(module_path):
+            cpp_path = str(SABOT_C_DIR / "morsel_executor_impl.cpp")
+            sources.append(cpp_path)
+        elif 'task_slot_manager' in str(module_path):
+            cpp_path = str(SABOT_C_DIR / "task_slot_manager_impl.cpp")
+            sources.append(cpp_path)
+        elif 'ipc_reader' in str(module_path):
+            # ipc_reader is pure Cython wrapping Arrow C++ IPC
+            # No additional .cpp files needed - uses Arrow C++ library directly
+            pass
 
         extensions_to_build.append(Extension(
             module_name,
-            [pyx_path],
+            sources,
             include_dirs=common_include_dirs,
             library_dirs=common_library_dirs,
             libraries=common_libraries,
@@ -573,8 +692,7 @@ def build_sabot_extensions(deps, vendor_results, modules):
     # Conditionally build RocksDB modules
     if vendor_results['rocksdb']:
         for module_path in modules['rocksdb']:
-            module_name = f"sabot._cython.{str(module_path.with_suffix('')).replace(os.sep, '.')}"
-            pyx_path = str(SABOT_CYTHON_DIR / module_path)
+            module_name, pyx_path = get_module_info(module_path)
 
             # Add vendored RocksDB paths
             rocksdb_include_dirs = common_include_dirs + [str(ROCKSDB_INSTALL / "include")]
@@ -597,8 +715,7 @@ def build_sabot_extensions(deps, vendor_results, modules):
     # Conditionally build Tonbo modules
     if vendor_results['tonbo']:
         for module_path in modules['tonbo']:
-            module_name = f"sabot._cython.{str(module_path.with_suffix('')).replace(os.sep, '.')}"
-            pyx_path = str(SABOT_CYTHON_DIR / module_path)
+            module_name, pyx_path = get_module_info(module_path)
 
             # Add Tonbo FFI paths
             tonbo_include_dirs = common_include_dirs + [str(TONBO_FFI_DIR)]
@@ -621,8 +738,7 @@ def build_sabot_extensions(deps, vendor_results, modules):
     # Conditionally build mixed modules
     if vendor_results['rocksdb'] and vendor_results['tonbo']:
         for module_path in modules['mixed']:
-            module_name = f"sabot._cython.{str(module_path.with_suffix('')).replace(os.sep, '.')}"
-            pyx_path = str(SABOT_CYTHON_DIR / module_path)
+            module_name, pyx_path = get_module_info(module_path)
 
             # Add both vendored RocksDB and Tonbo FFI paths
             mixed_include_dirs = common_include_dirs + [
@@ -875,11 +991,19 @@ def main():
     # Phase 1: Check dependencies
     deps = check_dependencies()
 
-    # Phase 2: Build Arrow
+    # Phase 2: Build Arrow C++
     arrow_install = build_arrow_cpp(skip=args.skip_arrow)
     if not arrow_install:
         print_error("Arrow C++ build failed - cannot continue")
         return 1
+
+    # Phase 2.5: Build PyArrow from vendored source
+    # NOTE: We don't actually need PyArrow installed - our Cython modules use .pxd files directly
+    # pyarrow_ok = build_vendored_pyarrow(arrow_install, skip=args.skip_arrow)
+    # if not pyarrow_ok:
+    #     print_error("PyArrow build failed - cannot continue")
+    #     return 1
+    print_skip("PyArrow build skipped - using .pxd bindings directly")
 
     # Phase 3: Build RocksDB
     rocksdb_install = build_rocksdb_cpp(skip=args.skip_vendor)

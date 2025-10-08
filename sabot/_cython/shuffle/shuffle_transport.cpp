@@ -37,7 +37,23 @@
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/iterator.h",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/key_value_metadata.h",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/thread_pool.h",
-            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/value_parsing.h"
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/value_parsing.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/arrow_to_pandas.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/async.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/benchmark.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/common.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/csv.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/extension_type.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/flight.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/gdb.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/helpers.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/inference.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/ipc.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/numpy_init.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/platform.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/pyarrow.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/udf.h"
         ],
         "extra_compile_args": [
             "-O3",
@@ -45,10 +61,19 @@
             "-Wno-unused-function",
             "-Wno-deprecated-declarations"
         ],
+        "extra_link_args": [
+            "-Wl,-headerpad_max_install_names",
+            "-Wl,-rpath,@loader_path/../../vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib"
+        ],
         "include_dirs": [
-            "/Users/bengamble/Sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
+            "/opt/homebrew/lib/python3.13/site-packages/numpy/_core/include",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
-            "vendor/arrow/python/pyarrow"
+            "/Users/bengamble/Sabot/vendor/arrow/python",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src",
+            "/Users/bengamble/Sabot/vendor/duckdb/third_party/concurrentqueue",
+            "/Users/bengamble/Sabot/sabot/_c"
         ],
         "language": "c++",
         "libraries": [
@@ -60,7 +85,7 @@
         ],
         "name": "sabot._cython.shuffle.shuffle_transport",
         "sources": [
-            "sabot/_cython/shuffle/shuffle_transport.pyx"
+            "/Users/bengamble/Sabot/sabot/_cython/shuffle/shuffle_transport.pyx"
         ]
     },
     "module_name": "sabot._cython.shuffle.shuffle_transport"
@@ -1607,13 +1632,13 @@ static const char *__pyx_filename;
 static const char* const __pyx_f[] = {
   "sabot/_cython/shuffle/shuffle_transport.pyx",
   "<stringsource>",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/contextvars.pxd",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/datetime.pxd",
+  "cpython/contextvars.pxd",
+  "cpython/datetime.pxd",
   "sabot/_cython/shuffle/atomic_partition_store.pxd",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/type.pxd",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/bool.pxd",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/complex.pxd",
-  ".venv/lib/python3.11/site-packages/pyarrow/lib.pxd",
+  "cpython/type.pxd",
+  "cpython/bool.pxd",
+  "cpython/complex.pxd",
+  "pyarrow/lib.pxd",
   "sabot/_cython/shuffle/lock_free_queue.pxd",
   "sabot/_cython/shuffle/flight_transport_lockfree.pxd",
 };
@@ -2237,7 +2262,7 @@ struct __pyx_t_5sabot_7_cython_7shuffle_25flight_transport_lockfree_ConnectionSl
 };
 struct __pyx_opt_args_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start_shuffle;
 
-/* "sabot/_cython/shuffle/shuffle_transport.pxd":71
+/* "sabot/_cython/shuffle/shuffle_transport.pxd":74
  * 
  *     # Shuffle coordination methods (Phase 4)
  *     cpdef void start_shuffle(self, bytes shuffle_id, int32_t num_partitions, list downstream_agents, list upstream_agents=?)             # <<<<<<<<<<<<<<
@@ -3685,11 +3710,12 @@ struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer {
   std::string host;
   int32_t port;
   bool running;
+  PyObject *task_slot_manager;
   struct __pyx_obj_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer *flight_server;
 };
 
 
-/* "sabot/_cython/shuffle/shuffle_transport.pxd":39
+/* "sabot/_cython/shuffle/shuffle_transport.pxd":41
  * 
  * 
  * cdef class ShuffleClient:             # <<<<<<<<<<<<<<
@@ -3705,7 +3731,7 @@ struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient {
 };
 
 
-/* "sabot/_cython/shuffle/shuffle_transport.pxd":52
+/* "sabot/_cython/shuffle/shuffle_transport.pxd":54
  * 
  * 
  * cdef class ShuffleTransport:             # <<<<<<<<<<<<<<
@@ -5128,11 +5154,12 @@ static struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_25flight_transport_lockf
 struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer {
   void (*start)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *, std::string, int32_t, int __pyx_skip_dispatch);
   void (*stop)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *, int __pyx_skip_dispatch);
+  void (*set_task_slot_manager)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *, PyObject *, int __pyx_skip_dispatch);
 };
 static struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer;
 
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":194
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":219
  * # ============================================================================
  * 
  * cdef class ShuffleTransport:             # <<<<<<<<<<<<<<
@@ -5143,6 +5170,7 @@ static struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_Shuf
 struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport {
   void (*start)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, std::string, int32_t, int __pyx_skip_dispatch);
   void (*stop)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, int __pyx_skip_dispatch);
+  void (*set_task_slot_manager)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, int __pyx_skip_dispatch);
   void (*publish_partition)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, int32_t, struct __pyx_obj_7pyarrow_3lib_RecordBatch *);
   struct __pyx_obj_7pyarrow_3lib_RecordBatch *(*fetch_partition_from_agent)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, PyObject *, int32_t);
   void (*start_shuffle)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, int32_t, PyObject *, int __pyx_skip_dispatch, struct __pyx_opt_args_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start_shuffle *__pyx_optional_args);
@@ -5539,6 +5567,31 @@ static CYTHON_INLINE PyObject *__Pyx_CallUnboundCMethod2(__Pyx_CachedCFunction *
         __Pyx__ArgTypeTest(obj, type, name, exact))
 static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *name, int exact);
 
+/* PyObjectVectorCallKwBuilder.proto */
+CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n);
+#if CYTHON_VECTORCALL
+#if PY_VERSION_HEX >= 0x03090000
+#define __Pyx_Object_Vectorcall_CallFromBuilder PyObject_Vectorcall
+#else
+#define __Pyx_Object_Vectorcall_CallFromBuilder _PyObject_Vectorcall
+#endif
+#define __Pyx_MakeVectorcallBuilderKwds(n) PyTuple_New(n)
+static int __Pyx_VectorcallBuilder_AddArg(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n);
+static int __Pyx_VectorcallBuilder_AddArgStr(const char *key, PyObject *value, PyObject *builder, PyObject **args, int n);
+#else
+#define __Pyx_Object_Vectorcall_CallFromBuilder __Pyx_PyObject_FastCallDict
+#define __Pyx_MakeVectorcallBuilderKwds(n) __Pyx_PyDict_NewPresized(n)
+#define __Pyx_VectorcallBuilder_AddArg(key, value, builder, args, n) PyDict_SetItem(builder, key, value)
+#define __Pyx_VectorcallBuilder_AddArgStr(key, value, builder, args, n) PyDict_SetItemString(builder, key, value)
+#endif
+
+/* PyObjectVectorCallMethodKwBuilder.proto */
+#if CYTHON_VECTORCALL && PY_VERSION_HEX >= 0x03090000
+#define __Pyx_Object_VectorcallMethod_CallFromBuilder PyObject_VectorcallMethod
+#else
+static PyObject *__Pyx_Object_VectorcallMethod_CallFromBuilder(PyObject *name, PyObject *const *args, size_t nargsf, PyObject *kwnames);
+#endif
+
 /* RaiseException.proto */
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
 
@@ -5890,24 +5943,6 @@ static void __Pyx_AddTraceback(const char *funcname, int c_line,
 /* CIntFromPy.proto */
 static CYTHON_INLINE int32_t __Pyx_PyLong_As_int32_t(PyObject *);
 
-/* PyObjectVectorCallKwBuilder.proto */
-CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n);
-#if CYTHON_VECTORCALL
-#if PY_VERSION_HEX >= 0x03090000
-#define __Pyx_Object_Vectorcall_CallFromBuilder PyObject_Vectorcall
-#else
-#define __Pyx_Object_Vectorcall_CallFromBuilder _PyObject_Vectorcall
-#endif
-#define __Pyx_MakeVectorcallBuilderKwds(n) PyTuple_New(n)
-static int __Pyx_VectorcallBuilder_AddArg(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n);
-static int __Pyx_VectorcallBuilder_AddArgStr(const char *key, PyObject *value, PyObject *builder, PyObject **args, int n);
-#else
-#define __Pyx_Object_Vectorcall_CallFromBuilder __Pyx_PyObject_FastCallDict
-#define __Pyx_MakeVectorcallBuilderKwds(n) __Pyx_PyDict_NewPresized(n)
-#define __Pyx_VectorcallBuilder_AddArg(key, value, builder, args, n) PyDict_SetItem(builder, key, value)
-#define __Pyx_VectorcallBuilder_AddArgStr(key, value, builder, args, n) PyDict_SetItemString(builder, key, value)
-#endif
-
 /* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyLong_From_int32_t(int32_t value);
 
@@ -6091,7 +6126,9 @@ static CYTHON_INLINE int __pyx_f_7cpython_8datetime_9timedelta_6second_second(Py
 static CYTHON_INLINE int __pyx_f_7cpython_8datetime_9timedelta_11microsecond_microsecond(PyDateTime_Delta *__pyx_v_self); /* proto*/
 static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_start(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, std::string __pyx_v_host, int32_t __pyx_v_port, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_stop(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
+static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_set_task_slot_manager(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, PyObject *__pyx_v_task_slot_manager, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, std::string __pyx_v_host, int32_t __pyx_v_port, int __pyx_skip_dispatch); /* proto*/
+static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_set_task_slot_manager(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_task_slot_manager, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_stop(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_publish_partition(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch); /* proto*/
 static struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_fetch_partition_from_agent(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_agent_address, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id); /* proto*/
@@ -6280,9 +6317,11 @@ static PyObject *__pyx_builtin_TypeError;
 static PyObject *__pyx_builtin_range;
 /* #### Code section: string_decls ### */
 static const char __pyx_k_[] = ":";
+static const char __pyx_k_A[] = "\200A\360\016\000\t\r\320\014!\240\021";
 static const char __pyx_k_Q[] = "\200\001\330\004\n\210+\220Q";
 static const char __pyx_k__2[] = "?";
 static const char __pyx_k_gc[] = "gc";
+static const char __pyx_k_A_G[] = "\200A\360\016\000\t\r\210G\320\023)\250\021\250!";
 static const char __pyx_k_get[] = "get";
 static const char __pyx_k_pop[] = "pop";
 static const char __pyx_k_func[] = "__func__";
@@ -6302,10 +6341,13 @@ static const char __pyx_k_enable[] = "enable";
 static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_module[] = "__module__";
 static const char __pyx_k_reduce[] = "__reduce__";
+static const char __pyx_k_source[] = "source";
 static const char __pyx_k_disable[] = "disable";
+static const char __pyx_k_network[] = "network";
 static const char __pyx_k_A_7_6_Ql[] = "\200A\360\016\000\t\014\2107\220!\2206\230\021\330\014\020\320\020!\240\024\240Q\240l\260!";
 static const char __pyx_k_add_note[] = "add_note";
 static const char __pyx_k_getstate[] = "__getstate__";
+static const char __pyx_k_num_rows[] = "num_rows";
 static const char __pyx_k_qualname[] = "__qualname__";
 static const char __pyx_k_set_name[] = "__set_name__";
 static const char __pyx_k_setstate[] = "__setstate__";
@@ -6314,6 +6356,7 @@ static const char __pyx_k_batch_cpp[] = "batch_cpp";
 static const char __pyx_k_isenabled[] = "isenabled";
 static const char __pyx_k_pyx_state[] = "__pyx_state";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
+static const char __pyx_k_start_row[] = "start_row";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static const char __pyx_k_shuffle_id[] = "shuffle_id";
 static const char __pyx_k_A_4t1_G5_O1[] = "\200A\340\010\013\2104\210t\2201\330\014\r\340\010\014\210G\2205\230\001\330\010\014\210O\2301";
@@ -6331,7 +6374,7 @@ static const char __pyx_k_class_getitem[] = "__class_getitem__";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
 static const char __pyx_k_start_shuffle[] = "start_shuffle";
 static const char __pyx_k_A_4q_N_N_G6_O1[] = "\200A\360\020\000\t\014\2104\210q\330\014\r\360\006\000\t\r\210N\230!\330\010\014\210N\230!\360\006\000\t\r\210G\2206\230\021\230&\240\001\340\010\014\210O\2301";
-static const char __pyx_k_A_O1_q_4_N_QnN[] = "\200A\360\"\000\t%\240O\2601\330\014\031\230\021\330\014\017\210q\220\001\360\010\000\t4\260=\300\001\300\021\360\010\000\t\r\210N\320\032-\250Q\250n\270N\310!";
+static const char __pyx_k_enqueue_morsel[] = "enqueue_morsel";
 static const char __pyx_k_num_partitions[] = "num_partitions";
 static const char __pyx_k_send_partition[] = "send_partition";
 static const char __pyx_k_active_shuffles[] = "_active_shuffles";
@@ -6342,6 +6385,7 @@ static const char __pyx_k_timeout_seconds[] = "timeout_seconds";
 static const char __pyx_k_upstream_agents[] = "upstream_agents";
 static const char __pyx_k_ShuffleTransport[] = "ShuffleTransport";
 static const char __pyx_k_downstream_agents[] = "downstream_agents";
+static const char __pyx_k_task_slot_manager[] = "task_slot_manager";
 static const char __pyx_k_ShuffleServer_stop[] = "ShuffleServer.stop";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
@@ -6351,6 +6395,8 @@ static const char __pyx_k_ShuffleServer_start[] = "ShuffleServer.start";
 static const char __pyx_k_A_4wavQ_A_Qa_a_22B_ST[] = "\200A\360\n\000\036\037\360\030\000\t\014\2104\210w\220a\220v\230Q\330\014\020\320\020$\240A\340\010\014\320\014\035\230Q\230a\330\014\036\230a\330\014!\240\021\330\014\037\320\0372\3202B\300'\310\032\320ST";
 static const char __pyx_k_A_O1_q_44_EUUV_1_aq_1[] = "\200A\360,\000\t%\240O\2601\330\014\031\230\021\330\014\017\210q\220\001\360\n\000\t4\2604\260~\320EU\320UV\330\014\031\230\021\330\014\r\330\014\r\330\014\r\360\010\000\t\014\2101\330\014\023\220;\230a\230q\360\006\000\r\024\2201";
 static const char __pyx_k_ShuffleTransport_stop[] = "ShuffleTransport.stop";
+static const char __pyx_k_set_task_slot_manager[] = "set_task_slot_manager";
+static const char __pyx_k_A_O1_q_4_N_QnN_4_a_Q_q[] = "\200A\360&\000\t%\240O\2601\330\014\031\230\021\330\014\017\210q\220\001\360\010\000\t4\260=\300\001\300\021\360\010\000\t\r\210N\320\032-\250Q\250n\270N\310!\360\006\000\t\014\2104\320\017\"\240'\250\021\340\014\020\320\020\"\240/\260\021\330\020\021\330\020\032\230!\330\020\031\230\025\230a\330\020\035\230Q\330\020\027\220q";
 static const char __pyx_k_ShuffleTransport_start[] = "ShuffleTransport.start";
 static const char __pyx_k_A_4q_HA_HA_G1HG1A_1_a_N_Kq[] = "\200A\360\020\000\t\014\2104\210q\330\014\r\360\006\000\t\r\210H\220A\330\010\014\210H\220A\360\006\000\t!\240\004\240G\2501\250H\260G\2701\270A\330\010\014\320\014\035\320\0351\260\021\260,\270a\330\010\014\210N\230&\240\001\340\010\014\210K\220q";
 static const char __pyx_k_A_a_L_q_q_uARwaq_s_5_1G2WA[] = "\200A\360&\000\t\r\320\014\036\230a\230|\250>\270\021\360\006\000\t\025\220L\240\007\240q\250\001\330\010\020\220\t\230\026\230q\240\001\330\010\017\210u\220A\220R\220w\230a\230q\330\010\017\210s\220!\2205\230\001\230\027\240\003\2401\240G\2502\250W\260A";
@@ -6366,9 +6412,11 @@ static const char __pyx_k_Shuffle_Transport_Implementatio[] = "\nShuffle Transpo
 static const char __pyx_k_A_1_4wav_1_Kwd_1_t_AQ_d_a_4q_l_a[] = "\200A\360\"\000\t\034\2301\360\020\000\t\014\2104\210w\220a\220v\320\0351\260\023\260K\270w\300d\310!\330\014\023\2201\340\010\027\220t\320\033,\250A\250Q\360\n\000\t\033\230,\240d\250!\320+>\270a\340\010\013\2104\210q\360\006\000\r\037\230l\250$\250a\320/D\300A\360\006\000\t\r\210N\230!\340\014\030\230\n\240'\250\021\250,\260j\300\001\300\034\310\\\320YZ\330\014\024\220I\230V\2401\240A\330\014\023\2205\230\001\230\022\2307\240!\2401\330\014\023\2203\220a\220u\230A\230W\240C\240q\250\007\250r\260\027\270\001\360\006\000\r\025\220D\230\007\320\037/\250q\260\006\260f\270L\310\001\340\014\017\210v\220W\230A\330\020\026\220g\230Q\230a\340\010\017\210q";
 static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.";
 static const char __pyx_k_ShuffleServer_register_partition[] = "ShuffleServer.register_partition";
+static const char __pyx_k_ShuffleServer_set_task_slot_mana[] = "ShuffleServer.set_task_slot_manager";
 static const char __pyx_k_ShuffleTransport___reduce_cython[] = "ShuffleTransport.__reduce_cython__";
 static const char __pyx_k_ShuffleTransport___setstate_cyth[] = "ShuffleTransport.__setstate_cython__";
 static const char __pyx_k_ShuffleTransport_receive_partiti[] = "ShuffleTransport.receive_partitions";
+static const char __pyx_k_ShuffleTransport_set_task_slot_m[] = "ShuffleTransport.set_task_slot_manager";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
 static const char __pyx_k_sabot__cython_shuffle_shuffle_tr[] = "sabot._cython.shuffle.shuffle_transport";
 static const char __pyx_k_sabot__cython_shuffle_shuffle_tr_2[] = "sabot/_cython/shuffle/shuffle_transport.pyx";
@@ -6376,22 +6424,24 @@ static const char __pyx_k_sabot__cython_shuffle_shuffle_tr_2[] = "sabot/_cython/
 static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer___cinit__(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_2start(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, std::string __pyx_v_host, int32_t __pyx_v_port); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_4stop(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_6register_partition(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_8__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_10__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_6set_task_slot_manager(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, PyObject *__pyx_v_task_slot_manager); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_8register_partition(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_10__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_12__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient___cinit__(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient *__pyx_v_self, int32_t __pyx_v_max_connections, int32_t __pyx_v_max_retries, double __pyx_v_timeout_seconds); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient_2fetch_partition(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient *__pyx_v_self, PyObject *__pyx_v_host, int32_t __pyx_v_port, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient_4__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient_6__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport___cinit__(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_2start(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, std::string __pyx_v_host, int32_t __pyx_v_port); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_4stop(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_6start_shuffle(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_num_partitions, PyObject *__pyx_v_downstream_agents, PyObject *__pyx_v_upstream_agents); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_8send_partition(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch, PyObject *__pyx_v_target_agent); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_10receive_partitions(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_12end_shuffle(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_14__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_16__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_4set_task_slot_manager(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_task_slot_manager); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_6stop(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_8start_shuffle(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_num_partitions, PyObject *__pyx_v_downstream_agents, PyObject *__pyx_v_upstream_agents); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_10send_partition(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch, PyObject *__pyx_v_target_agent); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_12receive_partitions(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_14end_shuffle(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_16__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_18__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_tp_new_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
@@ -6554,8 +6604,9 @@ typedef struct {
   PyTypeObject *__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
   PyObject *__pyx_tuple[1];
-  PyObject *__pyx_codeobj_tab[16];
-  PyObject *__pyx_string_tab[81];
+  PyObject *__pyx_codeobj_tab[18];
+  PyObject *__pyx_string_tab[90];
+  PyObject *__pyx_int_0;
   PyObject *__pyx_int_8816;
 /* #### Code section: module_state_contents ### */
 /* CommonTypesMetaclass.module_state_decls */
@@ -6604,77 +6655,86 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_ShuffleServer___reduce_cython __pyx_string_tab[7]
 #define __pyx_n_u_ShuffleServer___setstate_cython __pyx_string_tab[8]
 #define __pyx_n_u_ShuffleServer_register_partition __pyx_string_tab[9]
-#define __pyx_n_u_ShuffleServer_start __pyx_string_tab[10]
-#define __pyx_n_u_ShuffleServer_stop __pyx_string_tab[11]
-#define __pyx_n_u_ShuffleTransport __pyx_string_tab[12]
-#define __pyx_n_u_ShuffleTransport___reduce_cython __pyx_string_tab[13]
-#define __pyx_n_u_ShuffleTransport___setstate_cyth __pyx_string_tab[14]
-#define __pyx_n_u_ShuffleTransport_end_shuffle __pyx_string_tab[15]
-#define __pyx_n_u_ShuffleTransport_receive_partiti __pyx_string_tab[16]
-#define __pyx_n_u_ShuffleTransport_send_partition __pyx_string_tab[17]
-#define __pyx_n_u_ShuffleTransport_start __pyx_string_tab[18]
-#define __pyx_n_u_ShuffleTransport_start_shuffle __pyx_string_tab[19]
-#define __pyx_n_u_ShuffleTransport_stop __pyx_string_tab[20]
-#define __pyx_n_u_TypeError __pyx_string_tab[21]
-#define __pyx_kp_u__2 __pyx_string_tab[22]
-#define __pyx_n_u_active_shuffles __pyx_string_tab[23]
-#define __pyx_kp_u_add_note __pyx_string_tab[24]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[25]
-#define __pyx_n_u_batch __pyx_string_tab[26]
-#define __pyx_n_u_batch_cpp __pyx_string_tab[27]
-#define __pyx_n_u_class_getitem __pyx_string_tab[28]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[29]
-#define __pyx_kp_u_disable __pyx_string_tab[30]
-#define __pyx_n_u_downstream_agents __pyx_string_tab[31]
-#define __pyx_kp_u_enable __pyx_string_tab[32]
-#define __pyx_n_u_encode __pyx_string_tab[33]
-#define __pyx_n_u_end_shuffle __pyx_string_tab[34]
-#define __pyx_n_u_fetch_partition __pyx_string_tab[35]
-#define __pyx_n_u_func __pyx_string_tab[36]
-#define __pyx_kp_u_gc __pyx_string_tab[37]
-#define __pyx_n_u_get __pyx_string_tab[38]
-#define __pyx_n_u_getstate __pyx_string_tab[39]
-#define __pyx_n_u_host __pyx_string_tab[40]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[41]
-#define __pyx_kp_u_isenabled __pyx_string_tab[42]
-#define __pyx_n_u_main __pyx_string_tab[43]
-#define __pyx_n_u_max_connections __pyx_string_tab[44]
-#define __pyx_n_u_max_retries __pyx_string_tab[45]
-#define __pyx_n_u_module __pyx_string_tab[46]
-#define __pyx_n_u_name __pyx_string_tab[47]
-#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[48]
-#define __pyx_n_u_num_partitions __pyx_string_tab[49]
-#define __pyx_n_u_partition_id __pyx_string_tab[50]
-#define __pyx_n_u_pop __pyx_string_tab[51]
-#define __pyx_n_u_port __pyx_string_tab[52]
-#define __pyx_n_u_pyx_state __pyx_string_tab[53]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[54]
-#define __pyx_n_u_qualname __pyx_string_tab[55]
-#define __pyx_n_u_range __pyx_string_tab[56]
-#define __pyx_n_u_receive_partitions __pyx_string_tab[57]
-#define __pyx_n_u_reduce __pyx_string_tab[58]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[59]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[60]
-#define __pyx_n_u_register_partition __pyx_string_tab[61]
-#define __pyx_n_u_sabot__cython_shuffle_shuffle_tr __pyx_string_tab[62]
-#define __pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2 __pyx_string_tab[63]
-#define __pyx_n_u_self __pyx_string_tab[64]
-#define __pyx_n_u_send_partition __pyx_string_tab[65]
-#define __pyx_n_u_set_name __pyx_string_tab[66]
-#define __pyx_n_u_setstate __pyx_string_tab[67]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[68]
-#define __pyx_n_u_shuffle_hash __pyx_string_tab[69]
-#define __pyx_n_u_shuffle_id __pyx_string_tab[70]
-#define __pyx_n_u_split __pyx_string_tab[71]
-#define __pyx_n_u_start __pyx_string_tab[72]
-#define __pyx_n_u_start_shuffle __pyx_string_tab[73]
-#define __pyx_n_u_stop __pyx_string_tab[74]
-#define __pyx_kp_u_stringsource __pyx_string_tab[75]
-#define __pyx_n_u_target_agent __pyx_string_tab[76]
-#define __pyx_n_u_test __pyx_string_tab[77]
-#define __pyx_n_u_timeout_seconds __pyx_string_tab[78]
-#define __pyx_n_u_upstream_agents __pyx_string_tab[79]
-#define __pyx_kp_u_utf_8 __pyx_string_tab[80]
+#define __pyx_n_u_ShuffleServer_set_task_slot_mana __pyx_string_tab[10]
+#define __pyx_n_u_ShuffleServer_start __pyx_string_tab[11]
+#define __pyx_n_u_ShuffleServer_stop __pyx_string_tab[12]
+#define __pyx_n_u_ShuffleTransport __pyx_string_tab[13]
+#define __pyx_n_u_ShuffleTransport___reduce_cython __pyx_string_tab[14]
+#define __pyx_n_u_ShuffleTransport___setstate_cyth __pyx_string_tab[15]
+#define __pyx_n_u_ShuffleTransport_end_shuffle __pyx_string_tab[16]
+#define __pyx_n_u_ShuffleTransport_receive_partiti __pyx_string_tab[17]
+#define __pyx_n_u_ShuffleTransport_send_partition __pyx_string_tab[18]
+#define __pyx_n_u_ShuffleTransport_set_task_slot_m __pyx_string_tab[19]
+#define __pyx_n_u_ShuffleTransport_start __pyx_string_tab[20]
+#define __pyx_n_u_ShuffleTransport_start_shuffle __pyx_string_tab[21]
+#define __pyx_n_u_ShuffleTransport_stop __pyx_string_tab[22]
+#define __pyx_n_u_TypeError __pyx_string_tab[23]
+#define __pyx_kp_u__2 __pyx_string_tab[24]
+#define __pyx_n_u_active_shuffles __pyx_string_tab[25]
+#define __pyx_kp_u_add_note __pyx_string_tab[26]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[27]
+#define __pyx_n_u_batch __pyx_string_tab[28]
+#define __pyx_n_u_batch_cpp __pyx_string_tab[29]
+#define __pyx_n_u_class_getitem __pyx_string_tab[30]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[31]
+#define __pyx_kp_u_disable __pyx_string_tab[32]
+#define __pyx_n_u_downstream_agents __pyx_string_tab[33]
+#define __pyx_kp_u_enable __pyx_string_tab[34]
+#define __pyx_n_u_encode __pyx_string_tab[35]
+#define __pyx_n_u_end_shuffle __pyx_string_tab[36]
+#define __pyx_n_u_enqueue_morsel __pyx_string_tab[37]
+#define __pyx_n_u_fetch_partition __pyx_string_tab[38]
+#define __pyx_n_u_func __pyx_string_tab[39]
+#define __pyx_kp_u_gc __pyx_string_tab[40]
+#define __pyx_n_u_get __pyx_string_tab[41]
+#define __pyx_n_u_getstate __pyx_string_tab[42]
+#define __pyx_n_u_host __pyx_string_tab[43]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[44]
+#define __pyx_kp_u_isenabled __pyx_string_tab[45]
+#define __pyx_n_u_main __pyx_string_tab[46]
+#define __pyx_n_u_max_connections __pyx_string_tab[47]
+#define __pyx_n_u_max_retries __pyx_string_tab[48]
+#define __pyx_n_u_module __pyx_string_tab[49]
+#define __pyx_n_u_name __pyx_string_tab[50]
+#define __pyx_n_u_network __pyx_string_tab[51]
+#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[52]
+#define __pyx_n_u_num_partitions __pyx_string_tab[53]
+#define __pyx_n_u_num_rows __pyx_string_tab[54]
+#define __pyx_n_u_partition_id __pyx_string_tab[55]
+#define __pyx_n_u_pop __pyx_string_tab[56]
+#define __pyx_n_u_port __pyx_string_tab[57]
+#define __pyx_n_u_pyx_state __pyx_string_tab[58]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[59]
+#define __pyx_n_u_qualname __pyx_string_tab[60]
+#define __pyx_n_u_range __pyx_string_tab[61]
+#define __pyx_n_u_receive_partitions __pyx_string_tab[62]
+#define __pyx_n_u_reduce __pyx_string_tab[63]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[64]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[65]
+#define __pyx_n_u_register_partition __pyx_string_tab[66]
+#define __pyx_n_u_sabot__cython_shuffle_shuffle_tr __pyx_string_tab[67]
+#define __pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2 __pyx_string_tab[68]
+#define __pyx_n_u_self __pyx_string_tab[69]
+#define __pyx_n_u_send_partition __pyx_string_tab[70]
+#define __pyx_n_u_set_name __pyx_string_tab[71]
+#define __pyx_n_u_set_task_slot_manager __pyx_string_tab[72]
+#define __pyx_n_u_setstate __pyx_string_tab[73]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[74]
+#define __pyx_n_u_shuffle_hash __pyx_string_tab[75]
+#define __pyx_n_u_shuffle_id __pyx_string_tab[76]
+#define __pyx_n_u_source __pyx_string_tab[77]
+#define __pyx_n_u_split __pyx_string_tab[78]
+#define __pyx_n_u_start __pyx_string_tab[79]
+#define __pyx_n_u_start_row __pyx_string_tab[80]
+#define __pyx_n_u_start_shuffle __pyx_string_tab[81]
+#define __pyx_n_u_stop __pyx_string_tab[82]
+#define __pyx_kp_u_stringsource __pyx_string_tab[83]
+#define __pyx_n_u_target_agent __pyx_string_tab[84]
+#define __pyx_n_u_task_slot_manager __pyx_string_tab[85]
+#define __pyx_n_u_test __pyx_string_tab[86]
+#define __pyx_n_u_timeout_seconds __pyx_string_tab[87]
+#define __pyx_n_u_upstream_agents __pyx_string_tab[88]
+#define __pyx_kp_u_utf_8 __pyx_string_tab[89]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -6815,8 +6875,9 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport);
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport);
   for (int i=0; i<1; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<16; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<81; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<18; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<90; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  Py_CLEAR(clear_module_state->__pyx_int_0);
   Py_CLEAR(clear_module_state->__pyx_int_8816);
   return 0;
 }
@@ -6958,8 +7019,9 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport);
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport);
   for (int i=0; i<1; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<16; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<81; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<18; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<90; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_8816);
   return 0;
 }
@@ -9929,7 +9991,7 @@ static CYTHON_INLINE std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_7_cyth
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":61
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":63
  *     """
  * 
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -9964,17 +10026,32 @@ static int __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
 
 static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer___cinit__(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self) {
   int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":63
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":65
  *     def __cinit__(self):
  *         """Initialize shuffle server (lock-free)."""
  *         self.running = False             # <<<<<<<<<<<<<<
+ *         self.task_slot_manager = None
  *         # Flight server will be created in start()
- * 
 */
   __pyx_v_self->running = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":61
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":66
+ *         """Initialize shuffle server (lock-free)."""
+ *         self.running = False
+ *         self.task_slot_manager = None             # <<<<<<<<<<<<<<
+ *         # Flight server will be created in start()
+ * 
+*/
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF(__pyx_v_self->task_slot_manager);
+  __Pyx_DECREF(__pyx_v_self->task_slot_manager);
+  __pyx_v_self->task_slot_manager = Py_None;
+
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":63
  *     """
  * 
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -9984,10 +10061,11 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
 
   /* function exit code */
   __pyx_r = 0;
+  __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":66
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":69
  *         # Flight server will be created in start()
  * 
  *     cpdef void start(self, string host, int32_t port) except *:             # <<<<<<<<<<<<<<
@@ -10033,15 +10111,15 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 66, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_3start)) {
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; 
-        __pyx_t_5 = __pyx_convert_PyBytes_string_to_py_6libcpp_6string_std__in_string(__pyx_v_host); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 66, __pyx_L1_error)
+        __pyx_t_5 = __pyx_convert_PyBytes_string_to_py_6libcpp_6string_std__in_string(__pyx_v_host); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 69, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_port); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 66, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_port); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 69, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __pyx_t_7 = 1;
         #if CYTHON_UNPACK_METHODS
@@ -10062,7 +10140,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10082,7 +10160,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
     #endif
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":74
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":77
  *             port: Server port (e.g., 8816)
  *         """
  *         if self.running:             # <<<<<<<<<<<<<<
@@ -10092,7 +10170,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
   __pyx_t_8 = (__pyx_v_self->running != 0);
   if (__pyx_t_8) {
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":75
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":78
  *         """
  *         if self.running:
  *             return             # <<<<<<<<<<<<<<
@@ -10101,7 +10179,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
 */
     goto __pyx_L0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":74
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":77
  *             port: Server port (e.g., 8816)
  *         """
  *         if self.running:             # <<<<<<<<<<<<<<
@@ -10110,7 +10188,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
 */
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":78
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":81
  * 
  *         # Store configuration
  *         self.host = host             # <<<<<<<<<<<<<<
@@ -10119,7 +10197,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
 */
   __pyx_v_self->host = __pyx_v_host;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":79
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":82
  *         # Store configuration
  *         self.host = host
  *         self.port = port             # <<<<<<<<<<<<<<
@@ -10128,22 +10206,22 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
 */
   __pyx_v_self->port = __pyx_v_port;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":82
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":85
  * 
  *         # Create and start Flight server
  *         cdef bytes host_bytes = host.decode('utf-8').encode('utf-8')             # <<<<<<<<<<<<<<
  *         self.flight_server = LockFreeFlightServer(host_bytes, port)
  *         self.flight_server.start()
 */
-  __pyx_t_1 = __Pyx_decode_cpp_string(__pyx_v_host, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_decode_cpp_string(__pyx_v_host, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyUnicode_AsUTF8String(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_2 = PyUnicode_AsUTF8String(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_host_bytes = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":83
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":86
  *         # Create and start Flight server
  *         cdef bytes host_bytes = host.decode('utf-8').encode('utf-8')
  *         self.flight_server = LockFreeFlightServer(host_bytes, port)             # <<<<<<<<<<<<<<
@@ -10153,7 +10231,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
   __pyx_t_1 = NULL;
   __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer);
   __pyx_t_4 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer); 
-  __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_port); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 83, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_port); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_7 = 1;
   {
@@ -10162,7 +10240,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 83, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_2);
   }
   __Pyx_GIVEREF((PyObject *)__pyx_t_2);
@@ -10171,16 +10249,16 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
   __pyx_v_self->flight_server = ((struct __pyx_obj_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":84
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":87
  *         cdef bytes host_bytes = host.decode('utf-8').encode('utf-8')
  *         self.flight_server = LockFreeFlightServer(host_bytes, port)
  *         self.flight_server.start()             # <<<<<<<<<<<<<<
  * 
  *         self.running = True
 */
-  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer *)__pyx_v_self->flight_server->__pyx_vtab)->start(__pyx_v_self->flight_server); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 84, __pyx_L1_error)
+  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer *)__pyx_v_self->flight_server->__pyx_vtab)->start(__pyx_v_self->flight_server); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 87, __pyx_L1_error)
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":86
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":89
  *         self.flight_server.start()
  * 
  *         self.running = True             # <<<<<<<<<<<<<<
@@ -10189,7 +10267,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
 */
   __pyx_v_self->running = 1;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":66
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":69
  *         # Flight server will be created in start()
  * 
  *     cpdef void start(self, string host, int32_t port) except *:             # <<<<<<<<<<<<<<
@@ -10253,39 +10331,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_host,&__pyx_mstate_global->__pyx_n_u_port,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 66, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 69, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 66, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 69, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 66, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 69, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "start", 0) < 0) __PYX_ERR(0, 66, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "start", 0) < 0) __PYX_ERR(0, 69, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("start", 1, 2, 2, i); __PYX_ERR(0, 66, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("start", 1, 2, 2, i); __PYX_ERR(0, 69, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 66, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 69, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 66, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 69, __pyx_L3_error)
     }
-    __pyx_v_host = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(values[0]); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L3_error)
-    __pyx_v_port = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_port == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L3_error)
+    __pyx_v_host = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(values[0]); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 69, __pyx_L3_error)
+    __pyx_v_port = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_port == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 69, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("start", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 66, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("start", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 69, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10315,8 +10393,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("start", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_start(__pyx_v_self, __pyx_v_host, __pyx_v_port, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 66, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_start(__pyx_v_self, __pyx_v_host, __pyx_v_port, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -10333,7 +10411,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":88
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":91
  *         self.running = True
  * 
  *     cpdef void stop(self) except *:             # <<<<<<<<<<<<<<
@@ -10376,7 +10454,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_stop); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_stop); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 91, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_5stop)) {
         __pyx_t_3 = NULL;
@@ -10399,7 +10477,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 88, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 91, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10419,7 +10497,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
     #endif
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":90
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":93
  *     cpdef void stop(self) except *:
  *         """Stop the shuffle server."""
  *         if not self.running:             # <<<<<<<<<<<<<<
@@ -10429,7 +10507,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
   __pyx_t_6 = (!(__pyx_v_self->running != 0));
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":91
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":94
  *         """Stop the shuffle server."""
  *         if not self.running:
  *             return             # <<<<<<<<<<<<<<
@@ -10438,7 +10516,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
 */
     goto __pyx_L0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":90
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":93
  *     cpdef void stop(self) except *:
  *         """Stop the shuffle server."""
  *         if not self.running:             # <<<<<<<<<<<<<<
@@ -10447,25 +10525,25 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer
 */
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":94
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":97
  * 
  *         # Stop Flight server
  *         self.flight_server.stop()             # <<<<<<<<<<<<<<
  *         self.running = False
  * 
 */
-  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer *)__pyx_v_self->flight_server->__pyx_vtab)->stop(__pyx_v_self->flight_server); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 94, __pyx_L1_error)
+  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer *)__pyx_v_self->flight_server->__pyx_vtab)->stop(__pyx_v_self->flight_server); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 97, __pyx_L1_error)
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":95
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":98
  *         # Stop Flight server
  *         self.flight_server.stop()
  *         self.running = False             # <<<<<<<<<<<<<<
  * 
- *     def register_partition(
+ *     cpdef void set_task_slot_manager(self, object task_slot_manager):
 */
   __pyx_v_self->running = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":88
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":91
  *         self.running = True
  * 
  *     cpdef void stop(self) except *:             # <<<<<<<<<<<<<<
@@ -10537,8 +10615,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("stop", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_stop(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 88, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_stop(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 91, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -10555,8 +10633,239 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":97
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":100
  *         self.running = False
+ * 
+ *     cpdef void set_task_slot_manager(self, object task_slot_manager):             # <<<<<<<<<<<<<<
+ *         """
+ *         Wire task slot manager for network morsel processing.
+*/
+
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7set_task_slot_manager(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_set_task_slot_manager(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, PyObject *__pyx_v_task_slot_manager, int __pyx_skip_dispatch) {
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_5;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("set_task_slot_manager", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (
+  #if !CYTHON_USE_TYPE_SLOTS
+  unlikely(Py_TYPE(((PyObject *)__pyx_v_self)) != __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer &&
+  __Pyx_PyType_HasFeature(Py_TYPE(((PyObject *)__pyx_v_self)), Py_TPFLAGS_HAVE_GC))
+  #else
+  unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0 || __Pyx_PyType_HasFeature(Py_TYPE(((PyObject *)__pyx_v_self)), (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))
+  #endif
+  ) {
+    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
+      PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      #endif
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_set_task_slot_manager); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7set_task_slot_manager)) {
+        __pyx_t_3 = NULL;
+        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_4 = __pyx_t_1; 
+        __pyx_t_5 = 1;
+        #if CYTHON_UNPACK_METHODS
+        if (unlikely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+          assert(__pyx_t_3);
+          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_3);
+          __Pyx_INCREF(__pyx__function);
+          __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
+          __pyx_t_5 = 0;
+        }
+        #endif
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_task_slot_manager};
+          __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_2);
+        }
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        goto __pyx_L0;
+      }
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
+      if (unlikely(__pyx_typedict_guard != __pyx_tp_dict_version)) {
+        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+      }
+      #endif
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    }
+    #endif
+  }
+
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":107
+ *             task_slot_manager: TaskSlotManager instance from sabot._c.task_slot_manager
+ *         """
+ *         self.task_slot_manager = task_slot_manager             # <<<<<<<<<<<<<<
+ * 
+ *     def register_partition(
+*/
+  __Pyx_INCREF(__pyx_v_task_slot_manager);
+  __Pyx_GIVEREF(__pyx_v_task_slot_manager);
+  __Pyx_GOTREF(__pyx_v_self->task_slot_manager);
+  __Pyx_DECREF(__pyx_v_self->task_slot_manager);
+  __pyx_v_self->task_slot_manager = __pyx_v_task_slot_manager;
+
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":100
+ *         self.running = False
+ * 
+ *     cpdef void set_task_slot_manager(self, object task_slot_manager):             # <<<<<<<<<<<<<<
+ *         """
+ *         Wire task slot manager for network morsel processing.
+*/
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_AddTraceback("sabot._cython.shuffle.shuffle_transport.ShuffleServer.set_task_slot_manager", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7set_task_slot_manager(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_6set_task_slot_manager, "\n        Wire task slot manager for network morsel processing.\n\n        Args:\n            task_slot_manager: TaskSlotManager instance from sabot._c.task_slot_manager\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7set_task_slot_manager = {"set_task_slot_manager", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7set_task_slot_manager, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_6set_task_slot_manager};
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7set_task_slot_manager(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  PyObject *__pyx_v_task_slot_manager = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("set_task_slot_manager (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_task_slot_manager,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 100, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 100, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "set_task_slot_manager", 0) < 0) __PYX_ERR(0, 100, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("set_task_slot_manager", 1, 1, 1, i); __PYX_ERR(0, 100, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 100, __pyx_L3_error)
+    }
+    __pyx_v_task_slot_manager = values[0];
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("set_task_slot_manager", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 100, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("sabot._cython.shuffle.shuffle_transport.ShuffleServer.set_task_slot_manager", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_6set_task_slot_manager(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_v_self), __pyx_v_task_slot_manager);
+
+  /* function exit code */
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_6set_task_slot_manager(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, PyObject *__pyx_v_task_slot_manager) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("set_task_slot_manager", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_set_task_slot_manager(__pyx_v_self, __pyx_v_task_slot_manager, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("sabot._cython.shuffle.shuffle_transport.ShuffleServer.set_task_slot_manager", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":109
+ *         self.task_slot_manager = task_slot_manager
  * 
  *     def register_partition(             # <<<<<<<<<<<<<<
  *         self,
@@ -10564,16 +10873,16 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7register_partition(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_9register_partition(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_6register_partition, "\n        Register partition data for serving (lock-free, <100ns).\n\n        Args:\n            shuffle_id: Shuffle identifier\n            partition_id: Partition ID\n            batch: Batch to serve (Cython ca.RecordBatch)\n\n        Uses atomic CAS-based insertion, no locks.\n        ");
-static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7register_partition = {"register_partition", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7register_partition, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_6register_partition};
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7register_partition(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_8register_partition, "\n        Register partition data for serving (lock-free, <100ns).\n\n        Args:\n            shuffle_id: Shuffle identifier\n            partition_id: Partition ID\n            batch: Batch to serve (Cython ca.RecordBatch)\n\n        Uses atomic CAS-based insertion, no locks.\n\n        If task_slot_manager is set, also enqueues as network morsel for processing.\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_9register_partition = {"register_partition", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_9register_partition, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_8register_partition};
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_9register_partition(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -10605,46 +10914,46 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_shuffle_id,&__pyx_mstate_global->__pyx_n_u_partition_id,&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 97, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 109, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 97, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 109, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 97, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 109, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 97, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 109, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "register_partition", 0) < 0) __PYX_ERR(0, 97, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "register_partition", 0) < 0) __PYX_ERR(0, 109, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("register_partition", 1, 3, 3, i); __PYX_ERR(0, 97, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("register_partition", 1, 3, 3, i); __PYX_ERR(0, 109, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 3)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 97, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 109, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 97, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 109, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 97, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 109, __pyx_L3_error)
     }
     __pyx_v_shuffle_id = ((PyObject*)values[0]);
-    __pyx_v_partition_id = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_partition_id == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 100, __pyx_L3_error)
+    __pyx_v_partition_id = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_partition_id == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 112, __pyx_L3_error)
     __pyx_v_batch = ((struct __pyx_obj_7pyarrow_3lib_RecordBatch *)values[2]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("register_partition", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 97, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("register_partition", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 109, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10655,9 +10964,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 99, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_batch), __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch, 1, "batch", 0))) __PYX_ERR(0, 101, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_6register_partition(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_v_self), __pyx_v_shuffle_id, __pyx_v_partition_id, __pyx_v_batch);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 111, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_batch), __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch, 1, "batch", 0))) __PYX_ERR(0, 113, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_8register_partition(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_v_self), __pyx_v_shuffle_id, __pyx_v_partition_id, __pyx_v_batch);
 
   /* function exit code */
   goto __pyx_L0;
@@ -10676,7 +10985,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_6register_partition(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch) {
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_8register_partition(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch) {
   int64_t __pyx_v_shuffle_hash;
   std::shared_ptr< arrow::RecordBatch>  __pyx_v_batch_cpp;
   PyObject *__pyx_r = NULL;
@@ -10685,12 +10994,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
   Py_ssize_t __pyx_t_2;
   int64_t __pyx_t_3;
   std::shared_ptr< arrow::RecordBatch>  __pyx_t_4;
+  int __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  PyObject *__pyx_t_8 = NULL;
+  PyObject *__pyx_t_9 = NULL;
+  size_t __pyx_t_10;
+  PyObject *__pyx_t_11 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("register_partition", 0);
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":115
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":129
  *         # Hash shuffle ID
  *         cdef int64_t shuffle_hash = hash_shuffle_id(
  *             <const char*>shuffle_id,             # <<<<<<<<<<<<<<
@@ -10699,11 +11015,11 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
 */
   if (unlikely(__pyx_v_shuffle_id == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-    __PYX_ERR(0, 115, __pyx_L1_error)
+    __PYX_ERR(0, 129, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyBytes_AsString(__pyx_v_shuffle_id); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBytes_AsString(__pyx_v_shuffle_id); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) __PYX_ERR(0, 129, __pyx_L1_error)
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":116
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":130
  *         cdef int64_t shuffle_hash = hash_shuffle_id(
  *             <const char*>shuffle_id,
  *             len(shuffle_id)             # <<<<<<<<<<<<<<
@@ -10712,41 +11028,108 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
 */
   if (unlikely(__pyx_v_shuffle_id == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 116, __pyx_L1_error)
+    __PYX_ERR(0, 130, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyBytes_GET_SIZE(__pyx_v_shuffle_id); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 116, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBytes_GET_SIZE(__pyx_v_shuffle_id); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 130, __pyx_L1_error)
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":114
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":128
  *         """
  *         # Hash shuffle ID
  *         cdef int64_t shuffle_hash = hash_shuffle_id(             # <<<<<<<<<<<<<<
  *             <const char*>shuffle_id,
  *             len(shuffle_id)
 */
-  __pyx_t_3 = __pyx_f_5sabot_7_cython_7shuffle_25flight_transport_lockfree_hash_shuffle_id(((char const *)__pyx_t_1), __pyx_t_2); if (unlikely(__pyx_t_3 == ((int64_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 114, __pyx_L1_error)
+  __pyx_t_3 = __pyx_f_5sabot_7_cython_7shuffle_25flight_transport_lockfree_hash_shuffle_id(((char const *)__pyx_t_1), __pyx_t_2); if (unlikely(__pyx_t_3 == ((int64_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 128, __pyx_L1_error)
   __pyx_v_shuffle_hash = __pyx_t_3;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":120
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":134
  * 
  *         # Unwrap to C++ shared_ptr
  *         cdef shared_ptr[PCRecordBatch] batch_cpp = _unwrap_batch(batch)             # <<<<<<<<<<<<<<
  * 
  *         # Lock-free register with Flight server (atomic insert)
 */
-  __pyx_t_4 = __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport__unwrap_batch(__pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 120, __pyx_L1_error)
+  __pyx_t_4 = __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport__unwrap_batch(__pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 134, __pyx_L1_error)
   __pyx_v_batch_cpp = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_4);
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":124
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":138
  *         # Lock-free register with Flight server (atomic insert)
  *         # Note: register_partition is declared nogil, so GIL is released automatically
  *         self.flight_server.register_partition(shuffle_hash, partition_id, batch_cpp)             # <<<<<<<<<<<<<<
  * 
- * 
+ *         # If task slot manager is wired, enqueue as network morsel
 */
-  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer *)__pyx_v_self->flight_server->__pyx_vtab)->register_partition(__pyx_v_self->flight_server, __pyx_v_shuffle_hash, __pyx_v_partition_id, __pyx_v_batch_cpp); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 124, __pyx_L1_error)
+  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer *)__pyx_v_self->flight_server->__pyx_vtab)->register_partition(__pyx_v_self->flight_server, __pyx_v_shuffle_hash, __pyx_v_partition_id, __pyx_v_batch_cpp); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 138, __pyx_L1_error)
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":97
- *         self.running = False
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":141
+ * 
+ *         # If task slot manager is wired, enqueue as network morsel
+ *         if self.task_slot_manager is not None:             # <<<<<<<<<<<<<<
+ *             # Enqueue entire batch as network morsel
+ *             self.task_slot_manager.enqueue_morsel(
+*/
+  __pyx_t_5 = (__pyx_v_self->task_slot_manager != Py_None);
+  if (__pyx_t_5) {
+
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":143
+ *         if self.task_slot_manager is not None:
+ *             # Enqueue entire batch as network morsel
+ *             self.task_slot_manager.enqueue_morsel(             # <<<<<<<<<<<<<<
+ *                 batch,
+ *                 start_row=0,
+*/
+    __pyx_t_7 = __pyx_v_self->task_slot_manager;
+    __Pyx_INCREF(__pyx_t_7);
+
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":146
+ *                 batch,
+ *                 start_row=0,
+ *                 num_rows=batch.num_rows,             # <<<<<<<<<<<<<<
+ *                 partition_id=partition_id,
+ *                 source='network'
+*/
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_batch), __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 146, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":147
+ *                 start_row=0,
+ *                 num_rows=batch.num_rows,
+ *                 partition_id=partition_id,             # <<<<<<<<<<<<<<
+ *                 source='network'
+ *             )
+*/
+    __pyx_t_9 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 147, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_10 = 0;
+    {
+      PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 4 : 0)] = {__pyx_t_7, ((PyObject *)__pyx_v_batch)};
+      __pyx_t_11 = __Pyx_MakeVectorcallBuilderKwds(4); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 143, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_11);
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_start_row, __pyx_mstate_global->__pyx_int_0, __pyx_t_11, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_num_rows, __pyx_t_8, __pyx_t_11, __pyx_callargs+2, 1) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_partition_id, __pyx_t_9, __pyx_t_11, __pyx_callargs+2, 2) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_source, __pyx_mstate_global->__pyx_n_u_network, __pyx_t_11, __pyx_callargs+2, 3) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_Object_VectorcallMethod_CallFromBuilder(__pyx_mstate_global->__pyx_n_u_enqueue_morsel, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_11);
+      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+      __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 143, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_6);
+    }
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":141
+ * 
+ *         # If task slot manager is wired, enqueue as network morsel
+ *         if self.task_slot_manager is not None:             # <<<<<<<<<<<<<<
+ *             # Enqueue entire batch as network morsel
+ *             self.task_slot_manager.enqueue_morsel(
+*/
+  }
+
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":109
+ *         self.task_slot_manager = task_slot_manager
  * 
  *     def register_partition(             # <<<<<<<<<<<<<<
  *         self,
@@ -10757,6 +11140,11 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
   __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_11);
   __Pyx_AddTraceback("sabot._cython.shuffle.shuffle_transport.ShuffleServer.register_partition", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -10772,15 +11160,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_9__reduce_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_11__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_9__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_9__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_9__reduce_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_11__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_11__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_11__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -10806,14 +11194,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("__reduce_cython__", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_8__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_10__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_8__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_10__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -10853,15 +11241,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_11__setstate_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_13__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_11__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_11__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_11__setstate_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_13__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_13__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_13__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -10927,7 +11315,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_10__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_v_self), __pyx_v___pyx_state);
+  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_12__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_v_self), __pyx_v___pyx_state);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -10937,7 +11325,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_10__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_12__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -10969,7 +11357,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":136
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":161
  *     """
  * 
  *     def __cinit__(self, int32_t max_connections=10, int32_t max_retries=3,             # <<<<<<<<<<<<<<
@@ -11001,63 +11389,63 @@ static int __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_max_connections,&__pyx_mstate_global->__pyx_n_u_max_retries,&__pyx_mstate_global->__pyx_n_u_timeout_seconds,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 136, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 161, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 136, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 161, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 136, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 161, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 136, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 161, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__cinit__", 0) < 0) __PYX_ERR(0, 136, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__cinit__", 0) < 0) __PYX_ERR(0, 161, __pyx_L3_error)
     } else {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 136, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 161, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 136, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 161, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 136, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 161, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
     }
     if (values[0]) {
-      __pyx_v_max_connections = __Pyx_PyLong_As_int32_t(values[0]); if (unlikely((__pyx_v_max_connections == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 136, __pyx_L3_error)
+      __pyx_v_max_connections = __Pyx_PyLong_As_int32_t(values[0]); if (unlikely((__pyx_v_max_connections == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 161, __pyx_L3_error)
     } else {
       __pyx_v_max_connections = ((int32_t)10);
     }
     if (values[1]) {
-      __pyx_v_max_retries = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_max_retries == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 136, __pyx_L3_error)
+      __pyx_v_max_retries = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_max_retries == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 161, __pyx_L3_error)
     } else {
       __pyx_v_max_retries = ((int32_t)3);
     }
     if (values[2]) {
-      __pyx_v_timeout_seconds = __Pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_timeout_seconds == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 137, __pyx_L3_error)
+      __pyx_v_timeout_seconds = __Pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_timeout_seconds == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 162, __pyx_L3_error)
     } else {
       __pyx_v_timeout_seconds = ((double)30.0);
     }
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 0, 0, 3, __pyx_nargs); __PYX_ERR(0, 136, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 0, 0, 3, __pyx_nargs); __PYX_ERR(0, 161, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -11093,7 +11481,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":139
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":164
  *                   double timeout_seconds=30.0):
  *         """Initialize shuffle client (lock-free)."""
  *         self.max_connections = max_connections             # <<<<<<<<<<<<<<
@@ -11102,7 +11490,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient
 */
   __pyx_v_self->max_connections = __pyx_v_max_connections;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":140
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":165
  *         """Initialize shuffle client (lock-free)."""
  *         self.max_connections = max_connections
  *         self.max_retries = max_retries             # <<<<<<<<<<<<<<
@@ -11111,7 +11499,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient
 */
   __pyx_v_self->max_retries = __pyx_v_max_retries;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":141
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":166
  *         self.max_connections = max_connections
  *         self.max_retries = max_retries
  *         self.timeout_seconds = timeout_seconds             # <<<<<<<<<<<<<<
@@ -11120,7 +11508,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient
 */
   __pyx_v_self->timeout_seconds = __pyx_v_timeout_seconds;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":144
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":169
  * 
  *         # Create lock-free Flight client (NO mutexes, atomic connection pool)
  *         self.flight_client = LockFreeFlightClient(max_connections, max_retries, timeout_seconds)             # <<<<<<<<<<<<<<
@@ -11130,11 +11518,11 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient
   __pyx_t_2 = NULL;
   __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightClient);
   __pyx_t_3 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightClient); 
-  __pyx_t_4 = __Pyx_PyLong_From_int32_t(__pyx_v_max_connections); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyLong_From_int32_t(__pyx_v_max_connections); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 169, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyLong_From_int32_t(__pyx_v_max_retries); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyLong_From_int32_t(__pyx_v_max_retries); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 169, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = PyFloat_FromDouble(__pyx_v_timeout_seconds); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_6 = PyFloat_FromDouble(__pyx_v_timeout_seconds); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 169, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_7 = 1;
   {
@@ -11145,7 +11533,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 169, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __Pyx_GIVEREF((PyObject *)__pyx_t_1);
@@ -11154,7 +11542,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient
   __pyx_v_self->flight_client = ((struct __pyx_obj_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightClient *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":136
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":161
  *     """
  * 
  *     def __cinit__(self, int32_t max_connections=10, int32_t max_retries=3,             # <<<<<<<<<<<<<<
@@ -11179,7 +11567,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":146
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":171
  *         self.flight_client = LockFreeFlightClient(max_connections, max_retries, timeout_seconds)
  * 
  *     def fetch_partition(             # <<<<<<<<<<<<<<
@@ -11230,53 +11618,53 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_host,&__pyx_mstate_global->__pyx_n_u_port,&__pyx_mstate_global->__pyx_n_u_shuffle_id,&__pyx_mstate_global->__pyx_n_u_partition_id,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 146, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 171, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 146, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 171, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 146, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 171, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 146, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 171, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 146, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 171, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "fetch_partition", 0) < 0) __PYX_ERR(0, 146, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "fetch_partition", 0) < 0) __PYX_ERR(0, 171, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 4; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("fetch_partition", 1, 4, 4, i); __PYX_ERR(0, 146, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("fetch_partition", 1, 4, 4, i); __PYX_ERR(0, 171, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 4)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 146, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 171, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 146, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 171, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 146, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 171, __pyx_L3_error)
       values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 146, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 171, __pyx_L3_error)
     }
     __pyx_v_host = ((PyObject*)values[0]);
-    __pyx_v_port = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_port == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 149, __pyx_L3_error)
+    __pyx_v_port = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_port == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 174, __pyx_L3_error)
     __pyx_v_shuffle_id = ((PyObject*)values[2]);
-    __pyx_v_partition_id = __Pyx_PyLong_As_int32_t(values[3]); if (unlikely((__pyx_v_partition_id == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 151, __pyx_L3_error)
+    __pyx_v_partition_id = __Pyx_PyLong_As_int32_t(values[3]); if (unlikely((__pyx_v_partition_id == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 176, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("fetch_partition", 1, 4, 4, __pyx_nargs); __PYX_ERR(0, 146, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("fetch_partition", 1, 4, 4, __pyx_nargs); __PYX_ERR(0, 171, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -11287,8 +11675,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_host), (&PyBytes_Type), 1, "host", 1))) __PYX_ERR(0, 148, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 150, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_host), (&PyBytes_Type), 1, "host", 1))) __PYX_ERR(0, 173, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 175, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient_2fetch_partition(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient *)__pyx_v_self), __pyx_v_host, __pyx_v_port, __pyx_v_shuffle_id, __pyx_v_partition_id);
 
   /* function exit code */
@@ -11325,7 +11713,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("fetch_partition", 0);
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":169
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":194
  *         # Hash shuffle ID
  *         cdef int64_t shuffle_hash = hash_shuffle_id(
  *             <const char*>shuffle_id,             # <<<<<<<<<<<<<<
@@ -11334,11 +11722,11 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
 */
   if (unlikely(__pyx_v_shuffle_id == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-    __PYX_ERR(0, 169, __pyx_L1_error)
+    __PYX_ERR(0, 194, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyBytes_AsString(__pyx_v_shuffle_id); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBytes_AsString(__pyx_v_shuffle_id); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) __PYX_ERR(0, 194, __pyx_L1_error)
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":170
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":195
  *         cdef int64_t shuffle_hash = hash_shuffle_id(
  *             <const char*>shuffle_id,
  *             len(shuffle_id)             # <<<<<<<<<<<<<<
@@ -11347,21 +11735,21 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
 */
   if (unlikely(__pyx_v_shuffle_id == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 170, __pyx_L1_error)
+    __PYX_ERR(0, 195, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyBytes_GET_SIZE(__pyx_v_shuffle_id); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBytes_GET_SIZE(__pyx_v_shuffle_id); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 195, __pyx_L1_error)
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":168
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":193
  *         """
  *         # Hash shuffle ID
  *         cdef int64_t shuffle_hash = hash_shuffle_id(             # <<<<<<<<<<<<<<
  *             <const char*>shuffle_id,
  *             len(shuffle_id)
 */
-  __pyx_t_3 = __pyx_f_5sabot_7_cython_7shuffle_25flight_transport_lockfree_hash_shuffle_id(((char const *)__pyx_t_1), __pyx_t_2); if (unlikely(__pyx_t_3 == ((int64_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 168, __pyx_L1_error)
+  __pyx_t_3 = __pyx_f_5sabot_7_cython_7shuffle_25flight_transport_lockfree_hash_shuffle_id(((char const *)__pyx_t_1), __pyx_t_2); if (unlikely(__pyx_t_3 == ((int64_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 193, __pyx_L1_error)
   __pyx_v_shuffle_hash = __pyx_t_3;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":176
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":201
  *         # Note: fetch_partition is declared nogil, so GIL is released automatically
  *         cdef shared_ptr[PCRecordBatch] batch_cpp = self.flight_client.fetch_partition(
  *             <const char*>host,             # <<<<<<<<<<<<<<
@@ -11370,21 +11758,21 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
 */
   if (unlikely(__pyx_v_host == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-    __PYX_ERR(0, 176, __pyx_L1_error)
+    __PYX_ERR(0, 201, __pyx_L1_error)
   }
-  __pyx_t_4 = __Pyx_PyBytes_AsString(__pyx_v_host); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyBytes_AsString(__pyx_v_host); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) __PYX_ERR(0, 201, __pyx_L1_error)
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":175
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":200
  *         # Lock-free fetch using Flight client (atomic connection pool)
  *         # Note: fetch_partition is declared nogil, so GIL is released automatically
  *         cdef shared_ptr[PCRecordBatch] batch_cpp = self.flight_client.fetch_partition(             # <<<<<<<<<<<<<<
  *             <const char*>host,
  *             port,
 */
-  __pyx_t_5 = ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightClient *)__pyx_v_self->flight_client->__pyx_vtab)->fetch_partition(__pyx_v_self->flight_client, ((char const *)__pyx_t_4), __pyx_v_port, __pyx_v_shuffle_hash, __pyx_v_partition_id); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 175, __pyx_L1_error)
+  __pyx_t_5 = ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightClient *)__pyx_v_self->flight_client->__pyx_vtab)->fetch_partition(__pyx_v_self->flight_client, ((char const *)__pyx_t_4), __pyx_v_port, __pyx_v_shuffle_hash, __pyx_v_partition_id); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 200, __pyx_L1_error)
   __pyx_v_batch_cpp = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_5);
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":183
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":208
  * 
  *         # Wrap C++ shared_ptr as Cython RecordBatch (zero-copy)
  *         if batch_cpp:             # <<<<<<<<<<<<<<
@@ -11394,7 +11782,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
   __pyx_t_6 = __pyx_v_batch_cpp.operator bool();
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":184
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":209
  *         # Wrap C++ shared_ptr as Cython RecordBatch (zero-copy)
  *         if batch_cpp:
  *             return _wrap_batch(batch_cpp)             # <<<<<<<<<<<<<<
@@ -11402,13 +11790,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
  *             # Return empty batch on error
 */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_7 = ((PyObject *)__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport__wrap_batch(__pyx_v_batch_cpp)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 184, __pyx_L1_error)
+    __pyx_t_7 = ((PyObject *)__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport__wrap_batch(__pyx_v_batch_cpp)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 209, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_r = __pyx_t_7;
     __pyx_t_7 = 0;
     goto __pyx_L0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":183
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":208
  * 
  *         # Wrap C++ shared_ptr as Cython RecordBatch (zero-copy)
  *         if batch_cpp:             # <<<<<<<<<<<<<<
@@ -11417,7 +11805,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
 */
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":187
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":212
  *         else:
  *             # Return empty batch on error
  *             return None             # <<<<<<<<<<<<<<
@@ -11430,7 +11818,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":146
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":171
  *         self.flight_client = LockFreeFlightClient(max_connections, max_retries, timeout_seconds)
  * 
  *     def fetch_partition(             # <<<<<<<<<<<<<<
@@ -11653,7 +12041,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_13Shuffle
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":199
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":224
  *     """
  * 
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -11698,7 +12086,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":201
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":226
  *     def __cinit__(self):
  *         """Initialize shuffle transport."""
  *         self.initialized = False             # <<<<<<<<<<<<<<
@@ -11707,7 +12095,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 */
   __pyx_v_self->initialized = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":204
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":229
  * 
  *         # Create server and client components (configured in start())
  *         self.server = ShuffleServer()             # <<<<<<<<<<<<<<
@@ -11723,7 +12111,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_4, (1-__pyx_t_4) | (__pyx_t_4*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 229, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __Pyx_GIVEREF((PyObject *)__pyx_t_1);
@@ -11732,7 +12120,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
   __pyx_v_self->server = ((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":205
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":230
  *         # Create server and client components (configured in start())
  *         self.server = ShuffleServer()
  *         self.client = ShuffleClient()             # <<<<<<<<<<<<<<
@@ -11748,7 +12136,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+__pyx_t_4, (1-__pyx_t_4) | (__pyx_t_4*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 230, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __Pyx_GIVEREF((PyObject *)__pyx_t_1);
@@ -11757,7 +12145,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
   __pyx_v_self->client = ((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":199
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":224
  *     """
  * 
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -11779,7 +12167,7 @@ static int __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":207
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":232
  *         self.client = ShuffleClient()
  * 
  *     cpdef void start(self, string host, int32_t port) except *:             # <<<<<<<<<<<<<<
@@ -11824,15 +12212,15 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 232, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_3start)) {
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; 
-        __pyx_t_5 = __pyx_convert_PyBytes_string_to_py_6libcpp_6string_std__in_string(__pyx_v_host); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 207, __pyx_L1_error)
+        __pyx_t_5 = __pyx_convert_PyBytes_string_to_py_6libcpp_6string_std__in_string(__pyx_v_host); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 232, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_port); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_port); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 232, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __pyx_t_7 = 1;
         #if CYTHON_UNPACK_METHODS
@@ -11853,7 +12241,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 232, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -11873,7 +12261,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     #endif
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":215
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":240
  *             port: Agent port
  *         """
  *         if self.initialized:             # <<<<<<<<<<<<<<
@@ -11883,7 +12271,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
   __pyx_t_8 = (__pyx_v_self->initialized != 0);
   if (__pyx_t_8) {
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":216
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":241
  *         """
  *         if self.initialized:
  *             return             # <<<<<<<<<<<<<<
@@ -11892,7 +12280,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 */
     goto __pyx_L0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":215
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":240
  *             port: Agent port
  *         """
  *         if self.initialized:             # <<<<<<<<<<<<<<
@@ -11901,7 +12289,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 */
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":219
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":244
  * 
  *         # Store agent address
  *         self.agent_host = host             # <<<<<<<<<<<<<<
@@ -11910,7 +12298,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 */
   __pyx_v_self->agent_host = __pyx_v_host;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":220
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":245
  *         # Store agent address
  *         self.agent_host = host
  *         self.agent_port = port             # <<<<<<<<<<<<<<
@@ -11919,25 +12307,25 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 */
   __pyx_v_self->agent_port = __pyx_v_port;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":223
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":248
  * 
  *         # Start server on agent's address
  *         self.server.start(host, port)             # <<<<<<<<<<<<<<
  * 
  *         self.initialized = True
 */
-  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_v_self->server->__pyx_vtab)->start(__pyx_v_self->server, __pyx_v_host, __pyx_v_port, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 223, __pyx_L1_error)
+  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_v_self->server->__pyx_vtab)->start(__pyx_v_self->server, __pyx_v_host, __pyx_v_port, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 248, __pyx_L1_error)
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":225
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":250
  *         self.server.start(host, port)
  * 
  *         self.initialized = True             # <<<<<<<<<<<<<<
  * 
- *     cpdef void stop(self) except *:
+ *     cpdef void set_task_slot_manager(self, object task_slot_manager):
 */
   __pyx_v_self->initialized = 1;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":207
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":232
  *         self.client = ShuffleClient()
  * 
  *     cpdef void start(self, string host, int32_t port) except *:             # <<<<<<<<<<<<<<
@@ -12000,39 +12388,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_host,&__pyx_mstate_global->__pyx_n_u_port,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 207, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 232, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 207, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 232, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 207, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 232, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "start", 0) < 0) __PYX_ERR(0, 207, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "start", 0) < 0) __PYX_ERR(0, 232, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("start", 1, 2, 2, i); __PYX_ERR(0, 207, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("start", 1, 2, 2, i); __PYX_ERR(0, 232, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 207, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 232, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 207, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 232, __pyx_L3_error)
     }
-    __pyx_v_host = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(values[0]); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 207, __pyx_L3_error)
-    __pyx_v_port = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_port == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 207, __pyx_L3_error)
+    __pyx_v_host = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(values[0]); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 232, __pyx_L3_error)
+    __pyx_v_port = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_port == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 232, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("start", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 207, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("start", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 232, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -12062,8 +12450,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("start", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start(__pyx_v_self, __pyx_v_host, __pyx_v_port, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 207, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start(__pyx_v_self, __pyx_v_host, __pyx_v_port, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 232, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 232, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -12080,15 +12468,242 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":227
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":252
  *         self.initialized = True
+ * 
+ *     cpdef void set_task_slot_manager(self, object task_slot_manager):             # <<<<<<<<<<<<<<
+ *         """
+ *         Wire task slot manager for unified local + network morsel processing.
+*/
+
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5set_task_slot_manager(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_set_task_slot_manager(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_task_slot_manager, int __pyx_skip_dispatch) {
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_5;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("set_task_slot_manager", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (
+  #if !CYTHON_USE_TYPE_SLOTS
+  unlikely(Py_TYPE(((PyObject *)__pyx_v_self)) != __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport &&
+  __Pyx_PyType_HasFeature(Py_TYPE(((PyObject *)__pyx_v_self)), Py_TPFLAGS_HAVE_GC))
+  #else
+  unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0 || __Pyx_PyType_HasFeature(Py_TYPE(((PyObject *)__pyx_v_self)), (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))
+  #endif
+  ) {
+    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
+      PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      #endif
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_set_task_slot_manager); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5set_task_slot_manager)) {
+        __pyx_t_3 = NULL;
+        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_4 = __pyx_t_1; 
+        __pyx_t_5 = 1;
+        #if CYTHON_UNPACK_METHODS
+        if (unlikely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+          assert(__pyx_t_3);
+          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_3);
+          __Pyx_INCREF(__pyx__function);
+          __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
+          __pyx_t_5 = 0;
+        }
+        #endif
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_task_slot_manager};
+          __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 252, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_2);
+        }
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        goto __pyx_L0;
+      }
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
+      if (unlikely(__pyx_typedict_guard != __pyx_tp_dict_version)) {
+        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+      }
+      #endif
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    }
+    #endif
+  }
+
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":259
+ *             task_slot_manager: TaskSlotManager instance from sabot._c.task_slot_manager
+ *         """
+ *         self.server.set_task_slot_manager(task_slot_manager)             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef void stop(self) except *:
+*/
+  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_v_self->server->__pyx_vtab)->set_task_slot_manager(__pyx_v_self->server, __pyx_v_task_slot_manager, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 259, __pyx_L1_error)
+
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":252
+ *         self.initialized = True
+ * 
+ *     cpdef void set_task_slot_manager(self, object task_slot_manager):             # <<<<<<<<<<<<<<
+ *         """
+ *         Wire task slot manager for unified local + network morsel processing.
+*/
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_AddTraceback("sabot._cython.shuffle.shuffle_transport.ShuffleTransport.set_task_slot_manager", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5set_task_slot_manager(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_4set_task_slot_manager, "\n        Wire task slot manager for unified local + network morsel processing.\n\n        Args:\n            task_slot_manager: TaskSlotManager instance from sabot._c.task_slot_manager\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5set_task_slot_manager = {"set_task_slot_manager", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5set_task_slot_manager, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_4set_task_slot_manager};
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5set_task_slot_manager(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  PyObject *__pyx_v_task_slot_manager = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("set_task_slot_manager (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_task_slot_manager,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 252, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 252, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "set_task_slot_manager", 0) < 0) __PYX_ERR(0, 252, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("set_task_slot_manager", 1, 1, 1, i); __PYX_ERR(0, 252, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 252, __pyx_L3_error)
+    }
+    __pyx_v_task_slot_manager = values[0];
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("set_task_slot_manager", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 252, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("sabot._cython.shuffle.shuffle_transport.ShuffleTransport.set_task_slot_manager", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_4set_task_slot_manager(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self), __pyx_v_task_slot_manager);
+
+  /* function exit code */
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_4set_task_slot_manager(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_task_slot_manager) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("set_task_slot_manager", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_set_task_slot_manager(__pyx_v_self, __pyx_v_task_slot_manager, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("sabot._cython.shuffle.shuffle_transport.ShuffleTransport.set_task_slot_manager", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":261
+ *         self.server.set_task_slot_manager(task_slot_manager)
  * 
  *     cpdef void stop(self) except *:             # <<<<<<<<<<<<<<
  *         """Stop server and client."""
  *         if not self.initialized:
 */
 
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5stop(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7stop(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -12123,9 +12738,9 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_stop); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_stop); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 261, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5stop)) {
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7stop)) {
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; 
@@ -12146,7 +12761,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 227, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 261, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -12166,7 +12781,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     #endif
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":229
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":263
  *     cpdef void stop(self) except *:
  *         """Stop server and client."""
  *         if not self.initialized:             # <<<<<<<<<<<<<<
@@ -12176,7 +12791,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
   __pyx_t_6 = (!(__pyx_v_self->initialized != 0));
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":230
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":264
  *         """Stop server and client."""
  *         if not self.initialized:
  *             return             # <<<<<<<<<<<<<<
@@ -12185,7 +12800,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 */
     goto __pyx_L0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":229
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":263
  *     cpdef void stop(self) except *:
  *         """Stop server and client."""
  *         if not self.initialized:             # <<<<<<<<<<<<<<
@@ -12194,16 +12809,16 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 */
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":232
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":266
  *             return
  * 
  *         self.server.stop()             # <<<<<<<<<<<<<<
  *         self.initialized = False
  * 
 */
-  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_v_self->server->__pyx_vtab)->stop(__pyx_v_self->server, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 232, __pyx_L1_error)
+  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)__pyx_v_self->server->__pyx_vtab)->stop(__pyx_v_self->server, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 266, __pyx_L1_error)
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":233
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":267
  * 
  *         self.server.stop()
  *         self.initialized = False             # <<<<<<<<<<<<<<
@@ -12212,8 +12827,8 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 */
   __pyx_v_self->initialized = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":227
- *         self.initialized = True
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":261
+ *         self.server.set_task_slot_manager(task_slot_manager)
  * 
  *     cpdef void stop(self) except *:             # <<<<<<<<<<<<<<
  *         """Stop server and client."""
@@ -12233,16 +12848,16 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5stop(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7stop(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_4stop, "Stop server and client.");
-static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5stop = {"stop", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5stop, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_4stop};
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5stop(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_6stop, "Stop server and client.");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7stop = {"stop", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7stop, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_6stop};
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7stop(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -12268,14 +12883,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("stop", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_4stop(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_6stop(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_4stop(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_6stop(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -12284,8 +12899,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("stop", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_stop(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 227, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_stop(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 261, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 261, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -12302,7 +12917,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":235
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":269
  *         self.initialized = False
  * 
  *     cdef void publish_partition(             # <<<<<<<<<<<<<<
@@ -12321,7 +12936,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("publish_partition", 0);
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":249
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":283
  *             batch: Batch to publish (Cython ca.RecordBatch)
  *         """
  *         self.server.register_partition(shuffle_id, partition_id, batch)             # <<<<<<<<<<<<<<
@@ -12330,7 +12945,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 */
   __pyx_t_2 = ((PyObject *)__pyx_v_self->server);
   __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 249, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 283, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = 0;
   {
@@ -12338,12 +12953,12 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_register_partition, __pyx_callargs+__pyx_t_4, (4-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 249, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 283, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":235
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":269
  *         self.initialized = False
  * 
  *     cdef void publish_partition(             # <<<<<<<<<<<<<<
@@ -12362,7 +12977,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
   __Pyx_RefNannyFinishContext();
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":251
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":285
  *         self.server.register_partition(shuffle_id, partition_id, batch)
  * 
  *     cdef ca.RecordBatch fetch_partition_from_agent(             # <<<<<<<<<<<<<<
@@ -12387,7 +13002,7 @@ static struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_f_5sabot_7_cython_7shuf
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("fetch_partition_from_agent", 0);
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":269
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":303
  *         """
  *         # Parse agent address
  *         parts = agent_address.decode('utf-8').split(':')             # <<<<<<<<<<<<<<
@@ -12396,17 +13011,17 @@ static struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_f_5sabot_7_cython_7shuf
 */
   if (unlikely(__pyx_v_agent_address == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
-    __PYX_ERR(0, 269, __pyx_L1_error)
+    __PYX_ERR(0, 303, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_decode_bytes(__pyx_v_agent_address, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_decode_bytes(__pyx_v_agent_address, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyUnicode_Split(((PyObject*)__pyx_t_1), __Pyx_NoneAsNull(__pyx_mstate_global->__pyx_kp_u_), -1L); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_2 = PyUnicode_Split(((PyObject*)__pyx_t_1), __Pyx_NoneAsNull(__pyx_mstate_global->__pyx_kp_u_), -1L); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_parts = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":270
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":304
  *         # Parse agent address
  *         parts = agent_address.decode('utf-8').split(':')
  *         host = parts[0].encode('utf-8')             # <<<<<<<<<<<<<<
@@ -12420,23 +13035,23 @@ static struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_f_5sabot_7_cython_7shuf
     PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_mstate_global->__pyx_kp_u_utf_8};
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_encode, __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 304, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __pyx_v_host = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":271
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":305
  *         parts = agent_address.decode('utf-8').split(':')
  *         host = parts[0].encode('utf-8')
  *         port = int(parts[1]) if len(parts) > 1 else 8816             # <<<<<<<<<<<<<<
  * 
  *         return self.client.fetch_partition(host, port, shuffle_id, partition_id)
 */
-  __pyx_t_4 = __Pyx_PyList_GET_SIZE(__pyx_v_parts); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 271, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyList_GET_SIZE(__pyx_v_parts); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 305, __pyx_L1_error)
   __pyx_t_5 = (__pyx_t_4 > 1);
   if (__pyx_t_5) {
-    __pyx_t_1 = __Pyx_PyNumber_Int(__Pyx_PyList_GET_ITEM(__pyx_v_parts, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 271, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Int(__Pyx_PyList_GET_ITEM(__pyx_v_parts, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 305, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_2 = __pyx_t_1;
     __pyx_t_1 = 0;
@@ -12447,7 +13062,7 @@ static struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_f_5sabot_7_cython_7shuf
   __pyx_v_port = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":273
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":307
  *         port = int(parts[1]) if len(parts) > 1 else 8816
  * 
  *         return self.client.fetch_partition(host, port, shuffle_id, partition_id)             # <<<<<<<<<<<<<<
@@ -12457,7 +13072,7 @@ static struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_f_5sabot_7_cython_7shuf
   __Pyx_XDECREF((PyObject *)__pyx_r);
   __pyx_t_1 = ((PyObject *)__pyx_v_self->client);
   __Pyx_INCREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 273, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 307, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_3 = 0;
   {
@@ -12465,15 +13080,15 @@ static struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_f_5sabot_7_cython_7shuf
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_fetch_partition, __pyx_callargs+__pyx_t_3, (5-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 273, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 307, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch))))) __PYX_ERR(0, 273, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch))))) __PYX_ERR(0, 307, __pyx_L1_error)
   __pyx_r = ((struct __pyx_obj_7pyarrow_3lib_RecordBatch *)__pyx_t_2);
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":251
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":285
  *         self.server.register_partition(shuffle_id, partition_id, batch)
  * 
  *     cdef ca.RecordBatch fetch_partition_from_agent(             # <<<<<<<<<<<<<<
@@ -12497,7 +13112,7 @@ static struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_f_5sabot_7_cython_7shuf
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":279
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":313
  *     # ========================================================================
  * 
  *     cpdef void start_shuffle(             # <<<<<<<<<<<<<<
@@ -12505,7 +13120,7 @@ static struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_f_5sabot_7_cython_7shuf
  *         bytes shuffle_id,
 */
 
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7start_shuffle(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9start_shuffle(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -12514,7 +13129,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 ); /*proto*/
 static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start_shuffle(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_num_partitions, PyObject *__pyx_v_downstream_agents, int __pyx_skip_dispatch, struct __pyx_opt_args_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start_shuffle *__pyx_optional_args) {
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":284
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":318
  *         int32_t num_partitions,
  *         list downstream_agents,
  *         list upstream_agents=None             # <<<<<<<<<<<<<<
@@ -12541,7 +13156,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     }
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":279
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":313
  *     # ========================================================================
  * 
  *     cpdef void start_shuffle(             # <<<<<<<<<<<<<<
@@ -12564,13 +13179,13 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_start_shuffle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_start_shuffle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 313, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7start_shuffle)) {
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9start_shuffle)) {
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; 
-        __pyx_t_5 = __Pyx_PyLong_From_int32_t(__pyx_v_num_partitions); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 279, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyLong_From_int32_t(__pyx_v_num_partitions); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 313, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __pyx_t_6 = 1;
         #if CYTHON_UNPACK_METHODS
@@ -12590,7 +13205,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 279, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 313, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -12610,30 +13225,30 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     #endif
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":296
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":330
  *         """
  *         # Store shuffle metadata
  *         if not hasattr(self, '_active_shuffles'):             # <<<<<<<<<<<<<<
  *             self._active_shuffles = {}
  * 
 */
-  __pyx_t_7 = __Pyx_HasAttr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(__pyx_t_7 == ((int)-1))) __PYX_ERR(0, 296, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_HasAttr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(__pyx_t_7 == ((int)-1))) __PYX_ERR(0, 330, __pyx_L1_error)
   __pyx_t_8 = (!__pyx_t_7);
   if (__pyx_t_8) {
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":297
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":331
  *         # Store shuffle metadata
  *         if not hasattr(self, '_active_shuffles'):
  *             self._active_shuffles = {}             # <<<<<<<<<<<<<<
  * 
  *         self._active_shuffles[shuffle_id] = {
 */
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 331, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles, __pyx_t_1) < 0) __PYX_ERR(0, 297, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles, __pyx_t_1) < 0) __PYX_ERR(0, 331, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":296
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":330
  *         """
  *         # Store shuffle metadata
  *         if not hasattr(self, '_active_shuffles'):             # <<<<<<<<<<<<<<
@@ -12642,30 +13257,30 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 */
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":300
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":334
  * 
  *         self._active_shuffles[shuffle_id] = {
  *             'num_partitions': num_partitions,             # <<<<<<<<<<<<<<
  *             'downstream_agents': downstream_agents,
  *             'upstream_agents': upstream_agents if upstream_agents is not None else []
 */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 300, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 334, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyLong_From_int32_t(__pyx_v_num_partitions); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 300, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int32_t(__pyx_v_num_partitions); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 334, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_num_partitions, __pyx_t_2) < 0) __PYX_ERR(0, 300, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_num_partitions, __pyx_t_2) < 0) __PYX_ERR(0, 334, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":301
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":335
  *         self._active_shuffles[shuffle_id] = {
  *             'num_partitions': num_partitions,
  *             'downstream_agents': downstream_agents,             # <<<<<<<<<<<<<<
  *             'upstream_agents': upstream_agents if upstream_agents is not None else []
  *         }
 */
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_downstream_agents, __pyx_v_downstream_agents) < 0) __PYX_ERR(0, 300, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_downstream_agents, __pyx_v_downstream_agents) < 0) __PYX_ERR(0, 334, __pyx_L1_error)
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":302
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":336
  *             'num_partitions': num_partitions,
  *             'downstream_agents': downstream_agents,
  *             'upstream_agents': upstream_agents if upstream_agents is not None else []             # <<<<<<<<<<<<<<
@@ -12677,28 +13292,28 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     __Pyx_INCREF(__pyx_v_upstream_agents);
     __pyx_t_2 = __pyx_v_upstream_agents;
   } else {
-    __pyx_t_4 = PyList_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 302, __pyx_L1_error)
+    __pyx_t_4 = PyList_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 336, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_2 = __pyx_t_4;
     __pyx_t_4 = 0;
   }
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_upstream_agents, __pyx_t_2) < 0) __PYX_ERR(0, 300, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_upstream_agents, __pyx_t_2) < 0) __PYX_ERR(0, 334, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":299
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":333
  *             self._active_shuffles = {}
  * 
  *         self._active_shuffles[shuffle_id] = {             # <<<<<<<<<<<<<<
  *             'num_partitions': num_partitions,
  *             'downstream_agents': downstream_agents,
 */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 333, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (unlikely((PyObject_SetItem(__pyx_t_2, __pyx_v_shuffle_id, __pyx_t_1) < 0))) __PYX_ERR(0, 299, __pyx_L1_error)
+  if (unlikely((PyObject_SetItem(__pyx_t_2, __pyx_v_shuffle_id, __pyx_t_1) < 0))) __PYX_ERR(0, 333, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":279
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":313
  *     # ========================================================================
  * 
  *     cpdef void start_shuffle(             # <<<<<<<<<<<<<<
@@ -12720,16 +13335,16 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7start_shuffle(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9start_shuffle(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_6start_shuffle, "\n        Initialize shuffle for operator.\n\n        Args:\n            shuffle_id: Unique shuffle identifier\n            num_partitions: Number of downstream partitions\n            downstream_agents: List of \"host:port\" for downstream tasks\n            upstream_agents: List of \"host:port\" for upstream tasks (optional)\n        ");
-static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7start_shuffle = {"start_shuffle", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7start_shuffle, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_6start_shuffle};
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7start_shuffle(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_8start_shuffle, "\n        Initialize shuffle for operator.\n\n        Args:\n            shuffle_id: Unique shuffle identifier\n            num_partitions: Number of downstream partitions\n            downstream_agents: List of \"host:port\" for downstream tasks\n            upstream_agents: List of \"host:port\" for upstream tasks (optional)\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9start_shuffle = {"start_shuffle", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9start_shuffle, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_8start_shuffle};
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9start_shuffle(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -12762,32 +13377,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_shuffle_id,&__pyx_mstate_global->__pyx_n_u_num_partitions,&__pyx_mstate_global->__pyx_n_u_downstream_agents,&__pyx_mstate_global->__pyx_n_u_upstream_agents,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 279, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 313, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 279, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 313, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 279, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 313, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 279, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 313, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 279, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 313, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "start_shuffle", 0) < 0) __PYX_ERR(0, 279, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "start_shuffle", 0) < 0) __PYX_ERR(0, 313, __pyx_L3_error)
 
-      /* "sabot/_cython/shuffle/shuffle_transport.pyx":284
+      /* "sabot/_cython/shuffle/shuffle_transport.pyx":318
  *         int32_t num_partitions,
  *         list downstream_agents,
  *         list upstream_agents=None             # <<<<<<<<<<<<<<
@@ -12796,34 +13411,34 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 */
       if (!values[3]) values[3] = __Pyx_NewRef(((PyObject*)Py_None));
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("start_shuffle", 0, 3, 4, i); __PYX_ERR(0, 279, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("start_shuffle", 0, 3, 4, i); __PYX_ERR(0, 313, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 279, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 313, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 279, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 313, __pyx_L3_error)
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 279, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 313, __pyx_L3_error)
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 279, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 313, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
       if (!values[3]) values[3] = __Pyx_NewRef(((PyObject*)Py_None));
     }
     __pyx_v_shuffle_id = ((PyObject*)values[0]);
-    __pyx_v_num_partitions = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_num_partitions == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 282, __pyx_L3_error)
+    __pyx_v_num_partitions = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_num_partitions == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 316, __pyx_L3_error)
     __pyx_v_downstream_agents = ((PyObject*)values[2]);
     __pyx_v_upstream_agents = ((PyObject*)values[3]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("start_shuffle", 0, 3, 4, __pyx_nargs); __PYX_ERR(0, 279, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("start_shuffle", 0, 3, 4, __pyx_nargs); __PYX_ERR(0, 313, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -12834,12 +13449,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 281, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_downstream_agents), (&PyList_Type), 1, "downstream_agents", 1))) __PYX_ERR(0, 283, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_upstream_agents), (&PyList_Type), 1, "upstream_agents", 1))) __PYX_ERR(0, 284, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_6start_shuffle(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self), __pyx_v_shuffle_id, __pyx_v_num_partitions, __pyx_v_downstream_agents, __pyx_v_upstream_agents);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 315, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_downstream_agents), (&PyList_Type), 1, "downstream_agents", 1))) __PYX_ERR(0, 317, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_upstream_agents), (&PyList_Type), 1, "upstream_agents", 1))) __PYX_ERR(0, 318, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_8start_shuffle(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self), __pyx_v_shuffle_id, __pyx_v_num_partitions, __pyx_v_downstream_agents, __pyx_v_upstream_agents);
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":279
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":313
  *     # ========================================================================
  * 
  *     cpdef void start_shuffle(             # <<<<<<<<<<<<<<
@@ -12864,7 +13479,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_6start_shuffle(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_num_partitions, PyObject *__pyx_v_downstream_agents, PyObject *__pyx_v_upstream_agents) {
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_8start_shuffle(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_num_partitions, PyObject *__pyx_v_downstream_agents, PyObject *__pyx_v_upstream_agents) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   struct __pyx_opt_args_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start_shuffle __pyx_t_1;
@@ -12876,8 +13491,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_1.__pyx_n = 1;
   __pyx_t_1.upstream_agents = __pyx_v_upstream_agents;
-  __pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport->start_shuffle(__pyx_v_self, __pyx_v_shuffle_id, __pyx_v_num_partitions, __pyx_v_downstream_agents, 1, &__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 279, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport->start_shuffle(__pyx_v_self, __pyx_v_shuffle_id, __pyx_v_num_partitions, __pyx_v_downstream_agents, 1, &__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 313, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 313, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
@@ -12894,7 +13509,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":305
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":339
  *         }
  * 
  *     cpdef void send_partition(             # <<<<<<<<<<<<<<
@@ -12902,7 +13517,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
  *         bytes shuffle_id,
 */
 
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9send_partition(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11send_partition(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -12943,13 +13558,13 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_send_partition); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 305, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_send_partition); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 339, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9send_partition)) {
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11send_partition)) {
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; 
-        __pyx_t_5 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 305, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 339, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __pyx_t_6 = 1;
         #if CYTHON_UNPACK_METHODS
@@ -12969,7 +13584,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 305, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 339, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -12989,16 +13604,16 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     #endif
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":324
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":358
  *         """
  *         # First publish locally for remote fetching
  *         self.publish_partition(shuffle_id, partition_id, batch)             # <<<<<<<<<<<<<<
  * 
  *         # Parse target agent
 */
-  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self->__pyx_vtab)->publish_partition(__pyx_v_self, __pyx_v_shuffle_id, __pyx_v_partition_id, __pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 324, __pyx_L1_error)
+  ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self->__pyx_vtab)->publish_partition(__pyx_v_self, __pyx_v_shuffle_id, __pyx_v_partition_id, __pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 358, __pyx_L1_error)
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":327
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":361
  * 
  *         # Parse target agent
  *         agent_str = target_agent.decode('utf-8')             # <<<<<<<<<<<<<<
@@ -13007,26 +13622,26 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 */
   if (unlikely(__pyx_v_target_agent == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
-    __PYX_ERR(0, 327, __pyx_L1_error)
+    __PYX_ERR(0, 361, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_decode_bytes(__pyx_v_target_agent, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 327, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_decode_bytes(__pyx_v_target_agent, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_agent_str = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":328
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":362
  *         # Parse target agent
  *         agent_str = target_agent.decode('utf-8')
  *         parts = agent_str.split(':')             # <<<<<<<<<<<<<<
  *         host = parts[0].encode('utf-8')
  *         port = int(parts[1]) if len(parts) > 1 else 8816
 */
-  __pyx_t_1 = PyUnicode_Split(__pyx_v_agent_str, __Pyx_NoneAsNull(__pyx_mstate_global->__pyx_kp_u_), -1L); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 328, __pyx_L1_error)
+  __pyx_t_1 = PyUnicode_Split(__pyx_v_agent_str, __Pyx_NoneAsNull(__pyx_mstate_global->__pyx_kp_u_), -1L); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_parts = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":329
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":363
  *         agent_str = target_agent.decode('utf-8')
  *         parts = agent_str.split(':')
  *         host = parts[0].encode('utf-8')             # <<<<<<<<<<<<<<
@@ -13040,23 +13655,23 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_mstate_global->__pyx_kp_u_utf_8};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_encode, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 329, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 363, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_host = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":330
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":364
  *         parts = agent_str.split(':')
  *         host = parts[0].encode('utf-8')
  *         port = int(parts[1]) if len(parts) > 1 else 8816             # <<<<<<<<<<<<<<
  * 
  *         # Send notification to target agent
 */
-  __pyx_t_7 = __Pyx_PyList_GET_SIZE(__pyx_v_parts); if (unlikely(__pyx_t_7 == ((Py_ssize_t)-1))) __PYX_ERR(0, 330, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyList_GET_SIZE(__pyx_v_parts); if (unlikely(__pyx_t_7 == ((Py_ssize_t)-1))) __PYX_ERR(0, 364, __pyx_L1_error)
   __pyx_t_8 = (__pyx_t_7 > 1);
   if (__pyx_t_8) {
-    __pyx_t_2 = __Pyx_PyNumber_Int(__Pyx_PyList_GET_ITEM(__pyx_v_parts, 1)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 330, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyNumber_Int(__Pyx_PyList_GET_ITEM(__pyx_v_parts, 1)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 364, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_1 = __pyx_t_2;
     __pyx_t_2 = 0;
@@ -13067,7 +13682,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
   __pyx_v_port = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":305
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":339
  *         }
  * 
  *     cpdef void send_partition(             # <<<<<<<<<<<<<<
@@ -13093,16 +13708,16 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9send_partition(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11send_partition(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_8send_partition, "\n        Send partition to downstream agent via Arrow Flight.\n\n        Uses zero-copy Arrow Flight transfer.\n\n        Args:\n            shuffle_id: Shuffle identifier\n            partition_id: Partition ID within shuffle\n            batch: Batch to send (Cython ca.RecordBatch)\n            target_agent: \"host:port\" of target agent\n        ");
-static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9send_partition = {"send_partition", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9send_partition, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_8send_partition};
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9send_partition(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_10send_partition, "\n        Send partition to downstream agent via Arrow Flight.\n\n        Uses zero-copy Arrow Flight transfer.\n\n        Args:\n            shuffle_id: Shuffle identifier\n            partition_id: Partition ID within shuffle\n            batch: Batch to send (Cython ca.RecordBatch)\n            target_agent: \"host:port\" of target agent\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11send_partition = {"send_partition", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11send_partition, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_10send_partition};
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11send_partition(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -13135,53 +13750,53 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_shuffle_id,&__pyx_mstate_global->__pyx_n_u_partition_id,&__pyx_mstate_global->__pyx_n_u_batch,&__pyx_mstate_global->__pyx_n_u_target_agent,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 305, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 339, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 305, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 339, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 305, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 339, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 305, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 339, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 305, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 339, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "send_partition", 0) < 0) __PYX_ERR(0, 305, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "send_partition", 0) < 0) __PYX_ERR(0, 339, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 4; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("send_partition", 1, 4, 4, i); __PYX_ERR(0, 305, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("send_partition", 1, 4, 4, i); __PYX_ERR(0, 339, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 4)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 305, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 339, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 305, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 339, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 305, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 339, __pyx_L3_error)
       values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 305, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 339, __pyx_L3_error)
     }
     __pyx_v_shuffle_id = ((PyObject*)values[0]);
-    __pyx_v_partition_id = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_partition_id == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 308, __pyx_L3_error)
+    __pyx_v_partition_id = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_partition_id == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 342, __pyx_L3_error)
     __pyx_v_batch = ((struct __pyx_obj_7pyarrow_3lib_RecordBatch *)values[2]);
     __pyx_v_target_agent = ((PyObject*)values[3]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("send_partition", 1, 4, 4, __pyx_nargs); __PYX_ERR(0, 305, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("send_partition", 1, 4, 4, __pyx_nargs); __PYX_ERR(0, 339, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -13192,10 +13807,10 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 307, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_batch), __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch, 1, "batch", 0))) __PYX_ERR(0, 309, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_target_agent), (&PyBytes_Type), 1, "target_agent", 1))) __PYX_ERR(0, 310, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_8send_partition(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self), __pyx_v_shuffle_id, __pyx_v_partition_id, __pyx_v_batch, __pyx_v_target_agent);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 341, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_batch), __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch, 1, "batch", 0))) __PYX_ERR(0, 343, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_target_agent), (&PyBytes_Type), 1, "target_agent", 1))) __PYX_ERR(0, 344, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_10send_partition(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self), __pyx_v_shuffle_id, __pyx_v_partition_id, __pyx_v_batch, __pyx_v_target_agent);
 
   /* function exit code */
   goto __pyx_L0;
@@ -13214,7 +13829,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_8send_partition(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch, PyObject *__pyx_v_target_agent) {
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_10send_partition(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch, PyObject *__pyx_v_target_agent) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -13223,8 +13838,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("send_partition", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_send_partition(__pyx_v_self, __pyx_v_shuffle_id, __pyx_v_partition_id, __pyx_v_batch, __pyx_v_target_agent, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 305, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 305, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_send_partition(__pyx_v_self, __pyx_v_shuffle_id, __pyx_v_partition_id, __pyx_v_batch, __pyx_v_target_agent, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 339, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 339, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -13241,7 +13856,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":337
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":371
  *         pass
  * 
  *     cpdef list receive_partitions(             # <<<<<<<<<<<<<<
@@ -13249,7 +13864,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
  *         bytes shuffle_id,
 */
 
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11receive_partitions(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13receive_partitions(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -13303,14 +13918,14 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_receive_partitions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_receive_partitions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 371, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11receive_partitions)) {
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13receive_partitions)) {
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; 
-        __pyx_t_5 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 337, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 371, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __pyx_t_6 = 1;
         #if CYTHON_UNPACK_METHODS
@@ -13330,10 +13945,10 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 337, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 371, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_2))) __PYX_ERR(0, 337, __pyx_L1_error)
+        if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_2))) __PYX_ERR(0, 371, __pyx_L1_error)
         __pyx_r = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -13352,41 +13967,41 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
     #endif
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":354
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":388
  *             List of RecordBatches for this partition
  *         """
  *         cdef list result = []             # <<<<<<<<<<<<<<
  *         cdef ca.RecordBatch batch
  *         cdef bytes agent_addr
 */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 388, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_result = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":362
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":396
  * 
  *         # Get shuffle metadata
  *         if not hasattr(self, '_active_shuffles') or shuffle_id not in self._active_shuffles:             # <<<<<<<<<<<<<<
  *             return result
  * 
 */
-  __pyx_t_8 = __Pyx_HasAttr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 362, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_HasAttr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 396, __pyx_L1_error)
   __pyx_t_9 = (!__pyx_t_8);
   if (!__pyx_t_9) {
   } else {
     __pyx_t_7 = __pyx_t_9;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 396, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_9 = (__Pyx_PySequence_ContainsTF(__pyx_v_shuffle_id, __pyx_t_1, Py_NE)); if (unlikely((__pyx_t_9 < 0))) __PYX_ERR(0, 362, __pyx_L1_error)
+  __pyx_t_9 = (__Pyx_PySequence_ContainsTF(__pyx_v_shuffle_id, __pyx_t_1, Py_NE)); if (unlikely((__pyx_t_9 < 0))) __PYX_ERR(0, 396, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_7 = __pyx_t_9;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_7) {
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":363
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":397
  *         # Get shuffle metadata
  *         if not hasattr(self, '_active_shuffles') or shuffle_id not in self._active_shuffles:
  *             return result             # <<<<<<<<<<<<<<
@@ -13398,7 +14013,7 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
     __pyx_r = __pyx_v_result;
     goto __pyx_L0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":362
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":396
  * 
  *         # Get shuffle metadata
  *         if not hasattr(self, '_active_shuffles') or shuffle_id not in self._active_shuffles:             # <<<<<<<<<<<<<<
@@ -13407,22 +14022,22 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
 */
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":365
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":399
  *             return result
  * 
  *         shuffle_info = self._active_shuffles[shuffle_id]             # <<<<<<<<<<<<<<
  * 
  *         # Get upstream agents (agents that will send data to us)
 */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 365, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 399, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_shuffle_id); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 365, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_shuffle_id); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 399, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_shuffle_info = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":370
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":404
  *         # For now, we assume all agents in the shuffle are upstream
  *         # In a real implementation, this would come from JobManager
  *         upstream_agents = shuffle_info.get('upstream_agents', [])             # <<<<<<<<<<<<<<
@@ -13431,7 +14046,7 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
 */
   __pyx_t_1 = __pyx_v_shuffle_info;
   __Pyx_INCREF(__pyx_t_1);
-  __pyx_t_4 = PyList_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 370, __pyx_L1_error)
+  __pyx_t_4 = PyList_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 404, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_6 = 0;
   {
@@ -13439,24 +14054,24 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_get, __pyx_callargs+__pyx_t_6, (3-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 370, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 404, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __pyx_v_upstream_agents = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":372
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":406
  *         upstream_agents = shuffle_info.get('upstream_agents', [])
  * 
  *         if not upstream_agents:             # <<<<<<<<<<<<<<
  *             # No upstream agents specified - try to fetch from all known agents
  *             # This is a fallback for testing
 */
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_v_upstream_agents); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_v_upstream_agents); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 406, __pyx_L1_error)
   __pyx_t_9 = (!__pyx_t_7);
   if (__pyx_t_9) {
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":375
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":409
  *             # No upstream agents specified - try to fetch from all known agents
  *             # This is a fallback for testing
  *             upstream_agents = shuffle_info.get('downstream_agents', [])             # <<<<<<<<<<<<<<
@@ -13465,7 +14080,7 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
 */
     __pyx_t_4 = __pyx_v_shuffle_info;
     __Pyx_INCREF(__pyx_t_4);
-    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 375, __pyx_L1_error)
+    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 409, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_6 = 0;
     {
@@ -13473,13 +14088,13 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_get, __pyx_callargs+__pyx_t_6, (3-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 375, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 409, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __Pyx_DECREF_SET(__pyx_v_upstream_agents, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":372
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":406
  *         upstream_agents = shuffle_info.get('upstream_agents', [])
  * 
  *         if not upstream_agents:             # <<<<<<<<<<<<<<
@@ -13488,7 +14103,7 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
 */
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":378
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":412
  * 
  *         # Fetch partition from each upstream agent
  *         for agent_addr in upstream_agents:             # <<<<<<<<<<<<<<
@@ -13500,9 +14115,9 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
     __pyx_t_10 = 0;
     __pyx_t_11 = NULL;
   } else {
-    __pyx_t_10 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_upstream_agents); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 378, __pyx_L1_error)
+    __pyx_t_10 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_upstream_agents); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 412, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_11 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 378, __pyx_L1_error)
+    __pyx_t_11 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 412, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_11)) {
@@ -13510,7 +14125,7 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 378, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 412, __pyx_L1_error)
           #endif
           if (__pyx_t_10 >= __pyx_temp) break;
         }
@@ -13520,7 +14135,7 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 378, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 412, __pyx_L1_error)
           #endif
           if (__pyx_t_10 >= __pyx_temp) break;
         }
@@ -13531,24 +14146,24 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
         #endif
         ++__pyx_t_10;
       }
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 378, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 412, __pyx_L1_error)
     } else {
       __pyx_t_1 = __pyx_t_11(__pyx_t_2);
       if (unlikely(!__pyx_t_1)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 378, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 412, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
       }
     }
     __Pyx_GOTREF(__pyx_t_1);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_1))) __PYX_ERR(0, 378, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_1))) __PYX_ERR(0, 412, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_agent_addr, ((PyObject*)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":380
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":414
  *         for agent_addr in upstream_agents:
  *             # Parse agent address (host:port format)
  *             agent_str = agent_addr.decode('utf-8') if isinstance(agent_addr, bytes) else agent_addr             # <<<<<<<<<<<<<<
@@ -13559,9 +14174,9 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
     if (__pyx_t_9) {
       if (unlikely(__pyx_v_agent_addr == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
-        __PYX_ERR(0, 380, __pyx_L1_error)
+        __PYX_ERR(0, 414, __pyx_L1_error)
       }
-      __pyx_t_4 = __Pyx_decode_bytes(__pyx_v_agent_addr, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 380, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_decode_bytes(__pyx_v_agent_addr, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 414, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_1 = __pyx_t_4;
       __pyx_t_4 = 0;
@@ -13572,7 +14187,7 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
     __Pyx_XDECREF_SET(__pyx_v_agent_str, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":381
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":415
  *             # Parse agent address (host:port format)
  *             agent_str = agent_addr.decode('utf-8') if isinstance(agent_addr, bytes) else agent_addr
  *             parts = agent_str.split(':')             # <<<<<<<<<<<<<<
@@ -13586,20 +14201,20 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
       PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_mstate_global->__pyx_kp_u_};
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_split, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 381, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 415, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_XDECREF_SET(__pyx_v_parts, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":382
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":416
  *             agent_str = agent_addr.decode('utf-8') if isinstance(agent_addr, bytes) else agent_addr
  *             parts = agent_str.split(':')
  *             host = parts[0].encode('utf-8')             # <<<<<<<<<<<<<<
  *             port = int(parts[1]) if len(parts) > 1 else 8816
  * 
 */
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_parts, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 382, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_parts, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 416, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_4 = __pyx_t_5;
     __Pyx_INCREF(__pyx_t_4);
@@ -13609,29 +14224,29 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_encode, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 382, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 416, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
-    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_1))) __PYX_ERR(0, 382, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_1))) __PYX_ERR(0, 416, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_host, ((PyObject*)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":383
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":417
  *             parts = agent_str.split(':')
  *             host = parts[0].encode('utf-8')
  *             port = int(parts[1]) if len(parts) > 1 else 8816             # <<<<<<<<<<<<<<
  * 
  *             # Fetch partition from this agent
 */
-    __pyx_t_13 = PyObject_Length(__pyx_v_parts); if (unlikely(__pyx_t_13 == ((Py_ssize_t)-1))) __PYX_ERR(0, 383, __pyx_L1_error)
+    __pyx_t_13 = PyObject_Length(__pyx_v_parts); if (unlikely(__pyx_t_13 == ((Py_ssize_t)-1))) __PYX_ERR(0, 417, __pyx_L1_error)
     __pyx_t_9 = (__pyx_t_13 > 1);
     if (__pyx_t_9) {
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_parts, 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 383, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_parts, 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 417, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 383, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 417, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_14 = __Pyx_PyLong_As_int32_t(__pyx_t_5); if (unlikely((__pyx_t_14 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 383, __pyx_L1_error)
+      __pyx_t_14 = __Pyx_PyLong_As_int32_t(__pyx_t_5); if (unlikely((__pyx_t_14 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 417, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_12 = __pyx_t_14;
     } else {
@@ -13639,7 +14254,7 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
     }
     __pyx_v_port = __pyx_t_12;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":386
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":420
  * 
  *             # Fetch partition from this agent
  *             batch = self.client.fetch_partition(host, port, shuffle_id, partition_id)             # <<<<<<<<<<<<<<
@@ -13648,9 +14263,9 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
 */
     __pyx_t_1 = ((PyObject *)__pyx_v_self->client);
     __Pyx_INCREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyLong_From_int32_t(__pyx_v_port); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 386, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyLong_From_int32_t(__pyx_v_port); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 420, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 386, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 420, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_6 = 0;
     {
@@ -13659,14 +14274,14 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 386, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 420, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
     }
-    if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch))))) __PYX_ERR(0, 386, __pyx_L1_error)
+    if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch))))) __PYX_ERR(0, 420, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_batch, ((struct __pyx_obj_7pyarrow_3lib_RecordBatch *)__pyx_t_5));
     __pyx_t_5 = 0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":388
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":422
  *             batch = self.client.fetch_partition(host, port, shuffle_id, partition_id)
  * 
  *             if batch is not None:             # <<<<<<<<<<<<<<
@@ -13676,16 +14291,16 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
     __pyx_t_9 = (((PyObject *)__pyx_v_batch) != Py_None);
     if (__pyx_t_9) {
 
-      /* "sabot/_cython/shuffle/shuffle_transport.pyx":389
+      /* "sabot/_cython/shuffle/shuffle_transport.pyx":423
  * 
  *             if batch is not None:
  *                 result.append(batch)             # <<<<<<<<<<<<<<
  * 
  *         return result
 */
-      __pyx_t_15 = __Pyx_PyList_Append(__pyx_v_result, ((PyObject *)__pyx_v_batch)); if (unlikely(__pyx_t_15 == ((int)-1))) __PYX_ERR(0, 389, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyList_Append(__pyx_v_result, ((PyObject *)__pyx_v_batch)); if (unlikely(__pyx_t_15 == ((int)-1))) __PYX_ERR(0, 423, __pyx_L1_error)
 
-      /* "sabot/_cython/shuffle/shuffle_transport.pyx":388
+      /* "sabot/_cython/shuffle/shuffle_transport.pyx":422
  *             batch = self.client.fetch_partition(host, port, shuffle_id, partition_id)
  * 
  *             if batch is not None:             # <<<<<<<<<<<<<<
@@ -13694,7 +14309,7 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
 */
     }
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":378
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":412
  * 
  *         # Fetch partition from each upstream agent
  *         for agent_addr in upstream_agents:             # <<<<<<<<<<<<<<
@@ -13704,7 +14319,7 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":391
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":425
  *                 result.append(batch)
  * 
  *         return result             # <<<<<<<<<<<<<<
@@ -13716,7 +14331,7 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
   __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":337
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":371
  *         pass
  * 
  *     cpdef list receive_partitions(             # <<<<<<<<<<<<<<
@@ -13748,16 +14363,16 @@ static PyObject *__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleT
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11receive_partitions(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13receive_partitions(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_10receive_partitions, "\n        Receive all partitions for a shuffle operation.\n\n        Pulls data from upstream agents that have sent partitions for this task.\n\n        Args:\n            shuffle_id: Shuffle identifier\n            partition_id: This agent's partition ID\n\n        Returns:\n            List of RecordBatches for this partition\n        ");
-static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11receive_partitions = {"receive_partitions", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11receive_partitions, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_10receive_partitions};
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11receive_partitions(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_12receive_partitions, "\n        Receive all partitions for a shuffle operation.\n\n        Pulls data from upstream agents that have sent partitions for this task.\n\n        Args:\n            shuffle_id: Shuffle identifier\n            partition_id: This agent's partition ID\n\n        Returns:\n            List of RecordBatches for this partition\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13receive_partitions = {"receive_partitions", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13receive_partitions, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_12receive_partitions};
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13receive_partitions(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -13788,39 +14403,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_shuffle_id,&__pyx_mstate_global->__pyx_n_u_partition_id,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 337, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 371, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 337, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 371, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 337, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 371, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "receive_partitions", 0) < 0) __PYX_ERR(0, 337, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "receive_partitions", 0) < 0) __PYX_ERR(0, 371, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("receive_partitions", 1, 2, 2, i); __PYX_ERR(0, 337, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("receive_partitions", 1, 2, 2, i); __PYX_ERR(0, 371, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 337, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 371, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 337, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 371, __pyx_L3_error)
     }
     __pyx_v_shuffle_id = ((PyObject*)values[0]);
-    __pyx_v_partition_id = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_partition_id == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 340, __pyx_L3_error)
+    __pyx_v_partition_id = __Pyx_PyLong_As_int32_t(values[1]); if (unlikely((__pyx_v_partition_id == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 374, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("receive_partitions", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 337, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("receive_partitions", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 371, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -13831,8 +14446,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 339, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_10receive_partitions(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self), __pyx_v_shuffle_id, __pyx_v_partition_id);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 373, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_12receive_partitions(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self), __pyx_v_shuffle_id, __pyx_v_partition_id);
 
   /* function exit code */
   goto __pyx_L0;
@@ -13851,7 +14466,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_10receive_partitions(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id) {
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_12receive_partitions(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_partition_id) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -13860,7 +14475,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("receive_partitions", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_receive_partitions(__pyx_v_self, __pyx_v_shuffle_id, __pyx_v_partition_id, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_receive_partitions(__pyx_v_self, __pyx_v_shuffle_id, __pyx_v_partition_id, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 371, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -13877,7 +14492,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
   return __pyx_r;
 }
 
-/* "sabot/_cython/shuffle/shuffle_transport.pyx":393
+/* "sabot/_cython/shuffle/shuffle_transport.pyx":427
  *         return result
  * 
  *     cpdef void end_shuffle(self, bytes shuffle_id):             # <<<<<<<<<<<<<<
@@ -13885,7 +14500,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
  *         Clean up shuffle resources.
 */
 
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13end_shuffle(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15end_shuffle(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -13920,9 +14535,9 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_end_shuffle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 393, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_end_shuffle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 427, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13end_shuffle)) {
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15end_shuffle)) {
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; 
@@ -13943,7 +14558,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 393, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 427, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -13963,21 +14578,21 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
     #endif
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":400
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":434
  *             shuffle_id: Shuffle identifier to clean up
  *         """
  *         if hasattr(self, '_active_shuffles'):             # <<<<<<<<<<<<<<
  *             self._active_shuffles.pop(shuffle_id, None)
 */
-  __pyx_t_6 = __Pyx_HasAttr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 400, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_HasAttr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 434, __pyx_L1_error)
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":401
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":435
  *         """
  *         if hasattr(self, '_active_shuffles'):
  *             self._active_shuffles.pop(shuffle_id, None)             # <<<<<<<<<<<<<<
 */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 401, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_active_shuffles); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 435, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_2 = __pyx_t_4;
     __Pyx_INCREF(__pyx_t_2);
@@ -13987,12 +14602,12 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_pop, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 401, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 435, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "sabot/_cython/shuffle/shuffle_transport.pyx":400
+    /* "sabot/_cython/shuffle/shuffle_transport.pyx":434
  *             shuffle_id: Shuffle identifier to clean up
  *         """
  *         if hasattr(self, '_active_shuffles'):             # <<<<<<<<<<<<<<
@@ -14000,7 +14615,7 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 */
   }
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":393
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":427
  *         return result
  * 
  *     cpdef void end_shuffle(self, bytes shuffle_id):             # <<<<<<<<<<<<<<
@@ -14021,16 +14636,16 @@ static void __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransp
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13end_shuffle(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15end_shuffle(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_12end_shuffle, "\n        Clean up shuffle resources.\n\n        Args:\n            shuffle_id: Shuffle identifier to clean up\n        ");
-static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13end_shuffle = {"end_shuffle", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13end_shuffle, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_12end_shuffle};
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13end_shuffle(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_14end_shuffle, "\n        Clean up shuffle resources.\n\n        Args:\n            shuffle_id: Shuffle identifier to clean up\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15end_shuffle = {"end_shuffle", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15end_shuffle, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_14end_shuffle};
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15end_shuffle(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -14060,32 +14675,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_shuffle_id,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 393, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 427, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 393, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 427, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "end_shuffle", 0) < 0) __PYX_ERR(0, 393, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "end_shuffle", 0) < 0) __PYX_ERR(0, 427, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("end_shuffle", 1, 1, 1, i); __PYX_ERR(0, 393, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("end_shuffle", 1, 1, 1, i); __PYX_ERR(0, 427, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 393, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 427, __pyx_L3_error)
     }
     __pyx_v_shuffle_id = ((PyObject*)values[0]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("end_shuffle", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 393, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("end_shuffle", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 427, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -14096,8 +14711,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 393, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_12end_shuffle(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self), __pyx_v_shuffle_id);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 427, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_14end_shuffle(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self), __pyx_v_shuffle_id);
 
   /* function exit code */
   goto __pyx_L0;
@@ -14116,7 +14731,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_12end_shuffle(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id) {
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_14end_shuffle(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, PyObject *__pyx_v_shuffle_id) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -14125,8 +14740,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("end_shuffle", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_end_shuffle(__pyx_v_self, __pyx_v_shuffle_id, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 393, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 393, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_end_shuffle(__pyx_v_self, __pyx_v_shuffle_id, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 427, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 427, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -14150,15 +14765,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15__reduce_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_17__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15__reduce_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_17__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_17__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_17__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -14184,14 +14799,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("__reduce_cython__", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_14__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_16__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_14__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_16__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -14231,15 +14846,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16Shuffle
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_17__setstate_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_19__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_17__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_17__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_17__setstate_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_19__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_19__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_19__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -14305,7 +14920,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_16__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self), __pyx_v___pyx_state);
+  __pyx_r = __pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_18__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *)__pyx_v_self), __pyx_v___pyx_state);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -14315,7 +14930,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_16__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_18__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -14366,6 +14981,7 @@ static PyObject *__pyx_tp_new_5sabot_7_cython_7shuffle_17shuffle_transport_Shuff
   p = ((struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)o);
   p->__pyx_vtab = __pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer;
   __Pyx_default_placement_construct(&(p->host));
+  p->task_slot_manager = Py_None; Py_INCREF(Py_None);
   p->flight_server = ((struct __pyx_obj_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer *)Py_None); Py_INCREF(Py_None);
   if (unlikely(__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_1__cinit__(o, __pyx_mstate_global->__pyx_empty_tuple, NULL) < 0)) goto bad;
   return o;
@@ -14385,6 +15001,7 @@ static void __pyx_tp_dealloc_5sabot_7_cython_7shuffle_17shuffle_transport_Shuffl
   #endif
   PyObject_GC_UnTrack(o);
   __Pyx_call_destructor(p->host);
+  Py_CLEAR(p->task_slot_manager);
   Py_CLEAR(p->flight_server);
   #if CYTHON_USE_TYPE_SLOTS
   (*Py_TYPE(o)->tp_free)(o);
@@ -14403,6 +15020,9 @@ static int __pyx_tp_traverse_5sabot_7_cython_7shuffle_17shuffle_transport_Shuffl
     e = __Pyx_call_type_traverse(o, 1, v, a);
     if (e) return e;
   }
+  if (p->task_slot_manager) {
+    e = (*v)(p->task_slot_manager, a); if (e) return e;
+  }
   if (p->flight_server) {
     e = (*v)(((PyObject *)p->flight_server), a); if (e) return e;
   }
@@ -14412,6 +15032,9 @@ static int __pyx_tp_traverse_5sabot_7_cython_7shuffle_17shuffle_transport_Shuffl
 static int __pyx_tp_clear_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer(PyObject *o) {
   PyObject* tmp;
   struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *p = (struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *)o;
+  tmp = ((PyObject*)p->task_slot_manager);
+  p->task_slot_manager = Py_None; Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
   tmp = ((PyObject*)p->flight_server);
   p->flight_server = ((struct __pyx_obj_5sabot_7_cython_7shuffle_25flight_transport_lockfree_LockFreeFlightServer *)Py_None); Py_INCREF(Py_None);
   Py_XDECREF(tmp);
@@ -14419,15 +15042,15 @@ static int __pyx_tp_clear_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleSe
 }
 
 static PyMethodDef __pyx_methods_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer[] = {
-  {"register_partition", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7register_partition, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_6register_partition},
-  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_9__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_11__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"register_partition", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_9register_partition, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_8register_partition},
+  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_11__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_13__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 #if CYTHON_USE_TYPE_SPECS
 static PyType_Slot __pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer_slots[] = {
   {Py_tp_dealloc, (void *)__pyx_tp_dealloc_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer},
-  {Py_tp_doc, (void *)PyDoc_STR("\n    Shuffle server using Arrow Flight for zero-copy transport.\n    ")},
+  {Py_tp_doc, (void *)PyDoc_STR("\n    Shuffle server using Arrow Flight for zero-copy transport.\n\n    Integrates with TaskSlotManager for unified processing of network morsels.\n    ")},
   {Py_tp_traverse, (void *)__pyx_tp_traverse_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer},
   {Py_tp_clear, (void *)__pyx_tp_clear_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer},
   {Py_tp_methods, (void *)__pyx_methods_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer},
@@ -14469,7 +15092,7 @@ static PyTypeObject __pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_Shuf
   0, /*tp_setattro*/
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
-  PyDoc_STR("\n    Shuffle server using Arrow Flight for zero-copy transport.\n    "), /*tp_doc*/
+  PyDoc_STR("\n    Shuffle server using Arrow Flight for zero-copy transport.\n\n    Integrates with TaskSlotManager for unified processing of network morsels.\n    "), /*tp_doc*/
   __pyx_tp_traverse_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer, /*tp_traverse*/
   __pyx_tp_clear_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer, /*tp_clear*/
   0, /*tp_richcompare*/
@@ -14769,8 +15392,8 @@ static int __pyx_tp_clear_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTr
 }
 
 static PyMethodDef __pyx_methods_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport[] = {
-  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_17__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_17__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_19__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 #if CYTHON_USE_TYPE_SPECS
@@ -14926,6 +15549,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer = &__pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer;
   __pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer.start = (void (*)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *, std::string, int32_t, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_start;
   __pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer.stop = (void (*)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_stop;
+  __pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer.set_task_slot_manager = (void (*)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_set_task_slot_manager;
   #if CYTHON_USE_TYPE_SPECS
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer)) __PYX_ERR(0, 56, __pyx_L1_error)
   if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
@@ -14947,26 +15571,27 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_ShuffleServer, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
   if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient)) __PYX_ERR(0, 131, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient) < 0) __PYX_ERR(0, 131, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient)) __PYX_ERR(0, 156, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient) < 0) __PYX_ERR(0, 156, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient = &__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient) < 0) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient) < 0) __PYX_ERR(0, 156, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient->tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient->tp_getattro = PyObject_GenericGetAttr;
   }
   #endif
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_ShuffleClient, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient) < 0) __PYX_ERR(0, 131, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient) < 0) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_ShuffleClient, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient) < 0) __PYX_ERR(0, 156, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient) < 0) __PYX_ERR(0, 156, __pyx_L1_error)
   __pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport = &__pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport;
   __pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport.start = (void (*)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, std::string, int32_t, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start;
   __pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport.stop = (void (*)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_stop;
+  __pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport.set_task_slot_manager = (void (*)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_set_task_slot_manager;
   __pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport.publish_partition = (void (*)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, int32_t, struct __pyx_obj_7pyarrow_3lib_RecordBatch *))__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_publish_partition;
   __pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport.fetch_partition_from_agent = (struct __pyx_obj_7pyarrow_3lib_RecordBatch *(*)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, PyObject *, int32_t))__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_fetch_partition_from_agent;
   __pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport.start_shuffle = (void (*)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, int32_t, PyObject *, int __pyx_skip_dispatch, struct __pyx_opt_args_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start_shuffle *__pyx_optional_args))__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_start_shuffle;
@@ -14974,25 +15599,25 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport.receive_partitions = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, int32_t, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_receive_partitions;
   __pyx_vtable_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport.end_shuffle = (void (*)(struct __pyx_obj_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_end_shuffle;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport)) __PYX_ERR(0, 194, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) < 0) __PYX_ERR(0, 194, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport)) __PYX_ERR(0, 219, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport = &__pyx_type_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) < 0) __PYX_ERR(0, 194, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport->tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport->tp_getattro = PyObject_GenericGetAttr;
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) < 0) __PYX_ERR(0, 194, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) < 0) __PYX_ERR(0, 194, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_ShuffleTransport, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) < 0) __PYX_ERR(0, 194, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) < 0) __PYX_ERR(0, 194, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_vtabptr_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_ShuffleTransport, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -16454,40 +17079,52 @@ __Pyx_RefNannySetupContext("PyInit_shuffle_transport", 0);
   (void)__Pyx_modinit_function_import_code(__pyx_mstate);
   /*--- Execution code ---*/
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":66
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":69
  *         # Flight server will be created in start()
  * 
  *     cpdef void start(self, string host, int32_t port) except *:             # <<<<<<<<<<<<<<
  *         """
  *         Start the shuffle server on specified address.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_3start, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleServer_start, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_3start, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleServer_start, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer, __pyx_mstate_global->__pyx_n_u_start, __pyx_t_2) < 0) __PYX_ERR(0, 66, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer, __pyx_mstate_global->__pyx_n_u_start, __pyx_t_2) < 0) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":88
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":91
  *         self.running = True
  * 
  *     cpdef void stop(self) except *:             # <<<<<<<<<<<<<<
  *         """Stop the shuffle server."""
  *         if not self.running:
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_5stop, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleServer_stop, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_5stop, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleServer_stop, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 91, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer, __pyx_mstate_global->__pyx_n_u_stop, __pyx_t_2) < 0) __PYX_ERR(0, 88, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer, __pyx_mstate_global->__pyx_n_u_stop, __pyx_t_2) < 0) __PYX_ERR(0, 91, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":97
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":100
  *         self.running = False
+ * 
+ *     cpdef void set_task_slot_manager(self, object task_slot_manager):             # <<<<<<<<<<<<<<
+ *         """
+ *         Wire task slot manager for network morsel processing.
+*/
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7set_task_slot_manager, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleServer_set_task_slot_mana, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer, __pyx_mstate_global->__pyx_n_u_set_task_slot_manager, __pyx_t_2) < 0) __PYX_ERR(0, 100, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":109
+ *         self.task_slot_manager = task_slot_manager
  * 
  *     def register_partition(             # <<<<<<<<<<<<<<
  *         self,
  *         bytes shuffle_id,
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_7register_partition, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleServer_register_partition, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_9register_partition, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleServer_register_partition, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 109, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer, __pyx_mstate_global->__pyx_n_u_register_partition, __pyx_t_2) < 0) __PYX_ERR(0, 97, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleServer, __pyx_mstate_global->__pyx_n_u_register_partition, __pyx_t_2) < 0) __PYX_ERR(0, 109, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
@@ -16495,7 +17132,7 @@ __Pyx_RefNannySetupContext("PyInit_shuffle_transport", 0);
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
  * def __setstate_cython__(self, __pyx_state):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_9__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleServer___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_11__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleServer___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -16506,21 +17143,21 @@ __Pyx_RefNannySetupContext("PyInit_shuffle_transport", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_11__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleServer___setstate_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleServer_13__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleServer___setstate_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_2) < 0) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":146
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":171
  *         self.flight_client = LockFreeFlightClient(max_connections, max_retries, timeout_seconds)
  * 
  *     def fetch_partition(             # <<<<<<<<<<<<<<
  *         self,
  *         bytes host,
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient_3fetch_partition, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleClient_fetch_partition, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient_3fetch_partition, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleClient_fetch_partition, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient, __pyx_mstate_global->__pyx_n_u_fetch_partition, __pyx_t_2) < 0) __PYX_ERR(0, 146, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleClient, __pyx_mstate_global->__pyx_n_u_fetch_partition, __pyx_t_2) < 0) __PYX_ERR(0, 171, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
@@ -16528,7 +17165,7 @@ __Pyx_RefNannySetupContext("PyInit_shuffle_transport", 0);
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
  * def __setstate_cython__(self, __pyx_state):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient_5__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleClient___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient_5__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleClient___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -16539,82 +17176,94 @@ __Pyx_RefNannySetupContext("PyInit_shuffle_transport", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient_7__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleClient___setstate_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_13ShuffleClient_7__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleClient___setstate_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_2) < 0) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":207
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":232
  *         self.client = ShuffleClient()
  * 
  *     cpdef void start(self, string host, int32_t port) except *:             # <<<<<<<<<<<<<<
  *         """
  *         Start shuffle transport on agent's address.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_3start, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_start, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_3start, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_start, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 232, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_start, __pyx_t_2) < 0) __PYX_ERR(0, 207, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_start, __pyx_t_2) < 0) __PYX_ERR(0, 232, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":227
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":252
  *         self.initialized = True
+ * 
+ *     cpdef void set_task_slot_manager(self, object task_slot_manager):             # <<<<<<<<<<<<<<
+ *         """
+ *         Wire task slot manager for unified local + network morsel processing.
+*/
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5set_task_slot_manager, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_set_task_slot_m, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_set_task_slot_manager, __pyx_t_2) < 0) __PYX_ERR(0, 252, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":261
+ *         self.server.set_task_slot_manager(task_slot_manager)
  * 
  *     cpdef void stop(self) except *:             # <<<<<<<<<<<<<<
  *         """Stop server and client."""
  *         if not self.initialized:
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_5stop, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_stop, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7stop, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_stop, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 261, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_stop, __pyx_t_2) < 0) __PYX_ERR(0, 227, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_stop, __pyx_t_2) < 0) __PYX_ERR(0, 261, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":279
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":313
  *     # ========================================================================
  * 
  *     cpdef void start_shuffle(             # <<<<<<<<<<<<<<
  *         self,
  *         bytes shuffle_id,
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_7start_shuffle, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_start_shuffle, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9start_shuffle, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_start_shuffle, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[12])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 313, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_mstate_global->__pyx_tuple[0]);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_start_shuffle, __pyx_t_2) < 0) __PYX_ERR(0, 279, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_start_shuffle, __pyx_t_2) < 0) __PYX_ERR(0, 313, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":305
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":339
  *         }
  * 
  *     cpdef void send_partition(             # <<<<<<<<<<<<<<
  *         self,
  *         bytes shuffle_id,
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_9send_partition, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_send_partition, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 305, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11send_partition, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_send_partition, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[13])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 339, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_send_partition, __pyx_t_2) < 0) __PYX_ERR(0, 305, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_send_partition, __pyx_t_2) < 0) __PYX_ERR(0, 339, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":337
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":371
  *         pass
  * 
  *     cpdef list receive_partitions(             # <<<<<<<<<<<<<<
  *         self,
  *         bytes shuffle_id,
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_11receive_partitions, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_receive_partiti, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[12])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13receive_partitions, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_receive_partiti, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[14])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 371, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_receive_partitions, __pyx_t_2) < 0) __PYX_ERR(0, 337, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_receive_partitions, __pyx_t_2) < 0) __PYX_ERR(0, 371, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":393
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":427
  *         return result
  * 
  *     cpdef void end_shuffle(self, bytes shuffle_id):             # <<<<<<<<<<<<<<
  *         """
  *         Clean up shuffle resources.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_13end_shuffle, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_end_shuffle, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[13])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 393, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15end_shuffle, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport_end_shuffle, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[15])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 427, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_end_shuffle, __pyx_t_2) < 0) __PYX_ERR(0, 393, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_17shuffle_transport_ShuffleTransport, __pyx_mstate_global->__pyx_n_u_end_shuffle, __pyx_t_2) < 0) __PYX_ERR(0, 427, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
@@ -16622,7 +17271,7 @@ __Pyx_RefNannySetupContext("PyInit_shuffle_transport", 0);
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
  * def __setstate_cython__(self, __pyx_state):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_15__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[14])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_17__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[16])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -16633,7 +17282,7 @@ __Pyx_RefNannySetupContext("PyInit_shuffle_transport", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_17__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport___setstate_cyth, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[15])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_7shuffle_17shuffle_transport_16ShuffleTransport_19__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffleTransport___setstate_cyth, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[17])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_2) < 0) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -16716,6 +17365,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_ShuffleServer___reduce_cython, sizeof(__pyx_k_ShuffleServer___reduce_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleServer___reduce_cython */
   {__pyx_k_ShuffleServer___setstate_cython, sizeof(__pyx_k_ShuffleServer___setstate_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleServer___setstate_cython */
   {__pyx_k_ShuffleServer_register_partition, sizeof(__pyx_k_ShuffleServer_register_partition), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleServer_register_partition */
+  {__pyx_k_ShuffleServer_set_task_slot_mana, sizeof(__pyx_k_ShuffleServer_set_task_slot_mana), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleServer_set_task_slot_mana */
   {__pyx_k_ShuffleServer_start, sizeof(__pyx_k_ShuffleServer_start), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleServer_start */
   {__pyx_k_ShuffleServer_stop, sizeof(__pyx_k_ShuffleServer_stop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleServer_stop */
   {__pyx_k_ShuffleTransport, sizeof(__pyx_k_ShuffleTransport), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleTransport */
@@ -16724,6 +17374,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_ShuffleTransport_end_shuffle, sizeof(__pyx_k_ShuffleTransport_end_shuffle), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleTransport_end_shuffle */
   {__pyx_k_ShuffleTransport_receive_partiti, sizeof(__pyx_k_ShuffleTransport_receive_partiti), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleTransport_receive_partiti */
   {__pyx_k_ShuffleTransport_send_partition, sizeof(__pyx_k_ShuffleTransport_send_partition), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleTransport_send_partition */
+  {__pyx_k_ShuffleTransport_set_task_slot_m, sizeof(__pyx_k_ShuffleTransport_set_task_slot_m), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleTransport_set_task_slot_m */
   {__pyx_k_ShuffleTransport_start, sizeof(__pyx_k_ShuffleTransport_start), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleTransport_start */
   {__pyx_k_ShuffleTransport_start_shuffle, sizeof(__pyx_k_ShuffleTransport_start_shuffle), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleTransport_start_shuffle */
   {__pyx_k_ShuffleTransport_stop, sizeof(__pyx_k_ShuffleTransport_stop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleTransport_stop */
@@ -16741,6 +17392,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_enable, sizeof(__pyx_k_enable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_enable */
   {__pyx_k_encode, sizeof(__pyx_k_encode), 0, 1, 1}, /* PyObject cname: __pyx_n_u_encode */
   {__pyx_k_end_shuffle, sizeof(__pyx_k_end_shuffle), 0, 1, 1}, /* PyObject cname: __pyx_n_u_end_shuffle */
+  {__pyx_k_enqueue_morsel, sizeof(__pyx_k_enqueue_morsel), 0, 1, 1}, /* PyObject cname: __pyx_n_u_enqueue_morsel */
   {__pyx_k_fetch_partition, sizeof(__pyx_k_fetch_partition), 0, 1, 1}, /* PyObject cname: __pyx_n_u_fetch_partition */
   {__pyx_k_func, sizeof(__pyx_k_func), 0, 1, 1}, /* PyObject cname: __pyx_n_u_func */
   {__pyx_k_gc, sizeof(__pyx_k_gc), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_gc */
@@ -16754,8 +17406,10 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_max_retries, sizeof(__pyx_k_max_retries), 0, 1, 1}, /* PyObject cname: __pyx_n_u_max_retries */
   {__pyx_k_module, sizeof(__pyx_k_module), 0, 1, 1}, /* PyObject cname: __pyx_n_u_module */
   {__pyx_k_name, sizeof(__pyx_k_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_name */
+  {__pyx_k_network, sizeof(__pyx_k_network), 0, 1, 1}, /* PyObject cname: __pyx_n_u_network */
   {__pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_no_default___reduce___due_to_non */
   {__pyx_k_num_partitions, sizeof(__pyx_k_num_partitions), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_partitions */
+  {__pyx_k_num_rows, sizeof(__pyx_k_num_rows), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_rows */
   {__pyx_k_partition_id, sizeof(__pyx_k_partition_id), 0, 1, 1}, /* PyObject cname: __pyx_n_u_partition_id */
   {__pyx_k_pop, sizeof(__pyx_k_pop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pop */
   {__pyx_k_port, sizeof(__pyx_k_port), 0, 1, 1}, /* PyObject cname: __pyx_n_u_port */
@@ -16773,16 +17427,20 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_self, sizeof(__pyx_k_self), 0, 1, 1}, /* PyObject cname: __pyx_n_u_self */
   {__pyx_k_send_partition, sizeof(__pyx_k_send_partition), 0, 1, 1}, /* PyObject cname: __pyx_n_u_send_partition */
   {__pyx_k_set_name, sizeof(__pyx_k_set_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_set_name */
+  {__pyx_k_set_task_slot_manager, sizeof(__pyx_k_set_task_slot_manager), 0, 1, 1}, /* PyObject cname: __pyx_n_u_set_task_slot_manager */
   {__pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate */
   {__pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate_cython */
   {__pyx_k_shuffle_hash, sizeof(__pyx_k_shuffle_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_shuffle_hash */
   {__pyx_k_shuffle_id, sizeof(__pyx_k_shuffle_id), 0, 1, 1}, /* PyObject cname: __pyx_n_u_shuffle_id */
+  {__pyx_k_source, sizeof(__pyx_k_source), 0, 1, 1}, /* PyObject cname: __pyx_n_u_source */
   {__pyx_k_split, sizeof(__pyx_k_split), 0, 1, 1}, /* PyObject cname: __pyx_n_u_split */
   {__pyx_k_start, sizeof(__pyx_k_start), 0, 1, 1}, /* PyObject cname: __pyx_n_u_start */
+  {__pyx_k_start_row, sizeof(__pyx_k_start_row), 0, 1, 1}, /* PyObject cname: __pyx_n_u_start_row */
   {__pyx_k_start_shuffle, sizeof(__pyx_k_start_shuffle), 0, 1, 1}, /* PyObject cname: __pyx_n_u_start_shuffle */
   {__pyx_k_stop, sizeof(__pyx_k_stop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_stop */
   {__pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_stringsource */
   {__pyx_k_target_agent, sizeof(__pyx_k_target_agent), 0, 1, 1}, /* PyObject cname: __pyx_n_u_target_agent */
+  {__pyx_k_task_slot_manager, sizeof(__pyx_k_task_slot_manager), 0, 1, 1}, /* PyObject cname: __pyx_n_u_task_slot_manager */
   {__pyx_k_test, sizeof(__pyx_k_test), 0, 1, 1}, /* PyObject cname: __pyx_n_u_test */
   {__pyx_k_timeout_seconds, sizeof(__pyx_k_timeout_seconds), 0, 1, 1}, /* PyObject cname: __pyx_n_u_timeout_seconds */
   {__pyx_k_upstream_agents, sizeof(__pyx_k_upstream_agents), 0, 1, 1}, /* PyObject cname: __pyx_n_u_upstream_agents */
@@ -16809,14 +17467,14 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "sabot/_cython/shuffle/shuffle_transport.pyx":279
+  /* "sabot/_cython/shuffle/shuffle_transport.pyx":313
  *     # ========================================================================
  * 
  *     cpdef void start_shuffle(             # <<<<<<<<<<<<<<
  *         self,
  *         bytes shuffle_id,
 */
-  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(1, Py_None); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(1, Py_None); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 313, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[0]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[0]);
   __Pyx_RefNannyFinishContext();
@@ -16832,6 +17490,7 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate->__pyx_umethod_PyDict_Type_pop.type = (PyObject*)&PyDict_Type;
   __pyx_mstate->__pyx_umethod_PyDict_Type_pop.method_name = &__pyx_mstate->__pyx_n_u_pop;
   if (__Pyx_InitStrings(__pyx_string_tab, __pyx_mstate->__pyx_string_tab, __pyx_string_tab_encodings) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  __pyx_mstate->__pyx_int_0 = PyLong_FromLong(0); if (unlikely(!__pyx_mstate->__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_8816 = PyLong_FromLong(8816); if (unlikely(!__pyx_mstate->__pyx_int_8816)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -16863,84 +17522,94 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 66, 80};
+    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 69, 80};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_host, __pyx_mstate->__pyx_n_u_port};
     __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_start, __pyx_k_A_4q_HA_HA_G1HG1A_1_a_N_Kq, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 88, 32};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 91, 32};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_stop, __pyx_k_A_4t1_N_q_Kq, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 97, 52};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 100, 12};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_task_slot_manager};
+    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_set_task_slot_manager, __pyx_k_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
+  }
+  {
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 109, 101};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_shuffle_id, __pyx_mstate->__pyx_n_u_partition_id, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_shuffle_hash, __pyx_mstate->__pyx_n_u_batch_cpp};
-    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_register_partition, __pyx_k_A_O1_q_4_N_QnN, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_register_partition, __pyx_k_A_O1_q_4_N_QnN_4_a_Q_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 3, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 146, 75};
+    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 171, 75};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_host, __pyx_mstate->__pyx_n_u_port, __pyx_mstate->__pyx_n_u_shuffle_id, __pyx_mstate->__pyx_n_u_partition_id, __pyx_mstate->__pyx_n_u_shuffle_hash, __pyx_mstate->__pyx_n_u_batch_cpp};
-    __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_fetch_partition, __pyx_k_A_O1_q_44_EUUV_1_aq_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_fetch_partition, __pyx_k_A_O1_q_44_EUUV_1_aq_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 3, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 207, 52};
+    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 232, 52};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_host, __pyx_mstate->__pyx_n_u_port};
-    __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_start, __pyx_k_A_4q_N_N_G6_O1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_start, __pyx_k_A_4q_N_N_G6_O1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 227, 30};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 252, 16};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_task_slot_manager};
+    __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_set_task_slot_manager, __pyx_k_A_G, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
+  }
+  {
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 261, 30};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_stop, __pyx_k_A_4t1_G5_O1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[11] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_stop, __pyx_k_A_4t1_G5_O1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[11])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 279, 66};
+    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 313, 66};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_shuffle_id, __pyx_mstate->__pyx_n_u_num_partitions, __pyx_mstate->__pyx_n_u_downstream_agents, __pyx_mstate->__pyx_n_u_upstream_agents};
-    __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_start_shuffle, __pyx_k_A_4wavQ_A_Qa_a_22B_ST, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[12] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_start_shuffle, __pyx_k_A_4wavQ_A_Qa_a_22B_ST, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[12])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 305, 82};
+    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 339, 82};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_shuffle_id, __pyx_mstate->__pyx_n_u_partition_id, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_target_agent};
-    __pyx_mstate_global->__pyx_codeobj_tab[11] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_send_partition, __pyx_k_A_a_L_q_q_uARwaq_s_5_1G2WA, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[11])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[13] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_send_partition, __pyx_k_A_a_L_q_q_uARwaq_s_5_1G2WA, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[13])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 337, 218};
+    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 371, 218};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_shuffle_id, __pyx_mstate->__pyx_n_u_partition_id};
-    __pyx_mstate_global->__pyx_codeobj_tab[12] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_receive_partitions, __pyx_k_A_1_4wav_1_Kwd_1_t_AQ_d_a_4q_l_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[12])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[14] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_receive_partitions, __pyx_k_A_1_4wav_1_Kwd_1_t_AQ_d_a_4q_l_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[14])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 393, 29};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 427, 29};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_shuffle_id};
-    __pyx_mstate_global->__pyx_codeobj_tab[13] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_end_shuffle, __pyx_k_A_7_6_Ql, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[13])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[15] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_shuffle_shuffle_tr_2, __pyx_mstate->__pyx_n_u_end_shuffle, __pyx_k_A_7_6_Ql, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[15])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[14] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[14])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[16] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[16])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 3, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[15] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[15])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[17] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[17])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;
@@ -18366,6 +19035,51 @@ static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *nam
     __Pyx_DECREF_TypeName(obj_type_name);
     return 0;
 }
+
+/* PyObjectVectorCallKwBuilder */
+#if CYTHON_VECTORCALL
+static int __Pyx_VectorcallBuilder_AddArg(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
+    (void)__Pyx_PyObject_FastCallDict;
+    if (__Pyx_PyTuple_SET_ITEM(builder, n, key) != (0)) return -1;
+    Py_INCREF(key);
+    args[n] = value;
+    return 0;
+}
+CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
+    (void)__Pyx_VectorcallBuilder_AddArgStr;
+    if (unlikely(!PyUnicode_Check(key))) {
+        PyErr_SetString(PyExc_TypeError, "keywords must be strings");
+        return -1;
+    }
+    return __Pyx_VectorcallBuilder_AddArg(key, value, builder, args, n);
+}
+static int __Pyx_VectorcallBuilder_AddArgStr(const char *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
+    PyObject *pyKey = PyUnicode_FromString(key);
+    if (!pyKey) return -1;
+    return __Pyx_VectorcallBuilder_AddArg(pyKey, value, builder, args, n);
+}
+#else // CYTHON_VECTORCALL
+CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, CYTHON_UNUSED PyObject **args, CYTHON_UNUSED int n) {
+    if (unlikely(!PyUnicode_Check(key))) {
+        PyErr_SetString(PyExc_TypeError, "keywords must be strings");
+        return -1;
+    }
+    return PyDict_SetItem(builder, key, value);
+}
+#endif
+
+/* PyObjectVectorCallMethodKwBuilder */
+#if !CYTHON_VECTORCALL || PY_VERSION_HEX < 0x03090000
+static PyObject *__Pyx_Object_VectorcallMethod_CallFromBuilder(PyObject *name, PyObject *const *args, size_t nargsf, PyObject *kwnames) {
+    PyObject *result;
+    PyObject *obj = PyObject_GetAttr(args[0], name);
+    if (unlikely(!obj))
+        return NULL;
+    result = __Pyx_Object_Vectorcall_CallFromBuilder(obj, args+1, nargsf-1, kwnames);
+    Py_DECREF(obj);
+    return result;
+}
+#endif
 
 /* RaiseException */
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause) {
@@ -21365,38 +22079,6 @@ raise_neg_overflow:
         "can't convert negative value to int32_t");
     return (int32_t) -1;
 }
-
-/* PyObjectVectorCallKwBuilder */
-#if CYTHON_VECTORCALL
-static int __Pyx_VectorcallBuilder_AddArg(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
-    (void)__Pyx_PyObject_FastCallDict;
-    if (__Pyx_PyTuple_SET_ITEM(builder, n, key) != (0)) return -1;
-    Py_INCREF(key);
-    args[n] = value;
-    return 0;
-}
-CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
-    (void)__Pyx_VectorcallBuilder_AddArgStr;
-    if (unlikely(!PyUnicode_Check(key))) {
-        PyErr_SetString(PyExc_TypeError, "keywords must be strings");
-        return -1;
-    }
-    return __Pyx_VectorcallBuilder_AddArg(key, value, builder, args, n);
-}
-static int __Pyx_VectorcallBuilder_AddArgStr(const char *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
-    PyObject *pyKey = PyUnicode_FromString(key);
-    if (!pyKey) return -1;
-    return __Pyx_VectorcallBuilder_AddArg(pyKey, value, builder, args, n);
-}
-#else // CYTHON_VECTORCALL
-CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, CYTHON_UNUSED PyObject **args, CYTHON_UNUSED int n) {
-    if (unlikely(!PyUnicode_Check(key))) {
-        PyErr_SetString(PyExc_TypeError, "keywords must be strings");
-        return -1;
-    }
-    return PyDict_SetItem(builder, key, value);
-}
-#endif
 
 /* CIntToPy */
 static CYTHON_INLINE PyObject* __Pyx_PyLong_From_int32_t(int32_t value) {

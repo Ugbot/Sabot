@@ -23,9 +23,9 @@ import time
 from pathlib import Path
 from typing import Optional
 from sabot import cyarrow as ca
-import pyarrow as pa  # For specialized types
-import pyarrow.csv as pa_csv
-import pyarrow.compute as pc  # For compute functions
+from sabot import cyarrow as pa  # For specialized types (vendored Arrow)
+from sabot.cyarrow import csv as pa_csv
+from sabot.cyarrow import compute as pc  # For compute functions (vendored Arrow)
 
 # ============================================================================
 # Performance Tuning Parameters (Native PyArrow for maximum speed)

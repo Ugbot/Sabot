@@ -5,8 +5,8 @@ Test high-level Stream API with Cython operators.
 Demonstrates user-friendly API that automatically uses Cython acceleration.
 """
 
-import pyarrow as pa
-import pyarrow.compute as pc
+from sabot import cyarrow as pa
+from sabot.cyarrow import compute as pc
 import time
 from sabot.api.stream import Stream
 

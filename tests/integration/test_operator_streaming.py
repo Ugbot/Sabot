@@ -7,7 +7,7 @@ Tests the actual data flow paths that will be used in production.
 
 import pytest
 import time
-import pyarrow as pa
+from sabot import cyarrow as pa
 
 from sabot._cython.shuffle.atomic_partition_store import AtomicPartitionStore
 from sabot._cython.shuffle.lock_free_queue import SPSCRingBuffer, MPSCQueue

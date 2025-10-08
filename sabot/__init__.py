@@ -189,3 +189,16 @@ def create_app(
         database_url=database_url,
         **kwargs
     )
+
+
+# ============================================================================
+# Extend PyArrow Compute with Additional Functions
+# ============================================================================
+
+# Add modulo function to pyarrow.compute namespace
+try:
+    import pyarrow.compute as pc
+    from sabot._cython.arrow.compute import modulo
+    pc.modulo = modulo
+except ImportError:
+    pass  # Arrow not available, skip extension

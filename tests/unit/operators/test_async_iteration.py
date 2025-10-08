@@ -2,8 +2,8 @@
 """Test async iteration for operators."""
 
 import asyncio
-import pyarrow as pa
-import pyarrow.compute as pc
+from sabot import cyarrow as pa
+from sabot.cyarrow import compute as pc
 from sabot._cython.operators import CythonMapOperator, CythonFilterOperator
 
 

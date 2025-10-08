@@ -6,7 +6,7 @@ print("1: Starting imports", flush=True)
 from sabot._cython.shuffle.shuffle_transport import ShuffleServer, ShuffleClient
 print("2: Imported", flush=True)
 
-import pyarrow as pa
+from sabot import cyarrow as pa
 print("3: Imported PyArrow", flush=True)
 
 # Create server

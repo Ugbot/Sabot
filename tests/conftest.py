@@ -8,7 +8,7 @@ import shutil
 from pathlib import Path
 from typing import Generator, AsyncGenerator
 
-import pyarrow as pa
+from sabot import cyarrow as pa
 
 from sabot.app import App
 

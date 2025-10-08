@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from sabot.api.stream import Stream
 from sabot.api.window import tumbling, sliding
 from sabot.api.state import ValueState
-import pyarrow as pa
+from sabot import cyarrow as pa
 
 
 def test_imports():

@@ -38,9 +38,10 @@ from sabot.cyarrow import (
 )
 
 # Specialized modules not yet in cyarrow wrapper
-import pyarrow.csv as pa_csv
-import pyarrow.feather as feather
-import pyarrow.compute as pc
+# CSV support via vendored Arrow
+from sabot.cyarrow import csv as pa_csv
+from sabot.cyarrow import feather
+from sabot.cyarrow import compute as pc
 
 print(f"Zero-copy Arrow enabled: {USING_ZERO_COPY}")
 assert USING_ZERO_COPY, "Zero-copy Arrow required for optimal performance"
@@ -107,21 +108,25 @@ def load_csv_arrow(csv_path: Path, limit: Optional[int] = None, columns: Optiona
     use_arrow = os.getenv('SABOT_USE_ARROW', '0') == '1' and arrow_path.exists()
 
     if use_arrow:
-        print(f"  Using Arrow IPC: {arrow_path.name}")
+        print(f"  Using Arrow IPC streaming: {arrow_path.name}")
         print(f"  File size: {arrow_path.stat().st_size / 1024 / 1024:.1f} MB")
 
         start = time.perf_counter()
 
-        # Memory-mapped zero-copy read (BLAZING FAST!)
-        table = feather.read_table(
-            arrow_path,
-            columns=columns,  # Can select columns instantly (columnar format)
-            memory_map=True   # Zero-copy memory mapping
-        )
+        # Use C++ IPC streaming reader (BLAZING FAST!)
+        from sabot._c.ipc_reader import ArrowIPCReader
 
-        # Apply limit if specified (zero-copy slice)
-        if limit and table.num_rows > limit:
-            table = table.slice(0, limit)
+        reader = ArrowIPCReader(str(arrow_path))
+
+        # Stream batches until limit reached
+        batches = reader.read_batches(limit_rows=limit if limit else -1)
+
+        # Combine into table
+        table = ca.Table.from_batches(batches)
+
+        # Select columns if specified
+        if columns:
+            table = table.select(columns)
 
         # Convert NULL type columns to string (same as CSV path)
         table = _convert_null_columns(table)
@@ -130,8 +135,8 @@ def load_csv_arrow(csv_path: Path, limit: Optional[int] = None, columns: Optiona
         elapsed_ms = (end - start) * 1000
         throughput = table.num_rows / (end - start) / 1e6
 
-        print(f"  Loaded: {table.num_rows:,} rows")
-        print(f"  Time: {elapsed_ms:.2f}ms (memory-mapped)")
+        print(f"  Loaded: {table.num_rows:,} rows from {len(batches)} batches")
+        print(f"  Time: {elapsed_ms:.2f}ms (streamed)")
         print(f"  Throughput: {throughput:.1f}M rows/sec")
 
         return table

@@ -35,7 +35,7 @@ async def main():
         and executed on agent worker nodes.
         """
         from sabot.api.stream import Stream
-        import pyarrow.compute as pc
+        from sabot.cyarrow import compute as pc
 
         return (Stream.from_kafka('orders')
             .filter(lambda b: pc.greater(b['amount'], 100.0))  # Filter high-value orders

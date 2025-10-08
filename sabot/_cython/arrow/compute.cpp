@@ -60,8 +60,13 @@
             "-Wno-unused-function",
             "-Wno-deprecated-declarations"
         ],
+        "extra_link_args": [
+            "-Wl,-headerpad_max_install_names",
+            "-Wl,-rpath,@loader_path/../../vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib"
+        ],
         "include_dirs": [
-            "/opt/homebrew/lib/python3.13/site-packages/numpy/_core/include",
+            "/Users/bengamble/Sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
             "/Users/bengamble/Sabot/vendor/arrow/python",
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow",
@@ -1620,12 +1625,12 @@ static const char *__pyx_filename;
 
 static const char* const __pyx_f[] = {
   "sabot/_cython/arrow/compute.pyx",
-  "cpython/contextvars.pxd",
-  "cpython/datetime.pxd",
-  "cpython/type.pxd",
-  "cpython/bool.pxd",
-  "cpython/complex.pxd",
-  "pyarrow/lib.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/contextvars.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/datetime.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/type.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/bool.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/complex.pxd",
+  ".venv/lib/python3.11/site-packages/pyarrow/lib.pxd",
 };
 /* #### Code section: utility_code_proto_before_types ### */
 /* Atomics.proto */
@@ -5609,10 +5614,12 @@ static const char __pyx_k_i[] = "i";
 static const char __pyx_k_j[] = "j";
 static const char __pyx_k__2[] = "?";
 static const char __pyx_k_pa[] = "pa";
+static const char __pyx_k_pc[] = "pc";
 static const char __pyx_k_arr[] = "arr";
 static const char __pyx_k_get[] = "get";
 static const char __pyx_k_pop[] = "pop";
 static const char __pyx_k_val[] = "val";
+static const char __pyx_k_cast[] = "cast";
 static const char __pyx_k_func[] = "__func__";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
@@ -5622,26 +5629,38 @@ static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_type[] = "type";
 static const char __pyx_k_array[] = "array";
 static const char __pyx_k_as_py[] = "as_py";
+static const char __pyx_k_floor[] = "floor";
+static const char __pyx_k_int64[] = "int64";
 static const char __pyx_k_names[] = "names";
 static const char __pyx_k_range[] = "range";
+static const char __pyx_k_types[] = "types";
 static const char __pyx_k_utf_8[] = "utf-8";
 static const char __pyx_k_arrays[] = "arrays";
+static const char __pyx_k_divide[] = "divide";
 static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_module[] = "__module__";
+static const char __pyx_k_modulo[] = "modulo";
 static const char __pyx_k_uint64[] = "uint64";
+static const char __pyx_k_compute[] = "compute";
+static const char __pyx_k_divisor[] = "divisor";
+static const char __pyx_k_product[] = "product";
 static const char __pyx_k_pyarrow[] = "pyarrow";
 static const char __pyx_k_val_int[] = "val_int";
 static const char __pyx_k_byte_len[] = "byte_len";
 static const char __pyx_k_data_ptr[] = "data_ptr";
 static const char __pyx_k_hash_val[] = "hash_val";
+static const char __pyx_k_multiply[] = "multiply";
 static const char __pyx_k_num_cols[] = "num_cols";
 static const char __pyx_k_num_rows[] = "num_rows";
 static const char __pyx_k_qualname[] = "__qualname__";
+static const char __pyx_k_quotient[] = "quotient";
 static const char __pyx_k_row_dict[] = "row_dict";
 static const char __pyx_k_set_name[] = "__set_name__";
+static const char __pyx_k_subtract[] = "subtract";
 static const char __pyx_k_array_len[] = "array_len";
 static const char __pyx_k_is_binary[] = "is_binary";
 static const char __pyx_k_is_string[] = "is_string";
+static const char __pyx_k_remainder[] = "remainder";
 static const char __pyx_k_row_tuple[] = "row_tuple";
 static const char __pyx_k_val_bytes[] = "val_bytes";
 static const char __pyx_k_val_float[] = "val_float";
@@ -5662,8 +5681,10 @@ static const char __pyx_k_struct_array[] = "struct_array";
 static const char __pyx_k_column_hashes[] = "column_hashes";
 static const char __pyx_k_combined_hash[] = "combined_hash";
 static const char __pyx_k_pyarrow_types[] = "pyarrow.types";
+static const char __pyx_k_pyarrow_compute[] = "pyarrow.compute";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
+static const char __pyx_k_r_q_b_A_1G1_r_5_Be1Kr_q_1[] = "\200\001\360\032\000\014\r\330\013\014\360\010\000\005\020\210r\220\026\220q\230\002\230'\240\021\240'\250\021\330\004\016\210b\220\t\230\021\230*\240A\330\004\020\220\002\220)\2301\230G\2401\360\006\000\005\010\200r\210\026\210{\230!\2305\240\001\330\010\024\220B\220e\2301\230K\240r\250\026\250q\340\004\013\2101";
 static const char __pyx_k_At_least_one_array_required[] = "At least one array required";
 static const char __pyx_k_sabot__cython_arrow_compute[] = "sabot._cython.arrow.compute";
 static const char __pyx_k_CyArrow_Compute_Module_Arrow_co[] = "\nCyArrow Compute Module - Arrow compute functions with Cython acceleration.\n\nUses Arrow's vendored XXH3 hash for maximum performance (10-100x faster than Python hash).\n";
@@ -5676,6 +5697,7 @@ static const char __pyx_k_All_arrays_must_have_same_length[] = "All arrays must 
 static PyObject *__pyx_pf_5sabot_7_cython_5arrow_7compute_hash_array(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_array, CYTHON_UNUSED PyObject *__pyx_v_seed); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_5arrow_7compute_2hash_struct(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_struct_array, CYTHON_UNUSED PyObject *__pyx_v_seed); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_5arrow_7compute_4hash_combine(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_seed, PyObject *__pyx_v_arrays); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_5arrow_7compute_6modulo(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_array, PyObject *__pyx_v_divisor); /* proto */
 /* #### Code section: late_includes ### */
 /* #### Code section: module_state ### */
 /* SmallCodeConfig */
@@ -5823,9 +5845,9 @@ typedef struct {
   PyTypeObject *__pyx_ptype_7pyarrow_3lib_Codec;
   PyTypeObject *__pyx_ptype_7pyarrow_3lib_StopToken;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
-  PyObject *__pyx_tuple[1];
-  PyObject *__pyx_codeobj_tab[3];
-  PyObject *__pyx_string_tab[64];
+  PyObject *__pyx_tuple[2];
+  PyObject *__pyx_codeobj_tab[4];
+  PyObject *__pyx_string_tab[79];
   PyObject *__pyx_int_0;
   PyObject *__pyx_int_0xffffffffffffffff;
 /* #### Code section: module_state_contents ### */
@@ -5878,57 +5900,72 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_as_py __pyx_string_tab[10]
 #define __pyx_n_u_asyncio_coroutines __pyx_string_tab[11]
 #define __pyx_n_u_byte_len __pyx_string_tab[12]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[13]
-#define __pyx_n_u_column_hashes __pyx_string_tab[14]
-#define __pyx_n_u_combined_hash __pyx_string_tab[15]
-#define __pyx_n_u_data_ptr __pyx_string_tab[16]
-#define __pyx_n_u_encode __pyx_string_tab[17]
-#define __pyx_n_u_field_name __pyx_string_tab[18]
-#define __pyx_n_u_func __pyx_string_tab[19]
-#define __pyx_n_u_get __pyx_string_tab[20]
-#define __pyx_n_u_hash_array __pyx_string_tab[21]
-#define __pyx_n_u_hash_combine __pyx_string_tab[22]
-#define __pyx_n_u_hash_struct __pyx_string_tab[23]
-#define __pyx_n_u_hash_val __pyx_string_tab[24]
-#define __pyx_n_u_hash_values __pyx_string_tab[25]
-#define __pyx_n_u_i __pyx_string_tab[26]
-#define __pyx_n_u_initializing __pyx_string_tab[27]
-#define __pyx_n_u_is_binary __pyx_string_tab[28]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[29]
-#define __pyx_n_u_is_floating __pyx_string_tab[30]
-#define __pyx_n_u_is_integer __pyx_string_tab[31]
-#define __pyx_n_u_is_string __pyx_string_tab[32]
-#define __pyx_n_u_j __pyx_string_tab[33]
-#define __pyx_n_u_main __pyx_string_tab[34]
-#define __pyx_n_u_module __pyx_string_tab[35]
-#define __pyx_n_u_name __pyx_string_tab[36]
-#define __pyx_n_u_names __pyx_string_tab[37]
-#define __pyx_n_u_num_cols __pyx_string_tab[38]
-#define __pyx_n_u_num_rows __pyx_string_tab[39]
-#define __pyx_n_u_pa __pyx_string_tab[40]
-#define __pyx_n_u_pop __pyx_string_tab[41]
-#define __pyx_n_u_pyarrow __pyx_string_tab[42]
-#define __pyx_n_u_pyarrow_types __pyx_string_tab[43]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[44]
-#define __pyx_n_u_qualname __pyx_string_tab[45]
-#define __pyx_n_u_range __pyx_string_tab[46]
-#define __pyx_n_u_row_dict __pyx_string_tab[47]
-#define __pyx_n_u_row_tuple __pyx_string_tab[48]
-#define __pyx_n_u_row_values __pyx_string_tab[49]
-#define __pyx_n_u_sabot__cython_arrow_compute __pyx_string_tab[50]
-#define __pyx_kp_u_sabot__cython_arrow_compute_pyx __pyx_string_tab[51]
-#define __pyx_n_u_seed __pyx_string_tab[52]
-#define __pyx_n_u_set_name __pyx_string_tab[53]
-#define __pyx_n_u_spec __pyx_string_tab[54]
-#define __pyx_n_u_struct_array __pyx_string_tab[55]
-#define __pyx_n_u_test __pyx_string_tab[56]
-#define __pyx_n_u_type __pyx_string_tab[57]
-#define __pyx_n_u_uint64 __pyx_string_tab[58]
-#define __pyx_kp_u_utf_8 __pyx_string_tab[59]
-#define __pyx_n_u_val __pyx_string_tab[60]
-#define __pyx_n_u_val_bytes __pyx_string_tab[61]
-#define __pyx_n_u_val_float __pyx_string_tab[62]
-#define __pyx_n_u_val_int __pyx_string_tab[63]
+#define __pyx_n_u_cast __pyx_string_tab[13]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[14]
+#define __pyx_n_u_column_hashes __pyx_string_tab[15]
+#define __pyx_n_u_combined_hash __pyx_string_tab[16]
+#define __pyx_n_u_compute __pyx_string_tab[17]
+#define __pyx_n_u_data_ptr __pyx_string_tab[18]
+#define __pyx_n_u_divide __pyx_string_tab[19]
+#define __pyx_n_u_divisor __pyx_string_tab[20]
+#define __pyx_n_u_encode __pyx_string_tab[21]
+#define __pyx_n_u_field_name __pyx_string_tab[22]
+#define __pyx_n_u_floor __pyx_string_tab[23]
+#define __pyx_n_u_func __pyx_string_tab[24]
+#define __pyx_n_u_get __pyx_string_tab[25]
+#define __pyx_n_u_hash_array __pyx_string_tab[26]
+#define __pyx_n_u_hash_combine __pyx_string_tab[27]
+#define __pyx_n_u_hash_struct __pyx_string_tab[28]
+#define __pyx_n_u_hash_val __pyx_string_tab[29]
+#define __pyx_n_u_hash_values __pyx_string_tab[30]
+#define __pyx_n_u_i __pyx_string_tab[31]
+#define __pyx_n_u_initializing __pyx_string_tab[32]
+#define __pyx_n_u_int64 __pyx_string_tab[33]
+#define __pyx_n_u_is_binary __pyx_string_tab[34]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[35]
+#define __pyx_n_u_is_floating __pyx_string_tab[36]
+#define __pyx_n_u_is_integer __pyx_string_tab[37]
+#define __pyx_n_u_is_string __pyx_string_tab[38]
+#define __pyx_n_u_j __pyx_string_tab[39]
+#define __pyx_n_u_main __pyx_string_tab[40]
+#define __pyx_n_u_module __pyx_string_tab[41]
+#define __pyx_n_u_modulo __pyx_string_tab[42]
+#define __pyx_n_u_multiply __pyx_string_tab[43]
+#define __pyx_n_u_name __pyx_string_tab[44]
+#define __pyx_n_u_names __pyx_string_tab[45]
+#define __pyx_n_u_num_cols __pyx_string_tab[46]
+#define __pyx_n_u_num_rows __pyx_string_tab[47]
+#define __pyx_n_u_pa __pyx_string_tab[48]
+#define __pyx_n_u_pc __pyx_string_tab[49]
+#define __pyx_n_u_pop __pyx_string_tab[50]
+#define __pyx_n_u_product __pyx_string_tab[51]
+#define __pyx_n_u_pyarrow __pyx_string_tab[52]
+#define __pyx_n_u_pyarrow_compute __pyx_string_tab[53]
+#define __pyx_n_u_pyarrow_types __pyx_string_tab[54]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[55]
+#define __pyx_n_u_qualname __pyx_string_tab[56]
+#define __pyx_n_u_quotient __pyx_string_tab[57]
+#define __pyx_n_u_range __pyx_string_tab[58]
+#define __pyx_n_u_remainder __pyx_string_tab[59]
+#define __pyx_n_u_row_dict __pyx_string_tab[60]
+#define __pyx_n_u_row_tuple __pyx_string_tab[61]
+#define __pyx_n_u_row_values __pyx_string_tab[62]
+#define __pyx_n_u_sabot__cython_arrow_compute __pyx_string_tab[63]
+#define __pyx_kp_u_sabot__cython_arrow_compute_pyx __pyx_string_tab[64]
+#define __pyx_n_u_seed __pyx_string_tab[65]
+#define __pyx_n_u_set_name __pyx_string_tab[66]
+#define __pyx_n_u_spec __pyx_string_tab[67]
+#define __pyx_n_u_struct_array __pyx_string_tab[68]
+#define __pyx_n_u_subtract __pyx_string_tab[69]
+#define __pyx_n_u_test __pyx_string_tab[70]
+#define __pyx_n_u_type __pyx_string_tab[71]
+#define __pyx_n_u_types __pyx_string_tab[72]
+#define __pyx_n_u_uint64 __pyx_string_tab[73]
+#define __pyx_kp_u_utf_8 __pyx_string_tab[74]
+#define __pyx_n_u_val __pyx_string_tab[75]
+#define __pyx_n_u_val_bytes __pyx_string_tab[76]
+#define __pyx_n_u_val_float __pyx_string_tab[77]
+#define __pyx_n_u_val_int __pyx_string_tab[78]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -6057,9 +6094,9 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_ptype_7pyarrow_3lib_CacheOptions);
   Py_CLEAR(clear_module_state->__pyx_ptype_7pyarrow_3lib_Codec);
   Py_CLEAR(clear_module_state->__pyx_ptype_7pyarrow_3lib_StopToken);
-  for (int i=0; i<1; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<3; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<64; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<2; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
+  for (int i=0; i<4; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<79; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   Py_CLEAR(clear_module_state->__pyx_int_0);
   Py_CLEAR(clear_module_state->__pyx_int_0xffffffffffffffff);
   return 0;
@@ -6190,9 +6227,9 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_ptype_7pyarrow_3lib_CacheOptions);
   Py_VISIT(traverse_module_state->__pyx_ptype_7pyarrow_3lib_Codec);
   Py_VISIT(traverse_module_state->__pyx_ptype_7pyarrow_3lib_StopToken);
-  for (int i=0; i<1; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<3; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<64; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<2; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
+  for (int i=0; i<4; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<79; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0xffffffffffffffff);
   return 0;
@@ -10469,6 +10506,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_5arrow_7compute_4hash_combine(CYTHON_U
  *         hash_values.append(combined_hash)
  * 
  *     return pa.array(hash_values, type=pa.uint64())             # <<<<<<<<<<<<<<
+ * 
+ * 
 */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_5 = __pyx_v_pa;
@@ -10524,6 +10563,326 @@ static PyObject *__pyx_pf_5sabot_7_cython_5arrow_7compute_4hash_combine(CYTHON_U
   __Pyx_XDECREF(__pyx_v_column_hashes);
   __Pyx_XDECREF(__pyx_v_arr);
   __Pyx_XDECREF(__pyx_8genexpr1__pyx_v_arr);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "sabot/_cython/arrow/compute.pyx":204
+ * 
+ * 
+ * def modulo(array, divisor):             # <<<<<<<<<<<<<<
+ *     """
+ *     Compute element-wise modulo (remainder after division).
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_5arrow_7compute_7modulo(PyObject *__pyx_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_5arrow_7compute_6modulo, "\n    Compute element-wise modulo (remainder after division).\n\n    Implements: array % divisor\n\n    Args:\n        array: Input Arrow array (numeric)\n        divisor: Divisor (scalar or array)\n\n    Returns:\n        Array of remainders\n    ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_5arrow_7compute_7modulo = {"modulo", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_5arrow_7compute_7modulo, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_5arrow_7compute_6modulo};
+static PyObject *__pyx_pw_5sabot_7_cython_5arrow_7compute_7modulo(PyObject *__pyx_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  PyObject *__pyx_v_array = 0;
+  PyObject *__pyx_v_divisor = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[2] = {0,0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("modulo (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_array,&__pyx_mstate_global->__pyx_n_u_divisor,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 204, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  2:
+        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 204, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 204, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "modulo", 0) < 0) __PYX_ERR(0, 204, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("modulo", 1, 2, 2, i); __PYX_ERR(0, 204, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 2)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 204, __pyx_L3_error)
+      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 204, __pyx_L3_error)
+    }
+    __pyx_v_array = values[0];
+    __pyx_v_divisor = values[1];
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("modulo", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 204, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("sabot._cython.arrow.compute.modulo", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_5sabot_7_cython_5arrow_7compute_6modulo(__pyx_self, __pyx_v_array, __pyx_v_divisor);
+
+  /* function exit code */
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_5arrow_7compute_6modulo(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_array, PyObject *__pyx_v_divisor) {
+  PyObject *__pyx_v_pa = NULL;
+  PyObject *__pyx_v_pc = NULL;
+  PyObject *__pyx_v_quotient = NULL;
+  PyObject *__pyx_v_product = NULL;
+  PyObject *__pyx_v_remainder = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_5;
+  int __pyx_t_6;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("modulo", 0);
+
+  /* "sabot/_cython/arrow/compute.pyx":217
+ *         Array of remainders
+ *     """
+ *     import pyarrow as pa             # <<<<<<<<<<<<<<
+ *     import pyarrow.compute as pc
+ * 
+*/
+  __pyx_t_1 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_pyarrow, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 217, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_pa = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "sabot/_cython/arrow/compute.pyx":218
+ *     """
+ *     import pyarrow as pa
+ *     import pyarrow.compute as pc             # <<<<<<<<<<<<<<
+ * 
+ *     # modulo(x, d) = x - floor(x / d) * d
+*/
+  __pyx_t_1 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_pyarrow_compute, __pyx_mstate_global->__pyx_tuple[0]); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 218, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_pc = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "sabot/_cython/arrow/compute.pyx":222
+ *     # modulo(x, d) = x - floor(x / d) * d
+ *     # This works for both integers and floats
+ *     quotient = pc.floor(pc.divide(array, divisor))             # <<<<<<<<<<<<<<
+ *     product = pc.multiply(quotient, divisor)
+ *     remainder = pc.subtract(array, product)
+*/
+  __pyx_t_2 = __pyx_v_pc;
+  __Pyx_INCREF(__pyx_t_2);
+  __pyx_t_4 = __pyx_v_pc;
+  __Pyx_INCREF(__pyx_t_4);
+  __pyx_t_5 = 0;
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_4, __pyx_v_array, __pyx_v_divisor};
+    __pyx_t_3 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_divide, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 222, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+  }
+  __pyx_t_5 = 0;
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_t_3};
+    __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_floor, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 222, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __pyx_v_quotient = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "sabot/_cython/arrow/compute.pyx":223
+ *     # This works for both integers and floats
+ *     quotient = pc.floor(pc.divide(array, divisor))
+ *     product = pc.multiply(quotient, divisor)             # <<<<<<<<<<<<<<
+ *     remainder = pc.subtract(array, product)
+ * 
+*/
+  __pyx_t_3 = __pyx_v_pc;
+  __Pyx_INCREF(__pyx_t_3);
+  __pyx_t_5 = 0;
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_v_quotient, __pyx_v_divisor};
+    __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_multiply, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 223, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __pyx_v_product = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "sabot/_cython/arrow/compute.pyx":224
+ *     quotient = pc.floor(pc.divide(array, divisor))
+ *     product = pc.multiply(quotient, divisor)
+ *     remainder = pc.subtract(array, product)             # <<<<<<<<<<<<<<
+ * 
+ *     # Cast to int64 if input was integer
+*/
+  __pyx_t_3 = __pyx_v_pc;
+  __Pyx_INCREF(__pyx_t_3);
+  __pyx_t_5 = 0;
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_v_array, __pyx_v_product};
+    __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_subtract, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __pyx_v_remainder = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "sabot/_cython/arrow/compute.pyx":227
+ * 
+ *     # Cast to int64 if input was integer
+ *     if pa.types.is_integer(array.type):             # <<<<<<<<<<<<<<
+ *         remainder = pc.cast(remainder, pa.int64())
+ * 
+*/
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_pa, __pyx_mstate_global->__pyx_n_u_types); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __pyx_t_2;
+  __Pyx_INCREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_array, __pyx_mstate_global->__pyx_n_u_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = 0;
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_t_4};
+    __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_is_integer, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 227, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__pyx_t_6) {
+
+    /* "sabot/_cython/arrow/compute.pyx":228
+ *     # Cast to int64 if input was integer
+ *     if pa.types.is_integer(array.type):
+ *         remainder = pc.cast(remainder, pa.int64())             # <<<<<<<<<<<<<<
+ * 
+ *     return remainder
+*/
+    __pyx_t_2 = __pyx_v_pc;
+    __Pyx_INCREF(__pyx_t_2);
+    __pyx_t_3 = __pyx_v_pa;
+    __Pyx_INCREF(__pyx_t_3);
+    __pyx_t_5 = 0;
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
+      __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_int64, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 228, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+    }
+    __pyx_t_5 = 0;
+    {
+      PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_v_remainder, __pyx_t_4};
+      __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_cast, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 228, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+    }
+    __Pyx_DECREF_SET(__pyx_v_remainder, __pyx_t_1);
+    __pyx_t_1 = 0;
+
+    /* "sabot/_cython/arrow/compute.pyx":227
+ * 
+ *     # Cast to int64 if input was integer
+ *     if pa.types.is_integer(array.type):             # <<<<<<<<<<<<<<
+ *         remainder = pc.cast(remainder, pa.int64())
+ * 
+*/
+  }
+
+  /* "sabot/_cython/arrow/compute.pyx":230
+ *         remainder = pc.cast(remainder, pa.int64())
+ * 
+ *     return remainder             # <<<<<<<<<<<<<<
+*/
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_remainder);
+  __pyx_r = __pyx_v_remainder;
+  goto __pyx_L0;
+
+  /* "sabot/_cython/arrow/compute.pyx":204
+ * 
+ * 
+ * def modulo(array, divisor):             # <<<<<<<<<<<<<<
+ *     """
+ *     Compute element-wise modulo (remainder after division).
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_AddTraceback("sabot._cython.arrow.compute.modulo", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_pa);
+  __Pyx_XDECREF(__pyx_v_pc);
+  __Pyx_XDECREF(__pyx_v_quotient);
+  __Pyx_XDECREF(__pyx_v_product);
+  __Pyx_XDECREF(__pyx_v_remainder);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -11989,7 +12348,7 @@ __Pyx_RefNannySetupContext("PyInit_compute", 0);
 */
   __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5arrow_7compute_1hash_array, 0, __pyx_mstate_global->__pyx_n_u_hash_array, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_arrow_compute, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_mstate_global->__pyx_tuple[0]);
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_mstate_global->__pyx_tuple[1]);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_hash_array, __pyx_t_2) < 0) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
@@ -12002,7 +12361,7 @@ __Pyx_RefNannySetupContext("PyInit_compute", 0);
 */
   __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5arrow_7compute_3hash_struct, 0, __pyx_mstate_global->__pyx_n_u_hash_struct, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_arrow_compute, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_mstate_global->__pyx_tuple[0]);
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_mstate_global->__pyx_tuple[1]);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_hash_struct, __pyx_t_2) < 0) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
@@ -12021,6 +12380,18 @@ __Pyx_RefNannySetupContext("PyInit_compute", 0);
   __Pyx_CyFunction_SetDefaultsKwDict(__pyx_t_3, __pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_hash_combine, __pyx_t_3) < 0) __PYX_ERR(0, 156, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "sabot/_cython/arrow/compute.pyx":204
+ * 
+ * 
+ * def modulo(array, divisor):             # <<<<<<<<<<<<<<
+ *     """
+ *     Compute element-wise modulo (remainder after division).
+*/
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5arrow_7compute_7modulo, 0, __pyx_mstate_global->__pyx_n_u_modulo, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_arrow_compute, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_modulo, __pyx_t_3) < 0) __PYX_ERR(0, 204, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "sabot/_cython/arrow/compute.pyx":1
@@ -12105,12 +12476,17 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_as_py, sizeof(__pyx_k_as_py), 0, 1, 1}, /* PyObject cname: __pyx_n_u_as_py */
   {__pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 1, 1}, /* PyObject cname: __pyx_n_u_asyncio_coroutines */
   {__pyx_k_byte_len, sizeof(__pyx_k_byte_len), 0, 1, 1}, /* PyObject cname: __pyx_n_u_byte_len */
+  {__pyx_k_cast, sizeof(__pyx_k_cast), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cast */
   {__pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cline_in_traceback */
   {__pyx_k_column_hashes, sizeof(__pyx_k_column_hashes), 0, 1, 1}, /* PyObject cname: __pyx_n_u_column_hashes */
   {__pyx_k_combined_hash, sizeof(__pyx_k_combined_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_combined_hash */
+  {__pyx_k_compute, sizeof(__pyx_k_compute), 0, 1, 1}, /* PyObject cname: __pyx_n_u_compute */
   {__pyx_k_data_ptr, sizeof(__pyx_k_data_ptr), 0, 1, 1}, /* PyObject cname: __pyx_n_u_data_ptr */
+  {__pyx_k_divide, sizeof(__pyx_k_divide), 0, 1, 1}, /* PyObject cname: __pyx_n_u_divide */
+  {__pyx_k_divisor, sizeof(__pyx_k_divisor), 0, 1, 1}, /* PyObject cname: __pyx_n_u_divisor */
   {__pyx_k_encode, sizeof(__pyx_k_encode), 0, 1, 1}, /* PyObject cname: __pyx_n_u_encode */
   {__pyx_k_field_name, sizeof(__pyx_k_field_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_field_name */
+  {__pyx_k_floor, sizeof(__pyx_k_floor), 0, 1, 1}, /* PyObject cname: __pyx_n_u_floor */
   {__pyx_k_func, sizeof(__pyx_k_func), 0, 1, 1}, /* PyObject cname: __pyx_n_u_func */
   {__pyx_k_get, sizeof(__pyx_k_get), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get */
   {__pyx_k_hash_array, sizeof(__pyx_k_hash_array), 0, 1, 1}, /* PyObject cname: __pyx_n_u_hash_array */
@@ -12120,6 +12496,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_hash_values, sizeof(__pyx_k_hash_values), 0, 1, 1}, /* PyObject cname: __pyx_n_u_hash_values */
   {__pyx_k_i, sizeof(__pyx_k_i), 0, 1, 1}, /* PyObject cname: __pyx_n_u_i */
   {__pyx_k_initializing, sizeof(__pyx_k_initializing), 0, 1, 1}, /* PyObject cname: __pyx_n_u_initializing */
+  {__pyx_k_int64, sizeof(__pyx_k_int64), 0, 1, 1}, /* PyObject cname: __pyx_n_u_int64 */
   {__pyx_k_is_binary, sizeof(__pyx_k_is_binary), 0, 1, 1}, /* PyObject cname: __pyx_n_u_is_binary */
   {__pyx_k_is_coroutine, sizeof(__pyx_k_is_coroutine), 0, 1, 1}, /* PyObject cname: __pyx_n_u_is_coroutine */
   {__pyx_k_is_floating, sizeof(__pyx_k_is_floating), 0, 1, 1}, /* PyObject cname: __pyx_n_u_is_floating */
@@ -12128,17 +12505,24 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_j, sizeof(__pyx_k_j), 0, 1, 1}, /* PyObject cname: __pyx_n_u_j */
   {__pyx_k_main, sizeof(__pyx_k_main), 0, 1, 1}, /* PyObject cname: __pyx_n_u_main */
   {__pyx_k_module, sizeof(__pyx_k_module), 0, 1, 1}, /* PyObject cname: __pyx_n_u_module */
+  {__pyx_k_modulo, sizeof(__pyx_k_modulo), 0, 1, 1}, /* PyObject cname: __pyx_n_u_modulo */
+  {__pyx_k_multiply, sizeof(__pyx_k_multiply), 0, 1, 1}, /* PyObject cname: __pyx_n_u_multiply */
   {__pyx_k_name, sizeof(__pyx_k_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_name */
   {__pyx_k_names, sizeof(__pyx_k_names), 0, 1, 1}, /* PyObject cname: __pyx_n_u_names */
   {__pyx_k_num_cols, sizeof(__pyx_k_num_cols), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_cols */
   {__pyx_k_num_rows, sizeof(__pyx_k_num_rows), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_rows */
   {__pyx_k_pa, sizeof(__pyx_k_pa), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pa */
+  {__pyx_k_pc, sizeof(__pyx_k_pc), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pc */
   {__pyx_k_pop, sizeof(__pyx_k_pop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pop */
+  {__pyx_k_product, sizeof(__pyx_k_product), 0, 1, 1}, /* PyObject cname: __pyx_n_u_product */
   {__pyx_k_pyarrow, sizeof(__pyx_k_pyarrow), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyarrow */
+  {__pyx_k_pyarrow_compute, sizeof(__pyx_k_pyarrow_compute), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyarrow_compute */
   {__pyx_k_pyarrow_types, sizeof(__pyx_k_pyarrow_types), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyarrow_types */
   {__pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_vtable */
   {__pyx_k_qualname, sizeof(__pyx_k_qualname), 0, 1, 1}, /* PyObject cname: __pyx_n_u_qualname */
+  {__pyx_k_quotient, sizeof(__pyx_k_quotient), 0, 1, 1}, /* PyObject cname: __pyx_n_u_quotient */
   {__pyx_k_range, sizeof(__pyx_k_range), 0, 1, 1}, /* PyObject cname: __pyx_n_u_range */
+  {__pyx_k_remainder, sizeof(__pyx_k_remainder), 0, 1, 1}, /* PyObject cname: __pyx_n_u_remainder */
   {__pyx_k_row_dict, sizeof(__pyx_k_row_dict), 0, 1, 1}, /* PyObject cname: __pyx_n_u_row_dict */
   {__pyx_k_row_tuple, sizeof(__pyx_k_row_tuple), 0, 1, 1}, /* PyObject cname: __pyx_n_u_row_tuple */
   {__pyx_k_row_values, sizeof(__pyx_k_row_values), 0, 1, 1}, /* PyObject cname: __pyx_n_u_row_values */
@@ -12148,8 +12532,10 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_set_name, sizeof(__pyx_k_set_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_set_name */
   {__pyx_k_spec, sizeof(__pyx_k_spec), 0, 1, 1}, /* PyObject cname: __pyx_n_u_spec */
   {__pyx_k_struct_array, sizeof(__pyx_k_struct_array), 0, 1, 1}, /* PyObject cname: __pyx_n_u_struct_array */
+  {__pyx_k_subtract, sizeof(__pyx_k_subtract), 0, 1, 1}, /* PyObject cname: __pyx_n_u_subtract */
   {__pyx_k_test, sizeof(__pyx_k_test), 0, 1, 1}, /* PyObject cname: __pyx_n_u_test */
   {__pyx_k_type, sizeof(__pyx_k_type), 0, 1, 1}, /* PyObject cname: __pyx_n_u_type */
+  {__pyx_k_types, sizeof(__pyx_k_types), 0, 1, 1}, /* PyObject cname: __pyx_n_u_types */
   {__pyx_k_uint64, sizeof(__pyx_k_uint64), 0, 1, 1}, /* PyObject cname: __pyx_n_u_uint64 */
   {__pyx_k_utf_8, sizeof(__pyx_k_utf_8), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_utf_8 */
   {__pyx_k_val, sizeof(__pyx_k_val), 0, 1, 1}, /* PyObject cname: __pyx_n_u_val */
@@ -12178,6 +12564,17 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
+  /* "sabot/_cython/arrow/compute.pyx":218
+ *     """
+ *     import pyarrow as pa
+ *     import pyarrow.compute as pc             # <<<<<<<<<<<<<<
+ * 
+ *     # modulo(x, d) = x - floor(x / d) * d
+*/
+  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(2, __pyx_mstate_global->__pyx_n_u_pyarrow, __pyx_mstate_global->__pyx_n_u_compute); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 218, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[0]);
+  __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[0]);
+
   /* "sabot/_cython/arrow/compute.pyx":23
  * 
  * 
@@ -12185,9 +12582,9 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
  *     """
  *     Compute hash values for array elements using Arrow's XXH3 hash.
 */
-  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(1, ((PyObject*)__pyx_mstate_global->__pyx_int_0)); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 23, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[0]);
-  __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[0]);
+  __pyx_mstate_global->__pyx_tuple[1] = PyTuple_Pack(1, ((PyObject*)__pyx_mstate_global->__pyx_int_0)); if (unlikely(!__pyx_mstate_global->__pyx_tuple[1])) __PYX_ERR(0, 23, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[1]);
+  __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[1]);
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -12246,6 +12643,11 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     const __Pyx_PyCode_New_function_description descr = {0, 0, 1, 12, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS), 156, 221};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_seed, __pyx_mstate->__pyx_n_u_arrays, __pyx_mstate->__pyx_n_u_pa, __pyx_mstate->__pyx_n_u_hash_values, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_j, __pyx_mstate->__pyx_n_u_combined_hash, __pyx_mstate->__pyx_n_u_column_hashes, __pyx_mstate->__pyx_n_u_num_rows, __pyx_mstate->__pyx_n_u_num_cols, __pyx_mstate->__pyx_n_u_arr, __pyx_mstate->__pyx_n_u_arr};
     __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_arrow_compute_pyx, __pyx_mstate->__pyx_n_u_hash_combine, __pyx_k_s_83a_j_s_83a_z_U_A_s_6_s_1_q_3, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
+  }
+  {
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 204, 96};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_array, __pyx_mstate->__pyx_n_u_divisor, __pyx_mstate->__pyx_n_u_pa, __pyx_mstate->__pyx_n_u_pc, __pyx_mstate->__pyx_n_u_quotient, __pyx_mstate->__pyx_n_u_product, __pyx_mstate->__pyx_n_u_remainder};
+    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_arrow_compute_pyx, __pyx_mstate->__pyx_n_u_modulo, __pyx_k_r_q_b_A_1G1_r_5_Be1Kr_q_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;

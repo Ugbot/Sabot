@@ -11,8 +11,8 @@ Performance Targets (from PHASE4_NETWORK_SHUFFLE.md):
 """
 
 import time
-import pyarrow as pa
-import pyarrow.compute as pc
+from sabot import cyarrow as pa
+from sabot.cyarrow import compute as pc
 import numpy as np
 from typing import List
 

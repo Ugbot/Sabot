@@ -5,8 +5,8 @@ Test Cython aggregation operators with real data.
 Verifies aggregations work correctly and measure performance.
 """
 
-import pyarrow as pa
-import pyarrow.compute as pc
+from sabot import cyarrow as pa
+from sabot.cyarrow import compute as pc
 import time
 from sabot._cython.operators import (
     CythonGroupByOperator,

@@ -10,8 +10,8 @@ Verifies:
 """
 
 import pytest
-import pyarrow as pa
-import pyarrow.compute as pc
+from sabot import cyarrow as pa
+from sabot.cyarrow import compute as pc
 from sabot._cython.operators.base_operator import BaseOperator
 
 

@@ -11,7 +11,7 @@ Tests complete shuffle workflow:
 
 import pytest
 import time
-import pyarrow as pa
+from sabot import cyarrow as pa
 
 # Import shuffle components
 try:

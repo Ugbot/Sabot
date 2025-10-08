@@ -7,7 +7,7 @@ Tests lock-free Flight-based network shuffle between simulated agents.
 
 import sys
 import time
-import pyarrow as pa
+from sabot import cyarrow as pa
 from sabot._cython.shuffle.shuffle_transport import ShuffleServer, ShuffleClient
 
 

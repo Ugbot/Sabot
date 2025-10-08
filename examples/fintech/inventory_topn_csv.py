@@ -242,7 +242,7 @@ def enrich_inventory(inventory_batches, securities_dict):
         return None
 
     # Combine batches into single table
-    import pyarrow as _pa
+    from sabot import cyarrow as _pa
     enriched = _pa.concat_tables([_pa.Table.from_batches([b]) for b in enriched_batches])
 
     elapsed = time.perf_counter() - start

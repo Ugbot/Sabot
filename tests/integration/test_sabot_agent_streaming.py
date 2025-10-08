@@ -31,7 +31,7 @@ from sabot._cython.shuffle.atomic_partition_store import AtomicPartitionStore
 from sabot._cython.shuffle.lock_free_queue import SPSCRingBuffer, MPSCQueue
 
 # For batch creation only (will migrate to pure cyarrow later)
-import pyarrow as pa
+from sabot import cyarrow as pa
 
 
 # ============================================================================

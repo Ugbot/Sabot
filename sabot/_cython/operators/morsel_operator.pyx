@@ -3,7 +3,12 @@
 Morsel-Driven Operator Wrapper
 
 Automatically splits batches into cache-friendly morsels and processes them
-in parallel using work-stealing for load balancing.
+either locally (C++ threads) or via network shuffle (Arrow Flight).
+
+Decision logic:
+- Small batches (<10K rows) → direct execution (no overhead)
+- Stateless operators (map, filter) → local C++ parallel execution
+- Stateful operators (join, groupBy) → network shuffle via Arrow Flight
 """
 
 import cython
@@ -46,10 +51,15 @@ cdef class MorselDrivenOperator(BaseOperator):
             enabled: Enable morsel execution (False = passthrough)
         """
         self._wrapped_operator = wrapped_operator
-        self._num_workers = num_workers
+        self._num_workers = num_workers if num_workers > 0 else 0
         self._morsel_size_kb = morsel_size_kb
         self._enabled = enabled
-        self._parallel_processor = None
+
+        # Use shared task slot manager (unified local + network processing)
+        self._task_slot_manager = None
+
+        # Shuffle client for network morsels
+        self._shuffle_client = None
 
         # Copy source and schema from wrapped operator
         self._source = getattr(wrapped_operator, '_source', kwargs.get('source'))
@@ -61,17 +71,10 @@ cdef class MorselDrivenOperator(BaseOperator):
         self._parallelism_hint = num_workers if num_workers > 0 else 1
 
     def __dealloc__(self):
-        """Clean up parallel processor."""
-        if self._parallel_processor is not None:
-            import asyncio
-            try:
-                loop = asyncio.get_event_loop()
-                if loop.is_running():
-                    asyncio.create_task(self._parallel_processor.stop())
-                else:
-                    loop.run_until_complete(self._parallel_processor.stop())
-            except:
-                pass
+        """Clean up executors."""
+        # Task slot manager is shared across operators (managed by AgentContext)
+        # No cleanup needed here
+        pass
 
     cpdef bint should_use_morsel_execution(self, object batch):
         """
@@ -103,11 +106,12 @@ cdef class MorselDrivenOperator(BaseOperator):
     @cython.wraparound(False)
     cpdef object process_batch(self, object batch):
         """
-        Process batch with optional morsel parallelism.
+        Process batch with optimal execution strategy.
 
         Decision tree:
-        1. If batch is small → direct processing (no overhead)
-        2. If batch is large → split into morsels → parallel processing
+        1. If batch is small (<10K rows) → direct processing (no overhead)
+        2. If operator is stateful (join, groupBy) → network shuffle (Arrow Flight)
+        3. If operator is stateless (map, filter) → local parallel (C++ threads)
 
         Args:
             batch: RecordBatch to process
@@ -118,34 +122,95 @@ cdef class MorselDrivenOperator(BaseOperator):
         if batch is None:
             return None
 
-        # Check if we should use morsel execution
+        # Small batch - direct execution (no overhead)
         if not self.should_use_morsel_execution(batch):
-            # Small batch or morsel disabled - direct processing
             return self._wrapped_operator.process_batch(batch)
 
-        # Large batch - use morsel-driven parallelism
-        return self._process_batch_with_morsels(batch)
+        # Large batch - decide LOCAL vs NETWORK
+        if self._wrapped_operator.requires_shuffle():
+            # Stateful operator (join, groupBy, window)
+            # Needs network shuffle to co-locate keys across agents
+            return self._process_with_network_shuffle(batch)
+        else:
+            # Stateless operator (map, filter, select)
+            # Can process locally in parallel using C++ threads
+            return self._process_with_local_morsels(batch)
 
-    cpdef object _process_batch_with_morsels(self, object batch):
+    cdef object _process_with_local_morsels(self, object batch):
         """
-        Process batch by splitting into morsels and executing in parallel.
+        Process batch locally using shared task slot manager.
+
+        Stateless operators (map, filter, select) process morsels in parallel
+        using the agent's shared task slot pool (unified local + network processing).
 
         Steps:
-        1. Initialize parallel processor (lazy)
-        2. Split batch into morsels
-        3. Submit morsels to workers
-        4. Collect results
-        5. Reassemble into batch
-        """
-        import asyncio
+        1. Get shared task slot manager from AgentContext
+        2. Split batch into morsels (64KB chunks)
+        3. Submit morsels to shared slots (lock-free queue)
+        4. Workers process in parallel (GIL released!)
+        5. Reassemble results in order
 
-        # Lazy initialization of parallel processor
-        if self._parallel_processor is None:
-            from sabot.morsel_parallelism import ParallelProcessor
-            self._parallel_processor = ParallelProcessor(
-                num_workers=self._num_workers,
-                morsel_size_kb=self._morsel_size_kb
-            )
+        Returns:
+            Processed RecordBatch
+        """
+        # Get shared task slot manager (auto-initializes if needed)
+        if self._task_slot_manager is None:
+            from sabot.cluster.agent_context import get_or_create_slot_manager
+            self._task_slot_manager = get_or_create_slot_manager(num_slots=self._num_workers)
+
+        # Create morsels from batch
+        morsel_size_bytes = self._morsel_size_kb * 1024
+        rows_per_morsel = max(1, morsel_size_bytes // batch.schema.get_field_index('id'))  # Rough estimate
+
+        morsels = []
+        for start_row in range(0, batch.num_rows, rows_per_morsel):
+            num_rows = min(rows_per_morsel, batch.num_rows - start_row)
+            morsels.append((batch, start_row, num_rows, 0))  # (batch, start, num_rows, partition_id)
+
+        # Create callback that calls wrapped operator
+        def process_morsel_callback(morsel_batch):
+            """Process single morsel using wrapped operator."""
+            return self._wrapped_operator.process_batch(morsel_batch)
+
+        # Execute using shared task slots (releases GIL!)
+        result_batches = self._task_slot_manager.execute_morsels(
+            morsels,
+            process_morsel_callback
+        )
+
+        # Reassemble results
+        if not result_batches:
+            return None
+
+        if len(result_batches) == 1:
+            return result_batches[0]
+
+        # Multiple batches - concatenate using Arrow
+        from sabot import cyarrow as pa
+        table = pa.Table.from_batches(result_batches)
+        return table.combine_chunks()
+
+    cdef object _process_with_network_shuffle(self, object batch):
+        """
+        Process batch via network shuffle using Arrow Flight.
+
+        Stateful operators (join, groupBy, window) require shuffling data
+        across the network to co-locate records by key.
+
+        Steps:
+        1. Partition batch by key (hash partitioning)
+        2. Send partitions to remote agents via Arrow Flight
+        3. Remote agents process their partitions
+        4. Collect results
+
+        TODO: This currently uses Python asyncio. Migrate to C++ shuffle executor.
+
+        Returns:
+            Processed RecordBatch (after network shuffle)
+        """
+        # For now, fall back to Python-based shuffle
+        # TODO: Replace with C++ shuffle executor
+        import asyncio
 
         # Get or create event loop
         try:
@@ -154,75 +219,65 @@ cdef class MorselDrivenOperator(BaseOperator):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
 
-        # Process with morsels (async)
+        # Process with network shuffle (async)
         if loop.is_running():
-            # We're in an async context - create task
             future = asyncio.ensure_future(
-                self._async_process_with_morsels(batch)
+                self._async_process_with_network_shuffle(batch)
             )
             return future  # Caller must await
         else:
-            # Sync context - run until complete
             return loop.run_until_complete(
-                self._async_process_with_morsels(batch)
+                self._async_process_with_network_shuffle(batch)
             )
 
-    async def _async_process_with_morsels(self, batch):
+    async def _async_process_with_network_shuffle(self, batch):
         """
-        Async implementation of morsel processing.
+        Async implementation of network shuffle.
 
-        Args:
-            batch: RecordBatch to process
-
-        Returns:
-            Reassembled RecordBatch
+        Uses existing Arrow Flight infrastructure for zero-copy network transfer.
         """
-        # Start processor if needed
-        if not self._parallel_processor._running:
-            await self._parallel_processor.start()
+        # Initialize shuffle client if needed
+        if self._shuffle_client is None:
+            from sabot._cython.shuffle.shuffle_transport import ShuffleClient
+            self._shuffle_client = ShuffleClient()
 
-        # Create processing function that calls wrapped operator
-        async def process_morsel_func(morsel):
-            """Process a single morsel using wrapped operator."""
-            return self._wrapped_operator.process_morsel(morsel)
+        # Get partition keys from operator
+        partition_keys = self._wrapped_operator.get_partition_keys()
+        if not partition_keys:
+            # No keys - broadcast to all agents
+            # For now, just process locally
+            return self._wrapped_operator.process_batch(batch)
 
-        # Process batch with morsels
-        results = await self._parallel_processor.process_with_function(
-            data=batch,
-            processor_func=process_morsel_func,
-            partition_id=0
-        )
+        # Partition batch by keys using hash partitioner
+        from sabot._cython.shuffle.partitioner import HashPartitioner
+        partitioner = HashPartitioner(partition_keys)
+        partitions = partitioner.partition_batch(batch)
 
-        # Reassemble results
-        if not results:
-            return None
+        # TODO: Send partitions via Arrow Flight to remote agents
+        # For now, just process locally
+        # This will be implemented when we have agent coordination
 
-        # Extract batches from morsel results
-        result_batches = []
-        for result in results:
-            if hasattr(result, 'data'):
-                # It's a morsel
-                if result.data is not None:
-                    result_batches.append(result.data)
-            elif hasattr(result, '__class__') and 'RecordBatch' in str(result.__class__):
-                # Already a batch
-                result_batches.append(result)
-
-        if not result_batches:
-            return None
-
-        # Concatenate batches
-        if len(result_batches) == 1:
-            return result_batches[0]
-
-        # Multiple batches - concatenate using Arrow
-        import pyarrow as pa
-        table = pa.Table.from_batches(result_batches)
-        return table.combine_chunks()
+        return self._wrapped_operator.process_batch(batch)
 
     def get_stats(self):
         """Get morsel processing statistics."""
-        if self._parallel_processor is None:
-            return {'morsel_execution': 'not_initialized'}
+        stats = {
+            'num_workers': self._num_workers,
+            'morsel_size_kb': self._morsel_size_kb,
+            'enabled': self._enabled
+        }
 
-        return self._parallel_processor.get_stats()
+        # Get task slot manager stats (unified local + network)
+        if self._task_slot_manager is not None:
+            slot_stats = self._task_slot_manager.get_slot_stats()
+            stats.update({
+                'execution_mode': 'unified_task_slots',
+                'num_slots': self._task_slot_manager.num_slots,
+                'available_slots': self._task_slot_manager.available_slots,
+                'queue_depth': self._task_slot_manager.queue_depth,
+                'slot_stats': slot_stats
+            })
+        else:
+            stats['execution_mode'] = 'not_initialized'
+
+        return stats

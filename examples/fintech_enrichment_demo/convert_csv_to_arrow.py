@@ -15,9 +15,9 @@ Usage:
 import time
 from pathlib import Path
 from sabot import cyarrow as ca
-import pyarrow as pa  # For specialized types
-import pyarrow.csv as pa_csv
-import pyarrow.feather as feather
+from sabot import cyarrow as pa  # For specialized types (vendored Arrow)
+from sabot.cyarrow import csv as pa_csv
+from sabot.cyarrow import feather
 
 DATA_DIR = Path(__file__).parent
 

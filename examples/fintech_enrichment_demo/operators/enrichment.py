@@ -24,7 +24,7 @@ from typing import Optional, List, AsyncGenerator
 # Use Sabot's Arrow API
 from sabot import cyarrow as pa
 from sabot.cyarrow import compute as pc
-import pyarrow.flight as flight  # Flight not yet in sabot.arrow
+from sabot.cyarrow import flight  # Flight from vendored Arrow
 
 # Import Sabot's Cython compute functions
 try:
@@ -126,7 +126,7 @@ class EnrichmentOperator:
 
         logger.info(f"Loading dimension table from {self.securities_csv.name}...")
 
-        import pyarrow.csv as pa_csv  # CSV not yet in sabot.arrow
+        from sabot.cyarrow import csv as pa_csv  # CSV from vendored Arrow
 
         # Configure native CSV reader for maximum performance
         read_options = pa_csv.ReadOptions(
@@ -163,7 +163,7 @@ class EnrichmentOperator:
             table = table.rename_columns(column_names)
 
         # Cast null-type columns to string
-        import pyarrow.types as pa_types  # types module not in sabot.arrow yet
+        from sabot.cyarrow import types as pa_types  # types from vendored Arrow
         schema_fields = []
         for field in table.schema:
             if pa_types.is_null(field.type):

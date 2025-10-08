@@ -22,7 +22,7 @@ from typing import Optional, AsyncGenerator
 # Use Sabot's Arrow API (falls back to pyarrow if internal not available)
 from sabot import cyarrow as pa
 from sabot.cyarrow import compute as pc
-import pyarrow.flight as flight  # Flight not yet in sabot.arrow
+from sabot.cyarrow import flight  # Flight from vendored Arrow
 
 # Import Sabot's Cython compute functions
 try:
@@ -125,7 +125,7 @@ class WindowingOperator:
             timestamps = batch.column(self.timestamp_column)
 
         # Convert timestamps to int64 if they're not already (handle double/float types)
-        import pyarrow.types as pa_types  # types module not in sabot.arrow yet
+        from sabot.cyarrow import types as pa_types  # types from vendored Arrow
         if not pa_types.is_integer(timestamps.type):
             timestamps = pc.cast(timestamps, pa.int64())
             timestamp_field = pa.field(self.timestamp_column, pa.int64())
@@ -177,7 +177,7 @@ class WindowingOperator:
             timestamps = batch.column(self.timestamp_column)
 
         # Convert timestamps to int64 if they're not already (handle double/float types)
-        import pyarrow.types as pa_types  # types module not in sabot.arrow yet
+        from sabot.cyarrow import types as pa_types  # types from vendored Arrow
         if not pa_types.is_integer(timestamps.type):
             timestamps = pc.cast(timestamps, pa.int64())
 

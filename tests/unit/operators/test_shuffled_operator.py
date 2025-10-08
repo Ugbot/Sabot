@@ -6,7 +6,7 @@ send/receive modes, and integration with HashPartitioner.
 """
 
 import pytest
-import pyarrow as pa
+from sabot import cyarrow as pa
 from unittest.mock import Mock, MagicMock, patch
 
 # Import after compilation

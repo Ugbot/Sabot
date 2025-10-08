@@ -275,7 +275,7 @@ def windowed_topn_ranking_operator(enriched_stream, window_seconds=3600, n=5):
         return
 
     # Concatenate into single table for processing
-    import pyarrow as _pa
+    from sabot import cyarrow as _pa
     combined = _pa.concat_tables([_pa.Table.from_batches([b]) for b in all_batches])
 
     # Convert to list for grouping (TODO: vectorize this)
@@ -370,7 +370,7 @@ def best_bid_offer_operator(topn_stream):
         return
 
     # Concatenate into single table
-    import pyarrow as _pa
+    from sabot import cyarrow as _pa
     combined = _pa.concat_tables([_pa.Table.from_batches([b]) for b in all_batches])
 
     # Convert to list for processing (TODO: vectorize this)
@@ -454,7 +454,7 @@ def track_best_bid_offer(topn_batches):
     # Convert to list for display
     spreads = []
     if spread_batches:
-        import pyarrow as _pa
+        from sabot import cyarrow as _pa
         combined = _pa.concat_tables([_pa.Table.from_batches([b]) for b in spread_batches])
         spreads = combined.to_pylist()
 

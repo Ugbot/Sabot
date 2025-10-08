@@ -244,6 +244,9 @@ cdef class NumbaCompiler:
                     if 'np' in argval_lower or 'numpy' in argval_lower:
                         pattern.has_numpy = True
                         pattern.numpy_call_count += 1
+                    # PyArrow detection (pa, pc module aliases)
+                    if argval in ('pa', 'pc') or 'pyarrow' in argval_lower:
+                        pattern.has_arrow = True
 
         # Analyze imported modules
         for module in imported_modules:

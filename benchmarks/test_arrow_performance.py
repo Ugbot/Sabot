@@ -3,7 +3,7 @@
 
 import time
 import numpy as np
-import pyarrow as pa
+from sabot import cyarrow as pa
 
 from sabot.cyarrow import (
     compute_window_ids,
