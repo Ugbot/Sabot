@@ -1,6 +1,25 @@
 # Sabot Reality Check - What's Actually Working
 **Date:** October 2, 2025
-**Status:** Post-Refactor Assessment
+**Status:** HISTORICAL
+
+---
+
+## ⚠️ **HISTORICAL DOCUMENT (October 2, 2025)**
+
+**This is a snapshot of Sabot's status on October 2, 2025.**
+
+**For current status, see:**
+- **[../roadmap/CURRENT_ROADMAP_OCT2025.md](../roadmap/CURRENT_ROADMAP_OCT2025.md)** - Current roadmap (October 8)
+
+**What changed since this document:**
+- Phases 1-4 completed (were not started on October 2)
+- CLI mock removed (was identified as critical issue)
+- Arrow integration completed (was 32 NotImplementedError)
+- Agent runtime integration progressing (was "not integrated")
+- Test coverage improved (5% → 10%, 66+ → 115+ tests)
+- Functional: 20-25% → 70%
+
+**This document is preserved for historical reference.**
 
 ---
 

@@ -7,20 +7,31 @@
 Sabot is a Python framework that brings Apache Arrow's columnar performance to data processing workflows. Unlike PySpark's JVM overhead or Ray's distributed complexity, Sabot provides zero-copy Arrow operations with Cython acceleration for massive throughput on single machines.
 
 ```python
-import sabot as sb
+from sabot import cyarrow as ca
+from sabot.api.stream import Stream
+from sabot.cyarrow import compute as pc
 
-# Create app with Kafka
-app = sb.App('fraud-detection', broker='kafka://localhost:19092')
+# Load 10M rows from Parquet file
+data = ca.read_parquet('transactions.parquet')
 
-# Define streaming agent
-@app.agent('transactions')
-async def detect_fraud(stream):
-    async for transaction in stream:
-        if is_fraudulent(transaction):
-            yield alert
+# Create batch processing pipeline
+stream = (Stream.from_table(data, batch_size=100_000)
+    # Filter high-value transactions (SIMD-accelerated)
+    .filter(lambda batch: pc.greater(batch.column('amount'), 10000))
 
-# Deploy with CLI
-# $ sabot -A myapp:app worker
+    # Compute fraud score using auto-compiled Numba UDF
+    .map(lambda batch: batch.append_column('fraud_score',
+        compute_fraud_score(batch)))  # 10-100x Numba speedup
+
+    # Select output columns
+    .select('transaction_id', 'amount', 'fraud_score'))
+
+# Execute: 104M rows/sec hash joins, 10-100x UDF speedup
+for batch in stream:
+    print(f"Processed {batch.num_rows} rows")
+
+# Same code works for streaming (infinite) sources!
+# stream = Stream.from_kafka('transactions')  # Never terminates
 ```
 
 ## Project Status

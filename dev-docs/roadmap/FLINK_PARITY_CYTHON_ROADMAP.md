@@ -10,8 +10,8 @@
 
 1. **[FLINK_PARITY_ROADMAP.md](FLINK_PARITY_ROADMAP.md)** - Honest Flink comparison
 2. **[NEXT_IMPLEMENTATION_GUIDE.md](NEXT_IMPLEMENTATION_GUIDE.md)** - 3-month realistic plan
-3. **[REALITY_CHECK.md](../../REALITY_CHECK.md)** - Current ground truth
-4. **[CURRENT_PRIORITIES.md](../../CURRENT_PRIORITIES.md)** - What to work on now
+3. **[REALITY_CHECK.md](../planning/REALITY_CHECK.md)** - Current ground truth
+4. **[CURRENT_PRIORITIES.md](../planning/CURRENT_PRIORITIES.md)** - What to work on now
 
 ---
 
@@ -292,8 +292,8 @@
 **For current priorities:**
 - [NEXT_IMPLEMENTATION_GUIDE.md](NEXT_IMPLEMENTATION_GUIDE.md) - 3-month plan
 - [FLINK_PARITY_ROADMAP.md](FLINK_PARITY_ROADMAP.md) - Long-term vision
-- [REALITY_CHECK.md](../../REALITY_CHECK.md) - Current status
-- [CURRENT_PRIORITIES.md](../../CURRENT_PRIORITIES.md) - This week
+- [REALITY_CHECK.md](../planning/REALITY_CHECK.md) - Current status
+- [CURRENT_PRIORITIES.md](../planning/CURRENT_PRIORITIES.md) - This week
 
 ---
 

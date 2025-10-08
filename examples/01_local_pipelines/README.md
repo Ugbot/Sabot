@@ -245,20 +245,22 @@ ACC_2        33           $5280.00        $160.00
 
 ### State Backends
 
-Sabot provides multiple state backends:
+Sabot uses a hybrid storage architecture:
 
-| Backend | Use Case | Max Size | Latency | Durability |
-|---------|----------|----------|---------|------------|
-| MemoryBackend | Hot paths, fast access | <1GB | <1μs | Volatile |
-| RocksDBBackend | Large state | >100GB | ~100μs | Persistent |
-| RedisBackend | Distributed state | No limit | ~1ms | Distributed |
+| Backend | Purpose | Max Size | Latency | Durability |
+|---------|---------|----------|---------|------------|
+| MemoryBackend | Hot paths, temporary state | <1GB | <1μs | Volatile |
+| TonboBackend | Columnar data (aggregations, joins, windows) | >100GB | ~50μs | Persistent |
+| RocksDBBackend | Metadata (checkpoints, timers, barriers) | <100MB | ~100μs | Persistent |
+| RedisBackend | Distributed state coordination | No limit | ~1ms | Distributed |
 
 **Default:** MemoryBackend (used in stateful_processing.py)
 
 **When to use:**
 - **MemoryBackend:** Fast, small state (<1GB), can afford to lose state
-- **RocksDBBackend:** Large state (>100GB), need persistence
-- **RedisBackend:** Multi-agent, shared state across processes
+- **TonboBackend:** Large columnar data (aggregations, joins) - automatic
+- **RocksDBBackend:** System metadata only - automatic
+- **RedisBackend:** Multi-agent coordination, shared state across processes
 
 ---
 
@@ -334,11 +336,12 @@ stream → update_state(per_key) → emit_results
 
 ### State Backend Performance
 
-| Backend | Read Latency | Write Latency | Throughput |
-|---------|--------------|---------------|------------|
-| Memory | <1μs | <1μs | 10M ops/sec |
-| RocksDB | ~100μs | ~200μs | 100K ops/sec |
-| Redis | ~1ms | ~1ms | 10K ops/sec |
+| Backend | Read Latency | Write Latency | Throughput | Data Type |
+|---------|--------------|---------------|------------|-----------|
+| Memory | <1μs | <1μs | 10M ops/sec | Any |
+| Tonbo | ~50μs | ~100μs | 1M rows/sec | Columnar (Arrow) |
+| RocksDB | ~100μs | ~200μs | 100K ops/sec | Metadata only |
+| Redis | ~1ms | ~1ms | 10K ops/sec | Distributed |
 
 ---
 
@@ -383,17 +386,17 @@ stream → update_state(per_key) → emit_results
 # Small state (<1GB), fast
 state_backend = MemoryBackend()
 
-# Large state (>100GB), persistent
-state_backend = RocksDBBackend('/path/to/state')
+# Large columnar data (aggregations, joins) - automatic
+# Sabot automatically uses TonboBackend for columnar operations
 
 # Distributed, shared state
 state_backend = RedisBackend('redis://localhost:6379')
 ```
 
 **Rule of thumb:**
-- Start with MemoryBackend
-- Switch to RocksDB when state > 1GB
-- Use Redis for multi-process sharing
+- Start with MemoryBackend for user state
+- TonboBackend and RocksDBBackend are used automatically (you don't configure them)
+- Use Redis for multi-process coordination
 
 ---
 
@@ -470,7 +473,7 @@ for batch in stream:
 - Reduce batch size
 - Configure state TTL (time-to-live)
 - Set max window count
-- Use RocksDB for large state
+- Tonbo automatically handles large columnar state (>1GB)
 
 ---
 
