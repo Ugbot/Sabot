@@ -411,6 +411,24 @@ cpdef object sort_and_take(object batch, list sort_keys, int64_t limit=-1):
         raise RuntimeError(f"Error in sort_and_take: {e}")
 
 
+cdef object _remove_null_columns(object table):
+    """Remove columns with null data type."""
+    import pyarrow as pa
+
+    non_null_cols = []
+    for i, field in enumerate(table.schema):
+        if not pa.types.is_null(field.type):
+            non_null_cols.append(table.column(i))
+
+    if len(non_null_cols) < len(table.schema):
+        # Need to reconstruct schema without null columns
+        new_fields = [field for field in table.schema if not pa.types.is_null(field.type)]
+        new_schema = pa.schema(new_fields)
+        return pa.Table.from_arrays(non_null_cols, schema=new_schema)
+
+    return table
+
+
 cpdef object hash_join_batches(object left_batch, object right_batch,
                                str left_key, str right_key,
                                str join_type="inner"):
@@ -440,6 +458,10 @@ cpdef object hash_join_batches(object left_batch, object right_batch,
         # Note: This is minimal overhead as it wraps existing buffers
         left_table = pa.Table.from_batches([left_batch])
         right_table = pa.Table.from_batches([right_batch])
+
+        # Remove null-type columns (Arrow join doesn't support them)
+        left_table = _remove_null_columns(left_table)
+        right_table = _remove_null_columns(right_table)
 
         # Perform hash join (SIMD-accelerated)
         result_table = left_table.join(
