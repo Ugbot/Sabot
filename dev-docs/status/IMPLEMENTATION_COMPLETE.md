@@ -7,7 +7,7 @@ Successfully implemented complete **Flink/Spark-level streaming operator library
 - ✅ **9 high-performance operators** across 3 phases (transform, aggregation, join)
 - ✅ **Arrow-first architecture** with zero-copy throughout
 - ✅ **High-level Stream API** for easy userspace access
-- ✅ **Smart backend selection** ready (Tonbo/RocksDB integration pending)
+- ✅ **Hybrid storage architecture** implemented (Tonbo for data, RocksDB for metadata)
 - ✅ **Performance**: 0.12-729M rows/sec (up to 1000x faster than Python)
 
 ---
@@ -33,7 +33,7 @@ Successfully implemented complete **Flink/Spark-level streaming operator library
 | **aggregate** | 2.06M rows/sec | Global aggregations (sum, mean, min, max, count) |
 | **reduce** | 1.32M rows/sec | Custom reduction functions |
 | **distinct** | 1.36M rows/sec | Deduplication (99% reduction: 100K → 1K) |
-| **groupBy** | Partial | Grouped aggregations (Tonbo integration pending) |
+| **groupBy** | Partial | Grouped aggregations (uses Tonbo for large groups) |
 
 ### Phase 3: Join Operators ✅
 **File**: `sabot/_cython/operators/joins.pyx` (480 lines)
@@ -309,24 +309,26 @@ stream.foreach(lambda b: print(f"Processed {b.num_rows} rows"))
 5. **Lazy evaluation** with generator-based streaming
 6. **Chainable operations** for readable pipelines
 
+### ✅ Integrated State Backends
+1. **Tonbo state backend** - Columnar data storage (integrated and active)
+2. **RocksDB state backend** - Metadata and coordination (integrated and active)
+
 ### 🔄 Ready for Integration (Pending)
-1. **Tonbo state backend** for persistence (code ready, integration pending)
-2. **RocksDB timers** for event-time processing (code ready)
-3. **Numba UDF wrapper** for JIT acceleration
-4. **Window operators** (design complete, implementation pending)
-5. **Sorting operators** (topN, rank, rowNumber)
-6. **Pattern detection** (CEP, sessionize)
+1. **Numba UDF wrapper** for JIT acceleration
+2. **Window operators** (design complete, implementation pending)
+3. **Sorting operators** (topN, rank, rowNumber)
+4. **Pattern detection** (CEP, sessionize)
 
 ---
 
 ## Next Steps (Future Work)
 
 ### Immediate Optimizations
-1. **Integrate Tonbo state backend**
-   - Aggregation buffers → Tonbo AggregatingState
-   - Large join builds → Tonbo columnar storage
-   - Window buffers → Tonbo with TTL
-   - **Expected**: 2-5x performance improvement for aggregations/joins
+1. **Optimize Tonbo state backend usage**
+   - Tune aggregation buffer sizing for Tonbo
+   - Optimize join build performance with Tonbo columnar storage
+   - Configure window buffer TTL in Tonbo
+   - **Expected**: 2-5x performance improvement for large aggregations/joins
 
 2. **Optimize hash join**
    - Use Arrow hash_join kernel directly

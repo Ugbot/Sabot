@@ -245,11 +245,13 @@ optimized = optimizer.optimize(graph)
 
 ### 3. Choose Right State Backend
 
-| Backend | Use When | Max Size |
-|---------|----------|----------|
-| Memory | Hot paths, <1GB state | 1GB |
-| Tonbo | Medium state, <100GB | 100GB |
-| RocksDB | Large state, >100GB | 1TB+ |
+| Backend | Purpose | Max Size |
+|---------|---------|----------|
+| Memory | User state, hot paths | <1GB |
+| Tonbo | Columnar data (auto) | 1TB+ |
+| RocksDB | Metadata (auto) | <100MB |
+
+**Note:** Tonbo and RocksDB are used automatically by Sabot. You only configure MemoryBackend or RedisBackend for user state.
 
 ### 4. Monitor Performance
 

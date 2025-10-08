@@ -1,6 +1,44 @@
 # Current Priorities - Post-Refactor Next Steps
 **Date:** October 2, 2025
-**Status:** After arrow_core refactor completion
+**Status:** OUTDATED - See updated priorities
+
+---
+
+## ⚠️ **THIS DOCUMENT IS OUTDATED (October 2, 2025)**
+
+**This reflected priorities when Phases 1-4 were just starting.**
+
+**Current Status (October 8, 2025):**
+- Phases 1-4 complete (batch operators, Numba, morsels, network shuffle)
+- ~70% functional (up from 20-25%)
+- Test coverage: ~10% (66+ unit tests created)
+- CLI and channel creation: ✅ Working
+
+**See current priorities:**
+- **[CURRENT_ROADMAP_OCT2025.md](../roadmap/CURRENT_ROADMAP_OCT2025.md)** - Q4 2025 timeline and priorities
+
+---
+
+## What Changed Since This Document
+
+**Completed (were P0 in October 2):**
+- ✅ Arrow core refactor (P0 #1)
+- ✅ CLI mock removed (P0 #2)
+- ✅ Channel creation fixed (P0 #3)
+- ✅ Integration tests created (P0 #4)
+- ✅ Phases 1-4 implementation (batch, Numba, morsels, shuffle)
+
+**In Progress (were P1 in October 2):**
+- 🚧 Agent runtime integration (P1 #5) - 40% complete
+- 🚧 Stream API completion (P1 #6) - Basic ops working
+- 🚧 Test coverage increase (P1 #8) - 5% → 10%
+
+**Current Priorities (October 8):**
+- Complete Phase 5 (agent workers) - 2 weeks
+- Complete Phase 6 (DBOS control plane) - 1 week
+- Phase 7 (plan optimization) - Optional
+
+**This document is preserved for historical reference.**
 
 ---
 

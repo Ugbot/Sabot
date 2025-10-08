@@ -119,7 +119,7 @@ for result in aggregated:
 
 **Smart Backend Selection**:
 - Build side <10M rows: In-memory hash map ✅
-- Build side >=10M rows: Tonbo columnar storage (ready)
+- Build side >=10M rows: Tonbo columnar storage (integrated and active)
 
 **Example**:
 ```python
@@ -170,9 +170,9 @@ for batch in joined:
 - SIMD acceleration via Arrow compute kernels
 - Target: 10-1000M records/sec per operator
 
-### Smart State Backend Selection
-- **Tonbo**: Columnar state for aggregations, large joins, analytical queries
-- **RocksDB**: Timers, pure KV, small hash maps, session state
+### Hybrid Storage Architecture (Implemented)
+- **Tonbo**: Columnar data storage (Arrow batches, aggregations, joins) - Active
+- **RocksDB**: Metadata storage (checkpoints, timers, barriers) - Active
 - Operators automatically choose backend based on access pattern
 
 ### Chainable API
@@ -217,7 +217,7 @@ for batch in result:
 | **As-of Join** | 22,221M/s | 1-20M/s | ✅ Exceeds target |
 
 *Below-target operators will benefit from:
-1. Tonbo state backend integration (reduces memory pressure)
+1. Tonbo state backend tuning (integrated and active)
 2. Arrow compute kernel optimizations
 3. Numba JIT for UDFs
 
@@ -266,15 +266,15 @@ for batch in result:
 ## Next Steps
 
 ### Immediate (Optimization)
-1. **Integrate Tonbo state backend**
-   - Aggregation buffers → Tonbo AggregatingState
-   - Large join builds → Tonbo columnar storage
-   - Window buffers → Tonbo with TTL
+1. **Optimize Tonbo state backend usage**
+   - Tune aggregation buffer sizing for Tonbo
+   - Optimize join build performance with Tonbo columnar storage
+   - Configure window buffer TTL in Tonbo
 
-2. **Integrate RocksDB**
-   - Timers for interval joins → RocksDB sorted map
-   - Watermark tracking → RocksDB
-   - Small KV state → RocksDB ValueState
+2. **Optimize RocksDB metadata storage**
+   - Tune timer performance for interval joins
+   - Optimize watermark tracking
+   - Configure KV state compaction
 
 3. **Optimize hash join**
    - Use Arrow hash_join kernel

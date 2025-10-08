@@ -218,3 +218,9 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Test database directories
+test_rocksdb/
+test_rocksdb_final/
+test_tonbo/
+test_tonbo_final/

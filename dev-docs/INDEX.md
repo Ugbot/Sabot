@@ -4,9 +4,9 @@ This directory contains internal development documentation for the Sabot project
 
 **Note:** This documentation reflects the development journey and may contain outdated information. For current project status, see:
 - [README.md](../README.md) - Current project overview
-- [REALITY_CHECK.md](../REALITY_CHECK.md) - **Ground truth status** (October 2, 2025)
+- [REALITY_CHECK.md](planning/REALITY_CHECK.md) - **Ground truth status** (October 2, 2025)
 - [PROJECT_MAP.md](../PROJECT_MAP.md) - Codebase structure (⚠️ line counts inflated)
-- [STUB_INVENTORY.md](../STUB_INVENTORY.md) - Incomplete features (outdated)
+- [STUB_INVENTORY.md](analysis/STUB_INVENTORY.md) - Incomplete features (outdated)
 
 ---
 
@@ -14,10 +14,15 @@ This directory contains internal development documentation for the Sabot project
 
 ```
 dev-docs/
-├── status/         # Implementation status reports
-├── design/         # Design documents and architecture decisions
-├── roadmap/        # Feature roadmaps and planning
-└── results/        # Benchmark results and analysis
+├── INDEX.md            # This file - navigation guide
+├── analysis/           # Code analysis and stub inventory
+├── design/             # Design documents and architecture decisions
+├── implementation/     # Implementation guides and technical specs
+├── planning/           # Implementation plans and priorities
+├── roadmap/            # Feature roadmaps and planning
+├── results/            # Benchmark results and analysis
+├── status/             # Implementation status reports
+└── testing/            # Test organization and strategy
 ```
 
 ---
@@ -39,7 +44,7 @@ Track implementation progress and completion milestones.
 | [CYTHON_BUILD_SUMMARY.md](status/CYTHON_BUILD_SUMMARY.md) | Cython build summary | Sep 30 | Historical |
 | [COMPLETE_STATUS_AUDIT_OCT2025.md](status/COMPLETE_STATUS_AUDIT_OCT2025.md) | **Ground truth audit** | Oct 2 | **CURRENT** |
 
-**Note:** Many "completion" documents are aspirational. See [REALITY_CHECK.md](../REALITY_CHECK.md) for actual ground truth status.
+**Note:** Many "completion" documents are aspirational. See [REALITY_CHECK.md](planning/REALITY_CHECK.md) for actual ground truth status.
 
 ---
 
@@ -58,6 +63,59 @@ Architectural decisions and feature designs.
 | [ARROW_SUBMODULE_README.md](design/ARROW_SUBMODULE_README.md) | Vendored Arrow integration | Integration |
 | [COMPOSABLE_DEPLOYMENT_README.md](design/COMPOSABLE_DEPLOYMENT_README.md) | Deployment architecture | Deployment |
 | [INSTALLER_README.md](design/INSTALLER_README.md) | Installation system design | Setup |
+| [AGENT_WORKER_MODEL.md](design/AGENT_WORKER_MODEL.md) | Agent-based worker architecture | Architecture |
+| [DATA_FORMATS.md](design/DATA_FORMATS.md) | Data format specifications | Data |
+
+---
+
+## Analysis Documents (`analysis/`)
+
+Code analysis, stub inventories, and technical audits.
+
+| Document | Description | Date |
+|----------|-------------|------|
+| [STUB_INVENTORY.md](analysis/STUB_INVENTORY.md) | NotImplementedError inventory | Oct 8 |
+| [CURRENT_STUB_ANALYSIS.md](analysis/CURRENT_STUB_ANALYSIS.md) | Analysis of stub implementations | Oct 5 |
+
+---
+
+## Implementation Guides (`implementation/`)
+
+Technical implementation guides, phase specifications, and integration documentation.
+
+| Document | Description | Type |
+|----------|-------------|------|
+| [PHASE1_BATCH_OPERATOR_API.md](implementation/PHASE1_BATCH_OPERATOR_API.md) | Phase 1: Batch operator API | Phase Guide |
+| [PHASE2_AUTO_NUMBA_COMPILATION.md](implementation/PHASE2_AUTO_NUMBA_COMPILATION.md) | Phase 2: Auto-Numba compilation | Phase Guide |
+| [PHASE3_MORSEL_OPERATORS.md](implementation/PHASE3_MORSEL_OPERATORS.md) | Phase 3: Morsel-driven operators | Phase Guide |
+| [PHASE4_NETWORK_SHUFFLE.md](implementation/PHASE4_NETWORK_SHUFFLE.md) | Phase 4: Network shuffle | Phase Guide |
+| [PHASE5_AGENT_WORKER_NODE.md](implementation/PHASE5_AGENT_WORKER_NODE.md) | Phase 5: Agent worker nodes | Phase Guide |
+| [PHASE6_DBOS_CONTROL_PLANE.md](implementation/PHASE6_DBOS_CONTROL_PLANE.md) | Phase 6: DBOS control plane | Phase Guide |
+| [PHASE7_PLAN_OPTIMIZATION.md](implementation/PHASE7_PLAN_OPTIMIZATION.md) | Phase 7: Query plan optimization | Phase Guide |
+| [ARROW_MIGRATION.md](implementation/ARROW_MIGRATION.md) | Arrow migration guide | Integration |
+| [ARROW_XXH3_HASH_INTEGRATION.md](implementation/ARROW_XXH3_HASH_INTEGRATION.md) | Arrow XXH3 hash integration | Integration |
+| [CYARROW.md](implementation/CYARROW.md) | CyArrow implementation guide | Integration |
+| [DBOS_WORKFLOWS.md](implementation/DBOS_WORKFLOWS.md) | DBOS workflow integration | Integration |
+| [LOCK_FREE_QUEUE_OPTIMIZATION.md](implementation/LOCK_FREE_QUEUE_OPTIMIZATION.md) | Lock-free queue optimization | Performance |
+| [SHUFFLE_IMPLEMENTATION.md](implementation/SHUFFLE_IMPLEMENTATION.md) | Shuffle implementation details | Implementation |
+| [TONBO_FFI_INTEGRATION_SUMMARY.md](implementation/TONBO_FFI_INTEGRATION_SUMMARY.md) | Tonbo FFI integration | Integration |
+
+---
+
+## Planning Documents (`planning/`)
+
+Implementation plans, priorities, and reality checks.
+
+| Document | Description | Status |
+|----------|-------------|--------|
+| [IMPLEMENTATION_ROADMAP.md](planning/IMPLEMENTATION_ROADMAP.md) | Implementation roadmap (Phases 1-7) | ✅ **CURRENT** (Oct 8) |
+| [REALITY_CHECK.md](planning/REALITY_CHECK.md) | Ground truth project status | Historical (Oct 2) |
+| [REALITY_CHECK_OCT2025.md](planning/REALITY_CHECK_OCT2025.md) | October 2025 reality check | Historical (Oct 3) |
+| [CURRENT_PRIORITIES.md](planning/CURRENT_PRIORITIES.md) | Current implementation priorities | Historical (Oct 2) |
+| [IMPLEMENTATION_PLAN.md](planning/IMPLEMENTATION_PLAN.md) | Sequential implementation steps | Historical (Oct 2) |
+| [IMPLEMENTATION_STATUS.md](planning/IMPLEMENTATION_STATUS.md) | Implementation status tracking | Historical (Oct 3) |
+
+**Current Planning:** See [IMPLEMENTATION_ROADMAP.md](planning/IMPLEMENTATION_ROADMAP.md) for up-to-date phase status (Phases 1-4 complete).
 
 ---
 
@@ -65,15 +123,16 @@ Architectural decisions and feature designs.
 
 Feature planning and parity tracking with Apache Flink.
 
-| Document | Description | Scope |
-|----------|-------------|-------|
-| [DEVELOPMENT_ROADMAP.md](roadmap/DEVELOPMENT_ROADMAP.md) | Overall development roadmap | All features |
-| [FLINK_PARITY_ROADMAP.md](roadmap/FLINK_PARITY_ROADMAP.md) | Apache Flink parity tracking (Python) | Flink features |
-| [FLINK_PARITY_CYTHON_ROADMAP.md](roadmap/FLINK_PARITY_CYTHON_ROADMAP.md) | Flink parity with Cython acceleration | Performance |
-| [NEXT_IMPLEMENTATION_GUIDE.md](roadmap/NEXT_IMPLEMENTATION_GUIDE.md) | Next steps guide | Planning |
-| [MISSING_ARROW_FEATURES.md](roadmap/MISSING_ARROW_FEATURES.md) | Arrow features to implement | Arrow integration |
+| Document | Description | Status |
+|----------|-------------|--------|
+| [CURRENT_ROADMAP_OCT2025.md](roadmap/CURRENT_ROADMAP_OCT2025.md) | **Current roadmap (Oct 8, 2025)** | ✅ **CURRENT** |
+| [DEVELOPMENT_ROADMAP.md](roadmap/DEVELOPMENT_ROADMAP.md) | Overall development roadmap | Historical (Oct 2) |
+| [FLINK_PARITY_ROADMAP.md](roadmap/FLINK_PARITY_ROADMAP.md) | Apache Flink parity tracking | Historical (Oct 2) |
+| [FLINK_PARITY_CYTHON_ROADMAP.md](roadmap/FLINK_PARITY_CYTHON_ROADMAP.md) | Flink parity with Cython | Historical (Oct 8) |
+| [NEXT_IMPLEMENTATION_GUIDE.md](roadmap/NEXT_IMPLEMENTATION_GUIDE.md) | Next steps guide | Historical (Oct 2) |
+| [MISSING_ARROW_FEATURES.md](roadmap/MISSING_ARROW_FEATURES.md) | Arrow features to implement | Historical |
 
-**Note:** Roadmaps may be overly ambitious. Actual priorities in main [README.md](../README.md).
+**Current Roadmap:** See [CURRENT_ROADMAP_OCT2025.md](roadmap/CURRENT_ROADMAP_OCT2025.md) for up-to-date status and timeline.
 
 ---
 
@@ -90,6 +149,18 @@ Benchmarks, test results, and technical analysis.
 | [IMPLEMENTATION_DEEP_DIVE.md](results/IMPLEMENTATION_DEEP_DIVE.md) | Deep implementation analysis | Analysis |
 | [IMPLEMENTATION_SUMMARY.md](results/IMPLEMENTATION_SUMMARY.md) | Implementation summary | Analysis |
 | [PROJECT_REVIEW.md](results/PROJECT_REVIEW.md) | Project review | Review |
+| [DEMO_QUICKSTART.md](results/DEMO_QUICKSTART.md) | Demo quickstart guide | Testing |
+| [PERFORMANCE_SUMMARY.md](results/PERFORMANCE_SUMMARY.md) | Performance summary | Performance |
+
+---
+
+## Testing Documents (`testing/`)
+
+Test organization and strategy documentation.
+
+| Document | Description | Date |
+|----------|-------------|------|
+| [TEST_ORGANIZATION.md](testing/TEST_ORGANIZATION.md) | Test suite organization | Oct 5 |
 
 ---
 
@@ -110,7 +181,7 @@ Benchmarks, test results, and technical analysis.
 
 1. **Start with:** [README.md](../README.md) for current project overview
 2. **Then read:** [PROJECT_MAP.md](../PROJECT_MAP.md) to understand codebase structure
-3. **Check:** [STUB_INVENTORY.md](../STUB_INVENTORY.md) for what needs work
+3. **Check:** [STUB_INVENTORY.md](analysis/STUB_INVENTORY.md) for what needs work
 4. **Browse:** `design/` folder for architectural context
 
 ### For Understanding Design Decisions
@@ -149,7 +220,7 @@ This documentation folder is **historical and exploratory**. For authoritative i
 
 - **Current Status:** [README.md](../README.md)
 - **Architecture:** [PROJECT_MAP.md](../PROJECT_MAP.md)
-- **Incomplete Features:** [STUB_INVENTORY.md](../STUB_INVENTORY.md)
+- **Incomplete Features:** [STUB_INVENTORY.md](analysis/STUB_INVENTORY.md)
 
 When creating new dev docs:
 - Put status updates in `status/`
@@ -182,6 +253,6 @@ When creating new dev docs:
 
 ---
 
-**Last Updated:** October 2, 2025
+**Last Updated:** October 8, 2025
 **Maintained By:** Dev team
 **Questions?** See main [README.md](../README.md)

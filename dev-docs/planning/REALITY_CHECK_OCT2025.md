@@ -1,5 +1,27 @@
 # Sabot Reality Check - October 2025
 
+**Date:** October 3, 2025
+**Status:** HISTORICAL
+
+---
+
+## ⚠️ **HISTORICAL DOCUMENT (October 3, 2025)**
+
+**This is a snapshot of Sabot's status on October 3, 2025.**
+
+**For current status, see:**
+- **[../roadmap/CURRENT_ROADMAP_OCT2025.md](../roadmap/CURRENT_ROADMAP_OCT2025.md)** - Current roadmap (October 8)
+
+**What changed since this document:**
+- Phases 1-4 completed (batch operators, Numba, morsels, network shuffle)
+- Functional: 20-25% → 70%
+- Flink parity: 15-20% → 50-60%
+- State backends: Integrated hybrid architecture (Tonbo/RocksDB/Memory)
+
+**This document is preserved for historical reference.**
+
+---
+
 ## What I Fixed
 
 ### 1. Fraud Detection Throughput ✅

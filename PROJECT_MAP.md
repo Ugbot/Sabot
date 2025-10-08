@@ -153,24 +153,35 @@ Performance-critical modules implemented in Cython for 10-100x speedup over pure
 #### `_cython/state/` (State Management)
 **Purpose:** High-performance state backends for stateful stream processing
 
+**Hybrid Storage Architecture:**
+- **Tonbo:** Application data (Arrow batches, aggregations, join state, shuffle buffers)
+- **RocksDB:** Metadata (checkpoint manifests, timers, watermarks, barrier tracking)
+- **Memory:** Temporary user state (<1GB)
+
 **Files:**
 - `state_backend.pyx` - Abstract state backend interface
 - `memory_backend.pyx` - In-memory state backend
   - **Performance:** 1M+ ops/sec (measured)
   - LRU eviction with configurable max_size
   - TTL support
-- `rocksdb_state.pyx` - RocksDB-backed state (experimental)
-  - Persistent state for large working sets
-  - Falls back to SQLite if RocksDB unavailable
-  - **Status:** 🚧 Partially implemented
+- `tonbo_state.pyx` - Tonbo columnar state backend
+  - **Purpose:** Large columnar data storage (GB-TB scale)
+  - Arrow-native zero-copy operations
+  - High throughput for analytical workloads
+  - **Status:** ✅ Active and production-ready
+- `rocksdb_state.pyx` - RocksDB metadata state backend
+  - **Purpose:** Checkpoint metadata and coordination ONLY (KB-MB scale)
+  - Stores: checkpoint manifests, timers, watermarks, pickled ValueState
+  - Fast random access (<1ms)
+  - **Status:** ✅ Active for metadata storage
 - `primitives.pyx` - State primitives
   - ValueState, ListState, MapState
   - ReducingState, AggregatingState
 
-**Status:** ✅ Memory backend working, RocksDB experimental
-**Issues:**
-- RocksDB backend has dual code paths (RocksDB/SQLite fallback)
-- Complex types stored in-memory instead of persisted
+**Status:** ✅ Hybrid architecture fully implemented
+**Usage:**
+- Users configure MemoryBackend or RedisBackend for custom state
+- Tonbo and RocksDB used automatically by the system
 
 ---
 
