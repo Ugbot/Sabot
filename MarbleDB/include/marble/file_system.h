@@ -63,6 +63,11 @@ public:
     virtual Status Sync() = 0;
     virtual Status Truncate(size_t new_size) = 0;
 
+    // Memory mapping support
+    virtual Status MemoryMap(size_t offset, size_t size, void** mapped_memory) = 0;
+    virtual Status UnmapMemory(void* mapped_memory, size_t size) = 0;
+    virtual bool SupportsMemoryMapping() const = 0;
+
     // Close the file
     virtual Status Close() = 0;
 

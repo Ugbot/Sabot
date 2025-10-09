@@ -16,7 +16,7 @@ namespace marble {
 // Forward declarations
 class MemTable;
 class ImmutableMemTable;
-class SSTable;
+class LSMSSTable;
 class LSMTree;
 class CompactionManager;
 
@@ -99,10 +99,10 @@ public:
     ImmutableMemTable& operator=(const ImmutableMemTable&) = delete;
 };
 
-// SSTable (Sorted String Table) for on-disk storage
-class SSTable {
+// LSM SSTable statistics and metadata
+class LSMSSTable {
 public:
-    SSTable() = default;
+    LSMSSTable() = default;
 
     // Block-level statistics for ClickHouse-style indexing
     struct BlockStats {
@@ -139,10 +139,10 @@ public:
         std::vector<SparseIndexEntry> sparse_index;
     };
 
-    virtual ~SSTable() = default;
+    virtual ~LSMSSTable() = default;
 
     // Open an existing SSTable
-    static Status Open(const std::string& filename, std::unique_ptr<SSTable>* table);
+    static Status Open(const std::string& filename, std::unique_ptr<LSMSSTable>* table);
 
 
     // Get metadata
@@ -170,15 +170,15 @@ public:
     virtual Status ReadRecordBatch(std::shared_ptr<arrow::RecordBatch>* batch) const = 0;
 
     // Disable copying
-    SSTable(const SSTable&) = delete;
-    SSTable& operator=(const SSTable&) = delete;
+    LSMSSTable(const LSMSSTable&) = delete;
+    LSMSSTable& operator=(const LSMSSTable&) = delete;
 };
 
 // Factory function for creating SSTables with ClickHouse-style indexing
 Status CreateSSTable(const std::string& filename,
                     const std::shared_ptr<arrow::RecordBatch>& batch,
                     const DBOptions& options,
-                    std::unique_ptr<SSTable>* table);
+                    std::unique_ptr<LSMSSTable>* table);
 
 // Simple Bloom Filter implementation for ClickHouse-style indexing
 class BloomFilter {

@@ -1,4 +1,5 @@
 #include <marble/lsm_tree.h>
+#include <marble/sstable.h>
 #include <marble/file_system.h>
 #include <arrow/api.h>
 #include <arrow/util/key_value_metadata.h>
@@ -24,15 +25,15 @@ public:
             : data_(data)
             , it_(data_.begin()) {}
 
-        bool Valid() const override {
+        bool Valid() const {
             return it_ != data_.end();
         }
 
-        void SeekToFirst() override {
+        void SeekToFirst() {
             it_ = data_.begin();
         }
 
-        void SeekToLast() override {
+        void SeekToLast() {
             if (!data_.empty()) {
                 it_ = std::prev(data_.end());
             } else {
@@ -40,17 +41,17 @@ public:
             }
         }
 
-        void Seek(const marble::Key& key) override {
+        void Seek(const marble::Key& key) {
             it_ = data_.lower_bound(key.ToString());
         }
 
-        void Next() override {
+        void Next() {
             if (it_ != data_.end()) {
                 ++it_;
             }
         }
 
-        void Prev() override {
+        void Prev() {
             if (it_ != data_.begin()) {
                 --it_;
             } else {
@@ -58,21 +59,21 @@ public:
             }
         }
 
-        std::shared_ptr<marble::Key> GetKey() const override {
+        std::shared_ptr<marble::Key> GetKey() const {
             if (Valid()) {
                 return it_->second.first;
             }
             return nullptr;
         }
 
-        std::shared_ptr<Record> Value() const override {
+        std::shared_ptr<Record> Value() const {
             if (Valid()) {
                 return it_->second.second;
             }
             return nullptr;
         }
 
-        std::unique_ptr<RecordRef> ValueRef() const override {
+        std::unique_ptr<RecordRef> ValueRef() const {
             // Return zero-copy reference if available
             if (Valid() && it_->second.second) {
                 return it_->second.second->AsRecordRef();
@@ -80,7 +81,7 @@ public:
             return nullptr;
         }
 
-        marble::Status GetStatus() const override {
+        marble::Status GetStatus() const {
             return Status::OK();
         }
 
@@ -95,7 +96,7 @@ public:
         , max_size_(max_size)
         , current_size_(0) {}
 
-    Status Put(std::shared_ptr<Key> key, std::shared_ptr<Record> record) override {
+    Status Put(std::shared_ptr<Key> key, std::shared_ptr<Record> record) {
         std::unique_lock<std::mutex> lock(mutex_);
 
         // Check if we need to make space
@@ -112,7 +113,7 @@ public:
         return Status::OK();
     }
 
-    Status Get(const Key& key, std::shared_ptr<Record>* record) const override {
+    Status Get(const Key& key, std::shared_ptr<Record>* record) const {
         std::unique_lock<std::mutex> lock(mutex_);
 
         auto it = data_.find(key.ToString());
@@ -124,7 +125,7 @@ public:
         return Status::OK();
     }
 
-    Status Delete(std::shared_ptr<Key> key) override {
+    Status Delete(std::shared_ptr<Key> key) {
         std::unique_lock<std::mutex> lock(mutex_);
 
         auto it = data_.find(key->ToString());
@@ -135,30 +136,30 @@ public:
         return Status::OK();
     }
 
-    bool IsFull() const override {
+    bool IsFull() const {
         std::unique_lock<std::mutex> lock(mutex_);
         return current_size_ >= max_size_;
     }
 
-    size_t ApproximateMemoryUsage() const override {
+    size_t ApproximateMemoryUsage() const {
         std::unique_lock<std::mutex> lock(mutex_);
         return current_size_;
     }
 
-    size_t Size() const override {
+    size_t Size() const {
         std::unique_lock<std::mutex> lock(mutex_);
         return data_.size();
     }
 
-    std::unique_ptr<ImmutableMemTable> Freeze() override;
+    std::unique_ptr<ImmutableMemTable> Freeze();
 
-    void Clear() override {
+    void Clear() {
         std::unique_lock<std::mutex> lock(mutex_);
         data_.clear();
         current_size_ = 0;
     }
 
-    std::unique_ptr<Iterator> NewIterator() override {
+    std::unique_ptr<Iterator> NewIterator() {
         std::unique_lock<std::mutex> lock(mutex_);
         return std::make_unique<SkipListIterator>(data_);
     }
@@ -178,7 +179,7 @@ public:
         : ImmutableMemTable()
         , schema_(std::move(schema)) {}
 
-    Status Get(const marble::Key& key, std::shared_ptr<Record>* record) const override {
+    Status Get(const marble::Key& key, std::shared_ptr<Record>* record) const {
         auto it = data_.find(key.ToString());
         if (it == data_.end()) {
             return Status::NotFound("Key not found in immutable MemTable");
@@ -188,11 +189,11 @@ public:
         return Status::OK();
     }
 
-    std::unique_ptr<MemTable::Iterator> NewIterator() override {
+    std::unique_ptr<MemTable::Iterator> NewIterator() {
         return std::make_unique<SkipListMemTable::SkipListIterator>(data_);
     }
 
-    size_t ApproximateMemoryUsage() const override {
+    size_t ApproximateMemoryUsage() const {
         size_t size = 0;
         for (const auto& pair : data_) {
             size += pair.first.size() + 100;  // rough estimate
@@ -200,11 +201,11 @@ public:
         return size;
     }
 
-    size_t Size() const override {
+    size_t Size() const {
         return data_.size();
     }
 
-    Status ToRecordBatch(std::shared_ptr<arrow::RecordBatch>* batch) const override {
+    Status ToRecordBatch(std::shared_ptr<arrow::RecordBatch>* batch) const {
         if (data_.empty()) {
             return Status::InvalidArgument("Cannot create RecordBatch from empty MemTable");
         }
@@ -301,26 +302,26 @@ public:
     explicit BenchKey(int64_t id) : id_(id) {}
     explicit BenchKey(const std::string& str) : id_(std::stoll(str)) {}
 
-    int Compare(const marble::Key& other) const override {
+    int Compare(const marble::Key& other) const {
         const auto& other_key = static_cast<const BenchKey&>(other);
         if (id_ < other_key.id_) return -1;
         if (id_ > other_key.id_) return 1;
         return 0;
     }
 
-    std::shared_ptr<marble::Key> Clone() const override {
+    std::shared_ptr<marble::Key> Clone() const {
         return std::make_shared<BenchKey>(id_);
     }
 
-    std::string ToString() const override {
+    std::string ToString() const {
         return std::to_string(id_);
     }
 
-    size_t Hash() const override {
+    size_t Hash() const {
         return std::hash<int64_t>()(id_);
     }
 
-    arrow::Result<std::shared_ptr<arrow::Scalar>> ToArrowScalar() const override {
+    arrow::Result<std::shared_ptr<arrow::Scalar>> ToArrowScalar() const {
         return arrow::MakeScalar(id_);
     }
 
@@ -340,11 +341,11 @@ class BenchRecordImpl : public marble::Record {
 public:
     explicit BenchRecordImpl(BenchRecord record) : record_(std::move(record)) {}
 
-    std::shared_ptr<marble::Key> GetKey() const override {
+    std::shared_ptr<marble::Key> GetKey() const {
         return std::make_shared<BenchKey>(record_.id);
     }
 
-    std::shared_ptr<arrow::Schema> GetArrowSchema() const override {
+    std::shared_ptr<arrow::Schema> GetArrowSchema() const {
         return arrow::schema({
             arrow::field("id", arrow::int64()),
             arrow::field("name", arrow::utf8()),
@@ -353,7 +354,7 @@ public:
         });
     }
 
-    arrow::Result<std::shared_ptr<arrow::RecordBatch>> ToRecordBatch() const override {
+    arrow::Result<std::shared_ptr<arrow::RecordBatch>> ToRecordBatch() const {
         arrow::Int64Builder id_builder;
         arrow::StringBuilder name_builder;
         arrow::StringBuilder value_builder;
@@ -378,7 +379,7 @@ public:
         return sizeof(BenchRecord) + record_.name.size() + record_.value.size();
     }
 
-    std::unique_ptr<RecordRef> AsRecordRef() const override {
+    std::unique_ptr<RecordRef> AsRecordRef() const {
         // Return a simple implementation - in practice this would provide
         // zero-copy access to the underlying data
         return nullptr; // Placeholder
@@ -398,13 +399,13 @@ public:
                         const std::vector<ColumnPredicate>& predicates)
         : batch_(batch), current_row_(0), predicates_(predicates) {}
 
-    ~ArrowSSTableIterator() override = default;
+    ~ArrowSSTableIterator() = default;
 
-    bool Valid() const override {
+    bool Valid() const {
         return batch_ && current_row_ < static_cast<size_t>(batch_->num_rows());
     }
 
-    void SeekToFirst() override {
+    void SeekToFirst() {
         current_row_ = 0;
         // Skip to first matching row if predicates exist
         while (Valid() && !MatchesPredicates()) {
@@ -412,7 +413,7 @@ public:
         }
     }
 
-    void SeekToLast() override {
+    void SeekToLast() {
         current_row_ = batch_->num_rows() - 1;
         // Skip to last matching row if predicates exist
         while (current_row_ > 0 && !MatchesPredicates()) {
@@ -420,7 +421,7 @@ public:
         }
     }
 
-    void Seek(const Key& target) override {
+    void Seek(const Key& target) {
         // Simplified seek - would need proper key comparison
         current_row_ = 0;  // Start from beginning
         while (Valid() && !MatchesTarget(target)) {
@@ -428,7 +429,7 @@ public:
         }
     }
 
-    void Next() override {
+    void Next() {
         if (Valid()) {
             ++current_row_;
             // Skip rows that don't match predicates
@@ -438,7 +439,7 @@ public:
         }
     }
 
-    void Prev() override {
+    void Prev() {
         if (current_row_ > 0) {
             --current_row_;
             // Skip rows that don't match predicates
@@ -448,13 +449,13 @@ public:
         }
     }
 
-    std::shared_ptr<marble::Key> GetKey() const override {
+    std::shared_ptr<marble::Key> GetKey() const {
         if (!Valid()) return nullptr;
         // Simplified - return a key based on row index
         return std::make_shared<BenchKey>(static_cast<int64_t>(current_row_));
     }
 
-    std::shared_ptr<Record> Value() const override {
+    std::shared_ptr<Record> Value() const {
         if (!Valid()) return nullptr;
 
         // Create a record from the current row
@@ -466,11 +467,11 @@ public:
         return std::make_shared<BenchRecordImpl>(record);
     }
 
-    marble::Status GetStatus() const override {
+    marble::Status GetStatus() const {
         return marble::Status::OK();
     }
 
-    std::unique_ptr<RecordRef> ValueRef() const override {
+    std::unique_ptr<RecordRef> ValueRef() const {
         // Return a simple implementation that wraps the record
         // In a full implementation, this would provide zero-copy access
         return nullptr; // Placeholder
@@ -508,15 +509,15 @@ private:
 };
 
 // SSTable implementation using Arrow and filesystem
-class ArrowSSTable : public SSTable {
+class ArrowSSTable : public LSMSSTable {
 public:
     explicit ArrowSSTable(const std::string& filename)
-        : SSTable()
+        : LSMSSTable()
         , filename_(filename) {}
 
-    ~ArrowSSTable() override = default;
+    ~ArrowSSTable() = default;
 
-    static Status Open(const std::string& filename, std::unique_ptr<SSTable>* table) {
+    static Status Open(const std::string& filename, std::unique_ptr<LSMSSTable>* table) {
         auto sstable = std::make_unique<ArrowSSTable>(filename);
 
         // Load metadata and data
@@ -530,7 +531,7 @@ public:
     static Status Create(const std::string& filename,
                         const std::shared_ptr<arrow::RecordBatch>& batch,
                         const DBOptions& options,
-                        std::unique_ptr<SSTable>* table) {
+                        std::unique_ptr<LSMSSTable>* table) {
         auto sstable = std::make_unique<ArrowSSTable>(filename);
 
         // Write the batch to file
@@ -554,32 +555,32 @@ public:
             return Status::OK();
         }
 
-        // Initialize metadata with indexing options
-        metadata_.block_size = options.target_block_size;
-        metadata_.index_granularity = options.index_granularity;
-        metadata_.has_sparse_index = options.enable_sparse_index;
-        metadata_.has_bloom_filter = options.enable_bloom_filter;
+        // Initialize indexing options
+        block_size_ = options.target_block_size;
+        index_granularity_ = options.index_granularity;
+        has_sparse_index_ = options.enable_sparse_index;
+        has_bloom_filter_ = options.enable_bloom_filter;
 
         // Build block-level statistics and sparse index
         int64_t num_rows = batch->num_rows();
-        size_t num_blocks = (num_rows + options.target_block_size - 1) / options.target_block_size;
+        size_t num_blocks = (num_rows + block_size_ - 1) / block_size_;
 
-        metadata_.block_stats.reserve(num_blocks);
+        block_stats_.reserve(num_blocks);
 
-        if (options.enable_sparse_index) {
-            metadata_.sparse_index.reserve(num_rows / options.index_granularity + 1);
+        if (has_sparse_index_) {
+            sparse_index_.reserve(num_rows / index_granularity_ + 1);
         }
 
-        if (options.enable_bloom_filter) {
+        if (has_bloom_filter_) {
             bloom_filter_ = std::make_unique<BloomFilter>(options.bloom_filter_bits_per_key, num_rows);
         }
 
         // Process each block
         for (size_t block_idx = 0; block_idx < num_blocks; ++block_idx) {
-            size_t start_row = block_idx * options.target_block_size;
-            size_t end_row = std::min(start_row + options.target_block_size, static_cast<size_t>(num_rows));
+            size_t start_row = block_idx * block_size_;
+            size_t end_row = std::min(start_row + block_size_, static_cast<size_t>(num_rows));
 
-            BlockStats block_stat;
+            LSMSSTable::BlockStats block_stat;
             block_stat.first_row_index = start_row;
             block_stat.row_count = end_row - start_row;
 
@@ -592,13 +593,11 @@ public:
                 block_stat.max_key = max_key;
 
                 // Update global min/max
-                if (!metadata_.smallest_key ||
-                    min_key->Compare(*metadata_.smallest_key) < 0) {
-                    metadata_.smallest_key = min_key;
+                if (!smallest_key_ || min_key->Compare(*smallest_key_) < 0) {
+                    smallest_key_ = min_key;
                 }
-                if (!metadata_.largest_key ||
-                    max_key->Compare(*metadata_.largest_key) > 0) {
-                    metadata_.largest_key = max_key;
+                if (!largest_key_ || max_key->Compare(*largest_key_) > 0) {
+                    largest_key_ = max_key;
                 }
 
                 // Add to bloom filter
@@ -610,19 +609,17 @@ public:
                 }
             }
 
-            metadata_.block_stats.push_back(block_stat);
+            block_stats_.push_back(block_stat);
 
             // Build sparse index
-            if (options.enable_sparse_index && (start_row % options.index_granularity == 0)) {
-                SparseIndexEntry entry;
+            if (has_sparse_index_ && (start_row % index_granularity_ == 0)) {
+                LSMSSTable::SparseIndexEntry entry;
                 entry.key = std::make_shared<BenchKey>(static_cast<int64_t>(start_row));
                 entry.block_index = block_idx;
                 entry.row_index = start_row;
-                metadata_.sparse_index.push_back(entry);
+                sparse_index_.push_back(entry);
             }
         }
-
-        metadata_.num_entries = num_rows;
         return Status::OK();
     }
 
@@ -636,7 +633,7 @@ public:
         }
 
         // Use sparse index for efficient lookup if available
-        if (metadata_.has_sparse_index && !metadata_.sparse_index.empty()) {
+        if (has_sparse_index_ && !sparse_index_.empty()) {
             // Convert key to integer for easier comparison (assuming BenchKey)
             int64_t target_key;
             try {
@@ -648,15 +645,15 @@ public:
 
             // Find the sparse index entry that covers this key
             // Each entry covers [entry.key, entry.key + granularity)
-            size_t sparse_idx = target_key / metadata_.index_granularity;
-            if (sparse_idx >= metadata_.sparse_index.size()) {
-                sparse_idx = metadata_.sparse_index.size() - 1;
+            size_t sparse_idx = target_key / index_granularity_;
+            if (sparse_idx >= sparse_index_.size()) {
+                sparse_idx = sparse_index_.size() - 1;
             }
 
             // Search within the block covered by this sparse index entry
-            size_t block_start = metadata_.sparse_index[sparse_idx].row_index;
-            size_t block_end = (sparse_idx + 1 < metadata_.sparse_index.size()) ?
-                metadata_.sparse_index[sparse_idx + 1].row_index :
+            size_t block_start = sparse_index_[sparse_idx].row_index;
+            size_t block_end = (sparse_idx + 1 < sparse_index_.size()) ?
+                sparse_index_[sparse_idx + 1].row_index :
                 static_cast<size_t>(batch_->num_rows());
 
             // Linear search within the block
@@ -707,31 +704,31 @@ public:
 
     bool KeyMayMatch(const Key& key) const override {
         // Check bloom filter first if available
-        if (metadata_.has_bloom_filter && bloom_filter_) {
+        if (has_bloom_filter_ && bloom_filter_) {
             if (!bloom_filter_->MayContain(key)) {
                 return false;
             }
         }
 
         // Check if key is within the range of this SSTable
-        if (metadata_.smallest_key && metadata_.largest_key) {
-            return key.Compare(*metadata_.smallest_key) >= 0 &&
-                   key.Compare(*metadata_.largest_key) <= 0;
+        if (smallest_key_ && largest_key_) {
+            return key.Compare(*smallest_key_) >= 0 &&
+                   key.Compare(*largest_key_) <= 0;
         }
 
         return true;
     }
 
     Status GetBloomFilter(std::string* bloom_filter) const override {
-        if (bloom_filter_ && metadata_.has_bloom_filter) {
+        if (bloom_filter_ && has_bloom_filter_) {
             return bloom_filter_->Serialize(bloom_filter);
         }
         *bloom_filter = "";
         return Status::NotFound("No bloom filter available");
     }
 
-    Status GetBlockStats(std::vector<BlockStats>* stats) const override {
-        *stats = metadata_.block_stats;
+    Status GetBlockStats(std::vector<LSMSSTable::BlockStats>* stats) const override {
+        *stats = block_stats_;
         return Status::OK();
     }
 
@@ -765,10 +762,16 @@ private:
         // This is simplified - real implementation would read the Arrow file
         // and extract min/max keys and other metadata
         // Preserve indexing metadata set during BuildIndexing
-        bool preserve_indexing = metadata_.has_sparse_index || metadata_.has_bloom_filter;
+        bool preserve_indexing = has_sparse_index_ || has_bloom_filter_;
         size_t saved_num_entries = metadata_.num_entries;
         auto saved_smallest = metadata_.smallest_key;
         auto saved_largest = metadata_.largest_key;
+        auto saved_block_stats = metadata_.block_stats;
+        auto saved_sparse_index = metadata_.sparse_index;
+        auto saved_block_size = metadata_.block_size;
+        auto saved_index_granularity = metadata_.index_granularity;
+        auto saved_has_bloom = metadata_.has_bloom_filter;
+        auto saved_has_sparse = metadata_.has_sparse_index;
 
         metadata_.num_entries = batch_ ? static_cast<uint64_t>(batch_->num_rows()) : 0;  // Calculate from loaded batch
 
@@ -777,6 +780,12 @@ private:
             metadata_.num_entries = saved_num_entries;
             metadata_.smallest_key = saved_smallest;
             metadata_.largest_key = saved_largest;
+            metadata_.block_stats = saved_block_stats;
+            metadata_.sparse_index = saved_sparse_index;
+            metadata_.block_size = saved_block_size;
+            metadata_.index_granularity = saved_index_granularity;
+            metadata_.has_bloom_filter = saved_has_bloom;
+            metadata_.has_sparse_index = saved_has_sparse;
         }
 
         return Status::OK();
@@ -804,6 +813,16 @@ private:
     Metadata metadata_;
     std::shared_ptr<arrow::RecordBatch> batch_;
     std::unique_ptr<BloomFilter> bloom_filter_;
+
+    // Indexing data stored in the SSTable itself
+    size_t block_size_ = 1024;
+    size_t index_granularity_ = 100;
+    bool has_sparse_index_ = false;
+    bool has_bloom_filter_ = false;
+    std::vector<LSMSSTable::BlockStats> block_stats_;
+    std::vector<LSMSSTable::SparseIndexEntry> sparse_index_;
+    std::shared_ptr<Key> smallest_key_;
+    std::shared_ptr<Key> largest_key_;
 };
 
 // BloomFilter implementation
@@ -902,7 +921,7 @@ std::unique_ptr<MemTable> CreateSkipListMemTable(std::shared_ptr<Schema> schema)
 Status CreateSSTable(const std::string& filename,
                     const std::shared_ptr<arrow::RecordBatch>& batch,
                     const DBOptions& options,
-                    std::unique_ptr<SSTable>* table) {
+                    std::unique_ptr<LSMSSTable>* table) {
     return ArrowSSTable::Create(filename, batch, options, table);
 }
 

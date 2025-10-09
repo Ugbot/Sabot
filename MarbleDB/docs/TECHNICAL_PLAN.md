@@ -1,323 +1,511 @@
 # MarbleDB Technical Plan
 
 ## Overview
-MarbleDB is a C++ columnar state store implementation inspired by Tonbo, designed for the Sabot project. It implements an LSM-tree using Apache Arrow Feather files for efficient columnar storage with fixed run lengths to enable clean merging operations.
+MarbleDB is a high-performance, distributed analytical database built on Apache Arrow, designed for time-series and real-time analytics workloads. It combines QuestDB-style ingestion performance with ClickHouse-class analytical capabilities and ArcticDB-style bitemporal versioning, all distributed via Raft consensus for strong consistency.
+
+**Vision**: A unified analytical database that excels at both ingestion and complex queries, with time travel, real-time streaming, and distributed consistency.
 
 ## Core Architecture
 
-### 1. LSM Tree Structure
-- **Levels**: 7 levels (L0-L6) similar to Tonbo
-- **Level 0**: Uncompacted SSTables from memtable flushes
-- **Levels 1-6**: Compacted SSTables with increasing sizes
-- **Fixed Run Lengths**: Each level has a fixed number of SSTables before compaction
+### 1. Arrow-First Storage Hierarchy
 
-### 2. Storage Components
+MarbleDB implements a hierarchical storage format optimized for analytical workloads:
 
-#### MemTable
-- **Type**: SkipList-based in-memory table
-- **Format**: Arrow RecordBatch storage
-- **Trigger**: Size-based flush trigger (configurable)
-- **WAL**: Write-ahead logging for durability
+```
+Segment (immutable, atomic commit unit)
+├── Stripe (co-accessed columns for late materialization)
+│   ├── Column Chunk (contiguous values)
+│   │   └── Page (Arrow IPC buffers, compressed)
+│   │       └── Footer (checksums, statistics, metadata)
+└── Segment Footer (checksums, row counts, min/max timestamps, bloom filters)
+```
 
-#### SSTable (Sorted String Table)
-- **Format**: Apache Arrow Feather files
-- **Structure**: Columnar storage with metadata
-- **Compression**: LZ4/ZSTD support via Arrow
-- **Indexing**: Primary key indexing within files
+**Key Design Decisions:**
+- **Zero-copy access**: Arrow IPC enables direct memory mapping
+- **Columnar stripes**: Groups frequently co-accessed columns
+- **Page-level indexing**: Fine-grained pruning and access
+- **Segment immutability**: Enables atomic commits and time travel
 
-#### WAL (Write-Ahead Log)
-- **Format**: Binary log with record serialization
-- **Sync**: Configurable sync behavior (every write, periodic, none)
-- **Recovery**: Crash recovery from WAL files
+### 2. Time-Series Partitioning Strategy
 
-### 3. Columnar Storage Design
+**Primary Partitioning**: Time-based windows (1m/5m/1h/day configurable)
+**Secondary Clustering**: Multi-column sort keys (e.g., `(symbol, tenant, shard)`)
+**Hot Segments**: 32–256 MB in-memory segments, time or size-based sealing
 
-#### Record Schema
+### 3. Bitemporal Versioning
+
+**System Time (MVCC)**: `AS OF <timestamp | snapshot_id>` for transaction isolation
+**Valid Time**: Implicit `valid_from`, `valid_to` columns for temporal modeling
+**Storage**: Delete vectors + overlay for efficient point-in-time reconstruction
+
+### 4. Distributed Consensus Layer
+
+**Raft Integration**: Strong consistency across cluster nodes
+- **State Machines**: WAL replication + schema change coordination
+- **Persistent Logs**: Crash-recoverable operation history
+- **Dynamic Membership**: Add/remove nodes without downtime
+- **Arrow Flight Transport**: High-performance inter-node communication
+
+## Ingestion Pipeline
+
+### 1. High-Throughput Append-Only Ingestion
+
+**Flight DoPut Interface**: Streaming Arrow RecordBatch ingestion
+- **Partitioning**: Automatic routing to time + cluster key partitions
+- **Lock-free staging**: Multiple concurrent writers to hot segments
+- **Backpressure**: Bounded queues with overload strategies
+
+**Disruptor Stages**:
+1. **Receive** → Validate → Schema evolve → Encode/compress
+2. **Build indexes** → Seal → Fsync → Manifest commit
+
+**Performance Targets**:
+- Sustained ingest: > 10-50 MB/s/core
+- 99p latency to visibility: < 1-2 seconds
+- Hot segment sealing: < 100ms blocking
+
+### 2. Schema Evolution & Backpressure
+
+**Additive Schema Changes**: New columns with automatic null backfill
+**Type Safety**: Compatible type widening (int32 → int64, etc.)
+**Concurrent Writers**: Fair queuing with configurable backpressure policies
+
+## Execution Engine & Query Processing
+
+### 1. Vectorized Kernel Architecture
+
+**SIMD-Optimized Operations**:
+- Filter, project, hash aggregate, partial sort
+- Late materialization: Filter keys first, fetch payloads second
+- Rolling windows: SIMD-accelerated temporal aggregations
+
+**Performance Goals**:
+- 60-80% CPU time in vectorized kernels
+- Cache-aligned batch processing (64k rows typical)
+- NUMA-aware thread placement
+
+### 2. Multi-Level Pruning Strategy
+
+**Pruning Hierarchy** (evaluated in order):
+1. **Manifest Pruning**: Partition/time window elimination
+2. **Stripe Synopsis**: Composite mini-indexes for hot queries
+3. **Page Zone Maps**: Min/max/null counts + quantiles
+4. **Bloom Filters**: Membership testing (fixed-width + token/n-gram)
+5. **Dictionary Checks**: Low-cardinality optimizations
+6. **Adaptive Replanning**: Adjust strategy based on observed selectivity
+
+**Index Formats**:
+- **Zone Maps**: `min, max, nulls, quantiles[0.25,0.5,0.75]`
+- **Bloom Filters**: Target FPR <2%, size optimized per cardinality
+- **Interval Trees**: Valid-time range queries
+- **Sparse Key Maps**: `(cluster_key) → (segment, page)` for point lookups
+
+### 3. Query Compilation Pipeline
+
+**Deterministic Planner**:
+1. Normalize filters (CNF conversion, NOT propagation)
+2. Partition pruning by manifest metadata
+3. Zone map evaluation (min/max/null checks)
+4. Bloom filter pruning for selective predicates
+5. Adaptive replanning if selectivity deviates significantly
+
+**Tunable Thresholds**:
+- S1 (30%): Synopsis selectivity threshold
+- S2 (10%): Zone map selectivity threshold
+- S3 (3%): Bloom selectivity threshold
+- δ (2×): Adaptive replanning deviation factor
+
+## Storage & Compaction Architecture
+
+### 1. Compaction Strategies
+
+**Minor Compaction**: Merge small hot segments
+**Major Compaction**: Recluster by (time, key), rebuild indexes
+**TTL Management**: Policy-based retention with vacuum
+**Raft Coordination**: Leadership-aware to prevent thrashing
+
+### 2. Caching & I/O Optimization
+
+**Unified Cache Hierarchy**:
+- Page cache (decompressed Arrow arrays)
+- Footer/synopsis metadata cache
+- Bloom filter cache with admission control
+
+**Prefetching**:
+- Cooperative readahead based on pruning predictions
+- NUMA-local cache placement
+- Ghost entries for cache admission decisions
+
+## Distributed Systems Integration
+
+### 1. Raft Consensus Layer
+
+**Completed Integration**:
+- `MarbleWalStateMachine`: WAL replication across nodes
+- `MarbleSchemaStateMachine`: DDL coordination
+- `MarbleLogStore`: Persistent Raft logs with recovery
+- `RaftClusterManager`: Dynamic configuration management
+- `ArrowFlightTransport`: High-performance inter-node comms
+
+### 2. Failure Recovery & Consistency
+
+**WAL Replay**: Complete partial segments on recovery
+**Raft Snapshots**: System-time versioning for time travel
+**Exactly-Once Semantics**: Batch IDs prevent duplicates
+**Linearizability**: Jepsen-style testing for distributed correctness
+
+## API Design & Tooling
+
+### 1. Embedded C++/Python APIs
+
+**Core Interface**:
 ```cpp
-struct RecordSchema {
-    std::vector<ArrowField> fields;
-    size_t primary_key_index;
-    std::vector<size_t> primary_key_indices; // for composite keys
-};
+// Database lifecycle
+auto db = MarbleDB::Open("/path/to/db");
+db->CreateTable(schema);
+db->Append(record_batch);
+auto snapshot = db->Commit();
+
+// Query interface
+ScanSpec spec;
+spec.columns = {"timestamp", "value"};
+spec.filter = "timestamp > '2024-01-01'";
+spec.as_of = snapshot_id;
+auto result = db->Scan(spec);
 ```
 
-#### Feather File Structure
-```
-[Header: Magic + Schema + Metadata]
-[Column 0 Data]
-[Column 1 Data]
-...
-[Column N Data]
-[Footer: Statistics + Bloom Filter + Index]
-```
+### 2. Flight & ADBC Integration
 
-#### Fixed Run Lengths
-- **Level 0**: 4 SSTables max
-- **Level 1**: 8 SSTables max
-- **Level 2**: 16 SSTables max
-- **Level 3+**: 32 SSTables max
-
-### 4. Compaction Strategy
-
-#### Leveled Compaction (Primary)
-- **Trigger**: When level exceeds max SSTable count
-- **Scope**: Key-range based compaction
-- **Merge**: Clean merging due to fixed run lengths
-- **Output**: Single SSTable per compaction
-
-#### Compaction Process
-1. Select overlapping SSTables in target level
-2. Merge with overlapping SSTables from source level
-3. Write new SSTable with sorted, merged data
-4. Update manifest and delete old files
-
-### 5. Key Components
-
-#### Core Classes
+**Flight Service**:
 ```cpp
-class MarbleDB {
-    std::unique_ptr<MemTable> memtable_;
-    std::unique_ptr<Manifest> manifest_;
-    std::unique_ptr<Compactor> compactor_;
-    std::unique_ptr<WAL> wal_;
-};
+// Streaming ingestion
+flight_client.DoPut(descriptor, record_batch);
 
-class MemTable {
-    arrow::RecordBatchVector batches_;
-    size_t size_threshold_;
-};
-
-class SSTable {
-    std::string path_;
-    std::shared_ptr<arrow::Schema> schema_;
-    std::unique_ptr<FeatherReader> reader_;
-};
-
-class Compactor {
-    std::unique_ptr<LeveledCompactionStrategy> strategy_;
-};
+// Query execution
+auto result = flight_client.DoGet(scan_spec_descriptor);
 ```
 
-#### Key Abstractions
-- **Record**: Abstract base for user records
-- **Schema**: Column definitions and constraints
-- **Key**: Primary key abstraction (supports composite keys)
-- **Value**: Record value abstraction
+**ADBC Driver**: SQL → ScanSpec translation for broad ecosystem compatibility.
 
-### 6. Transaction Support
+### 3. Administrative Tools
 
-#### Transaction Types
-- **Read Transactions**: Snapshot isolation
-- **Write Transactions**: Optimistic concurrency control
-- **Batch Writes**: Efficient bulk operations
+**marblectl**: Inspect manifests, dump indexes, tail streams, diff snapshots
+**Metrics**: Ingest rate, prune ratio, Bloom FPR, scan efficiency, cache hit rates
+**Tracing**: Per-query spans for performance debugging
 
-#### Concurrency Control
-- **Lock Map**: Key-level locking for write conflicts
-- **Snapshot Isolation**: Read transactions see consistent state
-- **Write Conflicts**: Detected via key-level conflict checking
+## 🏛️ MarbleDB Grand Vision & Technical Plan
 
-### 7. Storage Backends
+MarbleDB aims to become the **analytical database that combines the best of QuestDB, ClickHouse, and ArcticDB** - delivering high-performance time-series ingestion, analytical query performance, and bitemporal time travel, all with distributed consistency.
 
-#### Local Filesystem
-- **Implementation**: std::filesystem + memory mapping
-- **Features**: Direct I/O, memory mapping for reads
+This document outlines the **complete technical vision** and **realistic implementation strategy** to achieve this ambitious goal.
 
-#### S3/Object Storage (Future)
-- **Implementation**: AWS SDK / MinIO client
-- **Features**: Multipart uploads, range reads
+---
 
-### 8. API Design
+## 🎯 The Grand Vision: Analytical Database for the Modern Era
 
-#### Basic Operations
-```cpp
-class MarbleDB {
-public:
-    Status Put(const Key& key, std::shared_ptr<Record> record);
-    Status Get(const Key& key, std::shared_ptr<Record>* record);
-    Status Delete(const Key& key);
+MarbleDB will be a **unified analytical database** that excels at:
 
-    std::unique_ptr<Iterator> Scan(const KeyRange& range);
-    std::unique_ptr<Transaction> BeginTransaction();
-};
+1. **Time-Series Ingestion**: QuestDB-level performance for high-velocity data streams
+2. **Analytical Queries**: ClickHouse-competitive performance on complex aggregations
+3. **Bitemporal Time Travel**: ArcticDB-style versioning for audit and temporal queries
+4. **Distributed Consistency**: Raft-based strong consistency without sacrificing performance
+5. **Streaming Analytics**: Real-time processing with exactly-once semantics
+
+**Unique Value Proposition**: The only analytical database that delivers all these capabilities without compromise.
+
+---
+
+## 📋 Implementation Strategy: Realistic Path to the Vision
+
+### Phase 1: Foundation (3-4 months) - Establish Technical Feasibility
+
+**Goal**: Working end-to-end system that proves the architectural direction
+
+**Deliverables**:
+- ✅ **Basic Arrow Storage**: File-based columnar storage using Feather format
+- ✅ **Flight Ingestion**: Arrow RecordBatch append via DoPut
+- ✅ **Time-Partitioned Queries**: Basic scanning with time-based filtering
+- ✅ **Embedded API**: Simple C++/Python interfaces
+
+**Success Metrics**:
+- Store/query time-series data end-to-end
+- 1-5 MB/s/core ingestion baseline
+- Basic time-range queries working
+
+### Phase 2: Analytical Performance (3-4 months) - Justify the Architecture
+
+**Goal**: Deliver the analytical performance that differentiates MarbleDB
+
+**Deliverables**:
+- **Indexing Layer**: Zone maps, bloom filters, basic statistics
+- **Vectorized Execution**: SIMD-accelerated query operators
+- **Aggregation Engine**: COUNT, SUM, AVG, GROUP BY operations
+- **Query Optimization**: Filter pushdown and basic planning
+
+**Success Metrics**:
+- 5-20× query performance improvement with indexing
+- Handle 10-100GB datasets efficiently
+- 50-80% query plans utilize indexes
+
+### Phase 3: Distributed Reliability (4-6 months) - Production-Ready Foundation
+
+**Goal**: Fault-tolerant, scalable distributed system
+
+**Deliverables**:
+- **Raft Consensus**: Multi-node clusters with strong consistency
+- **WAL + Recovery**: Crash-safe operation with minimal data loss
+- **Basic Compaction**: Size-based file merging and cleanup
+- **Cluster Management**: Node addition/removal, basic monitoring
+- **Streaming**: Real-time data tailing capabilities
+
+**Success Metrics**:
+- 3-node clusters survive single node failures
+- <1 minute crash recovery
+- Linear scaling with additional nodes
+
+### Phase 4: Advanced Analytics (6-12 months) - Unique Capabilities
+
+**Goal**: Features that make MarbleDB uniquely valuable
+
+**Deliverables**:
+- **Bitemporal Time Travel**: System + valid time versioning
+- **Advanced Pruning**: Multi-level indexing (100-1000× performance gains)
+- **Streaming Analytics**: Windowed operations, complex event processing
+- **Cloud Integration**: S3/GCS support for elastic storage
+- **Enterprise Security**: mTLS, row-level access control, audit logging
+
+**Success Metrics**:
+- Complex analytical queries with time travel
+- 100-1000× selective query improvements
+- Cloud-native deployment patterns
+
+### Phase 5: Ecosystem & Scale (12+ months) - Market Leadership
+
+**Goal**: Complete analytical database ecosystem
+
+**Deliverables**:
+- **GPU Acceleration**: CUDA/ROCm for heavy analytical workloads
+- **Advanced Analytics**: Statistical functions, ML model integration
+- **Deep Ecosystem**: ADBC drivers, BI tool connectors, SQL dialects
+- **Global Scale**: Multi-region, cross-cloud, geo-distributed deployments
+- **Advanced Features**: Vector search, inverted indexes, specialized analytics
+
+**Success Metrics**:
+- Competitive with ClickHouse on analytical benchmarks
+- Market-leading time travel and bitemporal capabilities
+- Enterprise-grade scalability and reliability
+
+---
+
+## 🌟 The Complete MarbleDB Grand Plan
+
+This section outlines the **full technical scope** of what MarbleDB could become - the comprehensive vision that guides long-term development. This is **aspirational** and represents the complete feature set rather than immediate implementation priorities.
+
+### 1. Ingestion: QuestDB-Class Performance
+
+**Must Have**:
+- ✅ **Flight DoPut Streaming**: Arrow RecordBatch ingestion with backpressure
+- ✅ **Time-Based Partitioning**: Configurable windows (1m/5m/1h/day) with automatic routing
+- ✅ **Multi-Column Clustering**: Sort keys like (symbol, tenant, shard) for query optimization
+- ✅ **Concurrent Writers**: Lock-free staging with fair queuing
+- ✅ **Schema Evolution**: Additive fields with automatic null backfill
+
+**Performance Targets**:
+- Sustained ingest: >10-50 MB/s per core
+- 99p latency: <1-2 seconds to visibility
+- Hot segment sealing: <100ms blocking
+
+### 2. Storage: Arrow-First Architecture
+
+**Hierarchical Design**:
+```
+Segment (immutable, atomic unit)
+├── Stripe (co-accessed columns)
+│   ├── Column Chunk (contiguous values)
+│   │   └── Page (Arrow IPC buffers, compressed)
+│   │       └── Footer (checksums, statistics, bloom filters)
+└── Segment Footer (manifest, row counts, min/max timestamps)
 ```
 
-#### Iterator Interface
-```cpp
-class Iterator {
-public:
-    virtual bool Valid() const = 0;
-    virtual void Next() = 0;
-    virtual Key key() const = 0;
-    virtual std::shared_ptr<Record> value() const = 0;
-    virtual Status status() const = 0;
-};
-```
+**Key Innovations**:
+- **Zero-copy access**: Direct mmap of Arrow IPC pages
+- **Multi-level pruning**: Manifest → Zone Maps → Bloom → Dictionary checks
+- **Raft-replicated manifests**: Consistent metadata across cluster
 
-### 9. Performance Optimizations
+### 3. Bitemporal Time Travel: ArcticDB-Style
 
-#### Read Optimizations
-- **Bloom Filters**: False positive filtering for SSTable files
-- **Block Cache**: LRU cache for compressed blocks
-- **Column Projection**: Only read required columns
+**Dual Time Dimensions**:
+- **System Time**: MVCC snapshots with `AS OF <timestamp | snapshot_id>`
+- **Valid Time**: `valid_from`, `valid_to` columns for temporal modeling
+- **Delete Vectors**: Efficient overlay for point-in-time reconstruction
+- **Interval Indexing**: Fast temporal range queries
 
-#### Write Optimizations
-- **Batch Writes**: Group multiple writes into single I/O
-- **Parallel Compaction**: Multi-threaded compaction
-- **Write Buffering**: Buffer writes before flush
+**Advanced Features**:
+- Diff queries between snapshots
+- Temporal aggregations with time predicates
+- Audit trails with full historical reconstruction
 
-#### Memory Management
-- **Arena Allocation**: Efficient memory reuse
-- **Object Pooling**: Reuse common objects
-- **Memory Mapping**: Map files into virtual memory
+### 4. Query Engine: ClickHouse-Class Analytics
 
-### 10. Configuration
+**Pruning Stack** (in evaluation order):
+1. **Manifest pruning**: Partition/time window elimination
+2. **Zone maps**: Min/max/nulls + quantiles per page
+3. **Bloom filters**: Membership testing (fixed-width + token/n-gram)
+4. **Dictionary checks**: Low-cardinality optimizations
+5. **Adaptive replanning**: Adjust strategy based on selectivity
 
-#### Database Options
-```cpp
-struct DBOptions {
-    std::string db_path;
-    size_t memtable_size = 64 * 1024 * 1024; // 64MB
-    size_t sstable_size = 256 * 1024 * 1024; // 256MB
-    size_t block_size = 64 * 1024; // 64KB
-    CompressionType compression = CompressionType::LZ4;
-    bool use_wal = true;
-    size_t wal_buffer_size = 64 * 1024 * 1024; // 64MB
-};
-```
+**Execution Engine**:
+- **Vectorized kernels**: SIMD-optimized operators (filter, project, aggregate)
+- **Late materialization**: Keys first, payloads second
+- **60-80% CPU in kernels**: Target for analytical workloads
 
-#### Compaction Options
-```cpp
-struct CompactionOptions {
-    size_t level0_max_files = 4;
-    size_t level1_max_files = 8;
-    size_t level_multiplier = 2;
-    size_t max_compaction_threads = 4;
-};
-```
+### 5. Distributed Layer: Raft + Arrow Flight
 
-### 11. Error Handling
+**Consensus**:
+- **State Machines**: WAL replication + schema coordination + manifest commits
+- **Persistent Logs**: Crash-recoverable operation history
+- **Dynamic Membership**: Add/remove nodes without downtime
+- **Split-brain prevention**: Jepsen-tested linearizability
 
-#### Status Codes
-```cpp
-enum class StatusCode {
-    OK,
-    NOT_FOUND,
-    CORRUPTION,
-    IO_ERROR,
-    INVALID_ARGUMENT,
-    WRITE_CONFLICT,
-    COMPACTION_ERROR
-};
-```
+**Communication**:
+- **Arrow Flight transport**: High-performance inter-node data movement
+- **Streaming replication**: Real-time data synchronization
+- **Cross-region support**: WAN-optimized protocols
 
-#### Error Propagation
-- **Status**: Return status for all operations
-- **Exceptions**: Only for programming errors
-- **Logging**: Structured logging for debugging
+### 6. Advanced Features: Market Differentiation
 
-### 12. Testing Strategy
+**Streaming & CDC**:
+- **Tailing cursors**: `DoGet(..., follow=true)` for real-time streams
+- **Change data capture**: Key + operation type with snapshot IDs
+- **Exactly-once semantics**: Cursor persistence and deduplication
 
-#### Unit Tests
-- **Component Tests**: Individual class testing
-- **Mock Objects**: Test isolation via mocks
-- **Property Tests**: QuickCheck-style testing
+**Enterprise Capabilities**:
+- **Security**: mTLS, API tokens, row-level access control, audit logging
+- **Multi-tenancy**: Resource isolation, usage metering, governance
+- **Observability**: Metrics, tracing, performance monitoring
 
-#### Integration Tests
-- **Full DB Tests**: End-to-end operations
-- **Performance Tests**: Benchmarking suite
-- **Stress Tests**: High load testing
+**Cloud Integration**:
+- **Object storage**: S3/GCS for elastic capacity
+- **Auto-scaling**: Compute and storage elasticity
+- **Multi-region**: Geo-distributed deployments
 
-#### Fuzz Testing
-- **Input Fuzzing**: Random input generation
-- **File Corruption**: Corrupted file handling
-- **Race Conditions**: Concurrent operation testing
+### 7. Ecosystem: Broad Compatibility
 
-### 13. Build System
+**APIs & Protocols**:
+- **Flight SQL**: SQL-over-Flight with ADBC drivers
+- **Embedded**: C++/Python native APIs
+- **REST/GraphQL**: HTTP interfaces for web applications
+- **Streaming**: Kafka/S3 event source integration
 
-#### CMake Configuration
-- **Modern CMake**: CMake 3.20+ features
-- **Dependencies**: Arrow, Boost, etc.
-- **Cross-platform**: Linux, macOS, Windows
+**Tooling**:
+- **marblectl**: Administrative command-line tool
+- **BI Connectors**: Tableau, PowerBI, Superset integration
+- **Language SDKs**: Go, Rust, Java bindings
 
-#### Dependencies
-- **Apache Arrow**: Columnar processing
-- **Boost**: Utilities and data structures
-- **Google Test**: Testing framework
-- **Abseil**: C++ utilities
-- **AWS SDK**: S3 support (optional)
+### 8. Performance Vision
 
-### 14. Development Roadmap
+**Benchmark Targets**:
+- **Ingestion**: 50+ MB/s/core sustained throughput
+- **Queries**: 100-1000× data reduction via pruning
+- **Time Travel**: Efficient bitemporal reconstruction
+- **Streaming**: Sub-second end-to-end latency
+- **Distributed**: Linear scaling across 100+ nodes
 
-#### Phase 1: Core Infrastructure (4 weeks)
-- Basic LSM tree implementation
-- MemTable and SSTable
-- Simple read/write operations
-- Basic testing
+**Competitive Positioning**:
+- **QuestDB ingestion** + **ClickHouse analytics** + **ArcticDB time travel** + **TiDB consistency**
+- **Arrow-native**: Superior interoperability vs custom formats
+- **Unified platform**: Single system for all analytical workloads
 
-#### Phase 2: Compaction (3 weeks)
-- Leveled compaction implementation
-- Manifest management
-- File merging logic
-- Compaction testing
+---
 
-#### Phase 3: Transactions (3 weeks)
-- Transaction support
-- Concurrency control
-- WAL implementation
-- Recovery testing
+## 🎯 Strategic Direction
 
-#### Phase 4: Optimizations (3 weeks)
-- Caching layers
-- Performance tuning
-- Memory management
-- Benchmarking
+### Why This Grand Plan Matters
 
-#### Phase 5: Advanced Features (2 weeks)
-- Column projection
-- Secondary indexing
-- Advanced compaction strategies
-- Integration testing
+1. **Market Gap**: No analytical database combines ingestion + analytics + time travel + consistency
+2. **Arrow Momentum**: Ecosystem standardization provides competitive advantage
+3. **Cloud Native**: Elastic storage and compute from day one
+4. **Streaming First**: Real-time capabilities differentiate from batch-oriented competitors
 
-### 15. File Structure
+### Implementation Philosophy
 
-```
-MarbleDB/
-├── cmake/           # CMake build files
-├── docs/            # Documentation
-├── examples/        # Example usage
-├── include/marble/  # Public headers
-│   ├── db.h         # Main DB interface
-│   ├── schema.h     # Schema definitions
-│   ├── record.h     # Record abstractions
-│   ├── iterator.h   # Iterator interface
-│   ├── transaction.h # Transaction support
-│   └── status.h     # Status codes
-├── src/             # Implementation
-│   ├── core/        # Core components
-│   ├── storage/     # Storage layer
-│   ├── compaction/  # Compaction logic
-│   └── util/        # Utilities
-└── tests/           # Test files
-    ├── unit/        # Unit tests
-    └── integration/ # Integration tests
-```
+1. **Start Simple**: MVP first, then layer sophistication
+2. **Prove Concepts**: Each phase validates architectural decisions
+3. **Ecosystem First**: Arrow/Raft integration provides foundation
+4. **Performance Driven**: Measure everything, optimize relentlessly
 
-## Integration with Sabot
+### Risk Mitigation
 
-### Data Flow
-1. **Input**: Sabot operators produce columnar data
-2. **Storage**: MarbleDB stores data in Feather format
-3. **Query**: Sabot queries access data via MarbleDB iterators
-4. **Output**: Results returned as Arrow RecordBatches
+1. **Technical Feasibility**: Arrow/Raft integration already proven
+2. **Incremental Complexity**: Features added as value justifies complexity
+3. **Market Validation**: Each phase provides user feedback
+4. **Team Scaling**: Architecture supports growing engineering team
 
-### Key Integration Points
-- **Schema Compatibility**: Arrow schema alignment
-- **Memory Management**: Shared memory pools
-- **Threading**: Compatible threading models
-- **Error Handling**: Unified error propagation
+### Success Metrics
 
-### Performance Requirements
-- **Throughput**: 100K+ ops/sec for small records
-- **Latency**: <1ms for point queries
-- **Storage Efficiency**: <2x space amplification
-- **Memory Usage**: Configurable memory limits
+**Phase 1-2**: Working system with basic analytical capabilities
+**Phase 3**: Production-ready distributed database
+**Phase 4**: Feature-complete analytical platform
+**Phase 5**: Market-leading analytical database
+
+This grand plan represents MarbleDB's journey from **promising prototype** to **market-leading analytical database** - ambitious but achievable through disciplined, incremental development.
+
+## Performance Benchmarks & Targets
+
+### Micro-Benchmarks
+- **Scan Throughput**: Memory bandwidth limited on cold data
+- **Predicate Selectivity**: 1e-6 to 1.0 range coverage
+- **Index Overhead**: <5% storage for zone maps + bloom filters
+
+### Macro-Benchmarks
+- **Ingest Rate**: 10-50 MB/s per core (configurable compression)
+- **Query Latency**: Sub-second for analytical queries
+- **Pruning Efficiency**: 10-100× bytes read reduction
+- **Time Travel**: Efficient point-in-time reconstruction
+
+### Distributed Benchmarks
+- **Replication Latency**: Sub-100ms cross-node consistency
+- **Failover Time**: Sub-second leader election
+- **Cluster Scaling**: Linear throughput with node addition
+
+## Team Requirements
+
+**Phase 1-2**: 5-7 engineers
+- 2x Storage/Execution Engine (SIMD, Arrow expertise)
+- 2x Distributed Systems (Raft, consensus)
+- 1x Time-Series/Analytics (query optimization)
+- 1x DevOps/Release Engineering
+- 1x Product/Testing
+
+**Skills Required**:
+- C++20, SIMD intrinsics, Arrow ecosystem
+- Distributed systems, Raft consensus
+- Performance engineering, benchmarking
+- Time-series data models, analytical query patterns
+
+## Risk Mitigation
+
+### Technical Risks
+- **Complexity**: Phased approach prevents feature creep
+- **Performance**: Early benchmarking validates assumptions
+- **Distributed Consistency**: Jepsen testing ensures correctness
+
+### Execution Risks
+- **Team Size**: Critical mass needed for complex system
+- **Arrow Maturity**: Ecosystem stability for production use
+- **Market Timing**: Competitive landscape evolution
+
+## Competitive Advantages
+
+**Unique Value Proposition**:
+1. **Arrow-Native**: Superior interoperability vs custom formats
+2. **Bitemporal + Time Travel**: Regulatory compliance features
+3. **QuestDB Ingestion + ClickHouse Analytics**: Best of both worlds
+4. **Raft Consistency**: Strong consistency in analytical space
+5. **Time-Series Optimized**: Purpose-built for IoT/financial workloads
+
+**Target Markets**:
+- Financial services (auditing, time travel)
+- IoT platforms (high-throughput ingestion)
+- Real-time analytics systems
+- Event streaming with analytical storage

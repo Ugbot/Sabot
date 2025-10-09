@@ -160,6 +160,121 @@ public:
     virtual Status OnRecoveryComplete(uint64_t last_sequence) = 0;
 };
 
+// Memory-mapped ring buffer WAL options
+struct MMRingBufferWalOptions : public WalOptions {
+    // Size of the ring buffer file in bytes
+    size_t buffer_size = 64 * 1024 * 1024;  // 64MB default
+
+    // Maximum entry size (to prevent single entries from wrapping around)
+    size_t max_entry_size = 1024 * 1024;   // 1MB max entry size
+
+    // Number of entries to keep in memory for quick access
+    size_t in_memory_cache_size = 1000;
+};
+
+// Memory-mapped ring buffer WAL file implementation
+class MMRingBufferWalFile : public WalFile {
+public:
+    explicit MMRingBufferWalFile(const std::string& path,
+                                const MMRingBufferWalOptions& options = MMRingBufferWalOptions());
+    ~MMRingBufferWalFile() override;
+
+    Status WriteEntry(const WalEntry& entry) override;
+    Status ReadEntries(std::vector<WalEntry>* entries,
+                      uint64_t start_sequence = 0,
+                      size_t max_entries = 0) override;
+    Status Flush() override;
+    Status Close() override;
+
+    // Public initialization (called by manager)
+    Status InitializeRingBuffer();
+
+    // File metadata
+    std::string GetFilePath() const override { return path_; }
+    uint64_t GetFileId() const override { return 0; }  // Single file implementation
+    size_t GetFileSize() const override { return options_.buffer_size; }
+    uint64_t GetFirstSequence() const override;
+    uint64_t GetLastSequence() const override;
+    bool IsFull() const override { return false; }  // Ring buffer is never "full"
+
+    // Ring buffer specific methods
+    Status GetRingBufferStats(std::string* stats) const;
+    size_t GetWriteOffset() const { return write_offset_; }
+    size_t GetReadOffset() const { return read_offset_; }
+
+private:
+    struct RingBufferHeader {
+        uint64_t magic = 0x4D4D57414C;  // "MMWAL"
+        uint32_t version = 1;
+        uint64_t first_sequence = 0;
+        uint64_t last_sequence = 0;
+        size_t write_offset = sizeof(RingBufferHeader);
+        size_t read_offset = sizeof(RingBufferHeader);
+        uint32_t checksum = 0;
+    };
+
+    Status SerializeEntry(const WalEntry& entry, std::string* buffer);
+    Status DeserializeEntry(const void* data, size_t size, WalEntry* entry);
+    Status WriteData(size_t offset, const void* data, size_t size);
+    Status ReadData(size_t offset, void* data, size_t size);
+    size_t GetNextOffset(size_t current_offset, size_t data_size) const;
+    bool WouldWrap(size_t current_offset, size_t data_size) const;
+    Status AdvanceReadOffset(size_t new_offset);
+    Status AdvanceWriteOffset(size_t new_offset);
+    uint32_t ComputeChecksum(const void* data, size_t size) const;
+
+    std::string path_;
+    MMRingBufferWalOptions options_;
+    std::unique_ptr<FileHandle> file_handle_;
+    RingBufferHeader* header_;
+    void* buffer_start_;
+    size_t buffer_size_;
+    std::atomic<size_t> write_offset_;
+    std::atomic<size_t> read_offset_;
+    std::mutex mutex_;  // For thread safety
+#ifdef _WIN32
+    // Windows handles would go here
+#else
+    int fd_;  // POSIX file descriptor for memory mapping
+#endif
+};
+
+// Memory-mapped ring buffer WAL manager
+class MMRingBufferWalManager : public WalManager {
+public:
+    explicit MMRingBufferWalManager(TaskScheduler* scheduler = nullptr);
+    ~MMRingBufferWalManager() override;
+
+    Status Open(const WalOptions& options) override;
+    Status Close() override;
+    Status WriteEntry(const WalEntry& entry) override;
+    Status WriteBatch(const std::vector<WalEntry>& entries) override;
+    uint64_t GetCurrentSequence() const override;
+    Status Sync() override;
+    Status Rotate() override;
+    Status Recover(std::function<Status(const WalEntry&)> callback,
+                  uint64_t start_sequence = 0) override;
+    Status Truncate(uint64_t sequence_number) override;
+    Status GetStats(std::string* stats) const override;
+    Status ListFiles(std::vector<std::string>* files) const override;
+
+private:
+    Status EnsureFileExists();
+    Status RecoverFromFile(std::function<Status(const WalEntry&)> callback,
+                          uint64_t start_sequence);
+
+    WalOptions options_;
+    MMRingBufferWalOptions mm_options_;
+    TaskScheduler* scheduler_;
+    std::unique_ptr<MMRingBufferWalFile> wal_file_;
+    std::atomic<uint64_t> current_sequence_;
+    bool is_open_;
+    mutable std::mutex mutex_;
+};
+
+// Factory function for memory-mapped ring buffer WAL
+std::unique_ptr<WalManager> CreateMMRingBufferWalManager(TaskScheduler* scheduler = nullptr);
+
 // Factory functions
 std::unique_ptr<WalManager> CreateWalManager(TaskScheduler* scheduler = nullptr);
 std::unique_ptr<WalFile> CreateWalFile(const std::string& path, uint64_t file_id);

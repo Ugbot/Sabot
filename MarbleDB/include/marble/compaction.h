@@ -7,12 +7,12 @@
 #include <atomic>
 #include <marble/status.h>
 #include <marble/task_scheduler.h>
+#include <marble/sstable.h>
 
 namespace marble {
 
 // Forward declarations
 class LSMTree;
-class SSTable;
 class ImmutableMemTable;
 class TaskScheduler;
 

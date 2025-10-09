@@ -4,6 +4,7 @@
 #include <string>
 #include <marble/status.h>
 #include <marble/record.h>
+#include <marble/table.h>
 
 namespace marble {
 
@@ -96,6 +97,15 @@ public:
     // Batch operations
     virtual Status WriteBatch(const WriteOptions& options,
                               const std::vector<std::shared_ptr<Record>>& records) = 0;
+
+    // Arrow batch operations
+    virtual Status InsertBatch(const std::string& table_name,
+                              const std::shared_ptr<arrow::RecordBatch>& batch) = 0;
+
+    // Table operations
+    virtual Status CreateTable(const TableSchema& schema) = 0;
+    virtual Status ScanTable(const std::string& table_name,
+                            std::unique_ptr<QueryResult>* result) = 0;
 
     // Scanning
     virtual Status NewIterator(const ReadOptions& options,

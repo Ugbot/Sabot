@@ -2,6 +2,7 @@
 
 #include <string>
 #include <system_error>
+#include <arrow/status.h>
 
 namespace marble {
 
@@ -10,6 +11,7 @@ enum class StatusCode {
     kNotFound = 1,
     kCorruption = 2,
     kIoError = 3,
+    kIOError = 3,  // Alias for compatibility
     kInvalidArgument = 4,
     kWriteConflict = 5,
     kCompactionError = 6,
@@ -20,7 +22,9 @@ enum class StatusCode {
     kDeadlineExceeded = 11,
     kNotImplemented = 12,
     kAlreadyExists = 13,
-    kInternalError = 14,
+    kPermissionDenied = 15,
+    kUnavailable = 16,
+    kInternalError = 17,
 };
 
 class Status {
@@ -29,6 +33,16 @@ public:
     Status(StatusCode code) : code_(code) {}
     Status(StatusCode code, const std::string& message)
         : code_(code), message_(message) {}
+
+    // Conversion from Arrow Status
+    Status(const arrow::Status& arrow_status) {
+        if (arrow_status.ok()) {
+            code_ = StatusCode::kOk;
+        } else {
+            code_ = StatusCode::kIoError;
+            message_ = arrow_status.ToString();
+        }
+    }
 
     static Status OK() { return Status(); }
     static Status NotFound(const std::string& message = "") {
@@ -57,6 +71,14 @@ public:
 
     static Status NotImplemented(const std::string& message = "") {
         return Status(StatusCode::kNotImplemented, message);
+    }
+
+    // Conversion from Arrow Status
+    static Status FromArrowStatus(const arrow::Status& arrow_status) {
+        if (arrow_status.ok()) {
+            return Status::OK();
+        }
+        return Status(StatusCode::kIoError, arrow_status.ToString());
     }
     static Status AlreadyExists(const std::string& message = "") {
         return Status(StatusCode::kAlreadyExists, message);
@@ -129,6 +151,12 @@ inline std::string Status::ToString() const {
         case StatusCode::kAlreadyExists:
             result = "AlreadyExists";
             break;
+        case StatusCode::kPermissionDenied:
+            result = "PermissionDenied";
+            break;
+        case StatusCode::kUnavailable:
+            result = "Unavailable";
+            break;
         case StatusCode::kInternalError:
             result = "InternalError";
             break;
@@ -142,3 +170,16 @@ inline std::string Status::ToString() const {
 }
 
 } // namespace marble
+
+// Arrow Status conversion support
+namespace arrow {
+template <>
+struct IntoStatus<marble::Status> {
+    static Status ToStatus(const marble::Status& s) {
+        if (s.ok()) {
+            return Status::OK();
+        }
+        return Status::IOError(s.message());
+    }
+};
+} // namespace arrow
