@@ -10,3 +10,12 @@
 [submodule "vendor/rocksdb"]
 	path = vendor/rocksdb
 	url = https://github.com/facebook/rocksdb.git
+[submodule "vendor/postgresql/wal2json"]
+	path = vendor/postgresql/wal2json
+	url = https://github.com/eulerto/wal2json.git
+[submodule "vendor/python-mysql-replication"]
+	path = vendor/python-mysql-replication
+	url = https://github.com/julien-duponchelle/python-mysql-replication.git
+[submodule "MarbleDB/vendor/nuraft"]
+	path = MarbleDB/vendor/nuraft
+	url = https://github.com/eBay/NuRaft.git
