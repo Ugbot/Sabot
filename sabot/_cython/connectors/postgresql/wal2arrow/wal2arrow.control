@@ -1,0 +1,5 @@
+# wal2arrow extension
+comment = 'Logical decoding output plugin for Apache Arrow format'
+default_version = '1.0'
+module_pathname = '$libdir/wal2arrow'
+relocatable = true

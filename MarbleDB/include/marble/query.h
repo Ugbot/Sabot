@@ -121,6 +121,61 @@ public:
     virtual Status NextAsync(std::function<void(Status, std::shared_ptr<arrow::RecordBatch>)> callback) = 0;
 };
 
+// Concrete implementation of QueryResult for table-based results
+class TableQueryResult : public QueryResult {
+public:
+    static Status Create(std::shared_ptr<arrow::Table> table, std::unique_ptr<QueryResult>* result) {
+        auto query_result = std::unique_ptr<TableQueryResult>(new TableQueryResult(table));
+        // Convert table to batches for streaming
+        ARROW_ASSIGN_OR_RAISE(query_result->batches_, arrow::TableBatchReader(*table).ToRecordBatches());
+        *result = std::move(query_result);
+        return Status::OK();
+    }
+
+private:
+    explicit TableQueryResult(std::shared_ptr<arrow::Table> table)
+        : table_(table), current_batch_(0), batch_size_(1024), num_batches_processed_(0) {}
+
+    bool HasNext() const override {
+        return current_batch_ < static_cast<int64_t>(batches_.size());
+    }
+
+    Status Next(std::shared_ptr<arrow::RecordBatch>* batch) override {
+        if (!HasNext()) {
+            return Status::InvalidArgument("No more batches available");
+        }
+        *batch = batches_[current_batch_++];
+        num_batches_processed_++;
+        return Status::OK();
+    }
+
+    Status NextAsync(std::function<void(Status, std::shared_ptr<arrow::RecordBatch>)> callback) override {
+        std::shared_ptr<arrow::RecordBatch> batch;
+        Status status = Next(&batch);
+        callback(status, batch);
+        return status;
+    }
+
+    std::shared_ptr<arrow::Schema> schema() const override {
+        return table_->schema();
+    }
+
+    int64_t num_rows() const override {
+        return table_->num_rows();
+    }
+
+    int64_t num_batches() const override {
+        return num_batches_processed_;
+    }
+
+private:
+    std::shared_ptr<arrow::Table> table_;
+    std::vector<std::shared_ptr<arrow::RecordBatch>> batches_;
+    int64_t current_batch_;
+    int64_t batch_size_;
+    int64_t num_batches_processed_;
+};
+
 // Streaming query result for large datasets
 class StreamingQueryResult : public QueryResult {
 public:

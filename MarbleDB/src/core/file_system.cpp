@@ -3,6 +3,12 @@
 #include <filesystem>
 #include <system_error>
 #include <iostream>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 namespace fs = std::filesystem;
 
@@ -125,8 +131,95 @@ public:
         return Status::InvalidArgument("Truncate not implemented for LocalFileHandle");
     }
 
+    Status MemoryMap(size_t offset, size_t size, void** mapped_memory) override {
+#ifdef _WIN32
+        // Windows memory mapping implementation
+        HANDLE file_handle = CreateFileA(path_.c_str(), GENERIC_READ | GENERIC_WRITE,
+                                        FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        if (file_handle == INVALID_HANDLE_VALUE) {
+            return Status::IOError("Failed to open file for memory mapping");
+        }
+
+        HANDLE mapping_handle = CreateFileMappingA(file_handle, nullptr, PAGE_READWRITE,
+                                                  0, 0, nullptr);
+        if (mapping_handle == nullptr) {
+            CloseHandle(file_handle);
+            return Status::IOError("Failed to create file mapping");
+        }
+
+        *mapped_memory = MapViewOfFile(mapping_handle, FILE_MAP_ALL_ACCESS,
+                                      static_cast<DWORD>(offset >> 32),
+                                      static_cast<DWORD>(offset & 0xFFFFFFFF), size);
+        if (*mapped_memory == nullptr) {
+            CloseHandle(mapping_handle);
+            CloseHandle(file_handle);
+            return Status::IOError("Failed to map view of file");
+        }
+
+        // Store handles for cleanup
+        mapping_handle_ = mapping_handle;
+        file_handle_ = file_handle;
+        mapped_memory_ = *mapped_memory;
+        mapped_size_ = size;
+        return Status::OK();
+#else
+        // POSIX memory mapping implementation
+        int fd = open(path_.c_str(), O_RDWR);
+        if (fd == -1) {
+            return Status::IOError(std::string("Failed to open file for memory mapping: ") +
+                                  strerror(errno));
+        }
+
+        *mapped_memory = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, offset);
+        if (*mapped_memory == MAP_FAILED) {
+            close(fd);
+            return Status::IOError(std::string("Failed to memory map file: ") +
+                                  strerror(errno));
+        }
+
+        // Store file descriptor for cleanup
+        fd_ = fd;
+        mapped_memory_ = *mapped_memory;
+        mapped_size_ = size;
+        return Status::OK();
+#endif
+    }
+
+    Status UnmapMemory(void* mapped_memory, size_t size) override {
+#ifdef _WIN32
+        if (mapped_memory == mapped_memory_ && mapping_handle_ != nullptr) {
+            UnmapViewOfFile(mapped_memory);
+            CloseHandle(mapping_handle_);
+            CloseHandle(file_handle_);
+            mapping_handle_ = nullptr;
+            file_handle_ = nullptr;
+            mapped_memory_ = nullptr;
+            mapped_size_ = 0;
+        }
+        return Status::OK();
+#else
+        if (mapped_memory == mapped_memory_ && fd_ != -1) {
+            munmap(mapped_memory, size);
+            close(fd_);
+            fd_ = -1;
+            mapped_memory_ = nullptr;
+            mapped_size_ = 0;
+        }
+        return Status::OK();
+#endif
+    }
+
+    bool SupportsMemoryMapping() const override {
+        return true;
+    }
+
     Status Close() override {
         try {
+            // Unmap memory if mapped
+            if (mapped_memory_ != nullptr) {
+                UnmapMemory(mapped_memory_, mapped_size_);
+            }
             file_.close();
             return Status::OK();
         } catch (const std::exception& e) {
@@ -136,6 +229,14 @@ public:
 
 private:
     mutable std::fstream file_;
+#ifdef _WIN32
+    HANDLE file_handle_ = nullptr;
+    HANDLE mapping_handle_ = nullptr;
+#else
+    int fd_ = -1;
+#endif
+    void* mapped_memory_ = nullptr;
+    size_t mapped_size_ = 0;
 };
 
 // LocalFileSystem implementation
@@ -585,6 +686,33 @@ public:
         return Status::OK();
     }
 
+    Status MemoryMap(size_t offset, size_t size, void** mapped_memory) override {
+        auto it = files_->find(path_);
+        if (it == files_->end()) {
+            return Status::NotFound("File not found for memory mapping");
+        }
+
+        auto& content = it->second;
+        if (offset + size > content.size()) {
+            return Status::InvalidArgument("Memory mapping request exceeds file size");
+        }
+
+        // For memory filesystem, just return a pointer to the content
+        // In a real implementation, this might involve more complex memory management
+        *mapped_memory = content.data() + offset;
+        return Status::OK();
+    }
+
+    Status UnmapMemory(void* mapped_memory, size_t size) override {
+        // For memory filesystem, unmapping is a no-op since we just return pointers
+        // In a real implementation, this would release any pinned memory regions
+        return Status::OK();
+    }
+
+    bool SupportsMemoryMapping() const override {
+        return true;
+    }
+
     Status Close() override {
         // Nothing to do for memory filesystem
         return Status::OK();
@@ -771,6 +899,20 @@ public:
 
     Status Truncate(size_t new_size) override {
         return Status::NotImplemented("S3 truncate not implemented in demo");
+    }
+
+    Status MemoryMap(size_t offset, size_t size, void** mapped_memory) override {
+        // S3 doesn't support direct memory mapping
+        // In a real implementation, this might download the range and return a pointer
+        return Status::NotImplemented("S3 filesystem does not support memory mapping");
+    }
+
+    Status UnmapMemory(void* mapped_memory, size_t size) override {
+        return Status::NotImplemented("S3 filesystem does not support memory mapping");
+    }
+
+    bool SupportsMemoryMapping() const override {
+        return false;
     }
 
     Status Close() override {

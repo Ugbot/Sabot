@@ -56,7 +56,7 @@ services:
     networks:
       - sabot-network
 
-  # PostgreSQL - For DBOS durable execution (optional)
+  # PostgreSQL - For DBOS durable execution + CDC testing
   postgres:
     image: postgres:16-alpine
     container_name: sabot-postgres
@@ -64,10 +64,19 @@ services:
       POSTGRES_USER: sabot
       POSTGRES_PASSWORD: sabot
       POSTGRES_DB: sabot
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+      - "-c"
+      - "max_replication_slots=10"
+      - "-c"
+      - "max_wal_senders=10"
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./sabot/_cython/connectors/postgresql/01_init_cdc.sql:/docker-entrypoint-initdb.d/01_init_cdc.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U sabot"]
       interval: 10s
@@ -93,6 +102,38 @@ services:
     networks:
       - sabot-network
 
+  # MySQL - For CDC testing with binlog replication
+  mysql:
+    image: mysql:8.0
+    container_name: sabot-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: sabot
+      MYSQL_DATABASE: sabot
+      MYSQL_USER: sabot
+      MYSQL_PASSWORD: sabot
+    command:
+      - "mysqld"
+      - "--server-id=1"
+      - "--log-bin=mysql-bin"
+      - "--binlog-format=ROW"
+      - "--binlog-row-image=FULL"
+      - "--binlog-row-metadata=FULL"
+      - "--gtid-mode=ON"
+      - "--enforce-gtid-consistency=ON"
+      - "--max-binlog-size=100M"
+      - "--binlog-expire-logs-seconds=604800"
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psabot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sabot-network
+
 networks:
   sabot-network:
     driver: bridge
@@ -100,3 +141,4 @@ networks:
 volumes:
   postgres-data:
   redis-data:
+  mysql-data:

@@ -41,8 +41,12 @@ ARROW_INSTALL = ARROW_SOURCE / "build" / "install"
 CYREDIS_DIR = PROJECT_ROOT / "vendor" / "cyredis"
 ROCKSDB_VENDOR_DIR = PROJECT_ROOT / "vendor" / "rocksdb"
 ROCKSDB_INSTALL = ROCKSDB_VENDOR_DIR / "install"
+DUCKDB_VENDOR_DIR = PROJECT_ROOT / "vendor" / "duckdb"
+DUCKDB_BUILD_DIR = DUCKDB_VENDOR_DIR / "build" / "release"
+DUCKDB_INSTALL = DUCKDB_VENDOR_DIR / "install"
 TONBO_DIR = PROJECT_ROOT / "vendor" / "tonbo" / "bindings" / "python"
 TONBO_FFI_DIR = PROJECT_ROOT / "vendor" / "tonbo" / "tonbo-ffi"
+POSTGRESQL_WAL2JSON_DIR = PROJECT_ROOT / "vendor" / "postgresql" / "wal2json"
 SABOT_CYTHON_DIR = PROJECT_ROOT / "sabot" / "_cython"
 SABOT_C_DIR = PROJECT_ROOT / "sabot" / "_c"  # Additional Cython modules
 
@@ -115,6 +119,11 @@ def check_dependencies():
         (ROCKSDB_INSTALL / "lib").glob("librocksdb.*")
     )
 
+    # Check DuckDB (vendored build)
+    duckdb_built = (DUCKDB_BUILD_DIR / "src").exists() and any(
+        (DUCKDB_BUILD_DIR / "src").glob("libduckdb.*")
+    )
+
     # Check hiredis for CyRedis
     hiredis_available = False
     try:
@@ -138,6 +147,11 @@ def check_dependencies():
     else:
         print_skip("RocksDB not built yet")
 
+    if duckdb_built:
+        print_success(f"DuckDB found at {DUCKDB_BUILD_DIR}")
+    else:
+        print_skip("DuckDB not built yet")
+
     if hiredis_available:
         print_success("hiredis found (CyRedis will be built)")
     else:
@@ -153,6 +167,7 @@ def check_dependencies():
     return {
         'arrow_built': arrow_built,
         'rocksdb_built': rocksdb_built,
+        'duckdb_built': duckdb_built,
         'hiredis_available': hiredis_available,
         'rust_available': deps['cargo'] and deps['rust'],
         'maturin_available': deps['maturin'] is not None,
@@ -439,6 +454,61 @@ def build_rocksdb_cpp(skip=False):
     return ROCKSDB_INSTALL
 
 
+def build_duckdb_cpp(skip=False):
+    """Build vendored DuckDB C++ library (Phase 3.5)."""
+    print_phase("3.5", 8, "Building vendored DuckDB C++...")
+
+    if skip:
+        print_skip("Skipped by user (--skip-vendor)")
+        return None
+
+    if not DUCKDB_VENDOR_DIR.exists():
+        print_error(f"DuckDB source not found at {DUCKDB_VENDOR_DIR}")
+        return None
+
+    # Check if already built
+    if (DUCKDB_BUILD_DIR / "src").exists() and any((DUCKDB_BUILD_DIR / "src").glob("libduckdb.*")):
+        print_success(f"DuckDB already built at {DUCKDB_BUILD_DIR}")
+        return DUCKDB_BUILD_DIR
+
+    cmake = find_executable('cmake', ['cmake3'])
+    if not cmake:
+        print_error("CMake not found")
+        return None
+
+    # Detect number of CPU cores
+    try:
+        num_jobs = multiprocessing.cpu_count()
+    except:
+        num_jobs = 4
+
+    print(f"Building DuckDB C++ (using {num_jobs} parallel jobs)...")
+    print(f"Source: {DUCKDB_VENDOR_DIR}")
+    print(f"Build dir: {DUCKDB_BUILD_DIR}")
+
+    # Create build directory
+    DUCKDB_BUILD_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Configure DuckDB with CMake
+    # DuckDB uses its own Makefile system, but we can use make directly
+    print("Configuring and building DuckDB...")
+
+    try:
+        # DuckDB has a Makefile in the root, use it directly
+        subprocess.run(
+            ['make', 'release', f'-j{num_jobs}'],
+            cwd=DUCKDB_VENDOR_DIR,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE
+        )
+        print_success(f"DuckDB C++ built successfully")
+        return DUCKDB_BUILD_DIR
+    except subprocess.CalledProcessError as e:
+        print_error(f"DuckDB build failed: {e.stderr.decode()[:200]}")
+        return None
+
+
 # ==============================================================================
 # Phase 4: Build Vendored Python Extensions
 # ==============================================================================
@@ -483,6 +553,17 @@ def build_rocksdb(deps):
     return True
 
 
+def build_duckdb(deps):
+    """Check for DuckDB library availability (now vendored)."""
+    if not deps['duckdb_built']:
+        print_skip("DuckDB (library not built)")
+        return False
+
+    # Using vendored DuckDB library
+    print_success(f"DuckDB library available at {DUCKDB_BUILD_DIR}")
+    return True
+
+
 def build_tonbo(deps):
     """Check for Tonbo FFI library availability."""
     tonbo_ffi_lib = TONBO_FFI_DIR / "target" / "release" / "libtonbo_ffi.dylib"
@@ -501,11 +582,12 @@ def build_vendor_extensions(deps, skip=False):
 
     if skip:
         print_skip("Skipped by user (--skip-vendor)")
-        return {'cyredis': False, 'rocksdb': False, 'tonbo': False}
+        return {'cyredis': False, 'rocksdb': False, 'duckdb': False, 'tonbo': False}
 
     results = {
         'cyredis': build_cyredis(deps),
         'rocksdb': build_rocksdb(deps),
+        'duckdb': build_duckdb(deps),
         'tonbo': build_tonbo(deps),
     }
 
@@ -530,13 +612,17 @@ def discover_cython_modules():
         'core': [],      # Arrow only
         'simple': [],    # No special deps
         'rocksdb': [],   # Needs RocksDB
+        'duckdb': [],    # Needs DuckDB
         'tonbo': [],     # Needs Tonbo
         'mixed': [],     # Needs both RocksDB and Tonbo
+        'postgresql': [], # Needs PostgreSQL libpq
     }
 
     # Keywords to detect dependencies
     rocksdb_keywords = ['rocksdb', 'RocksDB']
+    duckdb_keywords = ['duckdb', 'DuckDB']
     tonbo_keywords = ['tonbo', 'Tonbo']
+    postgresql_keywords = ['libpq', 'postgresql', 'postgres']
 
     for pyx_file in pyx_files:
         # Get relative path (works for both _cython and _c dirs)
@@ -558,14 +644,20 @@ def discover_cython_modules():
         try:
             content = pyx_file.read_text()
             has_rocksdb = any(kw in content for kw in rocksdb_keywords)
+            has_duckdb = any(kw in content for kw in duckdb_keywords)
             has_tonbo = any(kw in content for kw in tonbo_keywords)
+            has_postgresql = any(kw in content for kw in postgresql_keywords)
 
             if has_rocksdb and has_tonbo:
                 modules['mixed'].append(rel_path)
             elif has_rocksdb:
                 modules['rocksdb'].append(rel_path)
+            elif has_duckdb:
+                modules['duckdb'].append(rel_path)
             elif has_tonbo:
                 modules['tonbo'].append(rel_path)
+            elif has_postgresql:
+                modules['postgresql'].append(rel_path)
             elif 'arrow' in content.lower() or 'flight' in content.lower():
                 modules['core'].append(rel_path)
             else:
@@ -579,7 +671,9 @@ def discover_cython_modules():
     print(f"  - Core (Arrow): {len(modules['core'])}")
     print(f"  - Simple: {len(modules['simple'])}")
     print(f"  - RocksDB: {len(modules['rocksdb'])}")
+    print(f"  - DuckDB: {len(modules['duckdb'])}")
     print(f"  - Tonbo: {len(modules['tonbo'])}")
+    print(f"  - PostgreSQL: {len(modules['postgresql'])}")
     print(f"  - Mixed: {len(modules['mixed'])}")
 
     return modules
@@ -614,6 +708,9 @@ def build_sabot_extensions(deps, vendor_results, modules):
         str(PROJECT_ROOT / "vendor" / "arrow" / "python" / "pyarrow" / "src"),
         str(PROJECT_ROOT / "vendor" / "duckdb" / "third_party" / "concurrentqueue"),  # Lock-free queue
         str(SABOT_C_DIR),  # For morsel_executor.hpp
+        str(SABOT_CYTHON_DIR / "graph" / "storage"),  # For graph_storage.h
+        str(SABOT_CYTHON_DIR / "graph" / "traversal"),  # For bfs.h, dfs.h, etc.
+        str(SABOT_CYTHON_DIR / "graph" / "query"),  # For pattern_match.h
     ]
 
     common_library_dirs = [arrow_lib]
@@ -673,6 +770,46 @@ def build_sabot_extensions(deps, vendor_results, modules):
         elif 'task_slot_manager' in str(module_path):
             cpp_path = str(SABOT_C_DIR / "task_slot_manager_impl.cpp")
             sources.append(cpp_path)
+        elif 'graph/storage/graph_storage' in str(module_path):
+            # Graph storage module needs its C++ implementation
+            cpp_path = str(SABOT_CYTHON_DIR / "graph" / "storage" / "graph_storage_impl.cpp")
+            sources.append(cpp_path)
+        elif 'graph/traversal/bfs' in str(module_path):
+            # BFS traversal module needs its C++ implementation
+            cpp_path = str(SABOT_CYTHON_DIR / "graph" / "traversal" / "bfs_impl.cpp")
+            sources.append(cpp_path)
+        elif 'graph/traversal/dfs' in str(module_path):
+            # DFS traversal module needs its C++ implementation
+            cpp_path = str(SABOT_CYTHON_DIR / "graph" / "traversal" / "dfs_impl.cpp")
+            sources.append(cpp_path)
+        elif 'graph/traversal/shortest_paths' in str(module_path):
+            # Shortest paths traversal module needs its C++ implementation
+            cpp_path = str(SABOT_CYTHON_DIR / "graph" / "traversal" / "shortest_paths_impl.cpp")
+            sources.append(cpp_path)
+        elif 'graph/traversal/pagerank' in str(module_path):
+            # PageRank traversal module needs its C++ implementation
+            cpp_path = str(SABOT_CYTHON_DIR / "graph" / "traversal" / "pagerank_impl.cpp")
+            sources.append(cpp_path)
+        elif 'graph/traversal/centrality' in str(module_path):
+            # Centrality traversal module needs its C++ implementation
+            cpp_path = str(SABOT_CYTHON_DIR / "graph" / "traversal" / "centrality_impl.cpp")
+            sources.append(cpp_path)
+        elif 'graph/traversal/triangle_counting' in str(module_path):
+            # Triangle counting traversal module needs its C++ implementation
+            cpp_path = str(SABOT_CYTHON_DIR / "graph" / "traversal" / "triangle_counting_impl.cpp")
+            sources.append(cpp_path)
+        elif 'graph/traversal/connected_components' in str(module_path):
+            # Connected components traversal module needs its C++ implementation
+            cpp_path = str(SABOT_CYTHON_DIR / "graph" / "traversal" / "connected_components_impl.cpp")
+            sources.append(cpp_path)
+        elif 'graph/traversal/strongly_connected_components' in str(module_path):
+            # Strongly connected components traversal module needs its C++ implementation
+            cpp_path = str(SABOT_CYTHON_DIR / "graph" / "traversal" / "strongly_connected_components_impl.cpp")
+            sources.append(cpp_path)
+        elif 'graph/query/pattern_match' in str(module_path):
+            # Pattern match query module needs its C++ implementation
+            cpp_path = str(SABOT_CYTHON_DIR / "graph" / "query" / "pattern_match_impl.cpp")
+            sources.append(cpp_path)
         elif 'ipc_reader' in str(module_path):
             # ipc_reader is pure Cython wrapping Arrow C++ IPC
             # No additional .cpp files needed - uses Arrow C++ library directly
@@ -711,6 +848,29 @@ def build_sabot_extensions(deps, vendor_results, modules):
             ))
     else:
         results['skipped'].extend(modules['rocksdb'])
+
+    # Conditionally build DuckDB modules
+    if vendor_results['duckdb']:
+        for module_path in modules['duckdb']:
+            module_name, pyx_path = get_module_info(module_path)
+
+            # Add vendored DuckDB paths
+            duckdb_include_dirs = common_include_dirs + [str(DUCKDB_VENDOR_DIR / "src" / "include")]
+            duckdb_library_dirs = common_library_dirs + [str(DUCKDB_BUILD_DIR / "src")]
+            duckdb_link_args = common_link_args + [f"-Wl,-rpath,{str(DUCKDB_BUILD_DIR / 'src')}"]
+
+            extensions_to_build.append(Extension(
+                module_name,
+                [pyx_path],
+                include_dirs=duckdb_include_dirs,
+                library_dirs=duckdb_library_dirs,
+                libraries=common_libraries + ["duckdb"],
+                extra_compile_args=common_compile_args,
+                extra_link_args=duckdb_link_args,
+                language="c++",
+            ))
+    else:
+        results['skipped'].extend(modules['duckdb'])
 
     # Conditionally build Tonbo modules
     if vendor_results['tonbo']:
@@ -766,6 +926,33 @@ def build_sabot_extensions(deps, vendor_results, modules):
             ))
     else:
         results['skipped'].extend(modules['mixed'])
+
+    # Conditionally build PostgreSQL modules
+    # PostgreSQL libpq is usually available system-wide
+    for module_path in modules['postgresql']:
+        module_name, pyx_path = get_module_info(module_path)
+
+        # PostgreSQL libpq paths (system installation)
+        postgresql_include_dirs = common_include_dirs + ["/opt/homebrew/include/postgresql@14"]
+        postgresql_library_dirs = common_library_dirs + [
+            "/opt/homebrew/lib",
+            "/opt/homebrew/Cellar/postgresql@14/14.19/lib/postgresql@14"
+        ]
+        postgresql_link_args = common_link_args + [
+            "-Wl,-rpath,/opt/homebrew/lib",
+            "-Wl,-rpath,/opt/homebrew/Cellar/postgresql@14/14.19/lib/postgresql@14"
+        ]
+
+        extensions_to_build.append(Extension(
+            module_name,
+            [pyx_path],
+            include_dirs=postgresql_include_dirs,
+            library_dirs=postgresql_library_dirs,
+            libraries=common_libraries + ["pq"],  # libpq
+            extra_compile_args=common_compile_args,
+            extra_link_args=postgresql_link_args,
+            language="c++",
+        ))
 
     # Build all extensions - use individual compilation to identify all failures
     if extensions_to_build:
@@ -1010,6 +1197,12 @@ def main():
     if not rocksdb_install:
         print_error("RocksDB C++ build failed - some modules will be skipped")
         # Don't fail - RocksDB modules will just be skipped
+
+    # Phase 3.5: Build DuckDB
+    duckdb_build = build_duckdb_cpp(skip=args.skip_vendor)
+    if not duckdb_build:
+        print_error("DuckDB C++ build failed - DuckDB connectors will be skipped")
+        # Don't fail - DuckDB modules will just be skipped
 
     # Phase 4: Build vendor extensions
     vendor_results = build_vendor_extensions(deps, skip=args.skip_vendor)

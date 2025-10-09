@@ -8,6 +8,10 @@
 #include <iomanip>
 #include <cstring>
 #include <zlib.h>  // For compression (if enabled)
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 
 namespace marble {
 
@@ -669,7 +673,604 @@ bool ValidateChecksum(const WalEntry& entry) {
     return ComputeChecksum(entry) == entry.checksum;
 }
 
+// Simple key implementation for WAL demo
+class SimpleKey : public Key {
+public:
+    explicit SimpleKey(const std::string& value) : value_(value) {}
+
+    std::string ToString() const override { return value_; }
+    int Compare(const Key& other) const override {
+        const SimpleKey& other_key = static_cast<const SimpleKey&>(other);
+        return value_.compare(other_key.value_);
+    }
+    arrow::Result<std::shared_ptr<arrow::Scalar>> ToArrowScalar() const override {
+        return arrow::MakeScalar(value_);
+    }
+    std::shared_ptr<Key> Clone() const override {
+        return std::make_shared<SimpleKey>(value_);
+    }
+    size_t Hash() const override { return std::hash<std::string>()(value_); }
+
+private:
+    std::string value_;
+};
+
+// Memory-mapped ring buffer WAL implementation
+MMRingBufferWalFile::MMRingBufferWalFile(const std::string& path,
+                                       const MMRingBufferWalOptions& options)
+    : path_(path), options_(options), header_(nullptr), buffer_start_(nullptr),
+      buffer_size_(options.buffer_size), write_offset_(sizeof(RingBufferHeader)),
+      read_offset_(sizeof(RingBufferHeader))
+#ifdef _WIN32
+      // Windows initialization would go here
+#else
+      , fd_(-1)
+#endif
+      {}
+
+MMRingBufferWalFile::~MMRingBufferWalFile() {
+    Close();
+}
+
+Status MMRingBufferWalFile::InitializeRingBuffer() {
+    // For this demo, use direct POSIX memory mapping to avoid FileHandle complications
+#ifdef _WIN32
+    // Windows implementation would go here
+    return Status::NotImplemented("Windows memory mapping not implemented in demo");
+#else
+    // POSIX implementation
+    int fd = -1;
+    bool file_exists = false;
+
+    // Check if file exists and get its size
+    struct stat st;
+    if (stat(path_.c_str(), &st) == 0) {
+        file_exists = true;
+        if (st.st_size != static_cast<off_t>(buffer_size_)) {
+            return Status::InvalidArgument("Existing file size doesn't match buffer size");
+        }
+    }
+
+    // Open/create the file
+    fd = open(path_.c_str(), O_RDWR | O_CREAT, 0644);
+    if (fd == -1) {
+        return Status::IOError(std::string("Failed to open file: ") + strerror(errno));
+    }
+
+    if (!file_exists) {
+        // Pre-allocate the file to the desired size
+        if (ftruncate(fd, buffer_size_) != 0) {
+            close(fd);
+            return Status::IOError(std::string("Failed to resize file: ") + strerror(errno));
+        }
+    }
+
+    // Memory map the file
+    buffer_start_ = mmap(nullptr, buffer_size_, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (buffer_start_ == MAP_FAILED) {
+        close(fd);
+        return Status::IOError(std::string("Failed to memory map file: ") + strerror(errno));
+    }
+
+    // Store file descriptor for cleanup
+    fd_ = fd;
+    header_ = reinterpret_cast<RingBufferHeader*>(buffer_start_);
+#endif
+
+    if (!file_exists) {
+        // Initialize header for new file
+        header_->magic = 0x4D4D57414C;  // "MMWAL"
+        header_->version = 1;
+        header_->first_sequence = 0;
+        header_->last_sequence = 0;
+        header_->write_offset = sizeof(RingBufferHeader);
+        header_->read_offset = sizeof(RingBufferHeader);
+        header_->checksum = ComputeChecksum(header_, sizeof(RingBufferHeader) - sizeof(uint32_t));
+    } else {
+        // Validate existing header
+        if (header_->magic != 0x4D4D57414C) {
+            return Status::Corruption("Invalid WAL file magic number");
+        }
+        if (header_->version != 1) {
+            return Status::Corruption("Unsupported WAL file version");
+        }
+
+        // Restore offsets from header
+        write_offset_ = header_->write_offset;
+        read_offset_ = header_->read_offset;
+    }
+
+    return Status::OK();
+}
+
+Status MMRingBufferWalFile::WriteEntry(const WalEntry& entry) {
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    // Validate buffer state
+    if (!buffer_start_ || buffer_start_ == MAP_FAILED) {
+        return Status::InternalError("Buffer not properly mapped");
+    }
+
+    if (!header_) {
+        return Status::InternalError("Header is null");
+    }
+
+    // Serialize the entry
+    std::string buffer;
+    auto status = SerializeEntry(entry, &buffer);
+    if (!status.ok()) return status;
+
+    if (buffer.size() > options_.max_entry_size) {
+        return Status::InvalidArgument("Entry size exceeds maximum allowed size");
+    }
+
+    // Check if we need to wrap around or advance read offset
+    size_t current_write = write_offset_.load();
+    size_t entry_size = buffer.size() + sizeof(uint32_t);  // Data + size prefix
+
+    if (WouldWrap(current_write, entry_size)) {
+        // Move to beginning after header
+        size_t new_write_offset = sizeof(RingBufferHeader);
+
+        // Check if this would overwrite unread data
+        size_t current_read = read_offset_.load();
+        if (new_write_offset <= current_read && current_write >= current_read) {
+            // Need to advance read offset to make space
+            status = AdvanceReadOffset(new_write_offset);
+            if (!status.ok()) return status;
+        }
+
+        current_write = new_write_offset;
+    } else if (GetNextOffset(current_write, entry_size) > buffer_size_) {
+        // Wrap around
+        current_write = sizeof(RingBufferHeader);
+
+        // Check if this would overwrite unread data
+        size_t current_read = read_offset_.load();
+        if (current_write <= current_read) {
+            // Need to advance read offset
+            status = AdvanceReadOffset(current_write);
+            if (!status.ok()) return status;
+        }
+    }
+
+    // Write the entry size prefix
+    uint32_t size_prefix = static_cast<uint32_t>(buffer.size());
+    status = WriteData(current_write, &size_prefix, sizeof(uint32_t));
+    if (!status.ok()) return status;
+    current_write = GetNextOffset(current_write, sizeof(uint32_t));
+
+    // Write the entry data
+    status = WriteData(current_write, buffer.data(), buffer.size());
+    if (!status.ok()) return status;
+    current_write = GetNextOffset(current_write, buffer.size());
+
+    // Update write offset
+    status = AdvanceWriteOffset(current_write);
+    if (!status.ok()) return status;
+
+    // Update header
+    header_->last_sequence = entry.sequence_number;
+    if (header_->first_sequence == 0) {
+        header_->first_sequence = entry.sequence_number;
+    }
+
+    return Status::OK();
+}
+
+Status MMRingBufferWalFile::ReadEntries(std::vector<WalEntry>* entries,
+                                      uint64_t start_sequence,
+                                      size_t max_entries) {
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    size_t current_read = read_offset_.load();
+    size_t current_write = write_offset_.load();
+    size_t entries_read = 0;
+
+    // Start from the read offset, but we need to find entries starting from start_sequence
+    size_t read_pos = current_read;
+
+    while (entries_read < max_entries || max_entries == 0) {
+        // Check if we've caught up to write offset
+        if (read_pos == current_write) {
+            break;
+        }
+
+        // Read entry size
+        uint32_t entry_size;
+        auto status = ReadData(read_pos, &entry_size, sizeof(uint32_t));
+        if (!status.ok()) return status;
+        read_pos = GetNextOffset(read_pos, sizeof(uint32_t));
+
+        if (entry_size > options_.max_entry_size) {
+            return Status::Corruption("Invalid entry size in WAL");
+        }
+
+        // Read entry data
+        std::vector<char> entry_buffer(entry_size);
+        status = ReadData(read_pos, entry_buffer.data(), entry_size);
+        if (!status.ok()) return status;
+
+        // Deserialize entry
+        WalEntry entry;
+        status = DeserializeEntry(entry_buffer.data(), entry_size, &entry);
+        if (!status.ok()) return status;
+
+        if (entry.sequence_number >= start_sequence) {
+            entries->push_back(std::move(entry));
+            entries_read++;
+        }
+
+        read_pos = GetNextOffset(read_pos, entry_size);
+    }
+
+    return Status::OK();
+}
+
+Status MMRingBufferWalFile::Flush() {
+    if (file_handle_) {
+        return file_handle_->Sync();
+    }
+    return Status::OK();
+}
+
+Status MMRingBufferWalFile::Close() {
+    if (header_) {
+        // Update header with current offsets
+        header_->write_offset = write_offset_.load();
+        header_->read_offset = read_offset_.load();
+        header_->checksum = ComputeChecksum(header_, sizeof(RingBufferHeader) - sizeof(uint32_t));
+    }
+
+#ifdef _WIN32
+    // Windows cleanup would go here
+    if (buffer_start_) {
+        // UnmapViewOfFile, etc.
+        buffer_start_ = nullptr;
+        header_ = nullptr;
+    }
+#else
+    // POSIX cleanup
+    if (buffer_start_ && buffer_start_ != MAP_FAILED) {
+        munmap(buffer_start_, buffer_size_);
+        buffer_start_ = nullptr;
+        header_ = nullptr;
+    }
+
+    if (fd_ != -1) {
+        close(fd_);
+        fd_ = -1;
+    }
+#endif
+
+    if (file_handle_) {
+        file_handle_->Close();
+        file_handle_.reset();
+    }
+
+    return Status::OK();
+}
+
+uint64_t MMRingBufferWalFile::GetFirstSequence() const {
+    return header_ ? header_->first_sequence : 0;
+}
+
+uint64_t MMRingBufferWalFile::GetLastSequence() const {
+    return header_ ? header_->last_sequence : 0;
+}
+
+Status MMRingBufferWalFile::GetRingBufferStats(std::string* stats) const {
+    std::stringstream ss;
+    ss << "Ring Buffer Stats:\n";
+    ss << "  Buffer size: " << buffer_size_ << " bytes\n";
+    ss << "  Write offset: " << write_offset_.load() << "\n";
+    ss << "  Read offset: " << read_offset_.load() << "\n";
+    ss << "  First sequence: " << GetFirstSequence() << "\n";
+    ss << "  Last sequence: " << GetLastSequence() << "\n";
+    ss << "  Used space: " << (write_offset_.load() - read_offset_.load()) << " bytes\n";
+    *stats = ss.str();
+    return Status::OK();
+}
+
+Status MMRingBufferWalFile::SerializeEntry(const WalEntry& entry, std::string* buffer) {
+    // Simple binary serialization - in production this would be more robust
+    buffer->clear();
+    buffer->reserve(1024);
+
+    // Write sequence number
+    buffer->append(reinterpret_cast<const char*>(&entry.sequence_number), sizeof(uint64_t));
+
+    // Write transaction ID
+    buffer->append(reinterpret_cast<const char*>(&entry.transaction_id), sizeof(uint64_t));
+
+    // Write entry type
+    buffer->append(reinterpret_cast<const char*>(&entry.entry_type), sizeof(WalEntryType));
+
+    // Write key (simplified - assuming string keys for demo)
+    if (entry.key) {
+        std::string key_str = entry.key->ToString();
+        uint32_t key_size = key_str.size();
+        buffer->append(reinterpret_cast<const char*>(&key_size), sizeof(uint32_t));
+        buffer->append(key_str);
+    } else {
+        uint32_t key_size = 0;
+        buffer->append(reinterpret_cast<const char*>(&key_size), sizeof(uint32_t));
+    }
+
+    // Write value size and data
+    if (entry.value) {
+        // Simplified serialization - just store a placeholder for demo
+        // In production, would properly serialize the Record
+        std::string value_data = "record_placeholder";
+        uint32_t value_size = static_cast<uint32_t>(value_data.size());
+        buffer->append(reinterpret_cast<const char*>(&value_size), sizeof(uint32_t));
+        buffer->append(value_data);
+    } else {
+        uint32_t value_size = 0;
+        buffer->append(reinterpret_cast<const char*>(&value_size), sizeof(uint32_t));
+    }
+
+    // Write timestamp and other fields
+    buffer->append(reinterpret_cast<const char*>(&entry.timestamp), sizeof(uint64_t));
+
+    return Status::OK();
+}
+
+Status MMRingBufferWalFile::DeserializeEntry(const void* data, size_t size, WalEntry* entry) {
+    // Simplified deserialization - mirror of SerializeEntry
+    const char* ptr = static_cast<const char*>(data);
+
+    // Read sequence number
+    entry->sequence_number = *reinterpret_cast<const uint64_t*>(ptr);
+    ptr += sizeof(uint64_t);
+
+    // Read transaction ID
+    entry->transaction_id = *reinterpret_cast<const uint64_t*>(ptr);
+    ptr += sizeof(uint64_t);
+
+    // Read entry type
+    entry->entry_type = *reinterpret_cast<const WalEntryType*>(ptr);
+    ptr += sizeof(WalEntryType);
+
+    // Read key (simplified)
+    uint32_t key_size = *reinterpret_cast<const uint32_t*>(ptr);
+    ptr += sizeof(uint32_t);
+    if (key_size > 0) {
+        std::string key_str(ptr, key_size);
+        entry->key = std::make_shared<SimpleKey>(key_str);
+        ptr += key_size;
+    }
+
+    // Read value (placeholder)
+    uint32_t value_size = *reinterpret_cast<const uint32_t*>(ptr);
+    ptr += sizeof(uint32_t);
+    if (value_size > 0) {
+        // In production, would deserialize RecordBatch
+        entry->value = nullptr;  // Placeholder
+        ptr += value_size;
+    }
+
+    // Read timestamp
+    entry->timestamp = *reinterpret_cast<const uint64_t*>(ptr);
+
+    return Status::OK();
+}
+
+Status MMRingBufferWalFile::WriteData(size_t offset, const void* data, size_t size) {
+    if (offset + size > buffer_size_) {
+        return Status::InvalidArgument("Write would exceed buffer bounds");
+    }
+
+    if (!buffer_start_ || buffer_start_ == MAP_FAILED) {
+        return Status::InternalError("Buffer start is invalid");
+    }
+
+    std::memcpy(static_cast<char*>(buffer_start_) + offset, data, size);
+    return Status::OK();
+}
+
+Status MMRingBufferWalFile::ReadData(size_t offset, void* data, size_t size) {
+    if (offset + size > buffer_size_) {
+        return Status::InvalidArgument("Read would exceed buffer bounds");
+    }
+
+    std::memcpy(data, static_cast<const char*>(buffer_start_) + offset, size);
+    return Status::OK();
+}
+
+size_t MMRingBufferWalFile::GetNextOffset(size_t current_offset, size_t data_size) const {
+    return (current_offset + data_size) % buffer_size_;
+}
+
+bool MMRingBufferWalFile::WouldWrap(size_t current_offset, size_t data_size) const {
+    return current_offset + data_size > buffer_size_;
+}
+
+Status MMRingBufferWalFile::AdvanceReadOffset(size_t new_offset) {
+    read_offset_ = new_offset;
+    header_->read_offset = new_offset;
+    return Status::OK();
+}
+
+Status MMRingBufferWalFile::AdvanceWriteOffset(size_t new_offset) {
+    write_offset_ = new_offset;
+    header_->write_offset = new_offset;
+    return Status::OK();
+}
+
+uint32_t MMRingBufferWalFile::ComputeChecksum(const void* data, size_t size) const {
+    // Simple checksum - in production use CRC32
+    uint32_t checksum = 0;
+    const uint8_t* bytes = static_cast<const uint8_t*>(data);
+    for (size_t i = 0; i < size; ++i) {
+        checksum = (checksum << 5) + checksum + bytes[i];
+    }
+    return checksum;
+}
+
+// Memory-mapped ring buffer WAL manager implementation
+MMRingBufferWalManager::MMRingBufferWalManager(TaskScheduler* scheduler)
+    : scheduler_(scheduler), current_sequence_(0), is_open_(false) {}
+
+MMRingBufferWalManager::~MMRingBufferWalManager() {
+    Close();
+}
+
+Status MMRingBufferWalManager::Open(const WalOptions& options) {
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    if (is_open_) {
+        return Status::InvalidArgument("WAL manager is already open");
+    }
+
+    options_ = options;
+    mm_options_ = static_cast<const MMRingBufferWalOptions&>(options);
+
+    auto status = EnsureFileExists();
+    if (!status.ok()) return status;
+
+    wal_file_ = std::make_unique<MMRingBufferWalFile>(options_.wal_path, mm_options_);
+    status = wal_file_->InitializeRingBuffer();
+    if (!status.ok()) return status;
+
+    // Recover existing entries
+    status = RecoverFromFile(nullptr, 0);
+    if (!status.ok()) return status;
+
+    is_open_ = true;
+    return Status::OK();
+}
+
+Status MMRingBufferWalManager::Close() {
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    if (!is_open_) {
+        return Status::OK();
+    }
+
+    if (wal_file_) {
+        auto status = wal_file_->Close();
+        if (!status.ok()) return status;
+        wal_file_.reset();
+    }
+
+    is_open_ = false;
+    return Status::OK();
+}
+
+Status MMRingBufferWalManager::WriteEntry(const WalEntry& entry) {
+    if (!is_open_) {
+        return Status::InvalidArgument("WAL manager is not open");
+    }
+
+    return wal_file_->WriteEntry(entry);
+}
+
+Status MMRingBufferWalManager::WriteBatch(const std::vector<WalEntry>& entries) {
+    if (!is_open_) {
+        return Status::InvalidArgument("WAL manager is not open");
+    }
+
+    for (const auto& entry : entries) {
+        auto status = wal_file_->WriteEntry(entry);
+        if (!status.ok()) return status;
+    }
+
+    return Status::OK();
+}
+
+uint64_t MMRingBufferWalManager::GetCurrentSequence() const {
+    return current_sequence_.load();
+}
+
+Status MMRingBufferWalManager::Sync() {
+    if (!is_open_) {
+        return Status::InvalidArgument("WAL manager is not open");
+    }
+
+    return wal_file_->Flush();
+}
+
+Status MMRingBufferWalManager::Rotate() {
+    // For ring buffer, rotation is automatic - no-op
+    return Status::OK();
+}
+
+Status MMRingBufferWalManager::Recover(std::function<Status(const WalEntry&)> callback,
+                                     uint64_t start_sequence) {
+    if (!is_open_) {
+        return Status::InvalidArgument("WAL manager is not open");
+    }
+
+    return RecoverFromFile(callback, start_sequence);
+}
+
+Status MMRingBufferWalManager::Truncate(uint64_t sequence_number) {
+    // For ring buffer, truncation is automatic when buffer wraps
+    // In a full implementation, we might need to advance read offset
+    return Status::OK();
+}
+
+Status MMRingBufferWalManager::GetStats(std::string* stats) const {
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    if (!is_open_) {
+        return Status::InvalidArgument("WAL manager is not open");
+    }
+
+    std::string ring_stats;
+    auto status = wal_file_->GetRingBufferStats(&ring_stats);
+    if (!status.ok()) return status;
+
+    std::stringstream ss;
+    ss << "Memory-Mapped Ring Buffer WAL Stats:\n";
+    ss << "  Current sequence: " << current_sequence_.load() << "\n";
+    ss << "  Buffer size: " << mm_options_.buffer_size << " bytes\n";
+    ss << ring_stats;
+
+    *stats = ss.str();
+    return Status::OK();
+}
+
+Status MMRingBufferWalManager::ListFiles(std::vector<std::string>* files) const {
+    files->clear();
+    files->push_back(options_.wal_path);
+    return Status::OK();
+}
+
+Status MMRingBufferWalManager::EnsureFileExists() {
+    auto filesystem = FileSystem::CreateLocal();
+    bool exists;
+    auto status = filesystem->FileExists(options_.wal_path, &exists);
+    if (!status.ok()) return status;
+
+    // For demo purposes, just check if file exists
+    // In production, would create parent directories as needed
+    return Status::OK();
+}
+
+Status MMRingBufferWalManager::RecoverFromFile(std::function<Status(const WalEntry&)> callback,
+                                             uint64_t start_sequence) {
+    std::vector<WalEntry> entries;
+    auto status = wal_file_->ReadEntries(&entries, start_sequence);
+    if (!status.ok()) return status;
+
+    for (const auto& entry : entries) {
+        current_sequence_ = std::max(current_sequence_.load(), entry.sequence_number);
+        if (callback) {
+            status = callback(entry);
+            if (!status.ok()) return status;
+        }
+    }
+
+    return Status::OK();
+}
+
 // Factory functions
+std::unique_ptr<WalManager> CreateMMRingBufferWalManager(TaskScheduler* scheduler) {
+    return std::make_unique<MMRingBufferWalManager>(scheduler);
+}
+
 std::unique_ptr<WalManager> CreateWalManager(TaskScheduler* scheduler) {
     return std::make_unique<WalManagerImpl>(scheduler);
 }

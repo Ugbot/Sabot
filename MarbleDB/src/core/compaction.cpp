@@ -1,5 +1,5 @@
 #include <marble/compaction.h>
-#include <marble/lsm_tree.h>
+#include <marble/sstable.h>
 #include <algorithm>
 #include <chrono>
 #include <sstream>
@@ -95,10 +95,11 @@ std::vector<std::shared_ptr<SSTable>> LeveledCompactionStrategy::FindOverlapping
 
     for (const auto& table : level_files) {
         const auto& meta = table->GetMetadata();
-        // Simple string comparison for key ranges
-        // In real implementation, would need proper key comparison
-        if (!(max_key < meta.smallest_key->ToString() ||
-              meta.largest_key->ToString() < min_key)) {
+        // Simple key range comparison for compaction
+        // Convert string keys to uint64_t for comparison (simplified)
+        uint64_t min_key_num = std::stoull(min_key);
+        uint64_t max_key_num = std::stoull(max_key);
+        if (!(max_key_num < meta.min_key || meta.max_key < min_key_num)) {
             overlapping.push_back(table);
         }
     }
