@@ -9,6 +9,7 @@
 #include <marble/db.h>
 #include <marble/task_scheduler.h>
 #include <marble/query.h>
+#include <marble/hot_key_cache.h>
 #include <arrow/api.h>
 
 namespace marble {
@@ -112,6 +113,7 @@ public:
         uint64_t block_offset = 0;  // Offset in the SSTable file
         uint64_t block_size = 0;    // Size of the block in bytes
         uint64_t first_row_index = 0; // Index of first row in this block
+        std::shared_ptr<BloomFilter> block_bloom;  // Per-block bloom filter (shared for copyability)
     };
 
     // Sparse index entry for fast key lookup

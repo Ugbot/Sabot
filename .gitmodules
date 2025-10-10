@@ -19,3 +19,6 @@
 [submodule "MarbleDB/vendor/nuraft"]
 	path = MarbleDB/vendor/nuraft
 	url = https://github.com/eBay/NuRaft.git
+[submodule "vendor/kuzu"]
+	path = vendor/kuzu
+	url = https://github.com/kuzudb/kuzu.git

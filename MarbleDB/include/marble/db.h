@@ -5,11 +5,15 @@
 #include <marble/status.h>
 #include <marble/record.h>
 #include <marble/table.h>
+#include <marble/column_family.h>
+#include <marble/merge_operator.h>
+#include <marble/record_ref.h>
 
 namespace marble {
 
 // Forward declarations
 class Stream;
+class ColumnFamilyHandle;
 
 // Database configuration options
 struct DBOptions {
@@ -49,6 +53,15 @@ struct DBOptions {
     size_t target_block_size = 8192;  // Target rows per block
     bool enable_bloom_filter = true;
     size_t bloom_filter_bits_per_key = 10;  // Bloom filter size
+    
+    // Point lookup optimizations
+    bool enable_hot_key_cache = true;
+    size_t hot_key_cache_size_mb = 64;
+    uint32_t hot_key_promotion_threshold = 3;
+    bool enable_negative_cache = true;
+    size_t negative_cache_entries = 10000;
+    bool enable_sorted_blocks = true;  // Sort keys within blocks for binary search
+    bool enable_block_bloom_filters = true;  // Bloom filter per block
 
     // Threading options
     size_t max_background_threads = 4;
@@ -93,6 +106,27 @@ public:
 
     virtual Status Delete(const WriteOptions& options,
                           const Key& key) = 0;
+    
+    /**
+     * @brief Merge operation for associative updates
+     * 
+     * Applies merge operator to combine new value with existing value.
+     * More efficient than Get + Modify + Put for counters, sets, etc.
+     * 
+     * @param options Write options
+     * @param key Key to merge
+     * @param value Merge operand
+     * @return Status OK on success
+     */
+    virtual Status Merge(const WriteOptions& options,
+                        const Key& key,
+                        const std::string& value) = 0;
+    
+    // Column family operations
+    virtual Status Merge(const WriteOptions& options,
+                        ColumnFamilyHandle* cf,
+                        const Key& key,
+                        const std::string& value) = 0;
 
     // Batch operations
     virtual Status WriteBatch(const WriteOptions& options,
@@ -106,6 +140,62 @@ public:
     virtual Status CreateTable(const TableSchema& schema) = 0;
     virtual Status ScanTable(const std::string& table_name,
                             std::unique_ptr<QueryResult>* result) = 0;
+    
+    /**
+     * @brief Column Family operations
+     */
+    virtual Status CreateColumnFamily(const ColumnFamilyDescriptor& descriptor,
+                                     ColumnFamilyHandle** handle) = 0;
+    virtual Status DropColumnFamily(ColumnFamilyHandle* handle) = 0;
+    virtual std::vector<std::string> ListColumnFamilies() const = 0;
+    
+    // CF-specific operations
+    virtual Status Put(const WriteOptions& options,
+                      ColumnFamilyHandle* cf,
+                      std::shared_ptr<Record> record) = 0;
+    
+    virtual Status Get(const ReadOptions& options,
+                      ColumnFamilyHandle* cf,
+                      const Key& key,
+                      std::shared_ptr<Record>* record) = 0;
+    
+    virtual Status Delete(const WriteOptions& options,
+                         ColumnFamilyHandle* cf,
+                         const Key& key) = 0;
+    
+    /**
+     * @brief Multi-Get for batch point lookups
+     * 
+     * Faster than individual Get() calls due to:
+     * - Single lock acquisition
+     * - Batch I/O operations
+     * - Cache-friendly access patterns
+     * 
+     * @return Status OK if all keys processed (even if some not found)
+     */
+    virtual Status MultiGet(const ReadOptions& options,
+                           const std::vector<Key>& keys,
+                           std::vector<std::shared_ptr<Record>>* records) = 0;
+    
+    virtual Status MultiGet(const ReadOptions& options,
+                           ColumnFamilyHandle* cf,
+                           const std::vector<Key>& keys,
+                           std::vector<std::shared_ptr<Record>>* records) = 0;
+    
+    /**
+     * @brief Delete range of keys efficiently
+     * 
+     * Much faster than loop of Delete() calls.
+     * Uses tombstones for efficient bulk deletion.
+     */
+    virtual Status DeleteRange(const WriteOptions& options,
+                              const Key& begin_key,
+                              const Key& end_key) = 0;
+    
+    virtual Status DeleteRange(const WriteOptions& options,
+                              ColumnFamilyHandle* cf,
+                              const Key& begin_key,
+                              const Key& end_key) = 0;
 
     // Scanning
     virtual Status NewIterator(const ReadOptions& options,

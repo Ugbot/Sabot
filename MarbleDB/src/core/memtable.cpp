@@ -583,6 +583,14 @@ public:
             LSMSSTable::BlockStats block_stat;
             block_stat.first_row_index = start_row;
             block_stat.row_count = end_row - start_row;
+            
+            // Create per-block bloom filter if enabled
+            if (options.enable_block_bloom_filters) {
+                block_stat.block_bloom = std::make_shared<BloomFilter>(
+                    options.bloom_filter_bits_per_key, 
+                    block_stat.row_count
+                );
+            }
 
             // Get min/max keys for this block
             if (start_row < end_row) {
@@ -600,16 +608,21 @@ public:
                     largest_key_ = max_key;
                 }
 
-                // Add to bloom filter
+                // Add to bloom filters
                 if (bloom_filter_) {
                     for (size_t row = start_row; row < end_row; ++row) {
                         BenchKey key(static_cast<int64_t>(row));
                         bloom_filter_->Add(key);
+                        
+                        // Also add to block bloom filter
+                        if (block_stat.block_bloom) {
+                            block_stat.block_bloom->Add(key);
+                        }
                     }
                 }
             }
 
-            block_stats_.push_back(block_stat);
+            block_stats_.push_back(std::move(block_stat));
 
             // Build sparse index
             if (has_sparse_index_ && (start_row % index_granularity_ == 0)) {
@@ -643,6 +656,19 @@ public:
                 return linearSearch(key, record);
             }
 
+            // Find the block that might contain this key
+            size_t block_idx = target_key / block_size_;
+            if (block_idx >= block_stats_.size()) {
+                return Status::NotFound("Key out of range");
+            }
+            
+            // Check block bloom filter first (fast miss detection)
+            const auto& block_stat = block_stats_[block_idx];
+            if (block_stat.block_bloom && !block_stat.block_bloom->MayContain(key)) {
+                // Definitely not in this block!
+                return Status::NotFound("Key not found (bloom filter)");
+            }
+
             // Find the sparse index entry that covers this key
             // Each entry covers [entry.key, entry.key + granularity)
             size_t sparse_idx = target_key / index_granularity_;
@@ -656,7 +682,9 @@ public:
                 sparse_index_[sparse_idx + 1].row_index :
                 static_cast<size_t>(batch_->num_rows());
 
-            // Linear search within the block
+            // TODO: If sorted_blocks enabled, use binary search here
+            // For now, linear search within the block
+            // With sorted blocks, this becomes: O(log block_size) instead of O(block_size)
             for (size_t i = block_start; i < block_end; ++i) {
                 if (static_cast<int64_t>(i) == target_key) {
                     // Found the key - create record

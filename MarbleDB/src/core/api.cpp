@@ -203,6 +203,15 @@ public:
     Status Delete(const WriteOptions& options, const Key& key) override {
         return Status::NotImplemented("Delete not implemented");
     }
+    
+    // Merge operations
+    Status Merge(const WriteOptions& options, const Key& key, const std::string& value) override {
+        return Status::NotImplemented("Merge not implemented");
+    }
+    
+    Status Merge(const WriteOptions& options, ColumnFamilyHandle* cf, const Key& key, const std::string& value) override {
+        return Status::NotImplemented("CF Merge not implemented");
+    }
 
     Status WriteBatch(const WriteOptions& options, const std::vector<std::shared_ptr<Record>>& records) override {
         return Status::NotImplemented("WriteBatch not implemented");
@@ -220,6 +229,50 @@ public:
 
     Status ScanTable(const std::string& table_name, std::unique_ptr<QueryResult>* result) override {
         return Status::NotImplemented("ScanTable not implemented");
+    }
+    
+    // Column Family operations
+    Status CreateColumnFamily(const ColumnFamilyDescriptor& descriptor, ColumnFamilyHandle** handle) override {
+        return Status::NotImplemented("CreateColumnFamily not implemented");
+    }
+    
+    Status DropColumnFamily(ColumnFamilyHandle* handle) override {
+        return Status::NotImplemented("DropColumnFamily not implemented");
+    }
+    
+    std::vector<std::string> ListColumnFamilies() const override {
+        return std::vector<std::string>{"default"};
+    }
+    
+    // CF-specific operations
+    Status Put(const WriteOptions& options, ColumnFamilyHandle* cf, std::shared_ptr<Record> record) override {
+        return Status::NotImplemented("CF Put not implemented");
+    }
+    
+    Status Get(const ReadOptions& options, ColumnFamilyHandle* cf, const Key& key, std::shared_ptr<Record>* record) override {
+        return Status::NotImplemented("CF Get not implemented");
+    }
+    
+    Status Delete(const WriteOptions& options, ColumnFamilyHandle* cf, const Key& key) override {
+        return Status::NotImplemented("CF Delete not implemented");
+    }
+    
+    // Multi-Get
+    Status MultiGet(const ReadOptions& options, const std::vector<Key>& keys, std::vector<std::shared_ptr<Record>>* records) override {
+        return Status::NotImplemented("MultiGet not implemented");
+    }
+    
+    Status MultiGet(const ReadOptions& options, ColumnFamilyHandle* cf, const std::vector<Key>& keys, std::vector<std::shared_ptr<Record>>* records) override {
+        return Status::NotImplemented("CF MultiGet not implemented");
+    }
+    
+    // Delete Range
+    Status DeleteRange(const WriteOptions& options, const Key& begin_key, const Key& end_key) override {
+        return Status::NotImplemented("DeleteRange not implemented");
+    }
+    
+    Status DeleteRange(const WriteOptions& options, ColumnFamilyHandle* cf, const Key& begin_key, const Key& end_key) override {
+        return Status::NotImplemented("CF DeleteRange not implemented");
     }
 
     // Scanning
