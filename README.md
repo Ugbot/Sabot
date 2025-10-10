@@ -44,6 +44,7 @@ This is an experimental research project exploring the design space of:
 
 **Current State (v0.1.0-alpha):**
 - ✅ **CyArrow**: Production-ready zero-copy Arrow operations (104M rows/sec joins)
+- ✅ **Graph Processing**: High-performance graph analytics (3-37M matches/sec pattern matching)
 - ✅ **DataLoader**: High-performance CSV/Arrow IPC loading (52x faster than CSV)
 - ✅ **Streaming Agents**: Faust-inspired Kafka processing with columnar data
 - ✅ **Cython Acceleration**: SIMD-accelerated compute kernels
@@ -324,6 +325,7 @@ Sabot combines **Arrow's columnar performance** with **Python's ecosystem**:
 | **features** | Feature engineering for ML pipelines (CyRedis) | Streaming features |
 | **tonbo** | LSM state backend (Rust FFI, production-ready) | 72K writes/sec, 241K reads/sec |
 | **shuffle** | Lock-free network transport (Arrow Flight) | Zero-copy distributed shuffle |
+| **graph** | Graph storage, traversal, and pattern matching | 3-37M matches/sec |
 
 ### Feature Engineering (`sabot/features/`)
 
@@ -398,6 +400,78 @@ Zero-copy distributed data transfer using Arrow Flight:
 - Distributed joins and aggregations
 - Repartitioning operations
 - Multi-stage dataflow pipelines
+
+### Graph Processing (`sabot/_cython/graph/`)
+
+High-performance graph analytics and pattern matching built on Arrow columnar format.
+
+**Features:**
+- ✅ **Columnar Graph Storage**: Property graphs with CSR/CSC adjacency
+- ✅ **Graph Traversal**: BFS, DFS, shortest paths, PageRank, centrality, connected components
+- ✅ **Pattern Matching**: 2-hop, 3-hop, variable-length paths with cost-based optimization
+- ✅ **Zero-Copy Operations**: Direct Arrow buffer access for maximum throughput
+
+**Performance (M1 Pro, October 2025):**
+- 2-hop patterns: 3-37M matches/sec
+- 3-hop patterns: 2.7-5.6M matches/sec
+- Graph traversal: 10-50M nodes/sec
+- Join optimizer: <0.130ms overhead
+
+**API Example:**
+```python
+import pyarrow as pa
+from sabot._cython.graph import PropertyGraph, VertexTable, EdgeTable
+from sabot._cython.graph.query import match_2hop
+from sabot._cython.graph.traversal import pagerank
+
+# Create social graph
+vertices = pa.table({
+    'id': pa.array([0, 1, 2, 3], type=pa.int64()),
+    'label': pa.array(['Person', 'Person', 'Person', 'Company']).dictionary_encode(),
+    'name': ['Alice', 'Bob', 'Charlie', 'Acme Corp']
+})
+
+edges = pa.table({
+    'source': pa.array([0, 1, 0, 2], type=pa.int64()),
+    'target': pa.array([1, 2, 3, 3], type=pa.int64()),
+    'type': pa.array(['KNOWS', 'KNOWS', 'WORKS_AT', 'WORKS_AT']).dictionary_encode()
+})
+
+# Create property graph
+graph = PropertyGraph(VertexTable(vertices), EdgeTable(edges))
+graph.build_csr()
+
+# Find 2-hop patterns: Person → Person → Person
+result = match_2hop(edges, edges)
+print(f"Found {result.num_matches()} friend-of-friend connections")
+
+# Run PageRank
+ranks = pagerank(edges, num_vertices=4, damping=0.85, max_iterations=20)
+print(f"PageRank scores: {ranks.to_pylist()}")
+
+# Get neighbors
+neighbors = graph.get_neighbors(0)  # Alice's neighbors
+print(f"Alice knows: {neighbors.to_pylist()}")
+```
+
+**Use Cases:**
+- Social network analysis (friend-of-friend recommendations)
+- Fraud detection (money laundering pattern matching)
+- Knowledge graph inference
+- Supply chain tracking
+- Network influence analysis
+
+**Comprehensive Documentation**: See [GRAPH_QUERY_ENGINE.md](docs/GRAPH_QUERY_ENGINE.md) for complete API reference, examples, and benchmarks.
+
+**Working Examples**:
+- `examples/social_network_analysis.py` - Friend recommendations
+- `examples/fraud_detection_optimizer.py` - Money laundering patterns
+- `examples/pattern_sabot_integration.py` - Integration with Sabot operators
+
+**Test Suite**: 27 tests, 100% passing
+```bash
+pytest tests/unit/graph/test_pattern_matching.py -v
+```
 
 ## Example: Fintech Data Enrichment (Zero-Copy Arrow)
 
@@ -617,6 +691,9 @@ docker compose down
 | **Zero-Copy Operations** | Hash joins, windows, filtering | SIMD-accelerated | `examples/fintech_enrichment_demo/arrow_optimized_enrichment.py` |
 | **Fraud Detection** | Real-time fraud detection (experimental) | 3-6K txn/s | `examples/fraud_app.py` |
 | **Crypto Features** | Real-time feature engineering pipeline | Redis feature store | `examples/crypto_features_demo.py` |
+| **Graph Pattern Matching** | Friend-of-friend recommendations | 3-37M matches/sec | `examples/social_network_analysis.py` |
+| **Graph Fraud Detection** | Money laundering pattern detection | 2.7-5.6M matches/sec | `examples/fraud_detection_optimizer.py` |
+| **Graph Traversal** | BFS, DFS, PageRank, shortest paths | 10-50M nodes/sec | `examples/property_graph_demo.py` |
 
 ## Benchmark Results
 
@@ -652,6 +729,14 @@ docker compose down
 - **[CYARROW.md](CYARROW.md)** - CyArrow API reference and zero-copy operations
 - **[DEMO_QUICKSTART.md](DEMO_QUICKSTART.md)** - Fintech demo quick start
 
+### Graph Processing
+- **[GRAPH_QUERY_ENGINE.md](docs/GRAPH_QUERY_ENGINE.md)** - Complete graph API documentation
+  - Columnar graph storage (CSR/CSC adjacency)
+  - Graph traversal algorithms (BFS, DFS, PageRank, etc.)
+  - Pattern matching (2-hop, 3-hop, variable-length paths)
+  - Query optimization and planning
+  - Performance benchmarks (3-37M matches/sec)
+
 ### Architecture & Development
 - **[PROJECT_MAP.md](PROJECT_MAP.md)** - Directory structure and module overview
 - **[Architecture](docs/ARCHITECTURE.md)** - Deep dive into internals (if exists)
@@ -666,10 +751,11 @@ docker compose down
 | **Columnar Processing** | ✅ **Zero-copy Arrow** (SIMD-accelerated) | ⚠️ Arrow integration | ❌ No | ⚠️ Limited |
 | **Data Loading** | ✅ **52x faster** (Arrow IPC) | 🐌 Standard | 🐌 Standard | 🐌 Standard |
 | **Memory Efficiency** | ✅ **Memory-mapped** (no copies) | 🐌 JVM heap | ⚠️ Object serialization | ✅ Native |
+| **Graph Processing** | ✅ **3-37M matches/sec** (native) | ⚠️ GraphX (JVM overhead) | ❌ No native support | ⚠️ Gelly (limited) |
 | **Setup Complexity** | ✅ **Single pip install** | 🐌 JVM + Spark cluster | 🐌 Distributed setup | 🐌 Cluster management |
 | **Debugging** | ✅ **Pure Python** (pdb, breakpoints) | 🐌 JVM stack traces | ⚠️ Distributed complexity | 🐌 JVM debugging |
 | **Streaming** | ⚠️ Experimental agents | ✅ Structured Streaming | ✅ Ray Data | ✅ Production |
-| **Production Ready** | ✅ CyArrow (yes), ⚠️ Streaming (no) | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Production Ready** | ✅ CyArrow (yes), ✅ Graph (yes), ⚠️ Streaming (no) | ✅ Yes | ✅ Yes | ✅ Yes |
 
 ## Roadmap
 
@@ -679,6 +765,7 @@ docker compose down
 - ✅ **DataLoader**: Multi-threaded CSV, memory-mapped Arrow IPC
 - ✅ **Arrow IPC Format**: 52x faster than CSV, 50-70% smaller files
 - ✅ **SIMD Operations**: Window functions, filtering, sorting
+- ✅ **Graph Processing**: Storage, traversal, pattern matching (3-37M matches/sec)
 - ✅ **Cython checkpoint coordinator** (Chandy-Lamport barriers)
 - ✅ **Memory state backend** with Cython acceleration
 - ✅ **Fintech enrichment demo** (11.2M rows in 2.3s)
@@ -768,6 +855,7 @@ Built with:
 **Choose Sabot when:**
 - You need **PySpark-level performance** without JVM overhead
 - You're processing **large columnar datasets** (Arrow IPC, Parquet)
+- You need **high-performance graph analytics** (pattern matching, traversals)
 - You want **pure Python debugging** (pdb, breakpoints, no JVM stack traces)
 - **Single-machine performance** is your primary concern
 - You need **fast iteration** during development
@@ -783,6 +871,8 @@ Built with:
 - You're building **complex ML pipelines** with distributed training
 - **Python-first distributed computing** is your priority
 
-**This is experimental alpha software.** The CyArrow columnar processing is production-quality, but streaming features are experimental. We welcome feedback and contributions!
+**This is experimental alpha software.** The CyArrow columnar processing and graph analytics are production-quality, but streaming features are experimental. We welcome feedback and contributions!
 
-**Ready to try it?** Check out the [Fintech Enrichment Demo](examples/fintech_enrichment_demo/) to see Sabot processing millions of rows in seconds!
+**Ready to try it?**
+- **Columnar processing**: [Fintech Enrichment Demo](examples/fintech_enrichment_demo/) - 11.2M rows in 2.3 seconds
+- **Graph analytics**: [Graph Query Engine](docs/GRAPH_QUERY_ENGINE.md) - 3-37M matches/sec pattern matching

@@ -184,6 +184,7 @@ dictionary = _pa.dictionary
 field = _pa.field
 schema = _pa.schema
 array = _pa.array
+scalar = _pa.scalar
 record_batch = _pa.record_batch
 table = _pa.table
 
@@ -257,7 +258,7 @@ __all__ = [
     'list_', 'struct', 'field', 'schema',
     'timestamp', 'date32', 'date64',
     # Factory functions
-    'array', 'record_batch', 'table',
+    'array', 'scalar', 'record_batch', 'table',
     # IPC
     'ipc', 'BufferOutputStream', 'py_buffer',
     # Type class

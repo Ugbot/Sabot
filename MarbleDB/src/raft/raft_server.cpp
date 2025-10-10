@@ -270,19 +270,15 @@ private:
 // Wrapper class implementations
 class MarbleStateMachineWrapper : public state_machine {
 public:
-    explicit MarbleStateMachineWrapper(std::unique_ptr<marble::StateMachine> sm)
-        : state_machine_impl_(std::move(sm)) {}
+    MarbleStateMachineWrapper() = default;
 
     ptr<buffer> pre_commit(const ulong log_idx, buffer& data) override {
         return nullptr; // No pre-commit needed
     }
 
     ptr<buffer> commit(const ulong log_idx, buffer& data) override {
-        // Apply the log entry to our state machine
-        if (state_machine_impl_) {
-            std::string data_str(reinterpret_cast<const char*>(data.data()), data.size());
-            // state_machine_impl_->Apply(log_idx, data_str); // TODO: Implement Apply method
-        }
+        // Apply the log entry
+        // TODO: Connect to MarbleDB's LSM tree for state persistence
         return nullptr;
     }
 
@@ -310,8 +306,10 @@ public:
         }
     }
 
-private:
-    std::unique_ptr<marble::StateMachine> state_machine_impl_;
+    bool apply_snapshot(snapshot& s) override {
+        // TODO: Implement snapshot application
+        return true;
+    }
 };
 
 class MarbleLogStoreWrapper : public log_store {
@@ -377,9 +375,9 @@ public:
         : my_id_(srv_id), my_endpoint_(endpoint) {}
 
     ptr<cluster_config> load_config() override {
-        std::vector<ptr<srv_config>> servers;
-        servers.push_back(cs_new<srv_config>(my_id_, my_endpoint_));
-        return cs_new<cluster_config>(0, 0, servers);
+        ptr<cluster_config> config = cs_new<cluster_config>(0, 0);
+        config->get_servers().push_back(cs_new<srv_config>(my_id_, my_endpoint_));
+        return config;
     }
 
     void save_config(const cluster_config& config) override {
@@ -438,7 +436,7 @@ private:
 
 // Implementation of wrapper creation methods
 ptr<state_machine> NuRaftServer::create_state_machine_wrapper() {
-    return cs_new<MarbleStateMachineWrapper>(std::move(state_machine_));
+    return cs_new<MarbleStateMachineWrapper>();
 }
 
 ptr<log_store> NuRaftServer::create_log_store_wrapper() {
@@ -511,11 +509,10 @@ private:
     std::map<uint64_t, std::string> logs_;
 };
 
-// Forward declaration
-class MarbleLogStore;
-
 std::unique_ptr<RaftLogStore> CreateMarbleLogStore(const std::string& path) {
-    return std::make_unique<MarbleLogStore>(path);
+    // TODO: Implement persistent log store using path
+    // For now, use in-memory implementation
+    return std::make_unique<InMemoryLogStore>();
 }
 
 std::unique_ptr<RaftTransport> CreateArrowFlightTransport(

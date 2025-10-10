@@ -403,9 +403,7 @@ endif()
 
 # Benchmarks
 if(MARBLE_BUILD_BENCHMARKS)
-    # Benchmarks are under development
-    message(STATUS "Benchmarks are currently under development - skipping")
-    # add_subdirectory(benchmarks)
+    add_subdirectory(benchmarks)
 endif()
 
 # Installation

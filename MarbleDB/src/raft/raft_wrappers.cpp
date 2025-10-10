@@ -14,6 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 **************************************************************************/
 
+#include "marble/raft.h"
+#include "marble/status.h"
+
 #include <libnuraft/nuraft.hxx>
 #include <libnuraft/state_machine.hxx>
 #include <libnuraft/log_store.hxx>
