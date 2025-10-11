@@ -1,0 +1,266 @@
+// Cypher Grammar for Lark Parser
+// Based on official openCypher EBNF (https://s3.amazonaws.com/artifacts.opencypher.org/M23/cypher.ebnf)
+// Structure follows openCypher M23 specification exactly
+
+// Entry point
+start: cypher
+
+cypher:  statement ( ";" )? 
+
+statement: query
+
+query: regular_query
+     | standalone_call
+
+regular_query: single_query ( union)*
+
+union: "UNION" "ALL"  single_query
+     | "UNION"  single_query
+
+single_query: single_part_query
+            | multi_part_query
+
+// Key structure for WITH clause support
+single_part_query: reading_clause* return_clause
+
+multi_part_query: (reading_clause* with_clause )+ single_part_query
+
+// Clauses
+reading_clause: match_clause
+              | unwind_clause
+              | in_query_call
+
+match_clause: ("OPTIONAL")? "MATCH"  pattern ( where_clause)?
+
+unwind_clause: "UNWIND"  expression "AS"i variable
+
+with_clause: "WITH" projection_body ( where_clause)?
+
+return_clause: "RETURN" projection_body
+
+projection_body: ( "DISTINCT")? projection_items (order_clause)? (skip_clause)? (limit_clause)?
+
+projection_items: "*" ( ","  projection_item)*
+                | projection_item ( ","  projection_item)*
+
+projection_item: expression "AS"i variable
+               | expression
+
+order_clause: "ORDER" "BY" sort_item (","  sort_item)*
+
+skip_clause: "SKIP" expression
+
+limit_clause: "LIMIT" expression
+
+sort_item: expression ( ("ASCENDING" | "ASC" | "DESCENDING" | "DESC"))?
+
+where_clause: "WHERE" expression
+
+// Patterns
+pattern: pattern_part ( ","  pattern_part)*
+
+pattern_part: (variable  "="  anonymous_pattern_part)
+            | anonymous_pattern_part
+
+anonymous_pattern_part: pattern_element
+
+pattern_element: node_pattern ( pattern_element_chain)*
+               | "(" pattern_element ")"
+
+pattern_element_chain: relationship_pattern  node_pattern
+
+node_pattern: "("  (variable )? (node_labels )? (properties )? ")"
+
+relationship_pattern: left_arrow_head  dash  (relationship_detail)?  dash  right_arrow_head -> rel_both_arrows
+                    | left_arrow_head  dash  (relationship_detail)?  dash -> rel_left_arrow
+                    | dash  (relationship_detail)?  dash  right_arrow_head -> rel_right_arrow
+                    | dash  (relationship_detail)?  dash -> rel_no_arrow
+
+relationship_detail: "["  (variable )? (relationship_types )? (range_literal)? (properties )? "]"
+
+properties: map_literal
+          | parameter
+
+relationship_types: ":"  rel_type_name ( "|" (":")?   rel_type_name)*
+
+node_labels: node_label ( node_label)*
+
+node_label: ":"  label_name
+
+range_literal: "*"  (integer_literal )? (".."  (integer_literal )?)?
+
+label_name: schema_name
+
+rel_type_name: schema_name
+
+// Expressions
+expression: or_expression
+
+or_expression: xor_expression ("OR" xor_expression)*
+
+xor_expression: and_expression ("XOR" and_expression)*
+
+and_expression: not_expression ("AND" not_expression)*
+
+not_expression: ("NOT" )* comparison_expression
+
+comparison_expression: add_or_subtract_expression ( partial_comparison_expression)*
+
+partial_comparison_expression: "="  add_or_subtract_expression
+                             | "<>"  add_or_subtract_expression
+                             | "<"  add_or_subtract_expression
+                             | ">"  add_or_subtract_expression
+                             | "<="  add_or_subtract_expression
+                             | ">="  add_or_subtract_expression
+                             | ("STARTS" "WITH")  add_or_subtract_expression
+                             | ("ENDS" "WITH")  add_or_subtract_expression
+                             | "CONTAINS"  add_or_subtract_expression
+                             | "IN"  add_or_subtract_expression
+                             | "IS" "NULL"
+                             | "IS" "NOT" "NULL"
+
+add_or_subtract_expression: multiply_divide_modulo_expression (( "+"  multiply_divide_modulo_expression) | ( "-"  multiply_divide_modulo_expression))*
+
+multiply_divide_modulo_expression: power_of_expression (( "*"  power_of_expression) | ( "/"  power_of_expression) | ( "%"  power_of_expression))*
+
+power_of_expression: unary_add_or_subtract_expression ( "^"  unary_add_or_subtract_expression)*
+
+unary_add_or_subtract_expression: atom_with_suffix
+                                | ("+" | "-") atom_with_suffix
+
+atom_with_suffix: atom property_or_list_access* node_labels?
+
+property_or_list_access: property_lookup
+                       | list_operator_expression
+
+list_operator_expression: "[" expression "]"
+                        | "[" (expression)? ".." (expression)? "]"
+
+property_lookup: "." (symbolic_name | reserved_word)
+
+property_expression: atom ( property_lookup)+
+
+atom: literal
+    | parameter
+    | case_expression
+    | count_star
+    | list_comprehension
+    | quantifier
+    | parenthesized_expression
+    | function_invocation
+    | variable
+
+count_star: "COUNT"i "(" "*" ")"
+
+case_expression: "CASE" ( case_alternative)+ ( "ELSE"  expression)?  "END"
+               | "CASE"  expression ( case_alternative)+ ( "ELSE"  expression)?  "END"
+
+case_alternative: "WHEN"  expression  "THEN"  expression
+
+list_comprehension: "["  filter_expression ( "|"  expression)?  "]"
+
+quantifier: "ALL"  "("  filter_expression  ")"
+          | "ANY"  "("  filter_expression  ")"
+          | "NONE"  "("  filter_expression  ")"
+          | "SINGLE"  "("  filter_expression  ")"
+
+filter_expression: id_in_coll ( where_clause)?
+
+parenthesized_expression: "("  expression  ")"
+
+id_in_coll: variable "IN" expression
+
+function_invocation: function_name  "("  ("DISTINCT" )? (expression  (","  expression )*)? ")"
+
+function_name: namespace symbolic_name
+
+namespace: (symbolic_name ".")*
+
+// Procedure calls
+in_query_call: "CALL" explicit_procedure_invocation ( "YIELD" yield_items)?
+
+standalone_call: "CALL" (explicit_procedure_invocation | implicit_procedure_invocation) ( "YIELD" ("*" | yield_items))?
+
+yield_items: yield_item ( ","  yield_item)* ( where_clause)?
+
+yield_item: (procedure_result_field "AS"i)? variable
+
+explicit_procedure_invocation: procedure_name  "("  (expression  (","  expression )*)? ")"
+
+implicit_procedure_invocation: procedure_name
+
+procedure_result_field: symbolic_name
+
+procedure_name: namespace symbolic_name
+
+// Variables and names
+variable: symbolic_name
+
+// Literals
+literal: boolean_literal
+       | "NULL"
+       | number_literal
+       | string_literal
+       | list_literal
+       | map_literal
+
+boolean_literal: "TRUE" | "FALSE" | "true" | "false"
+
+number_literal: double_literal
+              | integer_literal
+
+integer_literal: hex_integer
+               | octal_integer
+               | decimal_integer
+
+hex_integer: /0[xX][0-9a-fA-F]+/
+
+octal_integer: /0[oO][0-7]+/
+
+decimal_integer: /0|[1-9][0-9]*/
+
+double_literal: /[0-9]+\.[0-9]+([eE][-+]?[0-9]+)?/
+              | /[0-9]+[eE][-+]?[0-9]+/
+              | /\.[0-9]+([eE][-+]?[0-9]+)?/
+
+string_literal: /"([^"\\]|\\["\\bfnrt]|\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8})*"/
+              | /'([^'\\]|\\['\\bfnrt]|\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8})*'/
+
+list_literal: "["  (expression  (","  expression )*)? "]"
+
+map_literal: "{"  (property_key_name  ":"  expression  (","  property_key_name  ":"  expression )*)? "}"
+
+property_key_name: schema_name
+
+parameter: "$" (symbolic_name | decimal_integer)
+
+schema_name: symbolic_name
+           | reserved_word
+
+reserved_word: "ALL" | "ASC" | "ASCENDING" | "BY" | "CREATE" | "DELETE" | "DESC" | "DESCENDING"
+             | "DETACH" | "EXISTS" | "LIMIT" | "MATCH" | "MERGE" | "ON" | "OPTIONAL" | "ORDER"
+             | "REMOVE" | "RETURN" | "SET" | "SKIP" | "WHERE" | "WITH" | "UNION" | "UNWIND"
+             | "AND" | "AS"i | "CONTAINS" | "DISTINCT" | "ENDS" | "IN" | "IS" | "NOT" | "OR"
+             | "STARTS" | "XOR" | "FALSE" | "TRUE" | "NULL" | "CONSTRAINT" | "DO" | "FOR"
+             | "REQUIRE" | "UNIQUE" | "CASE" | "WHEN" | "THEN" | "ELSE" | "END" | "MANDATORY"
+             | "SCALAR" | "OF" | "ADD" | "DROP"
+
+symbolic_name: unescaped_symbolic_name
+             | escaped_symbolic_name
+             | "COUNT" | "FILTER" | "EXTRACT" | "ANY" | "NONE" | "SINGLE"
+
+unescaped_symbolic_name: /[a-zA-Z_][a-zA-Z0-9_]*/
+
+escaped_symbolic_name: /`[^`]+`/
+
+// Arrow and dash characters
+left_arrow_head: "<"
+right_arrow_head: ">"
+dash: "-"
+
+// Whitespace handling
+%import common.WS
+%ignore WS
+
+COMMENT: /\/\*(.|\n)*?\*\// | /\/\/[^\n]*/
+%ignore COMMENT

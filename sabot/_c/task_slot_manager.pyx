@@ -35,6 +35,7 @@ cdef extern from "task_slot_manager.hpp" namespace "sabot" nogil:
         int64_t start_row
         int64_t num_rows
         int partition_id
+        int id
         CMorselSource source
 
     # Morsel result
@@ -179,6 +180,7 @@ cdef class TaskSlotManager:
             cpp_morsel.start_row = start_row
             cpp_morsel.num_rows = num_rows
             cpp_morsel.partition_id = partition_id
+            cpp_morsel.id = i  # Set original position for correct reassembly
             cpp_morsel.source = CMorselSource.LOCAL
 
             cpp_morsels.push_back(cpp_morsel)
@@ -204,7 +206,7 @@ cdef class TaskSlotManager:
         return results
 
     def enqueue_morsel(self, object batch, int64_t start_row, int64_t num_rows,
-                       int partition_id, str source='local'):
+                       int partition_id, int morsel_id=0, str source='local'):
         """
         Enqueue single morsel (for network morsels arriving async).
 
@@ -213,6 +215,7 @@ cdef class TaskSlotManager:
             start_row: Start row index
             num_rows: Number of rows in morsel
             partition_id: Partition ID
+            morsel_id: Original position ID (for correct reassembly)
             source: 'local' or 'network'
 
         Returns:
@@ -223,6 +226,7 @@ cdef class TaskSlotManager:
         cpp_morsel.start_row = start_row
         cpp_morsel.num_rows = num_rows
         cpp_morsel.partition_id = partition_id
+        cpp_morsel.id = morsel_id
         cpp_morsel.source = CMorselSource.NETWORK if source == 'network' else CMorselSource.LOCAL
 
         cdef cbool success

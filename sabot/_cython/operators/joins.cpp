@@ -59,13 +59,24 @@
             "-Wno-unused-function",
             "-Wno-deprecated-declarations"
         ],
+        "extra_link_args": [
+            "-Wl,-headerpad_max_install_names",
+            "-Wl,-rpath,@loader_path/../../vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/rocksdb/install/lib"
+        ],
         "include_dirs": [
             "/Users/bengamble/Sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
             "/Users/bengamble/Sabot/vendor/arrow/python",
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow",
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src",
-            "/opt/homebrew/include"
+            "/Users/bengamble/Sabot/vendor/duckdb/third_party/concurrentqueue",
+            "/Users/bengamble/Sabot/sabot/_c",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/storage",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/traversal",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/query",
+            "/Users/bengamble/Sabot/vendor/rocksdb/install/include"
         ],
         "language": "c++",
         "libraries": [
@@ -75,7 +86,7 @@
         ],
         "library_dirs": [
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib",
-            "/opt/homebrew/lib"
+            "/Users/bengamble/Sabot/vendor/rocksdb/install/lib"
         ],
         "name": "sabot._cython.operators.joins",
         "sources": [
@@ -3591,6 +3602,8 @@ struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner {
 */
 struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator {
   struct __pyx_obj_5sabot_7_cython_9operators_13base_operator_BaseOperator __pyx_base;
+  PyObject *operator_id;
+  int32_t parallelism;
   PyObject *_partition_keys;
   int32_t _num_partitions;
   int _stateful;
@@ -5249,7 +5262,7 @@ struct __pyx_vtabstruct_5sabot_7_cython_9operators_17shuffled_operator_ShuffledO
   struct __pyx_vtabstruct_5sabot_7_cython_9operators_13base_operator_BaseOperator __pyx_base;
   int32_t (*get_num_partitions)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, int __pyx_skip_dispatch);
   void (*set_shuffle_config)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, PyObject *, PyObject *, int32_t, int32_t, int __pyx_skip_dispatch);
-  PyObject *(*_partition_batch)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, struct __pyx_obj_7pyarrow_3lib_RecordBatch *);
+  PyObject *(*_partition_batch)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, struct __pyx_obj_7pyarrow_3lib_RecordBatch *, int __pyx_skip_dispatch);
   void (*_send_partitions)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, PyObject *, PyObject *);
   PyObject *(*_receive_shuffled_batches)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *);
   PyObject *(*_send_shuffled_batches)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *);
@@ -6832,6 +6845,7 @@ static const char __pyx_k_Invalid_direction[] = "Invalid direction: ";
 static const char __pyx_k_Invalid_join_type[] = "Invalid join type: ";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
+static const char __pyx_k_hk_A_1_7_8_9RR_a_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"|\005\360\000\000|\005~\005\360\000\000~\005\177\005\330\004\023\320\023)\250\030\260\021\260!\330\004\007\200|\2207\230!\330\0108\270\001\3209R\320R`\320`a\330\004\013\2101";
 static const char __pyx_k_receive_partitions[] = "receive_partitions";
 static const char __pyx_k_Error_in_as_of_join[] = "Error in as-of join: ";
 static const char __pyx_k_execute_with_shuffle[] = "_execute_with_shuffle";
@@ -6841,7 +6855,6 @@ static const char __pyx_k_CythonHashJoinOperator[] = "CythonHashJoinOperator";
 static const char __pyx_k_Error_in_interval_join[] = "Error in interval join: ";
 static const char __pyx_k_probe_batch_vectorized[] = "probe_batch_vectorized";
 static const char __pyx_k_receive_right_shuffled[] = "_receive_right_shuffled";
-static const char __pyx_k_hk_A_1_A_XQa_7_A_ZZhhi_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"~\005\360\000\000~\005@\006\360\000\000@\006A\006\330\004\023\320\023-\250X\260Q\260a\330\004\007\200|\2207\230!\330\010<\270A\320=Z\320Zh\320hi\330\004\013\2101";
 static const char __pyx_k_StreamingHashTableBuilder[] = "StreamingHashTableBuilder";
 static const char __pyx_k_create_asof_join_operator[] = "create_asof_join_operator";
 static const char __pyx_k_create_hash_join_operator[] = "create_hash_join_operator";
@@ -6850,13 +6863,13 @@ static const char __pyx_k_CythonIntervalJoinOperator[] = "CythonIntervalJoinOper
 static const char __pyx_k_build_index_locals_genexpr[] = "build_index.<locals>.genexpr";
 static const char __pyx_k_process_batch_locals_lambda[] = "process_batch.<locals>.<lambda>";
 static const char __pyx_k_hk_A_1_A_A_B_HAQ_7_1_XXffg_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"\177\002\360\000\000\177\002A\003\360\000\000A\003B\003\330\004\023\320\023,\250H\260A\260Q\330\004\007\200|\2207\230!\330\010;\2701\320<X\320Xf\320fg\330\004\013\2101";
-static const char __pyx_k_hk_A_1_W_W_Y_Y_Z_7_8_9RR_a_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"W\005\360\000\000W\005Y\005\360\000\000Y\005Z\005\330\004\023\320\023)\250\030\260\021\260!\330\004\007\200|\2207\230!\330\0108\270\001\3209R\320R`\320`a\330\004\013\2101";
-static const char __pyx_k_hk_A_1_b_b_d_d_e_7_8_9RR_a_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"b\005\360\000\000b\005d\005\360\000\000d\005e\005\330\004\023\320\023)\250\030\260\021\260!\330\004\007\200|\2207\230!\330\0108\270\001\3209R\320R`\320`a\330\004\013\2101";
+static const char __pyx_k_hk_A_1_q_q_s_s_t_7_8_9RR_a_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"q\005\360\000\000q\005s\005\360\000\000s\005t\005\330\004\023\320\023)\250\030\260\021\260!\330\004\007\200|\2207\230!\330\0108\270\001\3209R\320R`\320`a\330\004\013\2101";
 static const char __pyx_k_CythonHashJoinOperator___iter[] = "CythonHashJoinOperator.__iter__";
 static const char __pyx_k_create_interval_join_operator[] = "create_interval_join_operator";
 static const char __pyx_k_sabot__cython_operators_joins[] = "sabot._cython.operators.joins";
-static const char __pyx_k_T_O47I_M__ccww_N_N_R_R_a_a_e_e[] = "\200\001\360\010\000\005\016\210T\220\037\240\004\240O\2604\3207I\310\024\320M_\320_c\320cw\320w{\360\000\000|\001N\002\360\000\000N\002R\002\360\000\000R\002a\002\360\000\000a\002e\002\360\000\000e\002u\002\360\000\000u\002y\002\360\000\000y\002K\003\360\000\000K\003O\003\360\000\000O\003Y\003\360\000\000Y\003]\003\360\000\000]\003k\003\360\000\000k\003o\003\360\000\000o\003D\004\360\000\000D\004H\004\360\000\000H\004R\004\360\000\000R\004V\004\360\000\000V\004b\004\360\000\000b\004f\004\360\000\000f\004r\004\360\000\000r\004v\004\360\000\000v\004A\005\360\000\000A\005E\005\360\000\000E\005T\005\360\000\000T\005X\005\360\000\000X\005n\005\360\000\000n\005r\005\360\000\000r\005s\005\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230>\250\027\260\005\260S\270\004\320<M\310W\320TY\320Y\\\320\\`\320`n\320nu\320uz\320z}\360\000\000~\001B\002\360\000\000B\002Q\002\360\000\000Q\002X\002\360\000\000X\002]\002\360\000\000]\002`\002\360\000\000`\002d\002\360\000\000d\002u\002\360\000\000u\002|\002\360\000\000|\002A\003\360\000\000A\003D\003\360\000\000D\003H\003\360\000\000H\003Q\003\360\000\000Q\003X\003\360\000\000X\003]\003\360\000\000]\003`\003\360\000\000`\003d\003\360\000\000d\003q\003\360\000\000q\003x\003\360\000\000x\003}\003\360\000\000}\003@\004\360\000\000@\004D\004\360\000\000D\004X\004\360\000\000X\004_\004\360\000\000_\004d\004\360\000\000d\004g\004\360\000\000g\004k\004\360\000\000k\004t\004\360\000\000t\004{\004\360\000\000{\004@\005\360\000\000@\005C\005\360\000\000C\005G\005\360\000\000G\005U\005\360\000\000U\005\\\005\360\000\000\\\005a\005\360\000\000a\005d\005\360\000\000d\005h\005\360\000\000h\005}\005\360\000\000}\005D\006\360\000\000D\006E\006\330\004\007\200q\330\010\017\320\017;\2704\270q\300\007\300{\320RY\320YZ\340\010\017\320\017;\2704\270q\300\007\300{\320RS";
-static const char __pyx_k_T_d_5GtK_aauuy_z_L_L_P_P_____c[] = "\200\001\360\010\000\005\016\210T\220\035\230d\240/\260\024\3205G\300t\320K]\320]a\320au\320uy\360\000\000z\001L\002\360\000\000L\002P\002\360\000\000P\002_\002\360\000\000_\002c\002\360\000\000c\002s\002\360\000\000s\002w\002\360\000\000w\002A\003\360\000\000A\003E\003\360\000\000E\003S\003\360\000\000S\003W\003\360\000\000W\003l\003\360\000\000l\003p\003\360\000\000p\003@\004\360\000\000@\004D\004\360\000\000D\004N\004\360\000\000N\004R\004\360\000\000R\004^\004\360\000\000^\004b\004\360\000\000b\004n\004\360\000\000n\004r\004\360\000\000r\004}\004\360\000\000}\004A\005\360\000\000A\005B\005\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230<\240w\250e\2603\260d\270.\310\007\310u\320TW\320W[\320[l\320ls\320sx\320x{\320{\177\360\000\000@\002N\002\360\000\000N\002U\002\360\000\000U\002Z\002\360\000\000Z\002]\002\360\000\000]\002a\002\360\000\000a\002p\002\360\000\000p\002w\002\360\000\000w\002|\002\360\000\000|\002\177\002\360\000\000\177\002C\003\360\000\000C\003L\003\360\000\000L\003S\003\360\000\000S\003X\003\360\000\000X\003[\003\360\000\000[\003_\003\360\000\000_\003l\003\360\000\000l\003s\003\360\000\000s\003x\003\360\000\000x\003{\003\360\000\000{\003\177\003\360\000\000\177\003S\004\360\000\000S\004Z\004\360\000\000Z\004_\004\360\000\000_\004b\004\360\000\000b\004f\004\360\000\000f\004u\004\360\000\000u\004|\004\360\000\000|\004A\005\360\000\000A\005D\005\360\000\000D\005H\005\360\000\000H\005Q\005\360\000\000Q\005X\005\360\000\000X\005]\005\360\000\000]\005`\005\360\000\000`\005d\005\360\000\000d\005r\005\360\000\000r\005y\005\360\000\000y\005z\005\330\004\007\200q\330\010\017\320\0177\260t\2701\270G\300;\310g\320UV\340\010\017\320\0177\260t\2701\270G\300;\310a";
+static const char __pyx_k_T_O47I_M__ccww_N_N_R_R_a_a_e_e[] = "\200\001\360\010\000\005\016\210T\220\037\240\004\240O\2604\3207I\310\024\320M_\320_c\320cw\320w{\360\000\000|\001N\002\360\000\000N\002R\002\360\000\000R\002a\002\360\000\000a\002e\002\360\000\000e\002u\002\360\000\000u\002y\002\360\000\000y\002K\003\360\000\000K\003O\003\360\000\000O\003Y\003\360\000\000Y\003]\003\360\000\000]\003k\003\360\000\000k\003o\003\360\000\000o\003D\004\360\000\000D\004H\004\360\000\000H\004R\004\360\000\000R\004V\004\360\000\000V\004b\004\360\000\000b\004f\004\360\000\000f\004r\004\360\000\000r\004v\004\360\000\000v\004A\005\360\000\000A\005E\005\360\000\000E\005T\005\360\000\000T\005X\005\360\000\000X\005n\005\360\000\000n\005r\005\360\000\000r\005A\006\360\000\000A\006E\006\360\000\000E\006S\006\360\000\000S\006W\006\360\000\000W\006X\006\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230>\250\027\260\005\260S\270\004\320<M\310W\320TY\320Y\\\320\\`\320`n\320nu\320uz\320z}\360\000\000~\001B\002\360\000\000B\002Q\002\360\000\000Q\002X\002\360\000\000X\002]\002\360\000\000]\002`\002\360\000\000`\002d\002\360\000\000d\002u\002\360\000\000u\002|\002\360\000\000|\002A\003\360\000\000A\003D\003\360\000\000D\003H\003\360\000\000H\003Q\003\360\000\000Q\003X\003\360\000\000X\003]\003\360\000\000]\003`\003\360\000\000`\003d\003\360\000\000d\003q\003\360\000\000q\003x\003\360\000\000x\003}\003\360\000\000}\003@\004\360\000\000@\004D\004\360\000\000D\004X\004\360\000\000X\004_\004\360\000\000_\004d\004\360\000\000d\004g\004\360\000\000g\004k\004\360\000\000k\004t\004\360\000\000t\004{\004\360\000\000{\004@\005\360\000\000@\005C\005\360\000\000C\005G\005\360\000\000G\005U\005\360\000\000U\005\\\005\360\000\000\\\005a\005\360\000\000a\005d\005\360\000\000d\005h\005\360\000\000h\005}\005\360\000\000}\005D\006\360\000\000D\006I\006\360\000\000I\006L\006\360\000\000L\006P\006\360\000\000P\006]\006\360\000\000]\006d\006\360\000\000d\006e\006\330\004\007\200q\330\010\017\320\017;\2704""\270q\300\007\300{\320RY\320YZ\340\010\017\320\017;\2704\270q\300\007\300{\320RS";
+static const char __pyx_k_T_d_5GtK_aauuy_z_L_L_P_P_____c[] = "\200\001\360\010\000\005\016\210T\220\035\230d\240/\260\024\3205G\300t\320K]\320]a\320au\320uy\360\000\000z\001L\002\360\000\000L\002P\002\360\000\000P\002_\002\360\000\000_\002c\002\360\000\000c\002s\002\360\000\000s\002w\002\360\000\000w\002A\003\360\000\000A\003E\003\360\000\000E\003S\003\360\000\000S\003W\003\360\000\000W\003l\003\360\000\000l\003p\003\360\000\000p\003@\004\360\000\000@\004D\004\360\000\000D\004N\004\360\000\000N\004R\004\360\000\000R\004^\004\360\000\000^\004b\004\360\000\000b\004n\004\360\000\000n\004r\004\360\000\000r\004}\004\360\000\000}\004A\005\360\000\000A\005P\005\360\000\000P\005T\005\360\000\000T\005b\005\360\000\000b\005f\005\360\000\000f\005g\005\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230<\240w\250e\2603\260d\270.\310\007\310u\320TW\320W[\320[l\320ls\320sx\320x{\320{\177\360\000\000@\002N\002\360\000\000N\002U\002\360\000\000U\002Z\002\360\000\000Z\002]\002\360\000\000]\002a\002\360\000\000a\002p\002\360\000\000p\002w\002\360\000\000w\002|\002\360\000\000|\002\177\002\360\000\000\177\002C\003\360\000\000C\003L\003\360\000\000L\003S\003\360\000\000S\003X\003\360\000\000X\003[\003\360\000\000[\003_\003\360\000\000_\003l\003\360\000\000l\003s\003\360\000\000s\003x\003\360\000\000x\003{\003\360\000\000{\003\177\003\360\000\000\177\003S\004\360\000\000S\004Z\004\360\000\000Z\004_\004\360\000\000_\004b\004\360\000\000b\004f\004\360\000\000f\004u\004\360\000\000u\004|\004\360\000\000|\004A\005\360\000\000A\005D\005\360\000\000D\005H\005\360\000\000H\005Q\005\360\000\000Q\005X\005\360\000\000X\005]\005\360\000\000]\005`\005\360\000\000`\005d\005\360\000\000d\005r\005\360\000\000r\005y\005\360\000\000y\005~\005\360\000\000~\005A\006\360\000\000A\006E\006\360\000\000E\006R\006\360\000\000R\006Y\006\360\000\000Y\006Z\006\330\004\007\200q\330\010\017\320\0177\260t\2701\270G\300;\310g\320UV\340\010\017\320\0177\260t\2701\270G\300;\310a";
+static const char __pyx_k_hk_A_1_X_X_Z_Z_XQa_7_A_ZZhhi_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"X\006\360\000\000X\006Z\006\360\000\000Z\006[\006\330\004\023\320\023-\250X\260Q\260a\330\004\007\200|\2207\230!\330\010<\270A\320=Z\320Zh\320hi\330\004\013\2101";
 static const char __pyx_k_pyx_unpickle_CythonAsofJoinOpe[] = "__pyx_unpickle_CythonAsofJoinOperator";
 static const char __pyx_k_pyx_unpickle_CythonHashJoinOpe[] = "__pyx_unpickle_CythonHashJoinOperator";
 static const char __pyx_k_pyx_unpickle_CythonIntervalJoi[] = "__pyx_unpickle_CythonIntervalJoinOperator";
@@ -6870,7 +6883,7 @@ static const char __pyx_k_Cython_Join_Operators_High_perf[] = "\nCython Join Ope
 static const char __pyx_k_StreamingHashTableBuilder_build[] = "StreamingHashTableBuilder.build_index";
 static const char __pyx_k_StreamingHashTableBuilder_probe[] = "StreamingHashTableBuilder.probe_batch_vectorized";
 static const char __pyx_k_T_D_0_N_lRVVeeiisswwx_G1F_a_vWA[] = "\200\001\360\010\000\005\016\210T\220\033\230D\320 0\260\004\260N\300$\300l\320RV\320Ve\320ei\320is\320sw\320wx\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230:\240W\250E\260\023\260D\270\017\300w\310e\320SV\320VZ\320Zg\320gn\320ns\320sv\320vz\360\000\000{\001I\002\360\000\000I\002P\002\360\000\000P\002U\002\360\000\000U\002X\002\360\000\000X\002\\\002\360\000\000\\\002e\002\360\000\000e\002l\002\360\000\000l\002m\002\330\004\007\200q\330\010\017\320\017:\270$\270a\270w\300k\320QX\320XY\340\010\017\320\017:\270$\270a\270w\300k\320QR";
-static const char __pyx_k_T_oT_VZZllp_q_C_C_G_G_____q_q_u[] = "\200\001\360\010\000\005\016\210T\320\021!\240\024\240]\260$\260o\300T\310\035\320VZ\320Zl\320lp\360\000\000q\001C\002\360\000\000C\002G\002\360\000\000G\002[\002\360\000\000[\002_\002\360\000\000_\002q\002\360\000\000q\002u\002\360\000\000u\002D\003\360\000\000D\003H\003\360\000\000H\003V\003\360\000\000V\003Z\003\360\000\000Z\003j\003\360\000\000j\003n\003\360\000\000n\003x\003\360\000\000x\003|\003\360\000\000|\003J\004\360\000\000J\004N\004\360\000\000N\004c\004\360\000\000c\004g\004\360\000\000g\004q\004\360\000\000q\004u\004\360\000\000u\004A\005\360\000\000A\005E\005\360\000\000E\005Q\005\360\000\000Q\005U\005\360\000\000U\005V\005\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230?\250'\260\025\260c\270\024\270\\\310\027\320PU\320UX\320X\\\320\\j\320jq\320qv\320vy\320y}\360\000\000~\001J\002\360\000\000J\002Q\002\360\000\000Q\002V\002\360\000\000V\002Y\002\360\000\000Y\002]\002\360\000\000]\002n\002\360\000\000n\002u\002\360\000\000u\002z\002\360\000\000z\002}\002\360\000\000}\002A\003\360\000\000A\003O\003\360\000\000O\003V\003\360\000\000V\003[\003\360\000\000[\003^\003\360\000\000^\003b\003\360\000\000b\003o\003\360\000\000o\003v\003\360\000\000v\003{\003\360\000\000{\003~\003\360\000\000~\003B\004\360\000\000B\004Q\004\360\000\000Q\004X\004\360\000\000X\004]\004\360\000\000]\004`\004\360\000\000`\004d\004\360\000\000d\004m\004\360\000\000m\004t\004\360\000\000t\004y\004\360\000\000y\004|\004\360\000\000|\004@\005\360\000\000@\005M\005\360\000\000M\005T\005\360\000\000T\005Y\005\360\000\000Y\005\\\005\360\000\000\\\005`\005\360\000\000`\005t\005\360\000\000t\005{\005\360\000\000{\005@\006\360\000\000@\006C\006\360\000\000C\006G\006\360\000\000G\006P\006\360\000\000P\006W\006\360\000\000W\006X\006\330\004\007\200q\330\010\017\320\0177\260t\2701\270G\300;\310g\320UV\340\010\017\320\0177\260t\2701\270G\300;\310a";
+static const char __pyx_k_T_oT_VZZllp_q_C_C_G_G_____q_q_u[] = "\200\001\360\010\000\005\016\210T\320\021!\240\024\240]\260$\260o\300T\310\035\320VZ\320Zl\320lp\360\000\000q\001C\002\360\000\000C\002G\002\360\000\000G\002[\002\360\000\000[\002_\002\360\000\000_\002q\002\360\000\000q\002u\002\360\000\000u\002D\003\360\000\000D\003H\003\360\000\000H\003V\003\360\000\000V\003Z\003\360\000\000Z\003j\003\360\000\000j\003n\003\360\000\000n\003x\003\360\000\000x\003|\003\360\000\000|\003J\004\360\000\000J\004N\004\360\000\000N\004c\004\360\000\000c\004g\004\360\000\000g\004q\004\360\000\000q\004u\004\360\000\000u\004A\005\360\000\000A\005E\005\360\000\000E\005Q\005\360\000\000Q\005U\005\360\000\000U\005`\005\360\000\000`\005d\005\360\000\000d\005r\005\360\000\000r\005v\005\360\000\000v\005w\005\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230?\250'\260\025\260c\270\024\270\\\310\027\320PU\320UX\320X\\\320\\j\320jq\320qv\320vy\320y}\360\000\000~\001J\002\360\000\000J\002Q\002\360\000\000Q\002V\002\360\000\000V\002Y\002\360\000\000Y\002]\002\360\000\000]\002n\002\360\000\000n\002u\002\360\000\000u\002z\002\360\000\000z\002}\002\360\000\000}\002A\003\360\000\000A\003O\003\360\000\000O\003V\003\360\000\000V\003[\003\360\000\000[\003^\003\360\000\000^\003b\003\360\000\000b\003o\003\360\000\000o\003v\003\360\000\000v\003{\003\360\000\000{\003~\003\360\000\000~\003B\004\360\000\000B\004Q\004\360\000\000Q\004X\004\360\000\000X\004]\004\360\000\000]\004`\004\360\000\000`\004d\004\360\000\000d\004m\004\360\000\000m\004t\004\360\000\000t\004y\004\360\000\000y\004|\004\360\000\000|\004@\005\360\000\000@\005M\005\360\000\000M\005T\005\360\000\000T\005Y\005\360\000\000Y\005\\\005\360\000\000\\\005`\005\360\000\000`\005t\005\360\000\000t\005{\005\360\000\000{\005@\006\360\000\000@\006C\006\360\000\000C\006G\006\360\000\000G\006P\006\360\000\000P\006W\006\360\000\000W\006\\\006\360\000\000\\\006_\006\360\000\000_\006c\006\360\000\000c\006p\006\360\000\000p\006w\006\360\000\000w\006x""\006\330\004\007\200q\330\010\017\320\0177\260t\2701\270G\300;\310g\320UV\340\010\017\320\0177\260t\2701\270G\300;\310a";
 static const char __pyx_k_A_4_T_Q_Rv_4q_AT_wat_Q_A_E_at1_A[] = "\200A\360\014\000\t\014\2104\210{\230#\230T\240\024\240Q\330\014\r\360\006\000\t\r\320\014\035\230R\230v\240]\260!\2604\260q\360\010\000\t\025\220A\220T\230\036\240w\250a\250t\260:\270Q\330\025\031\230\027\240\004\240A\360\010\000\t\r\210E\220\025\220a\220t\2301\340\014\022\220%\220}\240A\360\006\000\r\020\210t\2207\230$\230a\330\020\024\220L\240\001\240\027\250\001\330\014\020\220\014\230A\230T\240\027\250\001\250\021\340\010\014\210M\230\021";
 static const char __pyx_k_A_4t1_A_4_c_c_Q_z_XQ_q_q_G1D_T_q[] = "\200A\360\030\000\t\014\2104\210t\2201\330\014\020\220\014\230A\340\010\013\2104\210\177\230c\240\025\240c\250\024\250]\270#\270Q\330\014\017\210z\230\024\230X\240Q\330\020\027\220q\340\020\027\220q\360\006\000\t\032\230\021\230*\240G\2501\250D\260\n\270#\270T\300\027\310\001\360\006\000\t\030\220q\330\010\030\230\001\360\006\000\t\r\210E\220\025\220a\220z\240\021\340\014\030\230\005\320\035/\250q\360\006\000\r\032\230\024\230\\\250\024\250Q\250k\270\021\340\014\017\210q\340\020\024\220M\240\021\330\024 \240\007\240q\250\001\330\024!\240\027\250\001\250\021\330\021\033\2304\230x\240q\340\020\034\230G\2401\240A\330\020\035\230W\240A\240Q\340\010\013\2104\210q\330\014\023\2201\360\006\000\t\031\230\n\240%\240q\250\002\250&\260\001\260\021\360\006\000\t\024\2201\340\014\035\230T\320!2\260!\2604\3207G\300q\360\006\000\r\036\230T\240\036\250u\260A\260R\260v\270Q\270a\360\006\000\t\020\210t\320\023$\240A\240_\3204D\300A";
 static const char __pyx_k_CythonAsofJoinOperator___setstat[] = "CythonAsofJoinOperator.__setstate_cython__";
@@ -6889,9 +6902,9 @@ static const char __pyx_k_sabot__cython_operators_joins_py[] = "sabot/_cython/op
 static const char __pyx_k_A_4_s_5_5_Q_1_t4q_O4q_3a_Kwat_1_2[] = "\200A\360\010\000\t\014\2104\320\017\037\230s\240&\250\003\2505\260\003\2605\270\n\300#\300Q\330\014\023\2201\340\010\t\340\014\017\210t\2204\220q\330\020\024\220O\2404\240q\330\024\027\220|\2403\240a\330\030\031\340\024\034\230K\240w\250a\250t\260>\300\032\3101\330\024\030\230\005\230U\240!\240;\250a\330\030$\240E\250\021\250!\330\030\036\230a\230u\240K\250w\260a\260t\2701\270B\270f\300A\330\037#\2407\250+\260W\270A\330\030\034\230N\250'\260\022\260;\270a\360\006\000\021\025\220N\240%\240q\250\004\250A\360\006\000\r\032\230\025\230g\240Q\240d\250.\270\n\300!\330\014\032\230!\340\014\020\220\005\220U\230!\2305\240\001\330\020\034\230J\240a\240q\330\020\033\2301\230E\240\025\240g\250Q\250d\260!\2602\260V\2703\270d\300'\310\025\310g\320UV\360\006\000\021\036\230Q\340\020\023\2204\220|\2403\240a\340\024\030\230\013\240=\260\010\270\001\270\024\270Q\330\030\033\230:\240S\250\001\330\034)\250\021\330\034\035\360\006\000\025\031\230\013\240=\260\004\260A\330\030\033\230:\240S\250\001\330\034)\250\021\330\034\035\360\006\000\021\024\2201\330\024!\240\023\240L\260\001\330\024\037\230w\240a\240q\360\006\000\025\"\240\023\240A\330\024\027\220t\2301\330\030'\240t\250>\270\021\270\"\270A\270Q\330\030\034\230G\240<\250u\260A\330\034\037\230t\2407\250!\330 *\250!\2507\260!\330\024\037\230w\240a\240q\340\014\017\210q\330\020\027\220r\230\034\240\\\260\021\260!\340\020\027\220q\340\010\017\210}\230A\330\014\022\220,\230a\230r\320!:\270!";
 static const char __pyx_k_CythonHashJoinOperator__execute_2[] = "CythonHashJoinOperator._execute_local";
 static const char __pyx_k_CythonHashJoinOperator__receive_2[] = "CythonHashJoinOperator._receive_left_shuffled";
-static const char __pyx_k_Incompatible_checksums_0x_x_vs_0_2[] = "Incompatible checksums (0x%x vs (0x92ef420, 0x39cd7fa, 0x0e3cab5) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id))";
-static const char __pyx_k_Incompatible_checksums_0x_x_vs_0_3[] = "Incompatible checksums (0x%x vs (0x8e8eb17, 0x57b6b8a, 0x0793bf8) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound))";
-static const char __pyx_k_Incompatible_checksums_0x_x_vs_0_4[] = "Incompatible checksums (0x%x vs (0x6f24980, 0x3786114, 0x845c488) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column))";
+static const char __pyx_k_Incompatible_checksums_0x_x_vs_0_2[] = "Incompatible checksums (0x%x vs (0xa031553, 0xdfd98c4, 0x0e11619) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, operator_id, parallelism))";
+static const char __pyx_k_Incompatible_checksums_0x_x_vs_0_3[] = "Incompatible checksums (0x%x vs (0x3fc2c20, 0xe5ae6a7, 0x6fdda79) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound, operator_id, parallelism))";
+static const char __pyx_k_Incompatible_checksums_0x_x_vs_0_4[] = "Incompatible checksums (0x%x vs (0x2598a62, 0xc2c389b, 0x6b9243c) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column, operator_id, parallelism))";
 /* #### Code section: decls ### */
 static int __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder___init__(struct __pyx_obj_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder *__pyx_v_self, PyObject *__pyx_v_key_columns); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_2add_batch(struct __pyx_obj_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder *__pyx_v_self, PyObject *__pyx_v_batch); /* proto */
@@ -7127,18 +7140,18 @@ typedef struct {
   PyObject *__pyx_int_0;
   PyObject *__pyx_int_1;
   PyObject *__pyx_int_4;
-  PyObject *__pyx_int_7945208;
-  PyObject *__pyx_int_14928565;
-  PyObject *__pyx_int_58220820;
-  PyObject *__pyx_int_60610554;
-  PyObject *__pyx_int_91974538;
+  PyObject *__pyx_int_14751257;
+  PyObject *__pyx_int_39422562;
+  PyObject *__pyx_int_66858016;
   PyObject *__pyx_int_103980883;
   PyObject *__pyx_int_110405684;
   PyObject *__pyx_int_112237191;
-  PyObject *__pyx_int_116541824;
-  PyObject *__pyx_int_138790024;
-  PyObject *__pyx_int_149482263;
-  PyObject *__pyx_int_154072096;
+  PyObject *__pyx_int_112796732;
+  PyObject *__pyx_int_117299833;
+  PyObject *__pyx_int_167974227;
+  PyObject *__pyx_int_204224667;
+  PyObject *__pyx_int_234723524;
+  PyObject *__pyx_int_240838311;
 /* #### Code section: module_state_contents ### */
 /* CommonTypesMetaclass.module_state_decls */
 PyTypeObject *__pyx_CommonTypesMetaclassType;
@@ -7594,18 +7607,18 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_int_0);
   Py_CLEAR(clear_module_state->__pyx_int_1);
   Py_CLEAR(clear_module_state->__pyx_int_4);
-  Py_CLEAR(clear_module_state->__pyx_int_7945208);
-  Py_CLEAR(clear_module_state->__pyx_int_14928565);
-  Py_CLEAR(clear_module_state->__pyx_int_58220820);
-  Py_CLEAR(clear_module_state->__pyx_int_60610554);
-  Py_CLEAR(clear_module_state->__pyx_int_91974538);
+  Py_CLEAR(clear_module_state->__pyx_int_14751257);
+  Py_CLEAR(clear_module_state->__pyx_int_39422562);
+  Py_CLEAR(clear_module_state->__pyx_int_66858016);
   Py_CLEAR(clear_module_state->__pyx_int_103980883);
   Py_CLEAR(clear_module_state->__pyx_int_110405684);
   Py_CLEAR(clear_module_state->__pyx_int_112237191);
-  Py_CLEAR(clear_module_state->__pyx_int_116541824);
-  Py_CLEAR(clear_module_state->__pyx_int_138790024);
-  Py_CLEAR(clear_module_state->__pyx_int_149482263);
-  Py_CLEAR(clear_module_state->__pyx_int_154072096);
+  Py_CLEAR(clear_module_state->__pyx_int_112796732);
+  Py_CLEAR(clear_module_state->__pyx_int_117299833);
+  Py_CLEAR(clear_module_state->__pyx_int_167974227);
+  Py_CLEAR(clear_module_state->__pyx_int_204224667);
+  Py_CLEAR(clear_module_state->__pyx_int_234723524);
+  Py_CLEAR(clear_module_state->__pyx_int_240838311);
   return 0;
 }
 #endif
@@ -7774,18 +7787,18 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_1);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_4);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_7945208);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_14928565);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_58220820);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_60610554);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_91974538);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_14751257);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_39422562);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_66858016);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_103980883);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_110405684);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_112237191);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_116541824);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_138790024);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_149482263);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_154072096);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_112796732);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_117299833);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_167974227);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_204224667);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_234723524);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_240838311);
   return 0;
 }
 #endif
@@ -16010,8 +16023,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   PyObject *__pyx_t_5 = NULL;
   PyObject *__pyx_t_6 = NULL;
   PyObject *__pyx_t_7 = NULL;
-  int __pyx_t_8;
+  PyObject *__pyx_t_8 = NULL;
   int __pyx_t_9;
+  int __pyx_t_10;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -16020,7 +16034,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   /* "(tree fragment)":5
  *     cdef object _dict
  *     cdef bint use_setstate
- *     state = (self._hash_builder, self._join_type, self._key_columns, self._left_keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_keys, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id)             # <<<<<<<<<<<<<<
+ *     state = (self._hash_builder, self._join_type, self._key_columns, self._left_keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_keys, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self.operator_id, self.parallelism)             # <<<<<<<<<<<<<<
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:
 */
@@ -16036,86 +16050,94 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_self->__pyx_base._task_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = PyTuple_New(18); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 5, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyLong_From_int32_t(__pyx_v_self->__pyx_base.parallelism); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_8 = PyTuple_New(20); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 5, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
   __Pyx_INCREF(__pyx_v_self->_hash_builder);
   __Pyx_GIVEREF(__pyx_v_self->_hash_builder);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_v_self->_hash_builder) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_v_self->_hash_builder) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_join_type);
   __Pyx_GIVEREF(__pyx_v_self->_join_type);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_v_self->_join_type) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_v_self->_join_type) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._key_columns);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._key_columns);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_v_self->__pyx_base.__pyx_base._key_columns) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 2, __pyx_v_self->__pyx_base.__pyx_base._key_columns) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_left_keys);
   __Pyx_GIVEREF(__pyx_v_self->_left_keys);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 3, __pyx_v_self->_left_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 3, __pyx_v_self->_left_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 4, __pyx_t_1) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 4, __pyx_t_1) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 5, __pyx_t_2) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 5, __pyx_t_2) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_3);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 6, __pyx_t_3) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 6, __pyx_t_3) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._partition_keys);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._partition_keys);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 7, __pyx_v_self->__pyx_base._partition_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 7, __pyx_v_self->__pyx_base._partition_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF((PyObject *)__pyx_v_self->__pyx_base._partitioner);
   __Pyx_GIVEREF((PyObject *)__pyx_v_self->__pyx_base._partitioner);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 8, ((PyObject *)__pyx_v_self->__pyx_base._partitioner)) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 8, ((PyObject *)__pyx_v_self->__pyx_base._partitioner)) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_right_keys);
   __Pyx_GIVEREF(__pyx_v_self->_right_keys);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 9, __pyx_v_self->_right_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 9, __pyx_v_self->_right_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_right_source);
   __Pyx_GIVEREF(__pyx_v_self->_right_source);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 10, __pyx_v_self->_right_source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 10, __pyx_v_self->_right_source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._schema);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._schema);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 11, __pyx_v_self->__pyx_base.__pyx_base._schema) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 11, __pyx_v_self->__pyx_base.__pyx_base._schema) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._shuffle_id);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._shuffle_id);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 12, __pyx_v_self->__pyx_base._shuffle_id) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 12, __pyx_v_self->__pyx_base._shuffle_id) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._shuffle_transport);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._shuffle_transport);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 13, __pyx_v_self->__pyx_base._shuffle_transport) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 13, __pyx_v_self->__pyx_base._shuffle_transport) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._source);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._source);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 14, __pyx_v_self->__pyx_base.__pyx_base._source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 14, __pyx_v_self->__pyx_base.__pyx_base._source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_4);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 15, __pyx_t_4) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 15, __pyx_t_4) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 16, __pyx_t_5) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 16, __pyx_t_5) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_6);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 17, __pyx_t_6) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 17, __pyx_t_6) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  __Pyx_INCREF(__pyx_v_self->__pyx_base.operator_id);
+  __Pyx_GIVEREF(__pyx_v_self->__pyx_base.operator_id);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 18, __pyx_v_self->__pyx_base.operator_id) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_7);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 19, __pyx_t_7) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
   __pyx_t_4 = 0;
   __pyx_t_5 = 0;
   __pyx_t_6 = 0;
-  __pyx_v_state = ((PyObject*)__pyx_t_7);
   __pyx_t_7 = 0;
+  __pyx_v_state = ((PyObject*)__pyx_t_8);
+  __pyx_t_8 = 0;
 
   /* "(tree fragment)":6
  *     cdef bint use_setstate
- *     state = (self._hash_builder, self._join_type, self._key_columns, self._left_keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_keys, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id)
+ *     state = (self._hash_builder, self._join_type, self._key_columns, self._left_keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_keys, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self.operator_id, self.parallelism)
  *     _dict = getattr(self, '__dict__', None)             # <<<<<<<<<<<<<<
  *     if _dict is not None:
  *         state += (_dict,)
 */
-  __pyx_t_7 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_dict, Py_None); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 6, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_v__dict = __pyx_t_7;
-  __pyx_t_7 = 0;
+  __pyx_t_8 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_dict, Py_None); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 6, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
+  __pyx_v__dict = __pyx_t_8;
+  __pyx_t_8 = 0;
 
   /* "(tree fragment)":7
- *     state = (self._hash_builder, self._join_type, self._key_columns, self._left_keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_keys, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id)
+ *     state = (self._hash_builder, self._join_type, self._key_columns, self._left_keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_keys, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self.operator_id, self.parallelism)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
  *         use_setstate = True
 */
-  __pyx_t_8 = (__pyx_v__dict != Py_None);
-  if (__pyx_t_8) {
+  __pyx_t_9 = (__pyx_v__dict != Py_None);
+  if (__pyx_t_9) {
 
     /* "(tree fragment)":8
  *     _dict = getattr(self, '__dict__', None)
@@ -16124,28 +16146,28 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
  *         use_setstate = True
  *     else:
 */
-    __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_8 = PyTuple_New(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_INCREF(__pyx_v__dict);
     __Pyx_GIVEREF(__pyx_v__dict);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_v__dict) != (0)) __PYX_ERR(3, 8, __pyx_L1_error);
-    __pyx_t_6 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_6));
-    __pyx_t_6 = 0;
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_v__dict) != (0)) __PYX_ERR(3, 8, __pyx_L1_error);
+    __pyx_t_7 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_7));
+    __pyx_t_7 = 0;
 
     /* "(tree fragment)":9
  *     if _dict is not None:
  *         state += (_dict,)
  *         use_setstate = True             # <<<<<<<<<<<<<<
  *     else:
- *         use_setstate = self._hash_builder is not None or self._join_type is not None or self._key_columns is not None or self._left_keys is not None or self._partition_keys is not None or self._partitioner is not None or self._right_keys is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None
+ *         use_setstate = self._hash_builder is not None or self._join_type is not None or self._key_columns is not None or self._left_keys is not None or self._partition_keys is not None or self._partitioner is not None or self._right_keys is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self.operator_id is not None
 */
     __pyx_v_use_setstate = 1;
 
     /* "(tree fragment)":7
- *     state = (self._hash_builder, self._join_type, self._key_columns, self._left_keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_keys, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id)
+ *     state = (self._hash_builder, self._join_type, self._key_columns, self._left_keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_keys, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self.operator_id, self.parallelism)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -16157,170 +16179,176 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   /* "(tree fragment)":11
  *         use_setstate = True
  *     else:
- *         use_setstate = self._hash_builder is not None or self._join_type is not None or self._key_columns is not None or self._left_keys is not None or self._partition_keys is not None or self._partitioner is not None or self._right_keys is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None             # <<<<<<<<<<<<<<
+ *         use_setstate = self._hash_builder is not None or self._join_type is not None or self._key_columns is not None or self._left_keys is not None or self._partition_keys is not None or self._partitioner is not None or self._right_keys is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self.operator_id is not None             # <<<<<<<<<<<<<<
  *     if use_setstate:
- *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0x92ef420, None), state
+ *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0xa031553, None), state
 */
   /*else*/ {
-    __pyx_t_9 = (__pyx_v_self->_hash_builder != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->_hash_builder != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->_join_type != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->_join_type != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base.__pyx_base._key_columns != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base.__pyx_base._key_columns != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->_left_keys != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->_left_keys != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base._partition_keys != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base._partition_keys != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (((PyObject *)__pyx_v_self->__pyx_base._partitioner) != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (((PyObject *)__pyx_v_self->__pyx_base._partitioner) != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->_right_keys != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->_right_keys != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->_right_source != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->_right_source != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base.__pyx_base._schema != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base.__pyx_base._schema != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base._shuffle_id != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base._shuffle_id != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base._shuffle_transport != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base._shuffle_transport != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base.__pyx_base._source != Py_None);
-    __pyx_t_8 = __pyx_t_9;
+    __pyx_t_10 = (__pyx_v_self->__pyx_base.__pyx_base._source != Py_None);
+    if (!__pyx_t_10) {
+    } else {
+      __pyx_t_9 = __pyx_t_10;
+      goto __pyx_L4_bool_binop_done;
+    }
+    __pyx_t_10 = (__pyx_v_self->__pyx_base.operator_id != ((PyObject*)Py_None));
+    __pyx_t_9 = __pyx_t_10;
     __pyx_L4_bool_binop_done:;
-    __pyx_v_use_setstate = __pyx_t_8;
+    __pyx_v_use_setstate = __pyx_t_9;
   }
   __pyx_L3:;
 
   /* "(tree fragment)":12
  *     else:
- *         use_setstate = self._hash_builder is not None or self._join_type is not None or self._key_columns is not None or self._left_keys is not None or self._partition_keys is not None or self._partitioner is not None or self._right_keys is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None
+ *         use_setstate = self._hash_builder is not None or self._join_type is not None or self._key_columns is not None or self._left_keys is not None or self._partition_keys is not None or self._partitioner is not None or self._right_keys is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self.operator_id is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0x92ef420, None), state
+ *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0xa031553, None), state
  *     else:
 */
   if (__pyx_v_use_setstate) {
 
     /* "(tree fragment)":13
- *         use_setstate = self._hash_builder is not None or self._join_type is not None or self._key_columns is not None or self._left_keys is not None or self._partition_keys is not None or self._partitioner is not None or self._right_keys is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None
+ *         use_setstate = self._hash_builder is not None or self._join_type is not None or self._key_columns is not None or self._left_keys is not None or self._partition_keys is not None or self._partitioner is not None or self._right_keys is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self.operator_id is not None
  *     if use_setstate:
- *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0x92ef420, None), state             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0xa031553, None), state             # <<<<<<<<<<<<<<
  *     else:
- *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0x92ef420, state)
+ *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0xa031553, state)
 */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonHashJoinOpe); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 13, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonHashJoinOpe); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 13, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_8 = PyTuple_New(3); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_154072096);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_154072096);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_mstate_global->__pyx_int_154072096) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_167974227);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_167974227);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_mstate_global->__pyx_int_167974227) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
     __Pyx_INCREF(Py_None);
     __Pyx_GIVEREF(Py_None);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 2, Py_None) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
-    __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(3, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_GIVEREF(__pyx_t_6);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_6) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 2, Py_None) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    __pyx_t_6 = PyTuple_New(3); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_7);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_7) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_7) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    __Pyx_GIVEREF(__pyx_t_8);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_8) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
-    __pyx_t_6 = 0;
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
     __pyx_t_7 = 0;
-    __pyx_r = __pyx_t_5;
-    __pyx_t_5 = 0;
+    __pyx_t_8 = 0;
+    __pyx_r = __pyx_t_6;
+    __pyx_t_6 = 0;
     goto __pyx_L0;
 
     /* "(tree fragment)":12
  *     else:
- *         use_setstate = self._hash_builder is not None or self._join_type is not None or self._key_columns is not None or self._left_keys is not None or self._partition_keys is not None or self._partitioner is not None or self._right_keys is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None
+ *         use_setstate = self._hash_builder is not None or self._join_type is not None or self._key_columns is not None or self._left_keys is not None or self._partition_keys is not None or self._partitioner is not None or self._right_keys is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self.operator_id is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0x92ef420, None), state
+ *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0xa031553, None), state
  *     else:
 */
   }
 
   /* "(tree fragment)":15
- *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0x92ef420, None), state
+ *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0xa031553, None), state
  *     else:
- *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0x92ef420, state)             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0xa031553, state)             # <<<<<<<<<<<<<<
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_CythonHashJoinOperator__set_state(self, __pyx_state)
 */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonHashJoinOpe); if (unlikely(!__pyx_t_5)) __PYX_ERR(3, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonHashJoinOpe); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    __pyx_t_8 = PyTuple_New(3); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_154072096);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_154072096);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_mstate_global->__pyx_int_154072096) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_167974227);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_167974227);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_mstate_global->__pyx_int_167974227) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_GIVEREF(__pyx_t_5);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __Pyx_GIVEREF(__pyx_t_7);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_7) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __pyx_t_5 = 0;
-    __pyx_t_7 = 0;
-    __pyx_r = __pyx_t_6;
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_GIVEREF(__pyx_t_6);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    __Pyx_GIVEREF(__pyx_t_8);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_8) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
     __pyx_t_6 = 0;
+    __pyx_t_8 = 0;
+    __pyx_r = __pyx_t_7;
+    __pyx_t_7 = 0;
     goto __pyx_L0;
   }
 
@@ -16339,6 +16367,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
   __Pyx_AddTraceback("sabot._cython.operators.joins.CythonHashJoinOperator.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -16351,7 +16380,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 
 /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0x92ef420, state)
+ *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0xa031553, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonHashJoinOperator__set_state(self, __pyx_state)
 */
@@ -16451,7 +16480,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
 
   /* "(tree fragment)":17
- *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0x92ef420, state)
+ *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0xa031553, state)
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_CythonHashJoinOperator__set_state(self, __pyx_state)             # <<<<<<<<<<<<<<
 */
@@ -16462,7 +16491,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0x92ef420, state)
+ *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0xa031553, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonHashJoinOperator__set_state(self, __pyx_state)
 */
@@ -18145,8 +18174,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
   PyObject *__pyx_t_7 = NULL;
   PyObject *__pyx_t_8 = NULL;
   PyObject *__pyx_t_9 = NULL;
-  int __pyx_t_10;
+  PyObject *__pyx_t_10 = NULL;
   int __pyx_t_11;
+  int __pyx_t_12;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -18155,7 +18185,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
   /* "(tree fragment)":5
  *     cdef object _dict
  *     cdef bint use_setstate
- *     state = (self._key_columns, self._lower_bound, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._rocksdb_timers, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._time_column, self._time_indexed_state, self._upper_bound)             # <<<<<<<<<<<<<<
+ *     state = (self._key_columns, self._lower_bound, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._rocksdb_timers, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._time_column, self._time_indexed_state, self._upper_bound, self.operator_id, self.parallelism)             # <<<<<<<<<<<<<<
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:
 */
@@ -18175,57 +18205,64 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_t_8 = __Pyx_PyLong_From_long(__pyx_v_self->_upper_bound); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_9 = PyTuple_New(19); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 5, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyLong_From_int32_t(__pyx_v_self->__pyx_base.parallelism); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_10 = PyTuple_New(21); if (unlikely(!__pyx_t_10)) __PYX_ERR(3, 5, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._key_columns);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._key_columns);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_v_self->__pyx_base.__pyx_base._key_columns) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_v_self->__pyx_base.__pyx_base._key_columns) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_1) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_t_1) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_t_2) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 2, __pyx_t_2) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_3);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 3, __pyx_t_3) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 3, __pyx_t_3) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_4);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 4, __pyx_t_4) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 4, __pyx_t_4) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._partition_keys);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._partition_keys);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 5, __pyx_v_self->__pyx_base._partition_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 5, __pyx_v_self->__pyx_base._partition_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF((PyObject *)__pyx_v_self->__pyx_base._partitioner);
   __Pyx_GIVEREF((PyObject *)__pyx_v_self->__pyx_base._partitioner);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 6, ((PyObject *)__pyx_v_self->__pyx_base._partitioner)) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 6, ((PyObject *)__pyx_v_self->__pyx_base._partitioner)) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_right_source);
   __Pyx_GIVEREF(__pyx_v_self->_right_source);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 7, __pyx_v_self->_right_source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 7, __pyx_v_self->_right_source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_rocksdb_timers);
   __Pyx_GIVEREF(__pyx_v_self->_rocksdb_timers);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 8, __pyx_v_self->_rocksdb_timers) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 8, __pyx_v_self->_rocksdb_timers) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._schema);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._schema);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 9, __pyx_v_self->__pyx_base.__pyx_base._schema) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 9, __pyx_v_self->__pyx_base.__pyx_base._schema) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._shuffle_id);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._shuffle_id);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 10, __pyx_v_self->__pyx_base._shuffle_id) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 10, __pyx_v_self->__pyx_base._shuffle_id) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._shuffle_transport);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._shuffle_transport);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 11, __pyx_v_self->__pyx_base._shuffle_transport) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 11, __pyx_v_self->__pyx_base._shuffle_transport) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._source);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._source);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 12, __pyx_v_self->__pyx_base.__pyx_base._source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 12, __pyx_v_self->__pyx_base.__pyx_base._source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 13, __pyx_t_5) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 13, __pyx_t_5) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_6);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 14, __pyx_t_6) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 14, __pyx_t_6) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_7);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 15, __pyx_t_7) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 15, __pyx_t_7) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_time_column);
   __Pyx_GIVEREF(__pyx_v_self->_time_column);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 16, __pyx_v_self->_time_column) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 16, __pyx_v_self->_time_column) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_time_indexed_state);
   __Pyx_GIVEREF(__pyx_v_self->_time_indexed_state);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 17, __pyx_v_self->_time_indexed_state) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 17, __pyx_v_self->_time_indexed_state) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_8);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 18, __pyx_t_8) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 18, __pyx_t_8) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  __Pyx_INCREF(__pyx_v_self->__pyx_base.operator_id);
+  __Pyx_GIVEREF(__pyx_v_self->__pyx_base.operator_id);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 19, __pyx_v_self->__pyx_base.operator_id) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_9);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 20, __pyx_t_9) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
@@ -18234,30 +18271,31 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
   __pyx_t_6 = 0;
   __pyx_t_7 = 0;
   __pyx_t_8 = 0;
-  __pyx_v_state = ((PyObject*)__pyx_t_9);
   __pyx_t_9 = 0;
+  __pyx_v_state = ((PyObject*)__pyx_t_10);
+  __pyx_t_10 = 0;
 
   /* "(tree fragment)":6
  *     cdef bint use_setstate
- *     state = (self._key_columns, self._lower_bound, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._rocksdb_timers, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._time_column, self._time_indexed_state, self._upper_bound)
+ *     state = (self._key_columns, self._lower_bound, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._rocksdb_timers, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._time_column, self._time_indexed_state, self._upper_bound, self.operator_id, self.parallelism)
  *     _dict = getattr(self, '__dict__', None)             # <<<<<<<<<<<<<<
  *     if _dict is not None:
  *         state += (_dict,)
 */
-  __pyx_t_9 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_dict, Py_None); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 6, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_v__dict = __pyx_t_9;
-  __pyx_t_9 = 0;
+  __pyx_t_10 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_dict, Py_None); if (unlikely(!__pyx_t_10)) __PYX_ERR(3, 6, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_v__dict = __pyx_t_10;
+  __pyx_t_10 = 0;
 
   /* "(tree fragment)":7
- *     state = (self._key_columns, self._lower_bound, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._rocksdb_timers, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._time_column, self._time_indexed_state, self._upper_bound)
+ *     state = (self._key_columns, self._lower_bound, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._rocksdb_timers, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._time_column, self._time_indexed_state, self._upper_bound, self.operator_id, self.parallelism)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
  *         use_setstate = True
 */
-  __pyx_t_10 = (__pyx_v__dict != Py_None);
-  if (__pyx_t_10) {
+  __pyx_t_11 = (__pyx_v__dict != Py_None);
+  if (__pyx_t_11) {
 
     /* "(tree fragment)":8
  *     _dict = getattr(self, '__dict__', None)
@@ -18266,28 +18304,28 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
  *         use_setstate = True
  *     else:
 */
-    __pyx_t_9 = PyTuple_New(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_10 = PyTuple_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(3, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
     __Pyx_INCREF(__pyx_v__dict);
     __Pyx_GIVEREF(__pyx_v__dict);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_v__dict) != (0)) __PYX_ERR(3, 8, __pyx_L1_error);
-    __pyx_t_8 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_9); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_8));
-    __pyx_t_8 = 0;
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_v__dict) != (0)) __PYX_ERR(3, 8, __pyx_L1_error);
+    __pyx_t_9 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_9));
+    __pyx_t_9 = 0;
 
     /* "(tree fragment)":9
  *     if _dict is not None:
  *         state += (_dict,)
  *         use_setstate = True             # <<<<<<<<<<<<<<
  *     else:
- *         use_setstate = self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._rocksdb_timers is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._time_column is not None or self._time_indexed_state is not None
+ *         use_setstate = self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._rocksdb_timers is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._time_column is not None or self._time_indexed_state is not None or self.operator_id is not None
 */
     __pyx_v_use_setstate = 1;
 
     /* "(tree fragment)":7
- *     state = (self._key_columns, self._lower_bound, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._rocksdb_timers, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._time_column, self._time_indexed_state, self._upper_bound)
+ *     state = (self._key_columns, self._lower_bound, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._rocksdb_timers, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._time_column, self._time_indexed_state, self._upper_bound, self.operator_id, self.parallelism)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -18299,164 +18337,170 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
   /* "(tree fragment)":11
  *         use_setstate = True
  *     else:
- *         use_setstate = self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._rocksdb_timers is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._time_column is not None or self._time_indexed_state is not None             # <<<<<<<<<<<<<<
+ *         use_setstate = self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._rocksdb_timers is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._time_column is not None or self._time_indexed_state is not None or self.operator_id is not None             # <<<<<<<<<<<<<<
  *     if use_setstate:
- *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x8e8eb17, None), state
+ *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x3fc2c20, None), state
 */
   /*else*/ {
-    __pyx_t_11 = (__pyx_v_self->__pyx_base.__pyx_base._key_columns != ((PyObject*)Py_None));
-    if (!__pyx_t_11) {
+    __pyx_t_12 = (__pyx_v_self->__pyx_base.__pyx_base._key_columns != ((PyObject*)Py_None));
+    if (!__pyx_t_12) {
     } else {
-      __pyx_t_10 = __pyx_t_11;
+      __pyx_t_11 = __pyx_t_12;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_11 = (__pyx_v_self->__pyx_base._partition_keys != ((PyObject*)Py_None));
-    if (!__pyx_t_11) {
+    __pyx_t_12 = (__pyx_v_self->__pyx_base._partition_keys != ((PyObject*)Py_None));
+    if (!__pyx_t_12) {
     } else {
-      __pyx_t_10 = __pyx_t_11;
+      __pyx_t_11 = __pyx_t_12;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_11 = (((PyObject *)__pyx_v_self->__pyx_base._partitioner) != Py_None);
-    if (!__pyx_t_11) {
+    __pyx_t_12 = (((PyObject *)__pyx_v_self->__pyx_base._partitioner) != Py_None);
+    if (!__pyx_t_12) {
     } else {
-      __pyx_t_10 = __pyx_t_11;
+      __pyx_t_11 = __pyx_t_12;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_11 = (__pyx_v_self->_right_source != Py_None);
-    if (!__pyx_t_11) {
+    __pyx_t_12 = (__pyx_v_self->_right_source != Py_None);
+    if (!__pyx_t_12) {
     } else {
-      __pyx_t_10 = __pyx_t_11;
+      __pyx_t_11 = __pyx_t_12;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_11 = (__pyx_v_self->_rocksdb_timers != Py_None);
-    if (!__pyx_t_11) {
+    __pyx_t_12 = (__pyx_v_self->_rocksdb_timers != Py_None);
+    if (!__pyx_t_12) {
     } else {
-      __pyx_t_10 = __pyx_t_11;
+      __pyx_t_11 = __pyx_t_12;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_11 = (__pyx_v_self->__pyx_base.__pyx_base._schema != Py_None);
-    if (!__pyx_t_11) {
+    __pyx_t_12 = (__pyx_v_self->__pyx_base.__pyx_base._schema != Py_None);
+    if (!__pyx_t_12) {
     } else {
-      __pyx_t_10 = __pyx_t_11;
+      __pyx_t_11 = __pyx_t_12;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_11 = (__pyx_v_self->__pyx_base._shuffle_id != ((PyObject*)Py_None));
-    if (!__pyx_t_11) {
+    __pyx_t_12 = (__pyx_v_self->__pyx_base._shuffle_id != ((PyObject*)Py_None));
+    if (!__pyx_t_12) {
     } else {
-      __pyx_t_10 = __pyx_t_11;
+      __pyx_t_11 = __pyx_t_12;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_11 = (__pyx_v_self->__pyx_base._shuffle_transport != Py_None);
-    if (!__pyx_t_11) {
+    __pyx_t_12 = (__pyx_v_self->__pyx_base._shuffle_transport != Py_None);
+    if (!__pyx_t_12) {
     } else {
-      __pyx_t_10 = __pyx_t_11;
+      __pyx_t_11 = __pyx_t_12;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_11 = (__pyx_v_self->__pyx_base.__pyx_base._source != Py_None);
-    if (!__pyx_t_11) {
+    __pyx_t_12 = (__pyx_v_self->__pyx_base.__pyx_base._source != Py_None);
+    if (!__pyx_t_12) {
     } else {
-      __pyx_t_10 = __pyx_t_11;
+      __pyx_t_11 = __pyx_t_12;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_11 = (__pyx_v_self->_time_column != ((PyObject*)Py_None));
-    if (!__pyx_t_11) {
+    __pyx_t_12 = (__pyx_v_self->_time_column != ((PyObject*)Py_None));
+    if (!__pyx_t_12) {
     } else {
-      __pyx_t_10 = __pyx_t_11;
+      __pyx_t_11 = __pyx_t_12;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_11 = (__pyx_v_self->_time_indexed_state != ((PyObject*)Py_None));
-    __pyx_t_10 = __pyx_t_11;
+    __pyx_t_12 = (__pyx_v_self->_time_indexed_state != ((PyObject*)Py_None));
+    if (!__pyx_t_12) {
+    } else {
+      __pyx_t_11 = __pyx_t_12;
+      goto __pyx_L4_bool_binop_done;
+    }
+    __pyx_t_12 = (__pyx_v_self->__pyx_base.operator_id != ((PyObject*)Py_None));
+    __pyx_t_11 = __pyx_t_12;
     __pyx_L4_bool_binop_done:;
-    __pyx_v_use_setstate = __pyx_t_10;
+    __pyx_v_use_setstate = __pyx_t_11;
   }
   __pyx_L3:;
 
   /* "(tree fragment)":12
  *     else:
- *         use_setstate = self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._rocksdb_timers is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._time_column is not None or self._time_indexed_state is not None
+ *         use_setstate = self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._rocksdb_timers is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._time_column is not None or self._time_indexed_state is not None or self.operator_id is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x8e8eb17, None), state
+ *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x3fc2c20, None), state
  *     else:
 */
   if (__pyx_v_use_setstate) {
 
     /* "(tree fragment)":13
- *         use_setstate = self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._rocksdb_timers is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._time_column is not None or self._time_indexed_state is not None
+ *         use_setstate = self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._rocksdb_timers is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._time_column is not None or self._time_indexed_state is not None or self.operator_id is not None
  *     if use_setstate:
- *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x8e8eb17, None), state             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x3fc2c20, None), state             # <<<<<<<<<<<<<<
  *     else:
- *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x8e8eb17, state)
+ *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x3fc2c20, state)
 */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonIntervalJoi); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 13, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonIntervalJoi); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 13, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_10 = PyTuple_New(3); if (unlikely(!__pyx_t_10)) __PYX_ERR(3, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_149482263);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_149482263);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_mstate_global->__pyx_int_149482263) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_66858016);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_66858016);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_mstate_global->__pyx_int_66858016) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
     __Pyx_INCREF(Py_None);
     __Pyx_GIVEREF(Py_None);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 2, Py_None) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
-    __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_GIVEREF(__pyx_t_8);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_8) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 2, Py_None) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    __pyx_t_8 = PyTuple_New(3); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_GIVEREF(__pyx_t_9);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_9) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_9) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    __Pyx_GIVEREF(__pyx_t_10);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_t_10) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
-    __pyx_t_8 = 0;
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
     __pyx_t_9 = 0;
-    __pyx_r = __pyx_t_7;
-    __pyx_t_7 = 0;
+    __pyx_t_10 = 0;
+    __pyx_r = __pyx_t_8;
+    __pyx_t_8 = 0;
     goto __pyx_L0;
 
     /* "(tree fragment)":12
  *     else:
- *         use_setstate = self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._rocksdb_timers is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._time_column is not None or self._time_indexed_state is not None
+ *         use_setstate = self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._rocksdb_timers is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._time_column is not None or self._time_indexed_state is not None or self.operator_id is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x8e8eb17, None), state
+ *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x3fc2c20, None), state
  *     else:
 */
   }
 
   /* "(tree fragment)":15
- *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x8e8eb17, None), state
+ *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x3fc2c20, None), state
  *     else:
- *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x8e8eb17, state)             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x3fc2c20, state)             # <<<<<<<<<<<<<<
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_CythonIntervalJoinOperator__set_state(self, __pyx_state)
 */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonIntervalJoi); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonIntervalJoi); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __pyx_t_10 = PyTuple_New(3); if (unlikely(!__pyx_t_10)) __PYX_ERR(3, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_149482263);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_149482263);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_mstate_global->__pyx_int_149482263) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_66858016);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_66858016);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_mstate_global->__pyx_int_66858016) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __pyx_t_8 = PyTuple_New(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_GIVEREF(__pyx_t_7);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __Pyx_GIVEREF(__pyx_t_9);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_t_9) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __pyx_t_7 = 0;
-    __pyx_t_9 = 0;
-    __pyx_r = __pyx_t_8;
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    __pyx_t_9 = PyTuple_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_GIVEREF(__pyx_t_8);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_8) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    __Pyx_GIVEREF(__pyx_t_10);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_10) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
     __pyx_t_8 = 0;
+    __pyx_t_10 = 0;
+    __pyx_r = __pyx_t_9;
+    __pyx_t_9 = 0;
     goto __pyx_L0;
   }
 
@@ -18477,6 +18521,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_10);
   __Pyx_AddTraceback("sabot._cython.operators.joins.CythonIntervalJoinOperator.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -18489,7 +18534,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
 
 /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x8e8eb17, state)
+ *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x3fc2c20, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonIntervalJoinOperator__set_state(self, __pyx_state)
 */
@@ -18589,7 +18634,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
 
   /* "(tree fragment)":17
- *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x8e8eb17, state)
+ *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x3fc2c20, state)
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_CythonIntervalJoinOperator__set_state(self, __pyx_state)             # <<<<<<<<<<<<<<
 */
@@ -18600,7 +18645,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x8e8eb17, state)
+ *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x3fc2c20, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonIntervalJoinOperator__set_state(self, __pyx_state)
 */
@@ -20747,8 +20792,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
   PyObject *__pyx_t_5 = NULL;
   PyObject *__pyx_t_6 = NULL;
   PyObject *__pyx_t_7 = NULL;
-  int __pyx_t_8;
+  PyObject *__pyx_t_8 = NULL;
   int __pyx_t_9;
+  int __pyx_t_10;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -20757,7 +20803,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
   /* "(tree fragment)":5
  *     cdef object _dict
  *     cdef bint use_setstate
- *     state = (self._direction, self._key_columns, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._sorted_state, self._source, self._stateful, self._stateful, self._task_id, self._time_column)             # <<<<<<<<<<<<<<
+ *     state = (self._direction, self._key_columns, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._sorted_state, self._source, self._stateful, self._stateful, self._task_id, self._time_column, self.operator_id, self.parallelism)             # <<<<<<<<<<<<<<
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:
 */
@@ -20773,83 +20819,91 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_self->__pyx_base._task_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = PyTuple_New(17); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 5, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyLong_From_int32_t(__pyx_v_self->__pyx_base.parallelism); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_8 = PyTuple_New(19); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 5, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
   __Pyx_INCREF(__pyx_v_self->_direction);
   __Pyx_GIVEREF(__pyx_v_self->_direction);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_v_self->_direction) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_v_self->_direction) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._key_columns);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._key_columns);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_v_self->__pyx_base.__pyx_base._key_columns) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_v_self->__pyx_base.__pyx_base._key_columns) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_t_1) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 2, __pyx_t_1) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 3, __pyx_t_2) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 3, __pyx_t_2) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_3);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 4, __pyx_t_3) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 4, __pyx_t_3) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._partition_keys);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._partition_keys);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 5, __pyx_v_self->__pyx_base._partition_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 5, __pyx_v_self->__pyx_base._partition_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF((PyObject *)__pyx_v_self->__pyx_base._partitioner);
   __Pyx_GIVEREF((PyObject *)__pyx_v_self->__pyx_base._partitioner);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 6, ((PyObject *)__pyx_v_self->__pyx_base._partitioner)) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 6, ((PyObject *)__pyx_v_self->__pyx_base._partitioner)) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_right_source);
   __Pyx_GIVEREF(__pyx_v_self->_right_source);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 7, __pyx_v_self->_right_source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 7, __pyx_v_self->_right_source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._schema);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._schema);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 8, __pyx_v_self->__pyx_base.__pyx_base._schema) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 8, __pyx_v_self->__pyx_base.__pyx_base._schema) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._shuffle_id);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._shuffle_id);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 9, __pyx_v_self->__pyx_base._shuffle_id) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 9, __pyx_v_self->__pyx_base._shuffle_id) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._shuffle_transport);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._shuffle_transport);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 10, __pyx_v_self->__pyx_base._shuffle_transport) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 10, __pyx_v_self->__pyx_base._shuffle_transport) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_sorted_state);
   __Pyx_GIVEREF(__pyx_v_self->_sorted_state);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 11, __pyx_v_self->_sorted_state) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 11, __pyx_v_self->_sorted_state) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._source);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._source);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 12, __pyx_v_self->__pyx_base.__pyx_base._source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 12, __pyx_v_self->__pyx_base.__pyx_base._source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_4);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 13, __pyx_t_4) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 13, __pyx_t_4) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 14, __pyx_t_5) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 14, __pyx_t_5) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_6);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 15, __pyx_t_6) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 15, __pyx_t_6) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_time_column);
   __Pyx_GIVEREF(__pyx_v_self->_time_column);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 16, __pyx_v_self->_time_column) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 16, __pyx_v_self->_time_column) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  __Pyx_INCREF(__pyx_v_self->__pyx_base.operator_id);
+  __Pyx_GIVEREF(__pyx_v_self->__pyx_base.operator_id);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 17, __pyx_v_self->__pyx_base.operator_id) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_7);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 18, __pyx_t_7) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
   __pyx_t_4 = 0;
   __pyx_t_5 = 0;
   __pyx_t_6 = 0;
-  __pyx_v_state = ((PyObject*)__pyx_t_7);
   __pyx_t_7 = 0;
+  __pyx_v_state = ((PyObject*)__pyx_t_8);
+  __pyx_t_8 = 0;
 
   /* "(tree fragment)":6
  *     cdef bint use_setstate
- *     state = (self._direction, self._key_columns, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._sorted_state, self._source, self._stateful, self._stateful, self._task_id, self._time_column)
+ *     state = (self._direction, self._key_columns, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._sorted_state, self._source, self._stateful, self._stateful, self._task_id, self._time_column, self.operator_id, self.parallelism)
  *     _dict = getattr(self, '__dict__', None)             # <<<<<<<<<<<<<<
  *     if _dict is not None:
  *         state += (_dict,)
 */
-  __pyx_t_7 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_dict, Py_None); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 6, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_v__dict = __pyx_t_7;
-  __pyx_t_7 = 0;
+  __pyx_t_8 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_dict, Py_None); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 6, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
+  __pyx_v__dict = __pyx_t_8;
+  __pyx_t_8 = 0;
 
   /* "(tree fragment)":7
- *     state = (self._direction, self._key_columns, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._sorted_state, self._source, self._stateful, self._stateful, self._task_id, self._time_column)
+ *     state = (self._direction, self._key_columns, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._sorted_state, self._source, self._stateful, self._stateful, self._task_id, self._time_column, self.operator_id, self.parallelism)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
  *         use_setstate = True
 */
-  __pyx_t_8 = (__pyx_v__dict != Py_None);
-  if (__pyx_t_8) {
+  __pyx_t_9 = (__pyx_v__dict != Py_None);
+  if (__pyx_t_9) {
 
     /* "(tree fragment)":8
  *     _dict = getattr(self, '__dict__', None)
@@ -20858,28 +20912,28 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
  *         use_setstate = True
  *     else:
 */
-    __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_8 = PyTuple_New(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_INCREF(__pyx_v__dict);
     __Pyx_GIVEREF(__pyx_v__dict);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_v__dict) != (0)) __PYX_ERR(3, 8, __pyx_L1_error);
-    __pyx_t_6 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_6));
-    __pyx_t_6 = 0;
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_v__dict) != (0)) __PYX_ERR(3, 8, __pyx_L1_error);
+    __pyx_t_7 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_7));
+    __pyx_t_7 = 0;
 
     /* "(tree fragment)":9
  *     if _dict is not None:
  *         state += (_dict,)
  *         use_setstate = True             # <<<<<<<<<<<<<<
  *     else:
- *         use_setstate = self._direction is not None or self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._sorted_state is not None or self._source is not None or self._time_column is not None
+ *         use_setstate = self._direction is not None or self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._sorted_state is not None or self._source is not None or self._time_column is not None or self.operator_id is not None
 */
     __pyx_v_use_setstate = 1;
 
     /* "(tree fragment)":7
- *     state = (self._direction, self._key_columns, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._sorted_state, self._source, self._stateful, self._stateful, self._task_id, self._time_column)
+ *     state = (self._direction, self._key_columns, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._right_source, self._schema, self._shuffle_id, self._shuffle_transport, self._sorted_state, self._source, self._stateful, self._stateful, self._task_id, self._time_column, self.operator_id, self.parallelism)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -20891,164 +20945,170 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
   /* "(tree fragment)":11
  *         use_setstate = True
  *     else:
- *         use_setstate = self._direction is not None or self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._sorted_state is not None or self._source is not None or self._time_column is not None             # <<<<<<<<<<<<<<
+ *         use_setstate = self._direction is not None or self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._sorted_state is not None or self._source is not None or self._time_column is not None or self.operator_id is not None             # <<<<<<<<<<<<<<
  *     if use_setstate:
- *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x6f24980, None), state
+ *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x2598a62, None), state
 */
   /*else*/ {
-    __pyx_t_9 = (__pyx_v_self->_direction != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->_direction != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base.__pyx_base._key_columns != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base.__pyx_base._key_columns != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base._partition_keys != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base._partition_keys != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (((PyObject *)__pyx_v_self->__pyx_base._partitioner) != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (((PyObject *)__pyx_v_self->__pyx_base._partitioner) != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->_right_source != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->_right_source != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base.__pyx_base._schema != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base.__pyx_base._schema != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base._shuffle_id != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base._shuffle_id != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base._shuffle_transport != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base._shuffle_transport != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->_sorted_state != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->_sorted_state != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base.__pyx_base._source != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base.__pyx_base._source != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->_time_column != ((PyObject*)Py_None));
-    __pyx_t_8 = __pyx_t_9;
+    __pyx_t_10 = (__pyx_v_self->_time_column != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
+    } else {
+      __pyx_t_9 = __pyx_t_10;
+      goto __pyx_L4_bool_binop_done;
+    }
+    __pyx_t_10 = (__pyx_v_self->__pyx_base.operator_id != ((PyObject*)Py_None));
+    __pyx_t_9 = __pyx_t_10;
     __pyx_L4_bool_binop_done:;
-    __pyx_v_use_setstate = __pyx_t_8;
+    __pyx_v_use_setstate = __pyx_t_9;
   }
   __pyx_L3:;
 
   /* "(tree fragment)":12
  *     else:
- *         use_setstate = self._direction is not None or self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._sorted_state is not None or self._source is not None or self._time_column is not None
+ *         use_setstate = self._direction is not None or self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._sorted_state is not None or self._source is not None or self._time_column is not None or self.operator_id is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x6f24980, None), state
+ *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x2598a62, None), state
  *     else:
 */
   if (__pyx_v_use_setstate) {
 
     /* "(tree fragment)":13
- *         use_setstate = self._direction is not None or self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._sorted_state is not None or self._source is not None or self._time_column is not None
+ *         use_setstate = self._direction is not None or self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._sorted_state is not None or self._source is not None or self._time_column is not None or self.operator_id is not None
  *     if use_setstate:
- *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x6f24980, None), state             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x2598a62, None), state             # <<<<<<<<<<<<<<
  *     else:
- *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x6f24980, state)
+ *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x2598a62, state)
 */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 13, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 13, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_8 = PyTuple_New(3); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_116541824);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_116541824);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_mstate_global->__pyx_int_116541824) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_39422562);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_39422562);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_mstate_global->__pyx_int_39422562) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
     __Pyx_INCREF(Py_None);
     __Pyx_GIVEREF(Py_None);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 2, Py_None) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
-    __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(3, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_GIVEREF(__pyx_t_6);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_6) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 2, Py_None) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    __pyx_t_6 = PyTuple_New(3); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_7);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_7) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_7) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    __Pyx_GIVEREF(__pyx_t_8);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_8) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
-    __pyx_t_6 = 0;
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
     __pyx_t_7 = 0;
-    __pyx_r = __pyx_t_5;
-    __pyx_t_5 = 0;
+    __pyx_t_8 = 0;
+    __pyx_r = __pyx_t_6;
+    __pyx_t_6 = 0;
     goto __pyx_L0;
 
     /* "(tree fragment)":12
  *     else:
- *         use_setstate = self._direction is not None or self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._sorted_state is not None or self._source is not None or self._time_column is not None
+ *         use_setstate = self._direction is not None or self._key_columns is not None or self._partition_keys is not None or self._partitioner is not None or self._right_source is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._sorted_state is not None or self._source is not None or self._time_column is not None or self.operator_id is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x6f24980, None), state
+ *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x2598a62, None), state
  *     else:
 */
   }
 
   /* "(tree fragment)":15
- *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x6f24980, None), state
+ *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x2598a62, None), state
  *     else:
- *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x6f24980, state)             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x2598a62, state)             # <<<<<<<<<<<<<<
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_CythonAsofJoinOperator__set_state(self, __pyx_state)
 */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe); if (unlikely(!__pyx_t_5)) __PYX_ERR(3, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    __pyx_t_8 = PyTuple_New(3); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_116541824);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_116541824);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_mstate_global->__pyx_int_116541824) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_39422562);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_39422562);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_mstate_global->__pyx_int_39422562) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_GIVEREF(__pyx_t_5);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __Pyx_GIVEREF(__pyx_t_7);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_7) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __pyx_t_5 = 0;
-    __pyx_t_7 = 0;
-    __pyx_r = __pyx_t_6;
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_GIVEREF(__pyx_t_6);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    __Pyx_GIVEREF(__pyx_t_8);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_8) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
     __pyx_t_6 = 0;
+    __pyx_t_8 = 0;
+    __pyx_r = __pyx_t_7;
+    __pyx_t_7 = 0;
     goto __pyx_L0;
   }
 
@@ -21067,6 +21127,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
   __Pyx_AddTraceback("sabot._cython.operators.joins.CythonAsofJoinOperator.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -21079,7 +21140,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 
 /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x6f24980, state)
+ *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x2598a62, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonAsofJoinOperator__set_state(self, __pyx_state)
 */
@@ -21179,7 +21240,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
 
   /* "(tree fragment)":17
- *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x6f24980, state)
+ *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x2598a62, state)
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_CythonAsofJoinOperator__set_state(self, __pyx_state)             # <<<<<<<<<<<<<<
 */
@@ -21190,7 +21251,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x6f24980, state)
+ *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x2598a62, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonAsofJoinOperator__set_state(self, __pyx_state)
 */
@@ -22382,9 +22443,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_8__pyx_unpickle_Cyth
   /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x92ef420, 0x39cd7fa, 0x0e3cab5):             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum not in (0xa031553, 0xdfd98c4, 0x0e11619):             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x92ef420, 0x39cd7fa, 0x0e3cab5) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0xa031553, 0xdfd98c4, 0x0e11619) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, operator_id, parallelism))" % __pyx_checksum
 */
   __pyx_t_1 = __Pyx_PyLong_From_long(__pyx_v___pyx_checksum); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -22394,9 +22455,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_8__pyx_unpickle_Cyth
 
     /* "(tree fragment)":5
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x92ef420, 0x39cd7fa, 0x0e3cab5):
+ *     if __pyx_checksum not in (0xa031553, 0xdfd98c4, 0x0e11619):
  *         from pickle import PickleError as __pyx_PickleError             # <<<<<<<<<<<<<<
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x92ef420, 0x39cd7fa, 0x0e3cab5) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0xa031553, 0xdfd98c4, 0x0e11619) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonHashJoinOperator.__new__(__pyx_type)
 */
     __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 5, __pyx_L1_error)
@@ -22415,9 +22476,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_8__pyx_unpickle_Cyth
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
     /* "(tree fragment)":6
- *     if __pyx_checksum not in (0x92ef420, 0x39cd7fa, 0x0e3cab5):
+ *     if __pyx_checksum not in (0xa031553, 0xdfd98c4, 0x0e11619):
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x92ef420, 0x39cd7fa, 0x0e3cab5) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id))" % __pyx_checksum             # <<<<<<<<<<<<<<
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0xa031553, 0xdfd98c4, 0x0e11619) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, operator_id, parallelism))" % __pyx_checksum             # <<<<<<<<<<<<<<
  *     __pyx_result = CythonHashJoinOperator.__new__(__pyx_type)
  *     if __pyx_state is not None:
 */
@@ -22433,15 +22494,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_8__pyx_unpickle_Cyth
     /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x92ef420, 0x39cd7fa, 0x0e3cab5):             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum not in (0xa031553, 0xdfd98c4, 0x0e11619):             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x92ef420, 0x39cd7fa, 0x0e3cab5) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0xa031553, 0xdfd98c4, 0x0e11619) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, operator_id, parallelism))" % __pyx_checksum
 */
   }
 
   /* "(tree fragment)":7
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x92ef420, 0x39cd7fa, 0x0e3cab5) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0xa031553, 0xdfd98c4, 0x0e11619) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonHashJoinOperator.__new__(__pyx_type)             # <<<<<<<<<<<<<<
  *     if __pyx_state is not None:
  *         __pyx_unpickle_CythonHashJoinOperator__set_state(<CythonHashJoinOperator> __pyx_result, __pyx_state)
@@ -22460,7 +22521,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_8__pyx_unpickle_Cyth
   __pyx_t_1 = 0;
 
   /* "(tree fragment)":8
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x92ef420, 0x39cd7fa, 0x0e3cab5) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0xa031553, 0xdfd98c4, 0x0e11619) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonHashJoinOperator.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_CythonHashJoinOperator__set_state(<CythonHashJoinOperator> __pyx_result, __pyx_state)
@@ -22482,7 +22543,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_8__pyx_unpickle_Cyth
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
     /* "(tree fragment)":8
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x92ef420, 0x39cd7fa, 0x0e3cab5) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0xa031553, 0xdfd98c4, 0x0e11619) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonHashJoinOperator.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_CythonHashJoinOperator__set_state(<CythonHashJoinOperator> __pyx_result, __pyx_state)
@@ -22495,7 +22556,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_8__pyx_unpickle_Cyth
  *         __pyx_unpickle_CythonHashJoinOperator__set_state(<CythonHashJoinOperator> __pyx_result, __pyx_state)
  *     return __pyx_result             # <<<<<<<<<<<<<<
  * cdef __pyx_unpickle_CythonHashJoinOperator__set_state(CythonHashJoinOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]
+ *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]; __pyx_result.operator_id = __pyx_state[18]; __pyx_result.parallelism = __pyx_state[19]
 */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v___pyx_result);
@@ -22526,8 +22587,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_8__pyx_unpickle_Cyth
  *         __pyx_unpickle_CythonHashJoinOperator__set_state(<CythonHashJoinOperator> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonHashJoinOperator__set_state(CythonHashJoinOperator __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]
- *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]; __pyx_result.operator_id = __pyx_state[18]; __pyx_result.parallelism = __pyx_state[19]
+ *     if len(__pyx_state) > 20 and hasattr(__pyx_result, '__dict__'):
 */
 
 static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_CythonHashJoinOperator__set_state(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v___pyx_result, PyObject *__pyx_v___pyx_state) {
@@ -22551,9 +22612,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   /* "(tree fragment)":12
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonHashJoinOperator__set_state(CythonHashJoinOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]             # <<<<<<<<<<<<<<
- *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
- *         __pyx_result.__dict__.update(__pyx_state[18])
+ *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]; __pyx_result.operator_id = __pyx_state[18]; __pyx_result.parallelism = __pyx_state[19]             # <<<<<<<<<<<<<<
+ *     if len(__pyx_state) > 20 and hasattr(__pyx_result, '__dict__'):
+ *         __pyx_result.__dict__.update(__pyx_state[20])
 */
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
@@ -22730,19 +22791,37 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   }
   __pyx_t_3 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 17)); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
   __pyx_v___pyx_result->__pyx_base._task_id = __pyx_t_3;
+  if (unlikely(__pyx_v___pyx_state == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(3, 12, __pyx_L1_error)
+  }
+  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 18);
+  __Pyx_INCREF(__pyx_t_1);
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.operator_id);
+  __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base.operator_id);
+  __pyx_v___pyx_result->__pyx_base.operator_id = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+  if (unlikely(__pyx_v___pyx_state == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(3, 12, __pyx_L1_error)
+  }
+  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 19)); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_v___pyx_result->__pyx_base.parallelism = __pyx_t_3;
 
   /* "(tree fragment)":13
  * cdef __pyx_unpickle_CythonHashJoinOperator__set_state(CythonHashJoinOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]
- *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
- *         __pyx_result.__dict__.update(__pyx_state[18])
+ *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]; __pyx_result.operator_id = __pyx_state[18]; __pyx_result.parallelism = __pyx_state[19]
+ *     if len(__pyx_state) > 20 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
+ *         __pyx_result.__dict__.update(__pyx_state[20])
 */
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
     __PYX_ERR(3, 13, __pyx_L1_error)
   }
   __pyx_t_6 = __Pyx_PyTuple_GET_SIZE(__pyx_v___pyx_state); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(3, 13, __pyx_L1_error)
-  __pyx_t_7 = (__pyx_t_6 > 18);
+  __pyx_t_7 = (__pyx_t_6 > 20);
   if (__pyx_t_7) {
   } else {
     __pyx_t_5 = __pyx_t_7;
@@ -22754,9 +22833,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   if (__pyx_t_5) {
 
     /* "(tree fragment)":14
- *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]
- *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
- *         __pyx_result.__dict__.update(__pyx_state[18])             # <<<<<<<<<<<<<<
+ *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]; __pyx_result.operator_id = __pyx_state[18]; __pyx_result.parallelism = __pyx_state[19]
+ *     if len(__pyx_state) > 20 and hasattr(__pyx_result, '__dict__'):
+ *         __pyx_result.__dict__.update(__pyx_state[20])             # <<<<<<<<<<<<<<
 */
     __pyx_t_9 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v___pyx_result), __pyx_mstate_global->__pyx_n_u_dict); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 14, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
@@ -22768,7 +22847,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     }
     __pyx_t_10 = 0;
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_8, __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 18)};
+      PyObject *__pyx_callargs[2] = {__pyx_t_8, __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 20)};
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_update, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -22779,9 +22858,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
 
     /* "(tree fragment)":13
  * cdef __pyx_unpickle_CythonHashJoinOperator__set_state(CythonHashJoinOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]
- *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
- *         __pyx_result.__dict__.update(__pyx_state[18])
+ *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]; __pyx_result.operator_id = __pyx_state[18]; __pyx_result.parallelism = __pyx_state[19]
+ *     if len(__pyx_state) > 20 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
+ *         __pyx_result.__dict__.update(__pyx_state[20])
 */
   }
 
@@ -22789,8 +22868,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
  *         __pyx_unpickle_CythonHashJoinOperator__set_state(<CythonHashJoinOperator> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonHashJoinOperator__set_state(CythonHashJoinOperator __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]
- *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result._hash_builder = __pyx_state[0]; __pyx_result._join_type = __pyx_state[1]; __pyx_result._key_columns = __pyx_state[2]; __pyx_result._left_keys = __pyx_state[3]; __pyx_result._morsel_size_kb = __pyx_state[4]; __pyx_result._num_partitions = __pyx_state[5]; __pyx_result._parallelism_hint = __pyx_state[6]; __pyx_result._partition_keys = __pyx_state[7]; __pyx_result._partitioner = __pyx_state[8]; __pyx_result._right_keys = __pyx_state[9]; __pyx_result._right_source = __pyx_state[10]; __pyx_result._schema = __pyx_state[11]; __pyx_result._shuffle_id = __pyx_state[12]; __pyx_result._shuffle_transport = __pyx_state[13]; __pyx_result._source = __pyx_state[14]; __pyx_result._stateful = __pyx_state[15]; __pyx_result._stateful = __pyx_state[16]; __pyx_result._task_id = __pyx_state[17]; __pyx_result.operator_id = __pyx_state[18]; __pyx_result.parallelism = __pyx_state[19]
+ *     if len(__pyx_state) > 20 and hasattr(__pyx_result, '__dict__'):
 */
 
   /* function exit code */
@@ -22932,9 +23011,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_10__pyx_unpickle_Cyt
   /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x8e8eb17, 0x57b6b8a, 0x0793bf8):             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum not in (0x3fc2c20, 0xe5ae6a7, 0x6fdda79):             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x8e8eb17, 0x57b6b8a, 0x0793bf8) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x3fc2c20, 0xe5ae6a7, 0x6fdda79) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound, operator_id, parallelism))" % __pyx_checksum
 */
   __pyx_t_1 = __Pyx_PyLong_From_long(__pyx_v___pyx_checksum); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -22944,9 +23023,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_10__pyx_unpickle_Cyt
 
     /* "(tree fragment)":5
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x8e8eb17, 0x57b6b8a, 0x0793bf8):
+ *     if __pyx_checksum not in (0x3fc2c20, 0xe5ae6a7, 0x6fdda79):
  *         from pickle import PickleError as __pyx_PickleError             # <<<<<<<<<<<<<<
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x8e8eb17, 0x57b6b8a, 0x0793bf8) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x3fc2c20, 0xe5ae6a7, 0x6fdda79) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonIntervalJoinOperator.__new__(__pyx_type)
 */
     __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 5, __pyx_L1_error)
@@ -22965,9 +23044,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_10__pyx_unpickle_Cyt
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
     /* "(tree fragment)":6
- *     if __pyx_checksum not in (0x8e8eb17, 0x57b6b8a, 0x0793bf8):
+ *     if __pyx_checksum not in (0x3fc2c20, 0xe5ae6a7, 0x6fdda79):
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x8e8eb17, 0x57b6b8a, 0x0793bf8) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound))" % __pyx_checksum             # <<<<<<<<<<<<<<
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x3fc2c20, 0xe5ae6a7, 0x6fdda79) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound, operator_id, parallelism))" % __pyx_checksum             # <<<<<<<<<<<<<<
  *     __pyx_result = CythonIntervalJoinOperator.__new__(__pyx_type)
  *     if __pyx_state is not None:
 */
@@ -22983,15 +23062,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_10__pyx_unpickle_Cyt
     /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x8e8eb17, 0x57b6b8a, 0x0793bf8):             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum not in (0x3fc2c20, 0xe5ae6a7, 0x6fdda79):             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x8e8eb17, 0x57b6b8a, 0x0793bf8) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x3fc2c20, 0xe5ae6a7, 0x6fdda79) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound, operator_id, parallelism))" % __pyx_checksum
 */
   }
 
   /* "(tree fragment)":7
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x8e8eb17, 0x57b6b8a, 0x0793bf8) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x3fc2c20, 0xe5ae6a7, 0x6fdda79) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonIntervalJoinOperator.__new__(__pyx_type)             # <<<<<<<<<<<<<<
  *     if __pyx_state is not None:
  *         __pyx_unpickle_CythonIntervalJoinOperator__set_state(<CythonIntervalJoinOperator> __pyx_result, __pyx_state)
@@ -23010,7 +23089,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_10__pyx_unpickle_Cyt
   __pyx_t_1 = 0;
 
   /* "(tree fragment)":8
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x8e8eb17, 0x57b6b8a, 0x0793bf8) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x3fc2c20, 0xe5ae6a7, 0x6fdda79) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonIntervalJoinOperator.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_CythonIntervalJoinOperator__set_state(<CythonIntervalJoinOperator> __pyx_result, __pyx_state)
@@ -23032,7 +23111,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_10__pyx_unpickle_Cyt
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
     /* "(tree fragment)":8
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x8e8eb17, 0x57b6b8a, 0x0793bf8) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x3fc2c20, 0xe5ae6a7, 0x6fdda79) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonIntervalJoinOperator.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_CythonIntervalJoinOperator__set_state(<CythonIntervalJoinOperator> __pyx_result, __pyx_state)
@@ -23045,7 +23124,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_10__pyx_unpickle_Cyt
  *         __pyx_unpickle_CythonIntervalJoinOperator__set_state(<CythonIntervalJoinOperator> __pyx_result, __pyx_state)
  *     return __pyx_result             # <<<<<<<<<<<<<<
  * cdef __pyx_unpickle_CythonIntervalJoinOperator__set_state(CythonIntervalJoinOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]
+ *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]; __pyx_result.operator_id = __pyx_state[19]; __pyx_result.parallelism = __pyx_state[20]
 */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v___pyx_result);
@@ -23076,8 +23155,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_10__pyx_unpickle_Cyt
  *         __pyx_unpickle_CythonIntervalJoinOperator__set_state(<CythonIntervalJoinOperator> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonIntervalJoinOperator__set_state(CythonIntervalJoinOperator __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]
- *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]; __pyx_result.operator_id = __pyx_state[19]; __pyx_result.parallelism = __pyx_state[20]
+ *     if len(__pyx_state) > 21 and hasattr(__pyx_result, '__dict__'):
 */
 
 static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_CythonIntervalJoinOperator__set_state(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator *__pyx_v___pyx_result, PyObject *__pyx_v___pyx_state) {
@@ -23102,9 +23181,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   /* "(tree fragment)":12
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonIntervalJoinOperator__set_state(CythonIntervalJoinOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]             # <<<<<<<<<<<<<<
- *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):
- *         __pyx_result.__dict__.update(__pyx_state[19])
+ *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]; __pyx_result.operator_id = __pyx_state[19]; __pyx_result.parallelism = __pyx_state[20]             # <<<<<<<<<<<<<<
+ *     if len(__pyx_state) > 21 and hasattr(__pyx_result, '__dict__'):
+ *         __pyx_result.__dict__.update(__pyx_state[21])
 */
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
@@ -23281,19 +23360,37 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   }
   __pyx_t_2 = __Pyx_PyLong_As_long(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 18)); if (unlikely((__pyx_t_2 == (long)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
   __pyx_v___pyx_result->_upper_bound = __pyx_t_2;
+  if (unlikely(__pyx_v___pyx_state == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(3, 12, __pyx_L1_error)
+  }
+  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 19);
+  __Pyx_INCREF(__pyx_t_1);
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.operator_id);
+  __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base.operator_id);
+  __pyx_v___pyx_result->__pyx_base.operator_id = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+  if (unlikely(__pyx_v___pyx_state == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(3, 12, __pyx_L1_error)
+  }
+  __pyx_t_4 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 20)); if (unlikely((__pyx_t_4 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_v___pyx_result->__pyx_base.parallelism = __pyx_t_4;
 
   /* "(tree fragment)":13
  * cdef __pyx_unpickle_CythonIntervalJoinOperator__set_state(CythonIntervalJoinOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]
- *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
- *         __pyx_result.__dict__.update(__pyx_state[19])
+ *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]; __pyx_result.operator_id = __pyx_state[19]; __pyx_result.parallelism = __pyx_state[20]
+ *     if len(__pyx_state) > 21 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
+ *         __pyx_result.__dict__.update(__pyx_state[21])
 */
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
     __PYX_ERR(3, 13, __pyx_L1_error)
   }
   __pyx_t_7 = __Pyx_PyTuple_GET_SIZE(__pyx_v___pyx_state); if (unlikely(__pyx_t_7 == ((Py_ssize_t)-1))) __PYX_ERR(3, 13, __pyx_L1_error)
-  __pyx_t_8 = (__pyx_t_7 > 19);
+  __pyx_t_8 = (__pyx_t_7 > 21);
   if (__pyx_t_8) {
   } else {
     __pyx_t_6 = __pyx_t_8;
@@ -23305,9 +23402,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   if (__pyx_t_6) {
 
     /* "(tree fragment)":14
- *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]
- *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):
- *         __pyx_result.__dict__.update(__pyx_state[19])             # <<<<<<<<<<<<<<
+ *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]; __pyx_result.operator_id = __pyx_state[19]; __pyx_result.parallelism = __pyx_state[20]
+ *     if len(__pyx_state) > 21 and hasattr(__pyx_result, '__dict__'):
+ *         __pyx_result.__dict__.update(__pyx_state[21])             # <<<<<<<<<<<<<<
 */
     __pyx_t_10 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v___pyx_result), __pyx_mstate_global->__pyx_n_u_dict); if (unlikely(!__pyx_t_10)) __PYX_ERR(3, 14, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
@@ -23319,7 +23416,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     }
     __pyx_t_11 = 0;
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_9, __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 19)};
+      PyObject *__pyx_callargs[2] = {__pyx_t_9, __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 21)};
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_update, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
@@ -23330,9 +23427,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
 
     /* "(tree fragment)":13
  * cdef __pyx_unpickle_CythonIntervalJoinOperator__set_state(CythonIntervalJoinOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]
- *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
- *         __pyx_result.__dict__.update(__pyx_state[19])
+ *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]; __pyx_result.operator_id = __pyx_state[19]; __pyx_result.parallelism = __pyx_state[20]
+ *     if len(__pyx_state) > 21 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
+ *         __pyx_result.__dict__.update(__pyx_state[21])
 */
   }
 
@@ -23340,8 +23437,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
  *         __pyx_unpickle_CythonIntervalJoinOperator__set_state(<CythonIntervalJoinOperator> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonIntervalJoinOperator__set_state(CythonIntervalJoinOperator __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]
- *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]; __pyx_result.operator_id = __pyx_state[19]; __pyx_result.parallelism = __pyx_state[20]
+ *     if len(__pyx_state) > 21 and hasattr(__pyx_result, '__dict__'):
 */
 
   /* function exit code */
@@ -23483,9 +23580,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_12__pyx_unpickle_Cyt
   /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x6f24980, 0x3786114, 0x845c488):             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum not in (0x2598a62, 0xc2c389b, 0x6b9243c):             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x6f24980, 0x3786114, 0x845c488) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x2598a62, 0xc2c389b, 0x6b9243c) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column, operator_id, parallelism))" % __pyx_checksum
 */
   __pyx_t_1 = __Pyx_PyLong_From_long(__pyx_v___pyx_checksum); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -23495,9 +23592,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_12__pyx_unpickle_Cyt
 
     /* "(tree fragment)":5
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x6f24980, 0x3786114, 0x845c488):
+ *     if __pyx_checksum not in (0x2598a62, 0xc2c389b, 0x6b9243c):
  *         from pickle import PickleError as __pyx_PickleError             # <<<<<<<<<<<<<<
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x6f24980, 0x3786114, 0x845c488) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x2598a62, 0xc2c389b, 0x6b9243c) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonAsofJoinOperator.__new__(__pyx_type)
 */
     __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 5, __pyx_L1_error)
@@ -23516,9 +23613,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_12__pyx_unpickle_Cyt
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
     /* "(tree fragment)":6
- *     if __pyx_checksum not in (0x6f24980, 0x3786114, 0x845c488):
+ *     if __pyx_checksum not in (0x2598a62, 0xc2c389b, 0x6b9243c):
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x6f24980, 0x3786114, 0x845c488) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column))" % __pyx_checksum             # <<<<<<<<<<<<<<
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x2598a62, 0xc2c389b, 0x6b9243c) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column, operator_id, parallelism))" % __pyx_checksum             # <<<<<<<<<<<<<<
  *     __pyx_result = CythonAsofJoinOperator.__new__(__pyx_type)
  *     if __pyx_state is not None:
 */
@@ -23534,15 +23631,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_12__pyx_unpickle_Cyt
     /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x6f24980, 0x3786114, 0x845c488):             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum not in (0x2598a62, 0xc2c389b, 0x6b9243c):             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x6f24980, 0x3786114, 0x845c488) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x2598a62, 0xc2c389b, 0x6b9243c) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column, operator_id, parallelism))" % __pyx_checksum
 */
   }
 
   /* "(tree fragment)":7
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x6f24980, 0x3786114, 0x845c488) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x2598a62, 0xc2c389b, 0x6b9243c) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonAsofJoinOperator.__new__(__pyx_type)             # <<<<<<<<<<<<<<
  *     if __pyx_state is not None:
  *         __pyx_unpickle_CythonAsofJoinOperator__set_state(<CythonAsofJoinOperator> __pyx_result, __pyx_state)
@@ -23561,7 +23658,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_12__pyx_unpickle_Cyt
   __pyx_t_1 = 0;
 
   /* "(tree fragment)":8
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x6f24980, 0x3786114, 0x845c488) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x2598a62, 0xc2c389b, 0x6b9243c) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonAsofJoinOperator.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_CythonAsofJoinOperator__set_state(<CythonAsofJoinOperator> __pyx_result, __pyx_state)
@@ -23583,7 +23680,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_12__pyx_unpickle_Cyt
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
     /* "(tree fragment)":8
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x6f24980, 0x3786114, 0x845c488) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x2598a62, 0xc2c389b, 0x6b9243c) = (_direction, _key_columns, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _schema, _shuffle_id, _shuffle_transport, _sorted_state, _source, _stateful, _stateful, _task_id, _time_column, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonAsofJoinOperator.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_CythonAsofJoinOperator__set_state(<CythonAsofJoinOperator> __pyx_result, __pyx_state)
@@ -23596,7 +23693,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_12__pyx_unpickle_Cyt
  *         __pyx_unpickle_CythonAsofJoinOperator__set_state(<CythonAsofJoinOperator> __pyx_result, __pyx_state)
  *     return __pyx_result             # <<<<<<<<<<<<<<
  * cdef __pyx_unpickle_CythonAsofJoinOperator__set_state(CythonAsofJoinOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]
+ *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result.operator_id = __pyx_state[17]; __pyx_result.parallelism = __pyx_state[18]
 */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v___pyx_result);
@@ -23627,8 +23724,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_12__pyx_unpickle_Cyt
  *         __pyx_unpickle_CythonAsofJoinOperator__set_state(<CythonAsofJoinOperator> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonAsofJoinOperator__set_state(CythonAsofJoinOperator __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result.operator_id = __pyx_state[17]; __pyx_result.parallelism = __pyx_state[18]
+ *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):
 */
 
 static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_CythonAsofJoinOperator__set_state(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator *__pyx_v___pyx_result, PyObject *__pyx_v___pyx_state) {
@@ -23652,9 +23749,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   /* "(tree fragment)":12
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonAsofJoinOperator__set_state(CythonAsofJoinOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]             # <<<<<<<<<<<<<<
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):
- *         __pyx_result.__dict__.update(__pyx_state[17])
+ *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result.operator_id = __pyx_state[17]; __pyx_result.parallelism = __pyx_state[18]             # <<<<<<<<<<<<<<
+ *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):
+ *         __pyx_result.__dict__.update(__pyx_state[19])
 */
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
@@ -23820,19 +23917,37 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   __Pyx_DECREF(__pyx_v___pyx_result->_time_column);
   __pyx_v___pyx_result->_time_column = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
+  if (unlikely(__pyx_v___pyx_state == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(3, 12, __pyx_L1_error)
+  }
+  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 17);
+  __Pyx_INCREF(__pyx_t_1);
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.operator_id);
+  __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base.operator_id);
+  __pyx_v___pyx_result->__pyx_base.operator_id = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+  if (unlikely(__pyx_v___pyx_state == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(3, 12, __pyx_L1_error)
+  }
+  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 18)); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_v___pyx_result->__pyx_base.parallelism = __pyx_t_3;
 
   /* "(tree fragment)":13
  * cdef __pyx_unpickle_CythonAsofJoinOperator__set_state(CythonAsofJoinOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
- *         __pyx_result.__dict__.update(__pyx_state[17])
+ *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result.operator_id = __pyx_state[17]; __pyx_result.parallelism = __pyx_state[18]
+ *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
+ *         __pyx_result.__dict__.update(__pyx_state[19])
 */
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
     __PYX_ERR(3, 13, __pyx_L1_error)
   }
   __pyx_t_6 = __Pyx_PyTuple_GET_SIZE(__pyx_v___pyx_state); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(3, 13, __pyx_L1_error)
-  __pyx_t_7 = (__pyx_t_6 > 17);
+  __pyx_t_7 = (__pyx_t_6 > 19);
   if (__pyx_t_7) {
   } else {
     __pyx_t_5 = __pyx_t_7;
@@ -23844,9 +23959,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   if (__pyx_t_5) {
 
     /* "(tree fragment)":14
- *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):
- *         __pyx_result.__dict__.update(__pyx_state[17])             # <<<<<<<<<<<<<<
+ *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result.operator_id = __pyx_state[17]; __pyx_result.parallelism = __pyx_state[18]
+ *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):
+ *         __pyx_result.__dict__.update(__pyx_state[19])             # <<<<<<<<<<<<<<
 */
     __pyx_t_9 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v___pyx_result), __pyx_mstate_global->__pyx_n_u_dict); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 14, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
@@ -23858,7 +23973,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     }
     __pyx_t_10 = 0;
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_8, __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 17)};
+      PyObject *__pyx_callargs[2] = {__pyx_t_8, __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 19)};
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_update, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -23869,9 +23984,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
 
     /* "(tree fragment)":13
  * cdef __pyx_unpickle_CythonAsofJoinOperator__set_state(CythonAsofJoinOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
- *         __pyx_result.__dict__.update(__pyx_state[17])
+ *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result.operator_id = __pyx_state[17]; __pyx_result.parallelism = __pyx_state[18]
+ *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
+ *         __pyx_result.__dict__.update(__pyx_state[19])
 */
   }
 
@@ -23879,8 +23994,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
  *         __pyx_unpickle_CythonAsofJoinOperator__set_state(<CythonAsofJoinOperator> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonAsofJoinOperator__set_state(CythonAsofJoinOperator __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result._direction = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._sorted_state = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result.operator_id = __pyx_state[17]; __pyx_result.parallelism = __pyx_state[18]
+ *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):
 */
 
   /* function exit code */
@@ -28132,7 +28247,7 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0x92ef420, state)
+ *         return __pyx_unpickle_CythonHashJoinOperator, (type(self), 0xa031553, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonHashJoinOperator__set_state(self, __pyx_state)
 */
@@ -28165,7 +28280,7 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x8e8eb17, state)
+ *         return __pyx_unpickle_CythonIntervalJoinOperator, (type(self), 0x3fc2c20, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonIntervalJoinOperator__set_state(self, __pyx_state)
 */
@@ -28198,7 +28313,7 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x6f24980, state)
+ *         return __pyx_unpickle_CythonAsofJoinOperator, (type(self), 0x2598a62, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonAsofJoinOperator__set_state(self, __pyx_state)
 */
@@ -28281,8 +28396,8 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
  *         __pyx_unpickle_CythonIntervalJoinOperator__set_state(<CythonIntervalJoinOperator> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonIntervalJoinOperator__set_state(CythonIntervalJoinOperator __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]
- *     if len(__pyx_state) > 19 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]; __pyx_result.operator_id = __pyx_state[19]; __pyx_result.parallelism = __pyx_state[20]
+ *     if len(__pyx_state) > 21 and hasattr(__pyx_result, '__dict__'):
 */
   __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_13__pyx_unpickle_CythonAsofJoinOperator, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[28])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
@@ -28336,11 +28451,11 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
 
 typedef struct {
     const char *s;
-#if 345 <= 65535
+#if 371 <= 65535
     const unsigned short n;
-#elif 345 / 2 < INT_MAX
+#elif 371 / 2 < INT_MAX
     const unsigned int n;
-#elif 345 / 2 < LONG_MAX
+#elif 371 / 2 < LONG_MAX
     const unsigned long n;
 #else
     const Py_ssize_t n;
@@ -28601,13 +28716,13 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(3, __pyx_mstate_global->__pyx_int_110405684, __pyx_mstate_global->__pyx_int_103980883, __pyx_mstate_global->__pyx_int_112237191); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(3, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[0]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[0]);
-  __pyx_mstate_global->__pyx_tuple[1] = PyTuple_Pack(3, __pyx_mstate_global->__pyx_int_154072096, __pyx_mstate_global->__pyx_int_60610554, __pyx_mstate_global->__pyx_int_14928565); if (unlikely(!__pyx_mstate_global->__pyx_tuple[1])) __PYX_ERR(3, 4, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_tuple[1] = PyTuple_Pack(3, __pyx_mstate_global->__pyx_int_167974227, __pyx_mstate_global->__pyx_int_234723524, __pyx_mstate_global->__pyx_int_14751257); if (unlikely(!__pyx_mstate_global->__pyx_tuple[1])) __PYX_ERR(3, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[1]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[1]);
-  __pyx_mstate_global->__pyx_tuple[2] = PyTuple_Pack(3, __pyx_mstate_global->__pyx_int_149482263, __pyx_mstate_global->__pyx_int_91974538, __pyx_mstate_global->__pyx_int_7945208); if (unlikely(!__pyx_mstate_global->__pyx_tuple[2])) __PYX_ERR(3, 4, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_tuple[2] = PyTuple_Pack(3, __pyx_mstate_global->__pyx_int_66858016, __pyx_mstate_global->__pyx_int_240838311, __pyx_mstate_global->__pyx_int_117299833); if (unlikely(!__pyx_mstate_global->__pyx_tuple[2])) __PYX_ERR(3, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[2]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[2]);
-  __pyx_mstate_global->__pyx_tuple[3] = PyTuple_Pack(3, __pyx_mstate_global->__pyx_int_116541824, __pyx_mstate_global->__pyx_int_58220820, __pyx_mstate_global->__pyx_int_138790024); if (unlikely(!__pyx_mstate_global->__pyx_tuple[3])) __PYX_ERR(3, 4, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_tuple[3] = PyTuple_Pack(3, __pyx_mstate_global->__pyx_int_39422562, __pyx_mstate_global->__pyx_int_204224667, __pyx_mstate_global->__pyx_int_112796732); if (unlikely(!__pyx_mstate_global->__pyx_tuple[3])) __PYX_ERR(3, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[3]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[3]);
 
@@ -28663,18 +28778,18 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate->__pyx_int_0 = PyLong_FromLong(0); if (unlikely(!__pyx_mstate->__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_1 = PyLong_FromLong(1); if (unlikely(!__pyx_mstate->__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_4 = PyLong_FromLong(4); if (unlikely(!__pyx_mstate->__pyx_int_4)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_7945208 = PyLong_FromLong(7945208L); if (unlikely(!__pyx_mstate->__pyx_int_7945208)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_14928565 = PyLong_FromLong(14928565L); if (unlikely(!__pyx_mstate->__pyx_int_14928565)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_58220820 = PyLong_FromLong(58220820L); if (unlikely(!__pyx_mstate->__pyx_int_58220820)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_60610554 = PyLong_FromLong(60610554L); if (unlikely(!__pyx_mstate->__pyx_int_60610554)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_91974538 = PyLong_FromLong(91974538L); if (unlikely(!__pyx_mstate->__pyx_int_91974538)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_14751257 = PyLong_FromLong(14751257L); if (unlikely(!__pyx_mstate->__pyx_int_14751257)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_39422562 = PyLong_FromLong(39422562L); if (unlikely(!__pyx_mstate->__pyx_int_39422562)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_66858016 = PyLong_FromLong(66858016L); if (unlikely(!__pyx_mstate->__pyx_int_66858016)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_103980883 = PyLong_FromLong(103980883L); if (unlikely(!__pyx_mstate->__pyx_int_103980883)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_110405684 = PyLong_FromLong(110405684L); if (unlikely(!__pyx_mstate->__pyx_int_110405684)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_112237191 = PyLong_FromLong(112237191L); if (unlikely(!__pyx_mstate->__pyx_int_112237191)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_116541824 = PyLong_FromLong(116541824L); if (unlikely(!__pyx_mstate->__pyx_int_116541824)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_138790024 = PyLong_FromLong(138790024L); if (unlikely(!__pyx_mstate->__pyx_int_138790024)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_149482263 = PyLong_FromLong(149482263L); if (unlikely(!__pyx_mstate->__pyx_int_149482263)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_154072096 = PyLong_FromLong(154072096L); if (unlikely(!__pyx_mstate->__pyx_int_154072096)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_112796732 = PyLong_FromLong(112796732L); if (unlikely(!__pyx_mstate->__pyx_int_112796732)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_117299833 = PyLong_FromLong(117299833L); if (unlikely(!__pyx_mstate->__pyx_int_117299833)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_167974227 = PyLong_FromLong(167974227L); if (unlikely(!__pyx_mstate->__pyx_int_167974227)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_204224667 = PyLong_FromLong(204224667L); if (unlikely(!__pyx_mstate->__pyx_int_204224667)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_234723524 = PyLong_FromLong(234723524L); if (unlikely(!__pyx_mstate->__pyx_int_234723524)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_240838311 = PyLong_FromLong(240838311L); if (unlikely(!__pyx_mstate->__pyx_int_240838311)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -28775,7 +28890,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[13] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_receive_left_shuffled, __pyx_k_A_4_3a_1_m2Q_A_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[13])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 624};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 687};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_state, __pyx_mstate->__pyx_n_u_dict_2, __pyx_mstate->__pyx_n_u_use_setstate};
     __pyx_mstate_global->__pyx_codeobj_tab[14] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_oT_VZZllp_q_C_C_G_G_____q_q_u, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[14])) goto bad;
   }
@@ -28790,7 +28905,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[16] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_4_s_5_5_Q_1_t4q_O4q_3a_Kwat_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[16])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 611};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 674};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_state, __pyx_mstate->__pyx_n_u_dict_2, __pyx_mstate->__pyx_n_u_use_setstate};
     __pyx_mstate_global->__pyx_codeobj_tab[17] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_O47I_M__ccww_N_N_R_R_a_a_e_e, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[17])) goto bad;
   }
@@ -28805,7 +28920,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[19] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_4_s_5_5_Q_1_t4q_O4q_3a_Kwat_1_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[19])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 575};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 638};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_state, __pyx_mstate->__pyx_n_u_dict_2, __pyx_mstate->__pyx_n_u_use_setstate};
     __pyx_mstate_global->__pyx_codeobj_tab[20] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_d_5GtK_aauuy_z_L_L_P_P_____c, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[20])) goto bad;
   }
@@ -28837,17 +28952,17 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 90};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_type, __pyx_mstate->__pyx_n_u_pyx_checksum, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_pyx_PickleError, __pyx_mstate->__pyx_n_u_pyx_result};
-    __pyx_mstate_global->__pyx_codeobj_tab[26] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonHashJoinOpe, __pyx_k_hk_A_1_b_b_d_d_e_7_8_9RR_a_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[26])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[26] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonHashJoinOpe, __pyx_k_hk_A_1_7_8_9RR_a_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[26])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 90};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_type, __pyx_mstate->__pyx_n_u_pyx_checksum, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_pyx_PickleError, __pyx_mstate->__pyx_n_u_pyx_result};
-    __pyx_mstate_global->__pyx_codeobj_tab[27] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonIntervalJoi, __pyx_k_hk_A_1_A_XQa_7_A_ZZhhi_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[27])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[27] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonIntervalJoi, __pyx_k_hk_A_1_X_X_Z_Z_XQa_7_A_ZZhhi_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[27])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 90};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_type, __pyx_mstate->__pyx_n_u_pyx_checksum, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_pyx_PickleError, __pyx_mstate->__pyx_n_u_pyx_result};
-    __pyx_mstate_global->__pyx_codeobj_tab[28] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe, __pyx_k_hk_A_1_W_W_Y_Y_Z_7_8_9RR_a_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[28])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[28] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe, __pyx_k_hk_A_1_q_q_s_s_t_7_8_9RR_a_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[28])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;

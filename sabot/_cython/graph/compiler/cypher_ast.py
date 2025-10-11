@@ -260,6 +260,34 @@ class ReturnClause:
     limit: Optional[int] = None
 
 
+@dataclass
+class WithClause:
+    """
+    WITH clause for multi-stage query pipelines.
+    Adapted from kuzu/src/include/parser/query/return_with_clause/with_clause.h
+
+    Examples:
+        WITH person, count(follower.id) as numFollowers
+
+        WITH person WHERE person.age > 18
+
+        WITH person, avg(person.age) as avgAge
+        ORDER BY avgAge DESC LIMIT 10
+
+    The WITH clause creates an intermediate result that can be:
+    1. Projected (select specific columns/expressions)
+    2. Filtered (WHERE clause after projection)
+    3. Ordered and limited (ORDER BY, SKIP, LIMIT)
+    4. Used as input for the next MATCH or WITH clause
+    """
+    items: List[ProjectionItem] = field(default_factory=list)
+    distinct: bool = False
+    where: Optional[Expression] = None  # WHERE after WITH
+    order_by: List[OrderBy] = field(default_factory=list)
+    skip: Optional[int] = None
+    limit: Optional[int] = None
+
+
 # ============================================================================
 # Top-Level Query
 # ============================================================================
@@ -267,16 +295,30 @@ class ReturnClause:
 @dataclass
 class CypherQuery:
     """
-    Complete Cypher query.
+    Complete Cypher query with optional WITH clauses.
     Adapted from kuzu/src/include/parser/query/regular_query.h
 
-    Example:
+    Simple query example:
         MATCH (a:Person)-[r:KNOWS]->(b:Person)
         WHERE a.age > 18
         RETURN a.name, b.name
         LIMIT 10
+
+    Multi-stage WITH example:
+        MATCH (follower:Person)-[:Follows]->(person:Person)
+        WITH person, count(follower.id) as numFollowers
+        ORDER BY numFollowers DESC LIMIT 1
+        MATCH (person)-[:LivesIn]->(city:City)
+        RETURN person.name, numFollowers, city.city
+
+    The WITH clause creates a pipeline where:
+    - First MATCH generates intermediate results
+    - WITH projects/aggregates/filters those results
+    - Second MATCH joins with the WITH results
+    - RETURN produces final output
     """
     match_clauses: List[MatchClause] = field(default_factory=list)
+    with_clauses: List[WithClause] = field(default_factory=list)  # NEW: multi-stage pipeline
     where_clause: Optional[WhereClause] = None
     return_clause: Optional[ReturnClause] = None
 
@@ -284,6 +326,8 @@ class CypherQuery:
         parts = []
         if self.match_clauses:
             parts.append(f"MATCH ({len(self.match_clauses)} patterns)")
+        if self.with_clauses:
+            parts.append(f"WITH ({len(self.with_clauses)} stages)")
         if self.where_clause:
             parts.append("WHERE")
         if self.return_clause:

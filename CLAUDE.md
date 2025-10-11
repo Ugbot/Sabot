@@ -17,3 +17,4 @@
 - dont use pyarrow. use cyarrow
 - if we are missing functinos in cyarrow we should build them in rather than do without.
 - use inbuilt arrow functions from the vendored arrow lib @vendor/arrow/  if we can to get the perf we want
+- never claim things as done when not finished, no lying

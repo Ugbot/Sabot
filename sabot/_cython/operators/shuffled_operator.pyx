@@ -43,6 +43,10 @@ cdef class ShuffledOperator(BaseOperator):
         """Initialize shuffle operator."""
         super().__init__(*args, **kwargs)
 
+        # Store operator_id and parallelism (expected by tests and metadata)
+        self.operator_id = kwargs.get('operator_id', 'shuffled-op')
+        self.parallelism = kwargs.get('parallelism', 1)
+
         self._partition_keys = kwargs.get('partition_keys', [])
         self._num_partitions = kwargs.get('num_partitions', 4)
         self._stateful = True
@@ -118,7 +122,7 @@ cdef class ShuffledOperator(BaseOperator):
     # ========================================================================
 
 
-    cdef list _partition_batch(
+    cpdef list _partition_batch(
         self,
         ca.RecordBatch batch
     ):

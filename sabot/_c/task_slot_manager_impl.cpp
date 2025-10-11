@@ -77,9 +77,10 @@ std::vector<MorselResult> TaskSlotManager::ExecuteMorsels(
     // Set processor function
     current_processor_ = processor;
 
-    // Enqueue all morsels
-    for (auto& morsel : morsels) {
-        global_queue_->enqueue(std::move(Morsel(morsel)));  // Copy then move
+    // Enqueue all morsels with IDs
+    for (size_t i = 0; i < morsels.size(); i++) {
+        morsels[i].id = static_cast<int>(i);  // Assign original position
+        global_queue_->enqueue(std::move(Morsel(morsels[i])));  // Copy then move
         total_morsels_enqueued_.fetch_add(1, std::memory_order_relaxed);
     }
 
@@ -265,7 +266,8 @@ void TaskSlot::WorkerLoop() {
             auto start_time = std::chrono::high_resolution_clock::now();
 
             MorselResult result;
-            result.morsel_id = morsels_processed_.fetch_add(1, std::memory_order_relaxed);
+            result.morsel_id = morsel.id;  // Use original position for correct reassembly
+            morsels_processed_.fetch_add(1, std::memory_order_relaxed);  // Just count, don't use for ordering
 
             try {
                 if (manager_->current_processor_) {

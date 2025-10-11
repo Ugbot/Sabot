@@ -73,7 +73,10 @@
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow",
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src",
             "/Users/bengamble/Sabot/vendor/duckdb/third_party/concurrentqueue",
-            "/Users/bengamble/Sabot/sabot/_c"
+            "/Users/bengamble/Sabot/sabot/_c",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/storage",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/traversal",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/query"
         ],
         "language": "c++",
         "libraries": [
@@ -3419,7 +3422,7 @@ struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph
 };
 
 
-/* "sabot/_cython/graph/storage/graph_storage.pxd":140
+/* "sabot/_cython/graph/storage/graph_storage.pxd":142
  * 
  * 
  * cdef class PyRDFTripleStore:             # <<<<<<<<<<<<<<
@@ -4821,11 +4824,13 @@ struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyProper
   struct __pyx_obj_7pyarrow_3lib_Int64Array *(*get_neighbors)(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *, int64_t, int __pyx_skip_dispatch);
   struct __pyx_obj_7pyarrow_3lib_Int64Array *(*get_in_neighbors)(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *, int64_t, int __pyx_skip_dispatch);
   struct __pyx_obj_7pyarrow_3lib_RecordBatch *(*match_pattern)(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *, PyObject *, PyObject *, PyObject *, int __pyx_skip_dispatch);
+  void (*add_vertices_from_table)(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *, struct __pyx_obj_7pyarrow_3lib_Table *, int __pyx_skip_dispatch);
+  void (*add_edges_from_table)(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *, struct __pyx_obj_7pyarrow_3lib_Table *, int __pyx_skip_dispatch);
 };
 static struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_vtabptr_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph;
 
 
-/* "sabot/_cython/graph/storage/graph_storage.pyx":542
+/* "sabot/_cython/graph/storage/graph_storage.pyx":594
  * # ============================================================================
  * 
  * cdef class PyRDFTripleStore:             # <<<<<<<<<<<<<<
@@ -5809,6 +5814,8 @@ static void __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyProperty
 static struct __pyx_obj_7pyarrow_3lib_Int64Array *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_get_neighbors(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, int64_t __pyx_v_v, int __pyx_skip_dispatch); /* proto*/
 static struct __pyx_obj_7pyarrow_3lib_Int64Array *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_get_in_neighbors(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, int64_t __pyx_v_v, int __pyx_skip_dispatch); /* proto*/
 static struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_match_pattern(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, PyObject *__pyx_v_src_label, PyObject *__pyx_v_edge_type, PyObject *__pyx_v_dst_label, int __pyx_skip_dispatch); /* proto*/
+static void __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_add_vertices_from_table(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_Table *__pyx_v_new_vertices, int __pyx_skip_dispatch); /* proto*/
+static void __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_add_edges_from_table(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_Table *__pyx_v_new_edges, int __pyx_skip_dispatch); /* proto*/
 static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_num_triples(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_num_terms(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_triples(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
@@ -6069,6 +6076,7 @@ static const char __pyx_k_edge_data[] = "edge_data";
 static const char __pyx_k_edge_type[] = "edge_type";
 static const char __pyx_k_get_types[] = "get_types";
 static const char __pyx_k_isenabled[] = "isenabled";
+static const char __pyx_k_new_edges[] = "new_edges";
 static const char __pyx_k_not_found[] = " not found";
 static const char __pyx_k_num_edges[] = "num_edges";
 static const char __pyx_k_num_terms[] = "num_terms";
@@ -6098,11 +6106,13 @@ static const char __pyx_k_num_triples[] = "num_triples";
 static const char __pyx_k_A_4vS_G_Qd_q[] = "\200A\340\010\013\2104\210v\220S\230\001\330\014\020\220\010\230\004\230G\240:\250Q\250d\260-\270q";
 static const char __pyx_k_initializing[] = "_initializing";
 static const char __pyx_k_is_coroutine[] = "_is_coroutine";
+static const char __pyx_k_new_vertices[] = "new_vertices";
 static const char __pyx_k_num_vertices[] = "num_vertices";
 static const char __pyx_k_sort_indices[] = "sort_indices";
 static const char __pyx_k_stringsource[] = "<stringsource>";
 static const char __pyx_k_PyVertexTable[] = "PyVertexTable";
 static const char __pyx_k_class_getitem[] = "__class_getitem__";
+static const char __pyx_k_concat_tables[] = "concat_tables";
 static const char __pyx_k_get_edge_data[] = "get_edge_data";
 static const char __pyx_k_get_neighbors[] = "get_neighbors";
 static const char __pyx_k_match_pattern[] = "match_pattern";
@@ -6131,16 +6141,19 @@ static const char __pyx_k_PyVertexTable_table[] = "PyVertexTable.table";
 static const char __pyx_k_get_neighbors_batch[] = "get_neighbors_batch";
 static const char __pyx_k_PyVertexTable_schema[] = "PyVertexTable.schema";
 static const char __pyx_k_PyVertexTable_select[] = "PyVertexTable.select";
+static const char __pyx_k_add_edges_from_table[] = "add_edges_from_table";
 static const char __pyx_k_PyEdgeTable_build_csc[] = "PyEdgeTable.build_csc";
 static const char __pyx_k_PyEdgeTable_build_csr[] = "PyEdgeTable.build_csr";
 static const char __pyx_k_PyEdgeTable_get_types[] = "PyEdgeTable.get_types";
 static const char __pyx_k_PyEdgeTable_num_edges[] = "PyEdgeTable.num_edges";
 static const char __pyx_k_PyPropertyGraph_edges[] = "PyPropertyGraph.edges";
 static const char __pyx_k_PyVertexTable_get_ids[] = "PyVertexTable.get_ids";
+static const char __pyx_k_A_2_1AT_d_Jk_K_q_HA_HA[] = "\200A\360\032\000\t\024\2202\220^\2401\240A\240T\250\027\260\006\260d\270!\330\010\014\210J\220k\240\021\240!\360\006\000\t\r\210K\220{\240/\260\021\330\014\020\220\n\230!\330\014\020\220\007\220q\360\010\000\t\r\210H\220A\330\010\014\210H\220A";
 static const char __pyx_k_No_edge_data_available[] = "No edge data available";
 static const char __pyx_k_PyEdgeTable_get_column[] = "PyEdgeTable.get_column";
 static const char __pyx_k_A_T_2Qa_4xz_1Bb_t9F_7_b[] = "\200A\360\016\000\t\036\230T\240\030\250\032\2602\260Q\260a\330\010\033\2304\230x\240z\260\022\2601\260B\260b\270\001\330\010\017\210t\2209\230F\240!\2407\250$\250b\260\001";
 static const char __pyx_k_PyEdgeTable_get_sources[] = "PyEdgeTable.get_sources";
+static const char __pyx_k_add_vertices_from_table[] = "add_vertices_from_table";
 static const char __pyx_k_PyCSRAdjacency_num_edges[] = "PyCSRAdjacency.num_edges";
 static const char __pyx_k_PyPropertyGraph_vertices[] = "PyPropertyGraph.vertices";
 static const char __pyx_k_PyRDFTripleStore_triples[] = "PyRDFTripleStore.triples";
@@ -6151,6 +6164,7 @@ static const char __pyx_k_PyCSRAdjacency_get_degree[] = "PyCSRAdjacency.get_degr
 static const char __pyx_k_PyPropertyGraph_build_csc[] = "PyPropertyGraph.build_csc";
 static const char __pyx_k_PyPropertyGraph_build_csr[] = "PyPropertyGraph.build_csr";
 static const char __pyx_k_PyPropertyGraph_num_edges[] = "PyPropertyGraph.num_edges";
+static const char __pyx_k_A_2_1AT_6_Q_M_aq_K_q_HA_HA[] = "\200A\360\032\000\t\024\2202\220^\2401\240A\240T\250\032\2606\270\024\270Q\330\010\014\210M\230\035\240a\240q\360\006\000\t\r\210K\220{\240/\260\021\330\014\020\220\n\230!\330\014\020\220\007\220q\360\010\000\t\r\210H\220A\330\010\014\210H\220A";
 static const char __pyx_k_PropertyGraph_num_vertices[] = "PropertyGraph(num_vertices=";
 static const char __pyx_k_PyEdgeTable_filter_by_type[] = "PyEdgeTable.filter_by_type";
 static const char __pyx_k_PyRDFTripleStore_num_terms[] = "PyRDFTripleStore.num_terms";
@@ -6189,6 +6203,8 @@ static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython
 static const char __pyx_k_PyCSRAdjacency___setstate_cython[] = "PyCSRAdjacency.__setstate_cython__";
 static const char __pyx_k_PyCSRAdjacency_get_neighbors_bat[] = "PyCSRAdjacency.get_neighbors_batch";
 static const char __pyx_k_PyPropertyGraph___setstate_cytho[] = "PyPropertyGraph.__setstate_cython__";
+static const char __pyx_k_PyPropertyGraph_add_edges_from_t[] = "PyPropertyGraph.add_edges_from_table";
+static const char __pyx_k_PyPropertyGraph_add_vertices_fro[] = "PyPropertyGraph.add_vertices_from_table";
 static const char __pyx_k_PyPropertyGraph_get_in_neighbors[] = "PyPropertyGraph.get_in_neighbors";
 static const char __pyx_k_PyRDFTripleStore___reduce_cython[] = "PyRDFTripleStore.__reduce_cython__";
 static const char __pyx_k_PyRDFTripleStore___setstate_cyth[] = "PyRDFTripleStore.__setstate_cython__";
@@ -6250,9 +6266,11 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPr
 static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_18get_neighbors(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, int64_t __pyx_v_v); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_20get_in_neighbors(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, int64_t __pyx_v_v); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_22match_pattern(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, PyObject *__pyx_v_src_label, PyObject *__pyx_v_edge_type, PyObject *__pyx_v_dst_label); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_24__repr__(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_26__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_28__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_24add_vertices_from_table(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_Table *__pyx_v_new_vertices); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_26add_edges_from_table(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_Table *__pyx_v_new_edges); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_28__repr__(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_30__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_32__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore___cinit__(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_Table *__pyx_v_triples, struct __pyx_obj_7pyarrow_3lib_Table *__pyx_v_term_dict); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_2num_triples(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_4num_terms(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *__pyx_v_self); /* proto */
@@ -6427,8 +6445,8 @@ typedef struct {
   PyTypeObject *__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
   PyObject *__pyx_tuple[2];
-  PyObject *__pyx_codeobj_tab[53];
-  PyObject *__pyx_string_tab[187];
+  PyObject *__pyx_codeobj_tab[55];
+  PyObject *__pyx_string_tab[194];
   PyObject *__pyx_int_0;
   PyObject *__pyx_int_1;
 /* #### Code section: module_state_contents ### */
@@ -6500,161 +6518,168 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_PyPropertyGraph __pyx_string_tab[29]
 #define __pyx_n_u_PyPropertyGraph___reduce_cython __pyx_string_tab[30]
 #define __pyx_n_u_PyPropertyGraph___setstate_cytho __pyx_string_tab[31]
-#define __pyx_n_u_PyPropertyGraph_build_csc __pyx_string_tab[32]
-#define __pyx_n_u_PyPropertyGraph_build_csr __pyx_string_tab[33]
-#define __pyx_n_u_PyPropertyGraph_csc __pyx_string_tab[34]
-#define __pyx_n_u_PyPropertyGraph_csr __pyx_string_tab[35]
-#define __pyx_n_u_PyPropertyGraph_edges __pyx_string_tab[36]
-#define __pyx_n_u_PyPropertyGraph_get_in_neighbors __pyx_string_tab[37]
-#define __pyx_n_u_PyPropertyGraph_get_neighbors __pyx_string_tab[38]
-#define __pyx_n_u_PyPropertyGraph_match_pattern __pyx_string_tab[39]
-#define __pyx_n_u_PyPropertyGraph_num_edges __pyx_string_tab[40]
-#define __pyx_n_u_PyPropertyGraph_num_vertices __pyx_string_tab[41]
-#define __pyx_n_u_PyPropertyGraph_vertices __pyx_string_tab[42]
-#define __pyx_n_u_PyRDFTripleStore __pyx_string_tab[43]
-#define __pyx_n_u_PyRDFTripleStore___reduce_cython __pyx_string_tab[44]
-#define __pyx_n_u_PyRDFTripleStore___setstate_cyth __pyx_string_tab[45]
-#define __pyx_n_u_PyRDFTripleStore_filter_triples __pyx_string_tab[46]
-#define __pyx_n_u_PyRDFTripleStore_lookup_term __pyx_string_tab[47]
-#define __pyx_n_u_PyRDFTripleStore_lookup_term_id __pyx_string_tab[48]
-#define __pyx_n_u_PyRDFTripleStore_num_terms __pyx_string_tab[49]
-#define __pyx_n_u_PyRDFTripleStore_num_triples __pyx_string_tab[50]
-#define __pyx_n_u_PyRDFTripleStore_term_dict __pyx_string_tab[51]
-#define __pyx_n_u_PyRDFTripleStore_triples __pyx_string_tab[52]
-#define __pyx_n_u_PyVertexTable __pyx_string_tab[53]
-#define __pyx_n_u_PyVertexTable___reduce_cython __pyx_string_tab[54]
-#define __pyx_n_u_PyVertexTable___setstate_cython __pyx_string_tab[55]
-#define __pyx_n_u_PyVertexTable_filter_by_label __pyx_string_tab[56]
-#define __pyx_n_u_PyVertexTable_get_column __pyx_string_tab[57]
-#define __pyx_n_u_PyVertexTable_get_ids __pyx_string_tab[58]
-#define __pyx_n_u_PyVertexTable_get_labels __pyx_string_tab[59]
-#define __pyx_n_u_PyVertexTable_num_vertices __pyx_string_tab[60]
-#define __pyx_n_u_PyVertexTable_schema __pyx_string_tab[61]
-#define __pyx_n_u_PyVertexTable_select __pyx_string_tab[62]
-#define __pyx_n_u_PyVertexTable_table __pyx_string_tab[63]
-#define __pyx_kp_u_RDFTripleStore_num_triples __pyx_string_tab[64]
-#define __pyx_n_u_RecordBatch __pyx_string_tab[65]
-#define __pyx_kp_u_Term_ID __pyx_string_tab[66]
-#define __pyx_n_u_TypeError __pyx_string_tab[67]
-#define __pyx_n_u_ValueError __pyx_string_tab[68]
-#define __pyx_kp_u_VertexTable_num_vertices __pyx_string_tab[69]
-#define __pyx_kp_u__2 __pyx_string_tab[70]
-#define __pyx_kp_u_add_note __pyx_string_tab[71]
-#define __pyx_n_u_and __pyx_string_tab[72]
-#define __pyx_n_u_array __pyx_string_tab[73]
-#define __pyx_n_u_as_py __pyx_string_tab[74]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[75]
-#define __pyx_n_u_build_csc __pyx_string_tab[76]
-#define __pyx_n_u_build_csr __pyx_string_tab[77]
-#define __pyx_n_u_cast __pyx_string_tab[78]
-#define __pyx_n_u_class_getitem __pyx_string_tab[79]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[80]
-#define __pyx_n_u_column __pyx_string_tab[81]
-#define __pyx_n_u_columns __pyx_string_tab[82]
-#define __pyx_n_u_combine_chunks __pyx_string_tab[83]
-#define __pyx_n_u_compute __pyx_string_tab[84]
-#define __pyx_n_u_csc __pyx_string_tab[85]
-#define __pyx_n_u_csr __pyx_string_tab[86]
-#define __pyx_n_u_dictionary __pyx_string_tab[87]
-#define __pyx_kp_u_disable __pyx_string_tab[88]
-#define __pyx_n_u_dst __pyx_string_tab[89]
-#define __pyx_n_u_dst_id __pyx_string_tab[90]
-#define __pyx_n_u_dst_label __pyx_string_tab[91]
-#define __pyx_n_u_edge_data __pyx_string_tab[92]
-#define __pyx_n_u_edge_idx __pyx_string_tab[93]
-#define __pyx_n_u_edge_type __pyx_string_tab[94]
-#define __pyx_n_u_edges __pyx_string_tab[95]
-#define __pyx_kp_u_enable __pyx_string_tab[96]
-#define __pyx_n_u_equal __pyx_string_tab[97]
-#define __pyx_n_u_filter __pyx_string_tab[98]
-#define __pyx_n_u_filter_by_label __pyx_string_tab[99]
-#define __pyx_n_u_filter_by_type __pyx_string_tab[100]
-#define __pyx_n_u_filter_triples __pyx_string_tab[101]
-#define __pyx_n_u_from_arrays __pyx_string_tab[102]
-#define __pyx_n_u_func __pyx_string_tab[103]
-#define __pyx_kp_u_gc __pyx_string_tab[104]
-#define __pyx_n_u_get_column __pyx_string_tab[105]
-#define __pyx_n_u_get_degree __pyx_string_tab[106]
-#define __pyx_n_u_get_destinations __pyx_string_tab[107]
-#define __pyx_n_u_get_edge_data __pyx_string_tab[108]
-#define __pyx_n_u_get_ids __pyx_string_tab[109]
-#define __pyx_n_u_get_in_neighbors __pyx_string_tab[110]
-#define __pyx_n_u_get_labels __pyx_string_tab[111]
-#define __pyx_n_u_get_neighbors __pyx_string_tab[112]
-#define __pyx_n_u_get_neighbors_batch __pyx_string_tab[113]
-#define __pyx_n_u_get_sources __pyx_string_tab[114]
-#define __pyx_n_u_get_types __pyx_string_tab[115]
-#define __pyx_n_u_getstate __pyx_string_tab[116]
-#define __pyx_n_u_id __pyx_string_tab[117]
-#define __pyx_n_u_indices __pyx_string_tab[118]
-#define __pyx_n_u_indptr __pyx_string_tab[119]
-#define __pyx_n_u_initializing __pyx_string_tab[120]
-#define __pyx_n_u_int64 __pyx_string_tab[121]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[122]
-#define __pyx_kp_u_isenabled __pyx_string_tab[123]
-#define __pyx_n_u_label __pyx_string_tab[124]
-#define __pyx_n_u_length __pyx_string_tab[125]
-#define __pyx_n_u_lex __pyx_string_tab[126]
-#define __pyx_n_u_lookup_term __pyx_string_tab[127]
-#define __pyx_n_u_lookup_term_id __pyx_string_tab[128]
-#define __pyx_n_u_main __pyx_string_tab[129]
-#define __pyx_n_u_match_pattern __pyx_string_tab[130]
-#define __pyx_n_u_module __pyx_string_tab[131]
-#define __pyx_n_u_name __pyx_string_tab[132]
-#define __pyx_n_u_name_2 __pyx_string_tab[133]
-#define __pyx_n_u_names __pyx_string_tab[134]
-#define __pyx_n_u_neighbor_id __pyx_string_tab[135]
-#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[136]
-#define __pyx_kp_u_not_found __pyx_string_tab[137]
-#define __pyx_n_u_num_edges __pyx_string_tab[138]
-#define __pyx_kp_u_num_edges_2 __pyx_string_tab[139]
-#define __pyx_n_u_num_terms __pyx_string_tab[140]
-#define __pyx_kp_u_num_terms_2 __pyx_string_tab[141]
-#define __pyx_n_u_num_triples __pyx_string_tab[142]
-#define __pyx_n_u_num_vertices __pyx_string_tab[143]
-#define __pyx_n_u_o __pyx_string_tab[144]
-#define __pyx_n_u_p __pyx_string_tab[145]
-#define __pyx_n_u_pa __pyx_string_tab[146]
-#define __pyx_n_u_pop __pyx_string_tab[147]
-#define __pyx_n_u_pyarrow __pyx_string_tab[148]
-#define __pyx_n_u_pyarrow_compute __pyx_string_tab[149]
-#define __pyx_n_u_pyx_state __pyx_string_tab[150]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[151]
-#define __pyx_n_u_qualname __pyx_string_tab[152]
-#define __pyx_n_u_range __pyx_string_tab[153]
-#define __pyx_n_u_reduce __pyx_string_tab[154]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[155]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[156]
-#define __pyx_n_u_s __pyx_string_tab[157]
-#define __pyx_n_u_sabot__cython_graph_storage_grap __pyx_string_tab[158]
-#define __pyx_kp_u_sabot__cython_graph_storage_grap_2 __pyx_string_tab[159]
-#define __pyx_n_u_scalar __pyx_string_tab[160]
-#define __pyx_n_u_schema __pyx_string_tab[161]
-#define __pyx_kp_u_schema_2 __pyx_string_tab[162]
-#define __pyx_n_u_select __pyx_string_tab[163]
-#define __pyx_n_u_self __pyx_string_tab[164]
-#define __pyx_n_u_set_name __pyx_string_tab[165]
-#define __pyx_n_u_setstate __pyx_string_tab[166]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[167]
-#define __pyx_n_u_slice __pyx_string_tab[168]
-#define __pyx_n_u_sort_indices __pyx_string_tab[169]
-#define __pyx_n_u_spec __pyx_string_tab[170]
-#define __pyx_n_u_src __pyx_string_tab[171]
-#define __pyx_n_u_src_id __pyx_string_tab[172]
-#define __pyx_n_u_src_label __pyx_string_tab[173]
-#define __pyx_n_u_string __pyx_string_tab[174]
-#define __pyx_kp_u_stringsource __pyx_string_tab[175]
-#define __pyx_n_u_table __pyx_string_tab[176]
-#define __pyx_n_u_take __pyx_string_tab[177]
-#define __pyx_n_u_term_dict __pyx_string_tab[178]
-#define __pyx_n_u_term_id __pyx_string_tab[179]
-#define __pyx_n_u_test __pyx_string_tab[180]
-#define __pyx_n_u_to_pylist __pyx_string_tab[181]
-#define __pyx_n_u_triples __pyx_string_tab[182]
-#define __pyx_n_u_type __pyx_string_tab[183]
-#define __pyx_n_u_v __pyx_string_tab[184]
-#define __pyx_n_u_vertex_id __pyx_string_tab[185]
-#define __pyx_n_u_vertices __pyx_string_tab[186]
+#define __pyx_n_u_PyPropertyGraph_add_edges_from_t __pyx_string_tab[32]
+#define __pyx_n_u_PyPropertyGraph_add_vertices_fro __pyx_string_tab[33]
+#define __pyx_n_u_PyPropertyGraph_build_csc __pyx_string_tab[34]
+#define __pyx_n_u_PyPropertyGraph_build_csr __pyx_string_tab[35]
+#define __pyx_n_u_PyPropertyGraph_csc __pyx_string_tab[36]
+#define __pyx_n_u_PyPropertyGraph_csr __pyx_string_tab[37]
+#define __pyx_n_u_PyPropertyGraph_edges __pyx_string_tab[38]
+#define __pyx_n_u_PyPropertyGraph_get_in_neighbors __pyx_string_tab[39]
+#define __pyx_n_u_PyPropertyGraph_get_neighbors __pyx_string_tab[40]
+#define __pyx_n_u_PyPropertyGraph_match_pattern __pyx_string_tab[41]
+#define __pyx_n_u_PyPropertyGraph_num_edges __pyx_string_tab[42]
+#define __pyx_n_u_PyPropertyGraph_num_vertices __pyx_string_tab[43]
+#define __pyx_n_u_PyPropertyGraph_vertices __pyx_string_tab[44]
+#define __pyx_n_u_PyRDFTripleStore __pyx_string_tab[45]
+#define __pyx_n_u_PyRDFTripleStore___reduce_cython __pyx_string_tab[46]
+#define __pyx_n_u_PyRDFTripleStore___setstate_cyth __pyx_string_tab[47]
+#define __pyx_n_u_PyRDFTripleStore_filter_triples __pyx_string_tab[48]
+#define __pyx_n_u_PyRDFTripleStore_lookup_term __pyx_string_tab[49]
+#define __pyx_n_u_PyRDFTripleStore_lookup_term_id __pyx_string_tab[50]
+#define __pyx_n_u_PyRDFTripleStore_num_terms __pyx_string_tab[51]
+#define __pyx_n_u_PyRDFTripleStore_num_triples __pyx_string_tab[52]
+#define __pyx_n_u_PyRDFTripleStore_term_dict __pyx_string_tab[53]
+#define __pyx_n_u_PyRDFTripleStore_triples __pyx_string_tab[54]
+#define __pyx_n_u_PyVertexTable __pyx_string_tab[55]
+#define __pyx_n_u_PyVertexTable___reduce_cython __pyx_string_tab[56]
+#define __pyx_n_u_PyVertexTable___setstate_cython __pyx_string_tab[57]
+#define __pyx_n_u_PyVertexTable_filter_by_label __pyx_string_tab[58]
+#define __pyx_n_u_PyVertexTable_get_column __pyx_string_tab[59]
+#define __pyx_n_u_PyVertexTable_get_ids __pyx_string_tab[60]
+#define __pyx_n_u_PyVertexTable_get_labels __pyx_string_tab[61]
+#define __pyx_n_u_PyVertexTable_num_vertices __pyx_string_tab[62]
+#define __pyx_n_u_PyVertexTable_schema __pyx_string_tab[63]
+#define __pyx_n_u_PyVertexTable_select __pyx_string_tab[64]
+#define __pyx_n_u_PyVertexTable_table __pyx_string_tab[65]
+#define __pyx_kp_u_RDFTripleStore_num_triples __pyx_string_tab[66]
+#define __pyx_n_u_RecordBatch __pyx_string_tab[67]
+#define __pyx_kp_u_Term_ID __pyx_string_tab[68]
+#define __pyx_n_u_TypeError __pyx_string_tab[69]
+#define __pyx_n_u_ValueError __pyx_string_tab[70]
+#define __pyx_kp_u_VertexTable_num_vertices __pyx_string_tab[71]
+#define __pyx_kp_u__2 __pyx_string_tab[72]
+#define __pyx_n_u_add_edges_from_table __pyx_string_tab[73]
+#define __pyx_kp_u_add_note __pyx_string_tab[74]
+#define __pyx_n_u_add_vertices_from_table __pyx_string_tab[75]
+#define __pyx_n_u_and __pyx_string_tab[76]
+#define __pyx_n_u_array __pyx_string_tab[77]
+#define __pyx_n_u_as_py __pyx_string_tab[78]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[79]
+#define __pyx_n_u_build_csc __pyx_string_tab[80]
+#define __pyx_n_u_build_csr __pyx_string_tab[81]
+#define __pyx_n_u_cast __pyx_string_tab[82]
+#define __pyx_n_u_class_getitem __pyx_string_tab[83]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[84]
+#define __pyx_n_u_column __pyx_string_tab[85]
+#define __pyx_n_u_columns __pyx_string_tab[86]
+#define __pyx_n_u_combine_chunks __pyx_string_tab[87]
+#define __pyx_n_u_compute __pyx_string_tab[88]
+#define __pyx_n_u_concat_tables __pyx_string_tab[89]
+#define __pyx_n_u_csc __pyx_string_tab[90]
+#define __pyx_n_u_csr __pyx_string_tab[91]
+#define __pyx_n_u_dictionary __pyx_string_tab[92]
+#define __pyx_kp_u_disable __pyx_string_tab[93]
+#define __pyx_n_u_dst __pyx_string_tab[94]
+#define __pyx_n_u_dst_id __pyx_string_tab[95]
+#define __pyx_n_u_dst_label __pyx_string_tab[96]
+#define __pyx_n_u_edge_data __pyx_string_tab[97]
+#define __pyx_n_u_edge_idx __pyx_string_tab[98]
+#define __pyx_n_u_edge_type __pyx_string_tab[99]
+#define __pyx_n_u_edges __pyx_string_tab[100]
+#define __pyx_kp_u_enable __pyx_string_tab[101]
+#define __pyx_n_u_equal __pyx_string_tab[102]
+#define __pyx_n_u_filter __pyx_string_tab[103]
+#define __pyx_n_u_filter_by_label __pyx_string_tab[104]
+#define __pyx_n_u_filter_by_type __pyx_string_tab[105]
+#define __pyx_n_u_filter_triples __pyx_string_tab[106]
+#define __pyx_n_u_from_arrays __pyx_string_tab[107]
+#define __pyx_n_u_func __pyx_string_tab[108]
+#define __pyx_kp_u_gc __pyx_string_tab[109]
+#define __pyx_n_u_get_column __pyx_string_tab[110]
+#define __pyx_n_u_get_degree __pyx_string_tab[111]
+#define __pyx_n_u_get_destinations __pyx_string_tab[112]
+#define __pyx_n_u_get_edge_data __pyx_string_tab[113]
+#define __pyx_n_u_get_ids __pyx_string_tab[114]
+#define __pyx_n_u_get_in_neighbors __pyx_string_tab[115]
+#define __pyx_n_u_get_labels __pyx_string_tab[116]
+#define __pyx_n_u_get_neighbors __pyx_string_tab[117]
+#define __pyx_n_u_get_neighbors_batch __pyx_string_tab[118]
+#define __pyx_n_u_get_sources __pyx_string_tab[119]
+#define __pyx_n_u_get_types __pyx_string_tab[120]
+#define __pyx_n_u_getstate __pyx_string_tab[121]
+#define __pyx_n_u_id __pyx_string_tab[122]
+#define __pyx_n_u_indices __pyx_string_tab[123]
+#define __pyx_n_u_indptr __pyx_string_tab[124]
+#define __pyx_n_u_initializing __pyx_string_tab[125]
+#define __pyx_n_u_int64 __pyx_string_tab[126]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[127]
+#define __pyx_kp_u_isenabled __pyx_string_tab[128]
+#define __pyx_n_u_label __pyx_string_tab[129]
+#define __pyx_n_u_length __pyx_string_tab[130]
+#define __pyx_n_u_lex __pyx_string_tab[131]
+#define __pyx_n_u_lookup_term __pyx_string_tab[132]
+#define __pyx_n_u_lookup_term_id __pyx_string_tab[133]
+#define __pyx_n_u_main __pyx_string_tab[134]
+#define __pyx_n_u_match_pattern __pyx_string_tab[135]
+#define __pyx_n_u_module __pyx_string_tab[136]
+#define __pyx_n_u_name __pyx_string_tab[137]
+#define __pyx_n_u_name_2 __pyx_string_tab[138]
+#define __pyx_n_u_names __pyx_string_tab[139]
+#define __pyx_n_u_neighbor_id __pyx_string_tab[140]
+#define __pyx_n_u_new_edges __pyx_string_tab[141]
+#define __pyx_n_u_new_vertices __pyx_string_tab[142]
+#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[143]
+#define __pyx_kp_u_not_found __pyx_string_tab[144]
+#define __pyx_n_u_num_edges __pyx_string_tab[145]
+#define __pyx_kp_u_num_edges_2 __pyx_string_tab[146]
+#define __pyx_n_u_num_terms __pyx_string_tab[147]
+#define __pyx_kp_u_num_terms_2 __pyx_string_tab[148]
+#define __pyx_n_u_num_triples __pyx_string_tab[149]
+#define __pyx_n_u_num_vertices __pyx_string_tab[150]
+#define __pyx_n_u_o __pyx_string_tab[151]
+#define __pyx_n_u_p __pyx_string_tab[152]
+#define __pyx_n_u_pa __pyx_string_tab[153]
+#define __pyx_n_u_pop __pyx_string_tab[154]
+#define __pyx_n_u_pyarrow __pyx_string_tab[155]
+#define __pyx_n_u_pyarrow_compute __pyx_string_tab[156]
+#define __pyx_n_u_pyx_state __pyx_string_tab[157]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[158]
+#define __pyx_n_u_qualname __pyx_string_tab[159]
+#define __pyx_n_u_range __pyx_string_tab[160]
+#define __pyx_n_u_reduce __pyx_string_tab[161]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[162]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[163]
+#define __pyx_n_u_s __pyx_string_tab[164]
+#define __pyx_n_u_sabot__cython_graph_storage_grap __pyx_string_tab[165]
+#define __pyx_kp_u_sabot__cython_graph_storage_grap_2 __pyx_string_tab[166]
+#define __pyx_n_u_scalar __pyx_string_tab[167]
+#define __pyx_n_u_schema __pyx_string_tab[168]
+#define __pyx_kp_u_schema_2 __pyx_string_tab[169]
+#define __pyx_n_u_select __pyx_string_tab[170]
+#define __pyx_n_u_self __pyx_string_tab[171]
+#define __pyx_n_u_set_name __pyx_string_tab[172]
+#define __pyx_n_u_setstate __pyx_string_tab[173]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[174]
+#define __pyx_n_u_slice __pyx_string_tab[175]
+#define __pyx_n_u_sort_indices __pyx_string_tab[176]
+#define __pyx_n_u_spec __pyx_string_tab[177]
+#define __pyx_n_u_src __pyx_string_tab[178]
+#define __pyx_n_u_src_id __pyx_string_tab[179]
+#define __pyx_n_u_src_label __pyx_string_tab[180]
+#define __pyx_n_u_string __pyx_string_tab[181]
+#define __pyx_kp_u_stringsource __pyx_string_tab[182]
+#define __pyx_n_u_table __pyx_string_tab[183]
+#define __pyx_n_u_take __pyx_string_tab[184]
+#define __pyx_n_u_term_dict __pyx_string_tab[185]
+#define __pyx_n_u_term_id __pyx_string_tab[186]
+#define __pyx_n_u_test __pyx_string_tab[187]
+#define __pyx_n_u_to_pylist __pyx_string_tab[188]
+#define __pyx_n_u_triples __pyx_string_tab[189]
+#define __pyx_n_u_type __pyx_string_tab[190]
+#define __pyx_n_u_v __pyx_string_tab[191]
+#define __pyx_n_u_vertex_id __pyx_string_tab[192]
+#define __pyx_n_u_vertices __pyx_string_tab[193]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -6794,8 +6819,8 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore);
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore);
   for (int i=0; i<2; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<53; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<187; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<55; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<194; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   Py_CLEAR(clear_module_state->__pyx_int_0);
   Py_CLEAR(clear_module_state->__pyx_int_1);
   return 0;
@@ -6937,8 +6962,8 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore);
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore);
   for (int i=0; i<2; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<53; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<187; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<55; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<194; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_1);
   return 0;
@@ -21863,27 +21888,719 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPr
 /* "sabot/_cython/graph/storage/graph_storage.pyx":534
  *         )
  * 
+ *     cpdef void add_vertices_from_table(self, ca.Table new_vertices):             # <<<<<<<<<<<<<<
+ *         """
+ *         Add vertices from table (mutable operation for streaming).
+*/
+
+static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_25add_vertices_from_table(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static void __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_add_vertices_from_table(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_Table *__pyx_v_new_vertices, int __pyx_skip_dispatch) {
+  PyObject *__pyx_v_combined = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
+  std::shared_ptr<sabot::graph::PropertyGraph>  __pyx_t_7;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("add_vertices_from_table", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (
+  #if !CYTHON_USE_TYPE_SLOTS
+  unlikely(Py_TYPE(((PyObject *)__pyx_v_self)) != __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph &&
+  __Pyx_PyType_HasFeature(Py_TYPE(((PyObject *)__pyx_v_self)), Py_TPFLAGS_HAVE_GC))
+  #else
+  unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0 || __Pyx_PyType_HasFeature(Py_TYPE(((PyObject *)__pyx_v_self)), (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))
+  #endif
+  ) {
+    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
+      PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      #endif
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_add_vertices_from_table); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 534, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_25add_vertices_from_table)) {
+        __pyx_t_3 = NULL;
+        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_4 = __pyx_t_1; 
+        __pyx_t_5 = 1;
+        #if CYTHON_UNPACK_METHODS
+        if (unlikely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+          assert(__pyx_t_3);
+          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_3);
+          __Pyx_INCREF(__pyx__function);
+          __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
+          __pyx_t_5 = 0;
+        }
+        #endif
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_3, ((PyObject *)__pyx_v_new_vertices)};
+          __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 534, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_2);
+        }
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        goto __pyx_L0;
+      }
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
+      if (unlikely(__pyx_typedict_guard != __pyx_tp_dict_version)) {
+        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+      }
+      #endif
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    }
+    #endif
+  }
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":547
+ *         """
+ *         # Concatenate new vertices to existing
+ *         combined = pa.concat_tables([self._vertices.table(), new_vertices])             # <<<<<<<<<<<<<<
+ *         self._vertices = PyVertexTable(combined)
+ * 
+*/
+  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 547, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_concat_tables); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 547, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = ((PyObject *)((struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyVertexTable *)__pyx_v_self->_vertices->__pyx_vtab)->table(__pyx_v_self->_vertices, 0)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 547, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_6 = PyList_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 547, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_GIVEREF(__pyx_t_4);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_6, 0, __pyx_t_4) != (0)) __PYX_ERR(0, 547, __pyx_L1_error);
+  __Pyx_INCREF((PyObject *)__pyx_v_new_vertices);
+  __Pyx_GIVEREF((PyObject *)__pyx_v_new_vertices);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_6, 1, ((PyObject *)__pyx_v_new_vertices)) != (0)) __PYX_ERR(0, 547, __pyx_L1_error);
+  __pyx_t_4 = 0;
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    assert(__pyx_t_2);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
+    __Pyx_INCREF(__pyx_t_2);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_t_6};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 547, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __pyx_v_combined = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":548
+ *         # Concatenate new vertices to existing
+ *         combined = pa.concat_tables([self._vertices.table(), new_vertices])
+ *         self._vertices = PyVertexTable(combined)             # <<<<<<<<<<<<<<
+ * 
+ *         # Recreate C++ graph with updated tables
+*/
+  __pyx_t_3 = NULL;
+  __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyVertexTable);
+  __pyx_t_6 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyVertexTable); 
+  __pyx_t_5 = 1;
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_combined};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_6, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 548, __pyx_L1_error)
+    __Pyx_GOTREF((PyObject *)__pyx_t_1);
+  }
+  __Pyx_GIVEREF((PyObject *)__pyx_t_1);
+  __Pyx_GOTREF((PyObject *)__pyx_v_self->_vertices);
+  __Pyx_DECREF((PyObject *)__pyx_v_self->_vertices);
+  __pyx_v_self->_vertices = ((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyVertexTable *)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":551
+ * 
+ *         # Recreate C++ graph with updated tables
+ *         self.c_graph = make_shared[PropertyGraph](             # <<<<<<<<<<<<<<
+ *             self._vertices.c_table,
+ *             self._edges.c_table
+*/
+  try {
+    __pyx_t_7 = std::make_shared<sabot::graph::PropertyGraph>(__pyx_v_self->_vertices->c_table, __pyx_v_self->_edges->c_table);
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 551, __pyx_L1_error)
+  }
+  __pyx_v_self->c_graph = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_7);
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":557
+ * 
+ *         # Invalidate caches (vertex IDs may have changed)
+ *         self._csr = None             # <<<<<<<<<<<<<<
+ *         self._csc = None
+ * 
+*/
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF((PyObject *)__pyx_v_self->_csr);
+  __Pyx_DECREF((PyObject *)__pyx_v_self->_csr);
+  __pyx_v_self->_csr = ((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyCSRAdjacency *)Py_None);
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":558
+ *         # Invalidate caches (vertex IDs may have changed)
+ *         self._csr = None
+ *         self._csc = None             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef void add_edges_from_table(self, ca.Table new_edges):
+*/
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF((PyObject *)__pyx_v_self->_csc);
+  __Pyx_DECREF((PyObject *)__pyx_v_self->_csc);
+  __pyx_v_self->_csc = ((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyCSRAdjacency *)Py_None);
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":534
+ *         )
+ * 
+ *     cpdef void add_vertices_from_table(self, ca.Table new_vertices):             # <<<<<<<<<<<<<<
+ *         """
+ *         Add vertices from table (mutable operation for streaming).
+*/
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_AddTraceback("sabot._cython.graph.storage.graph_storage.PyPropertyGraph.add_vertices_from_table", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_combined);
+  __Pyx_RefNannyFinishContext();
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_25add_vertices_from_table(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_24add_vertices_from_table, "\n        Add vertices from table (mutable operation for streaming).\n\n        Concatenates new vertices to existing vertex table and recreates\n        the C++ graph. Invalidates CSR/CSC caches since topology may change.\n\n        Args:\n            new_vertices: Arrow Table with new vertices (same schema as existing)\n\n        Performance: O(V_existing + V_new) for table concatenation + graph recreation\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_25add_vertices_from_table = {"add_vertices_from_table", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_25add_vertices_from_table, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_24add_vertices_from_table};
+static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_25add_vertices_from_table(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  struct __pyx_obj_7pyarrow_3lib_Table *__pyx_v_new_vertices = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("add_vertices_from_table (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_new_vertices,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 534, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 534, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "add_vertices_from_table", 0) < 0) __PYX_ERR(0, 534, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("add_vertices_from_table", 1, 1, 1, i); __PYX_ERR(0, 534, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 534, __pyx_L3_error)
+    }
+    __pyx_v_new_vertices = ((struct __pyx_obj_7pyarrow_3lib_Table *)values[0]);
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("add_vertices_from_table", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 534, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("sabot._cython.graph.storage.graph_storage.PyPropertyGraph.add_vertices_from_table", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_new_vertices), __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table, 1, "new_vertices", 0))) __PYX_ERR(0, 534, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_24add_vertices_from_table(((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *)__pyx_v_self), __pyx_v_new_vertices);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  goto __pyx_L7_cleaned_up;
+  __pyx_L0:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __pyx_L7_cleaned_up:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_24add_vertices_from_table(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_Table *__pyx_v_new_vertices) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("add_vertices_from_table", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_add_vertices_from_table(__pyx_v_self, __pyx_v_new_vertices, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 534, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 534, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("sabot._cython.graph.storage.graph_storage.PyPropertyGraph.add_vertices_from_table", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "sabot/_cython/graph/storage/graph_storage.pyx":560
+ *         self._csc = None
+ * 
+ *     cpdef void add_edges_from_table(self, ca.Table new_edges):             # <<<<<<<<<<<<<<
+ *         """
+ *         Add edges from table (mutable operation for streaming).
+*/
+
+static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27add_edges_from_table(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static void __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_add_edges_from_table(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_Table *__pyx_v_new_edges, int __pyx_skip_dispatch) {
+  PyObject *__pyx_v_combined = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
+  std::shared_ptr<sabot::graph::PropertyGraph>  __pyx_t_7;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("add_edges_from_table", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (
+  #if !CYTHON_USE_TYPE_SLOTS
+  unlikely(Py_TYPE(((PyObject *)__pyx_v_self)) != __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph &&
+  __Pyx_PyType_HasFeature(Py_TYPE(((PyObject *)__pyx_v_self)), Py_TPFLAGS_HAVE_GC))
+  #else
+  unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0 || __Pyx_PyType_HasFeature(Py_TYPE(((PyObject *)__pyx_v_self)), (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))
+  #endif
+  ) {
+    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
+      PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      #endif
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_add_edges_from_table); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 560, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27add_edges_from_table)) {
+        __pyx_t_3 = NULL;
+        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_4 = __pyx_t_1; 
+        __pyx_t_5 = 1;
+        #if CYTHON_UNPACK_METHODS
+        if (unlikely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+          assert(__pyx_t_3);
+          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_3);
+          __Pyx_INCREF(__pyx__function);
+          __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
+          __pyx_t_5 = 0;
+        }
+        #endif
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_3, ((PyObject *)__pyx_v_new_edges)};
+          __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 560, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_2);
+        }
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        goto __pyx_L0;
+      }
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
+      if (unlikely(__pyx_typedict_guard != __pyx_tp_dict_version)) {
+        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+      }
+      #endif
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    }
+    #endif
+  }
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":573
+ *         """
+ *         # Concatenate new edges to existing
+ *         combined = pa.concat_tables([self._edges.table(), new_edges])             # <<<<<<<<<<<<<<
+ *         self._edges = PyEdgeTable(combined)
+ * 
+*/
+  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 573, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_concat_tables); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 573, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = ((PyObject *)((struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyEdgeTable *)__pyx_v_self->_edges->__pyx_vtab)->table(__pyx_v_self->_edges, 0)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 573, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_6 = PyList_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 573, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_GIVEREF(__pyx_t_4);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_6, 0, __pyx_t_4) != (0)) __PYX_ERR(0, 573, __pyx_L1_error);
+  __Pyx_INCREF((PyObject *)__pyx_v_new_edges);
+  __Pyx_GIVEREF((PyObject *)__pyx_v_new_edges);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_6, 1, ((PyObject *)__pyx_v_new_edges)) != (0)) __PYX_ERR(0, 573, __pyx_L1_error);
+  __pyx_t_4 = 0;
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    assert(__pyx_t_2);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
+    __Pyx_INCREF(__pyx_t_2);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_t_6};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 573, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __pyx_v_combined = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":574
+ *         # Concatenate new edges to existing
+ *         combined = pa.concat_tables([self._edges.table(), new_edges])
+ *         self._edges = PyEdgeTable(combined)             # <<<<<<<<<<<<<<
+ * 
+ *         # Recreate C++ graph with updated tables
+*/
+  __pyx_t_3 = NULL;
+  __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyEdgeTable);
+  __pyx_t_6 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyEdgeTable); 
+  __pyx_t_5 = 1;
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_combined};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_6, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 574, __pyx_L1_error)
+    __Pyx_GOTREF((PyObject *)__pyx_t_1);
+  }
+  __Pyx_GIVEREF((PyObject *)__pyx_t_1);
+  __Pyx_GOTREF((PyObject *)__pyx_v_self->_edges);
+  __Pyx_DECREF((PyObject *)__pyx_v_self->_edges);
+  __pyx_v_self->_edges = ((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyEdgeTable *)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":577
+ * 
+ *         # Recreate C++ graph with updated tables
+ *         self.c_graph = make_shared[PropertyGraph](             # <<<<<<<<<<<<<<
+ *             self._vertices.c_table,
+ *             self._edges.c_table
+*/
+  try {
+    __pyx_t_7 = std::make_shared<sabot::graph::PropertyGraph>(__pyx_v_self->_vertices->c_table, __pyx_v_self->_edges->c_table);
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 577, __pyx_L1_error)
+  }
+  __pyx_v_self->c_graph = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_7);
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":583
+ * 
+ *         # Invalidate caches (topology changed)
+ *         self._csr = None             # <<<<<<<<<<<<<<
+ *         self._csc = None
+ * 
+*/
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF((PyObject *)__pyx_v_self->_csr);
+  __Pyx_DECREF((PyObject *)__pyx_v_self->_csr);
+  __pyx_v_self->_csr = ((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyCSRAdjacency *)Py_None);
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":584
+ *         # Invalidate caches (topology changed)
+ *         self._csr = None
+ *         self._csc = None             # <<<<<<<<<<<<<<
+ * 
+ *     def __repr__(self):
+*/
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF((PyObject *)__pyx_v_self->_csc);
+  __Pyx_DECREF((PyObject *)__pyx_v_self->_csc);
+  __pyx_v_self->_csc = ((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyCSRAdjacency *)Py_None);
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":560
+ *         self._csc = None
+ * 
+ *     cpdef void add_edges_from_table(self, ca.Table new_edges):             # <<<<<<<<<<<<<<
+ *         """
+ *         Add edges from table (mutable operation for streaming).
+*/
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_AddTraceback("sabot._cython.graph.storage.graph_storage.PyPropertyGraph.add_edges_from_table", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_combined);
+  __Pyx_RefNannyFinishContext();
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27add_edges_from_table(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_26add_edges_from_table, "\n        Add edges from table (mutable operation for streaming).\n\n        Concatenates new edges to existing edge table and recreates\n        the C++ graph. Invalidates CSR/CSC caches since topology changed.\n\n        Args:\n            new_edges: Arrow Table with new edges (same schema as existing)\n\n        Performance: O(E_existing + E_new) for table concatenation + graph recreation\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27add_edges_from_table = {"add_edges_from_table", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27add_edges_from_table, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_26add_edges_from_table};
+static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27add_edges_from_table(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  struct __pyx_obj_7pyarrow_3lib_Table *__pyx_v_new_edges = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("add_edges_from_table (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_new_edges,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 560, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 560, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "add_edges_from_table", 0) < 0) __PYX_ERR(0, 560, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("add_edges_from_table", 1, 1, 1, i); __PYX_ERR(0, 560, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 560, __pyx_L3_error)
+    }
+    __pyx_v_new_edges = ((struct __pyx_obj_7pyarrow_3lib_Table *)values[0]);
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("add_edges_from_table", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 560, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("sabot._cython.graph.storage.graph_storage.PyPropertyGraph.add_edges_from_table", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_new_edges), __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table, 1, "new_edges", 0))) __PYX_ERR(0, 560, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_26add_edges_from_table(((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *)__pyx_v_self), __pyx_v_new_edges);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  goto __pyx_L7_cleaned_up;
+  __pyx_L0:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __pyx_L7_cleaned_up:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_26add_edges_from_table(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_Table *__pyx_v_new_edges) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("add_edges_from_table", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_add_edges_from_table(__pyx_v_self, __pyx_v_new_edges, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 560, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 560, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("sabot._cython.graph.storage.graph_storage.PyPropertyGraph.add_edges_from_table", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "sabot/_cython/graph/storage/graph_storage.pyx":586
+ *         self._csc = None
+ * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
  *         return f"PropertyGraph(num_vertices={self.num_vertices()}, num_edges={self.num_edges()})"
  * 
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_25__repr__(PyObject *__pyx_v_self); /*proto*/
-static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_25__repr__(PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_29__repr__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_29__repr__(PyObject *__pyx_v_self) {
   CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__repr__ (wrapper)", 0);
   __pyx_kwvalues = __Pyx_KwValues_VARARGS(__pyx_args, __pyx_nargs);
-  __pyx_r = __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_24__repr__(((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_28__repr__(((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_24__repr__(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_28__repr__(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int64_t __pyx_t_1;
@@ -21896,7 +22613,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPr
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__repr__", 0);
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":535
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":587
  * 
  *     def __repr__(self):
  *         return f"PropertyGraph(num_vertices={self.num_vertices()}, num_edges={self.num_edges()})"             # <<<<<<<<<<<<<<
@@ -21904,16 +22621,16 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPr
  * 
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *)__pyx_v_self->__pyx_vtab)->num_vertices(__pyx_v_self, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 535, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 535, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *)__pyx_v_self->__pyx_vtab)->num_vertices(__pyx_v_self, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 587, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 587, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 535, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 587, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *)__pyx_v_self->__pyx_vtab)->num_edges(__pyx_v_self, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 535, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 535, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *)__pyx_v_self->__pyx_vtab)->num_edges(__pyx_v_self, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 587, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 587, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 535, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 587, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_5[0] = __pyx_mstate_global->__pyx_kp_u_PropertyGraph_num_vertices;
@@ -21922,7 +22639,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPr
   __pyx_t_5[3] = __pyx_t_4;
   __pyx_t_5[4] = __pyx_mstate_global->__pyx_kp_u_;
   __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_5, 5, 27 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3) + 12 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4) + 1, 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4));
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 535, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 587, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -21930,8 +22647,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPr
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":534
- *         )
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":586
+ *         self._csc = None
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
  *         return f"PropertyGraph(num_vertices={self.num_vertices()}, num_edges={self.num_edges()})"
@@ -21958,15 +22675,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPr
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27__reduce_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_31__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27__reduce_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_31__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_31__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_31__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -21992,14 +22709,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("__reduce_cython__", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_26__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_30__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_26__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_30__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -22039,15 +22756,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPr
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_29__setstate_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_33__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_29__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_29__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_29__setstate_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_33__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_33__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_33__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -22113,7 +22830,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_28__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *)__pyx_v_self), __pyx_v___pyx_state);
+  __pyx_r = __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_32__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *)__pyx_v_self), __pyx_v___pyx_state);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -22123,7 +22840,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_28__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_32__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -22155,7 +22872,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPr
   return __pyx_r;
 }
 
-/* "sabot/_cython/graph/storage/graph_storage.pyx":560
+/* "sabot/_cython/graph/storage/graph_storage.pyx":612
  *     """
  * 
  *     def __cinit__(self, ca.Table triples, ca.Table term_dict):             # <<<<<<<<<<<<<<
@@ -22186,39 +22903,39 @@ static int __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripl
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_triples,&__pyx_mstate_global->__pyx_n_u_term_dict,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 560, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 612, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 560, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 612, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 560, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 612, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__cinit__", 0) < 0) __PYX_ERR(0, 560, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__cinit__", 0) < 0) __PYX_ERR(0, 612, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 2, 2, i); __PYX_ERR(0, 560, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 2, 2, i); __PYX_ERR(0, 612, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 560, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 612, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 560, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 612, __pyx_L3_error)
     }
     __pyx_v_triples = ((struct __pyx_obj_7pyarrow_3lib_Table *)values[0]);
     __pyx_v_term_dict = ((struct __pyx_obj_7pyarrow_3lib_Table *)values[1]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 560, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 612, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -22229,8 +22946,8 @@ static int __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripl
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_triples), __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table, 1, "triples", 0))) __PYX_ERR(0, 560, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_term_dict), __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table, 1, "term_dict", 0))) __PYX_ERR(0, 560, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_triples), __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table, 1, "triples", 0))) __PYX_ERR(0, 612, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_term_dict), __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table, 1, "term_dict", 0))) __PYX_ERR(0, 612, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore___cinit__(((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *)__pyx_v_self), __pyx_v_triples, __pyx_v_term_dict);
 
   /* function exit code */
@@ -22261,7 +22978,7 @@ static int __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripl
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":562
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":614
  *     def __cinit__(self, ca.Table triples, ca.Table term_dict):
  *         """Create RDF triple store from triples and term dictionary."""
  *         self._triples = triples             # <<<<<<<<<<<<<<
@@ -22274,7 +22991,7 @@ static int __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripl
   __Pyx_DECREF((PyObject *)__pyx_v_self->_triples);
   __pyx_v_self->_triples = __pyx_v_triples;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":563
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":615
  *         """Create RDF triple store from triples and term dictionary."""
  *         self._triples = triples
  *         self._term_dict = term_dict             # <<<<<<<<<<<<<<
@@ -22287,25 +23004,25 @@ static int __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripl
   __Pyx_DECREF((PyObject *)__pyx_v_self->_term_dict);
   __pyx_v_self->_term_dict = __pyx_v_term_dict;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":566
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":618
  * 
  *         self.c_store = make_shared[RDFTripleStore](
  *             pyarrow_unwrap_table(triples),             # <<<<<<<<<<<<<<
  *             pyarrow_unwrap_table(term_dict)
  *         )
 */
-  __pyx_t_1 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_table(((PyObject *)__pyx_v_triples)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 566, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_table(((PyObject *)__pyx_v_triples)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 618, __pyx_L1_error)
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":567
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":619
  *         self.c_store = make_shared[RDFTripleStore](
  *             pyarrow_unwrap_table(triples),
  *             pyarrow_unwrap_table(term_dict)             # <<<<<<<<<<<<<<
  *         )
  * 
 */
-  __pyx_t_2 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_table(((PyObject *)__pyx_v_term_dict)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 567, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_table(((PyObject *)__pyx_v_term_dict)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 619, __pyx_L1_error)
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":565
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":617
  *         self._term_dict = term_dict
  * 
  *         self.c_store = make_shared[RDFTripleStore](             # <<<<<<<<<<<<<<
@@ -22316,11 +23033,11 @@ static int __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripl
     __pyx_t_3 = std::make_shared<sabot::graph::RDFTripleStore>(__PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_1), __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_2));
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 565, __pyx_L1_error)
+    __PYX_ERR(0, 617, __pyx_L1_error)
   }
   __pyx_v_self->c_store = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_3);
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":560
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":612
  *     """
  * 
  *     def __cinit__(self, ca.Table triples, ca.Table term_dict):             # <<<<<<<<<<<<<<
@@ -22339,7 +23056,7 @@ static int __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripl
   return __pyx_r;
 }
 
-/* "sabot/_cython/graph/storage/graph_storage.pyx":570
+/* "sabot/_cython/graph/storage/graph_storage.pyx":622
  *         )
  * 
  *     cpdef int64_t num_triples(self):             # <<<<<<<<<<<<<<
@@ -22383,7 +23100,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_num_triples); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 570, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_num_triples); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 622, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_3num_triples)) {
         __pyx_t_3 = NULL;
@@ -22406,10 +23123,10 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 570, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 622, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        __pyx_t_6 = __Pyx_PyLong_As_int64_t(__pyx_t_2); if (unlikely((__pyx_t_6 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 570, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyLong_As_int64_t(__pyx_t_2); if (unlikely((__pyx_t_6 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 622, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_6;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -22428,7 +23145,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
     #endif
   }
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":572
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":624
  *     cpdef int64_t num_triples(self):
  *         """Number of triples."""
  *         return self.c_store.get().num_triples()             # <<<<<<<<<<<<<<
@@ -22438,7 +23155,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
   __pyx_r = __pyx_v_self->c_store.get()->num_triples();
   goto __pyx_L0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":570
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":622
  *         )
  * 
  *     cpdef int64_t num_triples(self):             # <<<<<<<<<<<<<<
@@ -22512,8 +23229,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("num_triples", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_num_triples(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 570, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 570, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_num_triples(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 622, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 622, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
@@ -22530,7 +23247,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   return __pyx_r;
 }
 
-/* "sabot/_cython/graph/storage/graph_storage.pyx":574
+/* "sabot/_cython/graph/storage/graph_storage.pyx":626
  *         return self.c_store.get().num_triples()
  * 
  *     cpdef int64_t num_terms(self):             # <<<<<<<<<<<<<<
@@ -22574,7 +23291,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_num_terms); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 574, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_num_terms); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 626, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_5num_terms)) {
         __pyx_t_3 = NULL;
@@ -22597,10 +23314,10 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 574, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 626, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        __pyx_t_6 = __Pyx_PyLong_As_int64_t(__pyx_t_2); if (unlikely((__pyx_t_6 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 574, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyLong_As_int64_t(__pyx_t_2); if (unlikely((__pyx_t_6 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 626, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_6;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -22619,7 +23336,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
     #endif
   }
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":576
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":628
  *     cpdef int64_t num_terms(self):
  *         """Number of terms in dictionary."""
  *         return self.c_store.get().num_terms()             # <<<<<<<<<<<<<<
@@ -22629,7 +23346,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
   __pyx_r = __pyx_v_self->c_store.get()->num_terms();
   goto __pyx_L0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":574
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":626
  *         return self.c_store.get().num_triples()
  * 
  *     cpdef int64_t num_terms(self):             # <<<<<<<<<<<<<<
@@ -22703,8 +23420,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("num_terms", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_num_terms(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 574, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 574, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_num_terms(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 626, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 626, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
@@ -22721,7 +23438,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   return __pyx_r;
 }
 
-/* "sabot/_cython/graph/storage/graph_storage.pyx":578
+/* "sabot/_cython/graph/storage/graph_storage.pyx":630
  *         return self.c_store.get().num_terms()
  * 
  *     cpdef ca.Table triples(self):             # <<<<<<<<<<<<<<
@@ -22764,7 +23481,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_triples); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 578, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_triples); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 630, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_7triples)) {
         __Pyx_XDECREF((PyObject *)__pyx_r);
@@ -22788,10 +23505,10 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 578, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 630, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table))))) __PYX_ERR(0, 578, __pyx_L1_error)
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table))))) __PYX_ERR(0, 630, __pyx_L1_error)
         __pyx_r = ((struct __pyx_obj_7pyarrow_3lib_Table *)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -22810,7 +23527,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
     #endif
   }
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":580
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":632
  *     cpdef ca.Table triples(self):
  *         """Get triples table."""
  *         return self._triples             # <<<<<<<<<<<<<<
@@ -22822,7 +23539,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
   __pyx_r = __pyx_v_self->_triples;
   goto __pyx_L0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":578
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":630
  *         return self.c_store.get().num_terms()
  * 
  *     cpdef ca.Table triples(self):             # <<<<<<<<<<<<<<
@@ -22896,7 +23613,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("triples", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_triples(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 578, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_triples(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 630, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -22913,7 +23630,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   return __pyx_r;
 }
 
-/* "sabot/_cython/graph/storage/graph_storage.pyx":582
+/* "sabot/_cython/graph/storage/graph_storage.pyx":634
  *         return self._triples
  * 
  *     cpdef ca.Table term_dict(self):             # <<<<<<<<<<<<<<
@@ -22956,7 +23673,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_term_dict); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 582, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_term_dict); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 634, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_9term_dict)) {
         __Pyx_XDECREF((PyObject *)__pyx_r);
@@ -22980,10 +23697,10 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 582, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 634, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table))))) __PYX_ERR(0, 582, __pyx_L1_error)
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table))))) __PYX_ERR(0, 634, __pyx_L1_error)
         __pyx_r = ((struct __pyx_obj_7pyarrow_3lib_Table *)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -23002,7 +23719,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
     #endif
   }
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":584
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":636
  *     cpdef ca.Table term_dict(self):
  *         """Get term dictionary table."""
  *         return self._term_dict             # <<<<<<<<<<<<<<
@@ -23014,7 +23731,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
   __pyx_r = __pyx_v_self->_term_dict;
   goto __pyx_L0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":582
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":634
  *         return self._triples
  * 
  *     cpdef ca.Table term_dict(self):             # <<<<<<<<<<<<<<
@@ -23088,7 +23805,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("term_dict", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_term_dict(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 582, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_term_dict(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 634, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -23105,7 +23822,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   return __pyx_r;
 }
 
-/* "sabot/_cython/graph/storage/graph_storage.pyx":586
+/* "sabot/_cython/graph/storage/graph_storage.pyx":638
  *         return self._term_dict
  * 
  *     cpdef int64_t lookup_term_id(self, str lex):             # <<<<<<<<<<<<<<
@@ -23157,7 +23874,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_lookup_term_id); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 586, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_lookup_term_id); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 638, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_11lookup_term_id)) {
         __pyx_t_3 = NULL;
@@ -23180,10 +23897,10 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 586, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 638, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        __pyx_t_6 = __Pyx_PyLong_As_int64_t(__pyx_t_2); if (unlikely((__pyx_t_6 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 586, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyLong_As_int64_t(__pyx_t_2); if (unlikely((__pyx_t_6 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 638, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_6;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -23202,7 +23919,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
     #endif
   }
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":594
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":646
  *         # Linear search through term dictionary
  *         # (Full implementation would use hash table)
  *         lex_column = self._term_dict.column('lex').combine_chunks()             # <<<<<<<<<<<<<<
@@ -23216,7 +23933,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
     PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_mstate_global->__pyx_n_u_lex};
     __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 594, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 646, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __pyx_t_2 = __pyx_t_4;
@@ -23227,13 +23944,13 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_combine_chunks, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 594, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 646, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_lex_column = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":595
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":647
  *         # (Full implementation would use hash table)
  *         lex_column = self._term_dict.column('lex').combine_chunks()
  *         for i in range(lex_column.length()):             # <<<<<<<<<<<<<<
@@ -23250,7 +23967,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
     PyObject *__pyx_callargs[2] = {__pyx_t_7, NULL};
     __pyx_t_3 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_length, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 595, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 647, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
   }
   __pyx_t_5 = 1;
@@ -23260,7 +23977,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 595, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 647, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
@@ -23268,9 +23985,9 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
     __pyx_t_8 = 0;
     __pyx_t_9 = NULL;
   } else {
-    __pyx_t_8 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 595, __pyx_L1_error)
+    __pyx_t_8 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 647, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 595, __pyx_L1_error)
+    __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 647, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -23279,7 +23996,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 595, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 647, __pyx_L1_error)
           #endif
           if (__pyx_t_8 >= __pyx_temp) break;
         }
@@ -23289,7 +24006,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 595, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 647, __pyx_L1_error)
           #endif
           if (__pyx_t_8 >= __pyx_temp) break;
         }
@@ -23300,13 +24017,13 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
         #endif
         ++__pyx_t_8;
       }
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 595, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 647, __pyx_L1_error)
     } else {
       __pyx_t_1 = __pyx_t_9(__pyx_t_2);
       if (unlikely(!__pyx_t_1)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 595, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 647, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -23316,14 +24033,14 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
     __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/graph/storage/graph_storage.pyx":596
+    /* "sabot/_cython/graph/storage/graph_storage.pyx":648
  *         lex_column = self._term_dict.column('lex').combine_chunks()
  *         for i in range(lex_column.length()):
  *             if lex_column[i].as_py() == lex:             # <<<<<<<<<<<<<<
  *                 return self._term_dict.column('id').combine_chunks()[i].as_py()
  *         return -1
 */
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_lex_column, __pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 596, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_lex_column, __pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_3 = __pyx_t_4;
     __Pyx_INCREF(__pyx_t_3);
@@ -23333,14 +24050,14 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_as_py, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 596, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 648, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
-    __pyx_t_10 = (__Pyx_PyUnicode_Equals(__pyx_t_1, __pyx_v_lex, Py_EQ)); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 596, __pyx_L1_error)
+    __pyx_t_10 = (__Pyx_PyUnicode_Equals(__pyx_t_1, __pyx_v_lex, Py_EQ)); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (__pyx_t_10) {
 
-      /* "sabot/_cython/graph/storage/graph_storage.pyx":597
+      /* "sabot/_cython/graph/storage/graph_storage.pyx":649
  *         for i in range(lex_column.length()):
  *             if lex_column[i].as_py() == lex:
  *                 return self._term_dict.column('id').combine_chunks()[i].as_py()             # <<<<<<<<<<<<<<
@@ -23354,7 +24071,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
         PyObject *__pyx_callargs[2] = {__pyx_t_12, __pyx_mstate_global->__pyx_n_u_id};
         __pyx_t_11 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 597, __pyx_L1_error)
+        if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 649, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
       }
       __pyx_t_7 = __pyx_t_11;
@@ -23365,10 +24082,10 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
         __pyx_t_3 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_combine_chunks, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 597, __pyx_L1_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 649, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
       }
-      __pyx_t_11 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_v_i); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 597, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_v_i); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 649, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_4 = __pyx_t_11;
@@ -23379,16 +24096,16 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
         __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_as_py, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 597, __pyx_L1_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 649, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
       }
-      __pyx_t_6 = __Pyx_PyLong_As_int64_t(__pyx_t_1); if (unlikely((__pyx_t_6 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 597, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyLong_As_int64_t(__pyx_t_1); if (unlikely((__pyx_t_6 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 649, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_r = __pyx_t_6;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       goto __pyx_L0;
 
-      /* "sabot/_cython/graph/storage/graph_storage.pyx":596
+      /* "sabot/_cython/graph/storage/graph_storage.pyx":648
  *         lex_column = self._term_dict.column('lex').combine_chunks()
  *         for i in range(lex_column.length()):
  *             if lex_column[i].as_py() == lex:             # <<<<<<<<<<<<<<
@@ -23397,7 +24114,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
 */
     }
 
-    /* "sabot/_cython/graph/storage/graph_storage.pyx":595
+    /* "sabot/_cython/graph/storage/graph_storage.pyx":647
  *         # (Full implementation would use hash table)
  *         lex_column = self._term_dict.column('lex').combine_chunks()
  *         for i in range(lex_column.length()):             # <<<<<<<<<<<<<<
@@ -23407,7 +24124,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":598
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":650
  *             if lex_column[i].as_py() == lex:
  *                 return self._term_dict.column('id').combine_chunks()[i].as_py()
  *         return -1             # <<<<<<<<<<<<<<
@@ -23417,7 +24134,7 @@ static int64_t __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTr
   __pyx_r = -1L;
   goto __pyx_L0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":586
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":638
  *         return self._term_dict
  * 
  *     cpdef int64_t lookup_term_id(self, str lex):             # <<<<<<<<<<<<<<
@@ -23483,32 +24200,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_lex,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 586, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 638, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 586, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 638, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "lookup_term_id", 0) < 0) __PYX_ERR(0, 586, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "lookup_term_id", 0) < 0) __PYX_ERR(0, 638, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("lookup_term_id", 1, 1, 1, i); __PYX_ERR(0, 586, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("lookup_term_id", 1, 1, 1, i); __PYX_ERR(0, 638, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 586, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 638, __pyx_L3_error)
     }
     __pyx_v_lex = ((PyObject*)values[0]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("lookup_term_id", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 586, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("lookup_term_id", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 638, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -23519,7 +24236,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_lex), (&PyUnicode_Type), 1, "lex", 1))) __PYX_ERR(0, 586, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_lex), (&PyUnicode_Type), 1, "lex", 1))) __PYX_ERR(0, 638, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_10lookup_term_id(((struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *)__pyx_v_self), __pyx_v_lex);
 
   /* function exit code */
@@ -23549,8 +24266,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("lookup_term_id", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_lookup_term_id(__pyx_v_self, __pyx_v_lex, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 586, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 586, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_lookup_term_id(__pyx_v_self, __pyx_v_lex, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 638, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 638, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
@@ -23567,7 +24284,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   return __pyx_r;
 }
 
-/* "sabot/_cython/graph/storage/graph_storage.pyx":600
+/* "sabot/_cython/graph/storage/graph_storage.pyx":652
  *         return -1
  * 
  *     cpdef str lookup_term(self, int64_t term_id):             # <<<<<<<<<<<<<<
@@ -23618,14 +24335,14 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_lookup_term); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 600, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_lookup_term); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 652, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_13lookup_term)) {
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; 
-        __pyx_t_5 = __Pyx_PyLong_From_int64_t(__pyx_v_term_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 600, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyLong_From_int64_t(__pyx_v_term_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 652, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __pyx_t_6 = 1;
         #if CYTHON_UNPACK_METHODS
@@ -23645,10 +24362,10 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 600, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 652, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_2))) __PYX_ERR(0, 600, __pyx_L1_error)
+        if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_2))) __PYX_ERR(0, 652, __pyx_L1_error)
         __pyx_r = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -23667,7 +24384,7 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
     #endif
   }
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":606
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":658
  *         Raises KeyError if term_id not found.
  *         """
  *         id_column = self._term_dict.column('id').combine_chunks()             # <<<<<<<<<<<<<<
@@ -23681,7 +24398,7 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
     PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_mstate_global->__pyx_n_u_id};
     __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 606, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 658, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __pyx_t_2 = __pyx_t_4;
@@ -23692,13 +24409,13 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_combine_chunks, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 606, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 658, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_id_column = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":607
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":659
  *         """
  *         id_column = self._term_dict.column('id').combine_chunks()
  *         lex_column = self._term_dict.column('lex').combine_chunks()             # <<<<<<<<<<<<<<
@@ -23712,7 +24429,7 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
     PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_mstate_global->__pyx_n_u_lex};
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 607, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 659, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __pyx_t_4 = __pyx_t_2;
@@ -23723,13 +24440,13 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_combine_chunks, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 607, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 659, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_lex_column = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":609
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":661
  *         lex_column = self._term_dict.column('lex').combine_chunks()
  * 
  *         for i in range(id_column.length()):             # <<<<<<<<<<<<<<
@@ -23746,7 +24463,7 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
     PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
     __pyx_t_5 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_length, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 609, __pyx_L1_error)
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 661, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
   }
   __pyx_t_6 = 1;
@@ -23756,7 +24473,7 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 609, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 661, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
@@ -23764,9 +24481,9 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
     __pyx_t_7 = 0;
     __pyx_t_8 = NULL;
   } else {
-    __pyx_t_7 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 609, __pyx_L1_error)
+    __pyx_t_7 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 661, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_8 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 609, __pyx_L1_error)
+    __pyx_t_8 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 661, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -23775,7 +24492,7 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 609, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 661, __pyx_L1_error)
           #endif
           if (__pyx_t_7 >= __pyx_temp) break;
         }
@@ -23785,7 +24502,7 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 609, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 661, __pyx_L1_error)
           #endif
           if (__pyx_t_7 >= __pyx_temp) break;
         }
@@ -23796,13 +24513,13 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
         #endif
         ++__pyx_t_7;
       }
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 609, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 661, __pyx_L1_error)
     } else {
       __pyx_t_1 = __pyx_t_8(__pyx_t_4);
       if (unlikely(!__pyx_t_1)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 609, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 661, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -23812,14 +24529,14 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
     __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/graph/storage/graph_storage.pyx":610
+    /* "sabot/_cython/graph/storage/graph_storage.pyx":662
  * 
  *         for i in range(id_column.length()):
  *             if id_column[i].as_py() == term_id:             # <<<<<<<<<<<<<<
  *                 return lex_column[i].as_py()
  * 
 */
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_id_column, __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 610, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_id_column, __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 662, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_5 = __pyx_t_2;
     __Pyx_INCREF(__pyx_t_5);
@@ -23829,19 +24546,19 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_as_py, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 610, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 662, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
-    __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_term_id); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 610, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_term_id); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 662, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = PyObject_RichCompare(__pyx_t_1, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 610, __pyx_L1_error)
+    __pyx_t_5 = PyObject_RichCompare(__pyx_t_1, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 662, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely((__pyx_t_9 < 0))) __PYX_ERR(0, 610, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely((__pyx_t_9 < 0))) __PYX_ERR(0, 662, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     if (__pyx_t_9) {
 
-      /* "sabot/_cython/graph/storage/graph_storage.pyx":611
+      /* "sabot/_cython/graph/storage/graph_storage.pyx":663
  *         for i in range(id_column.length()):
  *             if id_column[i].as_py() == term_id:
  *                 return lex_column[i].as_py()             # <<<<<<<<<<<<<<
@@ -23849,7 +24566,7 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
  *         raise KeyError(f"Term ID {term_id} not found")
 */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_lex_column, __pyx_v_i); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 611, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_lex_column, __pyx_v_i); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 663, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_t_2 = __pyx_t_1;
       __Pyx_INCREF(__pyx_t_2);
@@ -23859,16 +24576,16 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
         __pyx_t_5 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_as_py, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 611, __pyx_L1_error)
+        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 663, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
       }
-      if (!(likely(PyUnicode_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_5))) __PYX_ERR(0, 611, __pyx_L1_error)
+      if (!(likely(PyUnicode_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_5))) __PYX_ERR(0, 663, __pyx_L1_error)
       __pyx_r = ((PyObject*)__pyx_t_5);
       __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       goto __pyx_L0;
 
-      /* "sabot/_cython/graph/storage/graph_storage.pyx":610
+      /* "sabot/_cython/graph/storage/graph_storage.pyx":662
  * 
  *         for i in range(id_column.length()):
  *             if id_column[i].as_py() == term_id:             # <<<<<<<<<<<<<<
@@ -23877,7 +24594,7 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
 */
     }
 
-    /* "sabot/_cython/graph/storage/graph_storage.pyx":609
+    /* "sabot/_cython/graph/storage/graph_storage.pyx":661
  *         lex_column = self._term_dict.column('lex').combine_chunks()
  * 
  *         for i in range(id_column.length()):             # <<<<<<<<<<<<<<
@@ -23887,7 +24604,7 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":613
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":665
  *                 return lex_column[i].as_py()
  * 
  *         raise KeyError(f"Term ID {term_id} not found")             # <<<<<<<<<<<<<<
@@ -23897,16 +24614,16 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
   __pyx_t_5 = NULL;
   __Pyx_INCREF(__pyx_builtin_KeyError);
   __pyx_t_1 = __pyx_builtin_KeyError; 
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_term_id); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 613, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_term_id); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 665, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 613, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 665, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_10[0] = __pyx_mstate_global->__pyx_kp_u_Term_ID;
   __pyx_t_10[1] = __pyx_t_3;
   __pyx_t_10[2] = __pyx_mstate_global->__pyx_kp_u_not_found;
   __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_10, 3, 8 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3) + 10, 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3));
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 613, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 665, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_6 = 1;
@@ -23916,14 +24633,14 @@ static PyObject *__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDF
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 613, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 665, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __Pyx_Raise(__pyx_t_4, 0, 0, 0);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __PYX_ERR(0, 613, __pyx_L1_error)
+  __PYX_ERR(0, 665, __pyx_L1_error)
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":600
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":652
  *         return -1
  * 
  *     cpdef str lookup_term(self, int64_t term_id):             # <<<<<<<<<<<<<<
@@ -23989,32 +24706,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_term_id,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 600, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 652, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 600, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 652, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "lookup_term", 0) < 0) __PYX_ERR(0, 600, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "lookup_term", 0) < 0) __PYX_ERR(0, 652, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("lookup_term", 1, 1, 1, i); __PYX_ERR(0, 600, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("lookup_term", 1, 1, 1, i); __PYX_ERR(0, 652, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 600, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 652, __pyx_L3_error)
     }
-    __pyx_v_term_id = __Pyx_PyLong_As_int64_t(values[0]); if (unlikely((__pyx_v_term_id == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 600, __pyx_L3_error)
+    __pyx_v_term_id = __Pyx_PyLong_As_int64_t(values[0]); if (unlikely((__pyx_v_term_id == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 652, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("lookup_term", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 600, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("lookup_term", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 652, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -24044,7 +24761,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("lookup_term", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_lookup_term(__pyx_v_self, __pyx_v_term_id, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 600, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_lookup_term(__pyx_v_self, __pyx_v_term_id, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 652, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -24061,7 +24778,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   return __pyx_r;
 }
 
-/* "sabot/_cython/graph/storage/graph_storage.pyx":615
+/* "sabot/_cython/graph/storage/graph_storage.pyx":667
  *         raise KeyError(f"Term ID {term_id} not found")
  * 
  *     cpdef ca.Table filter_triples(self, int64_t s, int64_t p, int64_t o):             # <<<<<<<<<<<<<<
@@ -24117,18 +24834,18 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_filter_triples); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 615, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_filter_triples); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 667, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_15filter_triples)) {
         __Pyx_XDECREF((PyObject *)__pyx_r);
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; 
-        __pyx_t_5 = __Pyx_PyLong_From_int64_t(__pyx_v_s); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 615, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyLong_From_int64_t(__pyx_v_s); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 667, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_6 = __Pyx_PyLong_From_int64_t(__pyx_v_p); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 615, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyLong_From_int64_t(__pyx_v_p); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 667, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_7 = __Pyx_PyLong_From_int64_t(__pyx_v_o); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 615, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyLong_From_int64_t(__pyx_v_o); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 667, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __pyx_t_8 = 1;
         #if CYTHON_UNPACK_METHODS
@@ -24150,10 +24867,10 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 615, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 667, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table))))) __PYX_ERR(0, 615, __pyx_L1_error)
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table))))) __PYX_ERR(0, 667, __pyx_L1_error)
         __pyx_r = ((struct __pyx_obj_7pyarrow_3lib_Table *)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -24172,19 +24889,19 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
     #endif
   }
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":624
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":676
  *         - (123, 456, 789) = exact triple match
  *         """
  *         import pyarrow.compute as pc             # <<<<<<<<<<<<<<
  * 
  *         mask = pa.array([True] * self.num_triples())
 */
-  __pyx_t_1 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_pyarrow_compute, __pyx_mstate_global->__pyx_tuple[1]); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 624, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_pyarrow_compute, __pyx_mstate_global->__pyx_tuple[1]); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 676, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_pc = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":626
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":678
  *         import pyarrow.compute as pc
  * 
  *         mask = pa.array([True] * self.num_triples())             # <<<<<<<<<<<<<<
@@ -24192,19 +24909,19 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
  *         if s >= 0:
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 626, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 678, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_array); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 626, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_array); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 678, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_9 = ((struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *)__pyx_v_self->__pyx_vtab)->num_triples(__pyx_v_self, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 626, __pyx_L1_error)
-  __pyx_t_4 = PyList_New(1 * ((__pyx_t_9<0) ? 0:__pyx_t_9)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 626, __pyx_L1_error)
+  __pyx_t_9 = ((struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *)__pyx_v_self->__pyx_vtab)->num_triples(__pyx_v_self, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 678, __pyx_L1_error)
+  __pyx_t_4 = PyList_New(1 * ((__pyx_t_9<0) ? 0:__pyx_t_9)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 678, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   { Py_ssize_t __pyx_temp;
     for (__pyx_temp=0; __pyx_temp < __pyx_t_9; __pyx_temp++) {
       __Pyx_INCREF(Py_True);
       __Pyx_GIVEREF(Py_True);
-      if (__Pyx_PyList_SET_ITEM(__pyx_t_4, __pyx_temp, Py_True) != (0)) __PYX_ERR(0, 626, __pyx_L1_error);
+      if (__Pyx_PyList_SET_ITEM(__pyx_t_4, __pyx_temp, Py_True) != (0)) __PYX_ERR(0, 678, __pyx_L1_error);
     }
   }
   __pyx_t_8 = 1;
@@ -24225,13 +24942,13 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 626, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 678, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_mask = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":628
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":680
  *         mask = pa.array([True] * self.num_triples())
  * 
  *         if s >= 0:             # <<<<<<<<<<<<<<
@@ -24241,7 +24958,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
   __pyx_t_10 = (__pyx_v_s >= 0);
   if (__pyx_t_10) {
 
-    /* "sabot/_cython/graph/storage/graph_storage.pyx":629
+    /* "sabot/_cython/graph/storage/graph_storage.pyx":681
  * 
  *         if s >= 0:
  *             mask = pc.and_(mask, pc.equal(self._triples.column('s'), pa.scalar(s, type=pa.int64())))             # <<<<<<<<<<<<<<
@@ -24259,21 +24976,21 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
       PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_mstate_global->__pyx_n_u_s};
       __pyx_t_6 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 629, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 681, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
     }
     __pyx_t_3 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 629, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 681, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_scalar); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 629, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_scalar); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 681, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyLong_From_int64_t(__pyx_v_s); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 629, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyLong_From_int64_t(__pyx_v_s); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 681, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __pyx_t_14 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 629, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 681, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_int64); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 629, __pyx_L1_error)
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_int64); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 681, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     __pyx_t_8 = 1;
@@ -24293,7 +25010,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
       __pyx_t_13 = __Pyx_PyObject_FastCall(__pyx_t_16, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
       __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-      if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 629, __pyx_L1_error)
+      if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 681, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
     }
     __pyx_t_8 = 1;
@@ -24310,16 +25027,16 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
     #endif
     {
       PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_3, __pyx_t_11};
-      __pyx_t_16 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 629, __pyx_L1_error)
+      __pyx_t_16 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 681, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_16);
-      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_type, __pyx_t_13, __pyx_t_16, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 629, __pyx_L1_error)
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_type, __pyx_t_13, __pyx_t_16, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 681, __pyx_L1_error)
       __pyx_t_5 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_12, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_16);
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
       __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 629, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 681, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
     }
     __pyx_t_8 = 0;
@@ -24329,7 +25046,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 629, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 681, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
     }
     __pyx_t_8 = 0;
@@ -24338,13 +25055,13 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_and, __pyx_callargs+__pyx_t_8, (3-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 629, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 681, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_DECREF_SET(__pyx_v_mask, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/graph/storage/graph_storage.pyx":628
+    /* "sabot/_cython/graph/storage/graph_storage.pyx":680
  *         mask = pa.array([True] * self.num_triples())
  * 
  *         if s >= 0:             # <<<<<<<<<<<<<<
@@ -24353,7 +25070,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
 */
   }
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":630
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":682
  *         if s >= 0:
  *             mask = pc.and_(mask, pc.equal(self._triples.column('s'), pa.scalar(s, type=pa.int64())))
  *         if p >= 0:             # <<<<<<<<<<<<<<
@@ -24363,7 +25080,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
   __pyx_t_10 = (__pyx_v_p >= 0);
   if (__pyx_t_10) {
 
-    /* "sabot/_cython/graph/storage/graph_storage.pyx":631
+    /* "sabot/_cython/graph/storage/graph_storage.pyx":683
  *             mask = pc.and_(mask, pc.equal(self._triples.column('s'), pa.scalar(s, type=pa.int64())))
  *         if p >= 0:
  *             mask = pc.and_(mask, pc.equal(self._triples.column('p'), pa.scalar(p, type=pa.int64())))             # <<<<<<<<<<<<<<
@@ -24381,21 +25098,21 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
       PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_mstate_global->__pyx_n_u_p};
       __pyx_t_6 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 631, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 683, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
     }
     __pyx_t_12 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 631, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 683, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
-    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_mstate_global->__pyx_n_u_scalar); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 631, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_mstate_global->__pyx_n_u_scalar); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 683, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
     __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-    __pyx_t_16 = __Pyx_PyLong_From_int64_t(__pyx_v_p); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 631, __pyx_L1_error)
+    __pyx_t_16 = __Pyx_PyLong_From_int64_t(__pyx_v_p); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 683, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
     __pyx_t_3 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 631, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 683, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_int64); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 631, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_int64); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 683, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
     __pyx_t_8 = 1;
@@ -24415,7 +25132,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
       __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 631, __pyx_L1_error)
+      if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 683, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
     }
     __pyx_t_8 = 1;
@@ -24432,16 +25149,16 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
     #endif
     {
       PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_12, __pyx_t_16};
-      __pyx_t_15 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 631, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 683, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
-      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_type, __pyx_t_11, __pyx_t_15, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 631, __pyx_L1_error)
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_type, __pyx_t_11, __pyx_t_15, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 683, __pyx_L1_error)
       __pyx_t_2 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_13, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_15);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 631, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 683, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __pyx_t_8 = 0;
@@ -24451,7 +25168,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 631, __pyx_L1_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 683, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
     }
     __pyx_t_8 = 0;
@@ -24460,13 +25177,13 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_and, __pyx_callargs+__pyx_t_8, (3-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 631, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 683, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_DECREF_SET(__pyx_v_mask, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/graph/storage/graph_storage.pyx":630
+    /* "sabot/_cython/graph/storage/graph_storage.pyx":682
  *         if s >= 0:
  *             mask = pc.and_(mask, pc.equal(self._triples.column('s'), pa.scalar(s, type=pa.int64())))
  *         if p >= 0:             # <<<<<<<<<<<<<<
@@ -24475,7 +25192,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
 */
   }
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":632
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":684
  *         if p >= 0:
  *             mask = pc.and_(mask, pc.equal(self._triples.column('p'), pa.scalar(p, type=pa.int64())))
  *         if o >= 0:             # <<<<<<<<<<<<<<
@@ -24485,7 +25202,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
   __pyx_t_10 = (__pyx_v_o >= 0);
   if (__pyx_t_10) {
 
-    /* "sabot/_cython/graph/storage/graph_storage.pyx":633
+    /* "sabot/_cython/graph/storage/graph_storage.pyx":685
  *             mask = pc.and_(mask, pc.equal(self._triples.column('p'), pa.scalar(p, type=pa.int64())))
  *         if o >= 0:
  *             mask = pc.and_(mask, pc.equal(self._triples.column('o'), pa.scalar(o, type=pa.int64())))             # <<<<<<<<<<<<<<
@@ -24503,21 +25220,21 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
       PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_mstate_global->__pyx_n_u_o};
       __pyx_t_6 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 633, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 685, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
     }
     __pyx_t_13 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 633, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 685, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_scalar); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 633, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_scalar); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 685, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_15 = __Pyx_PyLong_From_int64_t(__pyx_v_o); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 633, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyLong_From_int64_t(__pyx_v_o); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 685, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __pyx_t_12 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 633, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 685, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_int64); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 633, __pyx_L1_error)
+    __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_int64); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 685, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_8 = 1;
@@ -24537,7 +25254,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
       __pyx_t_16 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-      if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 633, __pyx_L1_error)
+      if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 685, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_16);
     }
     __pyx_t_8 = 1;
@@ -24554,16 +25271,16 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
     #endif
     {
       PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_13, __pyx_t_15};
-      __pyx_t_14 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 633, __pyx_L1_error)
+      __pyx_t_14 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 685, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_14);
-      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_type, __pyx_t_16, __pyx_t_14, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 633, __pyx_L1_error)
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_type, __pyx_t_16, __pyx_t_14, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 685, __pyx_L1_error)
       __pyx_t_5 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_11, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_14);
       __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
       __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 633, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 685, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
     }
     __pyx_t_8 = 0;
@@ -24573,7 +25290,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 633, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 685, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
     }
     __pyx_t_8 = 0;
@@ -24582,13 +25299,13 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_and, __pyx_callargs+__pyx_t_8, (3-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 633, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 685, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_DECREF_SET(__pyx_v_mask, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/graph/storage/graph_storage.pyx":632
+    /* "sabot/_cython/graph/storage/graph_storage.pyx":684
  *         if p >= 0:
  *             mask = pc.and_(mask, pc.equal(self._triples.column('p'), pa.scalar(p, type=pa.int64())))
  *         if o >= 0:             # <<<<<<<<<<<<<<
@@ -24597,7 +25314,7 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
 */
   }
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":635
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":687
  *             mask = pc.and_(mask, pc.equal(self._triples.column('o'), pa.scalar(o, type=pa.int64())))
  * 
  *         return self._triples.filter(mask)             # <<<<<<<<<<<<<<
@@ -24612,15 +25329,15 @@ static struct __pyx_obj_7pyarrow_3lib_Table *__pyx_f_5sabot_7_cython_5graph_7sto
     PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_v_mask};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_filter, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 635, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 687, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table))))) __PYX_ERR(0, 635, __pyx_L1_error)
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table))))) __PYX_ERR(0, 687, __pyx_L1_error)
   __pyx_r = ((struct __pyx_obj_7pyarrow_3lib_Table *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":615
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":667
  *         raise KeyError(f"Term ID {term_id} not found")
  * 
  *     cpdef ca.Table filter_triples(self, int64_t s, int64_t p, int64_t o):             # <<<<<<<<<<<<<<
@@ -24695,46 +25412,46 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_s,&__pyx_mstate_global->__pyx_n_u_p,&__pyx_mstate_global->__pyx_n_u_o,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 615, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 667, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 615, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 667, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 615, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 667, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 615, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 667, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "filter_triples", 0) < 0) __PYX_ERR(0, 615, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "filter_triples", 0) < 0) __PYX_ERR(0, 667, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("filter_triples", 1, 3, 3, i); __PYX_ERR(0, 615, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("filter_triples", 1, 3, 3, i); __PYX_ERR(0, 667, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 3)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 615, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 667, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 615, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 667, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 615, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 667, __pyx_L3_error)
     }
-    __pyx_v_s = __Pyx_PyLong_As_int64_t(values[0]); if (unlikely((__pyx_v_s == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 615, __pyx_L3_error)
-    __pyx_v_p = __Pyx_PyLong_As_int64_t(values[1]); if (unlikely((__pyx_v_p == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 615, __pyx_L3_error)
-    __pyx_v_o = __Pyx_PyLong_As_int64_t(values[2]); if (unlikely((__pyx_v_o == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 615, __pyx_L3_error)
+    __pyx_v_s = __Pyx_PyLong_As_int64_t(values[0]); if (unlikely((__pyx_v_s == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 667, __pyx_L3_error)
+    __pyx_v_p = __Pyx_PyLong_As_int64_t(values[1]); if (unlikely((__pyx_v_p == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 667, __pyx_L3_error)
+    __pyx_v_o = __Pyx_PyLong_As_int64_t(values[2]); if (unlikely((__pyx_v_o == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 667, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("filter_triples", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 615, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("filter_triples", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 667, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -24764,7 +25481,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("filter_triples", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_filter_triples(__pyx_v_self, __pyx_v_s, __pyx_v_p, __pyx_v_o, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 615, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_filter_triples(__pyx_v_self, __pyx_v_s, __pyx_v_p, __pyx_v_o, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 667, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -24781,7 +25498,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   return __pyx_r;
 }
 
-/* "sabot/_cython/graph/storage/graph_storage.pyx":637
+/* "sabot/_cython/graph/storage/graph_storage.pyx":689
  *         return self._triples.filter(mask)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -24816,22 +25533,22 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__repr__", 0);
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":638
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":690
  * 
  *     def __repr__(self):
  *         return f"RDFTripleStore(num_triples={self.num_triples()}, num_terms={self.num_terms()})"             # <<<<<<<<<<<<<<
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *)__pyx_v_self->__pyx_vtab)->num_triples(__pyx_v_self, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 638, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 638, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *)__pyx_v_self->__pyx_vtab)->num_triples(__pyx_v_self, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 690, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 690, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 638, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 690, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *)__pyx_v_self->__pyx_vtab)->num_terms(__pyx_v_self, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 638, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 638, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *)__pyx_v_self->__pyx_vtab)->num_terms(__pyx_v_self, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 690, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 690, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 638, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 690, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_5[0] = __pyx_mstate_global->__pyx_kp_u_RDFTripleStore_num_triples;
@@ -24840,7 +25557,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   __pyx_t_5[3] = __pyx_t_4;
   __pyx_t_5[4] = __pyx_mstate_global->__pyx_kp_u_;
   __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_5, 5, 27 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3) + 12 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4) + 1, 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4));
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 638, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 690, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -24848,7 +25565,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRD
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":637
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":689
  *         return self._triples.filter(mask)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -25764,14 +26481,14 @@ static int __pyx_tp_clear_5sabot_7_cython_5graph_7storage_13graph_storage_PyProp
 }
 
 static PyMethodDef __pyx_methods_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph[] = {
-  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_29__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_31__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_33__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 #if CYTHON_USE_TYPE_SPECS
 static PyType_Slot __pyx_type_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph_slots[] = {
   {Py_tp_dealloc, (void *)__pyx_tp_dealloc_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph},
-  {Py_tp_repr, (void *)__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_25__repr__},
+  {Py_tp_repr, (void *)__pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_29__repr__},
   {Py_tp_doc, (void *)PyDoc_STR("\n    Property graph with vertices, edges, and adjacency structures.\n\n    Combines vertex table, edge table, and CSR/CSC indices for\n    efficient pattern matching, traversals, and graph analytics.\n\n    Example:\n        >>> vertices = pa.table({\n        ...     'id': [0, 1, 2, 3],\n        ...     'label': pa.array(['Person', 'Person', 'Company', 'Company']).dictionary_encode(),\n        ...     'name': ['Alice', 'Bob', 'Acme', 'Globex']\n        ... })\n        >>> edges = pa.table({\n        ...     'src': [0, 1, 0],\n        ...     'dst': [2, 2, 3],\n        ...     'type': pa.array(['WORKS_AT', 'WORKS_AT', 'OWNS']).dictionary_encode(),\n        ...     'since': [2018, 2019, 2020]\n        ... })\n        >>> graph = PropertyGraph(vertices, edges)\n        >>> graph.build_csr()\n        >>> neighbors = graph.get_neighbors(0)  # Alice's neighbors\n    ")},
   {Py_tp_traverse, (void *)__pyx_tp_traverse_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph},
   {Py_tp_clear, (void *)__pyx_tp_clear_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph},
@@ -25803,7 +26520,7 @@ static PyTypeObject __pyx_type_5sabot_7_cython_5graph_7storage_13graph_storage_P
   0, /*tp_getattr*/
   0, /*tp_setattr*/
   0, /*tp_as_async*/
-  __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_25__repr__, /*tp_repr*/
+  __pyx_pw_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_29__repr__, /*tp_repr*/
   0, /*tp_as_number*/
   0, /*tp_as_sequence*/
   0, /*tp_as_mapping*/
@@ -26200,6 +26917,8 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_vtable_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph.get_neighbors = (struct __pyx_obj_7pyarrow_3lib_Int64Array *(*)(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *, int64_t, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_get_neighbors;
   __pyx_vtable_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph.get_in_neighbors = (struct __pyx_obj_7pyarrow_3lib_Int64Array *(*)(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *, int64_t, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_get_in_neighbors;
   __pyx_vtable_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph.match_pattern = (struct __pyx_obj_7pyarrow_3lib_RecordBatch *(*)(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *, PyObject *, PyObject *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_match_pattern;
+  __pyx_vtable_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph.add_vertices_from_table = (void (*)(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *, struct __pyx_obj_7pyarrow_3lib_Table *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_add_vertices_from_table;
+  __pyx_vtable_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph.add_edges_from_table = (void (*)(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph *, struct __pyx_obj_7pyarrow_3lib_Table *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_add_edges_from_table;
   #if CYTHON_USE_TYPE_SPECS
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph)) __PYX_ERR(0, 406, __pyx_L1_error)
   if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph) < 0) __PYX_ERR(0, 406, __pyx_L1_error)
@@ -26229,25 +26948,25 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_vtable_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore.lookup_term = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *, int64_t, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_lookup_term;
   __pyx_vtable_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore.filter_triples = (struct __pyx_obj_7pyarrow_3lib_Table *(*)(struct __pyx_obj_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore *, int64_t, int64_t, int64_t, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_filter_triples;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore)) __PYX_ERR(0, 542, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore) < 0) __PYX_ERR(0, 542, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore)) __PYX_ERR(0, 594, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore) < 0) __PYX_ERR(0, 594, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore = &__pyx_type_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore) < 0) __PYX_ERR(0, 542, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore) < 0) __PYX_ERR(0, 594, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore->tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore->tp_getattro = PyObject_GenericGetAttr;
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_vtabptr_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore) < 0) __PYX_ERR(0, 542, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore) < 0) __PYX_ERR(0, 542, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore) < 0) __PYX_ERR(0, 542, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore) < 0) __PYX_ERR(0, 542, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_vtabptr_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore) < 0) __PYX_ERR(0, 594, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore) < 0) __PYX_ERR(0, 594, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore) < 0) __PYX_ERR(0, 594, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore) < 0) __PYX_ERR(0, 594, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -28171,12 +28890,36 @@ __Pyx_RefNannySetupContext("PyInit_graph_storage", 0);
   if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph, __pyx_mstate_global->__pyx_n_u_match_pattern, __pyx_t_2) < 0) __PYX_ERR(0, 493, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":534
+ *         )
+ * 
+ *     cpdef void add_vertices_from_table(self, ca.Table new_vertices):             # <<<<<<<<<<<<<<
+ *         """
+ *         Add vertices from table (mutable operation for streaming).
+*/
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_25add_vertices_from_table, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyPropertyGraph_add_vertices_fro, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[42])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 534, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph, __pyx_mstate_global->__pyx_n_u_add_vertices_from_table, __pyx_t_2) < 0) __PYX_ERR(0, 534, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":560
+ *         self._csc = None
+ * 
+ *     cpdef void add_edges_from_table(self, ca.Table new_edges):             # <<<<<<<<<<<<<<
+ *         """
+ *         Add edges from table (mutable operation for streaming).
+*/
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27add_edges_from_table, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyPropertyGraph_add_edges_from_t, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[43])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 560, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyPropertyGraph, __pyx_mstate_global->__pyx_n_u_add_edges_from_table, __pyx_t_2) < 0) __PYX_ERR(0, 560, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
  * def __setstate_cython__(self, __pyx_state):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_27__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyPropertyGraph___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[42])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_31__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyPropertyGraph___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[44])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -28187,93 +28930,93 @@ __Pyx_RefNannySetupContext("PyInit_graph_storage", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_29__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyPropertyGraph___setstate_cytho, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[43])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_15PyPropertyGraph_33__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyPropertyGraph___setstate_cytho, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[45])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_2) < 0) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":570
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":622
  *         )
  * 
  *     cpdef int64_t num_triples(self):             # <<<<<<<<<<<<<<
  *         """Number of triples."""
  *         return self.c_store.get().num_triples()
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_3num_triples, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_num_triples, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[44])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 570, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_3num_triples, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_num_triples, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[46])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 622, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_num_triples, __pyx_t_2) < 0) __PYX_ERR(0, 570, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_num_triples, __pyx_t_2) < 0) __PYX_ERR(0, 622, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":574
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":626
  *         return self.c_store.get().num_triples()
  * 
  *     cpdef int64_t num_terms(self):             # <<<<<<<<<<<<<<
  *         """Number of terms in dictionary."""
  *         return self.c_store.get().num_terms()
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_5num_terms, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_num_terms, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[45])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 574, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_5num_terms, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_num_terms, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[47])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 626, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_num_terms, __pyx_t_2) < 0) __PYX_ERR(0, 574, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_num_terms, __pyx_t_2) < 0) __PYX_ERR(0, 626, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":578
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":630
  *         return self.c_store.get().num_terms()
  * 
  *     cpdef ca.Table triples(self):             # <<<<<<<<<<<<<<
  *         """Get triples table."""
  *         return self._triples
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_7triples, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_triples, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[46])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 578, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_7triples, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_triples, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[48])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 630, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_triples, __pyx_t_2) < 0) __PYX_ERR(0, 578, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_triples, __pyx_t_2) < 0) __PYX_ERR(0, 630, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":582
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":634
  *         return self._triples
  * 
  *     cpdef ca.Table term_dict(self):             # <<<<<<<<<<<<<<
  *         """Get term dictionary table."""
  *         return self._term_dict
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_9term_dict, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_term_dict, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[47])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 582, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_9term_dict, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_term_dict, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[49])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 634, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_term_dict, __pyx_t_2) < 0) __PYX_ERR(0, 582, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_term_dict, __pyx_t_2) < 0) __PYX_ERR(0, 634, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":586
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":638
  *         return self._term_dict
  * 
  *     cpdef int64_t lookup_term_id(self, str lex):             # <<<<<<<<<<<<<<
  *         """
  *         Lookup term ID by lexical form.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_11lookup_term_id, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_lookup_term_id, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[48])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 586, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_11lookup_term_id, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_lookup_term_id, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[50])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 638, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_lookup_term_id, __pyx_t_2) < 0) __PYX_ERR(0, 586, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_lookup_term_id, __pyx_t_2) < 0) __PYX_ERR(0, 638, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":600
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":652
  *         return -1
  * 
  *     cpdef str lookup_term(self, int64_t term_id):             # <<<<<<<<<<<<<<
  *         """
  *         Lookup term lexical form by ID.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_13lookup_term, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_lookup_term, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[49])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 600, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_13lookup_term, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_lookup_term, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[51])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 652, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_lookup_term, __pyx_t_2) < 0) __PYX_ERR(0, 600, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_lookup_term, __pyx_t_2) < 0) __PYX_ERR(0, 652, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/graph/storage/graph_storage.pyx":615
+  /* "sabot/_cython/graph/storage/graph_storage.pyx":667
  *         raise KeyError(f"Term ID {term_id} not found")
  * 
  *     cpdef ca.Table filter_triples(self, int64_t s, int64_t p, int64_t o):             # <<<<<<<<<<<<<<
  *         """
  *         Filter triples by pattern (s, p, o) where -1 = wildcard.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_15filter_triples, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_filter_triples, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[50])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 615, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_15filter_triples, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore_filter_triples, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[52])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 667, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_filter_triples, __pyx_t_2) < 0) __PYX_ERR(0, 615, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_5graph_7storage_13graph_storage_PyRDFTripleStore, __pyx_mstate_global->__pyx_n_u_filter_triples, __pyx_t_2) < 0) __PYX_ERR(0, 667, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
@@ -28281,7 +29024,7 @@ __Pyx_RefNannySetupContext("PyInit_graph_storage", 0);
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
  * def __setstate_cython__(self, __pyx_state):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_19__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[51])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_19__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[53])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -28292,7 +29035,7 @@ __Pyx_RefNannySetupContext("PyInit_graph_storage", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_21__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore___setstate_cyth, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[52])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_5graph_7storage_13graph_storage_16PyRDFTripleStore_21__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_PyRDFTripleStore___setstate_cyth, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_graph_storage_grap, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[54])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_2) < 0) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -28397,6 +29140,8 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_PyPropertyGraph, sizeof(__pyx_k_PyPropertyGraph), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PyPropertyGraph */
   {__pyx_k_PyPropertyGraph___reduce_cython, sizeof(__pyx_k_PyPropertyGraph___reduce_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PyPropertyGraph___reduce_cython */
   {__pyx_k_PyPropertyGraph___setstate_cytho, sizeof(__pyx_k_PyPropertyGraph___setstate_cytho), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PyPropertyGraph___setstate_cytho */
+  {__pyx_k_PyPropertyGraph_add_edges_from_t, sizeof(__pyx_k_PyPropertyGraph_add_edges_from_t), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PyPropertyGraph_add_edges_from_t */
+  {__pyx_k_PyPropertyGraph_add_vertices_fro, sizeof(__pyx_k_PyPropertyGraph_add_vertices_fro), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PyPropertyGraph_add_vertices_fro */
   {__pyx_k_PyPropertyGraph_build_csc, sizeof(__pyx_k_PyPropertyGraph_build_csc), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PyPropertyGraph_build_csc */
   {__pyx_k_PyPropertyGraph_build_csr, sizeof(__pyx_k_PyPropertyGraph_build_csr), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PyPropertyGraph_build_csr */
   {__pyx_k_PyPropertyGraph_csc, sizeof(__pyx_k_PyPropertyGraph_csc), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PyPropertyGraph_csc */
@@ -28436,7 +29181,9 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ValueError */
   {__pyx_k_VertexTable_num_vertices, sizeof(__pyx_k_VertexTable_num_vertices), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_VertexTable_num_vertices */
   {__pyx_k__2, sizeof(__pyx_k__2), 0, 1, 0}, /* PyObject cname: __pyx_kp_u__2 */
+  {__pyx_k_add_edges_from_table, sizeof(__pyx_k_add_edges_from_table), 0, 1, 1}, /* PyObject cname: __pyx_n_u_add_edges_from_table */
   {__pyx_k_add_note, sizeof(__pyx_k_add_note), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_add_note */
+  {__pyx_k_add_vertices_from_table, sizeof(__pyx_k_add_vertices_from_table), 0, 1, 1}, /* PyObject cname: __pyx_n_u_add_vertices_from_table */
   {__pyx_k_and, sizeof(__pyx_k_and), 0, 1, 1}, /* PyObject cname: __pyx_n_u_and */
   {__pyx_k_array, sizeof(__pyx_k_array), 0, 1, 1}, /* PyObject cname: __pyx_n_u_array */
   {__pyx_k_as_py, sizeof(__pyx_k_as_py), 0, 1, 1}, /* PyObject cname: __pyx_n_u_as_py */
@@ -28450,6 +29197,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_columns, sizeof(__pyx_k_columns), 0, 1, 1}, /* PyObject cname: __pyx_n_u_columns */
   {__pyx_k_combine_chunks, sizeof(__pyx_k_combine_chunks), 0, 1, 1}, /* PyObject cname: __pyx_n_u_combine_chunks */
   {__pyx_k_compute, sizeof(__pyx_k_compute), 0, 1, 1}, /* PyObject cname: __pyx_n_u_compute */
+  {__pyx_k_concat_tables, sizeof(__pyx_k_concat_tables), 0, 1, 1}, /* PyObject cname: __pyx_n_u_concat_tables */
   {__pyx_k_csc, sizeof(__pyx_k_csc), 0, 1, 1}, /* PyObject cname: __pyx_n_u_csc */
   {__pyx_k_csr, sizeof(__pyx_k_csr), 0, 1, 1}, /* PyObject cname: __pyx_n_u_csr */
   {__pyx_k_dictionary, sizeof(__pyx_k_dictionary), 0, 1, 1}, /* PyObject cname: __pyx_n_u_dictionary */
@@ -28501,6 +29249,8 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_name_2, sizeof(__pyx_k_name_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_name_2 */
   {__pyx_k_names, sizeof(__pyx_k_names), 0, 1, 1}, /* PyObject cname: __pyx_n_u_names */
   {__pyx_k_neighbor_id, sizeof(__pyx_k_neighbor_id), 0, 1, 1}, /* PyObject cname: __pyx_n_u_neighbor_id */
+  {__pyx_k_new_edges, sizeof(__pyx_k_new_edges), 0, 1, 1}, /* PyObject cname: __pyx_n_u_new_edges */
+  {__pyx_k_new_vertices, sizeof(__pyx_k_new_vertices), 0, 1, 1}, /* PyObject cname: __pyx_n_u_new_vertices */
   {__pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_no_default___reduce___due_to_non */
   {__pyx_k_not_found, sizeof(__pyx_k_not_found), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_not_found */
   {__pyx_k_num_edges, sizeof(__pyx_k_num_edges), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_edges */
@@ -28564,7 +29314,7 @@ static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 103, __pyx_L1_error)
   __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 128, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
-  __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_KeyError); if (!__pyx_builtin_KeyError) __PYX_ERR(0, 613, __pyx_L1_error)
+  __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_KeyError); if (!__pyx_builtin_KeyError) __PYX_ERR(0, 665, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -28852,59 +29602,69 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[41] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_match_pattern, __pyx_k_A_t_5Qa_t_5Qa_WO1A_L_a_nF_hb_N_b, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[41])) goto bad;
   }
   {
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 534, 79};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_new_vertices};
+    __pyx_mstate_global->__pyx_codeobj_tab[42] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_add_vertices_from_table, __pyx_k_A_2_1AT_6_Q_M_aq_K_q_HA_HA, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[42])) goto bad;
+  }
+  {
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 560, 79};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_new_edges};
+    __pyx_mstate_global->__pyx_codeobj_tab[43] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_add_edges_from_table, __pyx_k_A_2_1AT_d_Jk_K_q_HA_HA, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[43])) goto bad;
+  }
+  {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[42] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[42])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[44] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[44])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 3, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[43] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[43])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[45] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[45])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 570, 17};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 622, 17};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[44] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_num_triples, __pyx_k_A_t84r_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[44])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[46] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_num_triples, __pyx_k_A_t84r_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[46])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 574, 17};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 626, 17};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[45] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_num_terms, __pyx_k_A_t84r_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[45])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[47] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_num_terms, __pyx_k_A_t84r_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[47])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 578, 9};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 630, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[46] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_triples, __pyx_k_A_t1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[46])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[48] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_triples, __pyx_k_A_t1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[48])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 582, 9};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 634, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[47] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_term_dict, __pyx_k_A_t1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[47])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[49] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_term_dict, __pyx_k_A_t1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[49])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 586, 83};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 638, 83};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_lex};
-    __pyx_mstate_global->__pyx_codeobj_tab[48] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_lookup_term_id, __pyx_k_A_T_G1F_E_az_z_F_S_t_gQe_ARvQ, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[48])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[50] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_lookup_term_id, __pyx_k_A_T_G1F_E_az_z_F_S_t_gQe_ARvQ, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[50])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 600, 96};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 652, 96};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_term_id};
-    __pyx_mstate_global->__pyx_codeobj_tab[49] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_lookup_term, __pyx_k_A_D_7_5_q_T_G1F_E_ay_q_y_6_Cq_z, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[49])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[51] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_lookup_term, __pyx_k_A_D_7_5_q_T_G1F_E_ay_q_y_6_Cq_z, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[51])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 615, 207};
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 667, 207};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_s, __pyx_mstate->__pyx_n_u_p, __pyx_mstate->__pyx_n_u_o};
-    __pyx_mstate_global->__pyx_codeobj_tab[50] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_filter_triples, __pyx_k_A_r_q_2S_2U_6_6_iwavRwasRWWYY, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[50])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[52] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_graph_storage_grap_2, __pyx_mstate->__pyx_n_u_filter_triples, __pyx_k_A_r_q_2S_2U_6_6_iwavRwasRWWYY, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[52])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[51] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[51])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[53] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[53])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 3, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[52] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[52])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[54] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[54])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;

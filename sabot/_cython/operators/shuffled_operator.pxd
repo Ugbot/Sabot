@@ -12,6 +12,11 @@ cdef class ShuffledOperator(BaseOperator):
     """Base class for operators requiring network shuffle."""
 
     cdef:
+        # Public attributes (for tests and metadata)
+        public str operator_id           # Unique operator identifier
+        public int32_t parallelism       # Parallelism hint
+
+        # Internal attributes
         list _partition_keys             # Columns to partition by
         int32_t _num_partitions          # Number of downstream tasks
         bint _stateful                   # Always True for shuffled ops
@@ -33,7 +38,7 @@ cdef class ShuffledOperator(BaseOperator):
     cpdef void set_shuffle_config(self, object transport, bytes shuffle_id,
                                   int32_t task_id, int32_t num_partitions)
 
-    cdef list _partition_batch(self, ca.RecordBatch batch)
+    cpdef list _partition_batch(self, ca.RecordBatch batch)
     cdef void _send_partitions(self, list partitions, list agent_addresses)
     cdef object _receive_shuffled_batches(self)
     cdef object _send_shuffled_batches(self)

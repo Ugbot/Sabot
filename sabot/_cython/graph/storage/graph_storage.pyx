@@ -531,6 +531,58 @@ cdef class PyPropertyGraph:
             names=['src_id', 'dst_id']
         )
 
+    cpdef void add_vertices_from_table(self, ca.Table new_vertices):
+        """
+        Add vertices from table (mutable operation for streaming).
+
+        Concatenates new vertices to existing vertex table and recreates
+        the C++ graph. Invalidates CSR/CSC caches since topology may change.
+
+        Args:
+            new_vertices: Arrow Table with new vertices (same schema as existing)
+
+        Performance: O(V_existing + V_new) for table concatenation + graph recreation
+        """
+        # Concatenate new vertices to existing
+        combined = pa.concat_tables([self._vertices.table(), new_vertices])
+        self._vertices = PyVertexTable(combined)
+
+        # Recreate C++ graph with updated tables
+        self.c_graph = make_shared[PropertyGraph](
+            self._vertices.c_table,
+            self._edges.c_table
+        )
+
+        # Invalidate caches (vertex IDs may have changed)
+        self._csr = None
+        self._csc = None
+
+    cpdef void add_edges_from_table(self, ca.Table new_edges):
+        """
+        Add edges from table (mutable operation for streaming).
+
+        Concatenates new edges to existing edge table and recreates
+        the C++ graph. Invalidates CSR/CSC caches since topology changed.
+
+        Args:
+            new_edges: Arrow Table with new edges (same schema as existing)
+
+        Performance: O(E_existing + E_new) for table concatenation + graph recreation
+        """
+        # Concatenate new edges to existing
+        combined = pa.concat_tables([self._edges.table(), new_edges])
+        self._edges = PyEdgeTable(combined)
+
+        # Recreate C++ graph with updated tables
+        self.c_graph = make_shared[PropertyGraph](
+            self._vertices.c_table,
+            self._edges.c_table
+        )
+
+        # Invalidate caches (topology changed)
+        self._csr = None
+        self._csc = None
+
     def __repr__(self):
         return f"PropertyGraph(num_vertices={self.num_vertices()}, num_edges={self.num_edges()})"
 

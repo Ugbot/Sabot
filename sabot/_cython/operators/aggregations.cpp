@@ -59,13 +59,24 @@
             "-Wno-unused-function",
             "-Wno-deprecated-declarations"
         ],
+        "extra_link_args": [
+            "-Wl,-headerpad_max_install_names",
+            "-Wl,-rpath,@loader_path/../../vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/tonbo/tonbo-ffi/target/release"
+        ],
         "include_dirs": [
             "/Users/bengamble/Sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
             "/Users/bengamble/Sabot/vendor/arrow/python",
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow",
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src",
-            "/Users/bengamble/Sabot/tonbo/tonbo-ffi"
+            "/Users/bengamble/Sabot/vendor/duckdb/third_party/concurrentqueue",
+            "/Users/bengamble/Sabot/sabot/_c",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/storage",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/traversal",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/query",
+            "/Users/bengamble/Sabot/vendor/tonbo/tonbo-ffi"
         ],
         "language": "c++",
         "libraries": [
@@ -75,7 +86,7 @@
         ],
         "library_dirs": [
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib",
-            "/Users/bengamble/Sabot/tonbo/tonbo-ffi/target/release"
+            "/Users/bengamble/Sabot/vendor/tonbo/tonbo-ffi/target/release"
         ],
         "name": "sabot._cython.operators.aggregations",
         "sources": [
@@ -3587,6 +3598,8 @@ struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner {
 */
 struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator {
   struct __pyx_obj_5sabot_7_cython_9operators_13base_operator_BaseOperator __pyx_base;
+  PyObject *operator_id;
+  int32_t parallelism;
   PyObject *_partition_keys;
   int32_t _num_partitions;
   int _stateful;
@@ -5179,7 +5192,7 @@ struct __pyx_vtabstruct_5sabot_7_cython_9operators_17shuffled_operator_ShuffledO
   struct __pyx_vtabstruct_5sabot_7_cython_9operators_13base_operator_BaseOperator __pyx_base;
   int32_t (*get_num_partitions)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, int __pyx_skip_dispatch);
   void (*set_shuffle_config)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, PyObject *, PyObject *, int32_t, int32_t, int __pyx_skip_dispatch);
-  PyObject *(*_partition_batch)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, struct __pyx_obj_7pyarrow_3lib_RecordBatch *);
+  PyObject *(*_partition_batch)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, struct __pyx_obj_7pyarrow_3lib_RecordBatch *, int __pyx_skip_dispatch);
   void (*_send_partitions)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, PyObject *, PyObject *);
   PyObject *(*_receive_shuffled_batches)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *);
   PyObject *(*_send_shuffled_batches)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *);
@@ -6630,6 +6643,7 @@ static const char __pyx_k_init___locals_lambda[] = "__init__.<locals>.<lambda>";
 static const char __pyx_k_CythonGroupByOperator[] = "CythonGroupByOperator";
 static const char __pyx_k_CythonDistinctOperator[] = "CythonDistinctOperator";
 static const char __pyx_k_create_reduce_operator[] = "create_reduce_operator";
+static const char __pyx_k_hk_A_1_____7_7q8PP___1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"]\005\360\000\000]\005_\005\360\000\000_\005`\005\330\004\023\320\023(\250\010\260\001\260\021\330\004\007\200|\2207\230!\330\0107\260q\3208P\320P^\320^_\330\004\013\2101";
 static const char __pyx_k_CythonAggregateOperator[] = "CythonAggregateOperator";
 static const char __pyx_k_create_groupby_operator[] = "create_groupby_operator";
 static const char __pyx_k_Error_in_reduce_operator[] = "Error in reduce operator: ";
@@ -6642,7 +6656,6 @@ static const char __pyx_k_CythonReduceOperator___iter[] = "CythonReduceOperator.
 static const char __pyx_k_Error_in_aggregate_operator[] = "Error in aggregate operator: ";
 static const char __pyx_k_CythonGroupByOperator___iter[] = "CythonGroupByOperator.__iter__";
 static const char __pyx_k_Unknown_aggregation_function[] = "Unknown aggregation function: ";
-static const char __pyx_k_hk_A_1_C_C_E_E_F_7_7q8PP___1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"C\005\360\000\000C\005E\005\360\000\000E\005F\005\330\004\023\320\023(\250\010\260\001\260\021\330\004\007\200|\2207\230!\330\0107\260q\3208P\320P^\320^_\330\004\013\2101";
 static const char __pyx_k_hk_A_1_L_L_N_N_O_7_8_9RR_a_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"L\003\360\000\000L\003N\003\360\000\000N\003O\003\330\004\023\320\023)\250\030\260\021\260!\330\004\007\200|\2207\230!\330\0108\270\001\3209R\320R`\320`a\330\004\013\2101";
 static const char __pyx_k_hk_A_1_T_T_V_V_W_xq_7_6a7Nn_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"T\003\360\000\000T\003V\003\360\000\000V\003W\003\330\004\023\320\023'\240x\250q\260\001\330\004\007\200|\2207\230!\330\0106\260a\3207N\310n\320\\]\330\004\013\2101";
 static const char __pyx_k_CythonAggregateOperator___iter[] = "CythonAggregateOperator.__iter__";
@@ -6661,7 +6674,7 @@ static const char __pyx_k_CythonReduceOperator_get_result[] = "CythonReduceOpera
 static const char __pyx_k_Cython_Aggregation_Operators_Hi[] = "\nCython Aggregation Operators\n\nHigh-performance streaming aggregation operators using:\n- Arrow compute hash_aggregate kernels (SIMD-accelerated)\n- Tonbo columnar state backend for incremental aggregations\n- Zero-copy throughout\n\nPerformance targets:\n- groupBy: 5-100M records/sec\n- reduce: 5-50M records/sec\n- aggregate: 5-100M records/sec\n- distinct: 3-50M records/sec\n";
 static const char __pyx_k_T_D_t3Gt_UYYffjjttx_y_E_E_I_I_J[] = "\200\001\360\010\000\005\016\210T\220\033\230D\240\017\250t\3203G\300t\310:\320UY\320Yf\320fj\320jt\320tx\360\000\000y\001E\002\360\000\000E\002I\002\360\000\000I\002J\002\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230:\240W\250E\260\023\260D\270\016\300g\310U\320RU\320UY\320Yb\320bi\320in\320nq\320qu\360\000\000v\001B\002\360\000\000B\002I\002\360\000\000I\002N\002\360\000\000N\002Q\002\360\000\000Q\002U\002\360\000\000U\002^\002\360\000\000^\002e\002\360\000\000e\002j\002\360\000\000j\002m\002\360\000\000m\002q\002\360\000\000q\002\177\002\360\000\000\177\002F\003\360\000\000F\003G\003\330\004\007\200q\330\010\017\320\0177\260t\2701\270G\300;\310g\320UV\340\010\017\320\0177\260t\2701\270G\300;\310a";
 static const char __pyx_k_T__D8LDPZZ_hhllxx_G1F_a_vWA_q_t[] = "\200\001\360\010\000\005\016\210T\320\021!\240\024\240_\260D\3208L\310D\320PZ\320Z^\320^h\320hl\320lx\320x|\320|}\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230?\250'\260\025\260c\270\024\270^\3107\320RW\320WZ\320Z^\320^g\320gn\320ns\320sv\320vz\360\000\000{\001D\002\360\000\000D\002K\002\360\000\000K\002P\002\360\000\000P\002S\002\360\000\000S\002W\002\360\000\000W\002e\002\360\000\000e\002l\002\360\000\000l\002m\002\330\004\007\200q\330\010\017\320\0178\270\004\270A\270W\300K\310w\320VW\340\010\017\320\0178\270\004\270A\270W\300K\310q";
-static const char __pyx_k_T__D_DVVZZllp_q_E_E_I_I_____n_n[] = "\200\001\360\010\000\005\016\210T\320\021!\240\024\240_\260D\270\010\300\004\320DV\320VZ\320Zl\320lp\360\000\000q\001E\002\360\000\000E\002I\002\360\000\000I\002[\002\360\000\000[\002_\002\360\000\000_\002n\002\360\000\000n\002r\002\360\000\000r\002|\002\360\000\000|\002@\003\360\000\000@\003N\003\360\000\000N\003R\003\360\000\000R\003g\003\360\000\000g\003k\003\360\000\000k\003u\003\360\000\000u\003y\003\360\000\000y\003E\004\360\000\000E\004I\004\360\000\000I\004U\004\360\000\000U\004Y\004\360\000\000Y\004d\004\360\000\000d\004h\004\360\000\000h\004i\004\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230?\250'\260\025\260c\270\024\270^\3107\320RW\320WZ\320Z^\320^e\320el\320lq\320qt\320tx\360\000\000y\001J\002\360\000\000J\002Q\002\360\000\000Q\002V\002\360\000\000V\002Y\002\360\000\000Y\002]\002\360\000\000]\002k\002\360\000\000k\002r\002\360\000\000r\002w\002\360\000\000w\002z\002\360\000\000z\002~\002\360\000\000~\002G\003\360\000\000G\003N\003\360\000\000N\003S\003\360\000\000S\003V\003\360\000\000V\003Z\003\360\000\000Z\003g\003\360\000\000g\003n\003\360\000\000n\003s\003\360\000\000s\003v\003\360\000\000v\003z\003\360\000\000z\003N\004\360\000\000N\004U\004\360\000\000U\004Z\004\360\000\000Z\004]\004\360\000\000]\004a\004\360\000\000a\004j\004\360\000\000j\004q\004\360\000\000q\004v\004\360\000\000v\004y\004\360\000\000y\004}\004\360\000\000}\004K\005\360\000\000K\005R\005\360\000\000R\005S\005\330\004\007\200q\330\010\017\320\0176\260d\270!\2707\300+\310W\320TU\340\010\017\320\0176\260d\270!\2707\300+\310Q";
+static const char __pyx_k_T__D_DVVZZllp_q_E_E_I_I_____n_n[] = "\200\001\360\010\000\005\016\210T\320\021!\240\024\240_\260D\270\010\300\004\320DV\320VZ\320Zl\320lp\360\000\000q\001E\002\360\000\000E\002I\002\360\000\000I\002[\002\360\000\000[\002_\002\360\000\000_\002n\002\360\000\000n\002r\002\360\000\000r\002|\002\360\000\000|\002@\003\360\000\000@\003N\003\360\000\000N\003R\003\360\000\000R\003g\003\360\000\000g\003k\003\360\000\000k\003u\003\360\000\000u\003y\003\360\000\000y\003E\004\360\000\000E\004I\004\360\000\000I\004U\004\360\000\000U\004Y\004\360\000\000Y\004d\004\360\000\000d\004h\004\360\000\000h\004w\004\360\000\000w\004{\004\360\000\000{\004I\005\360\000\000I\005M\005\360\000\000M\005N\005\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\230?\250'\260\025\260c\270\024\270^\3107\320RW\320WZ\320Z^\320^e\320el\320lq\320qt\320tx\360\000\000y\001J\002\360\000\000J\002Q\002\360\000\000Q\002V\002\360\000\000V\002Y\002\360\000\000Y\002]\002\360\000\000]\002k\002\360\000\000k\002r\002\360\000\000r\002w\002\360\000\000w\002z\002\360\000\000z\002~\002\360\000\000~\002G\003\360\000\000G\003N\003\360\000\000N\003S\003\360\000\000S\003V\003\360\000\000V\003Z\003\360\000\000Z\003g\003\360\000\000g\003n\003\360\000\000n\003s\003\360\000\000s\003v\003\360\000\000v\003z\003\360\000\000z\003N\004\360\000\000N\004U\004\360\000\000U\004Z\004\360\000\000Z\004]\004\360\000\000]\004a\004\360\000\000a\004j\004\360\000\000j\004q\004\360\000\000q\004v\004\360\000\000v\004y\004\360\000\000y\004}\004\360\000\000}\004K\005\360\000\000K\005R\005\360\000\000R\005W\005\360\000\000W\005Z\005\360\000\000Z\005^\005\360\000\000^\005k\005\360\000\000k\005r\005\360\000\000r\005s\005\330\004\007\200q\330\010\017\320\0176\260d\270!\2707\300+\310W\320TU\340\010\017\320\0176\260d\270!\2707\300+\310Q";
 static const char __pyx_k_A_4_s_5_5_Q_1_hit_q_7_Q_WAQ_Ql_Q[] = "\200A\360\010\000\t\014\2104\320\017\037\230s\240&\250\003\2505\260\003\2605\270\n\300#\300Q\330\014\023\2201\340\010\t\340\014\020\220\016\230h\240i\250t\260>\300\026\300q\330\020\023\2207\230#\230Q\340\024 \240\005\240W\250A\250Q\330\024\030\230\r\240Q\240l\260'\270\021\270!\360\006\000\025\031\230\r\240Q\240l\260'\270\021\270%\270q\360\006\000\r\024\2201\340\010\017\210}\230A\330\014\022\220,\230a\230r\320!B\300!";
 static const char __pyx_k_A_4q_1_hit_q_7_Q_m1A_t1_1O1A_r_q[] = "\200A\340\010\013\2104\210q\330\014\023\2201\340\010\t\330\014\032\230!\340\014\020\220\016\230h\240i\250t\260>\300\026\300q\330\020\023\2207\230#\230Q\340\024\"\240$\240m\2601\260A\330\024\027\220t\2301\330\030#\2401\240O\2601\260A\330\030\031\360\006\000\025 \230r\240\036\250q\260\001\360\006\000\025\030\220u\230C\230q\330\030#\2401\240O\2601\260B\260d\270!\2709\300F\310!\330\031\036\230c\240\027\250\003\2505\260\003\2601\330\030#\2401\240O\2601\260B\260e\2701\270I\300V\3101\330\031\036\230c\240\021\330\030#\2401\240O\2601\260B\260d\270!\2709\300F\310!\330\031\036\230c\240\021\330\030#\2401\240O\2601\260B\260d\270!\2709\300F\310!\330\031\036\230c\240\021\330\030#\2401\240O\2601\260C\260q\270\001\330\031\036\230c\240\021\330\030#\2401\240O\2601\260B\260g\270Q\270i\300v\310Q\330\031\036\230c\240\021\330\030#\2401\240O\2601\260B\260i\270q\300\t\310\026\310q\340\030\036\230j\250\001\250\022\320+M\310Q\360\006\000\025#\240#\240Q\240d\250-\260q\270\001\330\024\037\230q\240\017\250q\260\001\340\014\023\2202\220\\\240\034\250Q\250a\340\010\017\210}\230A\330\014\022\220,\230a\230r\320!G\300q";
 static const char __pyx_k_CythonAggregateOperator___reduce[] = "CythonAggregateOperator.__reduce_cython__";
@@ -6679,7 +6692,7 @@ static const char __pyx_k_CythonGroupByOperator_process_ba[] = "CythonGroupByOpe
 static const char __pyx_k_CythonReduceOperator___reduce_cy[] = "CythonReduceOperator.__reduce_cython__";
 static const char __pyx_k_CythonReduceOperator_process_bat[] = "CythonReduceOperator.process_batch";
 static const char __pyx_k_Error_computing_aggregate_result[] = "Error computing aggregate result: ";
-static const char __pyx_k_Incompatible_checksums_0x_x_vs_0[] = "Incompatible checksums (0x%x vs (0x29baf64, 0x5a654c2, 0x055b43d) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state))";
+static const char __pyx_k_Incompatible_checksums_0x_x_vs_0[] = "Incompatible checksums (0x%x vs (0x0b735a4, 0xd7c56da, 0xce55c53) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state, operator_id, parallelism))";
 static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.";
 static const char __pyx_k_sabot__cython_operators_aggregat[] = "sabot._cython.operators.aggregations";
 static const char __pyx_k_Incompatible_checksums_0x_x_vs_0_2[] = "Incompatible checksums (0x%x vs (0xdc9616e, 0x318f0ea, 0xf2558a2) = (_accumulator, _initial_value, _key_columns, _parallelism_hint, _reduce_func, _schema, _source, _stateful))";
@@ -6910,16 +6923,16 @@ typedef struct {
   PyObject *__pyx_string_tab[162];
   PyObject *__pyx_int_0;
   PyObject *__pyx_int_4;
-  PyObject *__pyx_int_5616701;
+  PyObject *__pyx_int_12006820;
   PyObject *__pyx_int_26086037;
   PyObject *__pyx_int_32203476;
-  PyObject *__pyx_int_43757412;
   PyObject *__pyx_int_51966186;
   PyObject *__pyx_int_76157590;
-  PyObject *__pyx_int_94786754;
   PyObject *__pyx_int_153285704;
   PyObject *__pyx_int_157312778;
   PyObject *__pyx_int_170774808;
+  PyObject *__pyx_int_216357971;
+  PyObject *__pyx_int_226252506;
   PyObject *__pyx_int_231301486;
   PyObject *__pyx_int_254105762;
 /* #### Code section: module_state_contents ### */
@@ -7312,16 +7325,16 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   for (int i=0; i<162; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   Py_CLEAR(clear_module_state->__pyx_int_0);
   Py_CLEAR(clear_module_state->__pyx_int_4);
-  Py_CLEAR(clear_module_state->__pyx_int_5616701);
+  Py_CLEAR(clear_module_state->__pyx_int_12006820);
   Py_CLEAR(clear_module_state->__pyx_int_26086037);
   Py_CLEAR(clear_module_state->__pyx_int_32203476);
-  Py_CLEAR(clear_module_state->__pyx_int_43757412);
   Py_CLEAR(clear_module_state->__pyx_int_51966186);
   Py_CLEAR(clear_module_state->__pyx_int_76157590);
-  Py_CLEAR(clear_module_state->__pyx_int_94786754);
   Py_CLEAR(clear_module_state->__pyx_int_153285704);
   Py_CLEAR(clear_module_state->__pyx_int_157312778);
   Py_CLEAR(clear_module_state->__pyx_int_170774808);
+  Py_CLEAR(clear_module_state->__pyx_int_216357971);
+  Py_CLEAR(clear_module_state->__pyx_int_226252506);
   Py_CLEAR(clear_module_state->__pyx_int_231301486);
   Py_CLEAR(clear_module_state->__pyx_int_254105762);
   return 0;
@@ -7485,16 +7498,16 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   for (int i=0; i<162; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_4);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_5616701);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_12006820);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_26086037);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_32203476);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_43757412);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_51966186);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_76157590);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_94786754);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_153285704);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_157312778);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_170774808);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_216357971);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_226252506);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_231301486);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_254105762);
   return 0;
@@ -12786,8 +12799,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_21CythonGrou
   PyObject *__pyx_t_5 = NULL;
   PyObject *__pyx_t_6 = NULL;
   PyObject *__pyx_t_7 = NULL;
-  int __pyx_t_8;
+  PyObject *__pyx_t_8 = NULL;
   int __pyx_t_9;
+  int __pyx_t_10;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -12796,7 +12810,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_21CythonGrou
   /* "(tree fragment)":5
  *     cdef object _dict
  *     cdef bint use_setstate
- *     state = (self._aggregations, self._key_columns, self._keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._tonbo_state)             # <<<<<<<<<<<<<<
+ *     state = (self._aggregations, self._key_columns, self._keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._tonbo_state, self.operator_id, self.parallelism)             # <<<<<<<<<<<<<<
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:
 */
@@ -12812,80 +12826,88 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_21CythonGrou
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_self->__pyx_base._task_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = PyTuple_New(16); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 5, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyLong_From_int32_t(__pyx_v_self->__pyx_base.parallelism); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_8 = PyTuple_New(18); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 5, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
   __Pyx_INCREF(__pyx_v_self->_aggregations);
   __Pyx_GIVEREF(__pyx_v_self->_aggregations);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_v_self->_aggregations) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_v_self->_aggregations) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._key_columns);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._key_columns);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_v_self->__pyx_base.__pyx_base._key_columns) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_v_self->__pyx_base.__pyx_base._key_columns) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_keys);
   __Pyx_GIVEREF(__pyx_v_self->_keys);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_v_self->_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 2, __pyx_v_self->_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 3, __pyx_t_1) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 3, __pyx_t_1) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 4, __pyx_t_2) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 4, __pyx_t_2) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_3);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 5, __pyx_t_3) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 5, __pyx_t_3) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._partition_keys);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._partition_keys);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 6, __pyx_v_self->__pyx_base._partition_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 6, __pyx_v_self->__pyx_base._partition_keys) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF((PyObject *)__pyx_v_self->__pyx_base._partitioner);
   __Pyx_GIVEREF((PyObject *)__pyx_v_self->__pyx_base._partitioner);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 7, ((PyObject *)__pyx_v_self->__pyx_base._partitioner)) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 7, ((PyObject *)__pyx_v_self->__pyx_base._partitioner)) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._schema);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._schema);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 8, __pyx_v_self->__pyx_base.__pyx_base._schema) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 8, __pyx_v_self->__pyx_base.__pyx_base._schema) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._shuffle_id);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._shuffle_id);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 9, __pyx_v_self->__pyx_base._shuffle_id) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 9, __pyx_v_self->__pyx_base._shuffle_id) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._shuffle_transport);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._shuffle_transport);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 10, __pyx_v_self->__pyx_base._shuffle_transport) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 10, __pyx_v_self->__pyx_base._shuffle_transport) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._source);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._source);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 11, __pyx_v_self->__pyx_base.__pyx_base._source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 11, __pyx_v_self->__pyx_base.__pyx_base._source) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_4);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 12, __pyx_t_4) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 12, __pyx_t_4) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 13, __pyx_t_5) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 13, __pyx_t_5) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_6);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 14, __pyx_t_6) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 14, __pyx_t_6) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_tonbo_state);
   __Pyx_GIVEREF(__pyx_v_self->_tonbo_state);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 15, __pyx_v_self->_tonbo_state) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 15, __pyx_v_self->_tonbo_state) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  __Pyx_INCREF(__pyx_v_self->__pyx_base.operator_id);
+  __Pyx_GIVEREF(__pyx_v_self->__pyx_base.operator_id);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 16, __pyx_v_self->__pyx_base.operator_id) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_7);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 17, __pyx_t_7) != (0)) __PYX_ERR(3, 5, __pyx_L1_error);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
   __pyx_t_4 = 0;
   __pyx_t_5 = 0;
   __pyx_t_6 = 0;
-  __pyx_v_state = ((PyObject*)__pyx_t_7);
   __pyx_t_7 = 0;
+  __pyx_v_state = ((PyObject*)__pyx_t_8);
+  __pyx_t_8 = 0;
 
   /* "(tree fragment)":6
  *     cdef bint use_setstate
- *     state = (self._aggregations, self._key_columns, self._keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._tonbo_state)
+ *     state = (self._aggregations, self._key_columns, self._keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._tonbo_state, self.operator_id, self.parallelism)
  *     _dict = getattr(self, '__dict__', None)             # <<<<<<<<<<<<<<
  *     if _dict is not None:
  *         state += (_dict,)
 */
-  __pyx_t_7 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_dict, Py_None); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 6, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_v__dict = __pyx_t_7;
-  __pyx_t_7 = 0;
+  __pyx_t_8 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_dict, Py_None); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 6, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
+  __pyx_v__dict = __pyx_t_8;
+  __pyx_t_8 = 0;
 
   /* "(tree fragment)":7
- *     state = (self._aggregations, self._key_columns, self._keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._tonbo_state)
+ *     state = (self._aggregations, self._key_columns, self._keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._tonbo_state, self.operator_id, self.parallelism)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
  *         use_setstate = True
 */
-  __pyx_t_8 = (__pyx_v__dict != Py_None);
-  if (__pyx_t_8) {
+  __pyx_t_9 = (__pyx_v__dict != Py_None);
+  if (__pyx_t_9) {
 
     /* "(tree fragment)":8
  *     _dict = getattr(self, '__dict__', None)
@@ -12894,28 +12916,28 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_21CythonGrou
  *         use_setstate = True
  *     else:
 */
-    __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_8 = PyTuple_New(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_INCREF(__pyx_v__dict);
     __Pyx_GIVEREF(__pyx_v__dict);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_v__dict) != (0)) __PYX_ERR(3, 8, __pyx_L1_error);
-    __pyx_t_6 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_6));
-    __pyx_t_6 = 0;
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_v__dict) != (0)) __PYX_ERR(3, 8, __pyx_L1_error);
+    __pyx_t_7 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_7));
+    __pyx_t_7 = 0;
 
     /* "(tree fragment)":9
  *     if _dict is not None:
  *         state += (_dict,)
  *         use_setstate = True             # <<<<<<<<<<<<<<
  *     else:
- *         use_setstate = self._aggregations is not None or self._key_columns is not None or self._keys is not None or self._partition_keys is not None or self._partitioner is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._tonbo_state is not None
+ *         use_setstate = self._aggregations is not None or self._key_columns is not None or self._keys is not None or self._partition_keys is not None or self._partitioner is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._tonbo_state is not None or self.operator_id is not None
 */
     __pyx_v_use_setstate = 1;
 
     /* "(tree fragment)":7
- *     state = (self._aggregations, self._key_columns, self._keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._tonbo_state)
+ *     state = (self._aggregations, self._key_columns, self._keys, self._morsel_size_kb, self._num_partitions, self._parallelism_hint, self._partition_keys, self._partitioner, self._schema, self._shuffle_id, self._shuffle_transport, self._source, self._stateful, self._stateful, self._task_id, self._tonbo_state, self.operator_id, self.parallelism)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -12927,158 +12949,164 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_21CythonGrou
   /* "(tree fragment)":11
  *         use_setstate = True
  *     else:
- *         use_setstate = self._aggregations is not None or self._key_columns is not None or self._keys is not None or self._partition_keys is not None or self._partitioner is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._tonbo_state is not None             # <<<<<<<<<<<<<<
+ *         use_setstate = self._aggregations is not None or self._key_columns is not None or self._keys is not None or self._partition_keys is not None or self._partitioner is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._tonbo_state is not None or self.operator_id is not None             # <<<<<<<<<<<<<<
  *     if use_setstate:
- *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x29baf64, None), state
+ *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x0b735a4, None), state
 */
   /*else*/ {
-    __pyx_t_9 = (__pyx_v_self->_aggregations != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->_aggregations != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base.__pyx_base._key_columns != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base.__pyx_base._key_columns != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->_keys != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->_keys != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base._partition_keys != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base._partition_keys != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (((PyObject *)__pyx_v_self->__pyx_base._partitioner) != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (((PyObject *)__pyx_v_self->__pyx_base._partitioner) != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base.__pyx_base._schema != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base.__pyx_base._schema != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base._shuffle_id != ((PyObject*)Py_None));
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base._shuffle_id != ((PyObject*)Py_None));
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base._shuffle_transport != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base._shuffle_transport != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->__pyx_base.__pyx_base._source != Py_None);
-    if (!__pyx_t_9) {
+    __pyx_t_10 = (__pyx_v_self->__pyx_base.__pyx_base._source != Py_None);
+    if (!__pyx_t_10) {
     } else {
-      __pyx_t_8 = __pyx_t_9;
+      __pyx_t_9 = __pyx_t_10;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_9 = (__pyx_v_self->_tonbo_state != Py_None);
-    __pyx_t_8 = __pyx_t_9;
+    __pyx_t_10 = (__pyx_v_self->_tonbo_state != Py_None);
+    if (!__pyx_t_10) {
+    } else {
+      __pyx_t_9 = __pyx_t_10;
+      goto __pyx_L4_bool_binop_done;
+    }
+    __pyx_t_10 = (__pyx_v_self->__pyx_base.operator_id != ((PyObject*)Py_None));
+    __pyx_t_9 = __pyx_t_10;
     __pyx_L4_bool_binop_done:;
-    __pyx_v_use_setstate = __pyx_t_8;
+    __pyx_v_use_setstate = __pyx_t_9;
   }
   __pyx_L3:;
 
   /* "(tree fragment)":12
  *     else:
- *         use_setstate = self._aggregations is not None or self._key_columns is not None or self._keys is not None or self._partition_keys is not None or self._partitioner is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._tonbo_state is not None
+ *         use_setstate = self._aggregations is not None or self._key_columns is not None or self._keys is not None or self._partition_keys is not None or self._partitioner is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._tonbo_state is not None or self.operator_id is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x29baf64, None), state
+ *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x0b735a4, None), state
  *     else:
 */
   if (__pyx_v_use_setstate) {
 
     /* "(tree fragment)":13
- *         use_setstate = self._aggregations is not None or self._key_columns is not None or self._keys is not None or self._partition_keys is not None or self._partitioner is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._tonbo_state is not None
+ *         use_setstate = self._aggregations is not None or self._key_columns is not None or self._keys is not None or self._partition_keys is not None or self._partitioner is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._tonbo_state is not None or self.operator_id is not None
  *     if use_setstate:
- *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x29baf64, None), state             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x0b735a4, None), state             # <<<<<<<<<<<<<<
  *     else:
- *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x29baf64, state)
+ *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x0b735a4, state)
 */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonGroupByOper); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 13, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonGroupByOper); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 13, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_8 = PyTuple_New(3); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_43757412);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_43757412);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_mstate_global->__pyx_int_43757412) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_12006820);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_12006820);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_mstate_global->__pyx_int_12006820) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
     __Pyx_INCREF(Py_None);
     __Pyx_GIVEREF(Py_None);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 2, Py_None) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
-    __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(3, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_GIVEREF(__pyx_t_6);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_6) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 2, Py_None) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    __pyx_t_6 = PyTuple_New(3); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_7);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_7) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_7) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
+    __Pyx_GIVEREF(__pyx_t_8);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_8) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
-    __pyx_t_6 = 0;
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 13, __pyx_L1_error);
     __pyx_t_7 = 0;
-    __pyx_r = __pyx_t_5;
-    __pyx_t_5 = 0;
+    __pyx_t_8 = 0;
+    __pyx_r = __pyx_t_6;
+    __pyx_t_6 = 0;
     goto __pyx_L0;
 
     /* "(tree fragment)":12
  *     else:
- *         use_setstate = self._aggregations is not None or self._key_columns is not None or self._keys is not None or self._partition_keys is not None or self._partitioner is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._tonbo_state is not None
+ *         use_setstate = self._aggregations is not None or self._key_columns is not None or self._keys is not None or self._partition_keys is not None or self._partitioner is not None or self._schema is not None or self._shuffle_id is not None or self._shuffle_transport is not None or self._source is not None or self._tonbo_state is not None or self.operator_id is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x29baf64, None), state
+ *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x0b735a4, None), state
  *     else:
 */
   }
 
   /* "(tree fragment)":15
- *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x29baf64, None), state
+ *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x0b735a4, None), state
  *     else:
- *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x29baf64, state)             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x0b735a4, state)             # <<<<<<<<<<<<<<
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_CythonGroupByOperator__set_state(self, __pyx_state)
 */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonGroupByOper); if (unlikely(!__pyx_t_5)) __PYX_ERR(3, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonGroupByOper); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    __pyx_t_8 = PyTuple_New(3); if (unlikely(!__pyx_t_8)) __PYX_ERR(3, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_43757412);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_43757412);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_mstate_global->__pyx_int_43757412) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_12006820);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_12006820);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_mstate_global->__pyx_int_12006820) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(3, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_GIVEREF(__pyx_t_5);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __Pyx_GIVEREF(__pyx_t_7);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_7) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
-    __pyx_t_5 = 0;
-    __pyx_t_7 = 0;
-    __pyx_r = __pyx_t_6;
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 2, __pyx_v_state) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_GIVEREF(__pyx_t_6);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
+    __Pyx_GIVEREF(__pyx_t_8);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_8) != (0)) __PYX_ERR(3, 15, __pyx_L1_error);
     __pyx_t_6 = 0;
+    __pyx_t_8 = 0;
+    __pyx_r = __pyx_t_7;
+    __pyx_t_7 = 0;
     goto __pyx_L0;
   }
 
@@ -13097,6 +13125,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_21CythonGrou
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
   __Pyx_AddTraceback("sabot._cython.operators.aggregations.CythonGroupByOperator.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -13109,7 +13138,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_21CythonGrou
 
 /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x29baf64, state)
+ *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x0b735a4, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonGroupByOperator__set_state(self, __pyx_state)
 */
@@ -13209,7 +13238,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_21CythonGrou
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
 
   /* "(tree fragment)":17
- *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x29baf64, state)
+ *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x0b735a4, state)
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_CythonGroupByOperator__set_state(self, __pyx_state)             # <<<<<<<<<<<<<<
 */
@@ -13220,7 +13249,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_21CythonGrou
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x29baf64, state)
+ *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x0b735a4, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonGroupByOperator__set_state(self, __pyx_state)
 */
@@ -19731,9 +19760,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_8__pyx_unpic
   /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x29baf64, 0x5a654c2, 0x055b43d):             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum not in (0x0b735a4, 0xd7c56da, 0xce55c53):             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x29baf64, 0x5a654c2, 0x055b43d) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x0b735a4, 0xd7c56da, 0xce55c53) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state, operator_id, parallelism))" % __pyx_checksum
 */
   __pyx_t_1 = __Pyx_PyLong_From_long(__pyx_v___pyx_checksum); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -19743,9 +19772,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_8__pyx_unpic
 
     /* "(tree fragment)":5
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x29baf64, 0x5a654c2, 0x055b43d):
+ *     if __pyx_checksum not in (0x0b735a4, 0xd7c56da, 0xce55c53):
  *         from pickle import PickleError as __pyx_PickleError             # <<<<<<<<<<<<<<
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x29baf64, 0x5a654c2, 0x055b43d) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x0b735a4, 0xd7c56da, 0xce55c53) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonGroupByOperator.__new__(__pyx_type)
 */
     __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 5, __pyx_L1_error)
@@ -19764,9 +19793,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_8__pyx_unpic
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
     /* "(tree fragment)":6
- *     if __pyx_checksum not in (0x29baf64, 0x5a654c2, 0x055b43d):
+ *     if __pyx_checksum not in (0x0b735a4, 0xd7c56da, 0xce55c53):
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x29baf64, 0x5a654c2, 0x055b43d) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state))" % __pyx_checksum             # <<<<<<<<<<<<<<
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x0b735a4, 0xd7c56da, 0xce55c53) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state, operator_id, parallelism))" % __pyx_checksum             # <<<<<<<<<<<<<<
  *     __pyx_result = CythonGroupByOperator.__new__(__pyx_type)
  *     if __pyx_state is not None:
 */
@@ -19782,15 +19811,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_8__pyx_unpic
     /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x29baf64, 0x5a654c2, 0x055b43d):             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum not in (0x0b735a4, 0xd7c56da, 0xce55c53):             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x29baf64, 0x5a654c2, 0x055b43d) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x0b735a4, 0xd7c56da, 0xce55c53) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state, operator_id, parallelism))" % __pyx_checksum
 */
   }
 
   /* "(tree fragment)":7
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x29baf64, 0x5a654c2, 0x055b43d) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x0b735a4, 0xd7c56da, 0xce55c53) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonGroupByOperator.__new__(__pyx_type)             # <<<<<<<<<<<<<<
  *     if __pyx_state is not None:
  *         __pyx_unpickle_CythonGroupByOperator__set_state(<CythonGroupByOperator> __pyx_result, __pyx_state)
@@ -19809,7 +19838,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_8__pyx_unpic
   __pyx_t_1 = 0;
 
   /* "(tree fragment)":8
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x29baf64, 0x5a654c2, 0x055b43d) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x0b735a4, 0xd7c56da, 0xce55c53) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonGroupByOperator.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_CythonGroupByOperator__set_state(<CythonGroupByOperator> __pyx_result, __pyx_state)
@@ -19831,7 +19860,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_8__pyx_unpic
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
     /* "(tree fragment)":8
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x29baf64, 0x5a654c2, 0x055b43d) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x0b735a4, 0xd7c56da, 0xce55c53) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state, operator_id, parallelism))" % __pyx_checksum
  *     __pyx_result = CythonGroupByOperator.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_CythonGroupByOperator__set_state(<CythonGroupByOperator> __pyx_result, __pyx_state)
@@ -19844,7 +19873,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_8__pyx_unpic
  *         __pyx_unpickle_CythonGroupByOperator__set_state(<CythonGroupByOperator> __pyx_result, __pyx_state)
  *     return __pyx_result             # <<<<<<<<<<<<<<
  * cdef __pyx_unpickle_CythonGroupByOperator__set_state(CythonGroupByOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]
+ *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]; __pyx_result.operator_id = __pyx_state[16]; __pyx_result.parallelism = __pyx_state[17]
 */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v___pyx_result);
@@ -19875,8 +19904,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_12aggregations_8__pyx_unpic
  *         __pyx_unpickle_CythonGroupByOperator__set_state(<CythonGroupByOperator> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonGroupByOperator__set_state(CythonGroupByOperator __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]
- *     if len(__pyx_state) > 16 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]; __pyx_result.operator_id = __pyx_state[16]; __pyx_result.parallelism = __pyx_state[17]
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
 */
 
 static PyObject *__pyx_f_5sabot_7_cython_9operators_12aggregations___pyx_unpickle_CythonGroupByOperator__set_state(struct __pyx_obj_5sabot_7_cython_9operators_12aggregations_CythonGroupByOperator *__pyx_v___pyx_result, PyObject *__pyx_v___pyx_state) {
@@ -19900,9 +19929,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_12aggregations___pyx_unpickl
   /* "(tree fragment)":12
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonGroupByOperator__set_state(CythonGroupByOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]             # <<<<<<<<<<<<<<
- *     if len(__pyx_state) > 16 and hasattr(__pyx_result, '__dict__'):
- *         __pyx_result.__dict__.update(__pyx_state[16])
+ *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]; __pyx_result.operator_id = __pyx_state[16]; __pyx_result.parallelism = __pyx_state[17]             # <<<<<<<<<<<<<<
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
+ *         __pyx_result.__dict__.update(__pyx_state[18])
 */
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
@@ -20056,19 +20085,37 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_12aggregations___pyx_unpickl
   __Pyx_DECREF(__pyx_v___pyx_result->_tonbo_state);
   __pyx_v___pyx_result->_tonbo_state = __pyx_t_1;
   __pyx_t_1 = 0;
+  if (unlikely(__pyx_v___pyx_state == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(3, 12, __pyx_L1_error)
+  }
+  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 16);
+  __Pyx_INCREF(__pyx_t_1);
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.operator_id);
+  __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base.operator_id);
+  __pyx_v___pyx_result->__pyx_base.operator_id = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+  if (unlikely(__pyx_v___pyx_state == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(3, 12, __pyx_L1_error)
+  }
+  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 17)); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_v___pyx_result->__pyx_base.parallelism = __pyx_t_3;
 
   /* "(tree fragment)":13
  * cdef __pyx_unpickle_CythonGroupByOperator__set_state(CythonGroupByOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]
- *     if len(__pyx_state) > 16 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
- *         __pyx_result.__dict__.update(__pyx_state[16])
+ *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]; __pyx_result.operator_id = __pyx_state[16]; __pyx_result.parallelism = __pyx_state[17]
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
+ *         __pyx_result.__dict__.update(__pyx_state[18])
 */
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
     __PYX_ERR(3, 13, __pyx_L1_error)
   }
   __pyx_t_6 = __Pyx_PyTuple_GET_SIZE(__pyx_v___pyx_state); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(3, 13, __pyx_L1_error)
-  __pyx_t_7 = (__pyx_t_6 > 16);
+  __pyx_t_7 = (__pyx_t_6 > 18);
   if (__pyx_t_7) {
   } else {
     __pyx_t_5 = __pyx_t_7;
@@ -20080,9 +20127,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_12aggregations___pyx_unpickl
   if (__pyx_t_5) {
 
     /* "(tree fragment)":14
- *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]
- *     if len(__pyx_state) > 16 and hasattr(__pyx_result, '__dict__'):
- *         __pyx_result.__dict__.update(__pyx_state[16])             # <<<<<<<<<<<<<<
+ *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]; __pyx_result.operator_id = __pyx_state[16]; __pyx_result.parallelism = __pyx_state[17]
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
+ *         __pyx_result.__dict__.update(__pyx_state[18])             # <<<<<<<<<<<<<<
 */
     __pyx_t_9 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v___pyx_result), __pyx_mstate_global->__pyx_n_u_dict); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 14, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
@@ -20094,7 +20141,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_12aggregations___pyx_unpickl
     }
     __pyx_t_10 = 0;
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_8, __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 16)};
+      PyObject *__pyx_callargs[2] = {__pyx_t_8, __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 18)};
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_update, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -20105,9 +20152,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_12aggregations___pyx_unpickl
 
     /* "(tree fragment)":13
  * cdef __pyx_unpickle_CythonGroupByOperator__set_state(CythonGroupByOperator __pyx_result, tuple __pyx_state):
- *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]
- *     if len(__pyx_state) > 16 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
- *         __pyx_result.__dict__.update(__pyx_state[16])
+ *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]; __pyx_result.operator_id = __pyx_state[16]; __pyx_result.parallelism = __pyx_state[17]
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
+ *         __pyx_result.__dict__.update(__pyx_state[18])
 */
   }
 
@@ -20115,8 +20162,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_12aggregations___pyx_unpickl
  *         __pyx_unpickle_CythonGroupByOperator__set_state(<CythonGroupByOperator> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonGroupByOperator__set_state(CythonGroupByOperator __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]
- *     if len(__pyx_state) > 16 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]; __pyx_result.operator_id = __pyx_state[16]; __pyx_result.parallelism = __pyx_state[17]
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
 */
 
   /* function exit code */
@@ -25145,7 +25192,7 @@ __Pyx_RefNannySetupContext("PyInit_aggregations", 0);
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x29baf64, state)
+ *         return __pyx_unpickle_CythonGroupByOperator, (type(self), 0x0b735a4, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonGroupByOperator__set_state(self, __pyx_state)
 */
@@ -25341,8 +25388,8 @@ __Pyx_RefNannySetupContext("PyInit_aggregations", 0);
  *         __pyx_unpickle_CythonGroupByOperator__set_state(<CythonGroupByOperator> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_CythonGroupByOperator__set_state(CythonGroupByOperator __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]
- *     if len(__pyx_state) > 16 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result._aggregations = __pyx_state[0]; __pyx_result._key_columns = __pyx_state[1]; __pyx_result._keys = __pyx_state[2]; __pyx_result._morsel_size_kb = __pyx_state[3]; __pyx_result._num_partitions = __pyx_state[4]; __pyx_result._parallelism_hint = __pyx_state[5]; __pyx_result._partition_keys = __pyx_state[6]; __pyx_result._partitioner = __pyx_state[7]; __pyx_result._schema = __pyx_state[8]; __pyx_result._shuffle_id = __pyx_state[9]; __pyx_result._shuffle_transport = __pyx_state[10]; __pyx_result._source = __pyx_state[11]; __pyx_result._stateful = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._task_id = __pyx_state[14]; __pyx_result._tonbo_state = __pyx_state[15]; __pyx_result.operator_id = __pyx_state[16]; __pyx_result.parallelism = __pyx_state[17]
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
 */
   __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_12aggregations_11__pyx_unpickle_CythonReduceOperator, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonReduceOpera, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_aggregat, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[27])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
@@ -25418,11 +25465,11 @@ __Pyx_RefNannySetupContext("PyInit_aggregations", 0);
 
 typedef struct {
     const char *s;
-#if 286 <= 65535
+#if 312 <= 65535
     const unsigned short n;
-#elif 286 / 2 < INT_MAX
+#elif 312 / 2 < INT_MAX
     const unsigned int n;
-#elif 286 / 2 < LONG_MAX
+#elif 312 / 2 < LONG_MAX
     const unsigned long n;
 #else
     const Py_ssize_t n;
@@ -25632,11 +25679,11 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum not in (0x29baf64, 0x5a654c2, 0x055b43d):             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum not in (0x0b735a4, 0xd7c56da, 0xce55c53):             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x29baf64, 0x5a654c2, 0x055b43d) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (0x%x vs (0x0b735a4, 0xd7c56da, 0xce55c53) = (_aggregations, _key_columns, _keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _tonbo_state, operator_id, parallelism))" % __pyx_checksum
 */
-  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(3, __pyx_mstate_global->__pyx_int_43757412, __pyx_mstate_global->__pyx_int_94786754, __pyx_mstate_global->__pyx_int_5616701); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(3, 4, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(3, __pyx_mstate_global->__pyx_int_12006820, __pyx_mstate_global->__pyx_int_226252506, __pyx_mstate_global->__pyx_int_216357971); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(3, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[0]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[0]);
   __pyx_mstate_global->__pyx_tuple[1] = PyTuple_Pack(3, __pyx_mstate_global->__pyx_int_231301486, __pyx_mstate_global->__pyx_int_51966186, __pyx_mstate_global->__pyx_int_254105762); if (unlikely(!__pyx_mstate_global->__pyx_tuple[1])) __PYX_ERR(3, 4, __pyx_L1_error)
@@ -25685,16 +25732,16 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   if (__Pyx_InitStrings(__pyx_string_tab, __pyx_mstate->__pyx_string_tab, __pyx_string_tab_encodings) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   __pyx_mstate->__pyx_int_0 = PyLong_FromLong(0); if (unlikely(!__pyx_mstate->__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_4 = PyLong_FromLong(4); if (unlikely(!__pyx_mstate->__pyx_int_4)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_5616701 = PyLong_FromLong(5616701L); if (unlikely(!__pyx_mstate->__pyx_int_5616701)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_12006820 = PyLong_FromLong(12006820L); if (unlikely(!__pyx_mstate->__pyx_int_12006820)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_26086037 = PyLong_FromLong(26086037L); if (unlikely(!__pyx_mstate->__pyx_int_26086037)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_32203476 = PyLong_FromLong(32203476L); if (unlikely(!__pyx_mstate->__pyx_int_32203476)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_43757412 = PyLong_FromLong(43757412L); if (unlikely(!__pyx_mstate->__pyx_int_43757412)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_51966186 = PyLong_FromLong(51966186L); if (unlikely(!__pyx_mstate->__pyx_int_51966186)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_76157590 = PyLong_FromLong(76157590L); if (unlikely(!__pyx_mstate->__pyx_int_76157590)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_94786754 = PyLong_FromLong(94786754L); if (unlikely(!__pyx_mstate->__pyx_int_94786754)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_153285704 = PyLong_FromLong(153285704L); if (unlikely(!__pyx_mstate->__pyx_int_153285704)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_157312778 = PyLong_FromLong(157312778L); if (unlikely(!__pyx_mstate->__pyx_int_157312778)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_170774808 = PyLong_FromLong(170774808L); if (unlikely(!__pyx_mstate->__pyx_int_170774808)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_216357971 = PyLong_FromLong(216357971L); if (unlikely(!__pyx_mstate->__pyx_int_216357971)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_226252506 = PyLong_FromLong(226252506L); if (unlikely(!__pyx_mstate->__pyx_int_226252506)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_231301486 = PyLong_FromLong(231301486L); if (unlikely(!__pyx_mstate->__pyx_int_231301486)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_254105762 = PyLong_FromLong(254105762L); if (unlikely(!__pyx_mstate->__pyx_int_254105762)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
@@ -25772,7 +25819,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_aggregat_2, __pyx_mstate->__pyx_n_u_receive_shuffled, __pyx_k_A_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 527};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 590};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_state, __pyx_mstate->__pyx_n_u_dict_2, __pyx_mstate->__pyx_n_u_use_setstate};
     __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T__D_DVVZZllp_q_E_E_I_I_____n_n, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
   }
@@ -25859,7 +25906,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 90};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_type, __pyx_mstate->__pyx_n_u_pyx_checksum, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_pyx_PickleError, __pyx_mstate->__pyx_n_u_pyx_result};
-    __pyx_mstate_global->__pyx_codeobj_tab[26] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonGroupByOper, __pyx_k_hk_A_1_C_C_E_E_F_7_7q8PP___1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[26])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[26] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonGroupByOper, __pyx_k_hk_A_1_____7_7q8PP___1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[26])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 89};

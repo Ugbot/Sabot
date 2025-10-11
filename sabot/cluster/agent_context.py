@@ -204,6 +204,11 @@ def get_or_create_slot_manager(num_slots: Optional[int] = None):
 
     Auto-initializes if needed.
 
+    NOTE: Creates standalone TaskSlotManager without full agent initialization
+    (no Flight server). This is safe for local morsel processing in tests and
+    single-agent scenarios. For distributed scenarios, call initialize_agent()
+    explicitly.
+
     Args:
         num_slots: Number of slots (if creating new manager)
 
@@ -213,9 +218,13 @@ def get_or_create_slot_manager(num_slots: Optional[int] = None):
     ctx = AgentContext.get_instance()
 
     if ctx.task_slot_manager is None:
-        # Auto-initialize with default agent ID
-        agent_id = f"agent_{os.getpid()}"
-        ctx.initialize(agent_id=agent_id, num_slots=num_slots)
+        # Create standalone TaskSlotManager without Flight server
+        # This avoids blocking on network initialization in tests
+        num_slots = num_slots or os.cpu_count() or 4
+        from sabot._c.task_slot_manager import TaskSlotManager
+        ctx.task_slot_manager = TaskSlotManager(num_slots)
+        ctx.agent_id = f"agent_{os.getpid()}"
+        logger.info(f"Created standalone TaskSlotManager with {num_slots} slots (no Flight server)")
 
     return ctx.task_slot_manager
 

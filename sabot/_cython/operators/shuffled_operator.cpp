@@ -59,12 +59,22 @@
             "-Wno-unused-function",
             "-Wno-deprecated-declarations"
         ],
+        "extra_link_args": [
+            "-Wl,-headerpad_max_install_names",
+            "-Wl,-rpath,@loader_path/../../vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib"
+        ],
         "include_dirs": [
             "/Users/bengamble/Sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
             "/Users/bengamble/Sabot/vendor/arrow/python",
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src"
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src",
+            "/Users/bengamble/Sabot/vendor/duckdb/third_party/concurrentqueue",
+            "/Users/bengamble/Sabot/sabot/_c",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/storage",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/traversal",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/query"
         ],
         "language": "c++",
         "libraries": [
@@ -1621,6 +1631,7 @@ static const char* const __pyx_f[] = {
   "<stringsource>",
   ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/contextvars.pxd",
   ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/datetime.pxd",
+  "sabot/_cython/operators/shuffled_operator.pxd",
   ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/type.pxd",
   ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/bool.pxd",
   ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/complex.pxd",
@@ -3576,6 +3587,8 @@ struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner {
 */
 struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator {
   struct __pyx_obj_5sabot_7_cython_9operators_13base_operator_BaseOperator __pyx_base;
+  PyObject *operator_id;
+  int32_t parallelism;
   PyObject *_partition_keys;
   int32_t _num_partitions;
   int _stateful;
@@ -3587,7 +3600,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator
 };
 
 
-/* "sabot/_cython/operators/shuffled_operator.pyx":194
+/* "sabot/_cython/operators/shuffled_operator.pyx":198
  *     # ========================================================================
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -5047,7 +5060,7 @@ struct __pyx_vtabstruct_5sabot_7_cython_9operators_17shuffled_operator_ShuffledO
   struct __pyx_vtabstruct_5sabot_7_cython_9operators_13base_operator_BaseOperator __pyx_base;
   int32_t (*get_num_partitions)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, int __pyx_skip_dispatch);
   void (*set_shuffle_config)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, PyObject *, PyObject *, int32_t, int32_t, int __pyx_skip_dispatch);
-  PyObject *(*_partition_batch)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, struct __pyx_obj_7pyarrow_3lib_RecordBatch *);
+  PyObject *(*_partition_batch)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, struct __pyx_obj_7pyarrow_3lib_RecordBatch *, int __pyx_skip_dispatch);
   void (*_send_partitions)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, PyObject *, PyObject *);
   PyObject *(*_receive_shuffled_batches)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *);
   PyObject *(*_send_shuffled_batches)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *);
@@ -6040,7 +6053,7 @@ static int __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOper
 static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_get_partition_keys(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 static int32_t __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_get_num_partitions(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_set_shuffle_config(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, PyObject *__pyx_v_transport, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_task_id, int32_t __pyx_v_num_partitions, int __pyx_skip_dispatch); /* proto*/
-static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__partition_batch(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch); /* proto*/
+static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__partition_batch(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__send_partitions(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, PyObject *__pyx_v_partitions, PyObject *__pyx_v_agent_addresses); /* proto*/
 static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__receive_shuffled_batches(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self); /* proto*/
 static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__send_shuffled_batches(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self); /* proto*/
@@ -6239,6 +6252,7 @@ static const char __pyx_k_next[] = "next";
 static const char __pyx_k_self[] = "self";
 static const char __pyx_k_send[] = "send";
 static const char __pyx_k_test[] = "__test__";
+static const char __pyx_k_batch[] = "batch";
 static const char __pyx_k_close[] = "close";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_super[] = "super";
@@ -6266,6 +6280,9 @@ static const char __pyx_k_transport[] = "transport";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static const char __pyx_k_shuffle_id[] = "shuffle_id";
 static const char __pyx_k_MemoryError[] = "MemoryError";
+static const char __pyx_k_operator_id[] = "operator_id";
+static const char __pyx_k_parallelism[] = "parallelism";
+static const char __pyx_k_shuffled_op[] = "shuffled-op";
 static const char __pyx_k_is_coroutine[] = "_is_coroutine";
 static const char __pyx_k_stringsource[] = "<stringsource>";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
@@ -6273,6 +6290,7 @@ static const char __pyx_k_localhost_8817[] = "localhost:8817";
 static const char __pyx_k_num_partitions[] = "num_partitions";
 static const char __pyx_k_partition_keys[] = "partition_keys";
 static const char __pyx_k_send_partition[] = "send_partition";
+static const char __pyx_k_partition_batch[] = "_partition_batch";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_ShuffledOperator[] = "ShuffledOperator";
 static const char __pyx_k_requires_shuffle[] = "requires_shuffle";
@@ -6286,9 +6304,11 @@ static const char __pyx_k_receive_partitions[] = "receive_partitions";
 static const char __pyx_k_set_shuffle_config[] = "set_shuffle_config";
 static const char __pyx_k_ShuffledOperator___iter[] = "ShuffledOperator.__iter__";
 static const char __pyx_k_ShuffledOperator_Base_Class_Abs[] = "\nShuffledOperator Base Class\n\nAbstract base for stateful operators requiring network shuffle.\nHandles partitioning, shuffle transport, and co-location guarantees.\n";
+static const char __pyx_k_A_1_E_a_U_aq_y_Cs_XS_E_gQa_gQa_q[] = "\200A\360\036\000\t\032\230\024\230]\320*:\270!\2701\360\006\000\t\022\220\021\360\010\000\t\r\210E\220\025\220a\220~\240U\250!\330\014\030\230\016\240a\240q\330\014\017\210y\230\004\230C\230s\240!\330\020!\240\034\250X\260S\270\001\330\020\034\230E\240\021\240!\330\020\026\220g\230Q\230a\340\020\026\220g\230Q\230a\340\010\017\210q";
 static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.";
 static const char __pyx_k_ShuffledOperator___reduce_cython[] = "ShuffledOperator.__reduce_cython__";
 static const char __pyx_k_ShuffledOperator___setstate_cyth[] = "ShuffledOperator.__setstate_cython__";
+static const char __pyx_k_ShuffledOperator__partition_batc[] = "ShuffledOperator._partition_batch";
 static const char __pyx_k_ShuffledOperator_get_num_partiti[] = "ShuffledOperator.get_num_partitions";
 static const char __pyx_k_ShuffledOperator_get_partition_k[] = "ShuffledOperator.get_partition_keys";
 static const char __pyx_k_ShuffledOperator_requires_shuffl[] = "ShuffledOperator.requires_shuffle";
@@ -6302,9 +6322,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_4get_partition_keys(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_6get_num_partitions(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_8set_shuffle_config(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, PyObject *__pyx_v_transport, PyObject *__pyx_v_shuffle_id, int32_t __pyx_v_task_id, int32_t __pyx_v_num_partitions); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10__iter__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_13__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_15__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10_partition_batch(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_12__iter__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id___get__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self); /* proto */
+static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_2__set__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_4__del__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11parallelism___get__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self); /* proto */
+static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11parallelism_2__set__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_15__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_17__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 /* #### Code section: late_includes ### */
@@ -6468,9 +6494,10 @@ typedef struct {
   PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_get;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
-  PyObject *__pyx_codeobj_tab[7];
-  PyObject *__pyx_string_tab[67];
+  PyObject *__pyx_codeobj_tab[8];
+  PyObject *__pyx_string_tab[73];
   PyObject *__pyx_int_0;
+  PyObject *__pyx_int_1;
   PyObject *__pyx_int_4;
 /* #### Code section: module_state_contents ### */
 /* CommonTypesMetaclass.module_state_decls */
@@ -6526,66 +6553,72 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_ShuffledOperator___iter __pyx_string_tab[4]
 #define __pyx_n_u_ShuffledOperator___reduce_cython __pyx_string_tab[5]
 #define __pyx_n_u_ShuffledOperator___setstate_cyth __pyx_string_tab[6]
-#define __pyx_n_u_ShuffledOperator_get_num_partiti __pyx_string_tab[7]
-#define __pyx_n_u_ShuffledOperator_get_partition_k __pyx_string_tab[8]
-#define __pyx_n_u_ShuffledOperator_requires_shuffl __pyx_string_tab[9]
-#define __pyx_n_u_ShuffledOperator_set_shuffle_con __pyx_string_tab[10]
-#define __pyx_n_u_TypeError __pyx_string_tab[11]
-#define __pyx_kp_u_add_note __pyx_string_tab[12]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[13]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[14]
-#define __pyx_n_u_close __pyx_string_tab[15]
-#define __pyx_kp_u_disable __pyx_string_tab[16]
-#define __pyx_kp_u_enable __pyx_string_tab[17]
-#define __pyx_n_u_encode __pyx_string_tab[18]
-#define __pyx_n_u_func __pyx_string_tab[19]
-#define __pyx_kp_u_gc __pyx_string_tab[20]
-#define __pyx_n_u_get __pyx_string_tab[21]
-#define __pyx_n_u_get_num_partitions __pyx_string_tab[22]
-#define __pyx_n_u_get_partition_keys __pyx_string_tab[23]
-#define __pyx_n_u_getstate __pyx_string_tab[24]
-#define __pyx_n_u_init __pyx_string_tab[25]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[26]
-#define __pyx_kp_u_isenabled __pyx_string_tab[27]
-#define __pyx_n_u_iter __pyx_string_tab[28]
-#define __pyx_kp_b_localhost_8817 __pyx_string_tab[29]
-#define __pyx_n_u_main __pyx_string_tab[30]
-#define __pyx_n_u_module __pyx_string_tab[31]
-#define __pyx_n_u_name __pyx_string_tab[32]
-#define __pyx_n_u_next __pyx_string_tab[33]
-#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[34]
-#define __pyx_n_u_num_partitions __pyx_string_tab[35]
-#define __pyx_n_u_num_rows __pyx_string_tab[36]
-#define __pyx_n_u_partition_keys __pyx_string_tab[37]
-#define __pyx_n_u_pop __pyx_string_tab[38]
-#define __pyx_n_u_publish_partition __pyx_string_tab[39]
-#define __pyx_n_u_pyx_state __pyx_string_tab[40]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[41]
-#define __pyx_n_u_qualname __pyx_string_tab[42]
-#define __pyx_n_u_range __pyx_string_tab[43]
-#define __pyx_n_u_receive_partitions __pyx_string_tab[44]
-#define __pyx_n_u_reduce __pyx_string_tab[45]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[46]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[47]
-#define __pyx_n_u_requires_shuffle __pyx_string_tab[48]
-#define __pyx_n_u_sabot__cython_operators_shuffled __pyx_string_tab[49]
-#define __pyx_kp_u_sabot__cython_operators_shuffled_2 __pyx_string_tab[50]
-#define __pyx_n_u_self __pyx_string_tab[51]
-#define __pyx_n_u_send __pyx_string_tab[52]
-#define __pyx_n_u_send_partition __pyx_string_tab[53]
-#define __pyx_n_u_set_name __pyx_string_tab[54]
-#define __pyx_n_u_set_shuffle_config __pyx_string_tab[55]
-#define __pyx_n_u_setstate __pyx_string_tab[56]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[57]
-#define __pyx_n_u_shuffle_id __pyx_string_tab[58]
-#define __pyx_kp_u_stringsource __pyx_string_tab[59]
-#define __pyx_n_u_super __pyx_string_tab[60]
-#define __pyx_n_u_task_id __pyx_string_tab[61]
-#define __pyx_n_u_test __pyx_string_tab[62]
-#define __pyx_n_u_throw __pyx_string_tab[63]
-#define __pyx_n_u_transport __pyx_string_tab[64]
-#define __pyx_kp_u_utf_8 __pyx_string_tab[65]
-#define __pyx_n_u_value __pyx_string_tab[66]
+#define __pyx_n_u_ShuffledOperator__partition_batc __pyx_string_tab[7]
+#define __pyx_n_u_ShuffledOperator_get_num_partiti __pyx_string_tab[8]
+#define __pyx_n_u_ShuffledOperator_get_partition_k __pyx_string_tab[9]
+#define __pyx_n_u_ShuffledOperator_requires_shuffl __pyx_string_tab[10]
+#define __pyx_n_u_ShuffledOperator_set_shuffle_con __pyx_string_tab[11]
+#define __pyx_n_u_TypeError __pyx_string_tab[12]
+#define __pyx_kp_u_add_note __pyx_string_tab[13]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[14]
+#define __pyx_n_u_batch __pyx_string_tab[15]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[16]
+#define __pyx_n_u_close __pyx_string_tab[17]
+#define __pyx_kp_u_disable __pyx_string_tab[18]
+#define __pyx_kp_u_enable __pyx_string_tab[19]
+#define __pyx_n_u_encode __pyx_string_tab[20]
+#define __pyx_n_u_func __pyx_string_tab[21]
+#define __pyx_kp_u_gc __pyx_string_tab[22]
+#define __pyx_n_u_get __pyx_string_tab[23]
+#define __pyx_n_u_get_num_partitions __pyx_string_tab[24]
+#define __pyx_n_u_get_partition_keys __pyx_string_tab[25]
+#define __pyx_n_u_getstate __pyx_string_tab[26]
+#define __pyx_n_u_init __pyx_string_tab[27]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[28]
+#define __pyx_kp_u_isenabled __pyx_string_tab[29]
+#define __pyx_n_u_iter __pyx_string_tab[30]
+#define __pyx_kp_b_localhost_8817 __pyx_string_tab[31]
+#define __pyx_n_u_main __pyx_string_tab[32]
+#define __pyx_n_u_module __pyx_string_tab[33]
+#define __pyx_n_u_name __pyx_string_tab[34]
+#define __pyx_n_u_next __pyx_string_tab[35]
+#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[36]
+#define __pyx_n_u_num_partitions __pyx_string_tab[37]
+#define __pyx_n_u_num_rows __pyx_string_tab[38]
+#define __pyx_n_u_operator_id __pyx_string_tab[39]
+#define __pyx_n_u_parallelism __pyx_string_tab[40]
+#define __pyx_n_u_partition_batch __pyx_string_tab[41]
+#define __pyx_n_u_partition_keys __pyx_string_tab[42]
+#define __pyx_n_u_pop __pyx_string_tab[43]
+#define __pyx_n_u_publish_partition __pyx_string_tab[44]
+#define __pyx_n_u_pyx_state __pyx_string_tab[45]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[46]
+#define __pyx_n_u_qualname __pyx_string_tab[47]
+#define __pyx_n_u_range __pyx_string_tab[48]
+#define __pyx_n_u_receive_partitions __pyx_string_tab[49]
+#define __pyx_n_u_reduce __pyx_string_tab[50]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[51]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[52]
+#define __pyx_n_u_requires_shuffle __pyx_string_tab[53]
+#define __pyx_n_u_sabot__cython_operators_shuffled __pyx_string_tab[54]
+#define __pyx_kp_u_sabot__cython_operators_shuffled_2 __pyx_string_tab[55]
+#define __pyx_n_u_self __pyx_string_tab[56]
+#define __pyx_n_u_send __pyx_string_tab[57]
+#define __pyx_n_u_send_partition __pyx_string_tab[58]
+#define __pyx_n_u_set_name __pyx_string_tab[59]
+#define __pyx_n_u_set_shuffle_config __pyx_string_tab[60]
+#define __pyx_n_u_setstate __pyx_string_tab[61]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[62]
+#define __pyx_n_u_shuffle_id __pyx_string_tab[63]
+#define __pyx_kp_u_shuffled_op __pyx_string_tab[64]
+#define __pyx_kp_u_stringsource __pyx_string_tab[65]
+#define __pyx_n_u_super __pyx_string_tab[66]
+#define __pyx_n_u_task_id __pyx_string_tab[67]
+#define __pyx_n_u_test __pyx_string_tab[68]
+#define __pyx_n_u_throw __pyx_string_tab[69]
+#define __pyx_n_u_transport __pyx_string_tab[70]
+#define __pyx_kp_u_utf_8 __pyx_string_tab[71]
+#define __pyx_n_u_value __pyx_string_tab[72]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -6727,9 +6760,10 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator);
   Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__);
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__);
-  for (int i=0; i<7; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<67; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<8; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<73; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   Py_CLEAR(clear_module_state->__pyx_int_0);
+  Py_CLEAR(clear_module_state->__pyx_int_1);
   Py_CLEAR(clear_module_state->__pyx_int_4);
   return 0;
 }
@@ -6872,9 +6906,10 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator);
   Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__);
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__);
-  for (int i=0; i<7; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<67; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<8; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<73; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_1);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_4);
   return 0;
 }
@@ -9765,7 +9800,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
  *         """Initialize shuffle operator."""
  *         super().__init__(*args, **kwargs)             # <<<<<<<<<<<<<<
  * 
- *         self._partition_keys = kwargs.get('partition_keys', [])
+ *         # Store operator_id and parallelism (expected by tests and metadata)
 */
   __pyx_t_2 = NULL;
   __Pyx_INCREF(__pyx_builtin_super);
@@ -9790,39 +9825,68 @@ static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":46
- *         super().__init__(*args, **kwargs)
+  /* "sabot/_cython/operators/shuffled_operator.pyx":47
+ * 
+ *         # Store operator_id and parallelism (expected by tests and metadata)
+ *         self.operator_id = kwargs.get('operator_id', 'shuffled-op')             # <<<<<<<<<<<<<<
+ *         self.parallelism = kwargs.get('parallelism', 1)
+ * 
+*/
+  __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_kwargs, __pyx_mstate_global->__pyx_n_u_operator_id, __pyx_mstate_global->__pyx_kp_u_shuffled_op); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_2))) __PYX_ERR(0, 47, __pyx_L1_error)
+  __Pyx_GIVEREF(__pyx_t_2);
+  __Pyx_GOTREF(__pyx_v_self->operator_id);
+  __Pyx_DECREF(__pyx_v_self->operator_id);
+  __pyx_v_self->operator_id = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/shuffled_operator.pyx":48
+ *         # Store operator_id and parallelism (expected by tests and metadata)
+ *         self.operator_id = kwargs.get('operator_id', 'shuffled-op')
+ *         self.parallelism = kwargs.get('parallelism', 1)             # <<<<<<<<<<<<<<
+ * 
+ *         self._partition_keys = kwargs.get('partition_keys', [])
+*/
+  __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_kwargs, __pyx_mstate_global->__pyx_n_u_parallelism, __pyx_mstate_global->__pyx_int_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_5 = __Pyx_PyLong_As_int32_t(__pyx_t_2); if (unlikely((__pyx_t_5 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 48, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_self->parallelism = __pyx_t_5;
+
+  /* "sabot/_cython/operators/shuffled_operator.pyx":50
+ *         self.parallelism = kwargs.get('parallelism', 1)
  * 
  *         self._partition_keys = kwargs.get('partition_keys', [])             # <<<<<<<<<<<<<<
  *         self._num_partitions = kwargs.get('num_partitions', 4)
  *         self._stateful = True
 */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyDict_GetItemDefault(__pyx_v_kwargs, __pyx_mstate_global->__pyx_n_u_partition_keys, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_GetItemDefault(__pyx_v_kwargs, __pyx_mstate_global->__pyx_n_u_partition_keys, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 46, __pyx_L1_error)
+  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->_partition_keys);
   __Pyx_DECREF(__pyx_v_self->_partition_keys);
   __pyx_v_self->_partition_keys = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":47
+  /* "sabot/_cython/operators/shuffled_operator.pyx":51
  * 
  *         self._partition_keys = kwargs.get('partition_keys', [])
  *         self._num_partitions = kwargs.get('num_partitions', 4)             # <<<<<<<<<<<<<<
  *         self._stateful = True
  * 
 */
-  __pyx_t_1 = __Pyx_PyDict_GetItemDefault(__pyx_v_kwargs, __pyx_mstate_global->__pyx_n_u_num_partitions, __pyx_mstate_global->__pyx_int_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_GetItemDefault(__pyx_v_kwargs, __pyx_mstate_global->__pyx_n_u_num_partitions, __pyx_mstate_global->__pyx_int_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyLong_As_int32_t(__pyx_t_1); if (unlikely((__pyx_t_5 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyLong_As_int32_t(__pyx_t_1); if (unlikely((__pyx_t_5 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_self->_num_partitions = __pyx_t_5;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":48
+  /* "sabot/_cython/operators/shuffled_operator.pyx":52
  *         self._partition_keys = kwargs.get('partition_keys', [])
  *         self._num_partitions = kwargs.get('num_partitions', 4)
  *         self._stateful = True             # <<<<<<<<<<<<<<
@@ -9831,7 +9895,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
 */
   __pyx_v_self->_stateful = 1;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":50
+  /* "sabot/_cython/operators/shuffled_operator.pyx":54
  *         self._stateful = True
  * 
  *         self._shuffle_transport = None             # <<<<<<<<<<<<<<
@@ -9844,7 +9908,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
   __Pyx_DECREF(__pyx_v_self->_shuffle_transport);
   __pyx_v_self->_shuffle_transport = Py_None;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":51
+  /* "sabot/_cython/operators/shuffled_operator.pyx":55
  * 
  *         self._shuffle_transport = None
  *         self._shuffle_id = None             # <<<<<<<<<<<<<<
@@ -9857,7 +9921,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
   __Pyx_DECREF(__pyx_v_self->_shuffle_id);
   __pyx_v_self->_shuffle_id = ((PyObject*)Py_None);
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":52
+  /* "sabot/_cython/operators/shuffled_operator.pyx":56
  *         self._shuffle_transport = None
  *         self._shuffle_id = None
  *         self._task_id = -1             # <<<<<<<<<<<<<<
@@ -9866,7 +9930,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
 */
   __pyx_v_self->_task_id = -1;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":53
+  /* "sabot/_cython/operators/shuffled_operator.pyx":57
  *         self._shuffle_id = None
  *         self._task_id = -1
  *         self._morsel_size_kb = DEFAULT_MORSEL_SIZE_KB             # <<<<<<<<<<<<<<
@@ -9875,7 +9939,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
 */
   __pyx_v_self->_morsel_size_kb = 64;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":56
+  /* "sabot/_cython/operators/shuffled_operator.pyx":60
  * 
  *         # Initialize partitioner (will be updated when shuffle config is set)
  *         self._partitioner = None             # <<<<<<<<<<<<<<
@@ -9910,7 +9974,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/shuffled_operator.pyx":62
+/* "sabot/_cython/operators/shuffled_operator.pyx":66
  *     # ========================================================================
  * 
  *     cpdef bint requires_shuffle(self):             # <<<<<<<<<<<<<<
@@ -9954,7 +10018,7 @@ static int __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOper
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_requires_shuffle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 62, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_requires_shuffle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 66, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_3requires_shuffle)) {
         __pyx_t_3 = NULL;
@@ -9977,10 +10041,10 @@ static int __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOper
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 62, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 62, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_6;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -9999,7 +10063,7 @@ static int __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOper
     #endif
   }
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":68
+  /* "sabot/_cython/operators/shuffled_operator.pyx":72
  *         JobManager uses this to insert shuffle edges in execution graph.
  *         """
  *         return True             # <<<<<<<<<<<<<<
@@ -10009,7 +10073,7 @@ static int __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOper
   __pyx_r = 1;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":62
+  /* "sabot/_cython/operators/shuffled_operator.pyx":66
  *     # ========================================================================
  * 
  *     cpdef bint requires_shuffle(self):             # <<<<<<<<<<<<<<
@@ -10083,8 +10147,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("requires_shuffle", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_requires_shuffle(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 62, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 62, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_requires_shuffle(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
@@ -10101,7 +10165,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/shuffled_operator.pyx":70
+/* "sabot/_cython/operators/shuffled_operator.pyx":74
  *         return True
  * 
  *     cpdef list get_partition_keys(self):             # <<<<<<<<<<<<<<
@@ -10144,7 +10208,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_partition_keys); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 70, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_partition_keys); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 74, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_5get_partition_keys)) {
         __Pyx_XDECREF(__pyx_r);
@@ -10168,10 +10232,10 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 70, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 74, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_2))) __PYX_ERR(0, 70, __pyx_L1_error)
+        if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_2))) __PYX_ERR(0, 74, __pyx_L1_error)
         __pyx_r = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -10190,7 +10254,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
     #endif
   }
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":77
+  /* "sabot/_cython/operators/shuffled_operator.pyx":81
  *             List of column names for hash partitioning.
  *         """
  *         return self._partition_keys             # <<<<<<<<<<<<<<
@@ -10202,7 +10266,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
   __pyx_r = __pyx_v_self->_partition_keys;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":70
+  /* "sabot/_cython/operators/shuffled_operator.pyx":74
  *         return True
  * 
  *     cpdef list get_partition_keys(self):             # <<<<<<<<<<<<<<
@@ -10276,7 +10340,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_partition_keys", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_get_partition_keys(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_get_partition_keys(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 74, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -10293,7 +10357,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/shuffled_operator.pyx":79
+/* "sabot/_cython/operators/shuffled_operator.pyx":83
  *         return self._partition_keys
  * 
  *     cpdef int32_t get_num_partitions(self):             # <<<<<<<<<<<<<<
@@ -10337,7 +10401,7 @@ static int32_t __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffled
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_num_partitions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_num_partitions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 83, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_7get_num_partitions)) {
         __pyx_t_3 = NULL;
@@ -10360,10 +10424,10 @@ static int32_t __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffled
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 83, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        __pyx_t_6 = __Pyx_PyLong_As_int32_t(__pyx_t_2); if (unlikely((__pyx_t_6 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 79, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyLong_As_int32_t(__pyx_t_2); if (unlikely((__pyx_t_6 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_6;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -10382,7 +10446,7 @@ static int32_t __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffled
     #endif
   }
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":81
+  /* "sabot/_cython/operators/shuffled_operator.pyx":85
  *     cpdef int32_t get_num_partitions(self):
  *         """Get number of downstream partitions."""
  *         return self._num_partitions             # <<<<<<<<<<<<<<
@@ -10392,7 +10456,7 @@ static int32_t __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffled
   __pyx_r = __pyx_v_self->_num_partitions;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":79
+  /* "sabot/_cython/operators/shuffled_operator.pyx":83
  *         return self._partition_keys
  * 
  *     cpdef int32_t get_num_partitions(self):             # <<<<<<<<<<<<<<
@@ -10466,8 +10530,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_num_partitions", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_get_num_partitions(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 79, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyLong_From_int32_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_get_num_partitions(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int32_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
@@ -10484,7 +10548,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/shuffled_operator.pyx":83
+/* "sabot/_cython/operators/shuffled_operator.pyx":87
  *         return self._num_partitions
  * 
  *     cpdef void set_shuffle_config(             # <<<<<<<<<<<<<<
@@ -10532,15 +10596,15 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_set_shuffle_config); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 83, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_set_shuffle_config); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 87, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_9set_shuffle_config)) {
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; 
-        __pyx_t_5 = __Pyx_PyLong_From_int32_t(__pyx_v_task_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 83, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyLong_From_int32_t(__pyx_v_task_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 87, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_num_partitions); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 83, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_num_partitions); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 87, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __pyx_t_7 = 1;
         #if CYTHON_UNPACK_METHODS
@@ -10561,7 +10625,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 83, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 87, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10581,7 +10645,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
     #endif
   }
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":99
+  /* "sabot/_cython/operators/shuffled_operator.pyx":103
  *             num_partitions: Total number of partitions
  *         """
  *         self._shuffle_transport = transport             # <<<<<<<<<<<<<<
@@ -10594,7 +10658,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
   __Pyx_DECREF(__pyx_v_self->_shuffle_transport);
   __pyx_v_self->_shuffle_transport = __pyx_v_transport;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":100
+  /* "sabot/_cython/operators/shuffled_operator.pyx":104
  *         """
  *         self._shuffle_transport = transport
  *         self._shuffle_id = shuffle_id             # <<<<<<<<<<<<<<
@@ -10607,7 +10671,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
   __Pyx_DECREF(__pyx_v_self->_shuffle_id);
   __pyx_v_self->_shuffle_id = __pyx_v_shuffle_id;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":101
+  /* "sabot/_cython/operators/shuffled_operator.pyx":105
  *         self._shuffle_transport = transport
  *         self._shuffle_id = shuffle_id
  *         self._task_id = task_id             # <<<<<<<<<<<<<<
@@ -10616,7 +10680,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
 */
   __pyx_v_self->_task_id = __pyx_v_task_id;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":102
+  /* "sabot/_cython/operators/shuffled_operator.pyx":106
  *         self._shuffle_id = shuffle_id
  *         self._task_id = task_id
  *         self._num_partitions = num_partitions             # <<<<<<<<<<<<<<
@@ -10625,7 +10689,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
 */
   __pyx_v_self->_num_partitions = __pyx_v_num_partitions;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":106
+  /* "sabot/_cython/operators/shuffled_operator.pyx":110
  *         # Initialize partitioner with proper parameters
  *         cdef vector[string] key_columns
  *         for key_col in self._partition_keys:             # <<<<<<<<<<<<<<
@@ -10634,7 +10698,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
 */
   if (unlikely(__pyx_v_self->_partition_keys == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 106, __pyx_L1_error)
+    __PYX_ERR(0, 110, __pyx_L1_error)
   }
   __pyx_t_1 = __pyx_v_self->_partition_keys; __Pyx_INCREF(__pyx_t_1);
   __pyx_t_8 = 0;
@@ -10642,18 +10706,18 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
     {
       Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
       #if !CYTHON_ASSUME_SAFE_SIZE
-      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 106, __pyx_L1_error)
+      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 110, __pyx_L1_error)
       #endif
       if (__pyx_t_8 >= __pyx_temp) break;
     }
     __pyx_t_2 = __Pyx_PyList_GetItemRef(__pyx_t_1, __pyx_t_8);
     ++__pyx_t_8;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_key_col, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":107
+    /* "sabot/_cython/operators/shuffled_operator.pyx":111
  *         cdef vector[string] key_columns
  *         for key_col in self._partition_keys:
  *             key_columns.push_back(key_col.encode('utf-8'))             # <<<<<<<<<<<<<<
@@ -10667,19 +10731,19 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
       PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_mstate_global->__pyx_kp_u_utf_8};
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_encode, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
-    __pyx_t_9 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_2); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 107, __pyx_L1_error)
+    __pyx_t_9 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_2); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 111, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     try {
       __pyx_v_key_columns.push_back(__pyx_t_9);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 107, __pyx_L1_error)
+      __PYX_ERR(0, 111, __pyx_L1_error)
     }
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":106
+    /* "sabot/_cython/operators/shuffled_operator.pyx":110
  *         # Initialize partitioner with proper parameters
  *         cdef vector[string] key_columns
  *         for key_col in self._partition_keys:             # <<<<<<<<<<<<<<
@@ -10689,7 +10753,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":110
+  /* "sabot/_cython/operators/shuffled_operator.pyx":114
  * 
  *         # Use the existing schema (assuming it's set)
  *         self._partitioner = HashPartitioner(             # <<<<<<<<<<<<<<
@@ -10700,27 +10764,27 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
   __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner);
   __pyx_t_4 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner); 
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":111
+  /* "sabot/_cython/operators/shuffled_operator.pyx":115
  *         # Use the existing schema (assuming it's set)
  *         self._partitioner = HashPartitioner(
  *             num_partitions,             # <<<<<<<<<<<<<<
  *             key_columns,
  *             self._schema  # This needs to be the ca.Schema type
 */
-  __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_num_partitions); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyLong_From_int32_t(__pyx_v_num_partitions); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":112
+  /* "sabot/_cython/operators/shuffled_operator.pyx":116
  *         self._partitioner = HashPartitioner(
  *             num_partitions,
  *             key_columns,             # <<<<<<<<<<<<<<
  *             self._schema  # This needs to be the ca.Schema type
  *         )
 */
-  __pyx_t_5 = __pyx_convert_vector_to_py_std_3a__3a_string(__pyx_v_key_columns); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 112, __pyx_L1_error)
+  __pyx_t_5 = __pyx_convert_vector_to_py_std_3a__3a_string(__pyx_v_key_columns); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 116, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":113
+  /* "sabot/_cython/operators/shuffled_operator.pyx":117
  *             num_partitions,
  *             key_columns,
  *             self._schema  # This needs to be the ca.Schema type             # <<<<<<<<<<<<<<
@@ -10735,11 +10799,11 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 110, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":110
+  /* "sabot/_cython/operators/shuffled_operator.pyx":114
  * 
  *         # Use the existing schema (assuming it's set)
  *         self._partitioner = HashPartitioner(             # <<<<<<<<<<<<<<
@@ -10752,7 +10816,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
   __pyx_v_self->_partitioner = ((struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_Partitioner *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":83
+  /* "sabot/_cython/operators/shuffled_operator.pyx":87
  *         return self._num_partitions
  * 
  *     cpdef void set_shuffle_config(             # <<<<<<<<<<<<<<
@@ -10818,53 +10882,53 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_transport,&__pyx_mstate_global->__pyx_n_u_shuffle_id,&__pyx_mstate_global->__pyx_n_u_task_id,&__pyx_mstate_global->__pyx_n_u_num_partitions,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 83, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 87, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 83, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 87, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 83, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 87, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 83, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 87, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 83, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 87, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "set_shuffle_config", 0) < 0) __PYX_ERR(0, 83, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "set_shuffle_config", 0) < 0) __PYX_ERR(0, 87, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 4; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("set_shuffle_config", 1, 4, 4, i); __PYX_ERR(0, 83, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("set_shuffle_config", 1, 4, 4, i); __PYX_ERR(0, 87, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 4)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 83, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 87, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 83, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 87, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 83, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 87, __pyx_L3_error)
       values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 83, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 87, __pyx_L3_error)
     }
     __pyx_v_transport = values[0];
     __pyx_v_shuffle_id = ((PyObject*)values[1]);
-    __pyx_v_task_id = __Pyx_PyLong_As_int32_t(values[2]); if (unlikely((__pyx_v_task_id == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 87, __pyx_L3_error)
-    __pyx_v_num_partitions = __Pyx_PyLong_As_int32_t(values[3]); if (unlikely((__pyx_v_num_partitions == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 88, __pyx_L3_error)
+    __pyx_v_task_id = __Pyx_PyLong_As_int32_t(values[2]); if (unlikely((__pyx_v_task_id == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 91, __pyx_L3_error)
+    __pyx_v_num_partitions = __Pyx_PyLong_As_int32_t(values[3]); if (unlikely((__pyx_v_num_partitions == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 92, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("set_shuffle_config", 1, 4, 4, __pyx_nargs); __PYX_ERR(0, 83, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("set_shuffle_config", 1, 4, 4, __pyx_nargs); __PYX_ERR(0, 87, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10875,7 +10939,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 86, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shuffle_id), (&PyBytes_Type), 1, "shuffle_id", 1))) __PYX_ERR(0, 90, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_8set_shuffle_config(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self), __pyx_v_transport, __pyx_v_shuffle_id, __pyx_v_task_id, __pyx_v_num_partitions);
 
   /* function exit code */
@@ -10904,8 +10968,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("set_shuffle_config", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_set_shuffle_config(__pyx_v_self, __pyx_v_transport, __pyx_v_shuffle_id, __pyx_v_task_id, __pyx_v_num_partitions, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 83, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_set_shuffle_config(__pyx_v_self, __pyx_v_transport, __pyx_v_shuffle_id, __pyx_v_task_id, __pyx_v_num_partitions, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 87, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 87, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -10922,15 +10986,22 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/shuffled_operator.pyx":121
+/* "sabot/_cython/operators/shuffled_operator.pyx":125
  * 
  * 
- *     cdef list _partition_batch(             # <<<<<<<<<<<<<<
+ *     cpdef list _partition_batch(             # <<<<<<<<<<<<<<
  *         self,
  *         ca.RecordBatch batch
 */
 
-static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__partition_batch(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch) {
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11_partition_batch(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__partition_batch(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch, int __pyx_skip_dispatch) {
   std::vector<std::shared_ptr< arrow::RecordBatch> >  __pyx_v_cpp_partitions;
   PyObject *__pyx_v_result = NULL;
   std::shared_ptr< arrow::RecordBatch>  __pyx_v_cpp_batch;
@@ -10938,53 +11009,118 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
   std::vector<std::shared_ptr< arrow::RecordBatch> > ::size_type __pyx_v_i;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  std::vector<std::shared_ptr< arrow::RecordBatch> >  __pyx_t_1;
+  PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
-  std::vector<std::shared_ptr< arrow::RecordBatch> > ::size_type __pyx_t_3;
-  std::vector<std::shared_ptr< arrow::RecordBatch> > ::size_type __pyx_t_4;
-  std::vector<std::shared_ptr< arrow::RecordBatch> > ::size_type __pyx_t_5;
-  int __pyx_t_6;
-  int __pyx_t_7;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_5;
+  std::vector<std::shared_ptr< arrow::RecordBatch> >  __pyx_t_6;
+  std::vector<std::shared_ptr< arrow::RecordBatch> > ::size_type __pyx_t_7;
+  std::vector<std::shared_ptr< arrow::RecordBatch> > ::size_type __pyx_t_8;
+  std::vector<std::shared_ptr< arrow::RecordBatch> > ::size_type __pyx_t_9;
+  int __pyx_t_10;
+  int __pyx_t_11;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_partition_batch", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (
+  #if !CYTHON_USE_TYPE_SLOTS
+  unlikely(Py_TYPE(((PyObject *)__pyx_v_self)) != __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator &&
+  __Pyx_PyType_HasFeature(Py_TYPE(((PyObject *)__pyx_v_self)), Py_TPFLAGS_HAVE_GC))
+  #else
+  unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0 || __Pyx_PyType_HasFeature(Py_TYPE(((PyObject *)__pyx_v_self)), (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))
+  #endif
+  ) {
+    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
+      PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      #endif
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_partition_batch); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11_partition_batch)) {
+        __Pyx_XDECREF(__pyx_r);
+        __pyx_t_3 = NULL;
+        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_4 = __pyx_t_1; 
+        __pyx_t_5 = 1;
+        #if CYTHON_UNPACK_METHODS
+        if (unlikely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+          assert(__pyx_t_3);
+          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_3);
+          __Pyx_INCREF(__pyx__function);
+          __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
+          __pyx_t_5 = 0;
+        }
+        #endif
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_3, ((PyObject *)__pyx_v_batch)};
+          __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_2);
+        }
+        if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_2))) __PYX_ERR(0, 125, __pyx_L1_error)
+        __pyx_r = ((PyObject*)__pyx_t_2);
+        __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        goto __pyx_L0;
+      }
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
+      if (unlikely(__pyx_typedict_guard != __pyx_tp_dict_version)) {
+        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+      }
+      #endif
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    }
+    #endif
+  }
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":136
+  /* "sabot/_cython/operators/shuffled_operator.pyx":140
  *         # Use the existing HashPartitioner (returns C++ vector directly)
  *         cdef vector[shared_ptr[PCRecordBatch]] cpp_partitions
  *         cpp_partitions = self._partitioner.partition_batch(batch)             # <<<<<<<<<<<<<<
  * 
  *         # Convert C++ vector to Python list of Cython RecordBatches
 */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_11partitioner_Partitioner *)__pyx_v_self->_partitioner->__pyx_vtab)->partition_batch(__pyx_v_self->_partitioner, __pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 136, __pyx_L1_error)
-  __pyx_v_cpp_partitions = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_1);
+  __pyx_t_6 = ((struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_11partitioner_Partitioner *)__pyx_v_self->_partitioner->__pyx_vtab)->partition_batch(__pyx_v_self->_partitioner, __pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 140, __pyx_L1_error)
+  __pyx_v_cpp_partitions = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_6);
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":139
+  /* "sabot/_cython/operators/shuffled_operator.pyx":143
  * 
  *         # Convert C++ vector to Python list of Cython RecordBatches
  *         result = []             # <<<<<<<<<<<<<<
  *         cdef shared_ptr[PCRecordBatch] cpp_batch
  *         cdef ca.RecordBatch cython_batch
 */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 139, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_v_result = ((PyObject*)__pyx_t_2);
-  __pyx_t_2 = 0;
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_result = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":143
+  /* "sabot/_cython/operators/shuffled_operator.pyx":147
  *         cdef ca.RecordBatch cython_batch
  * 
  *         for i in range(cpp_partitions.size()):             # <<<<<<<<<<<<<<
  *             cpp_batch = cpp_partitions[i]
  *             if cpp_batch.get() != NULL:
 */
-  __pyx_t_3 = __pyx_v_cpp_partitions.size();
-  __pyx_t_4 = __pyx_t_3;
-  for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
-    __pyx_v_i = __pyx_t_5;
+  __pyx_t_7 = __pyx_v_cpp_partitions.size();
+  __pyx_t_8 = __pyx_t_7;
+  for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
+    __pyx_v_i = __pyx_t_9;
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":144
+    /* "sabot/_cython/operators/shuffled_operator.pyx":148
  * 
  *         for i in range(cpp_partitions.size()):
  *             cpp_batch = cpp_partitions[i]             # <<<<<<<<<<<<<<
@@ -10993,48 +11129,48 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
 */
     __pyx_v_cpp_batch = (__pyx_v_cpp_partitions[__pyx_v_i]);
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":145
+    /* "sabot/_cython/operators/shuffled_operator.pyx":149
  *         for i in range(cpp_partitions.size()):
  *             cpp_batch = cpp_partitions[i]
  *             if cpp_batch.get() != NULL:             # <<<<<<<<<<<<<<
  *                 cython_batch = ca.RecordBatch.__new__(ca.RecordBatch)
  *                 cython_batch.init(cpp_batch)
 */
-    __pyx_t_6 = (__pyx_v_cpp_batch.get() != NULL);
-    if (__pyx_t_6) {
+    __pyx_t_10 = (__pyx_v_cpp_batch.get() != NULL);
+    if (__pyx_t_10) {
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":146
+      /* "sabot/_cython/operators/shuffled_operator.pyx":150
  *             cpp_batch = cpp_partitions[i]
  *             if cpp_batch.get() != NULL:
  *                 cython_batch = ca.RecordBatch.__new__(ca.RecordBatch)             # <<<<<<<<<<<<<<
  *                 cython_batch.init(cpp_batch)
  *                 result.append(cython_batch)
 */
-      __pyx_t_2 = __Pyx_tp_new(((PyObject *)__pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch), __pyx_mstate_global->__pyx_empty_tuple); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      if (!(likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch)))) __PYX_ERR(0, 146, __pyx_L1_error)
-      __Pyx_XDECREF_SET(__pyx_v_cython_batch, ((struct __pyx_obj_7pyarrow_3lib_RecordBatch *)__pyx_t_2));
-      __pyx_t_2 = 0;
+      __pyx_t_1 = __Pyx_tp_new(((PyObject *)__pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch), __pyx_mstate_global->__pyx_empty_tuple); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch)))) __PYX_ERR(0, 150, __pyx_L1_error)
+      __Pyx_XDECREF_SET(__pyx_v_cython_batch, ((struct __pyx_obj_7pyarrow_3lib_RecordBatch *)__pyx_t_1));
+      __pyx_t_1 = 0;
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":147
+      /* "sabot/_cython/operators/shuffled_operator.pyx":151
  *             if cpp_batch.get() != NULL:
  *                 cython_batch = ca.RecordBatch.__new__(ca.RecordBatch)
  *                 cython_batch.init(cpp_batch)             # <<<<<<<<<<<<<<
  *                 result.append(cython_batch)
  *             else:
 */
-      ((struct __pyx_vtabstruct_7pyarrow_3lib_RecordBatch *)__pyx_v_cython_batch->__pyx_base.__pyx_vtab)->init(__pyx_v_cython_batch, __pyx_v_cpp_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 147, __pyx_L1_error)
+      ((struct __pyx_vtabstruct_7pyarrow_3lib_RecordBatch *)__pyx_v_cython_batch->__pyx_base.__pyx_vtab)->init(__pyx_v_cython_batch, __pyx_v_cpp_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 151, __pyx_L1_error)
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":148
+      /* "sabot/_cython/operators/shuffled_operator.pyx":152
  *                 cython_batch = ca.RecordBatch.__new__(ca.RecordBatch)
  *                 cython_batch.init(cpp_batch)
  *                 result.append(cython_batch)             # <<<<<<<<<<<<<<
  *             else:
  *                 result.append(None)
 */
-      __pyx_t_7 = __Pyx_PyList_Append(__pyx_v_result, ((PyObject *)__pyx_v_cython_batch)); if (unlikely(__pyx_t_7 == ((int)-1))) __PYX_ERR(0, 148, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_result, ((PyObject *)__pyx_v_cython_batch)); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 152, __pyx_L1_error)
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":145
+      /* "sabot/_cython/operators/shuffled_operator.pyx":149
  *         for i in range(cpp_partitions.size()):
  *             cpp_batch = cpp_partitions[i]
  *             if cpp_batch.get() != NULL:             # <<<<<<<<<<<<<<
@@ -11044,7 +11180,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
       goto __pyx_L5;
     }
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":150
+    /* "sabot/_cython/operators/shuffled_operator.pyx":154
  *                 result.append(cython_batch)
  *             else:
  *                 result.append(None)             # <<<<<<<<<<<<<<
@@ -11052,12 +11188,12 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
  *         return result
 */
     /*else*/ {
-      __pyx_t_7 = __Pyx_PyList_Append(__pyx_v_result, Py_None); if (unlikely(__pyx_t_7 == ((int)-1))) __PYX_ERR(0, 150, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_result, Py_None); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 154, __pyx_L1_error)
     }
     __pyx_L5:;
   }
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":152
+  /* "sabot/_cython/operators/shuffled_operator.pyx":156
  *                 result.append(None)
  * 
  *         return result             # <<<<<<<<<<<<<<
@@ -11069,17 +11205,20 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
   __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":121
+  /* "sabot/_cython/operators/shuffled_operator.pyx":125
  * 
  * 
- *     cdef list _partition_batch(             # <<<<<<<<<<<<<<
+ *     cpdef list _partition_batch(             # <<<<<<<<<<<<<<
  *         self,
  *         ca.RecordBatch batch
 */
 
   /* function exit code */
   __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
   __Pyx_AddTraceback("sabot._cython.operators.shuffled_operator.ShuffledOperator._partition_batch", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
@@ -11090,7 +11229,129 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/shuffled_operator.pyx":158
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11_partition_batch(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10_partition_batch, "\n        Partition batch into N partitions by hash(key).\n\n        Args:\n            batch: Input RecordBatch\n\n        Returns:\n            List of RecordBatches (one per partition)\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11_partition_batch = {"_partition_batch", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11_partition_batch, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10_partition_batch};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11_partition_batch(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_partition_batch (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 125, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 125, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_partition_batch", 0) < 0) __PYX_ERR(0, 125, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_partition_batch", 1, 1, 1, i); __PYX_ERR(0, 125, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 125, __pyx_L3_error)
+    }
+    __pyx_v_batch = ((struct __pyx_obj_7pyarrow_3lib_RecordBatch *)values[0]);
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("_partition_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 125, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("sabot._cython.operators.shuffled_operator.ShuffledOperator._partition_batch", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_batch), __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch, 1, "batch", 0))) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10_partition_batch(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self), __pyx_v_batch);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  goto __pyx_L7_cleaned_up;
+  __pyx_L0:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __pyx_L7_cleaned_up:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10_partition_batch(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, struct __pyx_obj_7pyarrow_3lib_RecordBatch *__pyx_v_batch) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("_partition_batch", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__partition_batch(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("sabot._cython.operators.shuffled_operator.ShuffledOperator._partition_batch", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "sabot/_cython/operators/shuffled_operator.pyx":162
  *     # ========================================================================
  * 
  *     cdef void _send_partitions(             # <<<<<<<<<<<<<<
@@ -11117,7 +11378,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_send_partitions", 0);
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":173
+  /* "sabot/_cython/operators/shuffled_operator.pyx":177
  *         cdef ca.RecordBatch partition_batch
  * 
  *         for partition_id in range(len(partitions)):             # <<<<<<<<<<<<<<
@@ -11126,14 +11387,14 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
 */
   if (unlikely(__pyx_v_partitions == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 173, __pyx_L1_error)
+    __PYX_ERR(0, 177, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyList_GET_SIZE(__pyx_v_partitions); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 173, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyList_GET_SIZE(__pyx_v_partitions); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 177, __pyx_L1_error)
   __pyx_t_2 = __pyx_t_1;
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_partition_id = __pyx_t_3;
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":174
+    /* "sabot/_cython/operators/shuffled_operator.pyx":178
  * 
  *         for partition_id in range(len(partitions)):
  *             partition_batch = partitions[partition_id]             # <<<<<<<<<<<<<<
@@ -11142,15 +11403,15 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
 */
     if (unlikely(__pyx_v_partitions == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 174, __pyx_L1_error)
+      __PYX_ERR(0, 178, __pyx_L1_error)
     }
     __pyx_t_4 = __Pyx_PyList_GET_ITEM(__pyx_v_partitions, __pyx_v_partition_id);
     __Pyx_INCREF(__pyx_t_4);
-    if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch))))) __PYX_ERR(0, 174, __pyx_L1_error)
+    if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch))))) __PYX_ERR(0, 178, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_partition_batch, ((struct __pyx_obj_7pyarrow_3lib_RecordBatch *)__pyx_t_4));
     __pyx_t_4 = 0;
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":176
+    /* "sabot/_cython/operators/shuffled_operator.pyx":180
  *             partition_batch = partitions[partition_id]
  * 
  *             if partition_batch is None or partition_batch.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -11163,15 +11424,15 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
       __pyx_t_5 = __pyx_t_6;
       goto __pyx_L6_bool_binop_done;
     }
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_partition_batch), __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 176, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_partition_batch), __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 180, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_4, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 176, __pyx_L1_error)
+    __pyx_t_6 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_4, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 180, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_5 = __pyx_t_6;
     __pyx_L6_bool_binop_done:;
     if (__pyx_t_5) {
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":177
+      /* "sabot/_cython/operators/shuffled_operator.pyx":181
  * 
  *             if partition_batch is None or partition_batch.num_rows == 0:
  *                 continue             # <<<<<<<<<<<<<<
@@ -11180,7 +11441,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
 */
       goto __pyx_L3_continue;
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":176
+      /* "sabot/_cython/operators/shuffled_operator.pyx":180
  *             partition_batch = partitions[partition_id]
  * 
  *             if partition_batch is None or partition_batch.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -11189,7 +11450,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
 */
     }
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":180
+    /* "sabot/_cython/operators/shuffled_operator.pyx":184
  * 
  *             # Get target agent address
  *             agent_address = agent_addresses[partition_id]             # <<<<<<<<<<<<<<
@@ -11198,14 +11459,14 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
 */
     if (unlikely(__pyx_v_agent_addresses == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 180, __pyx_L1_error)
+      __PYX_ERR(0, 184, __pyx_L1_error)
     }
     __pyx_t_4 = __Pyx_PyList_GET_ITEM(__pyx_v_agent_addresses, __pyx_v_partition_id);
     __Pyx_INCREF(__pyx_t_4);
     __Pyx_XDECREF_SET(__pyx_v_agent_address, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":183
+    /* "sabot/_cython/operators/shuffled_operator.pyx":187
  * 
  *             # Send via shuffle transport
  *             if self._shuffle_transport is not None:             # <<<<<<<<<<<<<<
@@ -11215,7 +11476,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
     __pyx_t_5 = (__pyx_v_self->_shuffle_transport != Py_None);
     if (__pyx_t_5) {
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":184
+      /* "sabot/_cython/operators/shuffled_operator.pyx":188
  *             # Send via shuffle transport
  *             if self._shuffle_transport is not None:
  *                 self._shuffle_transport.publish_partition(             # <<<<<<<<<<<<<<
@@ -11225,17 +11486,17 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
       __pyx_t_7 = __pyx_v_self->_shuffle_transport;
       __Pyx_INCREF(__pyx_t_7);
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":186
+      /* "sabot/_cython/operators/shuffled_operator.pyx":190
  *                 self._shuffle_transport.publish_partition(
  *                     self._shuffle_id,
  *                     partition_id,             # <<<<<<<<<<<<<<
  *                     partition_batch
  *                 )
 */
-      __pyx_t_8 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 186, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyLong_From_int32_t(__pyx_v_partition_id); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 190, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":187
+      /* "sabot/_cython/operators/shuffled_operator.pyx":191
  *                     self._shuffle_id,
  *                     partition_id,
  *                     partition_batch             # <<<<<<<<<<<<<<
@@ -11248,12 +11509,12 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
         __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_publish_partition, __pyx_callargs+__pyx_t_9, (4-__pyx_t_9) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 184, __pyx_L1_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 188, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":183
+      /* "sabot/_cython/operators/shuffled_operator.pyx":187
  * 
  *             # Send via shuffle transport
  *             if self._shuffle_transport is not None:             # <<<<<<<<<<<<<<
@@ -11264,7 +11525,7 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
     __pyx_L3_continue:;
   }
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":158
+  /* "sabot/_cython/operators/shuffled_operator.pyx":162
  *     # ========================================================================
  * 
  *     cdef void _send_partitions(             # <<<<<<<<<<<<<<
@@ -11284,9 +11545,9 @@ static void __pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOpe
   __Pyx_XDECREF(__pyx_v_agent_address);
   __Pyx_RefNannyFinishContext();
 }
-static PyObject *__pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_12generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
+static PyObject *__pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_14generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/shuffled_operator.pyx":194
+/* "sabot/_cython/operators/shuffled_operator.pyx":198
  *     # ========================================================================
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -11295,25 +11556,25 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11__iter__(PyObject *__pyx_v_self); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10__iter__, "\n        Receive shuffled data and process.\n\n        For downstream tasks, this receives data from shuffle transport\n        instead of directly from upstream operator.\n        ");
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_13__iter__(PyObject *__pyx_v_self); /*proto*/
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_12__iter__, "\n        Receive shuffled data and process.\n\n        For downstream tasks, this receives data from shuffle transport\n        instead of directly from upstream operator.\n        ");
 #if CYTHON_UPDATE_DESCRIPTOR_DOC
-struct wrapperbase __pyx_wrapperbase_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10__iter__;
+struct wrapperbase __pyx_wrapperbase_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_12__iter__;
 #endif
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11__iter__(PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_13__iter__(PyObject *__pyx_v_self) {
   CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__iter__ (wrapper)", 0);
   __pyx_kwvalues = __Pyx_KwValues_VARARGS(__pyx_args, __pyx_nargs);
-  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10__iter__(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_12__iter__(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10__iter__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_12__iter__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self) {
   struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__ *__pyx_cur_scope;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -11325,7 +11586,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__ *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 194, __pyx_L1_error)
+    __PYX_ERR(0, 198, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -11333,7 +11594,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_12generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_iter, __pyx_mstate_global->__pyx_n_u_ShuffledOperator___iter, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled); if (unlikely(!gen)) __PYX_ERR(0, 194, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_14generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_iter, __pyx_mstate_global->__pyx_n_u_ShuffledOperator___iter, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled); if (unlikely(!gen)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -11349,7 +11610,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   return __pyx_r;
 }
 
-static PyObject *__pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_12generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+static PyObject *__pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_14generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
 {
   struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__ *__pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__ *)__pyx_generator->closure);
   PyObject *__pyx_r = NULL;
@@ -11373,10 +11634,10 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
-    __PYX_ERR(0, 194, __pyx_L1_error)
+    __PYX_ERR(0, 198, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":202
+  /* "sabot/_cython/operators/shuffled_operator.pyx":206
  *         """
  *         # Check if we're a downstream task (shuffle receiver)
  *         if self._shuffle_transport is not None and self._task_id >= 0:             # <<<<<<<<<<<<<<
@@ -11394,14 +11655,14 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   __pyx_L5_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":204
+    /* "sabot/_cython/operators/shuffled_operator.pyx":208
  *         if self._shuffle_transport is not None and self._task_id >= 0:
  *             # Receive mode: pull data from shuffle transport
  *             yield from self._receive_shuffled_batches()             # <<<<<<<<<<<<<<
  *         else:
  *             # Send mode: partition and send upstream data
 */
-    __pyx_t_3 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_vtab)->_receive_shuffled_batches(__pyx_cur_scope->__pyx_v_self); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
+    __pyx_t_3 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_vtab)->_receive_shuffled_batches(__pyx_cur_scope->__pyx_v_self); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 208, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = __Pyx_Generator_Yield_From(__pyx_generator, __pyx_t_3, &__pyx_r);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -11414,16 +11675,16 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
       __pyx_generator->resume_label = 1;
       return __pyx_r;
       __pyx_L7_resume_from_yield_from:;
-      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 204, __pyx_L1_error)
+      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 208, __pyx_L1_error)
     } else if (likely(__pyx_t_4 == PYGEN_RETURN)) {
       __Pyx_GOTREF(__pyx_r);
       __Pyx_DECREF(__pyx_r); __pyx_r = 0;
     } else {
       __Pyx_XGOTREF(__pyx_r);
-      __PYX_ERR(0, 204, __pyx_L1_error)
+      __PYX_ERR(0, 208, __pyx_L1_error)
     }
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":202
+    /* "sabot/_cython/operators/shuffled_operator.pyx":206
  *         """
  *         # Check if we're a downstream task (shuffle receiver)
  *         if self._shuffle_transport is not None and self._task_id >= 0:             # <<<<<<<<<<<<<<
@@ -11433,7 +11694,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
     goto __pyx_L4;
   }
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":207
+  /* "sabot/_cython/operators/shuffled_operator.pyx":211
  *         else:
  *             # Send mode: partition and send upstream data
  *             yield from self._send_shuffled_batches()             # <<<<<<<<<<<<<<
@@ -11441,7 +11702,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
  *     cdef _receive_shuffled_batches(self):
 */
   /*else*/ {
-    __pyx_t_3 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_vtab)->_send_shuffled_batches(__pyx_cur_scope->__pyx_v_self); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
+    __pyx_t_3 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_vtab)->_send_shuffled_batches(__pyx_cur_scope->__pyx_v_self); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 211, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = __Pyx_Generator_Yield_From(__pyx_generator, __pyx_t_3, &__pyx_r);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -11454,19 +11715,19 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
       __pyx_generator->resume_label = 2;
       return __pyx_r;
       __pyx_L8_resume_from_yield_from:;
-      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 207, __pyx_L1_error)
+      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 211, __pyx_L1_error)
     } else if (likely(__pyx_t_4 == PYGEN_RETURN)) {
       __Pyx_GOTREF(__pyx_r);
       __Pyx_DECREF(__pyx_r); __pyx_r = 0;
     } else {
       __Pyx_XGOTREF(__pyx_r);
-      __PYX_ERR(0, 207, __pyx_L1_error)
+      __PYX_ERR(0, 211, __pyx_L1_error)
     }
   }
   __pyx_L4:;
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":194
+  /* "sabot/_cython/operators/shuffled_operator.pyx":198
  *     # ========================================================================
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -11494,7 +11755,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/shuffled_operator.pyx":209
+/* "sabot/_cython/operators/shuffled_operator.pyx":213
  *             yield from self._send_shuffled_batches()
  * 
  *     cdef _receive_shuffled_batches(self):             # <<<<<<<<<<<<<<
@@ -11515,7 +11776,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_receive_shuffled_batches", 0);
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":216
+  /* "sabot/_cython/operators/shuffled_operator.pyx":220
  *         """
  *         # Use ShuffleTransport to receive partitions
  *         if self._shuffle_transport is not None:             # <<<<<<<<<<<<<<
@@ -11525,7 +11786,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
   __pyx_t_1 = (__pyx_v_self->_shuffle_transport != Py_None);
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":217
+    /* "sabot/_cython/operators/shuffled_operator.pyx":221
  *         # Use ShuffleTransport to receive partitions
  *         if self._shuffle_transport is not None:
  *             return self._shuffle_transport.receive_partitions(             # <<<<<<<<<<<<<<
@@ -11536,14 +11797,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
     __pyx_t_3 = __pyx_v_self->_shuffle_transport;
     __Pyx_INCREF(__pyx_t_3);
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":218
+    /* "sabot/_cython/operators/shuffled_operator.pyx":222
  *         if self._shuffle_transport is not None:
  *             return self._shuffle_transport.receive_partitions(
  *                 self._shuffle_id, self._task_id             # <<<<<<<<<<<<<<
  *             )
  *         return []
 */
-    __pyx_t_4 = __Pyx_PyLong_From_int32_t(__pyx_v_self->_task_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 218, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyLong_From_int32_t(__pyx_v_self->_task_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 222, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = 0;
     {
@@ -11551,14 +11812,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_receive_partitions, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 217, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":216
+    /* "sabot/_cython/operators/shuffled_operator.pyx":220
  *         """
  *         # Use ShuffleTransport to receive partitions
  *         if self._shuffle_transport is not None:             # <<<<<<<<<<<<<<
@@ -11567,7 +11828,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
 */
   }
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":220
+  /* "sabot/_cython/operators/shuffled_operator.pyx":224
  *                 self._shuffle_id, self._task_id
  *             )
  *         return []             # <<<<<<<<<<<<<<
@@ -11575,13 +11836,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
  *     cdef _send_shuffled_batches(self):
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":209
+  /* "sabot/_cython/operators/shuffled_operator.pyx":213
  *             yield from self._send_shuffled_batches()
  * 
  *     cdef _receive_shuffled_batches(self):             # <<<<<<<<<<<<<<
@@ -11602,7 +11863,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/shuffled_operator.pyx":222
+/* "sabot/_cython/operators/shuffled_operator.pyx":226
  *         return []
  * 
  *     cdef _send_shuffled_batches(self):             # <<<<<<<<<<<<<<
@@ -11634,7 +11895,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_send_shuffled_batches", 0);
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":229
+  /* "sabot/_cython/operators/shuffled_operator.pyx":233
  *         """
  *         # Get shuffle metadata
  *         if self._shuffle_transport is None:             # <<<<<<<<<<<<<<
@@ -11644,7 +11905,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
   __pyx_t_1 = (__pyx_v_self->_shuffle_transport == Py_None);
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":230
+    /* "sabot/_cython/operators/shuffled_operator.pyx":234
  *         # Get shuffle metadata
  *         if self._shuffle_transport is None:
  *             return             # <<<<<<<<<<<<<<
@@ -11655,7 +11916,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":229
+    /* "sabot/_cython/operators/shuffled_operator.pyx":233
  *         """
  *         # Get shuffle metadata
  *         if self._shuffle_transport is None:             # <<<<<<<<<<<<<<
@@ -11664,26 +11925,26 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
 */
   }
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":234
+  /* "sabot/_cython/operators/shuffled_operator.pyx":238
  *         # TODO: Get downstream agent addresses from shuffle metadata
  *         # For now, placeholder
  *         downstream_agents = [b"localhost:8817"] * self._num_partitions             # <<<<<<<<<<<<<<
  * 
  *         # Process upstream batches
 */
-  __pyx_t_2 = PyList_New(1 * ((__pyx_v_self->_num_partitions<0) ? 0:__pyx_v_self->_num_partitions)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(1 * ((__pyx_v_self->_num_partitions<0) ? 0:__pyx_v_self->_num_partitions)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   { Py_ssize_t __pyx_temp;
     for (__pyx_temp=0; __pyx_temp < __pyx_v_self->_num_partitions; __pyx_temp++) {
       __Pyx_INCREF(__pyx_mstate_global->__pyx_kp_b_localhost_8817);
       __Pyx_GIVEREF(__pyx_mstate_global->__pyx_kp_b_localhost_8817);
-      if (__Pyx_PyList_SET_ITEM(__pyx_t_2, __pyx_temp, __pyx_mstate_global->__pyx_kp_b_localhost_8817) != (0)) __PYX_ERR(0, 234, __pyx_L1_error);
+      if (__Pyx_PyList_SET_ITEM(__pyx_t_2, __pyx_temp, __pyx_mstate_global->__pyx_kp_b_localhost_8817) != (0)) __PYX_ERR(0, 238, __pyx_L1_error);
     }
   }
   __pyx_v_downstream_agents = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":237
+  /* "sabot/_cython/operators/shuffled_operator.pyx":241
  * 
  *         # Process upstream batches
  *         for batch in self._source:             # <<<<<<<<<<<<<<
@@ -11695,9 +11956,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
     __pyx_t_3 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_3 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_self->__pyx_base._source); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 237, __pyx_L1_error)
+    __pyx_t_3 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_self->__pyx_base._source); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 241, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 237, __pyx_L1_error)
+    __pyx_t_4 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 241, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_4)) {
@@ -11705,7 +11966,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 237, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 241, __pyx_L1_error)
           #endif
           if (__pyx_t_3 >= __pyx_temp) break;
         }
@@ -11715,7 +11976,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 237, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 241, __pyx_L1_error)
           #endif
           if (__pyx_t_3 >= __pyx_temp) break;
         }
@@ -11726,13 +11987,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
         #endif
         ++__pyx_t_3;
       }
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 237, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
     } else {
       __pyx_t_5 = __pyx_t_4(__pyx_t_2);
       if (unlikely(!__pyx_t_5)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 237, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 241, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -11742,7 +12003,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
     __Pyx_XDECREF_SET(__pyx_v_batch, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":238
+    /* "sabot/_cython/operators/shuffled_operator.pyx":242
  *         # Process upstream batches
  *         for batch in self._source:
  *             if batch is None or batch.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -11755,15 +12016,15 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
       __pyx_t_1 = __pyx_t_6;
       goto __pyx_L7_bool_binop_done;
     }
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 238, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 242, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_5, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 238, __pyx_L1_error)
+    __pyx_t_6 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_5, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 242, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_1 = __pyx_t_6;
     __pyx_L7_bool_binop_done:;
     if (__pyx_t_1) {
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":239
+      /* "sabot/_cython/operators/shuffled_operator.pyx":243
  *         for batch in self._source:
  *             if batch is None or batch.num_rows == 0:
  *                 continue             # <<<<<<<<<<<<<<
@@ -11772,7 +12033,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
 */
       goto __pyx_L4_continue;
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":238
+      /* "sabot/_cython/operators/shuffled_operator.pyx":242
  *         # Process upstream batches
  *         for batch in self._source:
  *             if batch is None or batch.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -11781,20 +12042,20 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
 */
     }
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":242
+    /* "sabot/_cython/operators/shuffled_operator.pyx":246
  * 
  *             # Partition the batch
  *             partitions = self._partition_batch(batch)             # <<<<<<<<<<<<<<
  * 
  *             # Send each partition to its downstream agent
 */
-    if (!(likely(((__pyx_v_batch) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_batch, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch))))) __PYX_ERR(0, 242, __pyx_L1_error)
-    __pyx_t_5 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self->__pyx_base.__pyx_vtab)->_partition_batch(__pyx_v_self, ((struct __pyx_obj_7pyarrow_3lib_RecordBatch *)__pyx_v_batch)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 242, __pyx_L1_error)
+    if (!(likely(((__pyx_v_batch) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_batch, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_RecordBatch))))) __PYX_ERR(0, 246, __pyx_L1_error)
+    __pyx_t_5 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self->__pyx_base.__pyx_vtab)->_partition_batch(__pyx_v_self, ((struct __pyx_obj_7pyarrow_3lib_RecordBatch *)__pyx_v_batch), 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_XDECREF_SET(__pyx_v_partitions, ((PyObject*)__pyx_t_5));
     __pyx_t_5 = 0;
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":245
+    /* "sabot/_cython/operators/shuffled_operator.pyx":249
  * 
  *             # Send each partition to its downstream agent
  *             for i in range(len(partitions)):             # <<<<<<<<<<<<<<
@@ -11803,14 +12064,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
 */
     if (unlikely(__pyx_v_partitions == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-      __PYX_ERR(0, 245, __pyx_L1_error)
+      __PYX_ERR(0, 249, __pyx_L1_error)
     }
-    __pyx_t_7 = __Pyx_PyList_GET_SIZE(__pyx_v_partitions); if (unlikely(__pyx_t_7 == ((Py_ssize_t)-1))) __PYX_ERR(0, 245, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyList_GET_SIZE(__pyx_v_partitions); if (unlikely(__pyx_t_7 == ((Py_ssize_t)-1))) __PYX_ERR(0, 249, __pyx_L1_error)
     __pyx_t_8 = __pyx_t_7;
     for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
       __pyx_v_i = __pyx_t_9;
 
-      /* "sabot/_cython/operators/shuffled_operator.pyx":246
+      /* "sabot/_cython/operators/shuffled_operator.pyx":250
  *             # Send each partition to its downstream agent
  *             for i in range(len(partitions)):
  *                 if partitions[i] is not None and partitions[i].num_rows > 0:             # <<<<<<<<<<<<<<
@@ -11819,7 +12080,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
 */
       if (unlikely(__pyx_v_partitions == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 246, __pyx_L1_error)
+        __PYX_ERR(0, 250, __pyx_L1_error)
       }
       __pyx_t_6 = (__Pyx_PyList_GET_ITEM(__pyx_v_partitions, __pyx_v_i) != Py_None);
       if (__pyx_t_6) {
@@ -11829,19 +12090,19 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
       }
       if (unlikely(__pyx_v_partitions == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 246, __pyx_L1_error)
+        __PYX_ERR(0, 250, __pyx_L1_error)
       }
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__Pyx_PyList_GET_ITEM(__pyx_v_partitions, __pyx_v_i), __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 246, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__Pyx_PyList_GET_ITEM(__pyx_v_partitions, __pyx_v_i), __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 250, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_10 = PyObject_RichCompare(__pyx_t_5, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 246, __pyx_L1_error)
+      __pyx_t_10 = PyObject_RichCompare(__pyx_t_5, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 250, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_10); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 246, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_10); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 250, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __pyx_t_1 = __pyx_t_6;
       __pyx_L12_bool_binop_done:;
       if (__pyx_t_1) {
 
-        /* "sabot/_cython/operators/shuffled_operator.pyx":247
+        /* "sabot/_cython/operators/shuffled_operator.pyx":251
  *             for i in range(len(partitions)):
  *                 if partitions[i] is not None and partitions[i].num_rows > 0:
  *                     self._shuffle_transport.send_partition(             # <<<<<<<<<<<<<<
@@ -11851,17 +12112,17 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
         __pyx_t_5 = __pyx_v_self->_shuffle_transport;
         __Pyx_INCREF(__pyx_t_5);
 
-        /* "sabot/_cython/operators/shuffled_operator.pyx":249
+        /* "sabot/_cython/operators/shuffled_operator.pyx":253
  *                     self._shuffle_transport.send_partition(
  *                         self._shuffle_id,
  *                         i,  # partition_id             # <<<<<<<<<<<<<<
  *                         partitions[i],
  *                         downstream_agents[i]
 */
-        __pyx_t_11 = PyLong_FromSsize_t(__pyx_v_i); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 249, __pyx_L1_error)
+        __pyx_t_11 = PyLong_FromSsize_t(__pyx_v_i); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 253, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
 
-        /* "sabot/_cython/operators/shuffled_operator.pyx":250
+        /* "sabot/_cython/operators/shuffled_operator.pyx":254
  *                         self._shuffle_id,
  *                         i,  # partition_id
  *                         partitions[i],             # <<<<<<<<<<<<<<
@@ -11870,10 +12131,10 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
 */
         if (unlikely(__pyx_v_partitions == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 250, __pyx_L1_error)
+          __PYX_ERR(0, 254, __pyx_L1_error)
         }
 
-        /* "sabot/_cython/operators/shuffled_operator.pyx":251
+        /* "sabot/_cython/operators/shuffled_operator.pyx":255
  *                         i,  # partition_id
  *                         partitions[i],
  *                         downstream_agents[i]             # <<<<<<<<<<<<<<
@@ -11885,12 +12146,12 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
           __pyx_t_10 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_send_partition, __pyx_callargs+__pyx_t_12, (5-__pyx_t_12) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 247, __pyx_L1_error)
+          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 251, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_10);
         }
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-        /* "sabot/_cython/operators/shuffled_operator.pyx":246
+        /* "sabot/_cython/operators/shuffled_operator.pyx":250
  *             # Send each partition to its downstream agent
  *             for i in range(len(partitions)):
  *                 if partitions[i] is not None and partitions[i].num_rows > 0:             # <<<<<<<<<<<<<<
@@ -11900,7 +12161,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
       }
     }
 
-    /* "sabot/_cython/operators/shuffled_operator.pyx":237
+    /* "sabot/_cython/operators/shuffled_operator.pyx":241
  * 
  *         # Process upstream batches
  *         for batch in self._source:             # <<<<<<<<<<<<<<
@@ -11911,7 +12172,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":222
+  /* "sabot/_cython/operators/shuffled_operator.pyx":226
  *         return []
  * 
  *     cdef _send_shuffled_batches(self):             # <<<<<<<<<<<<<<
@@ -11938,6 +12199,203 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
   return __pyx_r;
 }
 
+/* "sabot/_cython/operators/shuffled_operator.pxd":16
+ *     cdef:
+ *         # Public attributes (for tests and metadata)
+ *         public str operator_id           # Unique operator identifier             # <<<<<<<<<<<<<<
+ *         public int32_t parallelism       # Parallelism hint
+ * 
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_1__get__(PyObject *__pyx_v_self) {
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_kwvalues = __Pyx_KwValues_VARARGS(__pyx_args, __pyx_nargs);
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id___get__(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id___get__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_self->operator_id);
+  __pyx_r = __pyx_v_self->operator_id;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_kwvalues = __Pyx_KwValues_VARARGS(__pyx_args, __pyx_nargs);
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_2__set__(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_2__set__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __pyx_v_value;
+  __Pyx_INCREF(__pyx_t_1);
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(4, 16, __pyx_L1_error)
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->operator_id);
+  __Pyx_DECREF(__pyx_v_self->operator_id);
+  __pyx_v_self->operator_id = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("sabot._cython.operators.shuffled_operator.ShuffledOperator.operator_id.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_5__del__(PyObject *__pyx_v_self); /*proto*/
+static int __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_5__del__(PyObject *__pyx_v_self) {
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__ (wrapper)", 0);
+  __pyx_kwvalues = __Pyx_KwValues_VARARGS(__pyx_args, __pyx_nargs);
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_4__del__(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_4__del__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__", 0);
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF(__pyx_v_self->operator_id);
+  __Pyx_DECREF(__pyx_v_self->operator_id);
+  __pyx_v_self->operator_id = ((PyObject*)Py_None);
+
+  /* function exit code */
+  __pyx_r = 0;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "sabot/_cython/operators/shuffled_operator.pxd":17
+ *         # Public attributes (for tests and metadata)
+ *         public str operator_id           # Unique operator identifier
+ *         public int32_t parallelism       # Parallelism hint             # <<<<<<<<<<<<<<
+ * 
+ *         # Internal attributes
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11parallelism_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11parallelism_1__get__(PyObject *__pyx_v_self) {
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_kwvalues = __Pyx_KwValues_VARARGS(__pyx_args, __pyx_nargs);
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11parallelism___get__(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11parallelism___get__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyLong_From_int32_t(__pyx_v_self->parallelism); if (unlikely(!__pyx_t_1)) __PYX_ERR(4, 17, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("sabot._cython.operators.shuffled_operator.ShuffledOperator.parallelism.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11parallelism_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11parallelism_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_kwvalues = __Pyx_KwValues_VARARGS(__pyx_args, __pyx_nargs);
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11parallelism_2__set__(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11parallelism_2__set__(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  int32_t __pyx_t_1;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __pyx_t_1 = __Pyx_PyLong_As_int32_t(__pyx_v_value); if (unlikely((__pyx_t_1 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(4, 17, __pyx_L1_error)
+  __pyx_v_self->parallelism = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("sabot._cython.operators.shuffled_operator.ShuffledOperator.parallelism.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  return __pyx_r;
+}
+
 /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
@@ -11945,15 +12403,15 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16Shuffl
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_14__reduce_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_16__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_14__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_14__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_14__reduce_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_16__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_16__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_16__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -11979,14 +12437,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("__reduce_cython__", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_13__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_15__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_13__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_15__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -12026,15 +12484,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16Shuff
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_16__setstate_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_18__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_16__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_16__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_16__setstate_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_18__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_18__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_18__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -12100,7 +12558,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_15__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self), __pyx_v___pyx_state);
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_17__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)__pyx_v_self), __pyx_v___pyx_state);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -12110,7 +12568,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_15__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_17__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -12150,6 +12608,7 @@ static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_17shuffled_operator_Shu
   if (unlikely(!o)) return 0;
   p = ((struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *)o);
   p->__pyx_base.__pyx_vtab = (struct __pyx_vtabstruct_5sabot_7_cython_9operators_13base_operator_BaseOperator*)__pyx_vtabptr_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator;
+  p->operator_id = ((PyObject*)Py_None); Py_INCREF(Py_None);
   p->_partition_keys = ((PyObject*)Py_None); Py_INCREF(Py_None);
   p->_shuffle_transport = Py_None; Py_INCREF(Py_None);
   p->_shuffle_id = ((PyObject*)Py_None); Py_INCREF(Py_None);
@@ -12171,6 +12630,7 @@ static void __pyx_tp_dealloc_5sabot_7_cython_9operators_17shuffled_operator_Shuf
   }
   #endif
   PyObject_GC_UnTrack(o);
+  Py_CLEAR(p->operator_id);
   Py_CLEAR(p->_partition_keys);
   Py_CLEAR(p->_shuffle_transport);
   Py_CLEAR(p->_shuffle_id);
@@ -12232,10 +12692,43 @@ static int __pyx_tp_clear_5sabot_7_cython_9operators_17shuffled_operator_Shuffle
   return 0;
 }
 
+static PyObject *__pyx_getprop_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_operator_id(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_1__get__(o);
+}
+
+static int __pyx_setprop_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_operator_id(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_3__set__(o, v);
+  }
+  else {
+    return __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11operator_id_5__del__(o);
+  }
+}
+
+static PyObject *__pyx_getprop_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_parallelism(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11parallelism_1__get__(o);
+}
+
+static int __pyx_setprop_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_parallelism(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11parallelism_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
 static PyMethodDef __pyx_methods_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator[] = {
-  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_14__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_16__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_16__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_18__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
+};
+
+static struct PyGetSetDef __pyx_getsets_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator[] = {
+  {"operator_id", __pyx_getprop_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_operator_id, __pyx_setprop_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_operator_id, 0, 0},
+  {"parallelism", __pyx_getprop_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_parallelism, __pyx_setprop_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_parallelism, 0, 0},
+  {0, 0, 0, 0, 0}
 };
 #if CYTHON_USE_TYPE_SPECS
 static PyType_Slot __pyx_type_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator_slots[] = {
@@ -12243,8 +12736,9 @@ static PyType_Slot __pyx_type_5sabot_7_cython_9operators_17shuffled_operator_Shu
   {Py_tp_doc, (void *)PyDoc_STR("\n    Base class for operators requiring network shuffle.\n\n    Responsibilities:\n    1. Declare shuffle requirement via requires_shuffle()\n    2. Specify partition keys via get_partition_keys()\n    3. Provide hash partitioning logic\n    4. Integrate with ShuffleTransport\n\n    Subclasses:\n    - HashJoinOperator (shuffle both sides by join key)\n    - GroupByOperator (shuffle by group keys)\n    - DistinctOperator (shuffle by all columns)\n    - WindowOperator (shuffle by window key + partition by)\n    ")},
   {Py_tp_traverse, (void *)__pyx_tp_traverse_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator},
   {Py_tp_clear, (void *)__pyx_tp_clear_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator},
-  {Py_tp_iter, (void *)__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11__iter__},
+  {Py_tp_iter, (void *)__pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_13__iter__},
   {Py_tp_methods, (void *)__pyx_methods_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator},
+  {Py_tp_getset, (void *)__pyx_getsets_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator},
   {Py_tp_new, (void *)__pyx_tp_new_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator},
   {0, 0},
 };
@@ -12288,11 +12782,11 @@ static PyTypeObject __pyx_type_5sabot_7_cython_9operators_17shuffled_operator_Sh
   __pyx_tp_clear_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, /*tp_clear*/
   0, /*tp_richcompare*/
   0, /*tp_weaklistoffset*/
-  __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11__iter__, /*tp_iter*/
+  __pyx_pw_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_13__iter__, /*tp_iter*/
   0, /*tp_iternext*/
   __pyx_methods_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, /*tp_methods*/
   0, /*tp_members*/
-  0, /*tp_getset*/
+  __pyx_getsets_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, /*tp_getset*/
   0, /*tp_base*/
   0, /*tp_dict*/
   0, /*tp_descr_get*/
@@ -12564,7 +13058,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_vtable_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator.__pyx_base.get_partition_keys = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_13base_operator_BaseOperator *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_get_partition_keys;
   __pyx_vtable_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator.get_num_partitions = (int32_t (*)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_get_num_partitions;
   __pyx_vtable_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator.set_shuffle_config = (void (*)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, PyObject *, PyObject *, int32_t, int32_t, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_set_shuffle_config;
-  __pyx_vtable_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator._partition_batch = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, struct __pyx_obj_7pyarrow_3lib_RecordBatch *))__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__partition_batch;
+  __pyx_vtable_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator._partition_batch = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, struct __pyx_obj_7pyarrow_3lib_RecordBatch *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__partition_batch;
   __pyx_vtable_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator._send_partitions = (void (*)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *, PyObject *, PyObject *))__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__send_partitions;
   __pyx_vtable_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator._receive_shuffled_batches = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *))__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__receive_shuffled_batches;
   __pyx_vtable_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator._send_shuffled_batches = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *))__pyx_f_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator__send_shuffled_batches;
@@ -12593,9 +13087,9 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   {
     PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, "__iter__"); if (unlikely(!wrapper)) __PYX_ERR(0, 25, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
-      __pyx_wrapperbase_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10__iter__ = *((PyWrapperDescrObject *)wrapper)->d_base;
-      __pyx_wrapperbase_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10__iter__.doc = __pyx_doc_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10__iter__;
-      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_10__iter__;
+      __pyx_wrapperbase_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_12__iter__ = *((PyWrapperDescrObject *)wrapper)->d_base;
+      __pyx_wrapperbase_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_12__iter__.doc = __pyx_doc_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_12__iter__;
+      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_12__iter__;
     }
   }
   #endif
@@ -12604,15 +13098,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_ShuffledOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator) < 0) __PYX_ERR(0, 25, __pyx_L1_error)
   if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator) < 0) __PYX_ERR(0, 25, __pyx_L1_error)
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__ = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter___spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__)) __PYX_ERR(0, 194, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter___spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__) < 0) __PYX_ERR(0, 194, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__ = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter___spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__)) __PYX_ERR(0, 198, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter___spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__) < 0) __PYX_ERR(0, 198, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__ = &__pyx_type_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__) < 0) __PYX_ERR(0, 194, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__) < 0) __PYX_ERR(0, 198, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator___pyx_scope_struct____iter__->tp_getattro == PyObject_GenericGetAttr)) {
@@ -12638,7 +13132,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_import_code", 0);
   /*--- Type import code ---*/
-  __pyx_t_1 = PyImport_ImportModule(__Pyx_BUILTIN_MODULE_NAME); if (unlikely(!__pyx_t_1)) __PYX_ERR(4, 9, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule(__Pyx_BUILTIN_MODULE_NAME); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_mstate->__pyx_ptype_7cpython_4type_type = __Pyx_ImportType_3_1_4(__pyx_t_1, __Pyx_BUILTIN_MODULE_NAME, "type",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
@@ -12648,9 +13142,9 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(PyHeapTypeObject), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(PyHeapTypeObject),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7cpython_4type_type) __PYX_ERR(4, 9, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7cpython_4type_type) __PYX_ERR(5, 9, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule(__Pyx_BUILTIN_MODULE_NAME); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 8, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule(__Pyx_BUILTIN_MODULE_NAME); if (unlikely(!__pyx_t_1)) __PYX_ERR(6, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_mstate->__pyx_ptype_7cpython_4bool_bool = __Pyx_ImportType_3_1_4(__pyx_t_1, __Pyx_BUILTIN_MODULE_NAME, "bool",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
@@ -12660,9 +13154,9 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(PyLongObject), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(PyLongObject),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7cpython_4bool_bool) __PYX_ERR(5, 8, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7cpython_4bool_bool) __PYX_ERR(6, 8, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule(__Pyx_BUILTIN_MODULE_NAME); if (unlikely(!__pyx_t_1)) __PYX_ERR(6, 16, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule(__Pyx_BUILTIN_MODULE_NAME); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 16, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_mstate->__pyx_ptype_7cpython_7complex_complex = __Pyx_ImportType_3_1_4(__pyx_t_1, __Pyx_BUILTIN_MODULE_NAME, "complex",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
@@ -12672,7 +13166,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(PyComplexObject), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(PyComplexObject),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7cpython_7complex_complex) __PYX_ERR(6, 16, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7cpython_7complex_complex) __PYX_ERR(7, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = PyImport_ImportModule("datetime"); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -12722,7 +13216,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7cpython_8datetime_tzinfo) __PYX_ERR(3, 133, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("pyarrow.lib"); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 37, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("pyarrow.lib"); if (unlikely(!__pyx_t_1)) __PYX_ERR(8, 37, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib__Weakrefable = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "_Weakrefable",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
@@ -12732,7 +13226,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib__Weakrefable), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib__Weakrefable),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib__Weakrefable) __PYX_ERR(7, 37, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib__Weakrefable) __PYX_ERR(8, 37, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_IpcWriteOptions = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "IpcWriteOptions",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_IpcWriteOptions), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_IpcWriteOptions),
@@ -12741,7 +13235,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_IpcWriteOptions), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_IpcWriteOptions),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_IpcWriteOptions) __PYX_ERR(7, 41, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_IpcWriteOptions) __PYX_ERR(8, 41, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_IpcReadOptions = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "IpcReadOptions",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_IpcReadOptions), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_IpcReadOptions),
@@ -12750,7 +13244,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_IpcReadOptions), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_IpcReadOptions),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_IpcReadOptions) __PYX_ERR(7, 46, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_IpcReadOptions) __PYX_ERR(8, 46, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Message = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Message",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Message), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Message),
@@ -12759,7 +13253,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Message), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Message),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Message) __PYX_ERR(7, 51, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Message) __PYX_ERR(8, 51, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_MemoryPool = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "MemoryPool",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_MemoryPool), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_MemoryPool),
@@ -12768,8 +13262,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_MemoryPool), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_MemoryPool),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MemoryPool) __PYX_ERR(7, 56, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_MemoryPool = (struct __pyx_vtabstruct_7pyarrow_3lib_MemoryPool*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MemoryPool); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_MemoryPool)) __PYX_ERR(7, 56, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MemoryPool) __PYX_ERR(8, 56, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_MemoryPool = (struct __pyx_vtabstruct_7pyarrow_3lib_MemoryPool*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MemoryPool); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_MemoryPool)) __PYX_ERR(8, 56, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_DataType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "DataType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_DataType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_DataType),
@@ -12778,8 +13272,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_DataType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_DataType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DataType) __PYX_ERR(7, 69, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_DataType = (struct __pyx_vtabstruct_7pyarrow_3lib_DataType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DataType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_DataType)) __PYX_ERR(7, 69, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DataType) __PYX_ERR(8, 69, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_DataType = (struct __pyx_vtabstruct_7pyarrow_3lib_DataType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DataType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_DataType)) __PYX_ERR(8, 69, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "ListType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_ListType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ListType),
@@ -12788,8 +13282,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_ListType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ListType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListType) __PYX_ERR(7, 79, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_ListType = (struct __pyx_vtabstruct_7pyarrow_3lib_ListType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ListType)) __PYX_ERR(7, 79, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListType) __PYX_ERR(8, 79, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_ListType = (struct __pyx_vtabstruct_7pyarrow_3lib_ListType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ListType)) __PYX_ERR(8, 79, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "LargeListType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_LargeListType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_LargeListType),
@@ -12798,8 +13292,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_LargeListType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_LargeListType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListType) __PYX_ERR(7, 84, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_LargeListType = (struct __pyx_vtabstruct_7pyarrow_3lib_LargeListType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_LargeListType)) __PYX_ERR(7, 84, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListType) __PYX_ERR(8, 84, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_LargeListType = (struct __pyx_vtabstruct_7pyarrow_3lib_LargeListType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_LargeListType)) __PYX_ERR(8, 84, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListViewType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "ListViewType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_ListViewType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ListViewType),
@@ -12808,8 +13302,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_ListViewType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ListViewType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListViewType) __PYX_ERR(7, 89, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_ListViewType = (struct __pyx_vtabstruct_7pyarrow_3lib_ListViewType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListViewType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ListViewType)) __PYX_ERR(7, 89, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListViewType) __PYX_ERR(8, 89, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_ListViewType = (struct __pyx_vtabstruct_7pyarrow_3lib_ListViewType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListViewType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ListViewType)) __PYX_ERR(8, 89, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListViewType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "LargeListViewType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_LargeListViewType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_LargeListViewType),
@@ -12818,8 +13312,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_LargeListViewType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_LargeListViewType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListViewType) __PYX_ERR(7, 94, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_LargeListViewType = (struct __pyx_vtabstruct_7pyarrow_3lib_LargeListViewType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListViewType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_LargeListViewType)) __PYX_ERR(7, 94, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListViewType) __PYX_ERR(8, 94, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_LargeListViewType = (struct __pyx_vtabstruct_7pyarrow_3lib_LargeListViewType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListViewType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_LargeListViewType)) __PYX_ERR(8, 94, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_MapType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "MapType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_MapType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_MapType),
@@ -12828,8 +13322,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_MapType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_MapType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MapType) __PYX_ERR(7, 99, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_MapType = (struct __pyx_vtabstruct_7pyarrow_3lib_MapType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MapType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_MapType)) __PYX_ERR(7, 99, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MapType) __PYX_ERR(8, 99, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_MapType = (struct __pyx_vtabstruct_7pyarrow_3lib_MapType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MapType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_MapType)) __PYX_ERR(8, 99, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeListType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "FixedSizeListType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_FixedSizeListType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FixedSizeListType),
@@ -12838,8 +13332,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_FixedSizeListType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FixedSizeListType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeListType) __PYX_ERR(7, 104, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_FixedSizeListType = (struct __pyx_vtabstruct_7pyarrow_3lib_FixedSizeListType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeListType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FixedSizeListType)) __PYX_ERR(7, 104, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeListType) __PYX_ERR(8, 104, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_FixedSizeListType = (struct __pyx_vtabstruct_7pyarrow_3lib_FixedSizeListType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeListType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FixedSizeListType)) __PYX_ERR(8, 104, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_StructType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "StructType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_StructType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_StructType),
@@ -12848,8 +13342,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_StructType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_StructType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StructType) __PYX_ERR(7, 109, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_StructType = (struct __pyx_vtabstruct_7pyarrow_3lib_StructType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StructType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_StructType)) __PYX_ERR(7, 109, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StructType) __PYX_ERR(8, 109, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_StructType = (struct __pyx_vtabstruct_7pyarrow_3lib_StructType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StructType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_StructType)) __PYX_ERR(8, 109, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryMemo = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "DictionaryMemo",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_DictionaryMemo), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_DictionaryMemo),
@@ -12858,7 +13352,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_DictionaryMemo), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_DictionaryMemo),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryMemo) __PYX_ERR(7, 116, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryMemo) __PYX_ERR(8, 116, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "DictionaryType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_DictionaryType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_DictionaryType),
@@ -12867,8 +13361,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_DictionaryType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_DictionaryType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryType) __PYX_ERR(7, 124, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_DictionaryType = (struct __pyx_vtabstruct_7pyarrow_3lib_DictionaryType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_DictionaryType)) __PYX_ERR(7, 124, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryType) __PYX_ERR(8, 124, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_DictionaryType = (struct __pyx_vtabstruct_7pyarrow_3lib_DictionaryType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_DictionaryType)) __PYX_ERR(8, 124, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_TimestampType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "TimestampType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_TimestampType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_TimestampType),
@@ -12877,8 +13371,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_TimestampType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_TimestampType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_TimestampType) __PYX_ERR(7, 129, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_TimestampType = (struct __pyx_vtabstruct_7pyarrow_3lib_TimestampType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_TimestampType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_TimestampType)) __PYX_ERR(7, 129, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_TimestampType) __PYX_ERR(8, 129, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_TimestampType = (struct __pyx_vtabstruct_7pyarrow_3lib_TimestampType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_TimestampType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_TimestampType)) __PYX_ERR(8, 129, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Time32Type = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Time32Type",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Time32Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Time32Type),
@@ -12887,8 +13381,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Time32Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Time32Type),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Time32Type) __PYX_ERR(7, 134, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Time32Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Time32Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Time32Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Time32Type)) __PYX_ERR(7, 134, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Time32Type) __PYX_ERR(8, 134, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Time32Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Time32Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Time32Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Time32Type)) __PYX_ERR(8, 134, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Time64Type = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Time64Type",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Time64Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Time64Type),
@@ -12897,8 +13391,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Time64Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Time64Type),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Time64Type) __PYX_ERR(7, 139, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Time64Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Time64Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Time64Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Time64Type)) __PYX_ERR(7, 139, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Time64Type) __PYX_ERR(8, 139, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Time64Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Time64Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Time64Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Time64Type)) __PYX_ERR(8, 139, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_DurationType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "DurationType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_DurationType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_DurationType),
@@ -12907,8 +13401,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_DurationType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_DurationType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DurationType) __PYX_ERR(7, 144, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_DurationType = (struct __pyx_vtabstruct_7pyarrow_3lib_DurationType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DurationType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_DurationType)) __PYX_ERR(7, 144, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DurationType) __PYX_ERR(8, 144, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_DurationType = (struct __pyx_vtabstruct_7pyarrow_3lib_DurationType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DurationType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_DurationType)) __PYX_ERR(8, 144, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeBinaryType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "FixedSizeBinaryType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_FixedSizeBinaryType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FixedSizeBinaryType),
@@ -12917,8 +13411,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_FixedSizeBinaryType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FixedSizeBinaryType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeBinaryType) __PYX_ERR(7, 149, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_FixedSizeBinaryType = (struct __pyx_vtabstruct_7pyarrow_3lib_FixedSizeBinaryType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeBinaryType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FixedSizeBinaryType)) __PYX_ERR(7, 149, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeBinaryType) __PYX_ERR(8, 149, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_FixedSizeBinaryType = (struct __pyx_vtabstruct_7pyarrow_3lib_FixedSizeBinaryType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeBinaryType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FixedSizeBinaryType)) __PYX_ERR(8, 149, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal32Type = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Decimal32Type",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal32Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal32Type),
@@ -12927,8 +13421,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal32Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal32Type),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal32Type) __PYX_ERR(7, 154, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Decimal32Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal32Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal32Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal32Type)) __PYX_ERR(7, 154, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal32Type) __PYX_ERR(8, 154, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Decimal32Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal32Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal32Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal32Type)) __PYX_ERR(8, 154, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal64Type = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Decimal64Type",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal64Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal64Type),
@@ -12937,8 +13431,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal64Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal64Type),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal64Type) __PYX_ERR(7, 159, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Decimal64Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal64Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal64Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal64Type)) __PYX_ERR(7, 159, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal64Type) __PYX_ERR(8, 159, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Decimal64Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal64Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal64Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal64Type)) __PYX_ERR(8, 159, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal128Type = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Decimal128Type",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal128Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal128Type),
@@ -12947,8 +13441,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal128Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal128Type),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal128Type) __PYX_ERR(7, 164, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Decimal128Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal128Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal128Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal128Type)) __PYX_ERR(7, 164, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal128Type) __PYX_ERR(8, 164, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Decimal128Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal128Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal128Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal128Type)) __PYX_ERR(8, 164, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal256Type = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Decimal256Type",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal256Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal256Type),
@@ -12957,8 +13451,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal256Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal256Type),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal256Type) __PYX_ERR(7, 169, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Decimal256Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal256Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal256Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal256Type)) __PYX_ERR(7, 169, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal256Type) __PYX_ERR(8, 169, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Decimal256Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal256Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal256Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal256Type)) __PYX_ERR(8, 169, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_RunEndEncodedType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "RunEndEncodedType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_RunEndEncodedType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_RunEndEncodedType),
@@ -12967,8 +13461,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_RunEndEncodedType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_RunEndEncodedType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_RunEndEncodedType) __PYX_ERR(7, 174, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_RunEndEncodedType = (struct __pyx_vtabstruct_7pyarrow_3lib_RunEndEncodedType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_RunEndEncodedType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_RunEndEncodedType)) __PYX_ERR(7, 174, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_RunEndEncodedType) __PYX_ERR(8, 174, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_RunEndEncodedType = (struct __pyx_vtabstruct_7pyarrow_3lib_RunEndEncodedType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_RunEndEncodedType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_RunEndEncodedType)) __PYX_ERR(8, 174, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_BaseExtensionType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "BaseExtensionType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_BaseExtensionType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BaseExtensionType),
@@ -12977,8 +13471,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_BaseExtensionType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BaseExtensionType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BaseExtensionType) __PYX_ERR(7, 179, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_BaseExtensionType = (struct __pyx_vtabstruct_7pyarrow_3lib_BaseExtensionType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BaseExtensionType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BaseExtensionType)) __PYX_ERR(7, 179, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BaseExtensionType) __PYX_ERR(8, 179, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_BaseExtensionType = (struct __pyx_vtabstruct_7pyarrow_3lib_BaseExtensionType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BaseExtensionType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BaseExtensionType)) __PYX_ERR(8, 179, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_ExtensionType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "ExtensionType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_ExtensionType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ExtensionType),
@@ -12987,8 +13481,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_ExtensionType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ExtensionType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ExtensionType) __PYX_ERR(7, 184, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_ExtensionType = (struct __pyx_vtabstruct_7pyarrow_3lib_ExtensionType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ExtensionType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ExtensionType)) __PYX_ERR(7, 184, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ExtensionType) __PYX_ERR(8, 184, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_ExtensionType = (struct __pyx_vtabstruct_7pyarrow_3lib_ExtensionType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ExtensionType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ExtensionType)) __PYX_ERR(8, 184, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedShapeTensorType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "FixedShapeTensorType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_FixedShapeTensorType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FixedShapeTensorType),
@@ -12997,8 +13491,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_FixedShapeTensorType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FixedShapeTensorType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedShapeTensorType) __PYX_ERR(7, 189, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_FixedShapeTensorType = (struct __pyx_vtabstruct_7pyarrow_3lib_FixedShapeTensorType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedShapeTensorType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FixedShapeTensorType)) __PYX_ERR(7, 189, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedShapeTensorType) __PYX_ERR(8, 189, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_FixedShapeTensorType = (struct __pyx_vtabstruct_7pyarrow_3lib_FixedShapeTensorType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedShapeTensorType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FixedShapeTensorType)) __PYX_ERR(8, 189, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Bool8Type = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Bool8Type",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Bool8Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Bool8Type),
@@ -13007,8 +13501,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Bool8Type), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Bool8Type),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Bool8Type) __PYX_ERR(7, 193, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Bool8Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Bool8Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Bool8Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Bool8Type)) __PYX_ERR(7, 193, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Bool8Type) __PYX_ERR(8, 193, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Bool8Type = (struct __pyx_vtabstruct_7pyarrow_3lib_Bool8Type*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Bool8Type); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Bool8Type)) __PYX_ERR(8, 193, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_OpaqueType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "OpaqueType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_OpaqueType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_OpaqueType),
@@ -13017,8 +13511,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_OpaqueType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_OpaqueType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_OpaqueType) __PYX_ERR(7, 197, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_OpaqueType = (struct __pyx_vtabstruct_7pyarrow_3lib_OpaqueType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_OpaqueType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_OpaqueType)) __PYX_ERR(7, 197, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_OpaqueType) __PYX_ERR(8, 197, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_OpaqueType = (struct __pyx_vtabstruct_7pyarrow_3lib_OpaqueType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_OpaqueType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_OpaqueType)) __PYX_ERR(8, 197, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_UuidType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "UuidType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_UuidType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_UuidType),
@@ -13027,8 +13521,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_UuidType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_UuidType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UuidType) __PYX_ERR(7, 201, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_UuidType = (struct __pyx_vtabstruct_7pyarrow_3lib_UuidType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UuidType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_UuidType)) __PYX_ERR(7, 201, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UuidType) __PYX_ERR(8, 201, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_UuidType = (struct __pyx_vtabstruct_7pyarrow_3lib_UuidType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UuidType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_UuidType)) __PYX_ERR(8, 201, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_JsonType = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "JsonType",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_JsonType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_JsonType),
@@ -13037,8 +13531,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_JsonType), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_JsonType),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_JsonType) __PYX_ERR(7, 205, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_JsonType = (struct __pyx_vtabstruct_7pyarrow_3lib_JsonType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_JsonType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_JsonType)) __PYX_ERR(7, 205, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_JsonType) __PYX_ERR(8, 205, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_JsonType = (struct __pyx_vtabstruct_7pyarrow_3lib_JsonType*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_JsonType); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_JsonType)) __PYX_ERR(8, 205, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib__Metadata = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "_Metadata",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib__Metadata), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib__Metadata),
@@ -13047,7 +13541,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib__Metadata), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib__Metadata),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib__Metadata) __PYX_ERR(7, 210, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib__Metadata) __PYX_ERR(8, 210, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_KeyValueMetadata = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "KeyValueMetadata",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_KeyValueMetadata), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_KeyValueMetadata),
@@ -13056,8 +13550,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_KeyValueMetadata), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_KeyValueMetadata),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_KeyValueMetadata) __PYX_ERR(7, 216, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_KeyValueMetadata = (struct __pyx_vtabstruct_7pyarrow_3lib_KeyValueMetadata*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_KeyValueMetadata); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_KeyValueMetadata)) __PYX_ERR(7, 216, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_KeyValueMetadata) __PYX_ERR(8, 216, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_KeyValueMetadata = (struct __pyx_vtabstruct_7pyarrow_3lib_KeyValueMetadata*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_KeyValueMetadata); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_KeyValueMetadata)) __PYX_ERR(8, 216, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Field = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Field",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Field), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Field),
@@ -13066,8 +13560,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Field), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Field),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Field) __PYX_ERR(7, 228, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Field = (struct __pyx_vtabstruct_7pyarrow_3lib_Field*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Field); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Field)) __PYX_ERR(7, 228, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Field) __PYX_ERR(8, 228, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Field = (struct __pyx_vtabstruct_7pyarrow_3lib_Field*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Field); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Field)) __PYX_ERR(8, 228, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Schema = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Schema",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Schema), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Schema),
@@ -13076,8 +13570,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Schema), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Schema),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Schema) __PYX_ERR(7, 239, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Schema = (struct __pyx_vtabstruct_7pyarrow_3lib_Schema*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Schema); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Schema)) __PYX_ERR(7, 239, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Schema) __PYX_ERR(8, 239, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Schema = (struct __pyx_vtabstruct_7pyarrow_3lib_Schema*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Schema); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Schema)) __PYX_ERR(8, 239, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Scalar = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Scalar",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Scalar), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Scalar),
@@ -13086,8 +13580,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Scalar), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Scalar),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Scalar) __PYX_ERR(7, 248, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Scalar = (struct __pyx_vtabstruct_7pyarrow_3lib_Scalar*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Scalar); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Scalar)) __PYX_ERR(7, 248, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Scalar) __PYX_ERR(8, 248, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Scalar = (struct __pyx_vtabstruct_7pyarrow_3lib_Scalar*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Scalar); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Scalar)) __PYX_ERR(8, 248, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_ArrayStatistics = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "ArrayStatistics",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_ArrayStatistics), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ArrayStatistics),
@@ -13096,8 +13590,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_ArrayStatistics), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ArrayStatistics),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ArrayStatistics) __PYX_ERR(7, 260, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_ArrayStatistics = (struct __pyx_vtabstruct_7pyarrow_3lib_ArrayStatistics*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ArrayStatistics); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ArrayStatistics)) __PYX_ERR(7, 260, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ArrayStatistics) __PYX_ERR(8, 260, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_ArrayStatistics = (struct __pyx_vtabstruct_7pyarrow_3lib_ArrayStatistics*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ArrayStatistics); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ArrayStatistics)) __PYX_ERR(8, 260, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib__PandasConvertible = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "_PandasConvertible",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib__PandasConvertible), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib__PandasConvertible),
@@ -13106,7 +13600,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib__PandasConvertible), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib__PandasConvertible),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib__PandasConvertible) __PYX_ERR(7, 268, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib__PandasConvertible) __PYX_ERR(8, 268, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Array),
@@ -13115,8 +13609,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Array) __PYX_ERR(7, 272, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Array)) __PYX_ERR(7, 272, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Array) __PYX_ERR(8, 272, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Array)) __PYX_ERR(8, 272, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Tensor = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Tensor",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Tensor), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Tensor),
@@ -13125,8 +13619,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Tensor), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Tensor),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Tensor) __PYX_ERR(7, 288, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Tensor = (struct __pyx_vtabstruct_7pyarrow_3lib_Tensor*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Tensor); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Tensor)) __PYX_ERR(7, 288, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Tensor) __PYX_ERR(8, 288, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Tensor = (struct __pyx_vtabstruct_7pyarrow_3lib_Tensor*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Tensor); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Tensor)) __PYX_ERR(8, 288, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSRMatrix = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "SparseCSRMatrix",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_SparseCSRMatrix), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_SparseCSRMatrix),
@@ -13135,8 +13629,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_SparseCSRMatrix), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_SparseCSRMatrix),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSRMatrix) __PYX_ERR(7, 301, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_SparseCSRMatrix = (struct __pyx_vtabstruct_7pyarrow_3lib_SparseCSRMatrix*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSRMatrix); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_SparseCSRMatrix)) __PYX_ERR(7, 301, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSRMatrix) __PYX_ERR(8, 301, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_SparseCSRMatrix = (struct __pyx_vtabstruct_7pyarrow_3lib_SparseCSRMatrix*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSRMatrix); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_SparseCSRMatrix)) __PYX_ERR(8, 301, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSCMatrix = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "SparseCSCMatrix",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_SparseCSCMatrix), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_SparseCSCMatrix),
@@ -13145,8 +13639,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_SparseCSCMatrix), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_SparseCSCMatrix),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSCMatrix) __PYX_ERR(7, 312, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_SparseCSCMatrix = (struct __pyx_vtabstruct_7pyarrow_3lib_SparseCSCMatrix*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSCMatrix); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_SparseCSCMatrix)) __PYX_ERR(7, 312, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSCMatrix) __PYX_ERR(8, 312, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_SparseCSCMatrix = (struct __pyx_vtabstruct_7pyarrow_3lib_SparseCSCMatrix*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSCMatrix); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_SparseCSCMatrix)) __PYX_ERR(8, 312, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCOOTensor = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "SparseCOOTensor",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_SparseCOOTensor), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_SparseCOOTensor),
@@ -13155,8 +13649,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_SparseCOOTensor), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_SparseCOOTensor),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCOOTensor) __PYX_ERR(7, 323, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_SparseCOOTensor = (struct __pyx_vtabstruct_7pyarrow_3lib_SparseCOOTensor*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCOOTensor); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_SparseCOOTensor)) __PYX_ERR(7, 323, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCOOTensor) __PYX_ERR(8, 323, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_SparseCOOTensor = (struct __pyx_vtabstruct_7pyarrow_3lib_SparseCOOTensor*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCOOTensor); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_SparseCOOTensor)) __PYX_ERR(8, 323, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSFTensor = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "SparseCSFTensor",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_SparseCSFTensor), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_SparseCSFTensor),
@@ -13165,8 +13659,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_SparseCSFTensor), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_SparseCSFTensor),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSFTensor) __PYX_ERR(7, 334, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_SparseCSFTensor = (struct __pyx_vtabstruct_7pyarrow_3lib_SparseCSFTensor*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSFTensor); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_SparseCSFTensor)) __PYX_ERR(7, 334, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSFTensor) __PYX_ERR(8, 334, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_SparseCSFTensor = (struct __pyx_vtabstruct_7pyarrow_3lib_SparseCSFTensor*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_SparseCSFTensor); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_SparseCSFTensor)) __PYX_ERR(8, 334, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_NullArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "NullArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_NullArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_NullArray),
@@ -13175,8 +13669,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_NullArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_NullArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_NullArray) __PYX_ERR(7, 345, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_NullArray = (struct __pyx_vtabstruct_7pyarrow_3lib_NullArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_NullArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_NullArray)) __PYX_ERR(7, 345, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_NullArray) __PYX_ERR(8, 345, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_NullArray = (struct __pyx_vtabstruct_7pyarrow_3lib_NullArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_NullArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_NullArray)) __PYX_ERR(8, 345, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_BooleanArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "BooleanArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_BooleanArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BooleanArray),
@@ -13185,8 +13679,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_BooleanArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BooleanArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BooleanArray) __PYX_ERR(7, 349, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_BooleanArray = (struct __pyx_vtabstruct_7pyarrow_3lib_BooleanArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BooleanArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BooleanArray)) __PYX_ERR(7, 349, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BooleanArray) __PYX_ERR(8, 349, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_BooleanArray = (struct __pyx_vtabstruct_7pyarrow_3lib_BooleanArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BooleanArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BooleanArray)) __PYX_ERR(8, 349, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_NumericArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "NumericArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_NumericArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_NumericArray),
@@ -13195,8 +13689,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_NumericArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_NumericArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_NumericArray) __PYX_ERR(7, 353, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_NumericArray = (struct __pyx_vtabstruct_7pyarrow_3lib_NumericArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_NumericArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_NumericArray)) __PYX_ERR(7, 353, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_NumericArray) __PYX_ERR(8, 353, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_NumericArray = (struct __pyx_vtabstruct_7pyarrow_3lib_NumericArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_NumericArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_NumericArray)) __PYX_ERR(8, 353, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_IntegerArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "IntegerArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_IntegerArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_IntegerArray),
@@ -13205,8 +13699,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_IntegerArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_IntegerArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_IntegerArray) __PYX_ERR(7, 357, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_IntegerArray = (struct __pyx_vtabstruct_7pyarrow_3lib_IntegerArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_IntegerArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_IntegerArray)) __PYX_ERR(7, 357, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_IntegerArray) __PYX_ERR(8, 357, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_IntegerArray = (struct __pyx_vtabstruct_7pyarrow_3lib_IntegerArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_IntegerArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_IntegerArray)) __PYX_ERR(8, 357, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_FloatingPointArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "FloatingPointArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_FloatingPointArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FloatingPointArray),
@@ -13215,8 +13709,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_FloatingPointArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FloatingPointArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FloatingPointArray) __PYX_ERR(7, 361, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_FloatingPointArray = (struct __pyx_vtabstruct_7pyarrow_3lib_FloatingPointArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FloatingPointArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FloatingPointArray)) __PYX_ERR(7, 361, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FloatingPointArray) __PYX_ERR(8, 361, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_FloatingPointArray = (struct __pyx_vtabstruct_7pyarrow_3lib_FloatingPointArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FloatingPointArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FloatingPointArray)) __PYX_ERR(8, 361, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int8Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Int8Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Int8Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Int8Array),
@@ -13225,8 +13719,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Int8Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Int8Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int8Array) __PYX_ERR(7, 365, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Int8Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Int8Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int8Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Int8Array)) __PYX_ERR(7, 365, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int8Array) __PYX_ERR(8, 365, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Int8Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Int8Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int8Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Int8Array)) __PYX_ERR(8, 365, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt8Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "UInt8Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_UInt8Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_UInt8Array),
@@ -13235,8 +13729,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_UInt8Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_UInt8Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt8Array) __PYX_ERR(7, 369, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_UInt8Array = (struct __pyx_vtabstruct_7pyarrow_3lib_UInt8Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt8Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_UInt8Array)) __PYX_ERR(7, 369, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt8Array) __PYX_ERR(8, 369, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_UInt8Array = (struct __pyx_vtabstruct_7pyarrow_3lib_UInt8Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt8Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_UInt8Array)) __PYX_ERR(8, 369, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int16Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Int16Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Int16Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Int16Array),
@@ -13245,8 +13739,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Int16Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Int16Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int16Array) __PYX_ERR(7, 373, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Int16Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Int16Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int16Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Int16Array)) __PYX_ERR(7, 373, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int16Array) __PYX_ERR(8, 373, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Int16Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Int16Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int16Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Int16Array)) __PYX_ERR(8, 373, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt16Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "UInt16Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_UInt16Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_UInt16Array),
@@ -13255,8 +13749,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_UInt16Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_UInt16Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt16Array) __PYX_ERR(7, 377, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_UInt16Array = (struct __pyx_vtabstruct_7pyarrow_3lib_UInt16Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt16Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_UInt16Array)) __PYX_ERR(7, 377, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt16Array) __PYX_ERR(8, 377, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_UInt16Array = (struct __pyx_vtabstruct_7pyarrow_3lib_UInt16Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt16Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_UInt16Array)) __PYX_ERR(8, 377, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int32Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Int32Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Int32Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Int32Array),
@@ -13265,8 +13759,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Int32Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Int32Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int32Array) __PYX_ERR(7, 381, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Int32Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Int32Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int32Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Int32Array)) __PYX_ERR(7, 381, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int32Array) __PYX_ERR(8, 381, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Int32Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Int32Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int32Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Int32Array)) __PYX_ERR(8, 381, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt32Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "UInt32Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_UInt32Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_UInt32Array),
@@ -13275,8 +13769,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_UInt32Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_UInt32Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt32Array) __PYX_ERR(7, 385, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_UInt32Array = (struct __pyx_vtabstruct_7pyarrow_3lib_UInt32Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt32Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_UInt32Array)) __PYX_ERR(7, 385, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt32Array) __PYX_ERR(8, 385, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_UInt32Array = (struct __pyx_vtabstruct_7pyarrow_3lib_UInt32Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt32Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_UInt32Array)) __PYX_ERR(8, 385, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int64Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Int64Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Int64Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Int64Array),
@@ -13285,8 +13779,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Int64Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Int64Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int64Array) __PYX_ERR(7, 389, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Int64Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Int64Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int64Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Int64Array)) __PYX_ERR(7, 389, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int64Array) __PYX_ERR(8, 389, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Int64Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Int64Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Int64Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Int64Array)) __PYX_ERR(8, 389, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt64Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "UInt64Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_UInt64Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_UInt64Array),
@@ -13295,8 +13789,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_UInt64Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_UInt64Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt64Array) __PYX_ERR(7, 393, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_UInt64Array = (struct __pyx_vtabstruct_7pyarrow_3lib_UInt64Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt64Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_UInt64Array)) __PYX_ERR(7, 393, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt64Array) __PYX_ERR(8, 393, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_UInt64Array = (struct __pyx_vtabstruct_7pyarrow_3lib_UInt64Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UInt64Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_UInt64Array)) __PYX_ERR(8, 393, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_HalfFloatArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "HalfFloatArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_HalfFloatArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_HalfFloatArray),
@@ -13305,8 +13799,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_HalfFloatArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_HalfFloatArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_HalfFloatArray) __PYX_ERR(7, 397, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_HalfFloatArray = (struct __pyx_vtabstruct_7pyarrow_3lib_HalfFloatArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_HalfFloatArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_HalfFloatArray)) __PYX_ERR(7, 397, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_HalfFloatArray) __PYX_ERR(8, 397, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_HalfFloatArray = (struct __pyx_vtabstruct_7pyarrow_3lib_HalfFloatArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_HalfFloatArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_HalfFloatArray)) __PYX_ERR(8, 397, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_FloatArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "FloatArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_FloatArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FloatArray),
@@ -13315,8 +13809,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_FloatArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FloatArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FloatArray) __PYX_ERR(7, 401, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_FloatArray = (struct __pyx_vtabstruct_7pyarrow_3lib_FloatArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FloatArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FloatArray)) __PYX_ERR(7, 401, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FloatArray) __PYX_ERR(8, 401, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_FloatArray = (struct __pyx_vtabstruct_7pyarrow_3lib_FloatArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FloatArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FloatArray)) __PYX_ERR(8, 401, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_DoubleArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "DoubleArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_DoubleArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_DoubleArray),
@@ -13325,8 +13819,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_DoubleArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_DoubleArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DoubleArray) __PYX_ERR(7, 405, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_DoubleArray = (struct __pyx_vtabstruct_7pyarrow_3lib_DoubleArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DoubleArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_DoubleArray)) __PYX_ERR(7, 405, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DoubleArray) __PYX_ERR(8, 405, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_DoubleArray = (struct __pyx_vtabstruct_7pyarrow_3lib_DoubleArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DoubleArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_DoubleArray)) __PYX_ERR(8, 405, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeBinaryArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "FixedSizeBinaryArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_FixedSizeBinaryArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FixedSizeBinaryArray),
@@ -13335,8 +13829,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_FixedSizeBinaryArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FixedSizeBinaryArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeBinaryArray) __PYX_ERR(7, 409, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_FixedSizeBinaryArray = (struct __pyx_vtabstruct_7pyarrow_3lib_FixedSizeBinaryArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeBinaryArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FixedSizeBinaryArray)) __PYX_ERR(7, 409, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeBinaryArray) __PYX_ERR(8, 409, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_FixedSizeBinaryArray = (struct __pyx_vtabstruct_7pyarrow_3lib_FixedSizeBinaryArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeBinaryArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FixedSizeBinaryArray)) __PYX_ERR(8, 409, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal32Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Decimal32Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal32Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal32Array),
@@ -13345,8 +13839,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal32Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal32Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal32Array) __PYX_ERR(7, 413, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Decimal32Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal32Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal32Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal32Array)) __PYX_ERR(7, 413, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal32Array) __PYX_ERR(8, 413, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Decimal32Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal32Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal32Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal32Array)) __PYX_ERR(8, 413, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal64Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Decimal64Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal64Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal64Array),
@@ -13355,8 +13849,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal64Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal64Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal64Array) __PYX_ERR(7, 417, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Decimal64Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal64Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal64Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal64Array)) __PYX_ERR(7, 417, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal64Array) __PYX_ERR(8, 417, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Decimal64Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal64Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal64Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal64Array)) __PYX_ERR(8, 417, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal128Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Decimal128Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal128Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal128Array),
@@ -13365,8 +13859,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal128Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal128Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal128Array) __PYX_ERR(7, 421, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Decimal128Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal128Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal128Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal128Array)) __PYX_ERR(7, 421, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal128Array) __PYX_ERR(8, 421, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Decimal128Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal128Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal128Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal128Array)) __PYX_ERR(8, 421, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal256Array = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Decimal256Array",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal256Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal256Array),
@@ -13375,8 +13869,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Decimal256Array), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Decimal256Array),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal256Array) __PYX_ERR(7, 425, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Decimal256Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal256Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal256Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal256Array)) __PYX_ERR(7, 425, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal256Array) __PYX_ERR(8, 425, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Decimal256Array = (struct __pyx_vtabstruct_7pyarrow_3lib_Decimal256Array*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Decimal256Array); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Decimal256Array)) __PYX_ERR(8, 425, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_StructArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "StructArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_StructArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_StructArray),
@@ -13385,8 +13879,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_StructArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_StructArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StructArray) __PYX_ERR(7, 429, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_StructArray = (struct __pyx_vtabstruct_7pyarrow_3lib_StructArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StructArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_StructArray)) __PYX_ERR(7, 429, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StructArray) __PYX_ERR(8, 429, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_StructArray = (struct __pyx_vtabstruct_7pyarrow_3lib_StructArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StructArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_StructArray)) __PYX_ERR(8, 429, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_BaseListArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "BaseListArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_BaseListArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BaseListArray),
@@ -13395,8 +13889,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_BaseListArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BaseListArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BaseListArray) __PYX_ERR(7, 433, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_BaseListArray = (struct __pyx_vtabstruct_7pyarrow_3lib_BaseListArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BaseListArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BaseListArray)) __PYX_ERR(7, 433, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BaseListArray) __PYX_ERR(8, 433, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_BaseListArray = (struct __pyx_vtabstruct_7pyarrow_3lib_BaseListArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BaseListArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BaseListArray)) __PYX_ERR(8, 433, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "ListArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_ListArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ListArray),
@@ -13405,8 +13899,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_ListArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ListArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListArray) __PYX_ERR(7, 437, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_ListArray = (struct __pyx_vtabstruct_7pyarrow_3lib_ListArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ListArray)) __PYX_ERR(7, 437, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListArray) __PYX_ERR(8, 437, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_ListArray = (struct __pyx_vtabstruct_7pyarrow_3lib_ListArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ListArray)) __PYX_ERR(8, 437, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "LargeListArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_LargeListArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_LargeListArray),
@@ -13415,8 +13909,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_LargeListArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_LargeListArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListArray) __PYX_ERR(7, 441, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_LargeListArray = (struct __pyx_vtabstruct_7pyarrow_3lib_LargeListArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_LargeListArray)) __PYX_ERR(7, 441, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListArray) __PYX_ERR(8, 441, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_LargeListArray = (struct __pyx_vtabstruct_7pyarrow_3lib_LargeListArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_LargeListArray)) __PYX_ERR(8, 441, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListViewArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "ListViewArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_ListViewArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ListViewArray),
@@ -13425,8 +13919,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_ListViewArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ListViewArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListViewArray) __PYX_ERR(7, 445, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_ListViewArray = (struct __pyx_vtabstruct_7pyarrow_3lib_ListViewArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListViewArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ListViewArray)) __PYX_ERR(7, 445, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListViewArray) __PYX_ERR(8, 445, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_ListViewArray = (struct __pyx_vtabstruct_7pyarrow_3lib_ListViewArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ListViewArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ListViewArray)) __PYX_ERR(8, 445, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListViewArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "LargeListViewArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_LargeListViewArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_LargeListViewArray),
@@ -13435,8 +13929,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_LargeListViewArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_LargeListViewArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListViewArray) __PYX_ERR(7, 449, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_LargeListViewArray = (struct __pyx_vtabstruct_7pyarrow_3lib_LargeListViewArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListViewArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_LargeListViewArray)) __PYX_ERR(7, 449, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListViewArray) __PYX_ERR(8, 449, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_LargeListViewArray = (struct __pyx_vtabstruct_7pyarrow_3lib_LargeListViewArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_LargeListViewArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_LargeListViewArray)) __PYX_ERR(8, 449, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_MapArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "MapArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_MapArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_MapArray),
@@ -13445,8 +13939,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_MapArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_MapArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MapArray) __PYX_ERR(7, 453, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_MapArray = (struct __pyx_vtabstruct_7pyarrow_3lib_MapArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MapArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_MapArray)) __PYX_ERR(7, 453, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MapArray) __PYX_ERR(8, 453, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_MapArray = (struct __pyx_vtabstruct_7pyarrow_3lib_MapArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MapArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_MapArray)) __PYX_ERR(8, 453, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeListArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "FixedSizeListArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_FixedSizeListArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FixedSizeListArray),
@@ -13455,8 +13949,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_FixedSizeListArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_FixedSizeListArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeListArray) __PYX_ERR(7, 457, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_FixedSizeListArray = (struct __pyx_vtabstruct_7pyarrow_3lib_FixedSizeListArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeListArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FixedSizeListArray)) __PYX_ERR(7, 457, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeListArray) __PYX_ERR(8, 457, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_FixedSizeListArray = (struct __pyx_vtabstruct_7pyarrow_3lib_FixedSizeListArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_FixedSizeListArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_FixedSizeListArray)) __PYX_ERR(8, 457, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_UnionArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "UnionArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_UnionArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_UnionArray),
@@ -13465,8 +13959,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_UnionArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_UnionArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UnionArray) __PYX_ERR(7, 461, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_UnionArray = (struct __pyx_vtabstruct_7pyarrow_3lib_UnionArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UnionArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_UnionArray)) __PYX_ERR(7, 461, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UnionArray) __PYX_ERR(8, 461, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_UnionArray = (struct __pyx_vtabstruct_7pyarrow_3lib_UnionArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_UnionArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_UnionArray)) __PYX_ERR(8, 461, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_StringArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "StringArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_StringArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_StringArray),
@@ -13475,8 +13969,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_StringArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_StringArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StringArray) __PYX_ERR(7, 465, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_StringArray = (struct __pyx_vtabstruct_7pyarrow_3lib_StringArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StringArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_StringArray)) __PYX_ERR(7, 465, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StringArray) __PYX_ERR(8, 465, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_StringArray = (struct __pyx_vtabstruct_7pyarrow_3lib_StringArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StringArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_StringArray)) __PYX_ERR(8, 465, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_BinaryArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "BinaryArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_BinaryArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BinaryArray),
@@ -13485,8 +13979,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_BinaryArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BinaryArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BinaryArray) __PYX_ERR(7, 469, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_BinaryArray = (struct __pyx_vtabstruct_7pyarrow_3lib_BinaryArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BinaryArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BinaryArray)) __PYX_ERR(7, 469, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BinaryArray) __PYX_ERR(8, 469, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_BinaryArray = (struct __pyx_vtabstruct_7pyarrow_3lib_BinaryArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BinaryArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BinaryArray)) __PYX_ERR(8, 469, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_StringViewArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "StringViewArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_StringViewArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_StringViewArray),
@@ -13495,8 +13989,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_StringViewArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_StringViewArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StringViewArray) __PYX_ERR(7, 473, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_StringViewArray = (struct __pyx_vtabstruct_7pyarrow_3lib_StringViewArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StringViewArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_StringViewArray)) __PYX_ERR(7, 473, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StringViewArray) __PYX_ERR(8, 473, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_StringViewArray = (struct __pyx_vtabstruct_7pyarrow_3lib_StringViewArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StringViewArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_StringViewArray)) __PYX_ERR(8, 473, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_BinaryViewArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "BinaryViewArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_BinaryViewArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BinaryViewArray),
@@ -13505,8 +13999,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_BinaryViewArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BinaryViewArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BinaryViewArray) __PYX_ERR(7, 477, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_BinaryViewArray = (struct __pyx_vtabstruct_7pyarrow_3lib_BinaryViewArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BinaryViewArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BinaryViewArray)) __PYX_ERR(7, 477, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BinaryViewArray) __PYX_ERR(8, 477, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_BinaryViewArray = (struct __pyx_vtabstruct_7pyarrow_3lib_BinaryViewArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BinaryViewArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BinaryViewArray)) __PYX_ERR(8, 477, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "DictionaryArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_DictionaryArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_DictionaryArray),
@@ -13515,8 +14009,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_DictionaryArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_DictionaryArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryArray) __PYX_ERR(7, 481, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_DictionaryArray = (struct __pyx_vtabstruct_7pyarrow_3lib_DictionaryArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_DictionaryArray)) __PYX_ERR(7, 481, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryArray) __PYX_ERR(8, 481, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_DictionaryArray = (struct __pyx_vtabstruct_7pyarrow_3lib_DictionaryArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_DictionaryArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_DictionaryArray)) __PYX_ERR(8, 481, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_ExtensionArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "ExtensionArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_ExtensionArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ExtensionArray),
@@ -13525,8 +14019,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_ExtensionArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ExtensionArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ExtensionArray) __PYX_ERR(7, 486, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_ExtensionArray = (struct __pyx_vtabstruct_7pyarrow_3lib_ExtensionArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ExtensionArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ExtensionArray)) __PYX_ERR(7, 486, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ExtensionArray) __PYX_ERR(8, 486, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_ExtensionArray = (struct __pyx_vtabstruct_7pyarrow_3lib_ExtensionArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ExtensionArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ExtensionArray)) __PYX_ERR(8, 486, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_MonthDayNanoIntervalArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "MonthDayNanoIntervalArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_MonthDayNanoIntervalArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_MonthDayNanoIntervalArray),
@@ -13535,8 +14029,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_MonthDayNanoIntervalArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_MonthDayNanoIntervalArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MonthDayNanoIntervalArray) __PYX_ERR(7, 490, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_MonthDayNanoIntervalArray = (struct __pyx_vtabstruct_7pyarrow_3lib_MonthDayNanoIntervalArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MonthDayNanoIntervalArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_MonthDayNanoIntervalArray)) __PYX_ERR(7, 490, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MonthDayNanoIntervalArray) __PYX_ERR(8, 490, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_MonthDayNanoIntervalArray = (struct __pyx_vtabstruct_7pyarrow_3lib_MonthDayNanoIntervalArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MonthDayNanoIntervalArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_MonthDayNanoIntervalArray)) __PYX_ERR(8, 490, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_ChunkedArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "ChunkedArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_ChunkedArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ChunkedArray),
@@ -13545,8 +14039,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_ChunkedArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ChunkedArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ChunkedArray) __PYX_ERR(7, 498, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_ChunkedArray = (struct __pyx_vtabstruct_7pyarrow_3lib_ChunkedArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ChunkedArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ChunkedArray)) __PYX_ERR(7, 498, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ChunkedArray) __PYX_ERR(8, 498, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_ChunkedArray = (struct __pyx_vtabstruct_7pyarrow_3lib_ChunkedArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ChunkedArray); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ChunkedArray)) __PYX_ERR(8, 498, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib__Tabular = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "_Tabular",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib__Tabular), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib__Tabular),
@@ -13555,8 +14049,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib__Tabular), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib__Tabular),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib__Tabular) __PYX_ERR(7, 513, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib__Tabular = (struct __pyx_vtabstruct_7pyarrow_3lib__Tabular*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib__Tabular); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib__Tabular)) __PYX_ERR(7, 513, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib__Tabular) __PYX_ERR(8, 513, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib__Tabular = (struct __pyx_vtabstruct_7pyarrow_3lib__Tabular*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib__Tabular); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib__Tabular)) __PYX_ERR(8, 513, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Table = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Table",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Table), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Table),
@@ -13565,8 +14059,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Table), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Table),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Table) __PYX_ERR(7, 517, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Table = (struct __pyx_vtabstruct_7pyarrow_3lib_Table*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Table); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Table)) __PYX_ERR(7, 517, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Table) __PYX_ERR(8, 517, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Table = (struct __pyx_vtabstruct_7pyarrow_3lib_Table*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Table); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Table)) __PYX_ERR(8, 517, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_RecordBatch = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "RecordBatch",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_RecordBatch), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_RecordBatch),
@@ -13575,8 +14069,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_RecordBatch), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_RecordBatch),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_RecordBatch) __PYX_ERR(7, 527, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_RecordBatch = (struct __pyx_vtabstruct_7pyarrow_3lib_RecordBatch*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_RecordBatch); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_RecordBatch)) __PYX_ERR(7, 527, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_RecordBatch) __PYX_ERR(8, 527, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_RecordBatch = (struct __pyx_vtabstruct_7pyarrow_3lib_RecordBatch*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_RecordBatch); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_RecordBatch)) __PYX_ERR(8, 527, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Device = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Device",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Device), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Device),
@@ -13585,8 +14079,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Device), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Device),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Device) __PYX_ERR(7, 536, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Device = (struct __pyx_vtabstruct_7pyarrow_3lib_Device*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Device); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Device)) __PYX_ERR(7, 536, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Device) __PYX_ERR(8, 536, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Device = (struct __pyx_vtabstruct_7pyarrow_3lib_Device*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Device); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Device)) __PYX_ERR(8, 536, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_MemoryManager = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "MemoryManager",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_MemoryManager), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_MemoryManager),
@@ -13595,8 +14089,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_MemoryManager), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_MemoryManager),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MemoryManager) __PYX_ERR(7, 548, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_MemoryManager = (struct __pyx_vtabstruct_7pyarrow_3lib_MemoryManager*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MemoryManager); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_MemoryManager)) __PYX_ERR(7, 548, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MemoryManager) __PYX_ERR(8, 548, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_MemoryManager = (struct __pyx_vtabstruct_7pyarrow_3lib_MemoryManager*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_MemoryManager); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_MemoryManager)) __PYX_ERR(8, 548, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Buffer = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Buffer",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Buffer), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Buffer),
@@ -13605,8 +14099,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Buffer), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Buffer),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Buffer) __PYX_ERR(7, 560, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Buffer = (struct __pyx_vtabstruct_7pyarrow_3lib_Buffer*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Buffer); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Buffer)) __PYX_ERR(7, 560, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Buffer) __PYX_ERR(8, 560, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Buffer = (struct __pyx_vtabstruct_7pyarrow_3lib_Buffer*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Buffer); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Buffer)) __PYX_ERR(8, 560, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_ResizableBuffer = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "ResizableBuffer",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_ResizableBuffer), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ResizableBuffer),
@@ -13615,8 +14109,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_ResizableBuffer), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_ResizableBuffer),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ResizableBuffer) __PYX_ERR(7, 570, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_ResizableBuffer = (struct __pyx_vtabstruct_7pyarrow_3lib_ResizableBuffer*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ResizableBuffer); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ResizableBuffer)) __PYX_ERR(7, 570, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ResizableBuffer) __PYX_ERR(8, 570, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_ResizableBuffer = (struct __pyx_vtabstruct_7pyarrow_3lib_ResizableBuffer*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_ResizableBuffer); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_ResizableBuffer)) __PYX_ERR(8, 570, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_NativeFile = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "NativeFile",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_NativeFile), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_NativeFile),
@@ -13625,8 +14119,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_NativeFile), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_NativeFile),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_NativeFile) __PYX_ERR(7, 575, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_NativeFile = (struct __pyx_vtabstruct_7pyarrow_3lib_NativeFile*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_NativeFile); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_NativeFile)) __PYX_ERR(7, 575, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_NativeFile) __PYX_ERR(8, 575, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_NativeFile = (struct __pyx_vtabstruct_7pyarrow_3lib_NativeFile*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_NativeFile); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_NativeFile)) __PYX_ERR(8, 575, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_BufferedInputStream = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "BufferedInputStream",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_BufferedInputStream), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BufferedInputStream),
@@ -13635,8 +14129,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_BufferedInputStream), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BufferedInputStream),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BufferedInputStream) __PYX_ERR(7, 599, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_BufferedInputStream = (struct __pyx_vtabstruct_7pyarrow_3lib_BufferedInputStream*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BufferedInputStream); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BufferedInputStream)) __PYX_ERR(7, 599, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BufferedInputStream) __PYX_ERR(8, 599, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_BufferedInputStream = (struct __pyx_vtabstruct_7pyarrow_3lib_BufferedInputStream*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BufferedInputStream); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BufferedInputStream)) __PYX_ERR(8, 599, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_BufferedOutputStream = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "BufferedOutputStream",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_BufferedOutputStream), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BufferedOutputStream),
@@ -13645,8 +14139,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_BufferedOutputStream), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_BufferedOutputStream),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BufferedOutputStream) __PYX_ERR(7, 603, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_BufferedOutputStream = (struct __pyx_vtabstruct_7pyarrow_3lib_BufferedOutputStream*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BufferedOutputStream); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BufferedOutputStream)) __PYX_ERR(7, 603, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BufferedOutputStream) __PYX_ERR(8, 603, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_BufferedOutputStream = (struct __pyx_vtabstruct_7pyarrow_3lib_BufferedOutputStream*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_BufferedOutputStream); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_BufferedOutputStream)) __PYX_ERR(8, 603, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_CompressedInputStream = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "CompressedInputStream",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_CompressedInputStream), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_CompressedInputStream),
@@ -13655,8 +14149,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_CompressedInputStream), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_CompressedInputStream),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_CompressedInputStream) __PYX_ERR(7, 607, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_CompressedInputStream = (struct __pyx_vtabstruct_7pyarrow_3lib_CompressedInputStream*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_CompressedInputStream); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_CompressedInputStream)) __PYX_ERR(7, 607, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_CompressedInputStream) __PYX_ERR(8, 607, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_CompressedInputStream = (struct __pyx_vtabstruct_7pyarrow_3lib_CompressedInputStream*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_CompressedInputStream); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_CompressedInputStream)) __PYX_ERR(8, 607, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_CompressedOutputStream = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "CompressedOutputStream",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_CompressedOutputStream), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_CompressedOutputStream),
@@ -13665,8 +14159,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_CompressedOutputStream), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_CompressedOutputStream),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_CompressedOutputStream) __PYX_ERR(7, 611, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_CompressedOutputStream = (struct __pyx_vtabstruct_7pyarrow_3lib_CompressedOutputStream*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_CompressedOutputStream); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_CompressedOutputStream)) __PYX_ERR(7, 611, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_CompressedOutputStream) __PYX_ERR(8, 611, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_CompressedOutputStream = (struct __pyx_vtabstruct_7pyarrow_3lib_CompressedOutputStream*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_CompressedOutputStream); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_CompressedOutputStream)) __PYX_ERR(8, 611, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib__CRecordBatchWriter = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "_CRecordBatchWriter",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib__CRecordBatchWriter), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib__CRecordBatchWriter),
@@ -13675,7 +14169,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib__CRecordBatchWriter), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib__CRecordBatchWriter),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib__CRecordBatchWriter) __PYX_ERR(7, 615, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib__CRecordBatchWriter) __PYX_ERR(8, 615, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_RecordBatchReader = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "RecordBatchReader",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_RecordBatchReader), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_RecordBatchReader),
@@ -13684,7 +14178,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_RecordBatchReader), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_RecordBatchReader),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_RecordBatchReader) __PYX_ERR(7, 620, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_RecordBatchReader) __PYX_ERR(8, 620, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_CacheOptions = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "CacheOptions",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_CacheOptions), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_CacheOptions),
@@ -13693,8 +14187,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_CacheOptions), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_CacheOptions),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_CacheOptions) __PYX_ERR(7, 625, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_CacheOptions = (struct __pyx_vtabstruct_7pyarrow_3lib_CacheOptions*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_CacheOptions); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_CacheOptions)) __PYX_ERR(7, 625, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_CacheOptions) __PYX_ERR(8, 625, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_CacheOptions = (struct __pyx_vtabstruct_7pyarrow_3lib_CacheOptions*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_CacheOptions); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_CacheOptions)) __PYX_ERR(8, 625, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_Codec = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "Codec",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_Codec), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Codec),
@@ -13703,8 +14197,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_Codec), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_Codec),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Codec) __PYX_ERR(7, 637, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_Codec = (struct __pyx_vtabstruct_7pyarrow_3lib_Codec*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Codec); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Codec)) __PYX_ERR(7, 637, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Codec) __PYX_ERR(8, 637, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_Codec = (struct __pyx_vtabstruct_7pyarrow_3lib_Codec*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_Codec); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_Codec)) __PYX_ERR(8, 637, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_7pyarrow_3lib_StopToken = __Pyx_ImportType_3_1_4(__pyx_t_1, "pyarrow.lib", "StopToken",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_7pyarrow_3lib_StopToken), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_StopToken),
@@ -13713,10 +14207,10 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_7pyarrow_3lib_StopToken), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_7pyarrow_3lib_StopToken),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StopToken) __PYX_ERR(7, 645, __pyx_L1_error)
-  __pyx_vtabptr_7pyarrow_3lib_StopToken = (struct __pyx_vtabstruct_7pyarrow_3lib_StopToken*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StopToken); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_StopToken)) __PYX_ERR(7, 645, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StopToken) __PYX_ERR(8, 645, __pyx_L1_error)
+  __pyx_vtabptr_7pyarrow_3lib_StopToken = (struct __pyx_vtabstruct_7pyarrow_3lib_StopToken*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_7pyarrow_3lib_StopToken); if (unlikely(!__pyx_vtabptr_7pyarrow_3lib_StopToken)) __PYX_ERR(8, 645, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("sabot._c.arrow_core"); if (unlikely(!__pyx_t_1)) __PYX_ERR(8, 27, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("sabot._c.arrow_core"); if (unlikely(!__pyx_t_1)) __PYX_ERR(9, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowArray = __Pyx_ImportType_3_1_4(__pyx_t_1, "sabot._c.arrow_core", "ArrowArray",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
@@ -13726,8 +14220,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowArray), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowArray),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowArray) __PYX_ERR(8, 27, __pyx_L1_error)
-  __pyx_vtabptr_5sabot_2_c_10arrow_core_ArrowArray = (struct __pyx_vtabstruct_5sabot_2_c_10arrow_core_ArrowArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowArray); if (unlikely(!__pyx_vtabptr_5sabot_2_c_10arrow_core_ArrowArray)) __PYX_ERR(8, 27, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowArray) __PYX_ERR(9, 27, __pyx_L1_error)
+  __pyx_vtabptr_5sabot_2_c_10arrow_core_ArrowArray = (struct __pyx_vtabstruct_5sabot_2_c_10arrow_core_ArrowArray*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowArray); if (unlikely(!__pyx_vtabptr_5sabot_2_c_10arrow_core_ArrowArray)) __PYX_ERR(9, 27, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowRecordBatch = __Pyx_ImportType_3_1_4(__pyx_t_1, "sabot._c.arrow_core", "ArrowRecordBatch",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowRecordBatch), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowRecordBatch),
@@ -13736,8 +14230,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowRecordBatch), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowRecordBatch),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowRecordBatch) __PYX_ERR(8, 38, __pyx_L1_error)
-  __pyx_vtabptr_5sabot_2_c_10arrow_core_ArrowRecordBatch = (struct __pyx_vtabstruct_5sabot_2_c_10arrow_core_ArrowRecordBatch*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowRecordBatch); if (unlikely(!__pyx_vtabptr_5sabot_2_c_10arrow_core_ArrowRecordBatch)) __PYX_ERR(8, 38, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowRecordBatch) __PYX_ERR(9, 38, __pyx_L1_error)
+  __pyx_vtabptr_5sabot_2_c_10arrow_core_ArrowRecordBatch = (struct __pyx_vtabstruct_5sabot_2_c_10arrow_core_ArrowRecordBatch*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowRecordBatch); if (unlikely(!__pyx_vtabptr_5sabot_2_c_10arrow_core_ArrowRecordBatch)) __PYX_ERR(9, 38, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowComputeEngine = __Pyx_ImportType_3_1_4(__pyx_t_1, "sabot._c.arrow_core", "ArrowComputeEngine",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowComputeEngine), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowComputeEngine),
@@ -13746,8 +14240,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowComputeEngine), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowComputeEngine),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowComputeEngine) __PYX_ERR(8, 48, __pyx_L1_error)
-  __pyx_vtabptr_5sabot_2_c_10arrow_core_ArrowComputeEngine = (struct __pyx_vtabstruct_5sabot_2_c_10arrow_core_ArrowComputeEngine*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowComputeEngine); if (unlikely(!__pyx_vtabptr_5sabot_2_c_10arrow_core_ArrowComputeEngine)) __PYX_ERR(8, 48, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowComputeEngine) __PYX_ERR(9, 48, __pyx_L1_error)
+  __pyx_vtabptr_5sabot_2_c_10arrow_core_ArrowComputeEngine = (struct __pyx_vtabstruct_5sabot_2_c_10arrow_core_ArrowComputeEngine*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowComputeEngine); if (unlikely(!__pyx_vtabptr_5sabot_2_c_10arrow_core_ArrowComputeEngine)) __PYX_ERR(9, 48, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowMemoryPool = __Pyx_ImportType_3_1_4(__pyx_t_1, "sabot._c.arrow_core", "ArrowMemoryPool",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowMemoryPool), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowMemoryPool),
@@ -13756,9 +14250,9 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowMemoryPool), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_2_c_10arrow_core_ArrowMemoryPool),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowMemoryPool) __PYX_ERR(8, 54, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_2_c_10arrow_core_ArrowMemoryPool) __PYX_ERR(9, 54, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("sabot._cython.shuffle.partitioner"); if (unlikely(!__pyx_t_1)) __PYX_ERR(9, 25, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("sabot._cython.shuffle.partitioner"); if (unlikely(!__pyx_t_1)) __PYX_ERR(10, 25, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_Partitioner = __Pyx_ImportType_3_1_4(__pyx_t_1, "sabot._cython.shuffle.partitioner", "Partitioner",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
@@ -13768,8 +14262,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_Partitioner), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_Partitioner),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_Partitioner) __PYX_ERR(9, 25, __pyx_L1_error)
-  __pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_Partitioner = (struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_11partitioner_Partitioner*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_Partitioner); if (unlikely(!__pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_Partitioner)) __PYX_ERR(9, 25, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_Partitioner) __PYX_ERR(10, 25, __pyx_L1_error)
+  __pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_Partitioner = (struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_11partitioner_Partitioner*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_Partitioner); if (unlikely(!__pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_Partitioner)) __PYX_ERR(10, 25, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner = __Pyx_ImportType_3_1_4(__pyx_t_1, "sabot._cython.shuffle.partitioner", "HashPartitioner",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner),
@@ -13778,8 +14272,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner) __PYX_ERR(9, 45, __pyx_L1_error)
-  __pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner = (struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner); if (unlikely(!__pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner)) __PYX_ERR(9, 45, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner) __PYX_ERR(10, 45, __pyx_L1_error)
+  __pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner = (struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner); if (unlikely(!__pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_HashPartitioner)) __PYX_ERR(10, 45, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner = __Pyx_ImportType_3_1_4(__pyx_t_1, "sabot._cython.shuffle.partitioner", "RangePartitioner",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner),
@@ -13788,8 +14282,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner) __PYX_ERR(9, 64, __pyx_L1_error)
-  __pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner = (struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner); if (unlikely(!__pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner)) __PYX_ERR(9, 64, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner) __PYX_ERR(10, 64, __pyx_L1_error)
+  __pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner = (struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner); if (unlikely(!__pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_RangePartitioner)) __PYX_ERR(10, 64, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner = __Pyx_ImportType_3_1_4(__pyx_t_1, "sabot._cython.shuffle.partitioner", "RoundRobinPartitioner",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner),
@@ -13798,8 +14292,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner), __PYX_GET_STRUCT_ALIGNMENT_3_1_4(struct __pyx_obj_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner) __PYX_ERR(9, 84, __pyx_L1_error)
-  __pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner = (struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner); if (unlikely(!__pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner)) __PYX_ERR(9, 84, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_1_4); if (!__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner) __PYX_ERR(10, 84, __pyx_L1_error)
+  __pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner = (struct __pyx_vtabstruct_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner); if (unlikely(!__pyx_vtabptr_5sabot_7_cython_7shuffle_11partitioner_RoundRobinPartitioner)) __PYX_ERR(10, 84, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -14109,52 +14603,64 @@ __Pyx_RefNannySetupContext("PyInit_shuffled_operator", 0);
   (void)__Pyx_modinit_function_import_code(__pyx_mstate);
   /*--- Execution code ---*/
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":62
+  /* "sabot/_cython/operators/shuffled_operator.pyx":66
  *     # ========================================================================
  * 
  *     cpdef bint requires_shuffle(self):             # <<<<<<<<<<<<<<
  *         """
  *         Declare that this operator requires shuffle.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_3requires_shuffle, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator_requires_shuffl, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 62, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_3requires_shuffle, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator_requires_shuffl, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, __pyx_mstate_global->__pyx_n_u_requires_shuffle, __pyx_t_2) < 0) __PYX_ERR(0, 62, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, __pyx_mstate_global->__pyx_n_u_requires_shuffle, __pyx_t_2) < 0) __PYX_ERR(0, 66, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":70
+  /* "sabot/_cython/operators/shuffled_operator.pyx":74
  *         return True
  * 
  *     cpdef list get_partition_keys(self):             # <<<<<<<<<<<<<<
  *         """
  *         Get columns to partition by for shuffle.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_5get_partition_keys, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator_get_partition_k, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_5get_partition_keys, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator_get_partition_k, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 74, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, __pyx_mstate_global->__pyx_n_u_get_partition_keys, __pyx_t_2) < 0) __PYX_ERR(0, 70, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, __pyx_mstate_global->__pyx_n_u_get_partition_keys, __pyx_t_2) < 0) __PYX_ERR(0, 74, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":79
+  /* "sabot/_cython/operators/shuffled_operator.pyx":83
  *         return self._partition_keys
  * 
  *     cpdef int32_t get_num_partitions(self):             # <<<<<<<<<<<<<<
  *         """Get number of downstream partitions."""
  *         return self._num_partitions
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_7get_num_partitions, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator_get_num_partiti, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_7get_num_partitions, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator_get_num_partiti, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, __pyx_mstate_global->__pyx_n_u_get_num_partitions, __pyx_t_2) < 0) __PYX_ERR(0, 79, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, __pyx_mstate_global->__pyx_n_u_get_num_partitions, __pyx_t_2) < 0) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/shuffled_operator.pyx":83
+  /* "sabot/_cython/operators/shuffled_operator.pyx":87
  *         return self._num_partitions
  * 
  *     cpdef void set_shuffle_config(             # <<<<<<<<<<<<<<
  *         self,
  *         object transport,
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_9set_shuffle_config, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator_set_shuffle_con, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 83, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_9set_shuffle_config, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator_set_shuffle_con, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 87, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, __pyx_mstate_global->__pyx_n_u_set_shuffle_config, __pyx_t_2) < 0) __PYX_ERR(0, 83, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, __pyx_mstate_global->__pyx_n_u_set_shuffle_config, __pyx_t_2) < 0) __PYX_ERR(0, 87, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/shuffled_operator.pyx":125
+ * 
+ * 
+ *     cpdef list _partition_batch(             # <<<<<<<<<<<<<<
+ *         self,
+ *         ca.RecordBatch batch
+*/
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_11_partition_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator__partition_batc, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator, __pyx_mstate_global->__pyx_n_u_partition_batch, __pyx_t_2) < 0) __PYX_ERR(0, 125, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
@@ -14162,7 +14668,7 @@ __Pyx_RefNannySetupContext("PyInit_shuffled_operator", 0);
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
  * def __setstate_cython__(self, __pyx_state):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_14__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_16__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -14173,7 +14679,7 @@ __Pyx_RefNannySetupContext("PyInit_shuffled_operator", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_16__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator___setstate_cyth, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_17shuffled_operator_16ShuffledOperator_18__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ShuffledOperator___setstate_cyth, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_shuffled, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_2) < 0) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -14253,6 +14759,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_ShuffledOperator___iter, sizeof(__pyx_k_ShuffledOperator___iter), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffledOperator___iter */
   {__pyx_k_ShuffledOperator___reduce_cython, sizeof(__pyx_k_ShuffledOperator___reduce_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffledOperator___reduce_cython */
   {__pyx_k_ShuffledOperator___setstate_cyth, sizeof(__pyx_k_ShuffledOperator___setstate_cyth), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffledOperator___setstate_cyth */
+  {__pyx_k_ShuffledOperator__partition_batc, sizeof(__pyx_k_ShuffledOperator__partition_batc), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffledOperator__partition_batc */
   {__pyx_k_ShuffledOperator_get_num_partiti, sizeof(__pyx_k_ShuffledOperator_get_num_partiti), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffledOperator_get_num_partiti */
   {__pyx_k_ShuffledOperator_get_partition_k, sizeof(__pyx_k_ShuffledOperator_get_partition_k), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffledOperator_get_partition_k */
   {__pyx_k_ShuffledOperator_requires_shuffl, sizeof(__pyx_k_ShuffledOperator_requires_shuffl), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffledOperator_requires_shuffl */
@@ -14260,6 +14767,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TypeError */
   {__pyx_k_add_note, sizeof(__pyx_k_add_note), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_add_note */
   {__pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 1, 1}, /* PyObject cname: __pyx_n_u_asyncio_coroutines */
+  {__pyx_k_batch, sizeof(__pyx_k_batch), 0, 1, 1}, /* PyObject cname: __pyx_n_u_batch */
   {__pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cline_in_traceback */
   {__pyx_k_close, sizeof(__pyx_k_close), 0, 1, 1}, /* PyObject cname: __pyx_n_u_close */
   {__pyx_k_disable, sizeof(__pyx_k_disable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_disable */
@@ -14283,6 +14791,9 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_no_default___reduce___due_to_non */
   {__pyx_k_num_partitions, sizeof(__pyx_k_num_partitions), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_partitions */
   {__pyx_k_num_rows, sizeof(__pyx_k_num_rows), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_rows */
+  {__pyx_k_operator_id, sizeof(__pyx_k_operator_id), 0, 1, 1}, /* PyObject cname: __pyx_n_u_operator_id */
+  {__pyx_k_parallelism, sizeof(__pyx_k_parallelism), 0, 1, 1}, /* PyObject cname: __pyx_n_u_parallelism */
+  {__pyx_k_partition_batch, sizeof(__pyx_k_partition_batch), 0, 1, 1}, /* PyObject cname: __pyx_n_u_partition_batch */
   {__pyx_k_partition_keys, sizeof(__pyx_k_partition_keys), 0, 1, 1}, /* PyObject cname: __pyx_n_u_partition_keys */
   {__pyx_k_pop, sizeof(__pyx_k_pop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pop */
   {__pyx_k_publish_partition, sizeof(__pyx_k_publish_partition), 0, 1, 1}, /* PyObject cname: __pyx_n_u_publish_partition */
@@ -14305,6 +14816,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate */
   {__pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate_cython */
   {__pyx_k_shuffle_id, sizeof(__pyx_k_shuffle_id), 0, 1, 1}, /* PyObject cname: __pyx_n_u_shuffle_id */
+  {__pyx_k_shuffled_op, sizeof(__pyx_k_shuffled_op), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_shuffled_op */
   {__pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_stringsource */
   {__pyx_k_super, sizeof(__pyx_k_super), 0, 1, 1}, /* PyObject cname: __pyx_n_u_super */
   {__pyx_k_task_id, sizeof(__pyx_k_task_id), 0, 1, 1}, /* PyObject cname: __pyx_n_u_task_id */
@@ -14323,7 +14835,7 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, c
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_super); if (!__pyx_builtin_super) __PYX_ERR(0, 44, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 143, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 147, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(1, 79, __pyx_L1_error)
   return 0;
@@ -14349,6 +14861,7 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate->__pyx_umethod_PyDict_Type_pop.method_name = &__pyx_mstate->__pyx_n_u_pop;
   if (__Pyx_InitStrings(__pyx_string_tab, __pyx_mstate->__pyx_string_tab, __pyx_string_tab_encodings) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   __pyx_mstate->__pyx_int_0 = PyLong_FromLong(0); if (unlikely(!__pyx_mstate->__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_1 = PyLong_FromLong(1); if (unlikely(!__pyx_mstate->__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_4 = PyLong_FromLong(4); if (unlikely(!__pyx_mstate->__pyx_int_4)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -14363,7 +14876,7 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
             unsigned int nlocals : 3;
             unsigned int flags : 10;
             unsigned int first_line : 8;
-            unsigned int line_table_length : 11;
+            unsigned int line_table_length : 12;
         } __Pyx_PyCode_New_function_description;
 /* NewCodeObj.proto */
 static PyObject* __Pyx_PyCode_New(
@@ -14380,39 +14893,44 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 194, 2};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 198, 2};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_shuffled_2, __pyx_mstate->__pyx_n_u_iter, __pyx_k_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 62, 9};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 66, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_shuffled_2, __pyx_mstate->__pyx_n_u_requires_shuffle, __pyx_k_A_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 70, 11};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 74, 11};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_shuffled_2, __pyx_mstate->__pyx_n_u_get_partition_keys, __pyx_k_A_t1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 79, 9};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 83, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_shuffled_2, __pyx_mstate->__pyx_n_u_get_num_partitions, __pyx_k_A_t1_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 83, 83};
+    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 87, 83};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_transport, __pyx_mstate->__pyx_n_u_shuffle_id, __pyx_mstate->__pyx_n_u_task_id, __pyx_mstate->__pyx_n_u_num_partitions};
     __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_shuffled_2, __pyx_mstate->__pyx_n_u_set_shuffle_config, __pyx_k_A_O1_L_q_Kt1_z_O1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
   }
   {
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 125, 107};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch};
+    __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_shuffled_2, __pyx_mstate->__pyx_n_u_partition_batch, __pyx_k_A_1_E_a_U_aq_y_Cs_XS_E_gQa_gQa_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
+  }
+  {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 3, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;

@@ -87,6 +87,7 @@ struct Morsel {
     int64_t start_row;                           //! Start row in batch
     int64_t num_rows;                            //! Number of rows
     int partition_id;                            //! Partition ID
+    int id;                                      //! Original position (for reassembly ordering)
     MorselSource source;                         //! Where morsel came from
 
     //! Get zero-copy slice

@@ -4,63 +4,92 @@
 {
     "distutils": {
         "depends": [
-            "sabot/_c/task_slot_manager.hpp",
-            "vendor/arrow/cpp/build/install/include/arrow/api.h",
-            "vendor/arrow/cpp/build/install/include/arrow/array/concatenate.h",
-            "vendor/arrow/cpp/build/install/include/arrow/builder.h",
-            "vendor/arrow/cpp/build/install/include/arrow/c/abi.h",
-            "vendor/arrow/cpp/build/install/include/arrow/c/bridge.h",
-            "vendor/arrow/cpp/build/install/include/arrow/c/dlpack.h",
-            "vendor/arrow/cpp/build/install/include/arrow/c/dlpack_abi.h",
-            "vendor/arrow/cpp/build/install/include/arrow/compute/api.h",
-            "vendor/arrow/cpp/build/install/include/arrow/compute/cast.h",
-            "vendor/arrow/cpp/build/install/include/arrow/compute/expression.h",
-            "vendor/arrow/cpp/build/install/include/arrow/config.h",
-            "vendor/arrow/cpp/build/install/include/arrow/csv/api.h",
-            "vendor/arrow/cpp/build/install/include/arrow/extension/bool8.h",
-            "vendor/arrow/cpp/build/install/include/arrow/extension/fixed_shape_tensor.h",
-            "vendor/arrow/cpp/build/install/include/arrow/extension/json.h",
-            "vendor/arrow/cpp/build/install/include/arrow/extension/opaque.h",
-            "vendor/arrow/cpp/build/install/include/arrow/extension/uuid.h",
-            "vendor/arrow/cpp/build/install/include/arrow/extension_type.h",
-            "vendor/arrow/cpp/build/install/include/arrow/io/api.h",
-            "vendor/arrow/cpp/build/install/include/arrow/ipc/api.h",
-            "vendor/arrow/cpp/build/install/include/arrow/json/options.h",
-            "vendor/arrow/cpp/build/install/include/arrow/json/reader.h",
-            "vendor/arrow/cpp/build/install/include/arrow/result.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/byte_size.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/cancel.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/compression.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/decimal.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/future.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/io_util.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/iterator.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/key_value_metadata.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/thread_pool.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/value_parsing.h"
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/array/concatenate.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/builder.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/c/abi.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/c/bridge.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/c/dlpack.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/c/dlpack_abi.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/compute/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/compute/cast.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/compute/expression.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/config.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/csv/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/extension/bool8.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/extension/fixed_shape_tensor.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/extension/json.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/extension/opaque.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/extension/uuid.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/extension_type.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/io/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/ipc/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/json/options.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/json/reader.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/result.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/byte_size.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/cancel.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/compression.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/decimal.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/future.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/io_util.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/iterator.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/key_value_metadata.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/thread_pool.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/value_parsing.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/arrow_to_pandas.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/async.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/benchmark.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/common.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/csv.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/extension_type.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/gdb.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/helpers.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/inference.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/ipc.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/numpy_init.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/platform.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/pyarrow.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/udf.h",
+            "sabot/_c/task_slot_manager.hpp"
         ],
         "extra_compile_args": [
+            "-O3",
             "-std=c++17",
-            "-O3"
+            "-Wno-unused-function",
+            "-Wno-deprecated-declarations"
+        ],
+        "extra_link_args": [
+            "-Wl,-headerpad_max_install_names",
+            "-Wl,-rpath,@loader_path/../../vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib"
         ],
         "include_dirs": [
             "sabot/_c",
-            "vendor/arrow/cpp/build/install/include",
-            "vendor/arrow/python",
-            "vendor/duckdb/third_party/concurrentqueue",
-            "/opt/homebrew/lib/python3.13/site-packages/numpy/_core/include"
+            "/Users/bengamble/Sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
+            "/Users/bengamble/Sabot/vendor/arrow/python",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src",
+            "/Users/bengamble/Sabot/vendor/duckdb/third_party/concurrentqueue",
+            "/Users/bengamble/Sabot/sabot/_c",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/storage",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/traversal",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/query"
         ],
         "language": "c++",
         "libraries": [
-            "arrow"
+            "arrow",
+            "arrow_flight"
         ],
         "library_dirs": [
-            "vendor/arrow/cpp/build/install/lib"
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib"
         ],
         "name": "sabot._c.task_slot_manager",
         "sources": [
-            "sabot/_c/task_slot_manager.pyx",
-            "sabot/_c/task_slot_manager_impl.cpp"
+            "/Users/bengamble/Sabot/sabot/_c/task_slot_manager.pyx",
+            "/Users/bengamble/Sabot/sabot/_c/task_slot_manager_impl.cpp"
         ]
     },
     "module_name": "sabot._c.task_slot_manager"
@@ -1604,12 +1633,12 @@ static const char *__pyx_filename;
 static const char* const __pyx_f[] = {
   "sabot/_c/task_slot_manager.pyx",
   "<stringsource>",
-  "cpython/contextvars.pxd",
-  "cpython/datetime.pxd",
-  "cpython/type.pxd",
-  "cpython/bool.pxd",
-  "cpython/complex.pxd",
-  "pyarrow/lib.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/contextvars.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/datetime.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/type.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/bool.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/complex.pxd",
+  ".venv/lib/python3.11/site-packages/pyarrow/lib.pxd",
 };
 /* #### Code section: utility_code_proto_before_types ### */
 /* ForceInitThreads.proto */
@@ -3347,7 +3376,7 @@ struct __pyx_obj_7pyarrow_3lib_StopToken {
 };
 
 
-/* "sabot/_c/task_slot_manager.pyx":105
+/* "sabot/_c/task_slot_manager.pyx":106
  * # ============================================================================
  * 
  * cdef class TaskSlotManager:             # <<<<<<<<<<<<<<
@@ -5719,6 +5748,7 @@ static const char __pyx_k_cpp_stats[] = "cpp_stats";
 static const char __pyx_k_cpu_count[] = "cpu_count";
 static const char __pyx_k_enumerate[] = "enumerate";
 static const char __pyx_k_isenabled[] = "isenabled";
+static const char __pyx_k_morsel_id[] = "morsel_id";
 static const char __pyx_k_num_slots[] = "num_slots";
 static const char __pyx_k_pyx_state[] = "__pyx_state";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
@@ -5743,9 +5773,9 @@ static const char __pyx_k_execute_morsels[] = "execute_morsels";
 static const char __pyx_k_network_morsels[] = "network_morsels";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_morsels_processed[] = "morsels_processed";
-static const char __pyx_k_A45_q_q_a_M_WC_d_q[] = "\200A\33045\360\036\000\t\023\220)\320\033/\250q\260\001\330\010\022\220-\230q\330\010\022\220,\230a\330\010\022\320\022\"\240!\330\010\022\220*\230M\250\034\260W\270C\320?[\320[\\\360\006\000\016\017\330\014\026\220d\230)\240>\260\021\260!\340\010\017\210q";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
+static const char __pyx_k_A7EQ_q_q_a_M_WC_d_q[] = "\200A\3307E\300Q\360 \000\t\023\220)\320\033/\250q\260\001\330\010\022\220-\230q\330\010\022\220,\230a\330\010\022\320\022\"\240!\330\010\022\220&\230\001\330\010\022\220*\230M\250\034\260W\270C\320?[\320[\\\360\006\000\016\017\330\014\026\220d\230)\240>\260\021\260!\340\010\017\210q";
 static const char __pyx_k_TaskSlotManager_shutdown[] = "TaskSlotManager.shutdown";
 static const char __pyx_k_total_processing_time_us[] = "total_processing_time_us";
 static const char __pyx_k_TaskSlotManager_add_slots[] = "TaskSlotManager.add_slots";
@@ -5754,10 +5784,10 @@ static const char __pyx_k_TaskSlotManager_remove_slots[] = "TaskSlotManager.remo
 static const char __pyx_k_TaskSlotManager_enqueue_morsel[] = "TaskSlotManager.enqueue_morsel";
 static const char __pyx_k_TaskSlotManager_get_slot_stats[] = "TaskSlotManager.get_slot_stats";
 static const char __pyx_k_sabot__c_task_slot_manager_pyx[] = "sabot/_c/task_slot_manager.pyx";
-static const char __pyx_k_A_C_iq_j_q_i_31A_m1_l_a_Q_z_1_i[] = "\200A\360 \000\t\n\360\014\000\t\r\210C\210\177\230i\240q\250\001\330\014\023\220;\230j\250\017\260q\340\014\026\220i\320\0373\2601\260A\330\014\026\220m\2401\330\014\026\220l\240!\330\014\026\320\026&\240a\330\014\026\320\026-\250Q\340\014\027\220z\240\021\240!\360\006\000\t$\2401\360\010\000\016\017\330\014\032\230$\230i\320'B\300!\300=\320PQ\360\006\000\t$\2401\360\006\000\t\023\220!\330\010\014\210E\220\025\220a\220{\240%\240q\330\014\017\210{\230!\2302\230Y\240d\250+\260Q\260b\270\001\330\020\033\320\033-\250Q\250k\270\021\270\"\270A\330\020\027\220w\230a\230q\340\010\017\210q";
 static const char __pyx_k_Cython_Wrapper_for_C_TaskSlotMa[] = "\nCython Wrapper for C++ TaskSlotManager\n\nProvides Python interface to dynamic task slot management with work stealing.\n";
 static const char __pyx_k_TaskSlotManager___reduce_cython[] = "TaskSlotManager.__reduce_cython__";
 static const char __pyx_k_TaskSlotManager_execute_morsels[] = "TaskSlotManager.execute_morsels";
+static const char __pyx_k_A_C_iq_j_q_i_31A_m1_l_a_fA_Q_z_1[] = "\200A\360 \000\t\n\360\014\000\t\r\210C\210\177\230i\240q\250\001\330\014\023\220;\230j\250\017\260q\340\014\026\220i\320\0373\2601\260A\330\014\026\220m\2401\330\014\026\220l\240!\330\014\026\320\026&\240a\330\014\026\220f\230A\330\014\026\320\026-\250Q\340\014\027\220z\240\021\240!\360\006\000\t$\2401\360\010\000\016\017\330\014\032\230$\230i\320'B\300!\300=\320PQ\360\006\000\t$\2401\360\006\000\t\023\220!\330\010\014\210E\220\025\220a\220{\240%\240q\330\014\017\210{\230!\2302\230Y\240d\250+\260Q\260b\270\001\330\020\033\320\033-\250Q\250k\270\021\270\"\270A\330\020\027\220w\230a\230q\340\010\017\210q";
 static const char __pyx_k_A_I_E_ay_Q_9ARq_A_Yar_IQb_2Q_9AR[] = "\200A\360\034\000\016\017\330\014\030\230\004\230I\240]\260!\340\010\020\220\001\330\010\014\210E\220\025\220a\220y\240\005\240Q\330\014\021\220\027\230\001\330\020\033\2309\240A\240R\240q\330\020\030\230\t\240\021\240\"\240A\330\020%\240Y\250a\250r\260\021\330\020,\250I\260Q\260b\270\001\330\020!\240\031\250!\2502\250Q\330\020#\2409\250A\250R\250q\360\006\000\t\020\210q";
 static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.";
 static const char __pyx_k_TaskSlotManager___setstate_cytho[] = "TaskSlotManager.__setstate_cython__";
@@ -5766,7 +5796,7 @@ static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __red
 static int __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager___cinit__(struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *__pyx_v_self, int __pyx_v_num_slots); /* proto */
 static void __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_2__dealloc__(struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4execute_morsels(struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *__pyx_v_self, PyObject *__pyx_v_morsels, PyObject *__pyx_v_processor_func); /* proto */
-static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqueue_morsel(struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *__pyx_v_self, PyObject *__pyx_v_batch, int64_t __pyx_v_start_row, int64_t __pyx_v_num_rows, int __pyx_v_partition_id, PyObject *__pyx_v_source); /* proto */
+static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqueue_morsel(struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *__pyx_v_self, PyObject *__pyx_v_batch, int64_t __pyx_v_start_row, int64_t __pyx_v_num_rows, int __pyx_v_partition_id, int __pyx_v_morsel_id, PyObject *__pyx_v_source); /* proto */
 static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_8add_slots(struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *__pyx_v_self, int __pyx_v_count); /* proto */
 static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_10remove_slots(struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *__pyx_v_self, int __pyx_v_count); /* proto */
 static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_9num_slots___get__(struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *__pyx_v_self); /* proto */
@@ -5928,7 +5958,8 @@ typedef struct {
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
   PyObject *__pyx_tuple[1];
   PyObject *__pyx_codeobj_tab[8];
-  PyObject *__pyx_string_tab[80];
+  PyObject *__pyx_string_tab[81];
+  PyObject *__pyx_int_0;
 /* #### Code section: module_state_contents ### */
 /* CommonTypesMetaclass.module_state_decls */
 PyTypeObject *__pyx_CommonTypesMetaclassType;
@@ -6007,45 +6038,46 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_main __pyx_string_tab[38]
 #define __pyx_n_u_module __pyx_string_tab[39]
 #define __pyx_n_u_morsel_data __pyx_string_tab[40]
-#define __pyx_n_u_morsels __pyx_string_tab[41]
-#define __pyx_n_u_morsels_processed __pyx_string_tab[42]
-#define __pyx_n_u_name __pyx_string_tab[43]
-#define __pyx_n_u_network __pyx_string_tab[44]
-#define __pyx_n_u_network_morsels __pyx_string_tab[45]
-#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[46]
-#define __pyx_n_u_num_rows __pyx_string_tab[47]
-#define __pyx_n_u_num_slots __pyx_string_tab[48]
-#define __pyx_n_u_os __pyx_string_tab[49]
-#define __pyx_n_u_partition_id __pyx_string_tab[50]
-#define __pyx_n_u_pop __pyx_string_tab[51]
-#define __pyx_n_u_processor_func __pyx_string_tab[52]
-#define __pyx_n_u_py_batch __pyx_string_tab[53]
-#define __pyx_n_u_pyx_state __pyx_string_tab[54]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[55]
-#define __pyx_n_u_qualname __pyx_string_tab[56]
-#define __pyx_n_u_range __pyx_string_tab[57]
-#define __pyx_n_u_reduce __pyx_string_tab[58]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[59]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[60]
-#define __pyx_n_u_remove_slots __pyx_string_tab[61]
-#define __pyx_n_u_results __pyx_string_tab[62]
-#define __pyx_n_u_results_cpp __pyx_string_tab[63]
-#define __pyx_n_u_sabot__c_task_slot_manager __pyx_string_tab[64]
-#define __pyx_kp_u_sabot__c_task_slot_manager_pyx __pyx_string_tab[65]
-#define __pyx_n_u_self __pyx_string_tab[66]
-#define __pyx_n_u_set_name __pyx_string_tab[67]
-#define __pyx_n_u_setstate __pyx_string_tab[68]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[69]
-#define __pyx_n_u_shutdown __pyx_string_tab[70]
-#define __pyx_n_u_slot_id __pyx_string_tab[71]
-#define __pyx_n_u_source __pyx_string_tab[72]
-#define __pyx_n_u_spec __pyx_string_tab[73]
-#define __pyx_n_u_start_row __pyx_string_tab[74]
-#define __pyx_n_u_stats __pyx_string_tab[75]
-#define __pyx_kp_u_stringsource __pyx_string_tab[76]
-#define __pyx_n_u_success __pyx_string_tab[77]
-#define __pyx_n_u_test __pyx_string_tab[78]
-#define __pyx_n_u_total_processing_time_us __pyx_string_tab[79]
+#define __pyx_n_u_morsel_id __pyx_string_tab[41]
+#define __pyx_n_u_morsels __pyx_string_tab[42]
+#define __pyx_n_u_morsels_processed __pyx_string_tab[43]
+#define __pyx_n_u_name __pyx_string_tab[44]
+#define __pyx_n_u_network __pyx_string_tab[45]
+#define __pyx_n_u_network_morsels __pyx_string_tab[46]
+#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[47]
+#define __pyx_n_u_num_rows __pyx_string_tab[48]
+#define __pyx_n_u_num_slots __pyx_string_tab[49]
+#define __pyx_n_u_os __pyx_string_tab[50]
+#define __pyx_n_u_partition_id __pyx_string_tab[51]
+#define __pyx_n_u_pop __pyx_string_tab[52]
+#define __pyx_n_u_processor_func __pyx_string_tab[53]
+#define __pyx_n_u_py_batch __pyx_string_tab[54]
+#define __pyx_n_u_pyx_state __pyx_string_tab[55]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[56]
+#define __pyx_n_u_qualname __pyx_string_tab[57]
+#define __pyx_n_u_range __pyx_string_tab[58]
+#define __pyx_n_u_reduce __pyx_string_tab[59]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[60]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[61]
+#define __pyx_n_u_remove_slots __pyx_string_tab[62]
+#define __pyx_n_u_results __pyx_string_tab[63]
+#define __pyx_n_u_results_cpp __pyx_string_tab[64]
+#define __pyx_n_u_sabot__c_task_slot_manager __pyx_string_tab[65]
+#define __pyx_kp_u_sabot__c_task_slot_manager_pyx __pyx_string_tab[66]
+#define __pyx_n_u_self __pyx_string_tab[67]
+#define __pyx_n_u_set_name __pyx_string_tab[68]
+#define __pyx_n_u_setstate __pyx_string_tab[69]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[70]
+#define __pyx_n_u_shutdown __pyx_string_tab[71]
+#define __pyx_n_u_slot_id __pyx_string_tab[72]
+#define __pyx_n_u_source __pyx_string_tab[73]
+#define __pyx_n_u_spec __pyx_string_tab[74]
+#define __pyx_n_u_start_row __pyx_string_tab[75]
+#define __pyx_n_u_stats __pyx_string_tab[76]
+#define __pyx_kp_u_stringsource __pyx_string_tab[77]
+#define __pyx_n_u_success __pyx_string_tab[78]
+#define __pyx_n_u_test __pyx_string_tab[79]
+#define __pyx_n_u_total_processing_time_us __pyx_string_tab[80]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -6178,7 +6210,8 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_2_c_17task_slot_manager_TaskSlotManager);
   for (int i=0; i<1; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
   for (int i=0; i<8; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<80; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<81; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  Py_CLEAR(clear_module_state->__pyx_int_0);
   return 0;
 }
 #endif
@@ -6311,7 +6344,8 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_2_c_17task_slot_manager_TaskSlotManager);
   for (int i=0; i<1; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
   for (int i=0; i<8; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<80; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<81; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
   return 0;
 }
 #endif
@@ -8718,7 +8752,7 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyarrow_8includes_6common_PyObject_to_ob
   return __pyx_r;
 }
 
-/* "sabot/_c/task_slot_manager.pyx":85
+/* "sabot/_c/task_slot_manager.pyx":86
  * cdef object _current_python_callback = None
  * 
  * cdef shared_ptr[PCRecordBatch] cpp_callback_wrapper(shared_ptr[PCRecordBatch] batch_cpp) noexcept nogil:             # <<<<<<<<<<<<<<
@@ -8746,7 +8780,7 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
   PyGILState_STATE __pyx_gilstate_save;
   __Pyx_RefNannySetupContext("cpp_callback_wrapper", 1);
 
-  /* "sabot/_c/task_slot_manager.pyx":87
+  /* "sabot/_c/task_slot_manager.pyx":88
  * cdef shared_ptr[PCRecordBatch] cpp_callback_wrapper(shared_ptr[PCRecordBatch] batch_cpp) noexcept nogil:
  *     """Bridge C++  Python callback."""
  *     with gil:             # <<<<<<<<<<<<<<
@@ -8757,19 +8791,19 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
       PyGILState_STATE __pyx_gilstate_save = __Pyx_PyGILState_Ensure();
       /*try:*/ {
 
-        /* "sabot/_c/task_slot_manager.pyx":88
+        /* "sabot/_c/task_slot_manager.pyx":89
  *     """Bridge C++  Python callback."""
  *     with gil:
  *         py_batch = pyarrow_wrap_batch(batch_cpp)             # <<<<<<<<<<<<<<
  * 
  *         if _current_python_callback is not None:
 */
-        __pyx_t_1 = __pyx_f_7pyarrow_3lib_pyarrow_wrap_batch(__pyx_v_batch_cpp); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L4_error)
+        __pyx_t_1 = __pyx_f_7pyarrow_3lib_pyarrow_wrap_batch(__pyx_v_batch_cpp); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 89, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_1);
         __pyx_v_py_batch = __pyx_t_1;
         __pyx_t_1 = 0;
 
-        /* "sabot/_c/task_slot_manager.pyx":90
+        /* "sabot/_c/task_slot_manager.pyx":91
  *         py_batch = pyarrow_wrap_batch(batch_cpp)
  * 
  *         if _current_python_callback is not None:             # <<<<<<<<<<<<<<
@@ -8779,7 +8813,7 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
         __pyx_t_2 = (__pyx_v_5sabot_2_c_17task_slot_manager__current_python_callback != Py_None);
         if (__pyx_t_2) {
 
-          /* "sabot/_c/task_slot_manager.pyx":91
+          /* "sabot/_c/task_slot_manager.pyx":92
  * 
  *         if _current_python_callback is not None:
  *             try:             # <<<<<<<<<<<<<<
@@ -8795,7 +8829,7 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
             __Pyx_XGOTREF(__pyx_t_5);
             /*try:*/ {
 
-              /* "sabot/_c/task_slot_manager.pyx":92
+              /* "sabot/_c/task_slot_manager.pyx":93
  *         if _current_python_callback is not None:
  *             try:
  *                 result_py = _current_python_callback(py_batch)             # <<<<<<<<<<<<<<
@@ -8822,13 +8856,13 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
                 __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
                 __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
                 __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 92, __pyx_L7_error)
+                if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L7_error)
                 __Pyx_GOTREF(__pyx_t_1);
               }
               __pyx_v_result_py = __pyx_t_1;
               __pyx_t_1 = 0;
 
-              /* "sabot/_c/task_slot_manager.pyx":93
+              /* "sabot/_c/task_slot_manager.pyx":94
  *             try:
  *                 result_py = _current_python_callback(py_batch)
  *                 if result_py is not None:             # <<<<<<<<<<<<<<
@@ -8838,18 +8872,18 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
               __pyx_t_2 = (__pyx_v_result_py != Py_None);
               if (__pyx_t_2) {
 
-                /* "sabot/_c/task_slot_manager.pyx":94
+                /* "sabot/_c/task_slot_manager.pyx":95
  *                 result_py = _current_python_callback(py_batch)
  *                 if result_py is not None:
  *                     return pyarrow_unwrap_batch(result_py)             # <<<<<<<<<<<<<<
  *             except:
  *                 pass
 */
-                __pyx_t_9 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_v_result_py); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 94, __pyx_L7_error)
+                __pyx_t_9 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_v_result_py); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 95, __pyx_L7_error)
                 __pyx_r = __pyx_t_9;
                 goto __pyx_L11_try_return;
 
-                /* "sabot/_c/task_slot_manager.pyx":93
+                /* "sabot/_c/task_slot_manager.pyx":94
  *             try:
  *                 result_py = _current_python_callback(py_batch)
  *                 if result_py is not None:             # <<<<<<<<<<<<<<
@@ -8858,7 +8892,7 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
 */
               }
 
-              /* "sabot/_c/task_slot_manager.pyx":91
+              /* "sabot/_c/task_slot_manager.pyx":92
  * 
  *         if _current_python_callback is not None:
  *             try:             # <<<<<<<<<<<<<<
@@ -8875,7 +8909,7 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
             __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
             __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-            /* "sabot/_c/task_slot_manager.pyx":95
+            /* "sabot/_c/task_slot_manager.pyx":96
  *                 if result_py is not None:
  *                     return pyarrow_unwrap_batch(result_py)
  *             except:             # <<<<<<<<<<<<<<
@@ -8887,7 +8921,7 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
               goto __pyx_L8_exception_handled;
             }
 
-            /* "sabot/_c/task_slot_manager.pyx":91
+            /* "sabot/_c/task_slot_manager.pyx":92
  * 
  *         if _current_python_callback is not None:
  *             try:             # <<<<<<<<<<<<<<
@@ -8908,7 +8942,7 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
             __pyx_L12_try_end:;
           }
 
-          /* "sabot/_c/task_slot_manager.pyx":90
+          /* "sabot/_c/task_slot_manager.pyx":91
  *         py_batch = pyarrow_wrap_batch(batch_cpp)
  * 
  *         if _current_python_callback is not None:             # <<<<<<<<<<<<<<
@@ -8917,7 +8951,7 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
 */
         }
 
-        /* "sabot/_c/task_slot_manager.pyx":98
+        /* "sabot/_c/task_slot_manager.pyx":99
  *                 pass
  * 
  *         return shared_ptr[PCRecordBatch]()             # <<<<<<<<<<<<<<
@@ -8928,7 +8962,7 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
         goto __pyx_L3_return;
       }
 
-      /* "sabot/_c/task_slot_manager.pyx":87
+      /* "sabot/_c/task_slot_manager.pyx":88
  * cdef shared_ptr[PCRecordBatch] cpp_callback_wrapper(shared_ptr[PCRecordBatch] batch_cpp) noexcept nogil:
  *     """Bridge C++  Python callback."""
  *     with gil:             # <<<<<<<<<<<<<<
@@ -8947,7 +8981,7 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
       }
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":85
+  /* "sabot/_c/task_slot_manager.pyx":86
  * cdef object _current_python_callback = None
  * 
  * cdef shared_ptr[PCRecordBatch] cpp_callback_wrapper(shared_ptr[PCRecordBatch] batch_cpp) noexcept nogil:             # <<<<<<<<<<<<<<
@@ -8973,7 +9007,7 @@ static std::shared_ptr< arrow::RecordBatch>  __pyx_f_5sabot_2_c_17task_slot_mana
   return __pyx_r;
 }
 
-/* "sabot/_c/task_slot_manager.pyx":134
+/* "sabot/_c/task_slot_manager.pyx":135
  *     cdef CTaskSlotManager* _manager
  * 
  *     def __cinit__(self, int num_slots=0):             # <<<<<<<<<<<<<<
@@ -9003,37 +9037,37 @@ static int __pyx_pw_5sabot_2_c_17task_slot_manager_15TaskSlotManager_1__cinit__(
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_num_slots,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 134, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 135, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 134, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 135, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__cinit__", 0) < 0) __PYX_ERR(0, 134, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__cinit__", 0) < 0) __PYX_ERR(0, 135, __pyx_L3_error)
     } else {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 134, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 135, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
     }
     if (values[0]) {
-      __pyx_v_num_slots = __Pyx_PyLong_As_int(values[0]); if (unlikely((__pyx_v_num_slots == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 134, __pyx_L3_error)
+      __pyx_v_num_slots = __Pyx_PyLong_As_int(values[0]); if (unlikely((__pyx_v_num_slots == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 135, __pyx_L3_error)
     } else {
       __pyx_v_num_slots = ((int)0);
     }
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 0, 0, 1, __pyx_nargs); __PYX_ERR(0, 134, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 0, 0, 1, __pyx_nargs); __PYX_ERR(0, 135, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9070,7 +9104,7 @@ static int __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager___cinit__(s
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "sabot/_c/task_slot_manager.pyx":141
+  /* "sabot/_c/task_slot_manager.pyx":142
  *             num_slots: Number of worker slots (0 = auto-detect)
  *         """
  *         if num_slots == 0:             # <<<<<<<<<<<<<<
@@ -9080,19 +9114,19 @@ static int __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager___cinit__(s
   __pyx_t_1 = (__pyx_v_num_slots == 0);
   if (__pyx_t_1) {
 
-    /* "sabot/_c/task_slot_manager.pyx":142
+    /* "sabot/_c/task_slot_manager.pyx":143
  *         """
  *         if num_slots == 0:
  *             import os             # <<<<<<<<<<<<<<
  *             num_slots = os.cpu_count() or 4
  * 
 */
-    __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_os, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_os, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 143, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_v_os = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "sabot/_c/task_slot_manager.pyx":143
+    /* "sabot/_c/task_slot_manager.pyx":144
  *         if num_slots == 0:
  *             import os
  *             num_slots = os.cpu_count() or 4             # <<<<<<<<<<<<<<
@@ -9106,14 +9140,14 @@ static int __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager___cinit__(s
       PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_cpu_count, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 143, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 144, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
-    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 143, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 144, __pyx_L1_error)
     if (!__pyx_t_1) {
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     } else {
-      __pyx_t_6 = __Pyx_PyLong_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 143, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyLong_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 144, __pyx_L1_error)
       __pyx_t_3 = __pyx_t_6;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       goto __pyx_L4_bool_binop_done;
@@ -9122,7 +9156,7 @@ static int __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager___cinit__(s
     __pyx_L4_bool_binop_done:;
     __pyx_v_num_slots = __pyx_t_3;
 
-    /* "sabot/_c/task_slot_manager.pyx":141
+    /* "sabot/_c/task_slot_manager.pyx":142
  *             num_slots: Number of worker slots (0 = auto-detect)
  *         """
  *         if num_slots == 0:             # <<<<<<<<<<<<<<
@@ -9131,7 +9165,7 @@ static int __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager___cinit__(s
 */
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":145
+  /* "sabot/_c/task_slot_manager.pyx":146
  *             num_slots = os.cpu_count() or 4
  * 
  *         self._manager = new CTaskSlotManager(num_slots)             # <<<<<<<<<<<<<<
@@ -9142,11 +9176,11 @@ static int __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager___cinit__(s
     __pyx_t_7 = new sabot::TaskSlotManager(__pyx_v_num_slots);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 145, __pyx_L1_error)
+    __PYX_ERR(0, 146, __pyx_L1_error)
   }
   __pyx_v_self->_manager = __pyx_t_7;
 
-  /* "sabot/_c/task_slot_manager.pyx":134
+  /* "sabot/_c/task_slot_manager.pyx":135
  *     cdef CTaskSlotManager* _manager
  * 
  *     def __cinit__(self, int num_slots=0):             # <<<<<<<<<<<<<<
@@ -9168,7 +9202,7 @@ static int __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager___cinit__(s
   return __pyx_r;
 }
 
-/* "sabot/_c/task_slot_manager.pyx":147
+/* "sabot/_c/task_slot_manager.pyx":148
  *         self._manager = new CTaskSlotManager(num_slots)
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -9192,7 +9226,7 @@ static void __pyx_pw_5sabot_2_c_17task_slot_manager_15TaskSlotManager_3__dealloc
 static void __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_2__dealloc__(struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *__pyx_v_self) {
   int __pyx_t_1;
 
-  /* "sabot/_c/task_slot_manager.pyx":149
+  /* "sabot/_c/task_slot_manager.pyx":150
  *     def __dealloc__(self):
  *         """Clean up C++ manager."""
  *         if self._manager != NULL:             # <<<<<<<<<<<<<<
@@ -9202,7 +9236,7 @@ static void __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_2__dealloc
   __pyx_t_1 = (__pyx_v_self->_manager != NULL);
   if (__pyx_t_1) {
 
-    /* "sabot/_c/task_slot_manager.pyx":150
+    /* "sabot/_c/task_slot_manager.pyx":151
  *         """Clean up C++ manager."""
  *         if self._manager != NULL:
  *             self._manager.Shutdown()             # <<<<<<<<<<<<<<
@@ -9211,7 +9245,7 @@ static void __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_2__dealloc
 */
     __pyx_v_self->_manager->Shutdown();
 
-    /* "sabot/_c/task_slot_manager.pyx":151
+    /* "sabot/_c/task_slot_manager.pyx":152
  *         if self._manager != NULL:
  *             self._manager.Shutdown()
  *             del self._manager             # <<<<<<<<<<<<<<
@@ -9220,7 +9254,7 @@ static void __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_2__dealloc
 */
     delete __pyx_v_self->_manager;
 
-    /* "sabot/_c/task_slot_manager.pyx":149
+    /* "sabot/_c/task_slot_manager.pyx":150
  *     def __dealloc__(self):
  *         """Clean up C++ manager."""
  *         if self._manager != NULL:             # <<<<<<<<<<<<<<
@@ -9229,7 +9263,7 @@ static void __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_2__dealloc
 */
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":147
+  /* "sabot/_c/task_slot_manager.pyx":148
  *         self._manager = new CTaskSlotManager(num_slots)
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -9240,7 +9274,7 @@ static void __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_2__dealloc
   /* function exit code */
 }
 
-/* "sabot/_c/task_slot_manager.pyx":153
+/* "sabot/_c/task_slot_manager.pyx":154
  *             del self._manager
  * 
  *     def execute_morsels(self, list morsels, object processor_func):             # <<<<<<<<<<<<<<
@@ -9289,39 +9323,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_morsels,&__pyx_mstate_global->__pyx_n_u_processor_func,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 153, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 154, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 153, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 154, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 153, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 154, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "execute_morsels", 0) < 0) __PYX_ERR(0, 153, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "execute_morsels", 0) < 0) __PYX_ERR(0, 154, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("execute_morsels", 1, 2, 2, i); __PYX_ERR(0, 153, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("execute_morsels", 1, 2, 2, i); __PYX_ERR(0, 154, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 153, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 154, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 153, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 154, __pyx_L3_error)
     }
     __pyx_v_morsels = ((PyObject*)values[0]);
     __pyx_v_processor_func = values[1];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("execute_morsels", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 153, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("execute_morsels", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 154, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9332,7 +9366,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_morsels), (&PyList_Type), 1, "morsels", 1))) __PYX_ERR(0, 153, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_morsels), (&PyList_Type), 1, "morsels", 1))) __PYX_ERR(0, 154, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4execute_morsels(((struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *)__pyx_v_self), __pyx_v_morsels, __pyx_v_processor_func);
 
   /* function exit code */
@@ -9389,7 +9423,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("execute_morsels", 0);
 
-  /* "sabot/_c/task_slot_manager.pyx":175
+  /* "sabot/_c/task_slot_manager.pyx":176
  *         cdef CMorsel cpp_morsel
  * 
  *         for i, morsel_data in enumerate(morsels):             # <<<<<<<<<<<<<<
@@ -9403,20 +9437,20 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
     {
       Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
       #if !CYTHON_ASSUME_SAFE_SIZE
-      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 175, __pyx_L1_error)
+      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 176, __pyx_L1_error)
       #endif
       if (__pyx_t_3 >= __pyx_temp) break;
     }
     __pyx_t_4 = __Pyx_PyList_GetItemRef(__pyx_t_2, __pyx_t_3);
     ++__pyx_t_3;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 175, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_XDECREF_SET(__pyx_v_morsel_data, __pyx_t_4);
     __pyx_t_4 = 0;
     __pyx_v_i = __pyx_t_1;
     __pyx_t_1 = (__pyx_t_1 + 1);
 
-    /* "sabot/_c/task_slot_manager.pyx":176
+    /* "sabot/_c/task_slot_manager.pyx":177
  * 
  *         for i, morsel_data in enumerate(morsels):
  *             batch, start_row, num_rows, partition_id = morsel_data             # <<<<<<<<<<<<<<
@@ -9429,7 +9463,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
       if (unlikely(size != 4)) {
         if (size > 4) __Pyx_RaiseTooManyValuesError(4);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 176, __pyx_L1_error)
+        __PYX_ERR(0, 177, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -9443,16 +9477,16 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
         __Pyx_INCREF(__pyx_t_7);
       } else {
         __pyx_t_4 = __Pyx_PyList_GetItemRef(sequence, 0);
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 176, __pyx_L1_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 177, __pyx_L1_error)
         __Pyx_XGOTREF(__pyx_t_4);
         __pyx_t_5 = __Pyx_PyList_GetItemRef(sequence, 1);
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 176, __pyx_L1_error)
+        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 177, __pyx_L1_error)
         __Pyx_XGOTREF(__pyx_t_5);
         __pyx_t_6 = __Pyx_PyList_GetItemRef(sequence, 2);
-        if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 176, __pyx_L1_error)
+        if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 177, __pyx_L1_error)
         __Pyx_XGOTREF(__pyx_t_6);
         __pyx_t_7 = __Pyx_PyList_GetItemRef(sequence, 3);
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 176, __pyx_L1_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 177, __pyx_L1_error)
         __Pyx_XGOTREF(__pyx_t_7);
       }
       #else
@@ -9460,7 +9494,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
         Py_ssize_t i;
         PyObject** temps[4] = {&__pyx_t_4,&__pyx_t_5,&__pyx_t_6,&__pyx_t_7};
         for (i=0; i < 4; i++) {
-          PyObject* item = __Pyx_PySequence_ITEM(sequence, i); if (unlikely(!item)) __PYX_ERR(0, 176, __pyx_L1_error)
+          PyObject* item = __Pyx_PySequence_ITEM(sequence, i); if (unlikely(!item)) __PYX_ERR(0, 177, __pyx_L1_error)
           __Pyx_GOTREF(item);
           *(temps[i]) = item;
         }
@@ -9469,7 +9503,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
     } else {
       Py_ssize_t index = -1;
       PyObject** temps[4] = {&__pyx_t_4,&__pyx_t_5,&__pyx_t_6,&__pyx_t_7};
-      __pyx_t_8 = PyObject_GetIter(__pyx_v_morsel_data); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 176, __pyx_L1_error)
+      __pyx_t_8 = PyObject_GetIter(__pyx_v_morsel_data); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 177, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_8);
       for (index=0; index < 4; index++) {
@@ -9477,7 +9511,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
         __Pyx_GOTREF(item);
         *(temps[index]) = item;
       }
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 4) < 0) __PYX_ERR(0, 176, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 4) < 0) __PYX_ERR(0, 177, __pyx_L1_error)
       __pyx_t_9 = NULL;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       goto __pyx_L6_unpacking_done;
@@ -9485,7 +9519,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_9 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 176, __pyx_L1_error)
+      __PYX_ERR(0, 177, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_batch, __pyx_t_4);
@@ -9497,56 +9531,65 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
     __Pyx_XDECREF_SET(__pyx_v_partition_id, __pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "sabot/_c/task_slot_manager.pyx":178
+    /* "sabot/_c/task_slot_manager.pyx":179
  *             batch, start_row, num_rows, partition_id = morsel_data
  * 
  *             cpp_morsel.batch = pyarrow_unwrap_batch(batch)             # <<<<<<<<<<<<<<
  *             cpp_morsel.start_row = start_row
  *             cpp_morsel.num_rows = num_rows
 */
-    __pyx_t_10 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 178, __pyx_L1_error)
+    __pyx_t_10 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 179, __pyx_L1_error)
     __pyx_v_cpp_morsel.batch = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_10);
 
-    /* "sabot/_c/task_slot_manager.pyx":179
+    /* "sabot/_c/task_slot_manager.pyx":180
  * 
  *             cpp_morsel.batch = pyarrow_unwrap_batch(batch)
  *             cpp_morsel.start_row = start_row             # <<<<<<<<<<<<<<
  *             cpp_morsel.num_rows = num_rows
  *             cpp_morsel.partition_id = partition_id
 */
-    __pyx_t_11 = __Pyx_PyLong_As_int64_t(__pyx_v_start_row); if (unlikely((__pyx_t_11 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 179, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyLong_As_int64_t(__pyx_v_start_row); if (unlikely((__pyx_t_11 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 180, __pyx_L1_error)
     __pyx_v_cpp_morsel.start_row = __pyx_t_11;
 
-    /* "sabot/_c/task_slot_manager.pyx":180
+    /* "sabot/_c/task_slot_manager.pyx":181
  *             cpp_morsel.batch = pyarrow_unwrap_batch(batch)
  *             cpp_morsel.start_row = start_row
  *             cpp_morsel.num_rows = num_rows             # <<<<<<<<<<<<<<
  *             cpp_morsel.partition_id = partition_id
- *             cpp_morsel.source = CMorselSource.LOCAL
+ *             cpp_morsel.id = i  # Set original position for correct reassembly
 */
-    __pyx_t_11 = __Pyx_PyLong_As_int64_t(__pyx_v_num_rows); if (unlikely((__pyx_t_11 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyLong_As_int64_t(__pyx_v_num_rows); if (unlikely((__pyx_t_11 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 181, __pyx_L1_error)
     __pyx_v_cpp_morsel.num_rows = __pyx_t_11;
 
-    /* "sabot/_c/task_slot_manager.pyx":181
+    /* "sabot/_c/task_slot_manager.pyx":182
  *             cpp_morsel.start_row = start_row
  *             cpp_morsel.num_rows = num_rows
  *             cpp_morsel.partition_id = partition_id             # <<<<<<<<<<<<<<
+ *             cpp_morsel.id = i  # Set original position for correct reassembly
+ *             cpp_morsel.source = CMorselSource.LOCAL
+*/
+    __pyx_t_12 = __Pyx_PyLong_As_int(__pyx_v_partition_id); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 182, __pyx_L1_error)
+    __pyx_v_cpp_morsel.partition_id = __pyx_t_12;
+
+    /* "sabot/_c/task_slot_manager.pyx":183
+ *             cpp_morsel.num_rows = num_rows
+ *             cpp_morsel.partition_id = partition_id
+ *             cpp_morsel.id = i  # Set original position for correct reassembly             # <<<<<<<<<<<<<<
  *             cpp_morsel.source = CMorselSource.LOCAL
  * 
 */
-    __pyx_t_12 = __Pyx_PyLong_As_int(__pyx_v_partition_id); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 181, __pyx_L1_error)
-    __pyx_v_cpp_morsel.partition_id = __pyx_t_12;
+    __pyx_v_cpp_morsel.id = __pyx_v_i;
 
-    /* "sabot/_c/task_slot_manager.pyx":182
- *             cpp_morsel.num_rows = num_rows
+    /* "sabot/_c/task_slot_manager.pyx":184
  *             cpp_morsel.partition_id = partition_id
+ *             cpp_morsel.id = i  # Set original position for correct reassembly
  *             cpp_morsel.source = CMorselSource.LOCAL             # <<<<<<<<<<<<<<
  * 
  *             cpp_morsels.push_back(cpp_morsel)
 */
     __pyx_v_cpp_morsel.source = sabot::MorselSource::LOCAL;
 
-    /* "sabot/_c/task_slot_manager.pyx":184
+    /* "sabot/_c/task_slot_manager.pyx":186
  *             cpp_morsel.source = CMorselSource.LOCAL
  * 
  *             cpp_morsels.push_back(cpp_morsel)             # <<<<<<<<<<<<<<
@@ -9557,10 +9600,10 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
       __pyx_v_cpp_morsels.push_back(__pyx_v_cpp_morsel);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 184, __pyx_L1_error)
+      __PYX_ERR(0, 186, __pyx_L1_error)
     }
 
-    /* "sabot/_c/task_slot_manager.pyx":175
+    /* "sabot/_c/task_slot_manager.pyx":176
  *         cdef CMorsel cpp_morsel
  * 
  *         for i, morsel_data in enumerate(morsels):             # <<<<<<<<<<<<<<
@@ -9570,7 +9613,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_c/task_slot_manager.pyx":187
+  /* "sabot/_c/task_slot_manager.pyx":189
  * 
  *         # Store callback
  *         _current_python_callback = processor_func             # <<<<<<<<<<<<<<
@@ -9582,7 +9625,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
   __Pyx_DECREF_SET(__pyx_v_5sabot_2_c_17task_slot_manager__current_python_callback, __pyx_v_processor_func);
   __Pyx_GIVEREF(__pyx_v_processor_func);
 
-  /* "sabot/_c/task_slot_manager.pyx":191
+  /* "sabot/_c/task_slot_manager.pyx":193
  *         # Execute in C++ (releases GIL!)
  *         cdef vector[CMorselResult] results_cpp
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -9596,7 +9639,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
       __Pyx_FastGIL_Remember();
       /*try:*/ {
 
-        /* "sabot/_c/task_slot_manager.pyx":192
+        /* "sabot/_c/task_slot_manager.pyx":194
  *         cdef vector[CMorselResult] results_cpp
  *         with nogil:
  *             results_cpp = self._manager.ExecuteMorselsWithCallback(cpp_morsels, cpp_callback_wrapper)             # <<<<<<<<<<<<<<
@@ -9606,7 +9649,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
         __pyx_v_results_cpp = __pyx_v_self->_manager->ExecuteMorselsWithCallback(__pyx_v_cpp_morsels, __pyx_f_5sabot_2_c_17task_slot_manager_cpp_callback_wrapper);
       }
 
-      /* "sabot/_c/task_slot_manager.pyx":191
+      /* "sabot/_c/task_slot_manager.pyx":193
  *         # Execute in C++ (releases GIL!)
  *         cdef vector[CMorselResult] results_cpp
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -9623,7 +9666,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
       }
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":195
+  /* "sabot/_c/task_slot_manager.pyx":197
  * 
  *         # Clear callback
  *         _current_python_callback = None             # <<<<<<<<<<<<<<
@@ -9635,19 +9678,19 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
   __Pyx_DECREF_SET(__pyx_v_5sabot_2_c_17task_slot_manager__current_python_callback, Py_None);
   __Pyx_GIVEREF(Py_None);
 
-  /* "sabot/_c/task_slot_manager.pyx":198
+  /* "sabot/_c/task_slot_manager.pyx":200
  * 
  *         # Convert C++ results to Python
  *         results = []             # <<<<<<<<<<<<<<
  *         for i in range(results_cpp.size()):
  *             if results_cpp[i].success and results_cpp[i].batch:
 */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_results = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_c/task_slot_manager.pyx":199
+  /* "sabot/_c/task_slot_manager.pyx":201
  *         # Convert C++ results to Python
  *         results = []
  *         for i in range(results_cpp.size()):             # <<<<<<<<<<<<<<
@@ -9659,7 +9702,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
   for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
     __pyx_v_i = __pyx_t_14;
 
-    /* "sabot/_c/task_slot_manager.pyx":200
+    /* "sabot/_c/task_slot_manager.pyx":202
  *         results = []
  *         for i in range(results_cpp.size()):
  *             if results_cpp[i].success and results_cpp[i].batch:             # <<<<<<<<<<<<<<
@@ -9677,28 +9720,28 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
     __pyx_L14_bool_binop_done:;
     if (__pyx_t_15) {
 
-      /* "sabot/_c/task_slot_manager.pyx":201
+      /* "sabot/_c/task_slot_manager.pyx":203
  *         for i in range(results_cpp.size()):
  *             if results_cpp[i].success and results_cpp[i].batch:
  *                 py_batch = pyarrow_wrap_batch(results_cpp[i].batch)             # <<<<<<<<<<<<<<
  *                 results.append(py_batch)
  * 
 */
-      __pyx_t_2 = __pyx_f_7pyarrow_3lib_pyarrow_wrap_batch((__pyx_v_results_cpp[__pyx_v_i]).batch); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
+      __pyx_t_2 = __pyx_f_7pyarrow_3lib_pyarrow_wrap_batch((__pyx_v_results_cpp[__pyx_v_i]).batch); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_XDECREF_SET(__pyx_v_py_batch, __pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "sabot/_c/task_slot_manager.pyx":202
+      /* "sabot/_c/task_slot_manager.pyx":204
  *             if results_cpp[i].success and results_cpp[i].batch:
  *                 py_batch = pyarrow_wrap_batch(results_cpp[i].batch)
  *                 results.append(py_batch)             # <<<<<<<<<<<<<<
  * 
  *         return results
 */
-      __pyx_t_18 = __Pyx_PyList_Append(__pyx_v_results, __pyx_v_py_batch); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 202, __pyx_L1_error)
+      __pyx_t_18 = __Pyx_PyList_Append(__pyx_v_results, __pyx_v_py_batch); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 204, __pyx_L1_error)
 
-      /* "sabot/_c/task_slot_manager.pyx":200
+      /* "sabot/_c/task_slot_manager.pyx":202
  *         results = []
  *         for i in range(results_cpp.size()):
  *             if results_cpp[i].success and results_cpp[i].batch:             # <<<<<<<<<<<<<<
@@ -9708,7 +9751,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
     }
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":204
+  /* "sabot/_c/task_slot_manager.pyx":206
  *                 results.append(py_batch)
  * 
  *         return results             # <<<<<<<<<<<<<<
@@ -9720,7 +9763,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
   __pyx_r = __pyx_v_results;
   goto __pyx_L0;
 
-  /* "sabot/_c/task_slot_manager.pyx":153
+  /* "sabot/_c/task_slot_manager.pyx":154
  *             del self._manager
  * 
  *     def execute_morsels(self, list morsels, object processor_func):             # <<<<<<<<<<<<<<
@@ -9751,11 +9794,11 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_4exec
   return __pyx_r;
 }
 
-/* "sabot/_c/task_slot_manager.pyx":206
+/* "sabot/_c/task_slot_manager.pyx":208
  *         return results
  * 
  *     def enqueue_morsel(self, object batch, int64_t start_row, int64_t num_rows,             # <<<<<<<<<<<<<<
- *                        int partition_id, str source='local'):
+ *                        int partition_id, int morsel_id=0, str source='local'):
  *         """
 */
 
@@ -9767,7 +9810,7 @@ PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqueue_morsel, "\n        Enqueue single morsel (for network morsels arriving async).\n\n        Args:\n            batch: RecordBatch\n            start_row: Start row index\n            num_rows: Number of rows in morsel\n            partition_id: Partition ID\n            source: 'local' or 'network'\n\n        Returns:\n            True if enqueued successfully\n        ");
+PyDoc_STRVAR(__pyx_doc_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqueue_morsel, "\n        Enqueue single morsel (for network morsels arriving async).\n\n        Args:\n            batch: RecordBatch\n            start_row: Start row index\n            num_rows: Number of rows in morsel\n            partition_id: Partition ID\n            morsel_id: Original position ID (for correct reassembly)\n            source: 'local' or 'network'\n\n        Returns:\n            True if enqueued successfully\n        ");
 static PyMethodDef __pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_7enqueue_morsel = {"enqueue_morsel", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_2_c_17task_slot_manager_15TaskSlotManager_7enqueue_morsel, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqueue_morsel};
 static PyObject *__pyx_pw_5sabot_2_c_17task_slot_manager_15TaskSlotManager_7enqueue_morsel(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
@@ -9780,12 +9823,13 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   int64_t __pyx_v_start_row;
   int64_t __pyx_v_num_rows;
   int __pyx_v_partition_id;
+  int __pyx_v_morsel_id;
   PyObject *__pyx_v_source = 0;
   #if !CYTHON_METH_FASTCALL
   CYTHON_UNUSED Py_ssize_t __pyx_nargs;
   #endif
   CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[5] = {0,0,0,0,0};
+  PyObject* values[6] = {0,0,0,0,0,0};
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -9801,69 +9845,82 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   #endif
   __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
   {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,&__pyx_mstate_global->__pyx_n_u_start_row,&__pyx_mstate_global->__pyx_n_u_num_rows,&__pyx_mstate_global->__pyx_n_u_partition_id,&__pyx_mstate_global->__pyx_n_u_source,0};
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,&__pyx_mstate_global->__pyx_n_u_start_row,&__pyx_mstate_global->__pyx_n_u_num_rows,&__pyx_mstate_global->__pyx_n_u_partition_id,&__pyx_mstate_global->__pyx_n_u_morsel_id,&__pyx_mstate_global->__pyx_n_u_source,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 206, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 208, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
+        case  6:
+        values[5] = __Pyx_ArgRef_FASTCALL(__pyx_args, 5);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 208, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
         case  5:
         values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 206, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 208, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 206, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 208, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 206, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 208, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 206, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 208, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 206, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 208, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "enqueue_morsel", 0) < 0) __PYX_ERR(0, 206, __pyx_L3_error)
-      if (!values[4]) values[4] = __Pyx_NewRef(((PyObject*)__pyx_mstate_global->__pyx_n_u_local));
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "enqueue_morsel", 0) < 0) __PYX_ERR(0, 208, __pyx_L3_error)
+      if (!values[5]) values[5] = __Pyx_NewRef(((PyObject*)__pyx_mstate_global->__pyx_n_u_local));
       for (Py_ssize_t i = __pyx_nargs; i < 4; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("enqueue_morsel", 0, 4, 5, i); __PYX_ERR(0, 206, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("enqueue_morsel", 0, 4, 6, i); __PYX_ERR(0, 208, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
+        case  6:
+        values[5] = __Pyx_ArgRef_FASTCALL(__pyx_args, 5);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 208, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
         case  5:
         values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 206, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 208, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 206, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 208, __pyx_L3_error)
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 206, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 208, __pyx_L3_error)
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 206, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 208, __pyx_L3_error)
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 206, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 208, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
-      if (!values[4]) values[4] = __Pyx_NewRef(((PyObject*)__pyx_mstate_global->__pyx_n_u_local));
+      if (!values[5]) values[5] = __Pyx_NewRef(((PyObject*)__pyx_mstate_global->__pyx_n_u_local));
     }
     __pyx_v_batch = values[0];
-    __pyx_v_start_row = __Pyx_PyLong_As_int64_t(values[1]); if (unlikely((__pyx_v_start_row == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 206, __pyx_L3_error)
-    __pyx_v_num_rows = __Pyx_PyLong_As_int64_t(values[2]); if (unlikely((__pyx_v_num_rows == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 206, __pyx_L3_error)
-    __pyx_v_partition_id = __Pyx_PyLong_As_int(values[3]); if (unlikely((__pyx_v_partition_id == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 207, __pyx_L3_error)
-    __pyx_v_source = ((PyObject*)values[4]);
+    __pyx_v_start_row = __Pyx_PyLong_As_int64_t(values[1]); if (unlikely((__pyx_v_start_row == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 208, __pyx_L3_error)
+    __pyx_v_num_rows = __Pyx_PyLong_As_int64_t(values[2]); if (unlikely((__pyx_v_num_rows == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 208, __pyx_L3_error)
+    __pyx_v_partition_id = __Pyx_PyLong_As_int(values[3]); if (unlikely((__pyx_v_partition_id == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 209, __pyx_L3_error)
+    if (values[4]) {
+      __pyx_v_morsel_id = __Pyx_PyLong_As_int(values[4]); if (unlikely((__pyx_v_morsel_id == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 209, __pyx_L3_error)
+    } else {
+      __pyx_v_morsel_id = ((int)0);
+    }
+    __pyx_v_source = ((PyObject*)values[5]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("enqueue_morsel", 0, 4, 5, __pyx_nargs); __PYX_ERR(0, 206, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("enqueue_morsel", 0, 4, 6, __pyx_nargs); __PYX_ERR(0, 208, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9874,8 +9931,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_source), (&PyUnicode_Type), 1, "source", 1))) __PYX_ERR(0, 207, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqueue_morsel(((struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *)__pyx_v_self), __pyx_v_batch, __pyx_v_start_row, __pyx_v_num_rows, __pyx_v_partition_id, __pyx_v_source);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_source), (&PyUnicode_Type), 1, "source", 1))) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqueue_morsel(((struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *)__pyx_v_self), __pyx_v_batch, __pyx_v_start_row, __pyx_v_num_rows, __pyx_v_partition_id, __pyx_v_morsel_id, __pyx_v_source);
 
   /* function exit code */
   goto __pyx_L0;
@@ -9894,7 +9951,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqueue_morsel(struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *__pyx_v_self, PyObject *__pyx_v_batch, int64_t __pyx_v_start_row, int64_t __pyx_v_num_rows, int __pyx_v_partition_id, PyObject *__pyx_v_source) {
+static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqueue_morsel(struct __pyx_obj_5sabot_2_c_17task_slot_manager_TaskSlotManager *__pyx_v_self, PyObject *__pyx_v_batch, int64_t __pyx_v_start_row, int64_t __pyx_v_num_rows, int __pyx_v_partition_id, int __pyx_v_morsel_id, PyObject *__pyx_v_source) {
   sabot::Morsel __pyx_v_cpp_morsel;
   bool __pyx_v_success;
   PyObject *__pyx_r = NULL;
@@ -9908,17 +9965,17 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqu
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("enqueue_morsel", 0);
 
-  /* "sabot/_c/task_slot_manager.pyx":222
+  /* "sabot/_c/task_slot_manager.pyx":225
  *         """
  *         cdef CMorsel cpp_morsel
  *         cpp_morsel.batch = pyarrow_unwrap_batch(batch)             # <<<<<<<<<<<<<<
  *         cpp_morsel.start_row = start_row
  *         cpp_morsel.num_rows = num_rows
 */
-  __pyx_t_1 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 225, __pyx_L1_error)
   __pyx_v_cpp_morsel.batch = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_1);
 
-  /* "sabot/_c/task_slot_manager.pyx":223
+  /* "sabot/_c/task_slot_manager.pyx":226
  *         cdef CMorsel cpp_morsel
  *         cpp_morsel.batch = pyarrow_unwrap_batch(batch)
  *         cpp_morsel.start_row = start_row             # <<<<<<<<<<<<<<
@@ -9927,32 +9984,41 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqu
 */
   __pyx_v_cpp_morsel.start_row = __pyx_v_start_row;
 
-  /* "sabot/_c/task_slot_manager.pyx":224
+  /* "sabot/_c/task_slot_manager.pyx":227
  *         cpp_morsel.batch = pyarrow_unwrap_batch(batch)
  *         cpp_morsel.start_row = start_row
  *         cpp_morsel.num_rows = num_rows             # <<<<<<<<<<<<<<
  *         cpp_morsel.partition_id = partition_id
- *         cpp_morsel.source = CMorselSource.NETWORK if source == 'network' else CMorselSource.LOCAL
+ *         cpp_morsel.id = morsel_id
 */
   __pyx_v_cpp_morsel.num_rows = __pyx_v_num_rows;
 
-  /* "sabot/_c/task_slot_manager.pyx":225
+  /* "sabot/_c/task_slot_manager.pyx":228
  *         cpp_morsel.start_row = start_row
  *         cpp_morsel.num_rows = num_rows
  *         cpp_morsel.partition_id = partition_id             # <<<<<<<<<<<<<<
+ *         cpp_morsel.id = morsel_id
  *         cpp_morsel.source = CMorselSource.NETWORK if source == 'network' else CMorselSource.LOCAL
- * 
 */
   __pyx_v_cpp_morsel.partition_id = __pyx_v_partition_id;
 
-  /* "sabot/_c/task_slot_manager.pyx":226
+  /* "sabot/_c/task_slot_manager.pyx":229
  *         cpp_morsel.num_rows = num_rows
  *         cpp_morsel.partition_id = partition_id
+ *         cpp_morsel.id = morsel_id             # <<<<<<<<<<<<<<
+ *         cpp_morsel.source = CMorselSource.NETWORK if source == 'network' else CMorselSource.LOCAL
+ * 
+*/
+  __pyx_v_cpp_morsel.id = __pyx_v_morsel_id;
+
+  /* "sabot/_c/task_slot_manager.pyx":230
+ *         cpp_morsel.partition_id = partition_id
+ *         cpp_morsel.id = morsel_id
  *         cpp_morsel.source = CMorselSource.NETWORK if source == 'network' else CMorselSource.LOCAL             # <<<<<<<<<<<<<<
  * 
  *         cdef cbool success
 */
-  __pyx_t_3 = (__Pyx_PyUnicode_Equals(__pyx_v_source, __pyx_mstate_global->__pyx_n_u_network, Py_EQ)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_3 = (__Pyx_PyUnicode_Equals(__pyx_v_source, __pyx_mstate_global->__pyx_n_u_network, Py_EQ)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 230, __pyx_L1_error)
   if (__pyx_t_3) {
     __pyx_t_2 = sabot::MorselSource::NETWORK;
   } else {
@@ -9960,7 +10026,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqu
   }
   __pyx_v_cpp_morsel.source = __pyx_t_2;
 
-  /* "sabot/_c/task_slot_manager.pyx":229
+  /* "sabot/_c/task_slot_manager.pyx":233
  * 
  *         cdef cbool success
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -9974,7 +10040,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqu
       __Pyx_FastGIL_Remember();
       /*try:*/ {
 
-        /* "sabot/_c/task_slot_manager.pyx":230
+        /* "sabot/_c/task_slot_manager.pyx":234
  *         cdef cbool success
  *         with nogil:
  *             success = self._manager.EnqueueMorsel(cpp_morsel)             # <<<<<<<<<<<<<<
@@ -9984,7 +10050,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqu
         __pyx_v_success = __pyx_v_self->_manager->EnqueueMorsel(__pyx_v_cpp_morsel);
       }
 
-      /* "sabot/_c/task_slot_manager.pyx":229
+      /* "sabot/_c/task_slot_manager.pyx":233
  * 
  *         cdef cbool success
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10001,7 +10067,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqu
       }
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":232
+  /* "sabot/_c/task_slot_manager.pyx":236
  *             success = self._manager.EnqueueMorsel(cpp_morsel)
  * 
  *         return success             # <<<<<<<<<<<<<<
@@ -10009,17 +10075,17 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqu
  *     def add_slots(self, int count):
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_v_success); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 232, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_v_success); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_r = __pyx_t_4;
   __pyx_t_4 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_c/task_slot_manager.pyx":206
+  /* "sabot/_c/task_slot_manager.pyx":208
  *         return results
  * 
  *     def enqueue_morsel(self, object batch, int64_t start_row, int64_t num_rows,             # <<<<<<<<<<<<<<
- *                        int partition_id, str source='local'):
+ *                        int partition_id, int morsel_id=0, str source='local'):
  *         """
 */
 
@@ -10034,7 +10100,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_6enqu
   return __pyx_r;
 }
 
-/* "sabot/_c/task_slot_manager.pyx":234
+/* "sabot/_c/task_slot_manager.pyx":238
  *         return success
  * 
  *     def add_slots(self, int count):             # <<<<<<<<<<<<<<
@@ -10082,32 +10148,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_count,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 234, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 238, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 234, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 238, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "add_slots", 0) < 0) __PYX_ERR(0, 234, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "add_slots", 0) < 0) __PYX_ERR(0, 238, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("add_slots", 1, 1, 1, i); __PYX_ERR(0, 234, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("add_slots", 1, 1, 1, i); __PYX_ERR(0, 238, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 234, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 238, __pyx_L3_error)
     }
-    __pyx_v_count = __Pyx_PyLong_As_int(values[0]); if (unlikely((__pyx_v_count == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 234, __pyx_L3_error)
+    __pyx_v_count = __Pyx_PyLong_As_int(values[0]); if (unlikely((__pyx_v_count == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 238, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("add_slots", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 234, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("add_slots", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 238, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10133,7 +10199,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_8add_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("add_slots", 0);
 
-  /* "sabot/_c/task_slot_manager.pyx":241
+  /* "sabot/_c/task_slot_manager.pyx":245
  *             count: Number of slots to add
  *         """
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10147,7 +10213,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_8add_
       __Pyx_FastGIL_Remember();
       /*try:*/ {
 
-        /* "sabot/_c/task_slot_manager.pyx":242
+        /* "sabot/_c/task_slot_manager.pyx":246
  *         """
  *         with nogil:
  *             self._manager.AddSlots(count)             # <<<<<<<<<<<<<<
@@ -10157,7 +10223,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_8add_
         __pyx_v_self->_manager->AddSlots(__pyx_v_count);
       }
 
-      /* "sabot/_c/task_slot_manager.pyx":241
+      /* "sabot/_c/task_slot_manager.pyx":245
  *             count: Number of slots to add
  *         """
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10174,7 +10240,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_8add_
       }
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":234
+  /* "sabot/_c/task_slot_manager.pyx":238
  *         return success
  * 
  *     def add_slots(self, int count):             # <<<<<<<<<<<<<<
@@ -10189,7 +10255,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_8add_
   return __pyx_r;
 }
 
-/* "sabot/_c/task_slot_manager.pyx":244
+/* "sabot/_c/task_slot_manager.pyx":248
  *             self._manager.AddSlots(count)
  * 
  *     def remove_slots(self, int count):             # <<<<<<<<<<<<<<
@@ -10237,32 +10303,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_count,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 244, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 248, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 244, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 248, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "remove_slots", 0) < 0) __PYX_ERR(0, 244, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "remove_slots", 0) < 0) __PYX_ERR(0, 248, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("remove_slots", 1, 1, 1, i); __PYX_ERR(0, 244, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("remove_slots", 1, 1, 1, i); __PYX_ERR(0, 248, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 244, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 248, __pyx_L3_error)
     }
-    __pyx_v_count = __Pyx_PyLong_As_int(values[0]); if (unlikely((__pyx_v_count == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 244, __pyx_L3_error)
+    __pyx_v_count = __Pyx_PyLong_As_int(values[0]); if (unlikely((__pyx_v_count == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 248, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("remove_slots", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 244, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("remove_slots", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 248, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10288,7 +10354,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_10rem
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("remove_slots", 0);
 
-  /* "sabot/_c/task_slot_manager.pyx":253
+  /* "sabot/_c/task_slot_manager.pyx":257
  *             count: Number of slots to remove
  *         """
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10302,7 +10368,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_10rem
       __Pyx_FastGIL_Remember();
       /*try:*/ {
 
-        /* "sabot/_c/task_slot_manager.pyx":254
+        /* "sabot/_c/task_slot_manager.pyx":258
  *         """
  *         with nogil:
  *             self._manager.RemoveSlots(count)             # <<<<<<<<<<<<<<
@@ -10312,7 +10378,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_10rem
         __pyx_v_self->_manager->RemoveSlots(__pyx_v_count);
       }
 
-      /* "sabot/_c/task_slot_manager.pyx":253
+      /* "sabot/_c/task_slot_manager.pyx":257
  *             count: Number of slots to remove
  *         """
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10329,7 +10395,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_10rem
       }
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":244
+  /* "sabot/_c/task_slot_manager.pyx":248
  *             self._manager.AddSlots(count)
  * 
  *     def remove_slots(self, int count):             # <<<<<<<<<<<<<<
@@ -10344,7 +10410,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_10rem
   return __pyx_r;
 }
 
-/* "sabot/_c/task_slot_manager.pyx":256
+/* "sabot/_c/task_slot_manager.pyx":260
  *             self._manager.RemoveSlots(count)
  * 
  *     @property             # <<<<<<<<<<<<<<
@@ -10377,7 +10443,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_9num_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "sabot/_c/task_slot_manager.pyx":260
+  /* "sabot/_c/task_slot_manager.pyx":264
  *         """Get current number of slots."""
  *         cdef int n
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10391,7 +10457,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_9num_
       __Pyx_FastGIL_Remember();
       /*try:*/ {
 
-        /* "sabot/_c/task_slot_manager.pyx":261
+        /* "sabot/_c/task_slot_manager.pyx":265
  *         cdef int n
  *         with nogil:
  *             n = self._manager.GetNumSlots()             # <<<<<<<<<<<<<<
@@ -10401,7 +10467,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_9num_
         __pyx_v_n = __pyx_v_self->_manager->GetNumSlots();
       }
 
-      /* "sabot/_c/task_slot_manager.pyx":260
+      /* "sabot/_c/task_slot_manager.pyx":264
  *         """Get current number of slots."""
  *         cdef int n
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10418,7 +10484,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_9num_
       }
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":262
+  /* "sabot/_c/task_slot_manager.pyx":266
  *         with nogil:
  *             n = self._manager.GetNumSlots()
  *         return n             # <<<<<<<<<<<<<<
@@ -10426,13 +10492,13 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_9num_
  *     @property
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyLong_From_int(__pyx_v_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyLong_From_int(__pyx_v_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 266, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_c/task_slot_manager.pyx":256
+  /* "sabot/_c/task_slot_manager.pyx":260
  *             self._manager.RemoveSlots(count)
  * 
  *     @property             # <<<<<<<<<<<<<<
@@ -10451,7 +10517,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_9num_
   return __pyx_r;
 }
 
-/* "sabot/_c/task_slot_manager.pyx":264
+/* "sabot/_c/task_slot_manager.pyx":268
  *         return n
  * 
  *     @property             # <<<<<<<<<<<<<<
@@ -10484,7 +10550,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_15ava
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "sabot/_c/task_slot_manager.pyx":268
+  /* "sabot/_c/task_slot_manager.pyx":272
  *         """Get number of idle (available) slots."""
  *         cdef int n
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10498,7 +10564,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_15ava
       __Pyx_FastGIL_Remember();
       /*try:*/ {
 
-        /* "sabot/_c/task_slot_manager.pyx":269
+        /* "sabot/_c/task_slot_manager.pyx":273
  *         cdef int n
  *         with nogil:
  *             n = self._manager.GetAvailableSlots()             # <<<<<<<<<<<<<<
@@ -10508,7 +10574,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_15ava
         __pyx_v_n = __pyx_v_self->_manager->GetAvailableSlots();
       }
 
-      /* "sabot/_c/task_slot_manager.pyx":268
+      /* "sabot/_c/task_slot_manager.pyx":272
  *         """Get number of idle (available) slots."""
  *         cdef int n
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10525,7 +10591,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_15ava
       }
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":270
+  /* "sabot/_c/task_slot_manager.pyx":274
  *         with nogil:
  *             n = self._manager.GetAvailableSlots()
  *         return n             # <<<<<<<<<<<<<<
@@ -10533,13 +10599,13 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_15ava
  *     @property
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyLong_From_int(__pyx_v_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyLong_From_int(__pyx_v_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_c/task_slot_manager.pyx":264
+  /* "sabot/_c/task_slot_manager.pyx":268
  *         return n
  * 
  *     @property             # <<<<<<<<<<<<<<
@@ -10558,7 +10624,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_15ava
   return __pyx_r;
 }
 
-/* "sabot/_c/task_slot_manager.pyx":272
+/* "sabot/_c/task_slot_manager.pyx":276
  *         return n
  * 
  *     @property             # <<<<<<<<<<<<<<
@@ -10591,7 +10657,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_11que
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "sabot/_c/task_slot_manager.pyx":276
+  /* "sabot/_c/task_slot_manager.pyx":280
  *         """Get current queue depth (enqueued - processed)."""
  *         cdef int64_t depth
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10605,7 +10671,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_11que
       __Pyx_FastGIL_Remember();
       /*try:*/ {
 
-        /* "sabot/_c/task_slot_manager.pyx":277
+        /* "sabot/_c/task_slot_manager.pyx":281
  *         cdef int64_t depth
  *         with nogil:
  *             depth = self._manager.GetQueueDepth()             # <<<<<<<<<<<<<<
@@ -10615,7 +10681,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_11que
         __pyx_v_depth = __pyx_v_self->_manager->GetQueueDepth();
       }
 
-      /* "sabot/_c/task_slot_manager.pyx":276
+      /* "sabot/_c/task_slot_manager.pyx":280
  *         """Get current queue depth (enqueued - processed)."""
  *         cdef int64_t depth
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10632,7 +10698,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_11que
       }
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":278
+  /* "sabot/_c/task_slot_manager.pyx":282
  *         with nogil:
  *             depth = self._manager.GetQueueDepth()
  *         return depth             # <<<<<<<<<<<<<<
@@ -10640,13 +10706,13 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_11que
  *     def get_slot_stats(self):
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyLong_From_int64_t(__pyx_v_depth); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyLong_From_int64_t(__pyx_v_depth); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 282, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_c/task_slot_manager.pyx":272
+  /* "sabot/_c/task_slot_manager.pyx":276
  *         return n
  * 
  *     @property             # <<<<<<<<<<<<<<
@@ -10665,7 +10731,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_11que
   return __pyx_r;
 }
 
-/* "sabot/_c/task_slot_manager.pyx":280
+/* "sabot/_c/task_slot_manager.pyx":284
  *         return depth
  * 
  *     def get_slot_stats(self):             # <<<<<<<<<<<<<<
@@ -10733,7 +10799,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_12get
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_slot_stats", 0);
 
-  /* "sabot/_c/task_slot_manager.pyx":294
+  /* "sabot/_c/task_slot_manager.pyx":298
  *         """
  *         cdef vector[CSlotStats] cpp_stats
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10747,7 +10813,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_12get
       __Pyx_FastGIL_Remember();
       /*try:*/ {
 
-        /* "sabot/_c/task_slot_manager.pyx":295
+        /* "sabot/_c/task_slot_manager.pyx":299
  *         cdef vector[CSlotStats] cpp_stats
  *         with nogil:
  *             cpp_stats = self._manager.GetSlotStats()             # <<<<<<<<<<<<<<
@@ -10757,7 +10823,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_12get
         __pyx_v_cpp_stats = __pyx_v_self->_manager->GetSlotStats();
       }
 
-      /* "sabot/_c/task_slot_manager.pyx":294
+      /* "sabot/_c/task_slot_manager.pyx":298
  *         """
  *         cdef vector[CSlotStats] cpp_stats
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10774,19 +10840,19 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_12get
       }
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":297
+  /* "sabot/_c/task_slot_manager.pyx":301
  *             cpp_stats = self._manager.GetSlotStats()
  * 
  *         stats = []             # <<<<<<<<<<<<<<
  *         for i in range(cpp_stats.size()):
  *             stats.append({
 */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 301, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_stats = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_c/task_slot_manager.pyx":298
+  /* "sabot/_c/task_slot_manager.pyx":302
  * 
  *         stats = []
  *         for i in range(cpp_stats.size()):             # <<<<<<<<<<<<<<
@@ -10798,92 +10864,92 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_12get
   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
     __pyx_v_i = __pyx_t_4;
 
-    /* "sabot/_c/task_slot_manager.pyx":300
+    /* "sabot/_c/task_slot_manager.pyx":304
  *         for i in range(cpp_stats.size()):
  *             stats.append({
  *                 'slot_id': cpp_stats[i].slot_id,             # <<<<<<<<<<<<<<
  *                 'busy': cpp_stats[i].busy,
  *                 'morsels_processed': cpp_stats[i].morsels_processed,
 */
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 300, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 304, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = __Pyx_PyLong_From_int((__pyx_v_cpp_stats[__pyx_v_i]).slot_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 300, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyLong_From_int((__pyx_v_cpp_stats[__pyx_v_i]).slot_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 304, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_slot_id, __pyx_t_5) < 0) __PYX_ERR(0, 300, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_slot_id, __pyx_t_5) < 0) __PYX_ERR(0, 304, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "sabot/_c/task_slot_manager.pyx":301
+    /* "sabot/_c/task_slot_manager.pyx":305
  *             stats.append({
  *                 'slot_id': cpp_stats[i].slot_id,
  *                 'busy': cpp_stats[i].busy,             # <<<<<<<<<<<<<<
  *                 'morsels_processed': cpp_stats[i].morsels_processed,
  *                 'total_processing_time_us': cpp_stats[i].total_processing_time_us,
 */
-    __pyx_t_5 = __Pyx_PyBool_FromLong((__pyx_v_cpp_stats[__pyx_v_i]).busy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 301, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyBool_FromLong((__pyx_v_cpp_stats[__pyx_v_i]).busy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 305, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_busy, __pyx_t_5) < 0) __PYX_ERR(0, 300, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_busy, __pyx_t_5) < 0) __PYX_ERR(0, 304, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "sabot/_c/task_slot_manager.pyx":302
+    /* "sabot/_c/task_slot_manager.pyx":306
  *                 'slot_id': cpp_stats[i].slot_id,
  *                 'busy': cpp_stats[i].busy,
  *                 'morsels_processed': cpp_stats[i].morsels_processed,             # <<<<<<<<<<<<<<
  *                 'total_processing_time_us': cpp_stats[i].total_processing_time_us,
  *                 'local_morsels': cpp_stats[i].local_morsels,
 */
-    __pyx_t_5 = __Pyx_PyLong_From_int64_t((__pyx_v_cpp_stats[__pyx_v_i]).morsels_processed); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 302, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyLong_From_int64_t((__pyx_v_cpp_stats[__pyx_v_i]).morsels_processed); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 306, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_morsels_processed, __pyx_t_5) < 0) __PYX_ERR(0, 300, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_morsels_processed, __pyx_t_5) < 0) __PYX_ERR(0, 304, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "sabot/_c/task_slot_manager.pyx":303
+    /* "sabot/_c/task_slot_manager.pyx":307
  *                 'busy': cpp_stats[i].busy,
  *                 'morsels_processed': cpp_stats[i].morsels_processed,
  *                 'total_processing_time_us': cpp_stats[i].total_processing_time_us,             # <<<<<<<<<<<<<<
  *                 'local_morsels': cpp_stats[i].local_morsels,
  *                 'network_morsels': cpp_stats[i].network_morsels,
 */
-    __pyx_t_5 = __Pyx_PyLong_From_int64_t((__pyx_v_cpp_stats[__pyx_v_i]).total_processing_time_us); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 303, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyLong_From_int64_t((__pyx_v_cpp_stats[__pyx_v_i]).total_processing_time_us); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 307, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_total_processing_time_us, __pyx_t_5) < 0) __PYX_ERR(0, 300, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_total_processing_time_us, __pyx_t_5) < 0) __PYX_ERR(0, 304, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "sabot/_c/task_slot_manager.pyx":304
+    /* "sabot/_c/task_slot_manager.pyx":308
  *                 'morsels_processed': cpp_stats[i].morsels_processed,
  *                 'total_processing_time_us': cpp_stats[i].total_processing_time_us,
  *                 'local_morsels': cpp_stats[i].local_morsels,             # <<<<<<<<<<<<<<
  *                 'network_morsels': cpp_stats[i].network_morsels,
  *             })
 */
-    __pyx_t_5 = __Pyx_PyLong_From_int64_t((__pyx_v_cpp_stats[__pyx_v_i]).local_morsels); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 304, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyLong_From_int64_t((__pyx_v_cpp_stats[__pyx_v_i]).local_morsels); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 308, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_local_morsels, __pyx_t_5) < 0) __PYX_ERR(0, 300, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_local_morsels, __pyx_t_5) < 0) __PYX_ERR(0, 304, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "sabot/_c/task_slot_manager.pyx":305
+    /* "sabot/_c/task_slot_manager.pyx":309
  *                 'total_processing_time_us': cpp_stats[i].total_processing_time_us,
  *                 'local_morsels': cpp_stats[i].local_morsels,
  *                 'network_morsels': cpp_stats[i].network_morsels,             # <<<<<<<<<<<<<<
  *             })
  * 
 */
-    __pyx_t_5 = __Pyx_PyLong_From_int64_t((__pyx_v_cpp_stats[__pyx_v_i]).network_morsels); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 305, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyLong_From_int64_t((__pyx_v_cpp_stats[__pyx_v_i]).network_morsels); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 309, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_network_morsels, __pyx_t_5) < 0) __PYX_ERR(0, 300, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_network_morsels, __pyx_t_5) < 0) __PYX_ERR(0, 304, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "sabot/_c/task_slot_manager.pyx":299
+    /* "sabot/_c/task_slot_manager.pyx":303
  *         stats = []
  *         for i in range(cpp_stats.size()):
  *             stats.append({             # <<<<<<<<<<<<<<
  *                 'slot_id': cpp_stats[i].slot_id,
  *                 'busy': cpp_stats[i].busy,
 */
-    __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_stats, __pyx_t_1); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 299, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_stats, __pyx_t_1); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 303, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":308
+  /* "sabot/_c/task_slot_manager.pyx":312
  *             })
  * 
  *         return stats             # <<<<<<<<<<<<<<
@@ -10895,7 +10961,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_12get
   __pyx_r = __pyx_v_stats;
   goto __pyx_L0;
 
-  /* "sabot/_c/task_slot_manager.pyx":280
+  /* "sabot/_c/task_slot_manager.pyx":284
  *         return depth
  * 
  *     def get_slot_stats(self):             # <<<<<<<<<<<<<<
@@ -10916,7 +10982,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_12get
   return __pyx_r;
 }
 
-/* "sabot/_c/task_slot_manager.pyx":310
+/* "sabot/_c/task_slot_manager.pyx":314
  *         return stats
  * 
  *     def shutdown(self):             # <<<<<<<<<<<<<<
@@ -10973,7 +11039,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_14shu
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("shutdown", 0);
 
-  /* "sabot/_c/task_slot_manager.pyx":312
+  /* "sabot/_c/task_slot_manager.pyx":316
  *     def shutdown(self):
  *         """Shutdown all slots and wait for completion."""
  *         if self._manager != NULL:             # <<<<<<<<<<<<<<
@@ -10982,14 +11048,14 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_14shu
   __pyx_t_1 = (__pyx_v_self->_manager != NULL);
   if (__pyx_t_1) {
 
-    /* "sabot/_c/task_slot_manager.pyx":313
+    /* "sabot/_c/task_slot_manager.pyx":317
  *         """Shutdown all slots and wait for completion."""
  *         if self._manager != NULL:
  *             self._manager.Shutdown()             # <<<<<<<<<<<<<<
 */
     __pyx_v_self->_manager->Shutdown();
 
-    /* "sabot/_c/task_slot_manager.pyx":312
+    /* "sabot/_c/task_slot_manager.pyx":316
  *     def shutdown(self):
  *         """Shutdown all slots and wait for completion."""
  *         if self._manager != NULL:             # <<<<<<<<<<<<<<
@@ -10997,7 +11063,7 @@ static PyObject *__pyx_pf_5sabot_2_c_17task_slot_manager_15TaskSlotManager_14shu
 */
   }
 
-  /* "sabot/_c/task_slot_manager.pyx":310
+  /* "sabot/_c/task_slot_manager.pyx":314
  *         return stats
  * 
  *     def shutdown(self):             # <<<<<<<<<<<<<<
@@ -11444,23 +11510,23 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_2_c_17task_slot_manager_TaskSlotManager_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager)) __PYX_ERR(0, 105, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_2_c_17task_slot_manager_TaskSlotManager_spec, __pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager) < 0) __PYX_ERR(0, 105, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_2_c_17task_slot_manager_TaskSlotManager_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager)) __PYX_ERR(0, 106, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_2_c_17task_slot_manager_TaskSlotManager_spec, __pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager) < 0) __PYX_ERR(0, 106, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager = &__pyx_type_5sabot_2_c_17task_slot_manager_TaskSlotManager;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager) < 0) __PYX_ERR(0, 105, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager) < 0) __PYX_ERR(0, 106, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager->tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager->tp_getattro = PyObject_GenericGetAttr;
   }
   #endif
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_TaskSlotManager, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager) < 0) __PYX_ERR(0, 105, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager) < 0) __PYX_ERR(0, 105, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_TaskSlotManager, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager) < 0) __PYX_ERR(0, 106, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager) < 0) __PYX_ERR(0, 106, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -12876,7 +12942,7 @@ __Pyx_RefNannySetupContext("PyInit_task_slot_manager", 0);
   if (unlikely((__Pyx_modinit_function_import_code(__pyx_mstate) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
   /*--- Execution code ---*/
 
-  /* "sabot/_c/task_slot_manager.pyx":83
+  /* "sabot/_c/task_slot_manager.pyx":84
  * 
  * # Global callback storage
  * cdef object _current_python_callback = None             # <<<<<<<<<<<<<<
@@ -12888,77 +12954,77 @@ __Pyx_RefNannySetupContext("PyInit_task_slot_manager", 0);
   __Pyx_DECREF_SET(__pyx_v_5sabot_2_c_17task_slot_manager__current_python_callback, Py_None);
   __Pyx_GIVEREF(Py_None);
 
-  /* "sabot/_c/task_slot_manager.pyx":153
+  /* "sabot/_c/task_slot_manager.pyx":154
  *             del self._manager
  * 
  *     def execute_morsels(self, list morsels, object processor_func):             # <<<<<<<<<<<<<<
  *         """
  *         Execute morsels using task slots.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_5execute_morsels, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TaskSlotManager_execute_morsels, NULL, __pyx_mstate_global->__pyx_n_u_sabot__c_task_slot_manager, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_5execute_morsels, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TaskSlotManager_execute_morsels, NULL, __pyx_mstate_global->__pyx_n_u_sabot__c_task_slot_manager, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager, __pyx_mstate_global->__pyx_n_u_execute_morsels, __pyx_t_2) < 0) __PYX_ERR(0, 153, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager, __pyx_mstate_global->__pyx_n_u_execute_morsels, __pyx_t_2) < 0) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_c/task_slot_manager.pyx":206
+  /* "sabot/_c/task_slot_manager.pyx":208
  *         return results
  * 
  *     def enqueue_morsel(self, object batch, int64_t start_row, int64_t num_rows,             # <<<<<<<<<<<<<<
- *                        int partition_id, str source='local'):
+ *                        int partition_id, int morsel_id=0, str source='local'):
  *         """
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_7enqueue_morsel, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TaskSlotManager_enqueue_morsel, NULL, __pyx_mstate_global->__pyx_n_u_sabot__c_task_slot_manager, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 206, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_7enqueue_morsel, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TaskSlotManager_enqueue_morsel, NULL, __pyx_mstate_global->__pyx_n_u_sabot__c_task_slot_manager, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 208, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_mstate_global->__pyx_tuple[0]);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager, __pyx_mstate_global->__pyx_n_u_enqueue_morsel, __pyx_t_2) < 0) __PYX_ERR(0, 206, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager, __pyx_mstate_global->__pyx_n_u_enqueue_morsel, __pyx_t_2) < 0) __PYX_ERR(0, 208, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_c/task_slot_manager.pyx":234
+  /* "sabot/_c/task_slot_manager.pyx":238
  *         return success
  * 
  *     def add_slots(self, int count):             # <<<<<<<<<<<<<<
  *         """
  *         Add worker slots (elastic scale up).
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_9add_slots, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TaskSlotManager_add_slots, NULL, __pyx_mstate_global->__pyx_n_u_sabot__c_task_slot_manager, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_9add_slots, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TaskSlotManager_add_slots, NULL, __pyx_mstate_global->__pyx_n_u_sabot__c_task_slot_manager, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager, __pyx_mstate_global->__pyx_n_u_add_slots, __pyx_t_2) < 0) __PYX_ERR(0, 234, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager, __pyx_mstate_global->__pyx_n_u_add_slots, __pyx_t_2) < 0) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_c/task_slot_manager.pyx":244
+  /* "sabot/_c/task_slot_manager.pyx":248
  *             self._manager.AddSlots(count)
  * 
  *     def remove_slots(self, int count):             # <<<<<<<<<<<<<<
  *         """
  *         Remove worker slots (elastic scale down).
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_11remove_slots, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TaskSlotManager_remove_slots, NULL, __pyx_mstate_global->__pyx_n_u_sabot__c_task_slot_manager, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 244, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_11remove_slots, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TaskSlotManager_remove_slots, NULL, __pyx_mstate_global->__pyx_n_u_sabot__c_task_slot_manager, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager, __pyx_mstate_global->__pyx_n_u_remove_slots, __pyx_t_2) < 0) __PYX_ERR(0, 244, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager, __pyx_mstate_global->__pyx_n_u_remove_slots, __pyx_t_2) < 0) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_c/task_slot_manager.pyx":280
+  /* "sabot/_c/task_slot_manager.pyx":284
  *         return depth
  * 
  *     def get_slot_stats(self):             # <<<<<<<<<<<<<<
  *         """
  *         Get per-slot statistics.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_13get_slot_stats, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TaskSlotManager_get_slot_stats, NULL, __pyx_mstate_global->__pyx_n_u_sabot__c_task_slot_manager, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 280, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_13get_slot_stats, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TaskSlotManager_get_slot_stats, NULL, __pyx_mstate_global->__pyx_n_u_sabot__c_task_slot_manager, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager, __pyx_mstate_global->__pyx_n_u_get_slot_stats, __pyx_t_2) < 0) __PYX_ERR(0, 280, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager, __pyx_mstate_global->__pyx_n_u_get_slot_stats, __pyx_t_2) < 0) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_c/task_slot_manager.pyx":310
+  /* "sabot/_c/task_slot_manager.pyx":314
  *         return stats
  * 
  *     def shutdown(self):             # <<<<<<<<<<<<<<
  *         """Shutdown all slots and wait for completion."""
  *         if self._manager != NULL:
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_15shutdown, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TaskSlotManager_shutdown, NULL, __pyx_mstate_global->__pyx_n_u_sabot__c_task_slot_manager, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 310, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_2_c_17task_slot_manager_15TaskSlotManager_15shutdown, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TaskSlotManager_shutdown, NULL, __pyx_mstate_global->__pyx_n_u_sabot__c_task_slot_manager, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 314, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager, __pyx_mstate_global->__pyx_n_u_shutdown, __pyx_t_2) < 0) __PYX_ERR(0, 310, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_2_c_17task_slot_manager_TaskSlotManager, __pyx_mstate_global->__pyx_n_u_shutdown, __pyx_t_2) < 0) __PYX_ERR(0, 314, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
@@ -13091,6 +13157,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_main, sizeof(__pyx_k_main), 0, 1, 1}, /* PyObject cname: __pyx_n_u_main */
   {__pyx_k_module, sizeof(__pyx_k_module), 0, 1, 1}, /* PyObject cname: __pyx_n_u_module */
   {__pyx_k_morsel_data, sizeof(__pyx_k_morsel_data), 0, 1, 1}, /* PyObject cname: __pyx_n_u_morsel_data */
+  {__pyx_k_morsel_id, sizeof(__pyx_k_morsel_id), 0, 1, 1}, /* PyObject cname: __pyx_n_u_morsel_id */
   {__pyx_k_morsels, sizeof(__pyx_k_morsels), 0, 1, 1}, /* PyObject cname: __pyx_n_u_morsels */
   {__pyx_k_morsels_processed, sizeof(__pyx_k_morsels_processed), 0, 1, 1}, /* PyObject cname: __pyx_n_u_morsels_processed */
   {__pyx_k_name, sizeof(__pyx_k_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_name */
@@ -13139,8 +13206,8 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, c
 
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
-  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 175, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 199, __pyx_L1_error)
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 201, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -13153,14 +13220,14 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "sabot/_c/task_slot_manager.pyx":206
+  /* "sabot/_c/task_slot_manager.pyx":208
  *         return results
  * 
  *     def enqueue_morsel(self, object batch, int64_t start_row, int64_t num_rows,             # <<<<<<<<<<<<<<
- *                        int partition_id, str source='local'):
+ *                        int partition_id, int morsel_id=0, str source='local'):
  *         """
 */
-  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(1, __pyx_mstate_global->__pyx_n_u_local); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 206, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(2, __pyx_mstate_global->__pyx_int_0, __pyx_mstate_global->__pyx_n_u_local); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 208, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[0]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[0]);
   __Pyx_RefNannyFinishContext();
@@ -13176,6 +13243,7 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate->__pyx_umethod_PyDict_Type_pop.type = (PyObject*)&PyDict_Type;
   __pyx_mstate->__pyx_umethod_PyDict_Type_pop.method_name = &__pyx_mstate->__pyx_n_u_pop;
   if (__Pyx_InitStrings(__pyx_string_tab, __pyx_mstate->__pyx_string_tab, __pyx_string_tab_encodings) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  __pyx_mstate->__pyx_int_0 = PyLong_FromLong(0); if (unlikely(!__pyx_mstate->__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -13206,32 +13274,32 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 14, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 153, 193};
+    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 14, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 154, 200};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_morsels, __pyx_mstate->__pyx_n_u_processor_func, __pyx_mstate->__pyx_n_u_cpp_morsels, __pyx_mstate->__pyx_n_u_cpp_morsel, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_morsel_data, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_start_row, __pyx_mstate->__pyx_n_u_num_rows, __pyx_mstate->__pyx_n_u_partition_id, __pyx_mstate->__pyx_n_u_results_cpp, __pyx_mstate->__pyx_n_u_results, __pyx_mstate->__pyx_n_u_py_batch};
-    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__c_task_slot_manager_pyx, __pyx_mstate->__pyx_n_u_execute_morsels, __pyx_k_A_C_iq_j_q_i_31A_m1_l_a_Q_z_1_i, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__c_task_slot_manager_pyx, __pyx_mstate->__pyx_n_u_execute_morsels, __pyx_k_A_C_iq_j_q_i_31A_m1_l_a_fA_Q_z_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {6, 0, 0, 8, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 206, 83};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_start_row, __pyx_mstate->__pyx_n_u_num_rows, __pyx_mstate->__pyx_n_u_partition_id, __pyx_mstate->__pyx_n_u_source, __pyx_mstate->__pyx_n_u_cpp_morsel, __pyx_mstate->__pyx_n_u_success};
-    __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__c_task_slot_manager_pyx, __pyx_mstate->__pyx_n_u_enqueue_morsel, __pyx_k_A45_q_q_a_M_WC_d_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
+    const __Pyx_PyCode_New_function_description descr = {7, 0, 0, 9, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 208, 92};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_start_row, __pyx_mstate->__pyx_n_u_num_rows, __pyx_mstate->__pyx_n_u_partition_id, __pyx_mstate->__pyx_n_u_morsel_id, __pyx_mstate->__pyx_n_u_source, __pyx_mstate->__pyx_n_u_cpp_morsel, __pyx_mstate->__pyx_n_u_success};
+    __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__c_task_slot_manager_pyx, __pyx_mstate->__pyx_n_u_enqueue_morsel, __pyx_k_A7EQ_q_q_a_M_WC_d_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 234, 18};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 238, 18};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_count};
     __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__c_task_slot_manager_pyx, __pyx_mstate->__pyx_n_u_add_slots, __pyx_k_A_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 244, 18};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 248, 18};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_count};
     __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__c_task_slot_manager_pyx, __pyx_mstate->__pyx_n_u_remove_slots, __pyx_k_A_Qa, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 280, 118};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 284, 118};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_cpp_stats, __pyx_mstate->__pyx_n_u_stats, __pyx_mstate->__pyx_n_u_i};
     __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__c_task_slot_manager_pyx, __pyx_mstate->__pyx_n_u_get_slot_stats, __pyx_k_A_I_E_ay_Q_9ARq_A_Yar_IQb_2Q_9AR, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 310, 22};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 314, 22};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__c_task_slot_manager_pyx, __pyx_mstate->__pyx_n_u_shutdown, __pyx_k_A_4z_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
   }
