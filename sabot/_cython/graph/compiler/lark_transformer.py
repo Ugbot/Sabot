@@ -200,11 +200,17 @@ class LarkToSabotTransformer(Transformer):
 
     def skip_clause(self, items):
         """skip_clause → SKIP expression"""
-        return {'skip': items[0]}
+        expr = items[0]
+        # Extract integer value from Literal expression
+        value = expr.value if isinstance(expr, Literal) else expr
+        return {'skip': value}
 
     def limit_clause(self, items):
         """limit_clause → LIMIT expression"""
-        return {'limit': items[0]}
+        expr = items[0]
+        # Extract integer value from Literal expression
+        value = expr.value if isinstance(expr, Literal) else expr
+        return {'limit': value}
 
     def where_clause(self, items):
         """where_clause → WHERE expression"""

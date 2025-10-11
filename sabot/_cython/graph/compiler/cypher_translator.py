@@ -453,8 +453,10 @@ class CypherTranslator:
         """
         Apply WHERE clause filter to result table.
 
-        This is simplified - full implementation would evaluate
-        arbitrary expressions against table columns.
+        Supports:
+        - Property comparisons: a.age > 18, b.name = 'Alice'
+        - Logical operators: AND, OR, NOT
+        - Function calls: lower(a.name) = 'alice'
 
         Args:
             table: Result table from pattern matching
@@ -464,23 +466,164 @@ class CypherTranslator:
         Returns:
             Filtered table
         """
-        # For now, only support simple comparisons like a.age > 18
-        if isinstance(where, Comparison):
-            if isinstance(where.left, PropertyAccess):
-                # Map variable to column name
-                var_name = where.left.variable
-                prop_name = where.left.property_name
+        # Evaluate WHERE expression to get a boolean mask
+        mask = self._evaluate_where_expression(table, where)
 
-                # Find column name in result table
-                # Pattern match results use names like 'a_id', 'b_id', etc.
-                # For properties, we'd need to join back to vertex table
-                # This is simplified - just filter if column exists
+        # Apply filter
+        return table.filter(mask)
 
-                # For now, skip property filters
-                # TODO: Implement full WHERE clause evaluation
-                pass
+    def _evaluate_where_expression(self, table: pa.Table, expr: Expression) -> pa.Array:
+        """
+        Evaluate WHERE expression to produce boolean mask.
 
-        return table
+        Args:
+            table: Result table from pattern matching
+            expr: WHERE clause expression
+
+        Returns:
+            Boolean Arrow array (mask) for filtering
+        """
+        if isinstance(expr, Comparison):
+            # Comparison: a.age > 18, b.name = 'Alice', etc.
+            left_val = self._evaluate_filter_operand(table, expr.left)
+            right_val = self._evaluate_filter_operand(table, expr.right)
+
+            # Apply comparison operator
+            op = expr.operator.lower()
+            if op == '=':
+                return pc.equal(left_val, right_val)
+            elif op == '!=':
+                return pc.not_equal(left_val, right_val)
+            elif op == '<':
+                return pc.less(left_val, right_val)
+            elif op == '<=':
+                return pc.less_equal(left_val, right_val)
+            elif op == '>':
+                return pc.greater(left_val, right_val)
+            elif op == '>=':
+                return pc.greater_equal(left_val, right_val)
+            else:
+                raise NotImplementedError(f"Comparison operator not supported: {op}")
+
+        elif isinstance(expr, BinaryOp):
+            # Logical operator: AND, OR
+            left_mask = self._evaluate_where_expression(table, expr.left)
+            right_mask = self._evaluate_where_expression(table, expr.right)
+
+            op = expr.operator.upper()
+            if op == 'AND':
+                return pc.and_(left_mask, right_mask)
+            elif op == 'OR':
+                return pc.or_(left_mask, right_mask)
+            else:
+                raise NotImplementedError(f"Logical operator not supported: {op}")
+
+        elif isinstance(expr, UnaryOp):
+            # Unary operator: NOT
+            if expr.operator.upper() == 'NOT':
+                inner_mask = self._evaluate_where_expression(table, expr.operand)
+                return pc.invert(inner_mask)
+            else:
+                raise NotImplementedError(f"Unary operator not supported: {expr.operator}")
+
+        else:
+            raise NotImplementedError(f"WHERE expression not supported: {type(expr)}")
+
+    def _evaluate_filter_operand(self, table: pa.Table, operand: Expression):
+        """
+        Evaluate a filter operand (left or right side of comparison).
+
+        Args:
+            table: Result table from pattern matching
+            operand: Expression node (PropertyAccess, Literal, Variable, FunctionCall)
+
+        Returns:
+            Arrow array or scalar value
+        """
+        if isinstance(operand, PropertyAccess):
+            # Property access: a.age, b.name, etc.
+            # Need to join with vertex table to get property values
+            return self._evaluate_property_access(table, operand)
+
+        elif isinstance(operand, Literal):
+            # Literal value: 18, 'Alice', true, etc.
+            # Create a scalar or array
+            if table.num_rows > 0:
+                # Broadcast scalar to match table length
+                return pa.scalar(operand.value)
+            else:
+                return pa.scalar(operand.value)
+
+        elif isinstance(operand, Variable):
+            # Variable reference: a, b, etc.
+            # This refers to vertex IDs in the pattern match result
+            var_name = operand.name
+            id_col = f"{var_name}_id"
+            if id_col in table.column_names:
+                return table.column(id_col)
+            else:
+                raise ValueError(f"Variable {var_name} not found in pattern match results")
+
+        elif isinstance(operand, FunctionCall):
+            # Function call: lower(a.name), upper(b.city), etc.
+            return self._evaluate_filter_function(table, operand)
+
+        else:
+            raise NotImplementedError(f"Filter operand not supported: {type(operand)}")
+
+    def _evaluate_filter_function(self, table: pa.Table, func_call: FunctionCall):
+        """
+        Evaluate function call in WHERE clause filter.
+
+        Supports:
+        - lower(expr): Convert to lowercase
+        - upper(expr): Convert to uppercase
+
+        Args:
+            table: Result table from pattern matching
+            func_call: FunctionCall AST node
+
+        Returns:
+            Arrow array with function applied
+        """
+        func_name = func_call.name.lower()
+
+        if func_name == 'lower':
+            # lower(a.name) → lowercase string
+            if len(func_call.args) != 1:
+                raise ValueError(f"lower() expects 1 argument, got {len(func_call.args)}")
+
+            arg_value = self._evaluate_filter_operand(table, func_call.args[0])
+
+            # Apply lowercase transformation
+            if isinstance(arg_value, pa.Array):
+                return pc.utf8_lower(arg_value)
+            elif isinstance(arg_value, pa.Scalar):
+                # Broadcast scalar to array, then apply
+                arr = pa.array([arg_value.as_py()] * table.num_rows)
+                return pc.utf8_lower(arr)
+            else:
+                raise ValueError(f"Unexpected type for lower(): {type(arg_value)}")
+
+        elif func_name == 'upper':
+            # upper(a.name) → uppercase string
+            if len(func_call.args) != 1:
+                raise ValueError(f"upper() expects 1 argument, got {len(func_call.args)}")
+
+            arg_value = self._evaluate_filter_operand(table, func_call.args[0])
+
+            # Apply uppercase transformation
+            if isinstance(arg_value, pa.Array):
+                return pc.utf8_upper(arg_value)
+            elif isinstance(arg_value, pa.Scalar):
+                # Broadcast scalar to array, then apply
+                arr = pa.array([arg_value.as_py()] * table.num_rows)
+                return pc.utf8_upper(arr)
+            else:
+                raise ValueError(f"Unexpected type for upper(): {type(arg_value)}")
+
+        else:
+            raise NotImplementedError(f"Function not supported in WHERE clause: {func_name}")
 
     def _apply_return(self, table: pa.Table, return_clause: ReturnClause) -> pa.Table:
         """
