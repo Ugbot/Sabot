@@ -180,24 +180,65 @@ class CypherBenchmarkRunner:
         print("✅ Engine created")
         print()
 
-        # Prepare vertices - for now, just use Person nodes
-        # (Full multi-type vertex support requires schema unification)
+        # Prepare vertices - load ALL node types with unified schema
         print("Preparing vertices...")
 
-        # Use only Person nodes for this demo
+        # Person nodes - already have 'id' column
         persons = self.data['person_nodes']
-
-        # Add label column
         persons_labeled = persons.append_column(
             'label',
             ca.array(['Person'] * persons.num_rows, type=ca.string())
         )
+        print(f"  Person vertices: {persons_labeled.num_rows:,}")
 
-        all_vertices = persons_labeled
-        print(f"  Person vertices: {all_vertices.num_rows:,}")
-        print(f"  Note: Other node types (City, State, etc.) require schema unification")
+        # City nodes - already have 'id' column
+        cities = self.data['city_nodes']
+        cities_labeled = cities.append_column(
+            'label',
+            ca.array(['City'] * cities.num_rows, type=ca.string())
+        )
+        print(f"  City vertices: {cities_labeled.num_rows:,}")
 
-        # Prepare edges - for now, just use Follows edges
+        # State nodes - already have 'id' column
+        states = self.data['state_nodes']
+        states_labeled = states.append_column(
+            'label',
+            ca.array(['State'] * states.num_rows, type=ca.string())
+        )
+        print(f"  State vertices: {states_labeled.num_rows:,}")
+
+        # Country nodes - already have 'id' column
+        countries = self.data['country_nodes']
+        countries_labeled = countries.append_column(
+            'label',
+            ca.array(['Country'] * countries.num_rows, type=ca.string())
+        )
+        print(f"  Country vertices: {countries_labeled.num_rows:,}")
+
+        # Interest nodes - already have 'id' column
+        interests = self.data['interest_nodes']
+        interests_labeled = interests.append_column(
+            'label',
+            ca.array(['Interest'] * interests.num_rows, type=ca.string())
+        )
+        print(f"  Interest vertices: {interests_labeled.num_rows:,}")
+
+        # Combine all vertices using pyarrow's concat_tables
+        # Note: concat_tables requires consistent schemas, so we use the
+        # GraphQueryEngine's ability to handle heterogeneous properties
+        # by storing the original tables separately
+        all_vertices = pa.concat_tables([
+            persons_labeled,
+            cities_labeled,
+            states_labeled,
+            countries_labeled,
+            interests_labeled
+        ], promote=True)  # promote=True allows schema unification
+
+        print(f"  Total vertices: {all_vertices.num_rows:,}")
+        print(f"  Schema: {all_vertices.schema}")
+
+        # Prepare edges - load ALL edge types
         print("Preparing edges...")
 
         # Follows edges
@@ -206,10 +247,50 @@ class CypherBenchmarkRunner:
             'label',
             ca.array(['Follows'] * follows.num_rows, type=ca.string())
         )
+        print(f"  Follows edges: {follows_labeled.num_rows:,}")
 
-        all_edges = follows_labeled
-        print(f"  Follows edges: {all_edges.num_rows:,}")
-        print(f"  Note: Other edge types available but not loaded for this demo")
+        # LivesIn edges
+        lives_in = self.data['lives_in_edges']
+        lives_in_labeled = lives_in.append_column(
+            'label',
+            ca.array(['LivesIn'] * lives_in.num_rows, type=ca.string())
+        )
+        print(f"  LivesIn edges: {lives_in_labeled.num_rows:,}")
+
+        # HasInterest edges
+        has_interest = self.data['has_interest_edges']
+        has_interest_labeled = has_interest.append_column(
+            'label',
+            ca.array(['HasInterest'] * has_interest.num_rows, type=ca.string())
+        )
+        print(f"  HasInterest edges: {has_interest_labeled.num_rows:,}")
+
+        # CityIn edges
+        city_in = self.data['city_in_edges']
+        city_in_labeled = city_in.append_column(
+            'label',
+            ca.array(['CityIn'] * city_in.num_rows, type=ca.string())
+        )
+        print(f"  CityIn edges: {city_in_labeled.num_rows:,}")
+
+        # StateIn edges
+        state_in = self.data['state_in_edges']
+        state_in_labeled = state_in.append_column(
+            'label',
+            ca.array(['StateIn'] * state_in.num_rows, type=ca.string())
+        )
+        print(f"  StateIn edges: {state_in_labeled.num_rows:,}")
+
+        # Combine all edges
+        all_edges = pa.concat_tables([
+            follows_labeled,
+            lives_in_labeled,
+            has_interest_labeled,
+            city_in_labeled,
+            state_in_labeled
+        ])
+
+        print(f"  Total edges: {all_edges.num_rows:,}")
         print()
 
         # Load into engine
