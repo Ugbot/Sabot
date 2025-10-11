@@ -65,13 +65,16 @@
             "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib"
         ],
         "include_dirs": [
-            "/opt/homebrew/lib/python3.13/site-packages/numpy/_core/include",
+            "/Users/bengamble/Sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
             "/Users/bengamble/Sabot/vendor/arrow/python",
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow",
             "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src",
             "/Users/bengamble/Sabot/vendor/duckdb/third_party/concurrentqueue",
-            "/Users/bengamble/Sabot/sabot/_c"
+            "/Users/bengamble/Sabot/sabot/_c",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/storage",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/traversal",
+            "/Users/bengamble/Sabot/sabot/_cython/graph/query"
         ],
         "language": "c++",
         "libraries": [
@@ -1626,12 +1629,12 @@ static const char *__pyx_filename;
 static const char* const __pyx_f[] = {
   "sabot/_cython/operators/morsel_operator.pyx",
   "<stringsource>",
-  "cpython/contextvars.pxd",
-  "cpython/datetime.pxd",
-  "cpython/type.pxd",
-  "cpython/bool.pxd",
-  "cpython/complex.pxd",
-  "pyarrow/lib.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/contextvars.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/datetime.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/type.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/bool.pxd",
+  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/complex.pxd",
+  ".venv/lib/python3.11/site-packages/pyarrow/lib.pxd",
   "sabot/_c/arrow_core.pxd",
 };
 /* #### Code section: utility_code_proto_before_types ### */
@@ -1907,6 +1910,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_13base_operator_BaseOperator;
 struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator;
 struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels;
 struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle;
+struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels;
 struct __pyx_opt_args_7cpython_11contextvars_get_value;
 struct __pyx_opt_args_7cpython_11contextvars_get_value_no_default;
 
@@ -3483,20 +3487,21 @@ struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperat
 };
 
 
-/* "sabot/_cython/operators/morsel_operator.pyx":139
+/* "sabot/_cython/operators/morsel_operator.pyx":135
  *             return self._process_with_local_morsels(batch)
  * 
  *     cdef object _process_with_local_morsels(self, object batch):             # <<<<<<<<<<<<<<
  *         """
- *         Process batch locally using shared task slot manager.
+ *         Process batch locally using TaskSlotManager (C++ work-stealing threads).
 */
 struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels {
   PyObject_HEAD
+  PyObject *__pyx_v_batch;
   struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self;
 };
 
 
-/* "sabot/_cython/operators/morsel_operator.pyx":233
+/* "sabot/_cython/operators/morsel_operator.pyx":284
  *             )
  * 
  *     async def _async_process_with_network_shuffle(self, batch):             # <<<<<<<<<<<<<<
@@ -3511,6 +3516,20 @@ struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct
   PyObject *__pyx_v_partition_keys;
   PyObject *__pyx_v_partitioner;
   PyObject *__pyx_v_partitions;
+  struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self;
+};
+
+
+/* "sabot/_cython/operators/morsel_operator.pyx":313
+ *         return self._wrapped_operator.process_batch(batch)
+ * 
+ *     async def _async_process_with_morsels(self, batch):             # <<<<<<<<<<<<<<
+ *         """
+ *         Async implementation of morsel-driven processing.
+*/
+struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels {
+  PyObject_HEAD
+  PyObject *__pyx_v_batch;
   struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self;
 };
 
@@ -5271,11 +5290,17 @@ static PyObject *__Pyx_PyObject_FastCallMethod(PyObject *name, PyObject *const *
 /* RaiseClosureNameError.proto */
 static void __Pyx_RaiseClosureNameError(const char *varname);
 
-/* Import.proto */
-static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
+/* RaiseTooManyValuesToUnpack.proto */
+static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected);
 
-/* ImportFrom.proto */
-static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name);
+/* RaiseNeedMoreValuesToUnpack.proto */
+static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index);
+
+/* IterFinish.proto */
+static CYTHON_INLINE int __Pyx_IterFinish(void);
+
+/* UnpackItemEndCheck.proto */
+static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
 
 /* PyObjectVectorCallKwBuilder.proto */
 CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n);
@@ -5294,6 +5319,19 @@ static int __Pyx_VectorcallBuilder_AddArgStr(const char *key, PyObject *value, P
 #define __Pyx_VectorcallBuilder_AddArg(key, value, builder, args, n) PyDict_SetItem(builder, key, value)
 #define __Pyx_VectorcallBuilder_AddArgStr(key, value, builder, args, n) PyDict_SetItemString(builder, key, value)
 #endif
+
+/* PyObjectVectorCallMethodKwBuilder.proto */
+#if CYTHON_VECTORCALL && PY_VERSION_HEX >= 0x03090000
+#define __Pyx_Object_VectorcallMethod_CallFromBuilder PyObject_VectorcallMethod
+#else
+static PyObject *__Pyx_Object_VectorcallMethod_CallFromBuilder(PyObject *name, PyObject *const *args, size_t nargsf, PyObject *kwnames);
+#endif
+
+/* Import.proto */
+static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
+
+/* ImportFrom.proto */
+static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name);
 
 /* ListAppend.proto */
 #if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
@@ -5452,6 +5490,27 @@ static PyObject *__Pyx_CyFunction_New(PyMethodDef *ml,
                                       PyObject *module, PyObject *globals,
                                       PyObject* code);
 
+/* ListCompAppend.proto */
+#if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
+static CYTHON_INLINE int __Pyx_ListComp_Append(PyObject* list, PyObject* x) {
+    PyListObject* L = (PyListObject*) list;
+    Py_ssize_t len = Py_SIZE(list);
+    if (likely(L->allocated > len)) {
+        Py_INCREF(x);
+        #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030d0000
+        L->ob_item[len] = x;
+        #else
+        PyList_SET_ITEM(list, len, x);
+        #endif
+        __Pyx_SET_SIZE(list, len + 1);
+        return 0;
+    }
+    return PyList_Append(list, x);
+}
+#else
+#define __Pyx_ListComp_Append(L,x) PyList_Append(L,x)
+#endif
+
 /* GetItemInt.proto */
 #define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck, has_gil)\
     (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
@@ -5473,10 +5532,6 @@ static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize
 static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
 static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
                                                      int is_list, int wraparound, int boundscheck);
-
-/* ImportDottedModule.proto */
-static PyObject *__Pyx_ImportDottedModule(PyObject *name, PyObject *parts_tuple);
-static PyObject *__Pyx_ImportDottedModule_WalkParts(PyObject *module, PyObject *name, PyObject *parts_tuple);
 
 /* GetTopmostException.proto */
 #if CYTHON_USE_EXC_INFO_STACK && CYTHON_FAST_THREAD_STATE
@@ -5502,14 +5557,186 @@ static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject 
 static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
 #endif
 
+/* ImportDottedModule.proto */
+static PyObject *__Pyx_ImportDottedModule(PyObject *name, PyObject *parts_tuple);
+static PyObject *__Pyx_ImportDottedModule_WalkParts(PyObject *module, PyObject *name, PyObject *parts_tuple);
+
+/* PyObjectFormatSimple.proto */
+#if CYTHON_COMPILING_IN_PYPY
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        PyObject_Format(s, f))
+#elif CYTHON_USE_TYPE_SLOTS
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        likely(PyLong_CheckExact(s)) ? PyLong_Type.tp_repr(s) :\
+        likely(PyFloat_CheckExact(s)) ? PyFloat_Type.tp_repr(s) :\
+        PyObject_Format(s, f))
+#else
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        PyObject_Format(s, f))
+#endif
+
+/* JoinPyUnicode.proto */
+static PyObject* __Pyx_PyUnicode_Join(PyObject** values, Py_ssize_t value_count, Py_ssize_t result_ulength,
+                                      Py_UCS4 max_char);
+
+/* PyObjectLookupSpecial.proto */
+#if CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+#define __Pyx_PyObject_LookupSpecialNoError(obj, attr_name)  __Pyx__PyObject_LookupSpecial(obj, attr_name, 0)
+#define __Pyx_PyObject_LookupSpecial(obj, attr_name)  __Pyx__PyObject_LookupSpecial(obj, attr_name, 1)
+static CYTHON_INLINE PyObject* __Pyx__PyObject_LookupSpecial(PyObject* obj, PyObject* attr_name, int with_error);
+#else
+#define __Pyx_PyObject_LookupSpecialNoError(o,n) __Pyx_PyObject_GetAttrStrNoError(o,n)
+#define __Pyx_PyObject_LookupSpecial(o,n) __Pyx_PyObject_GetAttrStr(o,n)
+#endif
+
+/* RaiseUnboundLocalError.proto */
+static void __Pyx_RaiseUnboundLocalError(const char *varname);
+
+/* SwapException.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_ExceptionSwap(type, value, tb)  __Pyx__ExceptionSwap(__pyx_tstate, type, value, tb)
+static CYTHON_INLINE void __Pyx__ExceptionSwap(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
+#else
+static CYTHON_INLINE void __Pyx_ExceptionSwap(PyObject **type, PyObject **value, PyObject **tb);
+#endif
+
 /* pep479.proto */
 static void __Pyx_Generator_Replace_StopIteration(int in_async_gen);
 
-/* RejectKeywords.proto */
-static void __Pyx_RejectKeywords(const char* function_name, PyObject *kwds);
-
 /* RaiseException.proto */
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
+
+/* IterNextPlain.proto */
+static CYTHON_INLINE PyObject *__Pyx_PyIter_Next_Plain(PyObject *iterator);
+#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030A0000
+static PyObject *__Pyx_GetBuiltinNext_LimitedAPI(void);
+#endif
+
+/* PyObjectCallOneArg.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
+
+/* PyObjectGetMethod.proto */
+static int __Pyx_PyObject_GetMethod(PyObject *obj, PyObject *name, PyObject **method);
+
+/* PyObjectCallMethod1.proto */
+static PyObject* __Pyx_PyObject_CallMethod1(PyObject* obj, PyObject* method_name, PyObject* arg);
+
+/* PyObjectCallNoArg.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
+
+/* ReturnWithStopIteration.proto */
+static CYTHON_INLINE void __Pyx_ReturnWithStopIteration(PyObject* value, int async, int iternext);
+
+/* CoroutineBase.proto */
+struct __pyx_CoroutineObject;
+typedef PyObject *(*__pyx_coroutine_body_t)(struct __pyx_CoroutineObject *, PyThreadState *, PyObject *);
+#if CYTHON_USE_EXC_INFO_STACK
+#define __Pyx_ExcInfoStruct  _PyErr_StackItem
+#else
+typedef struct {
+    PyObject *exc_type;
+    PyObject *exc_value;
+    PyObject *exc_traceback;
+} __Pyx_ExcInfoStruct;
+#endif
+typedef struct __pyx_CoroutineObject {
+    PyObject_HEAD
+    __pyx_coroutine_body_t body;
+    PyObject *closure;
+    __Pyx_ExcInfoStruct gi_exc_state;
+    PyObject *gi_weakreflist;
+    PyObject *classobj;
+    PyObject *yieldfrom;
+    __Pyx_pyiter_sendfunc yieldfrom_am_send;
+    PyObject *gi_name;
+    PyObject *gi_qualname;
+    PyObject *gi_modulename;
+    PyObject *gi_code;
+    PyObject *gi_frame;
+#if CYTHON_USE_SYS_MONITORING && (CYTHON_PROFILE || CYTHON_TRACE)
+    PyMonitoringState __pyx_pymonitoring_state[__Pyx_MonitoringEventTypes_CyGen_count];
+    uint64_t __pyx_pymonitoring_version;
+#endif
+    int resume_label;
+    char is_running;
+} __pyx_CoroutineObject;
+static __pyx_CoroutineObject *__Pyx__Coroutine_New(
+    PyTypeObject *type, __pyx_coroutine_body_t body, PyObject *code, PyObject *closure,
+    PyObject *name, PyObject *qualname, PyObject *module_name);
+static __pyx_CoroutineObject *__Pyx__Coroutine_NewInit(
+            __pyx_CoroutineObject *gen, __pyx_coroutine_body_t body, PyObject *code, PyObject *closure,
+            PyObject *name, PyObject *qualname, PyObject *module_name);
+static CYTHON_INLINE void __Pyx_Coroutine_ExceptionClear(__Pyx_ExcInfoStruct *self);
+static int __Pyx_Coroutine_clear(PyObject *self);
+static __Pyx_PySendResult __Pyx_Coroutine_AmSend(PyObject *self, PyObject *value, PyObject **retval);
+static PyObject *__Pyx_Coroutine_Send(PyObject *self, PyObject *value);
+static __Pyx_PySendResult __Pyx_Coroutine_Close(PyObject *self, PyObject **retval);
+static PyObject *__Pyx_Coroutine_Throw(PyObject *gen, PyObject *args);
+#if CYTHON_USE_EXC_INFO_STACK
+#define __Pyx_Coroutine_SwapException(self)
+#define __Pyx_Coroutine_ResetAndClearException(self)  __Pyx_Coroutine_ExceptionClear(&(self)->gi_exc_state)
+#else
+#define __Pyx_Coroutine_SwapException(self) {\
+    __Pyx_ExceptionSwap(&(self)->gi_exc_state.exc_type, &(self)->gi_exc_state.exc_value, &(self)->gi_exc_state.exc_traceback);\
+    __Pyx_Coroutine_ResetFrameBackpointer(&(self)->gi_exc_state);\
+    }
+#define __Pyx_Coroutine_ResetAndClearException(self) {\
+    __Pyx_ExceptionReset((self)->gi_exc_state.exc_type, (self)->gi_exc_state.exc_value, (self)->gi_exc_state.exc_traceback);\
+    (self)->gi_exc_state.exc_type = (self)->gi_exc_state.exc_value = (self)->gi_exc_state.exc_traceback = NULL;\
+    }
+#endif
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_PyGen_FetchStopIterationValue(pvalue)\
+    __Pyx_PyGen__FetchStopIterationValue(__pyx_tstate, pvalue)
+#else
+#define __Pyx_PyGen_FetchStopIterationValue(pvalue)\
+    __Pyx_PyGen__FetchStopIterationValue(__Pyx_PyThreadState_Current, pvalue)
+#endif
+static int __Pyx_PyGen__FetchStopIterationValue(PyThreadState *tstate, PyObject **pvalue);
+static CYTHON_INLINE void __Pyx_Coroutine_ResetFrameBackpointer(__Pyx_ExcInfoStruct *exc_state);
+static char __Pyx_Coroutine_test_and_set_is_running(__pyx_CoroutineObject *gen);
+static void __Pyx_Coroutine_unset_is_running(__pyx_CoroutineObject *gen);
+static char __Pyx_Coroutine_get_is_running(__pyx_CoroutineObject *gen);
+static PyObject *__Pyx_Coroutine_get_is_running_getter(PyObject *gen, void *closure);
+#if __PYX_HAS_PY_AM_SEND == 2
+static void __Pyx_SetBackportTypeAmSend(PyTypeObject *type, __Pyx_PyAsyncMethodsStruct *static_amsend_methods, __Pyx_pyiter_sendfunc am_send);
+#endif
+static PyObject *__Pyx_Coroutine_fail_reduce_ex(PyObject *self, PyObject *arg);
+
+/* Coroutine.proto */
+#define __Pyx_Coroutine_USED
+#define __Pyx_Coroutine_CheckExact(obj) __Pyx_IS_TYPE(obj, __pyx_mstate_global->__pyx_CoroutineType)
+#define __Pyx_Coroutine_Check(obj) __Pyx_Coroutine_CheckExact(obj)
+#define __Pyx_CoroutineAwait_CheckExact(obj) __Pyx_IS_TYPE(obj, __pyx_mstate_global->__pyx_CoroutineAwaitType)
+#define __Pyx_Coroutine_New(body, code, closure, name, qualname, module_name)\
+    __Pyx__Coroutine_New(__pyx_mstate_global->__pyx_CoroutineType, body, code, closure, name, qualname, module_name)
+static int __pyx_Coroutine_init(PyObject *module);
+static PyObject *__Pyx__Coroutine_await(PyObject *coroutine);
+typedef struct {
+    PyObject_HEAD
+    PyObject *coroutine;
+} __pyx_CoroutineAwaitObject;
+static __Pyx_PySendResult __Pyx_CoroutineAwait_Close(__pyx_CoroutineAwaitObject *self);
+
+/* Coro_CheckExact.proto */
+#if CYTHON_COMPILING_IN_LIMITED_API
+static int __Pyx_PyCoro_CheckExact(PyObject *o);
+#else
+#define __Pyx_PyCoro_CheckExact PyCoro_CheckExact
+#endif
+
+/* GetAwaitIter.proto */
+static CYTHON_INLINE PyObject *__Pyx_Coroutine_GetAwaitableIter(PyObject *o);
+static PyObject *__Pyx__Coroutine_GetAwaitableIter(PyObject *o);
+
+/* CoroutineYieldFrom.proto */
+static CYTHON_INLINE __Pyx_PySendResult __Pyx_Coroutine_Yield_From(__pyx_CoroutineObject *gen, PyObject *source, PyObject **retval);
+
+/* RejectKeywords.proto */
+static void __Pyx_RejectKeywords(const char* function_name, PyObject *kwds);
 
 /* CallNextTpDealloc.proto */
 static void __Pyx_call_next_tp_dealloc(PyObject* obj, destructor current_tp_dealloc);
@@ -5541,15 +5768,6 @@ static PyTypeObject *__Pyx_ImportType_3_1_4(PyObject* module, const char *module
 
 /* GetVTable.proto */
 static void* __Pyx_GetVtable(PyTypeObject *type);
-
-/* PyObjectCallNoArg.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
-
-/* PyObjectCallOneArg.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
-
-/* PyObjectGetMethod.proto */
-static int __Pyx_PyObject_GetMethod(PyObject *obj, PyObject *name, PyObject **method);
 
 /* PyObjectCallMethod0.proto */
 static PyObject* __Pyx_PyObject_CallMethod0(PyObject* obj, PyObject* method_name);
@@ -5671,117 +5889,6 @@ static CYTHON_INLINE int __Pyx_PyErr_GivenExceptionMatches2(PyObject *err, PyObj
 #else
   #define __Pyx_PyBaseException_Check(obj) __Pyx_TypeCheck(obj, PyExc_BaseException)
 #endif
-
-/* SwapException.proto */
-#if CYTHON_FAST_THREAD_STATE
-#define __Pyx_ExceptionSwap(type, value, tb)  __Pyx__ExceptionSwap(__pyx_tstate, type, value, tb)
-static CYTHON_INLINE void __Pyx__ExceptionSwap(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
-#else
-static CYTHON_INLINE void __Pyx_ExceptionSwap(PyObject **type, PyObject **value, PyObject **tb);
-#endif
-
-/* IterNextPlain.proto */
-static CYTHON_INLINE PyObject *__Pyx_PyIter_Next_Plain(PyObject *iterator);
-#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030A0000
-static PyObject *__Pyx_GetBuiltinNext_LimitedAPI(void);
-#endif
-
-/* PyObjectCallMethod1.proto */
-static PyObject* __Pyx_PyObject_CallMethod1(PyObject* obj, PyObject* method_name, PyObject* arg);
-
-/* ReturnWithStopIteration.proto */
-static CYTHON_INLINE void __Pyx_ReturnWithStopIteration(PyObject* value, int async, int iternext);
-
-/* CoroutineBase.proto */
-struct __pyx_CoroutineObject;
-typedef PyObject *(*__pyx_coroutine_body_t)(struct __pyx_CoroutineObject *, PyThreadState *, PyObject *);
-#if CYTHON_USE_EXC_INFO_STACK
-#define __Pyx_ExcInfoStruct  _PyErr_StackItem
-#else
-typedef struct {
-    PyObject *exc_type;
-    PyObject *exc_value;
-    PyObject *exc_traceback;
-} __Pyx_ExcInfoStruct;
-#endif
-typedef struct __pyx_CoroutineObject {
-    PyObject_HEAD
-    __pyx_coroutine_body_t body;
-    PyObject *closure;
-    __Pyx_ExcInfoStruct gi_exc_state;
-    PyObject *gi_weakreflist;
-    PyObject *classobj;
-    PyObject *yieldfrom;
-    __Pyx_pyiter_sendfunc yieldfrom_am_send;
-    PyObject *gi_name;
-    PyObject *gi_qualname;
-    PyObject *gi_modulename;
-    PyObject *gi_code;
-    PyObject *gi_frame;
-#if CYTHON_USE_SYS_MONITORING && (CYTHON_PROFILE || CYTHON_TRACE)
-    PyMonitoringState __pyx_pymonitoring_state[__Pyx_MonitoringEventTypes_CyGen_count];
-    uint64_t __pyx_pymonitoring_version;
-#endif
-    int resume_label;
-    char is_running;
-} __pyx_CoroutineObject;
-static __pyx_CoroutineObject *__Pyx__Coroutine_New(
-    PyTypeObject *type, __pyx_coroutine_body_t body, PyObject *code, PyObject *closure,
-    PyObject *name, PyObject *qualname, PyObject *module_name);
-static __pyx_CoroutineObject *__Pyx__Coroutine_NewInit(
-            __pyx_CoroutineObject *gen, __pyx_coroutine_body_t body, PyObject *code, PyObject *closure,
-            PyObject *name, PyObject *qualname, PyObject *module_name);
-static CYTHON_INLINE void __Pyx_Coroutine_ExceptionClear(__Pyx_ExcInfoStruct *self);
-static int __Pyx_Coroutine_clear(PyObject *self);
-static __Pyx_PySendResult __Pyx_Coroutine_AmSend(PyObject *self, PyObject *value, PyObject **retval);
-static PyObject *__Pyx_Coroutine_Send(PyObject *self, PyObject *value);
-static __Pyx_PySendResult __Pyx_Coroutine_Close(PyObject *self, PyObject **retval);
-static PyObject *__Pyx_Coroutine_Throw(PyObject *gen, PyObject *args);
-#if CYTHON_USE_EXC_INFO_STACK
-#define __Pyx_Coroutine_SwapException(self)
-#define __Pyx_Coroutine_ResetAndClearException(self)  __Pyx_Coroutine_ExceptionClear(&(self)->gi_exc_state)
-#else
-#define __Pyx_Coroutine_SwapException(self) {\
-    __Pyx_ExceptionSwap(&(self)->gi_exc_state.exc_type, &(self)->gi_exc_state.exc_value, &(self)->gi_exc_state.exc_traceback);\
-    __Pyx_Coroutine_ResetFrameBackpointer(&(self)->gi_exc_state);\
-    }
-#define __Pyx_Coroutine_ResetAndClearException(self) {\
-    __Pyx_ExceptionReset((self)->gi_exc_state.exc_type, (self)->gi_exc_state.exc_value, (self)->gi_exc_state.exc_traceback);\
-    (self)->gi_exc_state.exc_type = (self)->gi_exc_state.exc_value = (self)->gi_exc_state.exc_traceback = NULL;\
-    }
-#endif
-#if CYTHON_FAST_THREAD_STATE
-#define __Pyx_PyGen_FetchStopIterationValue(pvalue)\
-    __Pyx_PyGen__FetchStopIterationValue(__pyx_tstate, pvalue)
-#else
-#define __Pyx_PyGen_FetchStopIterationValue(pvalue)\
-    __Pyx_PyGen__FetchStopIterationValue(__Pyx_PyThreadState_Current, pvalue)
-#endif
-static int __Pyx_PyGen__FetchStopIterationValue(PyThreadState *tstate, PyObject **pvalue);
-static CYTHON_INLINE void __Pyx_Coroutine_ResetFrameBackpointer(__Pyx_ExcInfoStruct *exc_state);
-static char __Pyx_Coroutine_test_and_set_is_running(__pyx_CoroutineObject *gen);
-static void __Pyx_Coroutine_unset_is_running(__pyx_CoroutineObject *gen);
-static char __Pyx_Coroutine_get_is_running(__pyx_CoroutineObject *gen);
-static PyObject *__Pyx_Coroutine_get_is_running_getter(PyObject *gen, void *closure);
-#if __PYX_HAS_PY_AM_SEND == 2
-static void __Pyx_SetBackportTypeAmSend(PyTypeObject *type, __Pyx_PyAsyncMethodsStruct *static_amsend_methods, __Pyx_pyiter_sendfunc am_send);
-#endif
-static PyObject *__Pyx_Coroutine_fail_reduce_ex(PyObject *self, PyObject *arg);
-
-/* Coroutine.proto */
-#define __Pyx_Coroutine_USED
-#define __Pyx_Coroutine_CheckExact(obj) __Pyx_IS_TYPE(obj, __pyx_mstate_global->__pyx_CoroutineType)
-#define __Pyx_Coroutine_Check(obj) __Pyx_Coroutine_CheckExact(obj)
-#define __Pyx_CoroutineAwait_CheckExact(obj) __Pyx_IS_TYPE(obj, __pyx_mstate_global->__pyx_CoroutineAwaitType)
-#define __Pyx_Coroutine_New(body, code, closure, name, qualname, module_name)\
-    __Pyx__Coroutine_New(__pyx_mstate_global->__pyx_CoroutineType, body, code, closure, name, qualname, module_name)
-static int __pyx_Coroutine_init(PyObject *module);
-static PyObject *__Pyx__Coroutine_await(PyObject *coroutine);
-typedef struct {
-    PyObject_HEAD
-    PyObject *coroutine;
-} __pyx_CoroutineAwaitObject;
-static __Pyx_PySendResult __Pyx_CoroutineAwait_Close(__pyx_CoroutineAwaitObject *self);
 
 /* GetRuntimeVersion.proto */
 static unsigned long __Pyx_get_runtime_version(void);
@@ -6037,10 +6144,11 @@ static const char __pyx_k_Q[] = "\200\001\330\004\n\210+\220Q";
 static const char __pyx_k__2[] = "?";
 static const char __pyx_k__3[] = "\210!";
 static const char __pyx_k_gc[] = "gc";
-static const char __pyx_k_id[] = "id";
-static const char __pyx_k_4_q[] = "\210\001\340\014\023\2204\320\027)\250\036\260q\270\001";
+static const char __pyx_k_ctx[] = "ctx";
 static const char __pyx_k_get[] = "get";
+static const char __pyx_k_map[] = "map";
 static const char __pyx_k_pop[] = "pop";
+static const char __pyx_k_exit[] = "__exit__";
 static const char __pyx_k_func[] = "__func__";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
@@ -6050,15 +6158,21 @@ static const char __pyx_k_send[] = "send";
 static const char __pyx_k_spec[] = "__spec__";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_Table[] = "Table";
+static const char __pyx_k_await[] = "__await__";
 static const char __pyx_k_batch[] = "batch";
 static const char __pyx_k_close[] = "close";
+static const char __pyx_k_enter[] = "__enter__";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_sabot[] = "sabot";
+static const char __pyx_k_slice[] = "slice";
 static const char __pyx_k_stats[] = "stats";
 static const char __pyx_k_throw[] = "throw";
 static const char __pyx_k_value[] = "value";
+static const char __pyx_k_A_t_1A[] = "\210A\340\020\027\220t\320\033-\250^\2701\270A";
 static const char __pyx_k_enable[] = "enable";
+static const char __pyx_k_length[] = "length";
 static const char __pyx_k_module[] = "__module__";
+static const char __pyx_k_offset[] = "offset";
 static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_schema[] = "_schema";
 static const char __pyx_k_source[] = "_source";
@@ -6067,6 +6181,10 @@ static const char __pyx_k_asyncio[] = "asyncio";
 static const char __pyx_k_cyarrow[] = "cyarrow";
 static const char __pyx_k_disable[] = "disable";
 static const char __pyx_k_enabled[] = "enabled";
+static const char __pyx_k_end_row[] = "end_row";
+static const char __pyx_k_futures[] = "futures";
+static const char __pyx_k_logging[] = "logging";
+static const char __pyx_k_warning[] = "warning";
 static const char __pyx_k_getstate[] = "__getstate__";
 static const char __pyx_k_num_rows[] = "num_rows";
 static const char __pyx_k_qualname[] = "__qualname__";
@@ -6081,11 +6199,16 @@ static const char __pyx_k_isenabled[] = "isenabled";
 static const char __pyx_k_num_slots[] = "num_slots";
 static const char __pyx_k_pyx_state[] = "__pyx_state";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
+static const char __pyx_k_start_row[] = "start_row";
+static const char __pyx_k_concurrent[] = "concurrent";
 static const char __pyx_k_is_running[] = "is_running";
 static const char __pyx_k_partitions[] = "partitions";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
+static const char __pyx_k_slice_info[] = "slice_info";
 static const char __pyx_k_slot_stats[] = "slot_stats";
+static const char __pyx_k_to_batches[] = "to_batches";
 static const char __pyx_k_key_columns[] = "_key_columns";
+static const char __pyx_k_max_workers[] = "max_workers";
 static const char __pyx_k_num_workers[] = "num_workers";
 static const char __pyx_k_partitioner[] = "partitioner";
 static const char __pyx_k_queue_depth[] = "queue_depth";
@@ -6106,33 +6229,40 @@ static const char __pyx_k_get_slot_stats[] = "get_slot_stats";
 static const char __pyx_k_morsel_size_kb[] = "morsel_size_kb";
 static const char __pyx_k_new_event_loop[] = "new_event_loop";
 static const char __pyx_k_partition_keys[] = "partition_keys";
+static const char __pyx_k_process_morsel[] = "process_morsel";
 static const char __pyx_k_set_event_loop[] = "set_event_loop";
 static const char __pyx_k_HashPartitioner[] = "HashPartitioner";
 static const char __pyx_k_available_slots[] = "available_slots";
 static const char __pyx_k_execute_morsels[] = "execute_morsels";
-static const char __pyx_k_get_field_index[] = "get_field_index";
-static const char __pyx_k_not_initialized[] = "not_initialized";
 static const char __pyx_k_partition_batch[] = "partition_batch";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_requires_shuffle[] = "requires_shuffle";
 static const char __pyx_k_wrapped_operator[] = "wrapped_operator";
+static const char __pyx_k_get_agent_context[] = "get_agent_context";
+static const char __pyx_k_task_slot_manager[] = "task_slot_manager";
+static const char __pyx_k_A_Q_uF_7_XXRq_t_1A[] = "\210A\330\020\033\230:\240Q\330\020\037\230u\240F\250!\2507\260+\270X\300X\310R\310q\330\020\027\220t\320\033-\250^\2701\270A";
+static const char __pyx_k_ThreadPoolExecutor[] = "ThreadPoolExecutor";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
+static const char __pyx_k_concurrent_futures[] = "concurrent.futures";
 static const char __pyx_k_get_partition_keys[] = "get_partition_keys";
 static const char __pyx_k_run_until_complete[] = "run_until_complete";
-static const char __pyx_k_unified_task_slots[] = "unified_task_slots";
 static const char __pyx_k_MorselDrivenOperator[] = "MorselDrivenOperator";
 static const char __pyx_k_process_morsel_callback[] = "process_morsel_callback";
 static const char __pyx_k_A_4t1_1_4_S_1_6_E_E_2Q_1_q[] = "\200A\360\036\000\t\014\2104\210t\2201\330\014\023\2201\340\010\013\2104\210~\230S\240\001\330\014\023\2201\340\010\013\2106\220\023\220E\230\023\230E\240\032\2502\250Q\330\014\023\2201\340\010\017\210q";
+static const char __pyx_k_async_process_with_morsels[] = "_async_process_with_morsels";
 static const char __pyx_k_get_or_create_slot_manager[] = "get_or_create_slot_manager";
+static const char __pyx_k_TaskSlotManager_unavailable[] = "TaskSlotManager unavailable (";
 static const char __pyx_k_sabot_cluster_agent_context[] = "sabot.cluster.agent_context";
 static const char __pyx_k_should_use_morsel_execution[] = "should_use_morsel_execution";
+static const char __pyx_k_thread_pool_executor_fallback[] = "thread_pool_executor (fallback)";
 static const char __pyx_k_MorselDrivenOperator_get_stats[] = "MorselDrivenOperator.get_stats";
 static const char __pyx_k_Morsel_Driven_Operator_Wrapper[] = "\nMorsel-Driven Operator Wrapper\n\nAutomatically splits batches into cache-friendly morsels and processes them\neither locally (C++ threads) or via network shuffle (Arrow Flight).\n\nDecision logic:\n- Small batches (<10K rows) \342\206\222 direct execution (no overhead)\n- Stateless operators (map, filter) \342\206\222 local C++ parallel execution\n- Stateful operators (join, groupBy) \342\206\222 network shuffle via Arrow Flight\n";
-static const char __pyx_k_A_4q_d_t1_4_7_0_q_T_4A_4_t_6a_a[] = "\200A\340\010\t\330\014\033\2304\230q\330\014\036\230d\240!\330\014\027\220t\2301\360\010\000\t\014\2104\320\017#\2407\250!\330\014\031\230\024\320\0350\260\017\270q\330\014\021\220\027\230\001\330\020\"\240!\330\020\035\230T\320!4\260A\330\020#\2404\320':\270!\330\020\037\230t\320#6\260a\330\020\036\230a\360\006\000\r\022\220\021\320\022&\240a\340\010\017\210q";
+static const char __pyx_k_A_4q_d_t1_a_4A_1_s_WA_S_2_WA_6a[] = "\200A\340\010\t\330\014\033\2304\230q\330\014\036\230d\240!\330\014\027\220t\2301\330\014\036\230a\360\010\000\t\n\330\014\021\320\0214\260A\330\014\022\320\022#\2401\330\014\017\210s\320\022%\240W\250A\330\020\035\230S\320 2\260/\300\021\330\020\025\220W\230A\330\024!\240\023\320$6\260a\330\024'\240s\320*<\270A\330\024#\2403\320&8\270\001\330\024\"\240!\360\010\000\r\022\220\021\320\022&\240a\340\010\017\210q";
 static const char __pyx_k_MorselDrivenOperator___setstate[] = "MorselDrivenOperator.__setstate_cython__";
 static const char __pyx_k_MorselDrivenOperator_should_use[] = "MorselDrivenOperator.should_use_morsel_execution";
 static const char __pyx_k_async_process_with_network_shuf[] = "_async_process_with_network_shuffle";
+static const char __pyx_k_falling_back_to_ThreadPoolExecu[] = "), falling back to ThreadPoolExecutor";
 static const char __pyx_k_A_6_A_1_4t_q_4_q_4_2_4_5Qa_4_31A[] = "\200A\360\"\000\t\014\2106\220\023\220A\330\014\023\2201\360\006\000\t\014\2104\210t\320\023/\250q\260\001\330\014\023\2204\320\027)\250\036\260q\270\001\360\006\000\t\014\2104\320\017!\320!2\260!\360\006\000\r\024\2204\320\0275\260Q\260a\360\010\000\r\024\2204\320\0273\2601\260A";
 static const char __pyx_k_MorselDrivenOperator___reduce_cy[] = "MorselDrivenOperator.__reduce_cython__";
 static const char __pyx_k_MorselDrivenOperator__async_proc[] = "MorselDrivenOperator._async_process_with_network_shuffle";
@@ -6142,6 +6272,8 @@ static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __red
 static const char __pyx_k_sabot__cython_operators_morsel_o[] = "sabot._cython.operators.morsel_operator";
 static const char __pyx_k_sabot__cython_shuffle_partitione[] = "sabot._cython.shuffle.partitioner";
 static const char __pyx_k_sabot__cython_shuffle_shuffle_tr[] = "sabot._cython.shuffle.shuffle_transport";
+static const char __pyx_k_MorselDrivenOperator__async_proc_2[] = "MorselDrivenOperator._async_process_with_morsels";
+static const char __pyx_k_MorselDrivenOperator__process_wi_2[] = "MorselDrivenOperator._process_with_local_morsels.<locals>.process_morsel";
 static const char __pyx_k_sabot__cython_operators_morsel_o_2[] = "sabot/_cython/operators/morsel_operator.pyx";
 /* #### Code section: decls ### */
 static int __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator___cinit__(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self, PyObject *__pyx_v_wrapped_operator, int __pyx_v_num_workers, PY_LONG_LONG __pyx_v_morsel_size_kb, int __pyx_v_enabled, PyObject *__pyx_v_kwargs); /* proto */
@@ -6149,13 +6281,16 @@ static void __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDriven
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_4should_use_morsel_execution(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self, PyObject *__pyx_v_batch); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_6process_batch(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self, PyObject *__pyx_v_batch); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_27_process_with_local_morsels_process_morsel_callback(PyObject *__pyx_self, PyObject *__pyx_v_morsel_batch); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_27_process_with_local_morsels_2process_morsel(PyObject *__pyx_self, PyObject *__pyx_v_slice_info); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_8_async_process_with_network_shuffle(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self, PyObject *__pyx_v_batch); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_11get_stats(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_13__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_15__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_11_async_process_with_morsels(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self, PyObject *__pyx_v_batch); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_14get_stats(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_16__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_18__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 /* #### Code section: late_includes ### */
 /* #### Code section: module_state ### */
 /* SmallCodeConfig */
@@ -6310,15 +6445,19 @@ typedef struct {
   PyObject *__pyx_type_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator;
   PyObject *__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels;
   PyObject *__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle;
+  PyObject *__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels;
   PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator;
   PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels;
   PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle;
+  PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_get;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type__update;
-  PyObject *__pyx_codeobj_tab[7];
-  PyObject *__pyx_string_tab[104];
+  PyObject *__pyx_tuple[2];
+  PyObject *__pyx_codeobj_tab[9];
+  PyObject *__pyx_string_tab[128];
   PyObject *__pyx_int_0;
+  PyObject *__pyx_int_100;
   PyObject *__pyx_int_10000;
 /* #### Code section: module_state_contents ### */
 /* CommonTypesMetaclass.module_state_decls */
@@ -6327,6 +6466,16 @@ PyTypeObject *__pyx_CommonTypesMetaclassType;
 /* CachedMethodType.module_state_decls */
 #if CYTHON_COMPILING_IN_LIMITED_API
 PyObject *__Pyx_CachedMethodType;
+#endif
+
+/* IterNextPlain.module_state_decls */
+#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030A0000
+PyObject *__Pyx_GetBuiltinNext_LimitedAPI_cache;
+#endif
+
+/* Coro_CheckExact.module_state_decls */
+#if CYTHON_COMPILING_IN_LIMITED_API
+PyObject *__Pyx_CachedCoroType;
 #endif
 
 
@@ -6339,13 +6488,13 @@ int __pyx_freecount_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_str
 struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle *__pyx_freelist_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle[8];
 int __pyx_freecount_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle;
 #endif
+
+#if CYTHON_USE_FREELISTS
+struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels *__pyx_freelist_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels[8];
+int __pyx_freecount_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels;
+#endif
 /* CodeObjectCache.module_state_decls */
 struct __Pyx_CodeObjectCache __pyx_code_cache;
-
-/* IterNextPlain.module_state_decls */
-#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030A0000
-PyObject *__Pyx_GetBuiltinNext_LimitedAPI_cache;
-#endif
 
 /* #### Code section: module_state_end ### */
 } __pyx_mstatetype;
@@ -6378,104 +6527,128 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_MorselDrivenOperator___reduce_cy __pyx_string_tab[3]
 #define __pyx_n_u_MorselDrivenOperator___setstate __pyx_string_tab[4]
 #define __pyx_n_u_MorselDrivenOperator__async_proc __pyx_string_tab[5]
-#define __pyx_n_u_MorselDrivenOperator__process_wi __pyx_string_tab[6]
-#define __pyx_n_u_MorselDrivenOperator_get_stats __pyx_string_tab[7]
-#define __pyx_n_u_MorselDrivenOperator_process_bat __pyx_string_tab[8]
-#define __pyx_n_u_MorselDrivenOperator_should_use __pyx_string_tab[9]
-#define __pyx_n_u_RuntimeError __pyx_string_tab[10]
-#define __pyx_n_u_ShuffleClient __pyx_string_tab[11]
-#define __pyx_n_u_Table __pyx_string_tab[12]
-#define __pyx_n_u_TypeError __pyx_string_tab[13]
-#define __pyx_kp_u__2 __pyx_string_tab[14]
-#define __pyx_n_u_async_process_with_network_shuf __pyx_string_tab[15]
-#define __pyx_n_u_asyncio __pyx_string_tab[16]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[17]
-#define __pyx_n_u_available_slots __pyx_string_tab[18]
-#define __pyx_n_u_batch __pyx_string_tab[19]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[20]
-#define __pyx_n_u_close __pyx_string_tab[21]
-#define __pyx_n_u_combine_chunks __pyx_string_tab[22]
-#define __pyx_n_u_cyarrow __pyx_string_tab[23]
-#define __pyx_kp_u_disable __pyx_string_tab[24]
-#define __pyx_kp_u_enable __pyx_string_tab[25]
-#define __pyx_n_u_enabled __pyx_string_tab[26]
-#define __pyx_n_u_ensure_future __pyx_string_tab[27]
-#define __pyx_n_u_execute_morsels __pyx_string_tab[28]
-#define __pyx_n_u_execution_mode __pyx_string_tab[29]
-#define __pyx_n_u_from_batches __pyx_string_tab[30]
-#define __pyx_n_u_func __pyx_string_tab[31]
-#define __pyx_kp_u_gc __pyx_string_tab[32]
-#define __pyx_n_u_get __pyx_string_tab[33]
-#define __pyx_n_u_get_event_loop __pyx_string_tab[34]
-#define __pyx_n_u_get_field_index __pyx_string_tab[35]
-#define __pyx_n_u_get_or_create_slot_manager __pyx_string_tab[36]
-#define __pyx_n_u_get_partition_keys __pyx_string_tab[37]
-#define __pyx_n_u_get_slot_stats __pyx_string_tab[38]
-#define __pyx_n_u_get_stats __pyx_string_tab[39]
-#define __pyx_n_u_getstate __pyx_string_tab[40]
-#define __pyx_n_u_id __pyx_string_tab[41]
-#define __pyx_n_u_initializing __pyx_string_tab[42]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[43]
-#define __pyx_n_u_is_running __pyx_string_tab[44]
-#define __pyx_kp_u_isenabled __pyx_string_tab[45]
-#define __pyx_n_u_key_columns __pyx_string_tab[46]
-#define __pyx_n_u_main __pyx_string_tab[47]
-#define __pyx_n_u_module __pyx_string_tab[48]
-#define __pyx_n_u_morsel_batch __pyx_string_tab[49]
-#define __pyx_n_u_morsel_size_kb __pyx_string_tab[50]
-#define __pyx_n_u_name __pyx_string_tab[51]
-#define __pyx_n_u_new_event_loop __pyx_string_tab[52]
-#define __pyx_n_u_next __pyx_string_tab[53]
-#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[54]
-#define __pyx_n_u_not_initialized __pyx_string_tab[55]
-#define __pyx_n_u_num_rows __pyx_string_tab[56]
-#define __pyx_n_u_num_slots __pyx_string_tab[57]
-#define __pyx_n_u_num_workers __pyx_string_tab[58]
-#define __pyx_n_u_partition_batch __pyx_string_tab[59]
-#define __pyx_n_u_partition_keys __pyx_string_tab[60]
-#define __pyx_n_u_partitioner __pyx_string_tab[61]
-#define __pyx_n_u_partitions __pyx_string_tab[62]
-#define __pyx_n_u_pop __pyx_string_tab[63]
-#define __pyx_n_u_process_batch __pyx_string_tab[64]
-#define __pyx_n_u_process_morsel_callback __pyx_string_tab[65]
-#define __pyx_n_u_pyx_state __pyx_string_tab[66]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[67]
-#define __pyx_n_u_qualname __pyx_string_tab[68]
-#define __pyx_n_u_queue_depth __pyx_string_tab[69]
-#define __pyx_n_u_range __pyx_string_tab[70]
-#define __pyx_n_u_reduce __pyx_string_tab[71]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[72]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[73]
-#define __pyx_n_u_requires_shuffle __pyx_string_tab[74]
-#define __pyx_n_u_run_until_complete __pyx_string_tab[75]
-#define __pyx_n_u_sabot __pyx_string_tab[76]
-#define __pyx_n_u_sabot__cython_operators_morsel_o __pyx_string_tab[77]
-#define __pyx_kp_u_sabot__cython_operators_morsel_o_2 __pyx_string_tab[78]
-#define __pyx_n_u_sabot__cython_shuffle_partitione __pyx_string_tab[79]
-#define __pyx_n_u_sabot__cython_shuffle_shuffle_tr __pyx_string_tab[80]
-#define __pyx_n_u_sabot_cluster_agent_context __pyx_string_tab[81]
-#define __pyx_n_u_schema __pyx_string_tab[82]
-#define __pyx_n_u_schema_2 __pyx_string_tab[83]
-#define __pyx_n_u_self __pyx_string_tab[84]
-#define __pyx_n_u_send __pyx_string_tab[85]
-#define __pyx_n_u_set_event_loop __pyx_string_tab[86]
-#define __pyx_n_u_set_name __pyx_string_tab[87]
-#define __pyx_n_u_setstate __pyx_string_tab[88]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[89]
-#define __pyx_n_u_should_use_morsel_execution __pyx_string_tab[90]
-#define __pyx_n_u_slot_stats __pyx_string_tab[91]
-#define __pyx_n_u_source __pyx_string_tab[92]
-#define __pyx_n_u_source_2 __pyx_string_tab[93]
-#define __pyx_n_u_spec __pyx_string_tab[94]
-#define __pyx_n_u_stateful __pyx_string_tab[95]
-#define __pyx_n_u_stats __pyx_string_tab[96]
-#define __pyx_kp_u_stringsource __pyx_string_tab[97]
-#define __pyx_n_u_test __pyx_string_tab[98]
-#define __pyx_n_u_throw __pyx_string_tab[99]
-#define __pyx_n_u_unified_task_slots __pyx_string_tab[100]
-#define __pyx_n_u_update __pyx_string_tab[101]
-#define __pyx_n_u_value __pyx_string_tab[102]
-#define __pyx_n_u_wrapped_operator __pyx_string_tab[103]
+#define __pyx_n_u_MorselDrivenOperator__async_proc_2 __pyx_string_tab[6]
+#define __pyx_n_u_MorselDrivenOperator__process_wi __pyx_string_tab[7]
+#define __pyx_n_u_MorselDrivenOperator__process_wi_2 __pyx_string_tab[8]
+#define __pyx_n_u_MorselDrivenOperator_get_stats __pyx_string_tab[9]
+#define __pyx_n_u_MorselDrivenOperator_process_bat __pyx_string_tab[10]
+#define __pyx_n_u_MorselDrivenOperator_should_use __pyx_string_tab[11]
+#define __pyx_n_u_RuntimeError __pyx_string_tab[12]
+#define __pyx_n_u_ShuffleClient __pyx_string_tab[13]
+#define __pyx_n_u_Table __pyx_string_tab[14]
+#define __pyx_kp_u_TaskSlotManager_unavailable __pyx_string_tab[15]
+#define __pyx_n_u_ThreadPoolExecutor __pyx_string_tab[16]
+#define __pyx_n_u_TypeError __pyx_string_tab[17]
+#define __pyx_kp_u__2 __pyx_string_tab[18]
+#define __pyx_n_u_async_process_with_morsels __pyx_string_tab[19]
+#define __pyx_n_u_async_process_with_network_shuf __pyx_string_tab[20]
+#define __pyx_n_u_asyncio __pyx_string_tab[21]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[22]
+#define __pyx_n_u_available_slots __pyx_string_tab[23]
+#define __pyx_n_u_await __pyx_string_tab[24]
+#define __pyx_n_u_batch __pyx_string_tab[25]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[26]
+#define __pyx_n_u_close __pyx_string_tab[27]
+#define __pyx_n_u_combine_chunks __pyx_string_tab[28]
+#define __pyx_n_u_concurrent __pyx_string_tab[29]
+#define __pyx_n_u_concurrent_futures __pyx_string_tab[30]
+#define __pyx_n_u_ctx __pyx_string_tab[31]
+#define __pyx_n_u_cyarrow __pyx_string_tab[32]
+#define __pyx_kp_u_disable __pyx_string_tab[33]
+#define __pyx_kp_u_enable __pyx_string_tab[34]
+#define __pyx_n_u_enabled __pyx_string_tab[35]
+#define __pyx_n_u_end_row __pyx_string_tab[36]
+#define __pyx_n_u_ensure_future __pyx_string_tab[37]
+#define __pyx_n_u_enter __pyx_string_tab[38]
+#define __pyx_n_u_execute_morsels __pyx_string_tab[39]
+#define __pyx_n_u_execution_mode __pyx_string_tab[40]
+#define __pyx_n_u_exit __pyx_string_tab[41]
+#define __pyx_kp_u_falling_back_to_ThreadPoolExecu __pyx_string_tab[42]
+#define __pyx_n_u_from_batches __pyx_string_tab[43]
+#define __pyx_n_u_func __pyx_string_tab[44]
+#define __pyx_n_u_futures __pyx_string_tab[45]
+#define __pyx_kp_u_gc __pyx_string_tab[46]
+#define __pyx_n_u_get __pyx_string_tab[47]
+#define __pyx_n_u_get_agent_context __pyx_string_tab[48]
+#define __pyx_n_u_get_event_loop __pyx_string_tab[49]
+#define __pyx_n_u_get_or_create_slot_manager __pyx_string_tab[50]
+#define __pyx_n_u_get_partition_keys __pyx_string_tab[51]
+#define __pyx_n_u_get_slot_stats __pyx_string_tab[52]
+#define __pyx_n_u_get_stats __pyx_string_tab[53]
+#define __pyx_n_u_getstate __pyx_string_tab[54]
+#define __pyx_n_u_initializing __pyx_string_tab[55]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[56]
+#define __pyx_n_u_is_running __pyx_string_tab[57]
+#define __pyx_kp_u_isenabled __pyx_string_tab[58]
+#define __pyx_n_u_key_columns __pyx_string_tab[59]
+#define __pyx_n_u_length __pyx_string_tab[60]
+#define __pyx_n_u_logging __pyx_string_tab[61]
+#define __pyx_n_u_main __pyx_string_tab[62]
+#define __pyx_n_u_map __pyx_string_tab[63]
+#define __pyx_n_u_max_workers __pyx_string_tab[64]
+#define __pyx_n_u_module __pyx_string_tab[65]
+#define __pyx_n_u_morsel_batch __pyx_string_tab[66]
+#define __pyx_n_u_morsel_size_kb __pyx_string_tab[67]
+#define __pyx_n_u_name __pyx_string_tab[68]
+#define __pyx_n_u_new_event_loop __pyx_string_tab[69]
+#define __pyx_n_u_next __pyx_string_tab[70]
+#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[71]
+#define __pyx_n_u_num_rows __pyx_string_tab[72]
+#define __pyx_n_u_num_slots __pyx_string_tab[73]
+#define __pyx_n_u_num_workers __pyx_string_tab[74]
+#define __pyx_n_u_offset __pyx_string_tab[75]
+#define __pyx_n_u_partition_batch __pyx_string_tab[76]
+#define __pyx_n_u_partition_keys __pyx_string_tab[77]
+#define __pyx_n_u_partitioner __pyx_string_tab[78]
+#define __pyx_n_u_partitions __pyx_string_tab[79]
+#define __pyx_n_u_pop __pyx_string_tab[80]
+#define __pyx_n_u_process_batch __pyx_string_tab[81]
+#define __pyx_n_u_process_morsel __pyx_string_tab[82]
+#define __pyx_n_u_process_morsel_callback __pyx_string_tab[83]
+#define __pyx_n_u_pyx_state __pyx_string_tab[84]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[85]
+#define __pyx_n_u_qualname __pyx_string_tab[86]
+#define __pyx_n_u_queue_depth __pyx_string_tab[87]
+#define __pyx_n_u_range __pyx_string_tab[88]
+#define __pyx_n_u_reduce __pyx_string_tab[89]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[90]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[91]
+#define __pyx_n_u_requires_shuffle __pyx_string_tab[92]
+#define __pyx_n_u_run_until_complete __pyx_string_tab[93]
+#define __pyx_n_u_sabot __pyx_string_tab[94]
+#define __pyx_n_u_sabot__cython_operators_morsel_o __pyx_string_tab[95]
+#define __pyx_kp_u_sabot__cython_operators_morsel_o_2 __pyx_string_tab[96]
+#define __pyx_n_u_sabot__cython_shuffle_partitione __pyx_string_tab[97]
+#define __pyx_n_u_sabot__cython_shuffle_shuffle_tr __pyx_string_tab[98]
+#define __pyx_n_u_sabot_cluster_agent_context __pyx_string_tab[99]
+#define __pyx_n_u_schema __pyx_string_tab[100]
+#define __pyx_n_u_schema_2 __pyx_string_tab[101]
+#define __pyx_n_u_self __pyx_string_tab[102]
+#define __pyx_n_u_send __pyx_string_tab[103]
+#define __pyx_n_u_set_event_loop __pyx_string_tab[104]
+#define __pyx_n_u_set_name __pyx_string_tab[105]
+#define __pyx_n_u_setstate __pyx_string_tab[106]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[107]
+#define __pyx_n_u_should_use_morsel_execution __pyx_string_tab[108]
+#define __pyx_n_u_slice __pyx_string_tab[109]
+#define __pyx_n_u_slice_info __pyx_string_tab[110]
+#define __pyx_n_u_slot_stats __pyx_string_tab[111]
+#define __pyx_n_u_source __pyx_string_tab[112]
+#define __pyx_n_u_source_2 __pyx_string_tab[113]
+#define __pyx_n_u_spec __pyx_string_tab[114]
+#define __pyx_n_u_start_row __pyx_string_tab[115]
+#define __pyx_n_u_stateful __pyx_string_tab[116]
+#define __pyx_n_u_stats __pyx_string_tab[117]
+#define __pyx_kp_u_stringsource __pyx_string_tab[118]
+#define __pyx_n_u_task_slot_manager __pyx_string_tab[119]
+#define __pyx_n_u_test __pyx_string_tab[120]
+#define __pyx_kp_u_thread_pool_executor_fallback __pyx_string_tab[121]
+#define __pyx_n_u_throw __pyx_string_tab[122]
+#define __pyx_n_u_to_batches __pyx_string_tab[123]
+#define __pyx_n_u_update __pyx_string_tab[124]
+#define __pyx_n_u_value __pyx_string_tab[125]
+#define __pyx_n_u_warning __pyx_string_tab[126]
+#define __pyx_n_u_wrapped_operator __pyx_string_tab[127]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -6615,9 +6788,13 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels);
   Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle);
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle);
-  for (int i=0; i<7; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<104; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels);
+  Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels);
+  for (int i=0; i<2; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
+  for (int i=0; i<9; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<128; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   Py_CLEAR(clear_module_state->__pyx_int_0);
+  Py_CLEAR(clear_module_state->__pyx_int_100);
   Py_CLEAR(clear_module_state->__pyx_int_10000);
   return 0;
 }
@@ -6758,9 +6935,13 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels);
   Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle);
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle);
-  for (int i=0; i<7; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<104; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels);
+  Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels);
+  for (int i=0; i<2; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
+  for (int i=0; i<9; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<128; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_100);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_10000);
   return 0;
 }
@@ -9326,7 +9507,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenO
  *             enabled: Enable morsel execution (False = passthrough)
  *         """
  *         self._wrapped_operator = wrapped_operator             # <<<<<<<<<<<<<<
- *         self._num_workers = num_workers if num_workers > 0 else 0
+ *         self._num_workers = num_workers if num_workers > 0 else 4  # Default to 4 workers
  *         self._morsel_size_kb = morsel_size_kb
 */
   __Pyx_INCREF(__pyx_v_wrapped_operator);
@@ -9338,7 +9519,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenO
   /* "sabot/_cython/operators/morsel_operator.pyx":54
  *         """
  *         self._wrapped_operator = wrapped_operator
- *         self._num_workers = num_workers if num_workers > 0 else 0             # <<<<<<<<<<<<<<
+ *         self._num_workers = num_workers if num_workers > 0 else 4  # Default to 4 workers             # <<<<<<<<<<<<<<
  *         self._morsel_size_kb = morsel_size_kb
  *         self._enabled = enabled
 */
@@ -9346,13 +9527,13 @@ static int __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenO
   if (__pyx_t_2) {
     __pyx_t_1 = __pyx_v_num_workers;
   } else {
-    __pyx_t_1 = 0;
+    __pyx_t_1 = 4;
   }
   __pyx_v_self->_num_workers = __pyx_t_1;
 
   /* "sabot/_cython/operators/morsel_operator.pyx":55
  *         self._wrapped_operator = wrapped_operator
- *         self._num_workers = num_workers if num_workers > 0 else 0
+ *         self._num_workers = num_workers if num_workers > 0 else 4  # Default to 4 workers
  *         self._morsel_size_kb = morsel_size_kb             # <<<<<<<<<<<<<<
  *         self._enabled = enabled
  * 
@@ -9360,28 +9541,15 @@ static int __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenO
   __pyx_v_self->_morsel_size_kb = __pyx_v_morsel_size_kb;
 
   /* "sabot/_cython/operators/morsel_operator.pyx":56
- *         self._num_workers = num_workers if num_workers > 0 else 0
+ *         self._num_workers = num_workers if num_workers > 0 else 4  # Default to 4 workers
  *         self._morsel_size_kb = morsel_size_kb
  *         self._enabled = enabled             # <<<<<<<<<<<<<<
  * 
- *         # Use shared task slot manager (unified local + network processing)
+ *         # Shuffle client for network morsels
 */
   __pyx_v_self->_enabled = __pyx_v_enabled;
 
   /* "sabot/_cython/operators/morsel_operator.pyx":59
- * 
- *         # Use shared task slot manager (unified local + network processing)
- *         self._task_slot_manager = None             # <<<<<<<<<<<<<<
- * 
- *         # Shuffle client for network morsels
-*/
-  __Pyx_INCREF(Py_None);
-  __Pyx_GIVEREF(Py_None);
-  __Pyx_GOTREF(__pyx_v_self->_task_slot_manager);
-  __Pyx_DECREF(__pyx_v_self->_task_slot_manager);
-  __pyx_v_self->_task_slot_manager = Py_None;
-
-  /* "sabot/_cython/operators/morsel_operator.pyx":62
  * 
  *         # Shuffle client for network morsels
  *         self._shuffle_client = None             # <<<<<<<<<<<<<<
@@ -9394,16 +9562,16 @@ static int __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenO
   __Pyx_DECREF(__pyx_v_self->_shuffle_client);
   __pyx_v_self->_shuffle_client = Py_None;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":65
+  /* "sabot/_cython/operators/morsel_operator.pyx":62
  * 
  *         # Copy source and schema from wrapped operator
  *         self._source = getattr(wrapped_operator, '_source', kwargs.get('source'))             # <<<<<<<<<<<<<<
  *         self._schema = getattr(wrapped_operator, '_schema', kwargs.get('schema'))
  * 
 */
-  __pyx_t_3 = __Pyx_PyDict_GetItemDefault(__pyx_v_kwargs, __pyx_mstate_global->__pyx_n_u_source_2, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_GetItemDefault(__pyx_v_kwargs, __pyx_mstate_global->__pyx_n_u_source_2, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 62, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_GetAttr3(__pyx_v_wrapped_operator, __pyx_mstate_global->__pyx_n_u_source, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetAttr3(__pyx_v_wrapped_operator, __pyx_mstate_global->__pyx_n_u_source, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 62, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_GIVEREF(__pyx_t_4);
@@ -9412,16 +9580,16 @@ static int __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenO
   __pyx_v_self->__pyx_base._source = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":66
+  /* "sabot/_cython/operators/morsel_operator.pyx":63
  *         # Copy source and schema from wrapped operator
  *         self._source = getattr(wrapped_operator, '_source', kwargs.get('source'))
  *         self._schema = getattr(wrapped_operator, '_schema', kwargs.get('schema'))             # <<<<<<<<<<<<<<
  * 
  *         # Copy stateful metadata
 */
-  __pyx_t_4 = __Pyx_PyDict_GetItemDefault(__pyx_v_kwargs, __pyx_mstate_global->__pyx_n_u_schema_2, Py_None); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 66, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_GetItemDefault(__pyx_v_kwargs, __pyx_mstate_global->__pyx_n_u_schema_2, Py_None); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 63, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_GetAttr3(__pyx_v_wrapped_operator, __pyx_mstate_global->__pyx_n_u_schema, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 66, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetAttr3(__pyx_v_wrapped_operator, __pyx_mstate_global->__pyx_n_u_schema, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 63, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_GIVEREF(__pyx_t_3);
@@ -9430,36 +9598,36 @@ static int __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenO
   __pyx_v_self->__pyx_base._schema = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":69
+  /* "sabot/_cython/operators/morsel_operator.pyx":66
  * 
  *         # Copy stateful metadata
  *         self._stateful = getattr(wrapped_operator, '_stateful', False)             # <<<<<<<<<<<<<<
  *         self._key_columns = getattr(wrapped_operator, '_key_columns', None)
  *         self._parallelism_hint = num_workers if num_workers > 0 else 1
 */
-  __pyx_t_3 = __Pyx_GetAttr3(__pyx_v_wrapped_operator, __pyx_mstate_global->__pyx_n_u_stateful, Py_False); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetAttr3(__pyx_v_wrapped_operator, __pyx_mstate_global->__pyx_n_u_stateful, Py_False); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 66, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_self->__pyx_base._stateful = __pyx_t_2;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":70
+  /* "sabot/_cython/operators/morsel_operator.pyx":67
  *         # Copy stateful metadata
  *         self._stateful = getattr(wrapped_operator, '_stateful', False)
  *         self._key_columns = getattr(wrapped_operator, '_key_columns', None)             # <<<<<<<<<<<<<<
  *         self._parallelism_hint = num_workers if num_workers > 0 else 1
  * 
 */
-  __pyx_t_3 = __Pyx_GetAttr3(__pyx_v_wrapped_operator, __pyx_mstate_global->__pyx_n_u_key_columns, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetAttr3(__pyx_v_wrapped_operator, __pyx_mstate_global->__pyx_n_u_key_columns, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 67, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (!(likely(PyList_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_3))) __PYX_ERR(0, 70, __pyx_L1_error)
+  if (!(likely(PyList_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_3))) __PYX_ERR(0, 67, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_3);
   __Pyx_GOTREF(__pyx_v_self->__pyx_base._key_columns);
   __Pyx_DECREF(__pyx_v_self->__pyx_base._key_columns);
   __pyx_v_self->__pyx_base._key_columns = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":71
+  /* "sabot/_cython/operators/morsel_operator.pyx":68
  *         self._stateful = getattr(wrapped_operator, '_stateful', False)
  *         self._key_columns = getattr(wrapped_operator, '_key_columns', None)
  *         self._parallelism_hint = num_workers if num_workers > 0 else 1             # <<<<<<<<<<<<<<
@@ -9495,12 +9663,12 @@ static int __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenO
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/morsel_operator.pyx":73
+/* "sabot/_cython/operators/morsel_operator.pyx":70
  *         self._parallelism_hint = num_workers if num_workers > 0 else 1
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
  *         """Clean up executors."""
- *         # Task slot manager is shared across operators (managed by AgentContext)
+ *         # No cleanup needed (ThreadPoolExecutor is context-managed)
 */
 
 /* Python wrapper */
@@ -9521,7 +9689,7 @@ static void __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDriven
   /* function exit code */
 }
 
-/* "sabot/_cython/operators/morsel_operator.pyx":79
+/* "sabot/_cython/operators/morsel_operator.pyx":75
  *         pass
  * 
  *     cpdef bint should_use_morsel_execution(self, object batch):             # <<<<<<<<<<<<<<
@@ -9566,7 +9734,7 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_should_use_morsel_execution); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_should_use_morsel_execution); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 75, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_5should_use_morsel_execution)) {
         __pyx_t_3 = NULL;
@@ -9589,10 +9757,10 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 79, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 75, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_6;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -9611,7 +9779,7 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
     #endif
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":94
+  /* "sabot/_cython/operators/morsel_operator.pyx":90
  *             True if morsel execution should be used
  *         """
  *         if not self._enabled:             # <<<<<<<<<<<<<<
@@ -9621,7 +9789,7 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
   __pyx_t_6 = (!__pyx_v_self->_enabled);
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":95
+    /* "sabot/_cython/operators/morsel_operator.pyx":91
  *         """
  *         if not self._enabled:
  *             return False             # <<<<<<<<<<<<<<
@@ -9631,7 +9799,7 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
     __pyx_r = 0;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":94
+    /* "sabot/_cython/operators/morsel_operator.pyx":90
  *             True if morsel execution should be used
  *         """
  *         if not self._enabled:             # <<<<<<<<<<<<<<
@@ -9640,7 +9808,7 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
 */
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":97
+  /* "sabot/_cython/operators/morsel_operator.pyx":93
  *             return False
  * 
  *         if self._num_workers <= 1:             # <<<<<<<<<<<<<<
@@ -9650,7 +9818,7 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
   __pyx_t_6 = (__pyx_v_self->_num_workers <= 1);
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":98
+    /* "sabot/_cython/operators/morsel_operator.pyx":94
  * 
  *         if self._num_workers <= 1:
  *             return False             # <<<<<<<<<<<<<<
@@ -9660,7 +9828,7 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
     __pyx_r = 0;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":97
+    /* "sabot/_cython/operators/morsel_operator.pyx":93
  *             return False
  * 
  *         if self._num_workers <= 1:             # <<<<<<<<<<<<<<
@@ -9669,7 +9837,7 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
 */
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":100
+  /* "sabot/_cython/operators/morsel_operator.pyx":96
  *             return False
  * 
  *         if batch is None or batch.num_rows < MIN_BATCH_SIZE_FOR_MORSEL:             # <<<<<<<<<<<<<<
@@ -9682,17 +9850,17 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
     __pyx_t_6 = __pyx_t_7;
     goto __pyx_L6_bool_binop_done;
   }
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_mstate_global->__pyx_int_10000, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_mstate_global->__pyx_int_10000, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_6 = __pyx_t_7;
   __pyx_L6_bool_binop_done:;
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":101
+    /* "sabot/_cython/operators/morsel_operator.pyx":97
  * 
  *         if batch is None or batch.num_rows < MIN_BATCH_SIZE_FOR_MORSEL:
  *             return False             # <<<<<<<<<<<<<<
@@ -9702,7 +9870,7 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
     __pyx_r = 0;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":100
+    /* "sabot/_cython/operators/morsel_operator.pyx":96
  *             return False
  * 
  *         if batch is None or batch.num_rows < MIN_BATCH_SIZE_FOR_MORSEL:             # <<<<<<<<<<<<<<
@@ -9711,7 +9879,7 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
 */
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":103
+  /* "sabot/_cython/operators/morsel_operator.pyx":99
  *             return False
  * 
  *         return True             # <<<<<<<<<<<<<<
@@ -9721,7 +9889,7 @@ static int __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOp
   __pyx_r = 1;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":79
+  /* "sabot/_cython/operators/morsel_operator.pyx":75
  *         pass
  * 
  *     cpdef bint should_use_morsel_execution(self, object batch):             # <<<<<<<<<<<<<<
@@ -9782,32 +9950,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 79, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 75, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 79, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 75, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "should_use_morsel_execution", 0) < 0) __PYX_ERR(0, 79, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "should_use_morsel_execution", 0) < 0) __PYX_ERR(0, 75, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("should_use_morsel_execution", 1, 1, 1, i); __PYX_ERR(0, 79, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("should_use_morsel_execution", 1, 1, 1, i); __PYX_ERR(0, 75, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 79, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 75, __pyx_L3_error)
     }
     __pyx_v_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("should_use_morsel_execution", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 79, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("should_use_morsel_execution", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 75, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9838,8 +10006,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("should_use_morsel_execution", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_should_use_morsel_execution(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 79, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_should_use_morsel_execution(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 75, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
@@ -9856,7 +10024,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/morsel_operator.pyx":105
+/* "sabot/_cython/operators/morsel_operator.pyx":101
  *         return True
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -9901,7 +10069,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_process_batch); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 105, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_process_batch); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_7process_batch)) {
         __Pyx_XDECREF(__pyx_r);
@@ -9925,7 +10093,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 105, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __pyx_r = __pyx_t_2;
@@ -9946,7 +10114,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     #endif
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":122
+  /* "sabot/_cython/operators/morsel_operator.pyx":118
  *             Processed RecordBatch
  *         """
  *         if batch is None:             # <<<<<<<<<<<<<<
@@ -9956,7 +10124,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
   __pyx_t_6 = (__pyx_v_batch == Py_None);
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":123
+    /* "sabot/_cython/operators/morsel_operator.pyx":119
  *         """
  *         if batch is None:
  *             return None             # <<<<<<<<<<<<<<
@@ -9967,7 +10135,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":122
+    /* "sabot/_cython/operators/morsel_operator.pyx":118
  *             Processed RecordBatch
  *         """
  *         if batch is None:             # <<<<<<<<<<<<<<
@@ -9976,18 +10144,18 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
 */
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":126
+  /* "sabot/_cython/operators/morsel_operator.pyx":122
  * 
  *         # Small batch - direct execution (no overhead)
  *         if not self.should_use_morsel_execution(batch):             # <<<<<<<<<<<<<<
  *             return self._wrapped_operator.process_batch(batch)
  * 
 */
-  __pyx_t_6 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self->__pyx_base.__pyx_vtab)->should_use_morsel_execution(__pyx_v_self, __pyx_v_batch, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_6 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self->__pyx_base.__pyx_vtab)->should_use_morsel_execution(__pyx_v_self, __pyx_v_batch, 0); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 122, __pyx_L1_error)
   __pyx_t_7 = (!__pyx_t_6);
   if (__pyx_t_7) {
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":127
+    /* "sabot/_cython/operators/morsel_operator.pyx":123
  *         # Small batch - direct execution (no overhead)
  *         if not self.should_use_morsel_execution(batch):
  *             return self._wrapped_operator.process_batch(batch)             # <<<<<<<<<<<<<<
@@ -10002,14 +10170,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
       PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_batch};
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_process_batch, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 127, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __pyx_r = __pyx_t_1;
     __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":126
+    /* "sabot/_cython/operators/morsel_operator.pyx":122
  * 
  *         # Small batch - direct execution (no overhead)
  *         if not self.should_use_morsel_execution(batch):             # <<<<<<<<<<<<<<
@@ -10018,7 +10186,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
 */
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":130
+  /* "sabot/_cython/operators/morsel_operator.pyx":126
  * 
  *         # Large batch - decide LOCAL vs NETWORK
  *         if self._wrapped_operator.requires_shuffle():             # <<<<<<<<<<<<<<
@@ -10032,14 +10200,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_requires_shuffle, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_7) {
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":133
+    /* "sabot/_cython/operators/morsel_operator.pyx":129
  *             # Stateful operator (join, groupBy, window)
  *             # Needs network shuffle to co-locate keys across agents
  *             return self._process_with_network_shuffle(batch)             # <<<<<<<<<<<<<<
@@ -10047,13 +10215,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
  *             # Stateless operator (map, filter, select)
 */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self->__pyx_base.__pyx_vtab)->_process_with_network_shuffle(__pyx_v_self, __pyx_v_batch); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
+    __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self->__pyx_base.__pyx_vtab)->_process_with_network_shuffle(__pyx_v_self, __pyx_v_batch); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_r = __pyx_t_1;
     __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":130
+    /* "sabot/_cython/operators/morsel_operator.pyx":126
  * 
  *         # Large batch - decide LOCAL vs NETWORK
  *         if self._wrapped_operator.requires_shuffle():             # <<<<<<<<<<<<<<
@@ -10062,7 +10230,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
 */
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":137
+  /* "sabot/_cython/operators/morsel_operator.pyx":133
  *             # Stateless operator (map, filter, select)
  *             # Can process locally in parallel using C++ threads
  *             return self._process_with_local_morsels(batch)             # <<<<<<<<<<<<<<
@@ -10071,14 +10239,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
 */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self->__pyx_base.__pyx_vtab)->_process_with_local_morsels(__pyx_v_self, __pyx_v_batch); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 137, __pyx_L1_error)
+    __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self->__pyx_base.__pyx_vtab)->_process_with_local_morsels(__pyx_v_self, __pyx_v_batch); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_r = __pyx_t_1;
     __pyx_t_1 = 0;
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":105
+  /* "sabot/_cython/operators/morsel_operator.pyx":101
  *         return True
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -10140,32 +10308,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 105, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 101, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 105, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 101, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batch", 0) < 0) __PYX_ERR(0, 105, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batch", 0) < 0) __PYX_ERR(0, 101, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, i); __PYX_ERR(0, 105, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, i); __PYX_ERR(0, 101, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 105, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 101, __pyx_L3_error)
     }
     __pyx_v_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 105, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 101, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10195,7 +10363,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("process_batch", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_process_batch(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 105, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_process_batch(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -10212,12 +10380,12 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/morsel_operator.pyx":171
+/* "sabot/_cython/operators/morsel_operator.pyx":178
  * 
- *         # Create callback that calls wrapped operator
- *         def process_morsel_callback(morsel_batch):             # <<<<<<<<<<<<<<
- *             """Process single morsel using wrapped operator."""
- *             return self._wrapped_operator.process_batch(morsel_batch)
+ *             # Create callback that processes morsel slices
+ *             def process_morsel_callback(morsel_batch):             # <<<<<<<<<<<<<<
+ *                 """Process single morsel using wrapped operator."""
+ *                 return self._wrapped_operator.process_batch(morsel_batch)
 */
 
 /* Python wrapper */
@@ -10260,32 +10428,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_morsel_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 171, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 178, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 171, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 178, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_morsel_callback", 0) < 0) __PYX_ERR(0, 171, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_morsel_callback", 0) < 0) __PYX_ERR(0, 178, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_morsel_callback", 1, 1, 1, i); __PYX_ERR(0, 171, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_morsel_callback", 1, 1, 1, i); __PYX_ERR(0, 178, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 171, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 178, __pyx_L3_error)
     }
     __pyx_v_morsel_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("process_morsel_callback", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 171, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("process_morsel_callback", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 178, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10321,15 +10489,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   __pyx_outer_scope = (struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels *) __Pyx_CyFunction_GetClosure(__pyx_self);
   __pyx_cur_scope = __pyx_outer_scope;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":173
- *         def process_morsel_callback(morsel_batch):
- *             """Process single morsel using wrapped operator."""
- *             return self._wrapped_operator.process_batch(morsel_batch)             # <<<<<<<<<<<<<<
+  /* "sabot/_cython/operators/morsel_operator.pyx":180
+ *             def process_morsel_callback(morsel_batch):
+ *                 """Process single morsel using wrapped operator."""
+ *                 return self._wrapped_operator.process_batch(morsel_batch)             # <<<<<<<<<<<<<<
  * 
- *         # Execute using shared task slots (releases GIL!)
+ *             # Execute using task slot manager (releases GIL, C++ threads!)
 */
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_cur_scope->__pyx_v_self)) { __Pyx_RaiseClosureNameError("self"); __PYX_ERR(0, 173, __pyx_L1_error) }
+  if (unlikely(!__pyx_cur_scope->__pyx_v_self)) { __Pyx_RaiseClosureNameError("self"); __PYX_ERR(0, 180, __pyx_L1_error) }
   __pyx_t_2 = __pyx_cur_scope->__pyx_v_self->_wrapped_operator;
   __Pyx_INCREF(__pyx_t_2);
   __pyx_t_3 = 0;
@@ -10337,19 +10505,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_morsel_batch};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_process_batch, __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 180, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":171
+  /* "sabot/_cython/operators/morsel_operator.pyx":178
  * 
- *         # Create callback that calls wrapped operator
- *         def process_morsel_callback(morsel_batch):             # <<<<<<<<<<<<<<
- *             """Process single morsel using wrapped operator."""
- *             return self._wrapped_operator.process_batch(morsel_batch)
+ *             # Create callback that processes morsel slices
+ *             def process_morsel_callback(morsel_batch):             # <<<<<<<<<<<<<<
+ *                 """Process single morsel using wrapped operator."""
+ *                 return self._wrapped_operator.process_batch(morsel_batch)
 */
 
   /* function exit code */
@@ -10364,40 +10532,320 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/morsel_operator.pyx":139
+/* "sabot/_cython/operators/morsel_operator.pyx":223
+ * 
+ *             # Process morsels with ThreadPoolExecutor fallback
+ *             def process_morsel(slice_info):             # <<<<<<<<<<<<<<
+ *                 start_row, end_row = slice_info
+ *                 morsel_batch = batch.slice(offset=start_row, length=(end_row - start_row))
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_27_process_with_local_morsels_3process_morsel(PyObject *__pyx_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_27_process_with_local_morsels_3process_morsel = {"process_morsel", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_27_process_with_local_morsels_3process_morsel, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_27_process_with_local_morsels_3process_morsel(PyObject *__pyx_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  PyObject *__pyx_v_slice_info = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("process_morsel (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_slice_info,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 223, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 223, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_morsel", 0) < 0) __PYX_ERR(0, 223, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_morsel", 1, 1, 1, i); __PYX_ERR(0, 223, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 223, __pyx_L3_error)
+    }
+    __pyx_v_slice_info = values[0];
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("process_morsel", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 223, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("sabot._cython.operators.morsel_operator.MorselDrivenOperator._process_with_local_morsels.process_morsel", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_27_process_with_local_morsels_2process_morsel(__pyx_self, __pyx_v_slice_info);
+
+  /* function exit code */
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_27_process_with_local_morsels_2process_morsel(PyObject *__pyx_self, PyObject *__pyx_v_slice_info) {
+  struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels *__pyx_cur_scope;
+  struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels *__pyx_outer_scope;
+  PyObject *__pyx_v_start_row = NULL;
+  PyObject *__pyx_v_end_row = NULL;
+  PyObject *__pyx_v_morsel_batch = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *(*__pyx_t_4)(PyObject *);
+  size_t __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("process_morsel", 0);
+  __pyx_outer_scope = (struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels *) __Pyx_CyFunction_GetClosure(__pyx_self);
+  __pyx_cur_scope = __pyx_outer_scope;
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":224
+ *             # Process morsels with ThreadPoolExecutor fallback
+ *             def process_morsel(slice_info):
+ *                 start_row, end_row = slice_info             # <<<<<<<<<<<<<<
+ *                 morsel_batch = batch.slice(offset=start_row, length=(end_row - start_row))
+ *                 return self._wrapped_operator.process_batch(morsel_batch)
+*/
+  if ((likely(PyTuple_CheckExact(__pyx_v_slice_info))) || (PyList_CheckExact(__pyx_v_slice_info))) {
+    PyObject* sequence = __pyx_v_slice_info;
+    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
+    if (unlikely(size != 2)) {
+      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
+      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+      __PYX_ERR(0, 224, __pyx_L1_error)
+    }
+    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    if (likely(PyTuple_CheckExact(sequence))) {
+      __pyx_t_1 = PyTuple_GET_ITEM(sequence, 0);
+      __Pyx_INCREF(__pyx_t_1);
+      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1);
+      __Pyx_INCREF(__pyx_t_2);
+    } else {
+      __pyx_t_1 = __Pyx_PyList_GetItemRef(sequence, 0);
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
+      __Pyx_XGOTREF(__pyx_t_1);
+      __pyx_t_2 = __Pyx_PyList_GetItemRef(sequence, 1);
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
+      __Pyx_XGOTREF(__pyx_t_2);
+    }
+    #else
+    __pyx_t_1 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_2 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    #endif
+  } else {
+    Py_ssize_t index = -1;
+    __pyx_t_3 = PyObject_GetIter(__pyx_v_slice_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_3);
+    index = 0; __pyx_t_1 = __pyx_t_4(__pyx_t_3); if (unlikely(!__pyx_t_1)) goto __pyx_L3_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_1);
+    index = 1; __pyx_t_2 = __pyx_t_4(__pyx_t_3); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_2);
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_4(__pyx_t_3), 2) < 0) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_4 = NULL;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    goto __pyx_L4_unpacking_done;
+    __pyx_L3_unpacking_failed:;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_4 = NULL;
+    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+    __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_L4_unpacking_done:;
+  }
+  __pyx_v_start_row = __pyx_t_1;
+  __pyx_t_1 = 0;
+  __pyx_v_end_row = __pyx_t_2;
+  __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":225
+ *             def process_morsel(slice_info):
+ *                 start_row, end_row = slice_info
+ *                 morsel_batch = batch.slice(offset=start_row, length=(end_row - start_row))             # <<<<<<<<<<<<<<
+ *                 return self._wrapped_operator.process_batch(morsel_batch)
+ * 
+*/
+  if (unlikely(!__pyx_cur_scope->__pyx_v_batch)) { __Pyx_RaiseClosureNameError("batch"); __PYX_ERR(0, 225, __pyx_L1_error) }
+  __pyx_t_1 = __pyx_cur_scope->__pyx_v_batch;
+  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_3 = PyNumber_Subtract(__pyx_v_end_row, __pyx_v_start_row); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_5 = 0;
+  {
+    PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_1, NULL};
+    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 225, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_offset, __pyx_v_start_row, __pyx_t_6, __pyx_callargs+1, 0) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_length, __pyx_t_3, __pyx_t_6, __pyx_callargs+1, 1) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_Object_VectorcallMethod_CallFromBuilder(__pyx_mstate_global->__pyx_n_u_slice, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 225, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+  }
+  __pyx_v_morsel_batch = __pyx_t_2;
+  __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":226
+ *                 start_row, end_row = slice_info
+ *                 morsel_batch = batch.slice(offset=start_row, length=(end_row - start_row))
+ *                 return self._wrapped_operator.process_batch(morsel_batch)             # <<<<<<<<<<<<<<
+ * 
+ *             with concurrent.futures.ThreadPoolExecutor(max_workers=self._num_workers) as executor:
+*/
+  __Pyx_XDECREF(__pyx_r);
+  if (unlikely(!__pyx_cur_scope->__pyx_v_self)) { __Pyx_RaiseClosureNameError("self"); __PYX_ERR(0, 226, __pyx_L1_error) }
+  __pyx_t_6 = __pyx_cur_scope->__pyx_v_self->_wrapped_operator;
+  __Pyx_INCREF(__pyx_t_6);
+  __pyx_t_5 = 0;
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_6, __pyx_v_morsel_batch};
+    __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_process_batch, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 226, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+  }
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
+  goto __pyx_L0;
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":223
+ * 
+ *             # Process morsels with ThreadPoolExecutor fallback
+ *             def process_morsel(slice_info):             # <<<<<<<<<<<<<<
+ *                 start_row, end_row = slice_info
+ *                 morsel_batch = batch.slice(offset=start_row, length=(end_row - start_row))
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_AddTraceback("sabot._cython.operators.morsel_operator.MorselDrivenOperator._process_with_local_morsels.process_morsel", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_start_row);
+  __Pyx_XDECREF(__pyx_v_end_row);
+  __Pyx_XDECREF(__pyx_v_morsel_batch);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "sabot/_cython/operators/morsel_operator.pyx":135
  *             return self._process_with_local_morsels(batch)
  * 
  *     cdef object _process_with_local_morsels(self, object batch):             # <<<<<<<<<<<<<<
  *         """
- *         Process batch locally using shared task slot manager.
+ *         Process batch locally using TaskSlotManager (C++ work-stealing threads).
 */
 
 static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator__process_with_local_morsels(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self, PyObject *__pyx_v_batch) {
   struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels *__pyx_cur_scope;
+  PyObject *__pyx_v_pa = NULL;
   PyObject *__pyx_v_get_or_create_slot_manager = NULL;
+  PyObject *__pyx_v_task_slot_manager = NULL;
   PyObject *__pyx_v_morsel_size_bytes = NULL;
+  PyObject *__pyx_v_avg_bytes_per_row = NULL;
   PyObject *__pyx_v_rows_per_morsel = NULL;
   PyObject *__pyx_v_morsels = NULL;
   PyObject *__pyx_v_start_row = NULL;
   PyObject *__pyx_v_num_rows = NULL;
   PyObject *__pyx_v_process_morsel_callback = 0;
   PyObject *__pyx_v_result_batches = NULL;
-  PyObject *__pyx_v_pa = NULL;
   PyObject *__pyx_v_table = NULL;
+  PyObject *__pyx_v_combined_table = NULL;
+  PyObject *__pyx_v_batches = NULL;
+  PyObject *__pyx_v_e = NULL;
+  PyObject *__pyx_v_logging = NULL;
+  PyObject *__pyx_v_concurrent = NULL;
+  PyObject *__pyx_v_morsel_slices = NULL;
+  PyObject *__pyx_v_end_row = NULL;
+  PyObject *__pyx_v_process_morsel = 0;
+  PyObject *__pyx_v_executor = NULL;
+  PyObject *__pyx_7genexpr__pyx_v_rb = NULL;
+  PyObject *__pyx_8genexpr1__pyx_v_rb = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
+  PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
   PyObject *__pyx_t_5 = NULL;
-  size_t __pyx_t_6;
+  PyObject *__pyx_t_6 = NULL;
   PyObject *__pyx_t_7 = NULL;
-  long __pyx_t_8;
-  Py_ssize_t __pyx_t_9;
-  PyObject *(*__pyx_t_10)(PyObject *);
+  size_t __pyx_t_8;
+  PyObject *__pyx_t_9 = NULL;
+  long __pyx_t_10;
   int __pyx_t_11;
-  int __pyx_t_12;
+  Py_ssize_t __pyx_t_12;
+  PyObject *(*__pyx_t_13)(PyObject *);
+  int __pyx_t_14;
+  int __pyx_t_15;
+  int __pyx_t_16;
+  PyObject *__pyx_t_17 = NULL;
+  PyObject *__pyx_t_18[3];
+  PyObject *__pyx_t_19 = NULL;
+  PyObject *__pyx_t_20 = NULL;
+  PyObject *__pyx_t_21 = NULL;
+  PyObject *__pyx_t_22 = NULL;
+  PyObject *__pyx_t_23 = NULL;
+  PyObject *__pyx_t_24 = NULL;
+  PyObject *__pyx_t_25 = NULL;
+  int __pyx_t_26;
+  char const *__pyx_t_27;
+  PyObject *__pyx_t_28 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -10406,517 +10854,1536 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 139, __pyx_L1_error)
+    __PYX_ERR(0, 135, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
   __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __pyx_cur_scope->__pyx_v_batch = __pyx_v_batch;
+  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_batch);
+  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_batch);
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":157
+  /* "sabot/_cython/operators/morsel_operator.pyx":152
+ *             Processed RecordBatch
  *         """
- *         # Get shared task slot manager (auto-initializes if needed)
- *         if self._task_slot_manager is None:             # <<<<<<<<<<<<<<
- *             from sabot.cluster.agent_context import get_or_create_slot_manager
- *             self._task_slot_manager = get_or_create_slot_manager(num_slots=self._num_workers)
-*/
-  __pyx_t_1 = (__pyx_cur_scope->__pyx_v_self->_task_slot_manager == Py_None);
-  if (__pyx_t_1) {
-
-    /* "sabot/_cython/operators/morsel_operator.pyx":158
- *         # Get shared task slot manager (auto-initializes if needed)
- *         if self._task_slot_manager is None:
- *             from sabot.cluster.agent_context import get_or_create_slot_manager             # <<<<<<<<<<<<<<
- *             self._task_slot_manager = get_or_create_slot_manager(num_slots=self._num_workers)
- * 
-*/
-    __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 158, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_get_or_create_slot_manager);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_n_u_get_or_create_slot_manager);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_2, 0, __pyx_mstate_global->__pyx_n_u_get_or_create_slot_manager) != (0)) __PYX_ERR(0, 158, __pyx_L1_error);
-    __pyx_t_3 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot_cluster_agent_context, __pyx_t_2, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 158, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_get_or_create_slot_manager); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 158, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_INCREF(__pyx_t_2);
-    __pyx_v_get_or_create_slot_manager = __pyx_t_2;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-    /* "sabot/_cython/operators/morsel_operator.pyx":159
- *         if self._task_slot_manager is None:
- *             from sabot.cluster.agent_context import get_or_create_slot_manager
- *             self._task_slot_manager = get_or_create_slot_manager(num_slots=self._num_workers)             # <<<<<<<<<<<<<<
- * 
- *         # Create morsels from batch
-*/
-    __pyx_t_2 = NULL;
-    __Pyx_INCREF(__pyx_v_get_or_create_slot_manager);
-    __pyx_t_4 = __pyx_v_get_or_create_slot_manager; 
-    __pyx_t_5 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->_num_workers); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 159, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = 1;
-    #if CYTHON_UNPACK_METHODS
-    if (unlikely(PyMethod_Check(__pyx_t_4))) {
-      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_4);
-      assert(__pyx_t_2);
-      PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
-      __Pyx_INCREF(__pyx_t_2);
-      __Pyx_INCREF(__pyx__function);
-      __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
-      __pyx_t_6 = 0;
-    }
-    #endif
-    {
-      PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_2, NULL};
-      __pyx_t_7 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 159, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_num_slots, __pyx_t_5, __pyx_t_7, __pyx_callargs+1, 0) < 0) __PYX_ERR(0, 159, __pyx_L1_error)
-      __pyx_t_3 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_4, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_7);
-      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 159, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-    }
-    __Pyx_GIVEREF(__pyx_t_3);
-    __Pyx_GOTREF(__pyx_cur_scope->__pyx_v_self->_task_slot_manager);
-    __Pyx_DECREF(__pyx_cur_scope->__pyx_v_self->_task_slot_manager);
-    __pyx_cur_scope->__pyx_v_self->_task_slot_manager = __pyx_t_3;
-    __pyx_t_3 = 0;
-
-    /* "sabot/_cython/operators/morsel_operator.pyx":157
- *         """
- *         # Get shared task slot manager (auto-initializes if needed)
- *         if self._task_slot_manager is None:             # <<<<<<<<<<<<<<
- *             from sabot.cluster.agent_context import get_or_create_slot_manager
- *             self._task_slot_manager = get_or_create_slot_manager(num_slots=self._num_workers)
-*/
-  }
-
-  /* "sabot/_cython/operators/morsel_operator.pyx":162
- * 
- *         # Create morsels from batch
- *         morsel_size_bytes = self._morsel_size_kb * 1024             # <<<<<<<<<<<<<<
- *         rows_per_morsel = max(1, morsel_size_bytes // batch.schema.get_field_index('id'))  # Rough estimate
- * 
-*/
-  __pyx_t_3 = __Pyx_PyLong_From_PY_LONG_LONG((__pyx_cur_scope->__pyx_v_self->_morsel_size_kb * 0x400)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 162, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_v_morsel_size_bytes = __pyx_t_3;
-  __pyx_t_3 = 0;
-
-  /* "sabot/_cython/operators/morsel_operator.pyx":163
- *         # Create morsels from batch
- *         morsel_size_bytes = self._morsel_size_kb * 1024
- *         rows_per_morsel = max(1, morsel_size_bytes // batch.schema.get_field_index('id'))  # Rough estimate             # <<<<<<<<<<<<<<
- * 
- *         morsels = []
-*/
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_schema_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 163, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_4 = __pyx_t_7;
-  __Pyx_INCREF(__pyx_t_4);
-  __pyx_t_6 = 0;
-  {
-    PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_mstate_global->__pyx_n_u_id};
-    __pyx_t_3 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_get_field_index, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-  }
-  __pyx_t_7 = PyNumber_FloorDivide(__pyx_v_morsel_size_bytes, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 163, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_8 = 1;
-  __pyx_t_4 = __Pyx_PyLong_From_long(__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 163, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyObject_RichCompare(__pyx_t_7, __pyx_t_4, Py_GT); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 163, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 163, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (__pyx_t_1) {
-    __Pyx_INCREF(__pyx_t_7);
-    __pyx_t_3 = __pyx_t_7;
-  } else {
-    __pyx_t_5 = __Pyx_PyLong_From_long(__pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 163, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __pyx_t_5;
-    __pyx_t_5 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = __pyx_t_3;
-  __Pyx_INCREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_v_rows_per_morsel = __pyx_t_7;
-  __pyx_t_7 = 0;
-
-  /* "sabot/_cython/operators/morsel_operator.pyx":165
- *         rows_per_morsel = max(1, morsel_size_bytes // batch.schema.get_field_index('id'))  # Rough estimate
- * 
- *         morsels = []             # <<<<<<<<<<<<<<
- *         for start_row in range(0, batch.num_rows, rows_per_morsel):
- *             num_rows = min(rows_per_morsel, batch.num_rows - start_row)
-*/
-  __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 165, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_v_morsels = ((PyObject*)__pyx_t_7);
-  __pyx_t_7 = 0;
-
-  /* "sabot/_cython/operators/morsel_operator.pyx":166
- * 
- *         morsels = []
- *         for start_row in range(0, batch.num_rows, rows_per_morsel):             # <<<<<<<<<<<<<<
- *             num_rows = min(rows_per_morsel, batch.num_rows - start_row)
- *             morsels.append((batch, start_row, num_rows, 0))  # (batch, start, num_rows, partition_id)
-*/
-  __pyx_t_3 = NULL;
-  __Pyx_INCREF(__pyx_builtin_range);
-  __pyx_t_5 = __pyx_builtin_range; 
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 166, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_6 = 1;
-  {
-    PyObject *__pyx_callargs[4] = {__pyx_t_3, __pyx_mstate_global->__pyx_int_0, __pyx_t_4, __pyx_v_rows_per_morsel};
-    __pyx_t_7 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+__pyx_t_6, (4-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 166, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-  }
-  if (likely(PyList_CheckExact(__pyx_t_7)) || PyTuple_CheckExact(__pyx_t_7)) {
-    __pyx_t_5 = __pyx_t_7; __Pyx_INCREF(__pyx_t_5);
-    __pyx_t_9 = 0;
-    __pyx_t_10 = NULL;
-  } else {
-    __pyx_t_9 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 166, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_10 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_5); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 166, __pyx_L1_error)
-  }
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  for (;;) {
-    if (likely(!__pyx_t_10)) {
-      if (likely(PyList_CheckExact(__pyx_t_5))) {
-        {
-          Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_5);
-          #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 166, __pyx_L1_error)
-          #endif
-          if (__pyx_t_9 >= __pyx_temp) break;
-        }
-        __pyx_t_7 = __Pyx_PyList_GetItemRef(__pyx_t_5, __pyx_t_9);
-        ++__pyx_t_9;
-      } else {
-        {
-          Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_5);
-          #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 166, __pyx_L1_error)
-          #endif
-          if (__pyx_t_9 >= __pyx_temp) break;
-        }
-        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_7 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_9));
-        #else
-        __pyx_t_7 = __Pyx_PySequence_ITEM(__pyx_t_5, __pyx_t_9);
-        #endif
-        ++__pyx_t_9;
-      }
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 166, __pyx_L1_error)
-    } else {
-      __pyx_t_7 = __pyx_t_10(__pyx_t_5);
-      if (unlikely(!__pyx_t_7)) {
-        PyObject* exc_type = PyErr_Occurred();
-        if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 166, __pyx_L1_error)
-          PyErr_Clear();
-        }
-        break;
-      }
-    }
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_XDECREF_SET(__pyx_v_start_row, __pyx_t_7);
-    __pyx_t_7 = 0;
-
-    /* "sabot/_cython/operators/morsel_operator.pyx":167
- *         morsels = []
- *         for start_row in range(0, batch.num_rows, rows_per_morsel):
- *             num_rows = min(rows_per_morsel, batch.num_rows - start_row)             # <<<<<<<<<<<<<<
- *             morsels.append((batch, start_row, num_rows, 0))  # (batch, start, num_rows, partition_id)
- * 
-*/
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 167, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = PyNumber_Subtract(__pyx_t_7, __pyx_v_start_row); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 167, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_INCREF(__pyx_v_rows_per_morsel);
-    __pyx_t_7 = __pyx_v_rows_per_morsel;
-    __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_t_7, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
-    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 167, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (__pyx_t_1) {
-      __Pyx_INCREF(__pyx_t_4);
-      __pyx_t_3 = __pyx_t_4;
-    } else {
-      __Pyx_INCREF(__pyx_t_7);
-      __pyx_t_3 = __pyx_t_7;
-    }
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __pyx_t_3;
-    __Pyx_INCREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_XDECREF_SET(__pyx_v_num_rows, __pyx_t_4);
-    __pyx_t_4 = 0;
-
-    /* "sabot/_cython/operators/morsel_operator.pyx":168
- *         for start_row in range(0, batch.num_rows, rows_per_morsel):
- *             num_rows = min(rows_per_morsel, batch.num_rows - start_row)
- *             morsels.append((batch, start_row, num_rows, 0))  # (batch, start, num_rows, partition_id)             # <<<<<<<<<<<<<<
- * 
- *         # Create callback that calls wrapped operator
-*/
-    __pyx_t_4 = PyTuple_New(4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 168, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_INCREF(__pyx_v_batch);
-    __Pyx_GIVEREF(__pyx_v_batch);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_batch) != (0)) __PYX_ERR(0, 168, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_v_start_row);
-    __Pyx_GIVEREF(__pyx_v_start_row);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_start_row) != (0)) __PYX_ERR(0, 168, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_v_num_rows);
-    __Pyx_GIVEREF(__pyx_v_num_rows);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_v_num_rows) != (0)) __PYX_ERR(0, 168, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_0);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_0);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_mstate_global->__pyx_int_0) != (0)) __PYX_ERR(0, 168, __pyx_L1_error);
-    __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_morsels, __pyx_t_4); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 168, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-    /* "sabot/_cython/operators/morsel_operator.pyx":166
- * 
- *         morsels = []
- *         for start_row in range(0, batch.num_rows, rows_per_morsel):             # <<<<<<<<<<<<<<
- *             num_rows = min(rows_per_morsel, batch.num_rows - start_row)
- *             morsels.append((batch, start_row, num_rows, 0))  # (batch, start, num_rows, partition_id)
-*/
-  }
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "sabot/_cython/operators/morsel_operator.pyx":171
- * 
- *         # Create callback that calls wrapped operator
- *         def process_morsel_callback(morsel_batch):             # <<<<<<<<<<<<<<
- *             """Process single morsel using wrapped operator."""
- *             return self._wrapped_operator.process_batch(morsel_batch)
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_27_process_with_local_morsels_1process_morsel_callback, 0, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator__process_wi, ((PyObject*)__pyx_cur_scope), __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 171, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_v_process_morsel_callback = __pyx_t_5;
-  __pyx_t_5 = 0;
-
-  /* "sabot/_cython/operators/morsel_operator.pyx":176
- * 
- *         # Execute using shared task slots (releases GIL!)
- *         result_batches = self._task_slot_manager.execute_morsels(             # <<<<<<<<<<<<<<
- *             morsels,
- *             process_morsel_callback
-*/
-  __pyx_t_4 = __pyx_cur_scope->__pyx_v_self->_task_slot_manager;
-  __Pyx_INCREF(__pyx_t_4);
-
-  /* "sabot/_cython/operators/morsel_operator.pyx":178
- *         result_batches = self._task_slot_manager.execute_morsels(
- *             morsels,
- *             process_morsel_callback             # <<<<<<<<<<<<<<
- *         )
- * 
-*/
-  __pyx_t_6 = 0;
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_4, __pyx_v_morsels, __pyx_v_process_morsel_callback};
-    __pyx_t_5 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_execute_morsels, __pyx_callargs+__pyx_t_6, (3-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 176, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-  }
-  __pyx_v_result_batches = __pyx_t_5;
-  __pyx_t_5 = 0;
-
-  /* "sabot/_cython/operators/morsel_operator.pyx":182
- * 
- *         # Reassemble results
- *         if not result_batches:             # <<<<<<<<<<<<<<
- *             return None
- * 
-*/
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_result_batches); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 182, __pyx_L1_error)
-  __pyx_t_12 = (!__pyx_t_1);
-  if (__pyx_t_12) {
-
-    /* "sabot/_cython/operators/morsel_operator.pyx":183
- *         # Reassemble results
- *         if not result_batches:
- *             return None             # <<<<<<<<<<<<<<
- * 
- *         if len(result_batches) == 1:
-*/
-    __Pyx_XDECREF(__pyx_r);
-    __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-    goto __pyx_L0;
-
-    /* "sabot/_cython/operators/morsel_operator.pyx":182
- * 
- *         # Reassemble results
- *         if not result_batches:             # <<<<<<<<<<<<<<
- *             return None
- * 
-*/
-  }
-
-  /* "sabot/_cython/operators/morsel_operator.pyx":185
- *             return None
- * 
- *         if len(result_batches) == 1:             # <<<<<<<<<<<<<<
- *             return result_batches[0]
- * 
-*/
-  __pyx_t_9 = PyObject_Length(__pyx_v_result_batches); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 185, __pyx_L1_error)
-  __pyx_t_12 = (__pyx_t_9 == 1);
-  if (__pyx_t_12) {
-
-    /* "sabot/_cython/operators/morsel_operator.pyx":186
- * 
- *         if len(result_batches) == 1:
- *             return result_batches[0]             # <<<<<<<<<<<<<<
- * 
- *         # Multiple batches - concatenate using Arrow
-*/
-    __Pyx_XDECREF(__pyx_r);
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_result_batches, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 186, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_r = __pyx_t_5;
-    __pyx_t_5 = 0;
-    goto __pyx_L0;
-
-    /* "sabot/_cython/operators/morsel_operator.pyx":185
- *             return None
- * 
- *         if len(result_batches) == 1:             # <<<<<<<<<<<<<<
- *             return result_batches[0]
- * 
-*/
-  }
-
-  /* "sabot/_cython/operators/morsel_operator.pyx":189
- * 
- *         # Multiple batches - concatenate using Arrow
  *         from sabot import cyarrow as pa             # <<<<<<<<<<<<<<
- *         table = pa.Table.from_batches(result_batches)
- *         return table.combine_chunks()
+ * 
+ *         # Try to use TaskSlotManager (C++ work-stealing)
 */
-  __pyx_t_5 = PyList_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_cyarrow);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_n_u_cyarrow);
-  if (__Pyx_PyList_SET_ITEM(__pyx_t_5, 0, __pyx_mstate_global->__pyx_n_u_cyarrow) != (0)) __PYX_ERR(0, 189, __pyx_L1_error);
-  __pyx_t_4 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot, __pyx_t_5, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 189, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_ImportFrom(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_cyarrow); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_INCREF(__pyx_t_5);
-  __pyx_v_pa = __pyx_t_5;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_1, 0, __pyx_mstate_global->__pyx_n_u_cyarrow) != (0)) __PYX_ERR(0, 152, __pyx_L1_error);
+  __pyx_t_2 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_cyarrow); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_t_1);
+  __pyx_v_pa = __pyx_t_1;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":190
- *         # Multiple batches - concatenate using Arrow
- *         from sabot import cyarrow as pa
- *         table = pa.Table.from_batches(result_batches)             # <<<<<<<<<<<<<<
- *         return table.combine_chunks()
+  /* "sabot/_cython/operators/morsel_operator.pyx":155
+ * 
+ *         # Try to use TaskSlotManager (C++ work-stealing)
+ *         try:             # <<<<<<<<<<<<<<
+ *             from sabot.cluster.agent_context import get_or_create_slot_manager
  * 
 */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_pa, __pyx_mstate_global->__pyx_n_u_Table); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 190, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __pyx_t_3;
-  __Pyx_INCREF(__pyx_t_5);
-  __pyx_t_6 = 0;
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_v_result_batches};
-    __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_from_batches, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 190, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-  }
-  __pyx_v_table = __pyx_t_4;
-  __pyx_t_4 = 0;
+    __Pyx_PyThreadState_declare
+    __Pyx_PyThreadState_assign
+    __Pyx_ExceptionSave(&__pyx_t_3, &__pyx_t_4, &__pyx_t_5);
+    __Pyx_XGOTREF(__pyx_t_3);
+    __Pyx_XGOTREF(__pyx_t_4);
+    __Pyx_XGOTREF(__pyx_t_5);
+    /*try:*/ {
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":191
- *         from sabot import cyarrow as pa
- *         table = pa.Table.from_batches(result_batches)
- *         return table.combine_chunks()             # <<<<<<<<<<<<<<
+      /* "sabot/_cython/operators/morsel_operator.pyx":156
+ *         # Try to use TaskSlotManager (C++ work-stealing)
+ *         try:
+ *             from sabot.cluster.agent_context import get_or_create_slot_manager             # <<<<<<<<<<<<<<
+ * 
+ *             # Get shared task slot manager (auto-initializes if needed)
+*/
+      __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_get_or_create_slot_manager);
+      __Pyx_GIVEREF(__pyx_mstate_global->__pyx_n_u_get_or_create_slot_manager);
+      if (__Pyx_PyList_SET_ITEM(__pyx_t_2, 0, __pyx_mstate_global->__pyx_n_u_get_or_create_slot_manager) != (0)) __PYX_ERR(0, 156, __pyx_L3_error);
+      __pyx_t_1 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot_cluster_agent_context, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 156, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_get_or_create_slot_manager); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_2);
+      __pyx_v_get_or_create_slot_manager = __pyx_t_2;
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":159
+ * 
+ *             # Get shared task slot manager (auto-initializes if needed)
+ *             task_slot_manager = get_or_create_slot_manager(num_slots=self._num_workers)             # <<<<<<<<<<<<<<
+ * 
+ *             # Calculate rows per morsel
+*/
+      __pyx_t_2 = NULL;
+      __Pyx_INCREF(__pyx_v_get_or_create_slot_manager);
+      __pyx_t_6 = __pyx_v_get_or_create_slot_manager; 
+      __pyx_t_7 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->_num_workers); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 159, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __pyx_t_8 = 1;
+      #if CYTHON_UNPACK_METHODS
+      if (unlikely(PyMethod_Check(__pyx_t_6))) {
+        __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_6);
+        assert(__pyx_t_2);
+        PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_6);
+        __Pyx_INCREF(__pyx_t_2);
+        __Pyx_INCREF(__pyx__function);
+        __Pyx_DECREF_SET(__pyx_t_6, __pyx__function);
+        __pyx_t_8 = 0;
+      }
+      #endif
+      {
+        PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_2, NULL};
+        __pyx_t_9 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 159, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_9);
+        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_num_slots, __pyx_t_7, __pyx_t_9, __pyx_callargs+1, 0) < 0) __PYX_ERR(0, 159, __pyx_L3_error)
+        __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_6, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_9);
+        __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_1);
+      }
+      __pyx_v_task_slot_manager = __pyx_t_1;
+      __pyx_t_1 = 0;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":162
+ * 
+ *             # Calculate rows per morsel
+ *             morsel_size_bytes = self._morsel_size_kb * 1024             # <<<<<<<<<<<<<<
+ *             avg_bytes_per_row = 100  # Conservative estimate
+ *             rows_per_morsel = max(1000, morsel_size_bytes // avg_bytes_per_row)
+*/
+      __pyx_t_1 = __Pyx_PyLong_From_PY_LONG_LONG((__pyx_cur_scope->__pyx_v_self->_morsel_size_kb * 0x400)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 162, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_v_morsel_size_bytes = __pyx_t_1;
+      __pyx_t_1 = 0;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":163
+ *             # Calculate rows per morsel
+ *             morsel_size_bytes = self._morsel_size_kb * 1024
+ *             avg_bytes_per_row = 100  # Conservative estimate             # <<<<<<<<<<<<<<
+ *             rows_per_morsel = max(1000, morsel_size_bytes // avg_bytes_per_row)
+ * 
+*/
+      __Pyx_INCREF(__pyx_mstate_global->__pyx_int_100);
+      __pyx_v_avg_bytes_per_row = __pyx_mstate_global->__pyx_int_100;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":164
+ *             morsel_size_bytes = self._morsel_size_kb * 1024
+ *             avg_bytes_per_row = 100  # Conservative estimate
+ *             rows_per_morsel = max(1000, morsel_size_bytes // avg_bytes_per_row)             # <<<<<<<<<<<<<<
+ * 
+ *             # Create morsel tuples (batch, start_row, num_rows, partition_id)
+*/
+      __pyx_t_1 = PyNumber_FloorDivide(__pyx_v_morsel_size_bytes, __pyx_v_avg_bytes_per_row); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_t_10 = 0x3E8;
+      __pyx_t_9 = __Pyx_PyLong_From_long(__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 164, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __pyx_t_7 = PyObject_RichCompare(__pyx_t_1, __pyx_t_9, Py_GT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 164, __pyx_L3_error)
+      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+      __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 164, __pyx_L3_error)
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      if (__pyx_t_11) {
+        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_6 = __pyx_t_1;
+      } else {
+        __pyx_t_7 = __Pyx_PyLong_From_long(__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 164, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        __pyx_t_6 = __pyx_t_7;
+        __pyx_t_7 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __pyx_t_1 = __pyx_t_6;
+      __Pyx_INCREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __pyx_v_rows_per_morsel = __pyx_t_1;
+      __pyx_t_1 = 0;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":167
+ * 
+ *             # Create morsel tuples (batch, start_row, num_rows, partition_id)
+ *             morsels = []             # <<<<<<<<<<<<<<
+ *             for start_row in range(0, batch.num_rows, rows_per_morsel):
+ *                 num_rows = min(rows_per_morsel, batch.num_rows - start_row)
+*/
+      __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 167, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_v_morsels = ((PyObject*)__pyx_t_1);
+      __pyx_t_1 = 0;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":168
+ *             # Create morsel tuples (batch, start_row, num_rows, partition_id)
+ *             morsels = []
+ *             for start_row in range(0, batch.num_rows, rows_per_morsel):             # <<<<<<<<<<<<<<
+ *                 num_rows = min(rows_per_morsel, batch.num_rows - start_row)
+ *                 # TaskSlotManager expects tuples: (batch, start_row, num_rows, partition_id)
+*/
+      __pyx_t_6 = NULL;
+      __Pyx_INCREF(__pyx_builtin_range);
+      __pyx_t_7 = __pyx_builtin_range; 
+      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 168, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __pyx_t_8 = 1;
+      {
+        PyObject *__pyx_callargs[4] = {__pyx_t_6, __pyx_mstate_global->__pyx_int_0, __pyx_t_9, __pyx_v_rows_per_morsel};
+        __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+__pyx_t_8, (4-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+        __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 168, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_1);
+      }
+      if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
+        __pyx_t_7 = __pyx_t_1; __Pyx_INCREF(__pyx_t_7);
+        __pyx_t_12 = 0;
+        __pyx_t_13 = NULL;
+      } else {
+        __pyx_t_12 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 168, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        __pyx_t_13 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_7); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 168, __pyx_L3_error)
+      }
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      for (;;) {
+        if (likely(!__pyx_t_13)) {
+          if (likely(PyList_CheckExact(__pyx_t_7))) {
+            {
+              Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_7);
+              #if !CYTHON_ASSUME_SAFE_SIZE
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 168, __pyx_L3_error)
+              #endif
+              if (__pyx_t_12 >= __pyx_temp) break;
+            }
+            __pyx_t_1 = __Pyx_PyList_GetItemRef(__pyx_t_7, __pyx_t_12);
+            ++__pyx_t_12;
+          } else {
+            {
+              Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_7);
+              #if !CYTHON_ASSUME_SAFE_SIZE
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 168, __pyx_L3_error)
+              #endif
+              if (__pyx_t_12 >= __pyx_temp) break;
+            }
+            #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+            __pyx_t_1 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_12));
+            #else
+            __pyx_t_1 = __Pyx_PySequence_ITEM(__pyx_t_7, __pyx_t_12);
+            #endif
+            ++__pyx_t_12;
+          }
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 168, __pyx_L3_error)
+        } else {
+          __pyx_t_1 = __pyx_t_13(__pyx_t_7);
+          if (unlikely(!__pyx_t_1)) {
+            PyObject* exc_type = PyErr_Occurred();
+            if (exc_type) {
+              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 168, __pyx_L3_error)
+              PyErr_Clear();
+            }
+            break;
+          }
+        }
+        __Pyx_GOTREF(__pyx_t_1);
+        __Pyx_XDECREF_SET(__pyx_v_start_row, __pyx_t_1);
+        __pyx_t_1 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":169
+ *             morsels = []
+ *             for start_row in range(0, batch.num_rows, rows_per_morsel):
+ *                 num_rows = min(rows_per_morsel, batch.num_rows - start_row)             # <<<<<<<<<<<<<<
+ *                 # TaskSlotManager expects tuples: (batch, start_row, num_rows, partition_id)
+ *                 morsels.append((batch, start_row, num_rows, 0))
+*/
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 169, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_9 = PyNumber_Subtract(__pyx_t_1, __pyx_v_start_row); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 169, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_9);
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_INCREF(__pyx_v_rows_per_morsel);
+        __pyx_t_1 = __pyx_v_rows_per_morsel;
+        __pyx_t_2 = PyObject_RichCompare(__pyx_t_9, __pyx_t_1, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 169, __pyx_L3_error)
+        __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 169, __pyx_L3_error)
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        if (__pyx_t_11) {
+          __Pyx_INCREF(__pyx_t_9);
+          __pyx_t_6 = __pyx_t_9;
+        } else {
+          __Pyx_INCREF(__pyx_t_1);
+          __pyx_t_6 = __pyx_t_1;
+        }
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+        __pyx_t_9 = __pyx_t_6;
+        __Pyx_INCREF(__pyx_t_9);
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __Pyx_XDECREF_SET(__pyx_v_num_rows, __pyx_t_9);
+        __pyx_t_9 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":171
+ *                 num_rows = min(rows_per_morsel, batch.num_rows - start_row)
+ *                 # TaskSlotManager expects tuples: (batch, start_row, num_rows, partition_id)
+ *                 morsels.append((batch, start_row, num_rows, 0))             # <<<<<<<<<<<<<<
+ * 
+ *             # If only one morsel, process directly
+*/
+        __pyx_t_9 = PyTuple_New(4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 171, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_9);
+        __Pyx_INCREF(__pyx_cur_scope->__pyx_v_batch);
+        __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_batch);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_cur_scope->__pyx_v_batch) != (0)) __PYX_ERR(0, 171, __pyx_L3_error);
+        __Pyx_INCREF(__pyx_v_start_row);
+        __Pyx_GIVEREF(__pyx_v_start_row);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_v_start_row) != (0)) __PYX_ERR(0, 171, __pyx_L3_error);
+        __Pyx_INCREF(__pyx_v_num_rows);
+        __Pyx_GIVEREF(__pyx_v_num_rows);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_v_num_rows) != (0)) __PYX_ERR(0, 171, __pyx_L3_error);
+        __Pyx_INCREF(__pyx_mstate_global->__pyx_int_0);
+        __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_0);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 3, __pyx_mstate_global->__pyx_int_0) != (0)) __PYX_ERR(0, 171, __pyx_L3_error);
+        __pyx_t_14 = __Pyx_PyList_Append(__pyx_v_morsels, __pyx_t_9); if (unlikely(__pyx_t_14 == ((int)-1))) __PYX_ERR(0, 171, __pyx_L3_error)
+        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":168
+ *             # Create morsel tuples (batch, start_row, num_rows, partition_id)
+ *             morsels = []
+ *             for start_row in range(0, batch.num_rows, rows_per_morsel):             # <<<<<<<<<<<<<<
+ *                 num_rows = min(rows_per_morsel, batch.num_rows - start_row)
+ *                 # TaskSlotManager expects tuples: (batch, start_row, num_rows, partition_id)
+*/
+      }
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":174
+ * 
+ *             # If only one morsel, process directly
+ *             if len(morsels) <= 1:             # <<<<<<<<<<<<<<
+ *                 return self._wrapped_operator.process_batch(batch)
+ * 
+*/
+      __pyx_t_12 = __Pyx_PyList_GET_SIZE(__pyx_v_morsels); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 174, __pyx_L3_error)
+      __pyx_t_11 = (__pyx_t_12 <= 1);
+      if (__pyx_t_11) {
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":175
+ *             # If only one morsel, process directly
+ *             if len(morsels) <= 1:
+ *                 return self._wrapped_operator.process_batch(batch)             # <<<<<<<<<<<<<<
+ * 
+ *             # Create callback that processes morsel slices
+*/
+        __Pyx_XDECREF(__pyx_r);
+        __pyx_t_9 = __pyx_cur_scope->__pyx_v_self->_wrapped_operator;
+        __Pyx_INCREF(__pyx_t_9);
+        __pyx_t_8 = 0;
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_9, __pyx_cur_scope->__pyx_v_batch};
+          __pyx_t_7 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_process_batch, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 175, __pyx_L3_error)
+          __Pyx_GOTREF(__pyx_t_7);
+        }
+        __pyx_r = __pyx_t_7;
+        __pyx_t_7 = 0;
+        goto __pyx_L7_try_return;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":174
+ * 
+ *             # If only one morsel, process directly
+ *             if len(morsels) <= 1:             # <<<<<<<<<<<<<<
+ *                 return self._wrapped_operator.process_batch(batch)
+ * 
+*/
+      }
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":178
+ * 
+ *             # Create callback that processes morsel slices
+ *             def process_morsel_callback(morsel_batch):             # <<<<<<<<<<<<<<
+ *                 """Process single morsel using wrapped operator."""
+ *                 return self._wrapped_operator.process_batch(morsel_batch)
+*/
+      __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_27_process_with_local_morsels_1process_morsel_callback, 0, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator__process_wi, ((PyObject*)__pyx_cur_scope), __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 178, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __pyx_v_process_morsel_callback = __pyx_t_7;
+      __pyx_t_7 = 0;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":183
+ * 
+ *             # Execute using task slot manager (releases GIL, C++ threads!)
+ *             result_batches = task_slot_manager.execute_morsels(morsels, process_morsel_callback)             # <<<<<<<<<<<<<<
+ * 
+ *             # Filter out None results
+*/
+      __pyx_t_9 = __pyx_v_task_slot_manager;
+      __Pyx_INCREF(__pyx_t_9);
+      __pyx_t_8 = 0;
+      {
+        PyObject *__pyx_callargs[3] = {__pyx_t_9, __pyx_v_morsels, __pyx_v_process_morsel_callback};
+        __pyx_t_7 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_execute_morsels, __pyx_callargs+__pyx_t_8, (3-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+        __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 183, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_7);
+      }
+      __pyx_v_result_batches = __pyx_t_7;
+      __pyx_t_7 = 0;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":186
+ * 
+ *             # Filter out None results
+ *             result_batches = [rb for rb in result_batches if rb is not None and rb.num_rows > 0]             # <<<<<<<<<<<<<<
+ * 
+ *             # Reassemble results
+*/
+      { /* enter inner scope */
+        __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 186, __pyx_L15_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        if (likely(PyList_CheckExact(__pyx_v_result_batches)) || PyTuple_CheckExact(__pyx_v_result_batches)) {
+          __pyx_t_9 = __pyx_v_result_batches; __Pyx_INCREF(__pyx_t_9);
+          __pyx_t_12 = 0;
+          __pyx_t_13 = NULL;
+        } else {
+          __pyx_t_12 = -1; __pyx_t_9 = PyObject_GetIter(__pyx_v_result_batches); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 186, __pyx_L15_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __pyx_t_13 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_9); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 186, __pyx_L15_error)
+        }
+        for (;;) {
+          if (likely(!__pyx_t_13)) {
+            if (likely(PyList_CheckExact(__pyx_t_9))) {
+              {
+                Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_9);
+                #if !CYTHON_ASSUME_SAFE_SIZE
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 186, __pyx_L15_error)
+                #endif
+                if (__pyx_t_12 >= __pyx_temp) break;
+              }
+              __pyx_t_6 = __Pyx_PyList_GetItemRef(__pyx_t_9, __pyx_t_12);
+              ++__pyx_t_12;
+            } else {
+              {
+                Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_9);
+                #if !CYTHON_ASSUME_SAFE_SIZE
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 186, __pyx_L15_error)
+                #endif
+                if (__pyx_t_12 >= __pyx_temp) break;
+              }
+              #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+              __pyx_t_6 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_9, __pyx_t_12));
+              #else
+              __pyx_t_6 = __Pyx_PySequence_ITEM(__pyx_t_9, __pyx_t_12);
+              #endif
+              ++__pyx_t_12;
+            }
+            if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 186, __pyx_L15_error)
+          } else {
+            __pyx_t_6 = __pyx_t_13(__pyx_t_9);
+            if (unlikely(!__pyx_t_6)) {
+              PyObject* exc_type = PyErr_Occurred();
+              if (exc_type) {
+                if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 186, __pyx_L15_error)
+                PyErr_Clear();
+              }
+              break;
+            }
+          }
+          __Pyx_GOTREF(__pyx_t_6);
+          __Pyx_XDECREF_SET(__pyx_7genexpr__pyx_v_rb, __pyx_t_6);
+          __pyx_t_6 = 0;
+          __pyx_t_15 = (__pyx_7genexpr__pyx_v_rb != Py_None);
+          if (__pyx_t_15) {
+          } else {
+            __pyx_t_11 = __pyx_t_15;
+            goto __pyx_L19_bool_binop_done;
+          }
+          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_7genexpr__pyx_v_rb, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 186, __pyx_L15_error)
+          __Pyx_GOTREF(__pyx_t_6);
+          __pyx_t_1 = PyObject_RichCompare(__pyx_t_6, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L15_error)
+          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+          __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_15 < 0))) __PYX_ERR(0, 186, __pyx_L15_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_11 = __pyx_t_15;
+          __pyx_L19_bool_binop_done:;
+          if (__pyx_t_11) {
+            if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_7genexpr__pyx_v_rb))) __PYX_ERR(0, 186, __pyx_L15_error)
+          }
+        }
+        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+        __Pyx_XDECREF(__pyx_7genexpr__pyx_v_rb); __pyx_7genexpr__pyx_v_rb = 0;
+        goto __pyx_L22_exit_scope;
+        __pyx_L15_error:;
+        __Pyx_XDECREF(__pyx_7genexpr__pyx_v_rb); __pyx_7genexpr__pyx_v_rb = 0;
+        goto __pyx_L3_error;
+        __pyx_L22_exit_scope:;
+      } /* exit inner scope */
+      __Pyx_DECREF_SET(__pyx_v_result_batches, __pyx_t_7);
+      __pyx_t_7 = 0;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":189
+ * 
+ *             # Reassemble results
+ *             if not result_batches:             # <<<<<<<<<<<<<<
+ *                 return None
+ * 
+*/
+      __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_v_result_batches); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 189, __pyx_L3_error)
+      __pyx_t_15 = (!__pyx_t_11);
+      if (__pyx_t_15) {
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":190
+ *             # Reassemble results
+ *             if not result_batches:
+ *                 return None             # <<<<<<<<<<<<<<
+ * 
+ *             if len(result_batches) == 1:
+*/
+        __Pyx_XDECREF(__pyx_r);
+        __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+        goto __pyx_L7_try_return;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":189
+ * 
+ *             # Reassemble results
+ *             if not result_batches:             # <<<<<<<<<<<<<<
+ *                 return None
+ * 
+*/
+      }
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":192
+ *                 return None
+ * 
+ *             if len(result_batches) == 1:             # <<<<<<<<<<<<<<
+ *                 return result_batches[0]
+ * 
+*/
+      __pyx_t_12 = PyObject_Length(__pyx_v_result_batches); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 192, __pyx_L3_error)
+      __pyx_t_15 = (__pyx_t_12 == 1);
+      if (__pyx_t_15) {
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":193
+ * 
+ *             if len(result_batches) == 1:
+ *                 return result_batches[0]             # <<<<<<<<<<<<<<
+ * 
+ *             # Multiple batches - concatenate
+*/
+        __Pyx_XDECREF(__pyx_r);
+        __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_result_batches, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 193, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        __pyx_r = __pyx_t_7;
+        __pyx_t_7 = 0;
+        goto __pyx_L7_try_return;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":192
+ *                 return None
+ * 
+ *             if len(result_batches) == 1:             # <<<<<<<<<<<<<<
+ *                 return result_batches[0]
+ * 
+*/
+      }
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":196
+ * 
+ *             # Multiple batches - concatenate
+ *             table = pa.Table.from_batches(result_batches)             # <<<<<<<<<<<<<<
+ *             combined_table = table.combine_chunks()
+ *             batches = combined_table.to_batches()
+*/
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_pa, __pyx_mstate_global->__pyx_n_u_Table); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 196, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_t_9 = __pyx_t_1;
+      __Pyx_INCREF(__pyx_t_9);
+      __pyx_t_8 = 0;
+      {
+        PyObject *__pyx_callargs[2] = {__pyx_t_9, __pyx_v_result_batches};
+        __pyx_t_7 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_from_batches, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+        __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 196, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_7);
+      }
+      __pyx_v_table = __pyx_t_7;
+      __pyx_t_7 = 0;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":197
+ *             # Multiple batches - concatenate
+ *             table = pa.Table.from_batches(result_batches)
+ *             combined_table = table.combine_chunks()             # <<<<<<<<<<<<<<
+ *             batches = combined_table.to_batches()
+ *             return batches[0] if batches else None
+*/
+      __pyx_t_1 = __pyx_v_table;
+      __Pyx_INCREF(__pyx_t_1);
+      __pyx_t_8 = 0;
+      {
+        PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
+        __pyx_t_7 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_combine_chunks, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 197, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_7);
+      }
+      __pyx_v_combined_table = __pyx_t_7;
+      __pyx_t_7 = 0;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":198
+ *             table = pa.Table.from_batches(result_batches)
+ *             combined_table = table.combine_chunks()
+ *             batches = combined_table.to_batches()             # <<<<<<<<<<<<<<
+ *             return batches[0] if batches else None
+ * 
+*/
+      __pyx_t_1 = __pyx_v_combined_table;
+      __Pyx_INCREF(__pyx_t_1);
+      __pyx_t_8 = 0;
+      {
+        PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
+        __pyx_t_7 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_batches, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 198, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_7);
+      }
+      __pyx_v_batches = __pyx_t_7;
+      __pyx_t_7 = 0;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":199
+ *             combined_table = table.combine_chunks()
+ *             batches = combined_table.to_batches()
+ *             return batches[0] if batches else None             # <<<<<<<<<<<<<<
+ * 
+ *         except Exception as e:
+*/
+      __Pyx_XDECREF(__pyx_r);
+      __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_v_batches); if (unlikely((__pyx_t_15 < 0))) __PYX_ERR(0, 199, __pyx_L3_error)
+      if (__pyx_t_15) {
+        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_batches, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_7 = __pyx_t_1;
+        __pyx_t_1 = 0;
+      } else {
+        __Pyx_INCREF(Py_None);
+        __pyx_t_7 = Py_None;
+      }
+      __pyx_r = __pyx_t_7;
+      __pyx_t_7 = 0;
+      goto __pyx_L7_try_return;
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":155
+ * 
+ *         # Try to use TaskSlotManager (C++ work-stealing)
+ *         try:             # <<<<<<<<<<<<<<
+ *             from sabot.cluster.agent_context import get_or_create_slot_manager
+ * 
+*/
+    }
+    __pyx_L3_error:;
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+    /* "sabot/_cython/operators/morsel_operator.pyx":201
+ *             return batches[0] if batches else None
+ * 
+ *         except Exception as e:             # <<<<<<<<<<<<<<
+ *             # Fallback to ThreadPoolExecutor if TaskSlotManager unavailable
+ *             import logging
+*/
+    __pyx_t_16 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
+    if (__pyx_t_16) {
+      __Pyx_AddTraceback("sabot._cython.operators.morsel_operator.MorselDrivenOperator._process_with_local_morsels", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      if (__Pyx_GetException(&__pyx_t_7, &__pyx_t_1, &__pyx_t_9) < 0) __PYX_ERR(0, 201, __pyx_L5_except_error)
+      __Pyx_XGOTREF(__pyx_t_7);
+      __Pyx_XGOTREF(__pyx_t_1);
+      __Pyx_XGOTREF(__pyx_t_9);
+      __Pyx_INCREF(__pyx_t_1);
+      __pyx_v_e = __pyx_t_1;
+      /*try:*/ {
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":203
+ *         except Exception as e:
+ *             # Fallback to ThreadPoolExecutor if TaskSlotManager unavailable
+ *             import logging             # <<<<<<<<<<<<<<
+ *             import concurrent.futures
+ *             logging.warning(f"TaskSlotManager unavailable ({e}), falling back to ThreadPoolExecutor")
+*/
+        __pyx_t_6 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_logging, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 203, __pyx_L30_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __pyx_v_logging = __pyx_t_6;
+        __pyx_t_6 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":204
+ *             # Fallback to ThreadPoolExecutor if TaskSlotManager unavailable
+ *             import logging
+ *             import concurrent.futures             # <<<<<<<<<<<<<<
+ *             logging.warning(f"TaskSlotManager unavailable ({e}), falling back to ThreadPoolExecutor")
+ * 
+*/
+        __pyx_t_6 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_concurrent_futures, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 204, __pyx_L30_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __pyx_v_concurrent = __pyx_t_6;
+        __pyx_t_6 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":205
+ *             import logging
+ *             import concurrent.futures
+ *             logging.warning(f"TaskSlotManager unavailable ({e}), falling back to ThreadPoolExecutor")             # <<<<<<<<<<<<<<
+ * 
+ *             # Calculate rows per morsel
+*/
+        __pyx_t_2 = __pyx_v_logging;
+        __Pyx_INCREF(__pyx_t_2);
+        __pyx_t_17 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 205, __pyx_L30_error)
+        __Pyx_GOTREF(__pyx_t_17);
+        __pyx_t_18[0] = __pyx_mstate_global->__pyx_kp_u_TaskSlotManager_unavailable;
+        __pyx_t_18[1] = __pyx_t_17;
+        __pyx_t_18[2] = __pyx_mstate_global->__pyx_kp_u_falling_back_to_ThreadPoolExecu;
+        __pyx_t_19 = __Pyx_PyUnicode_Join(__pyx_t_18, 3, 29 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_17) + 37, 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_17));
+        if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 205, __pyx_L30_error)
+        __Pyx_GOTREF(__pyx_t_19);
+        __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+        __pyx_t_8 = 0;
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_t_19};
+          __pyx_t_6 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_warning, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
+          if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 205, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_6);
+        }
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":208
+ * 
+ *             # Calculate rows per morsel
+ *             morsel_size_bytes = self._morsel_size_kb * 1024             # <<<<<<<<<<<<<<
+ *             avg_bytes_per_row = 100
+ *             rows_per_morsel = max(1000, morsel_size_bytes // avg_bytes_per_row)
+*/
+        __pyx_t_6 = __Pyx_PyLong_From_PY_LONG_LONG((__pyx_cur_scope->__pyx_v_self->_morsel_size_kb * 0x400)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 208, __pyx_L30_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __Pyx_XDECREF_SET(__pyx_v_morsel_size_bytes, __pyx_t_6);
+        __pyx_t_6 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":209
+ *             # Calculate rows per morsel
+ *             morsel_size_bytes = self._morsel_size_kb * 1024
+ *             avg_bytes_per_row = 100             # <<<<<<<<<<<<<<
+ *             rows_per_morsel = max(1000, morsel_size_bytes // avg_bytes_per_row)
+ * 
+*/
+        __Pyx_INCREF(__pyx_mstate_global->__pyx_int_100);
+        __Pyx_XDECREF_SET(__pyx_v_avg_bytes_per_row, __pyx_mstate_global->__pyx_int_100);
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":210
+ *             morsel_size_bytes = self._morsel_size_kb * 1024
+ *             avg_bytes_per_row = 100
+ *             rows_per_morsel = max(1000, morsel_size_bytes // avg_bytes_per_row)             # <<<<<<<<<<<<<<
+ * 
+ *             # Split batch into slices
+*/
+        __pyx_t_6 = PyNumber_FloorDivide(__pyx_v_morsel_size_bytes, __pyx_v_avg_bytes_per_row); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 210, __pyx_L30_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __pyx_t_10 = 0x3E8;
+        __pyx_t_2 = __Pyx_PyLong_From_long(__pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 210, __pyx_L30_error)
+        __Pyx_GOTREF(__pyx_t_2);
+        __pyx_t_17 = PyObject_RichCompare(__pyx_t_6, __pyx_t_2, Py_GT); __Pyx_XGOTREF(__pyx_t_17); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 210, __pyx_L30_error)
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_17); if (unlikely((__pyx_t_15 < 0))) __PYX_ERR(0, 210, __pyx_L30_error)
+        __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+        if (__pyx_t_15) {
+          __Pyx_INCREF(__pyx_t_6);
+          __pyx_t_19 = __pyx_t_6;
+        } else {
+          __pyx_t_17 = __Pyx_PyLong_From_long(__pyx_t_10); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 210, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_17);
+          __pyx_t_19 = __pyx_t_17;
+          __pyx_t_17 = 0;
+        }
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __pyx_t_6 = __pyx_t_19;
+        __Pyx_INCREF(__pyx_t_6);
+        __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
+        __Pyx_XDECREF_SET(__pyx_v_rows_per_morsel, __pyx_t_6);
+        __pyx_t_6 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":213
+ * 
+ *             # Split batch into slices
+ *             morsel_slices = []             # <<<<<<<<<<<<<<
+ *             for start_row in range(0, batch.num_rows, rows_per_morsel):
+ *                 end_row = min(start_row + rows_per_morsel, batch.num_rows)
+*/
+        __pyx_t_6 = PyList_New(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 213, __pyx_L30_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __pyx_v_morsel_slices = ((PyObject*)__pyx_t_6);
+        __pyx_t_6 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":214
+ *             # Split batch into slices
+ *             morsel_slices = []
+ *             for start_row in range(0, batch.num_rows, rows_per_morsel):             # <<<<<<<<<<<<<<
+ *                 end_row = min(start_row + rows_per_morsel, batch.num_rows)
+ *                 morsel_slices.append((start_row, end_row))
+*/
+        __pyx_t_19 = NULL;
+        __Pyx_INCREF(__pyx_builtin_range);
+        __pyx_t_17 = __pyx_builtin_range; 
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 214, __pyx_L30_error)
+        __Pyx_GOTREF(__pyx_t_2);
+        __pyx_t_8 = 1;
+        {
+          PyObject *__pyx_callargs[4] = {__pyx_t_19, __pyx_mstate_global->__pyx_int_0, __pyx_t_2, __pyx_v_rows_per_morsel};
+          __pyx_t_6 = __Pyx_PyObject_FastCall(__pyx_t_17, __pyx_callargs+__pyx_t_8, (4-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+          if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 214, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_6);
+        }
+        if (likely(PyList_CheckExact(__pyx_t_6)) || PyTuple_CheckExact(__pyx_t_6)) {
+          __pyx_t_17 = __pyx_t_6; __Pyx_INCREF(__pyx_t_17);
+          __pyx_t_12 = 0;
+          __pyx_t_13 = NULL;
+        } else {
+          __pyx_t_12 = -1; __pyx_t_17 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 214, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_17);
+          __pyx_t_13 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_17); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 214, __pyx_L30_error)
+        }
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        for (;;) {
+          if (likely(!__pyx_t_13)) {
+            if (likely(PyList_CheckExact(__pyx_t_17))) {
+              {
+                Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_17);
+                #if !CYTHON_ASSUME_SAFE_SIZE
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 214, __pyx_L30_error)
+                #endif
+                if (__pyx_t_12 >= __pyx_temp) break;
+              }
+              __pyx_t_6 = __Pyx_PyList_GetItemRef(__pyx_t_17, __pyx_t_12);
+              ++__pyx_t_12;
+            } else {
+              {
+                Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_17);
+                #if !CYTHON_ASSUME_SAFE_SIZE
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 214, __pyx_L30_error)
+                #endif
+                if (__pyx_t_12 >= __pyx_temp) break;
+              }
+              #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+              __pyx_t_6 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_17, __pyx_t_12));
+              #else
+              __pyx_t_6 = __Pyx_PySequence_ITEM(__pyx_t_17, __pyx_t_12);
+              #endif
+              ++__pyx_t_12;
+            }
+            if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 214, __pyx_L30_error)
+          } else {
+            __pyx_t_6 = __pyx_t_13(__pyx_t_17);
+            if (unlikely(!__pyx_t_6)) {
+              PyObject* exc_type = PyErr_Occurred();
+              if (exc_type) {
+                if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 214, __pyx_L30_error)
+                PyErr_Clear();
+              }
+              break;
+            }
+          }
+          __Pyx_GOTREF(__pyx_t_6);
+          __Pyx_XDECREF_SET(__pyx_v_start_row, __pyx_t_6);
+          __pyx_t_6 = 0;
+
+          /* "sabot/_cython/operators/morsel_operator.pyx":215
+ *             morsel_slices = []
+ *             for start_row in range(0, batch.num_rows, rows_per_morsel):
+ *                 end_row = min(start_row + rows_per_morsel, batch.num_rows)             # <<<<<<<<<<<<<<
+ *                 morsel_slices.append((start_row, end_row))
+ * 
+*/
+          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 215, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_6);
+          __pyx_t_2 = PyNumber_Add(__pyx_v_start_row, __pyx_v_rows_per_morsel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 215, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __pyx_t_20 = PyObject_RichCompare(__pyx_t_6, __pyx_t_2, Py_LT); __Pyx_XGOTREF(__pyx_t_20); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 215, __pyx_L30_error)
+          __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_20); if (unlikely((__pyx_t_15 < 0))) __PYX_ERR(0, 215, __pyx_L30_error)
+          __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+          if (__pyx_t_15) {
+            __Pyx_INCREF(__pyx_t_6);
+            __pyx_t_19 = __pyx_t_6;
+          } else {
+            __Pyx_INCREF(__pyx_t_2);
+            __pyx_t_19 = __pyx_t_2;
+          }
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+          __pyx_t_6 = __pyx_t_19;
+          __Pyx_INCREF(__pyx_t_6);
+          __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
+          __Pyx_XDECREF_SET(__pyx_v_end_row, __pyx_t_6);
+          __pyx_t_6 = 0;
+
+          /* "sabot/_cython/operators/morsel_operator.pyx":216
+ *             for start_row in range(0, batch.num_rows, rows_per_morsel):
+ *                 end_row = min(start_row + rows_per_morsel, batch.num_rows)
+ *                 morsel_slices.append((start_row, end_row))             # <<<<<<<<<<<<<<
+ * 
+ *             # If only one morsel, process directly
+*/
+          __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 216, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_6);
+          __Pyx_INCREF(__pyx_v_start_row);
+          __Pyx_GIVEREF(__pyx_v_start_row);
+          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_v_start_row) != (0)) __PYX_ERR(0, 216, __pyx_L30_error);
+          __Pyx_INCREF(__pyx_v_end_row);
+          __Pyx_GIVEREF(__pyx_v_end_row);
+          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_v_end_row) != (0)) __PYX_ERR(0, 216, __pyx_L30_error);
+          __pyx_t_14 = __Pyx_PyList_Append(__pyx_v_morsel_slices, __pyx_t_6); if (unlikely(__pyx_t_14 == ((int)-1))) __PYX_ERR(0, 216, __pyx_L30_error)
+          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+          /* "sabot/_cython/operators/morsel_operator.pyx":214
+ *             # Split batch into slices
+ *             morsel_slices = []
+ *             for start_row in range(0, batch.num_rows, rows_per_morsel):             # <<<<<<<<<<<<<<
+ *                 end_row = min(start_row + rows_per_morsel, batch.num_rows)
+ *                 morsel_slices.append((start_row, end_row))
+*/
+        }
+        __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":219
+ * 
+ *             # If only one morsel, process directly
+ *             if len(morsel_slices) <= 1:             # <<<<<<<<<<<<<<
+ *                 return self._wrapped_operator.process_batch(batch)
+ * 
+*/
+        __pyx_t_12 = __Pyx_PyList_GET_SIZE(__pyx_v_morsel_slices); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 219, __pyx_L30_error)
+        __pyx_t_15 = (__pyx_t_12 <= 1);
+        if (__pyx_t_15) {
+
+          /* "sabot/_cython/operators/morsel_operator.pyx":220
+ *             # If only one morsel, process directly
+ *             if len(morsel_slices) <= 1:
+ *                 return self._wrapped_operator.process_batch(batch)             # <<<<<<<<<<<<<<
+ * 
+ *             # Process morsels with ThreadPoolExecutor fallback
+*/
+          __Pyx_XDECREF(__pyx_r);
+          __pyx_t_6 = __pyx_cur_scope->__pyx_v_self->_wrapped_operator;
+          __Pyx_INCREF(__pyx_t_6);
+          __pyx_t_8 = 0;
+          {
+            PyObject *__pyx_callargs[2] = {__pyx_t_6, __pyx_cur_scope->__pyx_v_batch};
+            __pyx_t_17 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_process_batch, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+            __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+            if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 220, __pyx_L30_error)
+            __Pyx_GOTREF(__pyx_t_17);
+          }
+          __pyx_r = __pyx_t_17;
+          __pyx_t_17 = 0;
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          goto __pyx_L29_return;
+
+          /* "sabot/_cython/operators/morsel_operator.pyx":219
+ * 
+ *             # If only one morsel, process directly
+ *             if len(morsel_slices) <= 1:             # <<<<<<<<<<<<<<
+ *                 return self._wrapped_operator.process_batch(batch)
+ * 
+*/
+        }
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":223
+ * 
+ *             # Process morsels with ThreadPoolExecutor fallback
+ *             def process_morsel(slice_info):             # <<<<<<<<<<<<<<
+ *                 start_row, end_row = slice_info
+ *                 morsel_batch = batch.slice(offset=start_row, length=(end_row - start_row))
+*/
+        __pyx_t_17 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_27_process_with_local_morsels_3process_morsel, 0, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator__process_wi_2, ((PyObject*)__pyx_cur_scope), __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 223, __pyx_L30_error)
+        __Pyx_GOTREF(__pyx_t_17);
+        __pyx_v_process_morsel = __pyx_t_17;
+        __pyx_t_17 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":228
+ *                 return self._wrapped_operator.process_batch(morsel_batch)
+ * 
+ *             with concurrent.futures.ThreadPoolExecutor(max_workers=self._num_workers) as executor:             # <<<<<<<<<<<<<<
+ *                 result_batches = list(executor.map(process_morsel, morsel_slices))
+ * 
+*/
+        /*with:*/ {
+          __pyx_t_19 = __Pyx_PyObject_GetAttrStr(__pyx_v_concurrent, __pyx_mstate_global->__pyx_n_u_futures); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 228, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_19);
+          __pyx_t_6 = __pyx_t_19;
+          __Pyx_INCREF(__pyx_t_6);
+          __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->_num_workers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 228, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __pyx_t_8 = 0;
+          {
+            PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_6, NULL};
+            __pyx_t_20 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 228, __pyx_L30_error)
+            __Pyx_GOTREF(__pyx_t_20);
+            if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_max_workers, __pyx_t_2, __pyx_t_20, __pyx_callargs+1, 0) < 0) __PYX_ERR(0, 228, __pyx_L30_error)
+            __pyx_t_17 = __Pyx_Object_VectorcallMethod_CallFromBuilder(__pyx_mstate_global->__pyx_n_u_ThreadPoolExecutor, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_20);
+            __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+            __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+            __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
+            if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 228, __pyx_L30_error)
+            __Pyx_GOTREF(__pyx_t_17);
+          }
+          __pyx_t_21 = __Pyx_PyObject_LookupSpecial(__pyx_t_17, __pyx_mstate_global->__pyx_n_u_exit); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 228, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_21);
+          __pyx_t_20 = NULL;
+          __pyx_t_2 = __Pyx_PyObject_LookupSpecial(__pyx_t_17, __pyx_mstate_global->__pyx_n_u_enter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 228, __pyx_L36_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __pyx_t_8 = 1;
+          #if CYTHON_UNPACK_METHODS
+          if (likely(PyMethod_Check(__pyx_t_2))) {
+            __pyx_t_20 = PyMethod_GET_SELF(__pyx_t_2);
+            assert(__pyx_t_20);
+            PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_2);
+            __Pyx_INCREF(__pyx_t_20);
+            __Pyx_INCREF(__pyx__function);
+            __Pyx_DECREF_SET(__pyx_t_2, __pyx__function);
+            __pyx_t_8 = 0;
+          }
+          #endif
+          {
+            PyObject *__pyx_callargs[2] = {__pyx_t_20, NULL};
+            __pyx_t_19 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+            __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
+            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+            if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 228, __pyx_L36_error)
+            __Pyx_GOTREF(__pyx_t_19);
+          }
+          __pyx_t_2 = __pyx_t_19;
+          __pyx_t_19 = 0;
+          __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+          /*try:*/ {
+            {
+              __Pyx_PyThreadState_declare
+              __Pyx_PyThreadState_assign
+              __Pyx_ExceptionSave(&__pyx_t_22, &__pyx_t_23, &__pyx_t_24);
+              __Pyx_XGOTREF(__pyx_t_22);
+              __Pyx_XGOTREF(__pyx_t_23);
+              __Pyx_XGOTREF(__pyx_t_24);
+              /*try:*/ {
+                __pyx_v_executor = __pyx_t_2;
+                __pyx_t_2 = 0;
+
+                /* "sabot/_cython/operators/morsel_operator.pyx":229
+ * 
+ *             with concurrent.futures.ThreadPoolExecutor(max_workers=self._num_workers) as executor:
+ *                 result_batches = list(executor.map(process_morsel, morsel_slices))             # <<<<<<<<<<<<<<
+ * 
+ *             # Filter and reassemble
+*/
+                __pyx_t_17 = __pyx_v_executor;
+                __Pyx_INCREF(__pyx_t_17);
+                __pyx_t_8 = 0;
+                {
+                  PyObject *__pyx_callargs[3] = {__pyx_t_17, __pyx_v_process_morsel, __pyx_v_morsel_slices};
+                  __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_map, __pyx_callargs+__pyx_t_8, (3-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+                  __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
+                  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 229, __pyx_L42_error)
+                  __Pyx_GOTREF(__pyx_t_2);
+                }
+                __pyx_t_17 = __Pyx_PySequence_ListKeepNew(__pyx_t_2); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 229, __pyx_L42_error)
+                __Pyx_GOTREF(__pyx_t_17);
+                __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+                __Pyx_XDECREF_SET(__pyx_v_result_batches, __pyx_t_17);
+                __pyx_t_17 = 0;
+
+                /* "sabot/_cython/operators/morsel_operator.pyx":228
+ *                 return self._wrapped_operator.process_batch(morsel_batch)
+ * 
+ *             with concurrent.futures.ThreadPoolExecutor(max_workers=self._num_workers) as executor:             # <<<<<<<<<<<<<<
+ *                 result_batches = list(executor.map(process_morsel, morsel_slices))
+ * 
+*/
+              }
+              __Pyx_XDECREF(__pyx_t_22); __pyx_t_22 = 0;
+              __Pyx_XDECREF(__pyx_t_23); __pyx_t_23 = 0;
+              __Pyx_XDECREF(__pyx_t_24); __pyx_t_24 = 0;
+              goto __pyx_L49_try_end;
+              __pyx_L42_error:;
+              __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
+              __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
+              __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+              __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
+              __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+              /*except:*/ {
+                __Pyx_AddTraceback("sabot._cython.operators.morsel_operator.MorselDrivenOperator._process_with_local_morsels", __pyx_clineno, __pyx_lineno, __pyx_filename);
+                if (__Pyx_GetException(&__pyx_t_17, &__pyx_t_2, &__pyx_t_19) < 0) __PYX_ERR(0, 228, __pyx_L44_except_error)
+                __Pyx_XGOTREF(__pyx_t_17);
+                __Pyx_XGOTREF(__pyx_t_2);
+                __Pyx_XGOTREF(__pyx_t_19);
+                __pyx_t_20 = PyTuple_Pack(3, __pyx_t_17, __pyx_t_2, __pyx_t_19); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 228, __pyx_L44_except_error)
+                __Pyx_GOTREF(__pyx_t_20);
+                __pyx_t_25 = __Pyx_PyObject_Call(__pyx_t_21, __pyx_t_20, NULL);
+                __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+                __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+                if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 228, __pyx_L44_except_error)
+                __Pyx_GOTREF(__pyx_t_25);
+                __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_25);
+                __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
+                if (__pyx_t_15 < 0) __PYX_ERR(0, 228, __pyx_L44_except_error)
+                __pyx_t_11 = (!__pyx_t_15);
+                if (unlikely(__pyx_t_11)) {
+                  __Pyx_GIVEREF(__pyx_t_17);
+                  __Pyx_GIVEREF(__pyx_t_2);
+                  __Pyx_XGIVEREF(__pyx_t_19);
+                  __Pyx_ErrRestoreWithState(__pyx_t_17, __pyx_t_2, __pyx_t_19);
+                  __pyx_t_17 = 0;  __pyx_t_2 = 0;  __pyx_t_19 = 0; 
+                  __PYX_ERR(0, 228, __pyx_L44_except_error)
+                }
+                __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
+                __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+                __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
+                goto __pyx_L43_exception_handled;
+              }
+              __pyx_L44_except_error:;
+              __Pyx_XGIVEREF(__pyx_t_22);
+              __Pyx_XGIVEREF(__pyx_t_23);
+              __Pyx_XGIVEREF(__pyx_t_24);
+              __Pyx_ExceptionReset(__pyx_t_22, __pyx_t_23, __pyx_t_24);
+              goto __pyx_L30_error;
+              __pyx_L43_exception_handled:;
+              __Pyx_XGIVEREF(__pyx_t_22);
+              __Pyx_XGIVEREF(__pyx_t_23);
+              __Pyx_XGIVEREF(__pyx_t_24);
+              __Pyx_ExceptionReset(__pyx_t_22, __pyx_t_23, __pyx_t_24);
+              __pyx_L49_try_end:;
+            }
+          }
+          /*finally:*/ {
+            /*normal exit:*/{
+              if (__pyx_t_21) {
+                __pyx_t_24 = __Pyx_PyObject_Call(__pyx_t_21, __pyx_mstate_global->__pyx_tuple[1], NULL);
+                __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+                if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 228, __pyx_L30_error)
+                __Pyx_GOTREF(__pyx_t_24);
+                __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+              }
+              goto __pyx_L41;
+            }
+            __pyx_L41:;
+          }
+          goto __pyx_L53;
+          __pyx_L36_error:;
+          __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+          goto __pyx_L30_error;
+          __pyx_L53:;
+        }
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":232
+ * 
+ *             # Filter and reassemble
+ *             result_batches = [rb for rb in result_batches if rb is not None and rb.num_rows > 0]             # <<<<<<<<<<<<<<
+ * 
+ *             if not result_batches:
+*/
+        { /* enter inner scope */
+          __pyx_t_19 = PyList_New(0); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 232, __pyx_L56_error)
+          __Pyx_GOTREF(__pyx_t_19);
+          if (unlikely(!__pyx_v_result_batches)) { __Pyx_RaiseUnboundLocalError("result_batches"); __PYX_ERR(0, 232, __pyx_L56_error) }
+          if (likely(PyList_CheckExact(__pyx_v_result_batches)) || PyTuple_CheckExact(__pyx_v_result_batches)) {
+            __pyx_t_2 = __pyx_v_result_batches; __Pyx_INCREF(__pyx_t_2);
+            __pyx_t_12 = 0;
+            __pyx_t_13 = NULL;
+          } else {
+            __pyx_t_12 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_result_batches); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 232, __pyx_L56_error)
+            __Pyx_GOTREF(__pyx_t_2);
+            __pyx_t_13 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 232, __pyx_L56_error)
+          }
+          for (;;) {
+            if (likely(!__pyx_t_13)) {
+              if (likely(PyList_CheckExact(__pyx_t_2))) {
+                {
+                  Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
+                  #if !CYTHON_ASSUME_SAFE_SIZE
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 232, __pyx_L56_error)
+                  #endif
+                  if (__pyx_t_12 >= __pyx_temp) break;
+                }
+                __pyx_t_17 = __Pyx_PyList_GetItemRef(__pyx_t_2, __pyx_t_12);
+                ++__pyx_t_12;
+              } else {
+                {
+                  Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
+                  #if !CYTHON_ASSUME_SAFE_SIZE
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 232, __pyx_L56_error)
+                  #endif
+                  if (__pyx_t_12 >= __pyx_temp) break;
+                }
+                #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+                __pyx_t_17 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_12));
+                #else
+                __pyx_t_17 = __Pyx_PySequence_ITEM(__pyx_t_2, __pyx_t_12);
+                #endif
+                ++__pyx_t_12;
+              }
+              if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 232, __pyx_L56_error)
+            } else {
+              __pyx_t_17 = __pyx_t_13(__pyx_t_2);
+              if (unlikely(!__pyx_t_17)) {
+                PyObject* exc_type = PyErr_Occurred();
+                if (exc_type) {
+                  if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 232, __pyx_L56_error)
+                  PyErr_Clear();
+                }
+                break;
+              }
+            }
+            __Pyx_GOTREF(__pyx_t_17);
+            __Pyx_XDECREF_SET(__pyx_8genexpr1__pyx_v_rb, __pyx_t_17);
+            __pyx_t_17 = 0;
+            __pyx_t_15 = (__pyx_8genexpr1__pyx_v_rb != Py_None);
+            if (__pyx_t_15) {
+            } else {
+              __pyx_t_11 = __pyx_t_15;
+              goto __pyx_L60_bool_binop_done;
+            }
+            __pyx_t_17 = __Pyx_PyObject_GetAttrStr(__pyx_8genexpr1__pyx_v_rb, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 232, __pyx_L56_error)
+            __Pyx_GOTREF(__pyx_t_17);
+            __pyx_t_20 = PyObject_RichCompare(__pyx_t_17, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_20); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 232, __pyx_L56_error)
+            __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+            __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_20); if (unlikely((__pyx_t_15 < 0))) __PYX_ERR(0, 232, __pyx_L56_error)
+            __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+            __pyx_t_11 = __pyx_t_15;
+            __pyx_L60_bool_binop_done:;
+            if (__pyx_t_11) {
+              if (unlikely(__Pyx_ListComp_Append(__pyx_t_19, (PyObject*)__pyx_8genexpr1__pyx_v_rb))) __PYX_ERR(0, 232, __pyx_L56_error)
+            }
+          }
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_XDECREF(__pyx_8genexpr1__pyx_v_rb); __pyx_8genexpr1__pyx_v_rb = 0;
+          goto __pyx_L63_exit_scope;
+          __pyx_L56_error:;
+          __Pyx_XDECREF(__pyx_8genexpr1__pyx_v_rb); __pyx_8genexpr1__pyx_v_rb = 0;
+          goto __pyx_L30_error;
+          __pyx_L63_exit_scope:;
+        } /* exit inner scope */
+        __Pyx_XDECREF_SET(__pyx_v_result_batches, __pyx_t_19);
+        __pyx_t_19 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":234
+ *             result_batches = [rb for rb in result_batches if rb is not None and rb.num_rows > 0]
+ * 
+ *             if not result_batches:             # <<<<<<<<<<<<<<
+ *                 return None
+ *             if len(result_batches) == 1:
+*/
+        __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_v_result_batches); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 234, __pyx_L30_error)
+        __pyx_t_15 = (!__pyx_t_11);
+        if (__pyx_t_15) {
+
+          /* "sabot/_cython/operators/morsel_operator.pyx":235
+ * 
+ *             if not result_batches:
+ *                 return None             # <<<<<<<<<<<<<<
+ *             if len(result_batches) == 1:
+ *                 return result_batches[0]
+*/
+          __Pyx_XDECREF(__pyx_r);
+          __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          goto __pyx_L29_return;
+
+          /* "sabot/_cython/operators/morsel_operator.pyx":234
+ *             result_batches = [rb for rb in result_batches if rb is not None and rb.num_rows > 0]
+ * 
+ *             if not result_batches:             # <<<<<<<<<<<<<<
+ *                 return None
+ *             if len(result_batches) == 1:
+*/
+        }
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":236
+ *             if not result_batches:
+ *                 return None
+ *             if len(result_batches) == 1:             # <<<<<<<<<<<<<<
+ *                 return result_batches[0]
+ * 
+*/
+        __pyx_t_12 = PyObject_Length(__pyx_v_result_batches); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 236, __pyx_L30_error)
+        __pyx_t_15 = (__pyx_t_12 == 1);
+        if (__pyx_t_15) {
+
+          /* "sabot/_cython/operators/morsel_operator.pyx":237
+ *                 return None
+ *             if len(result_batches) == 1:
+ *                 return result_batches[0]             # <<<<<<<<<<<<<<
+ * 
+ *             table = pa.Table.from_batches(result_batches)
+*/
+          __Pyx_XDECREF(__pyx_r);
+          __pyx_t_19 = __Pyx_GetItemInt(__pyx_v_result_batches, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 237, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_19);
+          __pyx_r = __pyx_t_19;
+          __pyx_t_19 = 0;
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          goto __pyx_L29_return;
+
+          /* "sabot/_cython/operators/morsel_operator.pyx":236
+ *             if not result_batches:
+ *                 return None
+ *             if len(result_batches) == 1:             # <<<<<<<<<<<<<<
+ *                 return result_batches[0]
+ * 
+*/
+        }
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":239
+ *                 return result_batches[0]
+ * 
+ *             table = pa.Table.from_batches(result_batches)             # <<<<<<<<<<<<<<
+ *             combined_table = table.combine_chunks()
+ *             batches = combined_table.to_batches()
+*/
+        __pyx_t_20 = __Pyx_PyObject_GetAttrStr(__pyx_v_pa, __pyx_mstate_global->__pyx_n_u_Table); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 239, __pyx_L30_error)
+        __Pyx_GOTREF(__pyx_t_20);
+        __pyx_t_2 = __pyx_t_20;
+        __Pyx_INCREF(__pyx_t_2);
+        __pyx_t_8 = 0;
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_result_batches};
+          __pyx_t_19 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_from_batches, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+          if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 239, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_19);
+        }
+        __Pyx_XDECREF_SET(__pyx_v_table, __pyx_t_19);
+        __pyx_t_19 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":240
+ * 
+ *             table = pa.Table.from_batches(result_batches)
+ *             combined_table = table.combine_chunks()             # <<<<<<<<<<<<<<
+ *             batches = combined_table.to_batches()
+ *             return batches[0] if batches else None
+*/
+        __pyx_t_20 = __pyx_v_table;
+        __Pyx_INCREF(__pyx_t_20);
+        __pyx_t_8 = 0;
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_20, NULL};
+          __pyx_t_19 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_combine_chunks, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
+          if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 240, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_19);
+        }
+        __Pyx_XDECREF_SET(__pyx_v_combined_table, __pyx_t_19);
+        __pyx_t_19 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":241
+ *             table = pa.Table.from_batches(result_batches)
+ *             combined_table = table.combine_chunks()
+ *             batches = combined_table.to_batches()             # <<<<<<<<<<<<<<
+ *             return batches[0] if batches else None
+ * 
+*/
+        __pyx_t_20 = __pyx_v_combined_table;
+        __Pyx_INCREF(__pyx_t_20);
+        __pyx_t_8 = 0;
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_20, NULL};
+          __pyx_t_19 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_batches, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
+          if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 241, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_19);
+        }
+        __Pyx_XDECREF_SET(__pyx_v_batches, __pyx_t_19);
+        __pyx_t_19 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":242
+ *             combined_table = table.combine_chunks()
+ *             batches = combined_table.to_batches()
+ *             return batches[0] if batches else None             # <<<<<<<<<<<<<<
  * 
  *     cdef object _process_with_network_shuffle(self, object batch):
 */
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = __pyx_v_table;
-  __Pyx_INCREF(__pyx_t_3);
-  __pyx_t_6 = 0;
-  {
-    PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
-    __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_combine_chunks, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 191, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-  }
-  __pyx_r = __pyx_t_4;
-  __pyx_t_4 = 0;
-  goto __pyx_L0;
+        __Pyx_XDECREF(__pyx_r);
+        __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_v_batches); if (unlikely((__pyx_t_15 < 0))) __PYX_ERR(0, 242, __pyx_L30_error)
+        if (__pyx_t_15) {
+          __pyx_t_20 = __Pyx_GetItemInt(__pyx_v_batches, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 242, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_20);
+          __pyx_t_19 = __pyx_t_20;
+          __pyx_t_20 = 0;
+        } else {
+          __Pyx_INCREF(Py_None);
+          __pyx_t_19 = Py_None;
+        }
+        __pyx_r = __pyx_t_19;
+        __pyx_t_19 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+        goto __pyx_L29_return;
+      }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":139
+      /* "sabot/_cython/operators/morsel_operator.pyx":201
+ *             return batches[0] if batches else None
+ * 
+ *         except Exception as e:             # <<<<<<<<<<<<<<
+ *             # Fallback to ThreadPoolExecutor if TaskSlotManager unavailable
+ *             import logging
+*/
+      /*finally:*/ {
+        __pyx_L30_error:;
+        /*exception exit:*/{
+          __Pyx_PyThreadState_declare
+          __Pyx_PyThreadState_assign
+          __pyx_t_21 = 0; __pyx_t_24 = 0; __pyx_t_23 = 0; __pyx_t_22 = 0; __pyx_t_25 = 0; __pyx_t_28 = 0;
+          __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
+          __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
+          __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+           __Pyx_ExceptionSwap(&__pyx_t_22, &__pyx_t_25, &__pyx_t_28);
+          if ( unlikely(__Pyx_GetException(&__pyx_t_21, &__pyx_t_24, &__pyx_t_23) < 0)) __Pyx_ErrFetch(&__pyx_t_21, &__pyx_t_24, &__pyx_t_23);
+          __Pyx_XGOTREF(__pyx_t_21);
+          __Pyx_XGOTREF(__pyx_t_24);
+          __Pyx_XGOTREF(__pyx_t_23);
+          __Pyx_XGOTREF(__pyx_t_22);
+          __Pyx_XGOTREF(__pyx_t_25);
+          __Pyx_XGOTREF(__pyx_t_28);
+          __pyx_t_16 = __pyx_lineno; __pyx_t_26 = __pyx_clineno; __pyx_t_27 = __pyx_filename;
+          {
+            __Pyx_DECREF(__pyx_v_e); __pyx_v_e = 0;
+          }
+          __Pyx_XGIVEREF(__pyx_t_22);
+          __Pyx_XGIVEREF(__pyx_t_25);
+          __Pyx_XGIVEREF(__pyx_t_28);
+          __Pyx_ExceptionReset(__pyx_t_22, __pyx_t_25, __pyx_t_28);
+          __Pyx_XGIVEREF(__pyx_t_21);
+          __Pyx_XGIVEREF(__pyx_t_24);
+          __Pyx_XGIVEREF(__pyx_t_23);
+          __Pyx_ErrRestore(__pyx_t_21, __pyx_t_24, __pyx_t_23);
+          __pyx_t_21 = 0; __pyx_t_24 = 0; __pyx_t_23 = 0; __pyx_t_22 = 0; __pyx_t_25 = 0; __pyx_t_28 = 0;
+          __pyx_lineno = __pyx_t_16; __pyx_clineno = __pyx_t_26; __pyx_filename = __pyx_t_27;
+          goto __pyx_L5_except_error;
+        }
+        __pyx_L29_return: {
+          __pyx_t_28 = __pyx_r;
+          __pyx_r = 0;
+          __Pyx_DECREF(__pyx_v_e); __pyx_v_e = 0;
+          __pyx_r = __pyx_t_28;
+          __pyx_t_28 = 0;
+          goto __pyx_L6_except_return;
+        }
+      }
+    }
+    goto __pyx_L5_except_error;
+
+    /* "sabot/_cython/operators/morsel_operator.pyx":155
+ * 
+ *         # Try to use TaskSlotManager (C++ work-stealing)
+ *         try:             # <<<<<<<<<<<<<<
+ *             from sabot.cluster.agent_context import get_or_create_slot_manager
+ * 
+*/
+    __pyx_L5_except_error:;
+    __Pyx_XGIVEREF(__pyx_t_3);
+    __Pyx_XGIVEREF(__pyx_t_4);
+    __Pyx_XGIVEREF(__pyx_t_5);
+    __Pyx_ExceptionReset(__pyx_t_3, __pyx_t_4, __pyx_t_5);
+    goto __pyx_L1_error;
+    __pyx_L7_try_return:;
+    __Pyx_XGIVEREF(__pyx_t_3);
+    __Pyx_XGIVEREF(__pyx_t_4);
+    __Pyx_XGIVEREF(__pyx_t_5);
+    __Pyx_ExceptionReset(__pyx_t_3, __pyx_t_4, __pyx_t_5);
+    goto __pyx_L0;
+    __pyx_L6_except_return:;
+    __Pyx_XGIVEREF(__pyx_t_3);
+    __Pyx_XGIVEREF(__pyx_t_4);
+    __Pyx_XGIVEREF(__pyx_t_5);
+    __Pyx_ExceptionReset(__pyx_t_3, __pyx_t_4, __pyx_t_5);
+    goto __pyx_L0;
+  }
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":135
  *             return self._process_with_local_morsels(batch)
  * 
  *     cdef object _process_with_local_morsels(self, object batch):             # <<<<<<<<<<<<<<
  *         """
- *         Process batch locally using shared task slot manager.
+ *         Process batch locally using TaskSlotManager (C++ work-stealing threads).
 */
 
   /* function exit code */
   __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_17);
+  __Pyx_XDECREF(__pyx_t_19);
+  __Pyx_XDECREF(__pyx_t_20);
   __Pyx_AddTraceback("sabot._cython.operators.morsel_operator.MorselDrivenOperator._process_with_local_morsels", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_pa);
   __Pyx_XDECREF(__pyx_v_get_or_create_slot_manager);
+  __Pyx_XDECREF(__pyx_v_task_slot_manager);
   __Pyx_XDECREF(__pyx_v_morsel_size_bytes);
+  __Pyx_XDECREF(__pyx_v_avg_bytes_per_row);
   __Pyx_XDECREF(__pyx_v_rows_per_morsel);
   __Pyx_XDECREF(__pyx_v_morsels);
   __Pyx_XDECREF(__pyx_v_start_row);
   __Pyx_XDECREF(__pyx_v_num_rows);
   __Pyx_XDECREF(__pyx_v_process_morsel_callback);
   __Pyx_XDECREF(__pyx_v_result_batches);
-  __Pyx_XDECREF(__pyx_v_pa);
   __Pyx_XDECREF(__pyx_v_table);
+  __Pyx_XDECREF(__pyx_v_combined_table);
+  __Pyx_XDECREF(__pyx_v_batches);
+  __Pyx_XDECREF(__pyx_v_e);
+  __Pyx_XDECREF(__pyx_v_logging);
+  __Pyx_XDECREF(__pyx_v_concurrent);
+  __Pyx_XDECREF(__pyx_v_morsel_slices);
+  __Pyx_XDECREF(__pyx_v_end_row);
+  __Pyx_XDECREF(__pyx_v_process_morsel);
+  __Pyx_XDECREF(__pyx_v_executor);
+  __Pyx_XDECREF(__pyx_7genexpr__pyx_v_rb);
+  __Pyx_XDECREF(__pyx_8genexpr1__pyx_v_rb);
   __Pyx_DECREF((PyObject *)__pyx_cur_scope);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/morsel_operator.pyx":193
- *         return table.combine_chunks()
+/* "sabot/_cython/operators/morsel_operator.pyx":244
+ *             return batches[0] if batches else None
  * 
  *     cdef object _process_with_network_shuffle(self, object batch):             # <<<<<<<<<<<<<<
  *         """
@@ -10945,19 +12412,19 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_process_with_network_shuffle", 0);
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":213
+  /* "sabot/_cython/operators/morsel_operator.pyx":264
  *         # For now, fall back to Python-based shuffle
  *         # TODO: Replace with C++ shuffle executor
  *         import asyncio             # <<<<<<<<<<<<<<
  * 
  *         # Get or create event loop
 */
-  __pyx_t_1 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_asyncio, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 213, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_asyncio, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_asyncio = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":216
+  /* "sabot/_cython/operators/morsel_operator.pyx":267
  * 
  *         # Get or create event loop
  *         try:             # <<<<<<<<<<<<<<
@@ -10973,7 +12440,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     __Pyx_XGOTREF(__pyx_t_4);
     /*try:*/ {
 
-      /* "sabot/_cython/operators/morsel_operator.pyx":217
+      /* "sabot/_cython/operators/morsel_operator.pyx":268
  *         # Get or create event loop
  *         try:
  *             loop = asyncio.get_event_loop()             # <<<<<<<<<<<<<<
@@ -10987,13 +12454,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
         PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
         __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_get_event_loop, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 217, __pyx_L3_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_1);
       }
       __pyx_v_loop = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "sabot/_cython/operators/morsel_operator.pyx":216
+      /* "sabot/_cython/operators/morsel_operator.pyx":267
  * 
  *         # Get or create event loop
  *         try:             # <<<<<<<<<<<<<<
@@ -11009,7 +12476,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":218
+    /* "sabot/_cython/operators/morsel_operator.pyx":269
  *         try:
  *             loop = asyncio.get_event_loop()
  *         except RuntimeError:             # <<<<<<<<<<<<<<
@@ -11019,12 +12486,12 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     __pyx_t_7 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_RuntimeError);
     if (__pyx_t_7) {
       __Pyx_AddTraceback("sabot._cython.operators.morsel_operator.MorselDrivenOperator._process_with_network_shuffle", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_5, &__pyx_t_8) < 0) __PYX_ERR(0, 218, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_5, &__pyx_t_8) < 0) __PYX_ERR(0, 269, __pyx_L5_except_error)
       __Pyx_XGOTREF(__pyx_t_1);
       __Pyx_XGOTREF(__pyx_t_5);
       __Pyx_XGOTREF(__pyx_t_8);
 
-      /* "sabot/_cython/operators/morsel_operator.pyx":219
+      /* "sabot/_cython/operators/morsel_operator.pyx":270
  *             loop = asyncio.get_event_loop()
  *         except RuntimeError:
  *             loop = asyncio.new_event_loop()             # <<<<<<<<<<<<<<
@@ -11038,13 +12505,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
         PyObject *__pyx_callargs[2] = {__pyx_t_10, NULL};
         __pyx_t_9 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_new_event_loop, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 219, __pyx_L5_except_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 270, __pyx_L5_except_error)
         __Pyx_GOTREF(__pyx_t_9);
       }
       __Pyx_XDECREF_SET(__pyx_v_loop, __pyx_t_9);
       __pyx_t_9 = 0;
 
-      /* "sabot/_cython/operators/morsel_operator.pyx":220
+      /* "sabot/_cython/operators/morsel_operator.pyx":271
  *         except RuntimeError:
  *             loop = asyncio.new_event_loop()
  *             asyncio.set_event_loop(loop)             # <<<<<<<<<<<<<<
@@ -11058,7 +12525,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
         PyObject *__pyx_callargs[2] = {__pyx_t_10, __pyx_v_loop};
         __pyx_t_9 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_set_event_loop, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 220, __pyx_L5_except_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 271, __pyx_L5_except_error)
         __Pyx_GOTREF(__pyx_t_9);
       }
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -11069,7 +12536,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     }
     goto __pyx_L5_except_error;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":216
+    /* "sabot/_cython/operators/morsel_operator.pyx":267
  * 
  *         # Get or create event loop
  *         try:             # <<<<<<<<<<<<<<
@@ -11090,7 +12557,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     __pyx_L8_try_end:;
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":223
+  /* "sabot/_cython/operators/morsel_operator.pyx":274
  * 
  *         # Process with network shuffle (async)
  *         if loop.is_running():             # <<<<<<<<<<<<<<
@@ -11104,14 +12571,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
     __pyx_t_8 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_is_running, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 223, __pyx_L1_error)
+    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 274, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
   }
-  __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   if (__pyx_t_11) {
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":224
+    /* "sabot/_cython/operators/morsel_operator.pyx":275
  *         # Process with network shuffle (async)
  *         if loop.is_running():
  *             future = asyncio.ensure_future(             # <<<<<<<<<<<<<<
@@ -11121,7 +12588,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     __pyx_t_5 = __pyx_v_asyncio;
     __Pyx_INCREF(__pyx_t_5);
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":225
+    /* "sabot/_cython/operators/morsel_operator.pyx":276
  *         if loop.is_running():
  *             future = asyncio.ensure_future(
  *                 self._async_process_with_network_shuffle(batch)             # <<<<<<<<<<<<<<
@@ -11135,7 +12602,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
       PyObject *__pyx_callargs[2] = {__pyx_t_9, __pyx_v_batch};
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_async_process_with_network_shuf, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 225, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __pyx_t_6 = 0;
@@ -11144,13 +12611,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
       __pyx_t_8 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_ensure_future, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 224, __pyx_L1_error)
+      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 275, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
     }
     __pyx_v_future = __pyx_t_8;
     __pyx_t_8 = 0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":227
+    /* "sabot/_cython/operators/morsel_operator.pyx":278
  *                 self._async_process_with_network_shuffle(batch)
  *             )
  *             return future  # Caller must await             # <<<<<<<<<<<<<<
@@ -11162,7 +12629,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     __pyx_r = __pyx_v_future;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":223
+    /* "sabot/_cython/operators/morsel_operator.pyx":274
  * 
  *         # Process with network shuffle (async)
  *         if loop.is_running():             # <<<<<<<<<<<<<<
@@ -11171,7 +12638,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
 */
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":229
+  /* "sabot/_cython/operators/morsel_operator.pyx":280
  *             return future  # Caller must await
  *         else:
  *             return loop.run_until_complete(             # <<<<<<<<<<<<<<
@@ -11183,7 +12650,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     __pyx_t_1 = __pyx_v_loop;
     __Pyx_INCREF(__pyx_t_1);
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":230
+    /* "sabot/_cython/operators/morsel_operator.pyx":281
  *         else:
  *             return loop.run_until_complete(
  *                 self._async_process_with_network_shuffle(batch)             # <<<<<<<<<<<<<<
@@ -11197,7 +12664,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
       PyObject *__pyx_callargs[2] = {__pyx_t_9, __pyx_v_batch};
       __pyx_t_5 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_async_process_with_network_shuf, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 230, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 281, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
     }
     __pyx_t_6 = 0;
@@ -11206,7 +12673,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
       __pyx_t_8 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_run_until_complete, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 229, __pyx_L1_error)
+      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 280, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
     }
     __pyx_r = __pyx_t_8;
@@ -11214,8 +12681,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":193
- *         return table.combine_chunks()
+  /* "sabot/_cython/operators/morsel_operator.pyx":244
+ *             return batches[0] if batches else None
  * 
  *     cdef object _process_with_network_shuffle(self, object batch):             # <<<<<<<<<<<<<<
  *         """
@@ -11241,7 +12708,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_15morsel_operator_20MorselDr
 }
 static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_10generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/morsel_operator.pyx":233
+/* "sabot/_cython/operators/morsel_operator.pyx":284
  *             )
  * 
  *     async def _async_process_with_network_shuffle(self, batch):             # <<<<<<<<<<<<<<
@@ -11289,32 +12756,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 233, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 284, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 233, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 284, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_async_process_with_network_shuffle", 0) < 0) __PYX_ERR(0, 233, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_async_process_with_network_shuffle", 0) < 0) __PYX_ERR(0, 284, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_async_process_with_network_shuffle", 1, 1, 1, i); __PYX_ERR(0, 233, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_async_process_with_network_shuffle", 1, 1, 1, i); __PYX_ERR(0, 284, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 233, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 284, __pyx_L3_error)
     }
     __pyx_v_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_async_process_with_network_shuffle", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 233, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_async_process_with_network_shuffle", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 284, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -11347,7 +12814,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 233, __pyx_L1_error)
+    __PYX_ERR(0, 284, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -11358,7 +12825,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_batch);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_batch);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_10generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_async_process_with_network_shuf, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator__async_proc, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o); if (unlikely(!gen)) __PYX_ERR(0, 233, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_10generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_async_process_with_network_shuf, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator__async_proc, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o); if (unlikely(!gen)) __PYX_ERR(0, 284, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -11398,10 +12865,10 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
-    __PYX_ERR(0, 233, __pyx_L1_error)
+    __PYX_ERR(0, 284, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":240
+  /* "sabot/_cython/operators/morsel_operator.pyx":291
  *         """
  *         # Initialize shuffle client if needed
  *         if self._shuffle_client is None:             # <<<<<<<<<<<<<<
@@ -11411,22 +12878,22 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   __pyx_t_1 = (__pyx_cur_scope->__pyx_v_self->_shuffle_client == Py_None);
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":241
+    /* "sabot/_cython/operators/morsel_operator.pyx":292
  *         # Initialize shuffle client if needed
  *         if self._shuffle_client is None:
  *             from sabot._cython.shuffle.shuffle_transport import ShuffleClient             # <<<<<<<<<<<<<<
  *             self._shuffle_client = ShuffleClient()
  * 
 */
-    __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 241, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 292, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_ShuffleClient);
     __Pyx_GIVEREF(__pyx_mstate_global->__pyx_n_u_ShuffleClient);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_2, 0, __pyx_mstate_global->__pyx_n_u_ShuffleClient) != (0)) __PYX_ERR(0, 241, __pyx_L1_error);
-    __pyx_t_3 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_t_2, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 241, __pyx_L1_error)
+    if (__Pyx_PyList_SET_ITEM(__pyx_t_2, 0, __pyx_mstate_global->__pyx_n_u_ShuffleClient) != (0)) __PYX_ERR(0, 292, __pyx_L1_error);
+    __pyx_t_3 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_shuffle_tr, __pyx_t_2, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 292, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_ShuffleClient); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 241, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_ShuffleClient); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 292, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_GIVEREF(__pyx_t_2);
@@ -11434,7 +12901,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":242
+    /* "sabot/_cython/operators/morsel_operator.pyx":293
  *         if self._shuffle_client is None:
  *             from sabot._cython.shuffle.shuffle_transport import ShuffleClient
  *             self._shuffle_client = ShuffleClient()             # <<<<<<<<<<<<<<
@@ -11461,7 +12928,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
       __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 242, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 293, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
     }
     __Pyx_GIVEREF(__pyx_t_3);
@@ -11470,7 +12937,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
     __pyx_cur_scope->__pyx_v_self->_shuffle_client = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":240
+    /* "sabot/_cython/operators/morsel_operator.pyx":291
  *         """
  *         # Initialize shuffle client if needed
  *         if self._shuffle_client is None:             # <<<<<<<<<<<<<<
@@ -11479,7 +12946,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
 */
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":245
+  /* "sabot/_cython/operators/morsel_operator.pyx":296
  * 
  *         # Get partition keys from operator
  *         partition_keys = self._wrapped_operator.get_partition_keys()             # <<<<<<<<<<<<<<
@@ -11493,25 +12960,25 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
     PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
     __pyx_t_3 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_get_partition_keys, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 245, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 296, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
   }
   __Pyx_GIVEREF(__pyx_t_3);
   __pyx_cur_scope->__pyx_v_partition_keys = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":246
+  /* "sabot/_cython/operators/morsel_operator.pyx":297
  *         # Get partition keys from operator
  *         partition_keys = self._wrapped_operator.get_partition_keys()
  *         if not partition_keys:             # <<<<<<<<<<<<<<
  *             # No keys - broadcast to all agents
  *             # For now, just process locally
 */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_cur_scope->__pyx_v_partition_keys); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 246, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_cur_scope->__pyx_v_partition_keys); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 297, __pyx_L1_error)
   __pyx_t_6 = (!__pyx_t_1);
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":249
+    /* "sabot/_cython/operators/morsel_operator.pyx":300
  *             # No keys - broadcast to all agents
  *             # For now, just process locally
  *             return self._wrapped_operator.process_batch(batch)             # <<<<<<<<<<<<<<
@@ -11526,14 +12993,14 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
       PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_cur_scope->__pyx_v_batch};
       __pyx_t_3 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_process_batch, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 249, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 300, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
     }
     __pyx_r = __pyx_t_3;
     __pyx_t_3 = 0;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":246
+    /* "sabot/_cython/operators/morsel_operator.pyx":297
  *         # Get partition keys from operator
  *         partition_keys = self._wrapped_operator.get_partition_keys()
  *         if not partition_keys:             # <<<<<<<<<<<<<<
@@ -11542,22 +13009,22 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
 */
   }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":252
+  /* "sabot/_cython/operators/morsel_operator.pyx":303
  * 
  *         # Partition batch by keys using hash partitioner
  *         from sabot._cython.shuffle.partitioner import HashPartitioner             # <<<<<<<<<<<<<<
  *         partitioner = HashPartitioner(partition_keys)
  *         partitions = partitioner.partition_batch(batch)
 */
-  __pyx_t_3 = PyList_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_3 = PyList_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_HashPartitioner);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_n_u_HashPartitioner);
-  if (__Pyx_PyList_SET_ITEM(__pyx_t_3, 0, __pyx_mstate_global->__pyx_n_u_HashPartitioner) != (0)) __PYX_ERR(0, 252, __pyx_L1_error);
-  __pyx_t_4 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_partitione, __pyx_t_3, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 252, __pyx_L1_error)
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_3, 0, __pyx_mstate_global->__pyx_n_u_HashPartitioner) != (0)) __PYX_ERR(0, 303, __pyx_L1_error);
+  __pyx_t_4 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot__cython_shuffle_partitione, __pyx_t_3, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_ImportFrom(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_HashPartitioner); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_ImportFrom(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_HashPartitioner); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_3);
@@ -11565,7 +13032,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":253
+  /* "sabot/_cython/operators/morsel_operator.pyx":304
  *         # Partition batch by keys using hash partitioner
  *         from sabot._cython.shuffle.partitioner import HashPartitioner
  *         partitioner = HashPartitioner(partition_keys)             # <<<<<<<<<<<<<<
@@ -11592,14 +13059,14 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 253, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 304, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __Pyx_GIVEREF(__pyx_t_4);
   __pyx_cur_scope->__pyx_v_partitioner = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":254
+  /* "sabot/_cython/operators/morsel_operator.pyx":305
  *         from sabot._cython.shuffle.partitioner import HashPartitioner
  *         partitioner = HashPartitioner(partition_keys)
  *         partitions = partitioner.partition_batch(batch)             # <<<<<<<<<<<<<<
@@ -11613,19 +13080,19 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_batch};
     __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_partition_batch, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 254, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 305, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __Pyx_GIVEREF(__pyx_t_4);
   __pyx_cur_scope->__pyx_v_partitions = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":260
+  /* "sabot/_cython/operators/morsel_operator.pyx":311
  *         # This will be implemented when we have agent coordination
  * 
  *         return self._wrapped_operator.process_batch(batch)             # <<<<<<<<<<<<<<
  * 
- *     def get_stats(self):
+ *     async def _async_process_with_morsels(self, batch):
 */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2 = __pyx_cur_scope->__pyx_v_self->_wrapped_operator;
@@ -11635,7 +13102,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_batch};
     __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_process_batch, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 260, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 311, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __pyx_r = __pyx_t_4;
@@ -11643,7 +13110,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   goto __pyx_L0;
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":233
+  /* "sabot/_cython/operators/morsel_operator.pyx":284
  *             )
  * 
  *     async def _async_process_with_network_shuffle(self, batch):             # <<<<<<<<<<<<<<
@@ -11670,9 +13137,316 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
+static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_13generator1(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/morsel_operator.pyx":262
+/* "sabot/_cython/operators/morsel_operator.pyx":313
  *         return self._wrapped_operator.process_batch(batch)
+ * 
+ *     async def _async_process_with_morsels(self, batch):             # <<<<<<<<<<<<<<
+ *         """
+ *         Async implementation of morsel-driven processing.
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_12_async_process_with_morsels(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_11_async_process_with_morsels, "\n        Async implementation of morsel-driven processing.\n\n        This method is called by tests and provides a unified async interface\n        for morsel processing (either local or network-based).\n\n        Delegates to appropriate processing strategy:\n        - Stateful operators \342\206\222 network shuffle\n        - Stateless operators \342\206\222 local parallel execution (C++ handles threading)\n\n        Args:\n            batch: RecordBatch to process\n\n        Returns:\n            Processed RecordBatch\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_12_async_process_with_morsels = {"_async_process_with_morsels", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_12_async_process_with_morsels, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_11_async_process_with_morsels};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_12_async_process_with_morsels(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  PyObject *__pyx_v_batch = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_async_process_with_morsels (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 313, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 313, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_async_process_with_morsels", 0) < 0) __PYX_ERR(0, 313, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_async_process_with_morsels", 1, 1, 1, i); __PYX_ERR(0, 313, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 313, __pyx_L3_error)
+    }
+    __pyx_v_batch = values[0];
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("_async_process_with_morsels", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 313, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("sabot._cython.operators.morsel_operator.MorselDrivenOperator._async_process_with_morsels", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_11_async_process_with_morsels(((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self), __pyx_v_batch);
+
+  /* function exit code */
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_11_async_process_with_morsels(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self, PyObject *__pyx_v_batch) {
+  struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels *__pyx_cur_scope;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("_async_process_with_morsels", 0);
+  __pyx_cur_scope = (struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels *)__pyx_tp_new_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels, __pyx_mstate_global->__pyx_empty_tuple, NULL);
+  if (unlikely(!__pyx_cur_scope)) {
+    __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels *)Py_None);
+    __Pyx_INCREF(Py_None);
+    __PYX_ERR(0, 313, __pyx_L1_error)
+  } else {
+    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
+  }
+  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
+  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __pyx_cur_scope->__pyx_v_batch = __pyx_v_batch;
+  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_batch);
+  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_batch);
+  {
+    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_13generator1, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_async_process_with_morsels, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator__async_proc_2, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o); if (unlikely(!gen)) __PYX_ERR(0, 313, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_cur_scope);
+    __Pyx_RefNannyFinishContext();
+    return (PyObject *) gen;
+  }
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("sabot._cython.operators.morsel_operator.MorselDrivenOperator._async_process_with_morsels", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_13generator1(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+{
+  struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels *__pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels *)__pyx_generator->closure);
+  PyObject *__pyx_r = NULL;
+  int __pyx_t_1;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  size_t __pyx_t_4;
+  __Pyx_PySendResult __pyx_t_5;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_async_process_with_morsels", 0);
+  switch (__pyx_generator->resume_label) {
+    case 0: goto __pyx_L3_first_run;
+    case 1: goto __pyx_L6_resume_from_await;
+    default: /* CPython raises the right error here */
+    __Pyx_RefNannyFinishContext();
+    return NULL;
+  }
+  __pyx_L3_first_run:;
+  if (unlikely(__pyx_sent_value != Py_None)) {
+    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
+    __PYX_ERR(0, 313, __pyx_L1_error)
+  }
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":330
+ *             Processed RecordBatch
+ *         """
+ *         if batch is None:             # <<<<<<<<<<<<<<
+ *             return None
+ * 
+*/
+  __pyx_t_1 = (__pyx_cur_scope->__pyx_v_batch == Py_None);
+  if (__pyx_t_1) {
+
+    /* "sabot/_cython/operators/morsel_operator.pyx":331
+ *         """
+ *         if batch is None:
+ *             return None             # <<<<<<<<<<<<<<
+ * 
+ *         # Decide processing strategy
+*/
+    __Pyx_XDECREF(__pyx_r);
+    __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+    goto __pyx_L0;
+
+    /* "sabot/_cython/operators/morsel_operator.pyx":330
+ *             Processed RecordBatch
+ *         """
+ *         if batch is None:             # <<<<<<<<<<<<<<
+ *             return None
+ * 
+*/
+  }
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":334
+ * 
+ *         # Decide processing strategy
+ *         if self._wrapped_operator.requires_shuffle():             # <<<<<<<<<<<<<<
+ *             # Stateful operator - use network shuffle
+ *             return await self._async_process_with_network_shuffle(batch)
+*/
+  __pyx_t_3 = __pyx_cur_scope->__pyx_v_self->_wrapped_operator;
+  __Pyx_INCREF(__pyx_t_3);
+  __pyx_t_4 = 0;
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
+    __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_requires_shuffle, __pyx_callargs+__pyx_t_4, (1-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 334, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+  }
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 334, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_1) {
+
+    /* "sabot/_cython/operators/morsel_operator.pyx":336
+ *         if self._wrapped_operator.requires_shuffle():
+ *             # Stateful operator - use network shuffle
+ *             return await self._async_process_with_network_shuffle(batch)             # <<<<<<<<<<<<<<
+ *         else:
+ *             # Stateless operator - use local morsels
+*/
+    __Pyx_XDECREF(__pyx_r);
+    __pyx_t_3 = ((PyObject *)__pyx_cur_scope->__pyx_v_self);
+    __Pyx_INCREF(__pyx_t_3);
+    __pyx_t_4 = 0;
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_batch};
+      __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_async_process_with_network_shuf, __pyx_callargs+__pyx_t_4, (2-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 336, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+    }
+    __pyx_t_5 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_2, &__pyx_r);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (likely(__pyx_t_5 == PYGEN_NEXT)) {
+      __Pyx_GOTREF(__pyx_r);
+      __Pyx_XGIVEREF(__pyx_r);
+      __Pyx_RefNannyFinishContext();
+      __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+      /* return from generator, awaiting value */
+      __pyx_generator->resume_label = 1;
+      return __pyx_r;
+      __pyx_L6_resume_from_await:;
+      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 336, __pyx_L1_error)
+      __pyx_t_2 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_2);
+    } else if (likely(__pyx_t_5 == PYGEN_RETURN)) {
+      __Pyx_GOTREF(__pyx_r);
+      __pyx_t_2 = __pyx_r; __pyx_r = NULL;
+    } else {
+      __Pyx_XGOTREF(__pyx_r);
+      __PYX_ERR(0, 336, __pyx_L1_error)
+    }
+    __pyx_r = __pyx_t_2;
+    __pyx_t_2 = 0;
+    goto __pyx_L0;
+
+    /* "sabot/_cython/operators/morsel_operator.pyx":334
+ * 
+ *         # Decide processing strategy
+ *         if self._wrapped_operator.requires_shuffle():             # <<<<<<<<<<<<<<
+ *             # Stateful operator - use network shuffle
+ *             return await self._async_process_with_network_shuffle(batch)
+*/
+  }
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":341
+ *             # Just call sync method directly - C++ TaskSlotManager handles all threading
+ *             # No need for asyncio wrapper - that causes triple-threading conflicts
+ *             return self._process_with_local_morsels(batch)             # <<<<<<<<<<<<<<
+ * 
+ *     def get_stats(self):
+*/
+  /*else*/ {
+    __Pyx_XDECREF(__pyx_r);
+    __pyx_t_2 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_vtab)->_process_with_local_morsels(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_batch); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 341, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_r = __pyx_t_2;
+    __pyx_t_2 = 0;
+    goto __pyx_L0;
+  }
+  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":313
+ *         return self._wrapped_operator.process_batch(batch)
+ * 
+ *     async def _async_process_with_morsels(self, batch):             # <<<<<<<<<<<<<<
+ *         """
+ *         Async implementation of morsel-driven processing.
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  if (__Pyx_PyErr_Occurred()) {
+    __Pyx_Generator_Replace_StopIteration(0);
+    __Pyx_AddTraceback("_async_process_with_morsels", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  }
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  #if !CYTHON_USE_EXC_INFO_STACK
+  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+  #endif
+  __pyx_generator->resume_label = -1;
+  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "sabot/_cython/operators/morsel_operator.pyx":343
+ *             return self._process_with_local_morsels(batch)
  * 
  *     def get_stats(self):             # <<<<<<<<<<<<<<
  *         """Get morsel processing statistics."""
@@ -11680,16 +13454,16 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_15morsel_operator_20MorselD
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_12get_stats(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_15get_stats(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_11get_stats, "Get morsel processing statistics.");
-static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_12get_stats = {"get_stats", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_12get_stats, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_11get_stats};
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_12get_stats(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_14get_stats, "Get morsel processing statistics.");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_15get_stats = {"get_stats", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_15get_stats, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_14get_stats};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_15get_stats(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -11715,189 +13489,326 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("get_stats", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_11get_stats(((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_14get_stats(((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_11get_stats(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_14get_stats(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self) {
   PyObject *__pyx_v_stats = NULL;
+  PyObject *__pyx_v_get_agent_context = NULL;
+  PyObject *__pyx_v_ctx = NULL;
   PyObject *__pyx_v_slot_stats = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
-  int __pyx_t_3;
-  size_t __pyx_t_4;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  size_t __pyx_t_7;
+  int __pyx_t_8;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_stats", 0);
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":265
+  /* "sabot/_cython/operators/morsel_operator.pyx":346
  *         """Get morsel processing statistics."""
  *         stats = {
  *             'num_workers': self._num_workers,             # <<<<<<<<<<<<<<
  *             'morsel_size_kb': self._morsel_size_kb,
- *             'enabled': self._enabled
+ *             'enabled': self._enabled,
 */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_self->_num_workers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_self->_num_workers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_num_workers, __pyx_t_2) < 0) __PYX_ERR(0, 265, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_num_workers, __pyx_t_2) < 0) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":266
+  /* "sabot/_cython/operators/morsel_operator.pyx":347
  *         stats = {
  *             'num_workers': self._num_workers,
  *             'morsel_size_kb': self._morsel_size_kb,             # <<<<<<<<<<<<<<
- *             'enabled': self._enabled
- *         }
+ *             'enabled': self._enabled,
+ *             'execution_mode': 'task_slot_manager'
 */
-  __pyx_t_2 = __Pyx_PyLong_From_PY_LONG_LONG(__pyx_v_self->_morsel_size_kb); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 266, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_PY_LONG_LONG(__pyx_v_self->_morsel_size_kb); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_morsel_size_kb, __pyx_t_2) < 0) __PYX_ERR(0, 265, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_morsel_size_kb, __pyx_t_2) < 0) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":267
+  /* "sabot/_cython/operators/morsel_operator.pyx":348
  *             'num_workers': self._num_workers,
  *             'morsel_size_kb': self._morsel_size_kb,
- *             'enabled': self._enabled             # <<<<<<<<<<<<<<
+ *             'enabled': self._enabled,             # <<<<<<<<<<<<<<
+ *             'execution_mode': 'task_slot_manager'
  *         }
- * 
 */
-  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_v_self->_enabled); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_v_self->_enabled); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 348, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_enabled, __pyx_t_2) < 0) __PYX_ERR(0, 265, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_enabled, __pyx_t_2) < 0) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_execution_mode, __pyx_mstate_global->__pyx_n_u_task_slot_manager) < 0) __PYX_ERR(0, 346, __pyx_L1_error)
   __pyx_v_stats = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":271
+  /* "sabot/_cython/operators/morsel_operator.pyx":353
  * 
- *         # Get task slot manager stats (unified local + network)
- *         if self._task_slot_manager is not None:             # <<<<<<<<<<<<<<
- *             slot_stats = self._task_slot_manager.get_slot_stats()
- *             stats.update({
+ *         # Try to get task slot manager stats
+ *         try:             # <<<<<<<<<<<<<<
+ *             from sabot.cluster.agent_context import get_agent_context
+ *             ctx = get_agent_context()
 */
-  __pyx_t_3 = (__pyx_v_self->_task_slot_manager != Py_None);
-  if (__pyx_t_3) {
+  {
+    __Pyx_PyThreadState_declare
+    __Pyx_PyThreadState_assign
+    __Pyx_ExceptionSave(&__pyx_t_3, &__pyx_t_4, &__pyx_t_5);
+    __Pyx_XGOTREF(__pyx_t_3);
+    __Pyx_XGOTREF(__pyx_t_4);
+    __Pyx_XGOTREF(__pyx_t_5);
+    /*try:*/ {
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":272
- *         # Get task slot manager stats (unified local + network)
- *         if self._task_slot_manager is not None:
- *             slot_stats = self._task_slot_manager.get_slot_stats()             # <<<<<<<<<<<<<<
- *             stats.update({
- *                 'execution_mode': 'unified_task_slots',
+      /* "sabot/_cython/operators/morsel_operator.pyx":354
+ *         # Try to get task slot manager stats
+ *         try:
+ *             from sabot.cluster.agent_context import get_agent_context             # <<<<<<<<<<<<<<
+ *             ctx = get_agent_context()
+ *             if ctx.task_slot_manager is not None:
 */
-    __pyx_t_2 = __pyx_v_self->_task_slot_manager;
-    __Pyx_INCREF(__pyx_t_2);
-    __pyx_t_4 = 0;
-    {
-      PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
-      __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_get_slot_stats, __pyx_callargs+__pyx_t_4, (1-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
+      __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 354, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
-    }
-    __pyx_v_slot_stats = __pyx_t_1;
-    __pyx_t_1 = 0;
+      __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_get_agent_context);
+      __Pyx_GIVEREF(__pyx_mstate_global->__pyx_n_u_get_agent_context);
+      if (__Pyx_PyList_SET_ITEM(__pyx_t_1, 0, __pyx_mstate_global->__pyx_n_u_get_agent_context) != (0)) __PYX_ERR(0, 354, __pyx_L3_error);
+      __pyx_t_2 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot_cluster_agent_context, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 354, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_get_agent_context); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 354, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_INCREF(__pyx_t_1);
+      __pyx_v_get_agent_context = __pyx_t_1;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":274
- *             slot_stats = self._task_slot_manager.get_slot_stats()
- *             stats.update({
- *                 'execution_mode': 'unified_task_slots',             # <<<<<<<<<<<<<<
- *                 'num_slots': self._task_slot_manager.num_slots,
- *                 'available_slots': self._task_slot_manager.available_slots,
+      /* "sabot/_cython/operators/morsel_operator.pyx":355
+ *         try:
+ *             from sabot.cluster.agent_context import get_agent_context
+ *             ctx = get_agent_context()             # <<<<<<<<<<<<<<
+ *             if ctx.task_slot_manager is not None:
+ *                 slot_stats = ctx.task_slot_manager.get_slot_stats()
 */
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_execution_mode, __pyx_mstate_global->__pyx_n_u_unified_task_slots) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
+      __pyx_t_1 = NULL;
+      __Pyx_INCREF(__pyx_v_get_agent_context);
+      __pyx_t_6 = __pyx_v_get_agent_context; 
+      __pyx_t_7 = 1;
+      #if CYTHON_UNPACK_METHODS
+      if (unlikely(PyMethod_Check(__pyx_t_6))) {
+        __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_6);
+        assert(__pyx_t_1);
+        PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_6);
+        __Pyx_INCREF(__pyx_t_1);
+        __Pyx_INCREF(__pyx__function);
+        __Pyx_DECREF_SET(__pyx_t_6, __pyx__function);
+        __pyx_t_7 = 0;
+      }
+      #endif
+      {
+        PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
+        __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_6, __pyx_callargs+__pyx_t_7, (1-__pyx_t_7) | (__pyx_t_7*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_2);
+      }
+      __pyx_v_ctx = __pyx_t_2;
+      __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":275
- *             stats.update({
- *                 'execution_mode': 'unified_task_slots',
- *                 'num_slots': self._task_slot_manager.num_slots,             # <<<<<<<<<<<<<<
- *                 'available_slots': self._task_slot_manager.available_slots,
- *                 'queue_depth': self._task_slot_manager.queue_depth,
+      /* "sabot/_cython/operators/morsel_operator.pyx":356
+ *             from sabot.cluster.agent_context import get_agent_context
+ *             ctx = get_agent_context()
+ *             if ctx.task_slot_manager is not None:             # <<<<<<<<<<<<<<
+ *                 slot_stats = ctx.task_slot_manager.get_slot_stats()
+ *                 stats.update({
 */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->_task_slot_manager, __pyx_mstate_global->__pyx_n_u_num_slots); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 275, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_num_slots, __pyx_t_2) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ctx, __pyx_mstate_global->__pyx_n_u_task_slot_manager); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 356, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_8 = (__pyx_t_2 != Py_None);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      if (__pyx_t_8) {
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":276
- *                 'execution_mode': 'unified_task_slots',
- *                 'num_slots': self._task_slot_manager.num_slots,
- *                 'available_slots': self._task_slot_manager.available_slots,             # <<<<<<<<<<<<<<
- *                 'queue_depth': self._task_slot_manager.queue_depth,
- *                 'slot_stats': slot_stats
+        /* "sabot/_cython/operators/morsel_operator.pyx":357
+ *             ctx = get_agent_context()
+ *             if ctx.task_slot_manager is not None:
+ *                 slot_stats = ctx.task_slot_manager.get_slot_stats()             # <<<<<<<<<<<<<<
+ *                 stats.update({
+ *                     'num_slots': ctx.task_slot_manager.num_slots,
 */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->_task_slot_manager, __pyx_mstate_global->__pyx_n_u_available_slots); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 276, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_available_slots, __pyx_t_2) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ctx, __pyx_mstate_global->__pyx_n_u_task_slot_manager); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 357, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_6 = __pyx_t_1;
+        __Pyx_INCREF(__pyx_t_6);
+        __pyx_t_7 = 0;
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_6, NULL};
+          __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_get_slot_stats, __pyx_callargs+__pyx_t_7, (1-__pyx_t_7) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 357, __pyx_L3_error)
+          __Pyx_GOTREF(__pyx_t_2);
+        }
+        __pyx_v_slot_stats = __pyx_t_2;
+        __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":277
- *                 'num_slots': self._task_slot_manager.num_slots,
- *                 'available_slots': self._task_slot_manager.available_slots,
- *                 'queue_depth': self._task_slot_manager.queue_depth,             # <<<<<<<<<<<<<<
- *                 'slot_stats': slot_stats
- *             })
+        /* "sabot/_cython/operators/morsel_operator.pyx":359
+ *                 slot_stats = ctx.task_slot_manager.get_slot_stats()
+ *                 stats.update({
+ *                     'num_slots': ctx.task_slot_manager.num_slots,             # <<<<<<<<<<<<<<
+ *                     'available_slots': ctx.task_slot_manager.available_slots,
+ *                     'queue_depth': ctx.task_slot_manager.queue_depth,
 */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->_task_slot_manager, __pyx_mstate_global->__pyx_n_u_queue_depth); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 277, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_queue_depth, __pyx_t_2) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __pyx_t_2 = __Pyx_PyDict_NewPresized(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 359, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_2);
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ctx, __pyx_mstate_global->__pyx_n_u_task_slot_manager); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 359, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_num_slots); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 359, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        if (PyDict_SetItem(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_num_slots, __pyx_t_6) < 0) __PYX_ERR(0, 359, __pyx_L3_error)
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":278
- *                 'available_slots': self._task_slot_manager.available_slots,
- *                 'queue_depth': self._task_slot_manager.queue_depth,
- *                 'slot_stats': slot_stats             # <<<<<<<<<<<<<<
- *             })
- *         else:
+        /* "sabot/_cython/operators/morsel_operator.pyx":360
+ *                 stats.update({
+ *                     'num_slots': ctx.task_slot_manager.num_slots,
+ *                     'available_slots': ctx.task_slot_manager.available_slots,             # <<<<<<<<<<<<<<
+ *                     'queue_depth': ctx.task_slot_manager.queue_depth,
+ *                     'slot_stats': slot_stats
 */
-    if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_slot_stats, __pyx_v_slot_stats) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_ctx, __pyx_mstate_global->__pyx_n_u_task_slot_manager); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 360, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_available_slots); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        if (PyDict_SetItem(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_available_slots, __pyx_t_1) < 0) __PYX_ERR(0, 359, __pyx_L3_error)
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":273
- *         if self._task_slot_manager is not None:
- *             slot_stats = self._task_slot_manager.get_slot_stats()
- *             stats.update({             # <<<<<<<<<<<<<<
- *                 'execution_mode': 'unified_task_slots',
- *                 'num_slots': self._task_slot_manager.num_slots,
+        /* "sabot/_cython/operators/morsel_operator.pyx":361
+ *                     'num_slots': ctx.task_slot_manager.num_slots,
+ *                     'available_slots': ctx.task_slot_manager.available_slots,
+ *                     'queue_depth': ctx.task_slot_manager.queue_depth,             # <<<<<<<<<<<<<<
+ *                     'slot_stats': slot_stats
+ *                 })
 */
-    __pyx_t_2 = __Pyx_CallUnboundCMethod1(&__pyx_mstate_global->__pyx_umethod_PyDict_Type__update, __pyx_v_stats, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 273, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ctx, __pyx_mstate_global->__pyx_n_u_task_slot_manager); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 361, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_queue_depth); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 361, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        if (PyDict_SetItem(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_queue_depth, __pyx_t_6) < 0) __PYX_ERR(0, 359, __pyx_L3_error)
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "sabot/_cython/operators/morsel_operator.pyx":271
+        /* "sabot/_cython/operators/morsel_operator.pyx":362
+ *                     'available_slots': ctx.task_slot_manager.available_slots,
+ *                     'queue_depth': ctx.task_slot_manager.queue_depth,
+ *                     'slot_stats': slot_stats             # <<<<<<<<<<<<<<
+ *                 })
+ *         except:
+*/
+        if (PyDict_SetItem(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_slot_stats, __pyx_v_slot_stats) < 0) __PYX_ERR(0, 359, __pyx_L3_error)
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":358
+ *             if ctx.task_slot_manager is not None:
+ *                 slot_stats = ctx.task_slot_manager.get_slot_stats()
+ *                 stats.update({             # <<<<<<<<<<<<<<
+ *                     'num_slots': ctx.task_slot_manager.num_slots,
+ *                     'available_slots': ctx.task_slot_manager.available_slots,
+*/
+        __pyx_t_6 = __Pyx_CallUnboundCMethod1(&__pyx_mstate_global->__pyx_umethod_PyDict_Type__update, __pyx_v_stats, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 358, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+        /* "sabot/_cython/operators/morsel_operator.pyx":356
+ *             from sabot.cluster.agent_context import get_agent_context
+ *             ctx = get_agent_context()
+ *             if ctx.task_slot_manager is not None:             # <<<<<<<<<<<<<<
+ *                 slot_stats = ctx.task_slot_manager.get_slot_stats()
+ *                 stats.update({
+*/
+      }
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":353
  * 
- *         # Get task slot manager stats (unified local + network)
- *         if self._task_slot_manager is not None:             # <<<<<<<<<<<<<<
- *             slot_stats = self._task_slot_manager.get_slot_stats()
- *             stats.update({
+ *         # Try to get task slot manager stats
+ *         try:             # <<<<<<<<<<<<<<
+ *             from sabot.cluster.agent_context import get_agent_context
+ *             ctx = get_agent_context()
 */
-    goto __pyx_L3;
-  }
+    }
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+    goto __pyx_L8_try_end;
+    __pyx_L3_error:;
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":281
- *             })
- *         else:
- *             stats['execution_mode'] = 'not_initialized'             # <<<<<<<<<<<<<<
+    /* "sabot/_cython/operators/morsel_operator.pyx":364
+ *                     'slot_stats': slot_stats
+ *                 })
+ *         except:             # <<<<<<<<<<<<<<
+ *             # TaskSlotManager not available - using ThreadPoolExecutor fallback
+ *             stats['execution_mode'] = 'thread_pool_executor (fallback)'
+*/
+    /*except:*/ {
+      __Pyx_AddTraceback("sabot._cython.operators.morsel_operator.MorselDrivenOperator.get_stats", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      if (__Pyx_GetException(&__pyx_t_6, &__pyx_t_2, &__pyx_t_1) < 0) __PYX_ERR(0, 364, __pyx_L5_except_error)
+      __Pyx_XGOTREF(__pyx_t_6);
+      __Pyx_XGOTREF(__pyx_t_2);
+      __Pyx_XGOTREF(__pyx_t_1);
+
+      /* "sabot/_cython/operators/morsel_operator.pyx":366
+ *         except:
+ *             # TaskSlotManager not available - using ThreadPoolExecutor fallback
+ *             stats['execution_mode'] = 'thread_pool_executor (fallback)'             # <<<<<<<<<<<<<<
  * 
  *         return stats
 */
-  /*else*/ {
-    if (unlikely((PyDict_SetItem(__pyx_v_stats, __pyx_mstate_global->__pyx_n_u_execution_mode, __pyx_mstate_global->__pyx_n_u_not_initialized) < 0))) __PYX_ERR(0, 281, __pyx_L1_error)
-  }
-  __pyx_L3:;
+      if (unlikely((PyDict_SetItem(__pyx_v_stats, __pyx_mstate_global->__pyx_n_u_execution_mode, __pyx_mstate_global->__pyx_kp_u_thread_pool_executor_fallback) < 0))) __PYX_ERR(0, 366, __pyx_L5_except_error)
+      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+      goto __pyx_L4_exception_handled;
+    }
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":283
- *             stats['execution_mode'] = 'not_initialized'
+    /* "sabot/_cython/operators/morsel_operator.pyx":353
+ * 
+ *         # Try to get task slot manager stats
+ *         try:             # <<<<<<<<<<<<<<
+ *             from sabot.cluster.agent_context import get_agent_context
+ *             ctx = get_agent_context()
+*/
+    __pyx_L5_except_error:;
+    __Pyx_XGIVEREF(__pyx_t_3);
+    __Pyx_XGIVEREF(__pyx_t_4);
+    __Pyx_XGIVEREF(__pyx_t_5);
+    __Pyx_ExceptionReset(__pyx_t_3, __pyx_t_4, __pyx_t_5);
+    goto __pyx_L1_error;
+    __pyx_L4_exception_handled:;
+    __Pyx_XGIVEREF(__pyx_t_3);
+    __Pyx_XGIVEREF(__pyx_t_4);
+    __Pyx_XGIVEREF(__pyx_t_5);
+    __Pyx_ExceptionReset(__pyx_t_3, __pyx_t_4, __pyx_t_5);
+    __pyx_L8_try_end:;
+  }
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":368
+ *             stats['execution_mode'] = 'thread_pool_executor (fallback)'
  * 
  *         return stats             # <<<<<<<<<<<<<<
 */
@@ -11906,8 +13817,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   __pyx_r = __pyx_v_stats;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":262
- *         return self._wrapped_operator.process_batch(batch)
+  /* "sabot/_cython/operators/morsel_operator.pyx":343
+ *             return self._process_with_local_morsels(batch)
  * 
  *     def get_stats(self):             # <<<<<<<<<<<<<<
  *         """Get morsel processing statistics."""
@@ -11918,10 +13829,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_AddTraceback("sabot._cython.operators.morsel_operator.MorselDrivenOperator.get_stats", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_stats);
+  __Pyx_XDECREF(__pyx_v_get_agent_context);
+  __Pyx_XDECREF(__pyx_v_ctx);
   __Pyx_XDECREF(__pyx_v_slot_stats);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
@@ -11935,15 +13849,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_14__reduce_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_17__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_14__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_14__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_14__reduce_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_17__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_17__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_17__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -11969,14 +13883,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("__reduce_cython__", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_13__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_16__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_13__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_16__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -12016,15 +13930,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselD
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_16__setstate_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_19__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_16__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_16__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_16__setstate_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_19__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_19__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_19__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -12090,7 +14004,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_15__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self), __pyx_v___pyx_state);
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_18__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)__pyx_v_self), __pyx_v___pyx_state);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -12100,7 +14014,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_15__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_18__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -12230,9 +14144,10 @@ static int __pyx_tp_clear_5sabot_7_cython_9operators_15morsel_operator_MorselDri
 
 static PyMethodDef __pyx_methods_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator[] = {
   {"_async_process_with_network_shuffle", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_9_async_process_with_network_shuffle, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_8_async_process_with_network_shuffle},
-  {"get_stats", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_12get_stats, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_11get_stats},
-  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_14__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_16__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"_async_process_with_morsels", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_12_async_process_with_morsels, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_11_async_process_with_morsels},
+  {"get_stats", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_15get_stats, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_14get_stats},
+  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_17__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_19__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 #if CYTHON_USE_TYPE_SPECS
@@ -12364,6 +14279,7 @@ static void __pyx_tp_dealloc_5sabot_7_cython_9operators_15morsel_operator___pyx_
   }
   #endif
   PyObject_GC_UnTrack(o);
+  Py_CLEAR(p->__pyx_v_batch);
   Py_CLEAR(p->__pyx_v_self);
   #if CYTHON_USE_FREELISTS
   if (((int)(__pyx_mstate_global->__pyx_freecount_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels < 8) & (int)(Py_TYPE(o)->tp_basicsize == sizeof(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels)))) {
@@ -12389,6 +14305,9 @@ static int __pyx_tp_traverse_5sabot_7_cython_9operators_15morsel_operator___pyx_
     e = __Pyx_call_type_traverse(o, 1, v, a);
     if (e) return e;
   }
+  if (p->__pyx_v_batch) {
+    e = (*v)(p->__pyx_v_batch, a); if (e) return e;
+  }
   if (p->__pyx_v_self) {
     e = (*v)(((PyObject *)p->__pyx_v_self), a); if (e) return e;
   }
@@ -12398,6 +14317,9 @@ static int __pyx_tp_traverse_5sabot_7_cython_9operators_15morsel_operator___pyx_
 static int __pyx_tp_clear_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels(PyObject *o) {
   PyObject* tmp;
   struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels *p = (struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels *)o;
+  tmp = ((PyObject*)p->__pyx_v_batch);
+  p->__pyx_v_batch = Py_None; Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
   tmp = ((PyObject*)p->__pyx_v_self);
   p->__pyx_v_self = ((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator *)Py_None); Py_INCREF(Py_None);
   Py_XDECREF(tmp);
@@ -12678,6 +14600,166 @@ static PyTypeObject __pyx_type_5sabot_7_cython_9operators_15morsel_operator___py
 };
 #endif
 
+static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+  PyObject *o;
+  #if CYTHON_COMPILING_IN_LIMITED_API
+  allocfunc alloc_func = (allocfunc)PyType_GetSlot(t, Py_tp_alloc);
+  o = alloc_func(t, 0);
+  #else
+  #if CYTHON_USE_FREELISTS
+  if (likely((int)(__pyx_mstate_global->__pyx_freecount_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels > 0) & (int)(t->tp_basicsize == sizeof(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels)))) {
+    o = (PyObject*)__pyx_mstate_global->__pyx_freelist_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels[--__pyx_mstate_global->__pyx_freecount_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels];
+    memset(o, 0, sizeof(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels));
+    (void) PyObject_INIT(o, t);
+    PyObject_GC_Track(o);
+  } else
+  #endif
+  {
+    o = (*t->tp_alloc)(t, 0);
+    if (unlikely(!o)) return 0;
+  }
+  #endif
+  return o;
+}
+
+static void __pyx_tp_dealloc_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels(PyObject *o) {
+  struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels *p = (struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels *)o;
+  #if CYTHON_USE_TP_FINALIZE
+  if (unlikely((PY_VERSION_HEX >= 0x03080000 || __Pyx_PyType_HasFeature(Py_TYPE(o), Py_TPFLAGS_HAVE_FINALIZE)) && __Pyx_PyObject_GetSlot(o, tp_finalize, destructor)) && !__Pyx_PyObject_GC_IsFinalized(o)) {
+    if (__Pyx_PyObject_GetSlot(o, tp_dealloc, destructor) == __pyx_tp_dealloc_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels) {
+      if (PyObject_CallFinalizerFromDealloc(o)) return;
+    }
+  }
+  #endif
+  PyObject_GC_UnTrack(o);
+  Py_CLEAR(p->__pyx_v_batch);
+  Py_CLEAR(p->__pyx_v_self);
+  #if CYTHON_USE_FREELISTS
+  if (((int)(__pyx_mstate_global->__pyx_freecount_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels < 8) & (int)(Py_TYPE(o)->tp_basicsize == sizeof(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels)))) {
+    __pyx_mstate_global->__pyx_freelist_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels[__pyx_mstate_global->__pyx_freecount_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels++] = ((struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels *)o);
+  } else
+  #endif
+  {
+    #if CYTHON_USE_TYPE_SLOTS
+    (*Py_TYPE(o)->tp_free)(o);
+    #else
+    {
+      freefunc tp_free = (freefunc)PyType_GetSlot(Py_TYPE(o), Py_tp_free);
+      if (tp_free) tp_free(o);
+    }
+    #endif
+  }
+}
+
+static int __pyx_tp_traverse_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels(PyObject *o, visitproc v, void *a) {
+  int e;
+  struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels *p = (struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels *)o;
+  {
+    e = __Pyx_call_type_traverse(o, 1, v, a);
+    if (e) return e;
+  }
+  if (p->__pyx_v_batch) {
+    e = (*v)(p->__pyx_v_batch, a); if (e) return e;
+  }
+  if (p->__pyx_v_self) {
+    e = (*v)(((PyObject *)p->__pyx_v_self), a); if (e) return e;
+  }
+  return 0;
+}
+#if CYTHON_USE_TYPE_SPECS
+static PyType_Slot __pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels_slots[] = {
+  {Py_tp_dealloc, (void *)__pyx_tp_dealloc_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels},
+  {Py_tp_traverse, (void *)__pyx_tp_traverse_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels},
+  {Py_tp_new, (void *)__pyx_tp_new_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels},
+  {0, 0},
+};
+static PyType_Spec __pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels_spec = {
+  "sabot._cython.operators.morsel_operator.__pyx_scope_struct_2__async_process_with_morsels",
+  sizeof(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels),
+  0,
+  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_HAVE_FINALIZE,
+  __pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels_slots,
+};
+#else
+
+static PyTypeObject __pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels = {
+  PyVarObject_HEAD_INIT(0, 0)
+  "sabot._cython.operators.morsel_operator.""__pyx_scope_struct_2__async_process_with_morsels", /*tp_name*/
+  sizeof(struct __pyx_obj_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels), /*tp_basicsize*/
+  0, /*tp_itemsize*/
+  __pyx_tp_dealloc_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels, /*tp_dealloc*/
+  #if PY_VERSION_HEX < 0x030800b4
+  0, /*tp_print*/
+  #endif
+  #if PY_VERSION_HEX >= 0x030800b4
+  0, /*tp_vectorcall_offset*/
+  #endif
+  0, /*tp_getattr*/
+  0, /*tp_setattr*/
+  0, /*tp_as_async*/
+  0, /*tp_repr*/
+  0, /*tp_as_number*/
+  0, /*tp_as_sequence*/
+  0, /*tp_as_mapping*/
+  0, /*tp_hash*/
+  0, /*tp_call*/
+  0, /*tp_str*/
+  0, /*tp_getattro*/
+  0, /*tp_setattro*/
+  0, /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_HAVE_FINALIZE, /*tp_flags*/
+  0, /*tp_doc*/
+  __pyx_tp_traverse_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels, /*tp_traverse*/
+  0, /*tp_clear*/
+  0, /*tp_richcompare*/
+  0, /*tp_weaklistoffset*/
+  0, /*tp_iter*/
+  0, /*tp_iternext*/
+  0, /*tp_methods*/
+  0, /*tp_members*/
+  0, /*tp_getset*/
+  0, /*tp_base*/
+  0, /*tp_dict*/
+  0, /*tp_descr_get*/
+  0, /*tp_descr_set*/
+  #if !CYTHON_USE_TYPE_SPECS
+  0, /*tp_dictoffset*/
+  #endif
+  0, /*tp_init*/
+  0, /*tp_alloc*/
+  __pyx_tp_new_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels, /*tp_new*/
+  0, /*tp_free*/
+  0, /*tp_is_gc*/
+  0, /*tp_bases*/
+  0, /*tp_mro*/
+  0, /*tp_cache*/
+  0, /*tp_subclasses*/
+  0, /*tp_weaklist*/
+  0, /*tp_del*/
+  0, /*tp_version_tag*/
+  #if CYTHON_USE_TP_FINALIZE
+  0, /*tp_finalize*/
+  #else
+  NULL, /*tp_finalize*/
+  #endif
+  #if PY_VERSION_HEX >= 0x030800b1 && (!CYTHON_COMPILING_IN_PYPY || PYPY_VERSION_NUM >= 0x07030800)
+  0, /*tp_vectorcall*/
+  #endif
+  #if __PYX_NEED_TP_PRINT_SLOT == 1
+  0, /*tp_print*/
+  #endif
+  #if PY_VERSION_HEX >= 0x030C0000
+  0, /*tp_watched*/
+  #endif
+  #if PY_VERSION_HEX >= 0x030d00A4
+  0, /*tp_versions_used*/
+  #endif
+  #if CYTHON_COMPILING_IN_PYPY && PY_VERSION_HEX >= 0x03090000 && PY_VERSION_HEX < 0x030a0000
+  0, /*tp_pypy_flags*/
+  #endif
+};
+#endif
+
 static PyMethodDef __pyx_methods[] = {
   {0, 0, 0, 0}
 };
@@ -12777,15 +14859,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator) < 0) __PYX_ERR(0, 22, __pyx_L1_error)
   if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator) < 0) __PYX_ERR(0, 22, __pyx_L1_error)
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels)) __PYX_ERR(0, 139, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels) < 0) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels)) __PYX_ERR(0, 135, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels) < 0) __PYX_ERR(0, 135, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels = &__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels) < 0) __PYX_ERR(0, 139, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels) < 0) __PYX_ERR(0, 135, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct___process_with_local_morsels->tp_getattro == PyObject_GenericGetAttr)) {
@@ -12793,19 +14875,35 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle)) __PYX_ERR(0, 233, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle) < 0) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle)) __PYX_ERR(0, 284, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle) < 0) __PYX_ERR(0, 284, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle = &__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle) < 0) __PYX_ERR(0, 233, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle) < 0) __PYX_ERR(0, 284, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle->tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_1__async_process_with_network_shuffle->tp_getattro = PyObject_GenericGetAttr;
+  }
+  #endif
+  #if CYTHON_USE_TYPE_SPECS
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels)) __PYX_ERR(0, 313, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels) < 0) __PYX_ERR(0, 313, __pyx_L1_error)
+  #else
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels = &__pyx_type_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels;
+  #endif
+  #if !CYTHON_COMPILING_IN_LIMITED_API
+  #endif
+  #if !CYTHON_USE_TYPE_SPECS
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels) < 0) __PYX_ERR(0, 313, __pyx_L1_error)
+  #endif
+  #if !CYTHON_COMPILING_IN_LIMITED_API
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels->tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator___pyx_scope_struct_2__async_process_with_morsels->tp_getattro = PyObject_GenericGetAttr;
   }
   #endif
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -14255,52 +16353,64 @@ __Pyx_RefNannySetupContext("PyInit_morsel_operator", 0);
   (void)__Pyx_modinit_function_import_code(__pyx_mstate);
   /*--- Execution code ---*/
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":79
+  /* "sabot/_cython/operators/morsel_operator.pyx":75
  *         pass
  * 
  *     cpdef bint should_use_morsel_execution(self, object batch):             # <<<<<<<<<<<<<<
  *         """
  *         Determine if morsel execution should be used for this batch.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_5should_use_morsel_execution, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator_should_use, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_5should_use_morsel_execution, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator_should_use, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator, __pyx_mstate_global->__pyx_n_u_should_use_morsel_execution, __pyx_t_2) < 0) __PYX_ERR(0, 79, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator, __pyx_mstate_global->__pyx_n_u_should_use_morsel_execution, __pyx_t_2) < 0) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":105
+  /* "sabot/_cython/operators/morsel_operator.pyx":101
  *         return True
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
  *     cpdef object process_batch(self, object batch):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_7process_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator_process_bat, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 105, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_7process_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator_process_bat, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator, __pyx_mstate_global->__pyx_n_u_process_batch, __pyx_t_2) < 0) __PYX_ERR(0, 105, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator, __pyx_mstate_global->__pyx_n_u_process_batch, __pyx_t_2) < 0) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":233
+  /* "sabot/_cython/operators/morsel_operator.pyx":284
  *             )
  * 
  *     async def _async_process_with_network_shuffle(self, batch):             # <<<<<<<<<<<<<<
  *         """
  *         Async implementation of network shuffle.
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_9_async_process_with_network_shuffle, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator__async_proc, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_9_async_process_with_network_shuffle, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator__async_proc, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator, __pyx_mstate_global->__pyx_n_u_async_process_with_network_shuf, __pyx_t_2) < 0) __PYX_ERR(0, 233, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator, __pyx_mstate_global->__pyx_n_u_async_process_with_network_shuf, __pyx_t_2) < 0) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/morsel_operator.pyx":262
+  /* "sabot/_cython/operators/morsel_operator.pyx":313
  *         return self._wrapped_operator.process_batch(batch)
+ * 
+ *     async def _async_process_with_morsels(self, batch):             # <<<<<<<<<<<<<<
+ *         """
+ *         Async implementation of morsel-driven processing.
+*/
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_12_async_process_with_morsels, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator__async_proc_2, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 313, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator, __pyx_mstate_global->__pyx_n_u_async_process_with_morsels, __pyx_t_2) < 0) __PYX_ERR(0, 313, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":343
+ *             return self._process_with_local_morsels(batch)
  * 
  *     def get_stats(self):             # <<<<<<<<<<<<<<
  *         """Get morsel processing statistics."""
  *         stats = {
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_12get_stats, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator_get_stats, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_15get_stats, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator_get_stats, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator, __pyx_mstate_global->__pyx_n_u_get_stats, __pyx_t_2) < 0) __PYX_ERR(0, 262, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_15morsel_operator_MorselDrivenOperator, __pyx_mstate_global->__pyx_n_u_get_stats, __pyx_t_2) < 0) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
@@ -14308,7 +16418,7 @@ __Pyx_RefNannySetupContext("PyInit_morsel_operator", 0);
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
  * def __setstate_cython__(self, __pyx_state):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_14__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator___reduce_cy, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_17__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator___reduce_cy, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -14319,7 +16429,7 @@ __Pyx_RefNannySetupContext("PyInit_morsel_operator", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     raise TypeError, "no default __reduce__ due to non-trivial __cinit__"
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_16__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator___setstate, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_15morsel_operator_20MorselDrivenOperator_19__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MorselDrivenOperator___setstate, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_morsel_o, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_2) < 0) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -14398,48 +16508,65 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_MorselDrivenOperator___reduce_cy, sizeof(__pyx_k_MorselDrivenOperator___reduce_cy), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MorselDrivenOperator___reduce_cy */
   {__pyx_k_MorselDrivenOperator___setstate, sizeof(__pyx_k_MorselDrivenOperator___setstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MorselDrivenOperator___setstate */
   {__pyx_k_MorselDrivenOperator__async_proc, sizeof(__pyx_k_MorselDrivenOperator__async_proc), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MorselDrivenOperator__async_proc */
+  {__pyx_k_MorselDrivenOperator__async_proc_2, sizeof(__pyx_k_MorselDrivenOperator__async_proc_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MorselDrivenOperator__async_proc_2 */
   {__pyx_k_MorselDrivenOperator__process_wi, sizeof(__pyx_k_MorselDrivenOperator__process_wi), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MorselDrivenOperator__process_wi */
+  {__pyx_k_MorselDrivenOperator__process_wi_2, sizeof(__pyx_k_MorselDrivenOperator__process_wi_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MorselDrivenOperator__process_wi_2 */
   {__pyx_k_MorselDrivenOperator_get_stats, sizeof(__pyx_k_MorselDrivenOperator_get_stats), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MorselDrivenOperator_get_stats */
   {__pyx_k_MorselDrivenOperator_process_bat, sizeof(__pyx_k_MorselDrivenOperator_process_bat), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MorselDrivenOperator_process_bat */
   {__pyx_k_MorselDrivenOperator_should_use, sizeof(__pyx_k_MorselDrivenOperator_should_use), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MorselDrivenOperator_should_use */
   {__pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_RuntimeError */
   {__pyx_k_ShuffleClient, sizeof(__pyx_k_ShuffleClient), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ShuffleClient */
   {__pyx_k_Table, sizeof(__pyx_k_Table), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Table */
+  {__pyx_k_TaskSlotManager_unavailable, sizeof(__pyx_k_TaskSlotManager_unavailable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_TaskSlotManager_unavailable */
+  {__pyx_k_ThreadPoolExecutor, sizeof(__pyx_k_ThreadPoolExecutor), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ThreadPoolExecutor */
   {__pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TypeError */
   {__pyx_k__2, sizeof(__pyx_k__2), 0, 1, 0}, /* PyObject cname: __pyx_kp_u__2 */
+  {__pyx_k_async_process_with_morsels, sizeof(__pyx_k_async_process_with_morsels), 0, 1, 1}, /* PyObject cname: __pyx_n_u_async_process_with_morsels */
   {__pyx_k_async_process_with_network_shuf, sizeof(__pyx_k_async_process_with_network_shuf), 0, 1, 1}, /* PyObject cname: __pyx_n_u_async_process_with_network_shuf */
   {__pyx_k_asyncio, sizeof(__pyx_k_asyncio), 0, 1, 1}, /* PyObject cname: __pyx_n_u_asyncio */
   {__pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 1, 1}, /* PyObject cname: __pyx_n_u_asyncio_coroutines */
   {__pyx_k_available_slots, sizeof(__pyx_k_available_slots), 0, 1, 1}, /* PyObject cname: __pyx_n_u_available_slots */
+  {__pyx_k_await, sizeof(__pyx_k_await), 0, 1, 1}, /* PyObject cname: __pyx_n_u_await */
   {__pyx_k_batch, sizeof(__pyx_k_batch), 0, 1, 1}, /* PyObject cname: __pyx_n_u_batch */
   {__pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cline_in_traceback */
   {__pyx_k_close, sizeof(__pyx_k_close), 0, 1, 1}, /* PyObject cname: __pyx_n_u_close */
   {__pyx_k_combine_chunks, sizeof(__pyx_k_combine_chunks), 0, 1, 1}, /* PyObject cname: __pyx_n_u_combine_chunks */
+  {__pyx_k_concurrent, sizeof(__pyx_k_concurrent), 0, 1, 1}, /* PyObject cname: __pyx_n_u_concurrent */
+  {__pyx_k_concurrent_futures, sizeof(__pyx_k_concurrent_futures), 0, 1, 1}, /* PyObject cname: __pyx_n_u_concurrent_futures */
+  {__pyx_k_ctx, sizeof(__pyx_k_ctx), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ctx */
   {__pyx_k_cyarrow, sizeof(__pyx_k_cyarrow), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cyarrow */
   {__pyx_k_disable, sizeof(__pyx_k_disable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_disable */
   {__pyx_k_enable, sizeof(__pyx_k_enable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_enable */
   {__pyx_k_enabled, sizeof(__pyx_k_enabled), 0, 1, 1}, /* PyObject cname: __pyx_n_u_enabled */
+  {__pyx_k_end_row, sizeof(__pyx_k_end_row), 0, 1, 1}, /* PyObject cname: __pyx_n_u_end_row */
   {__pyx_k_ensure_future, sizeof(__pyx_k_ensure_future), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ensure_future */
+  {__pyx_k_enter, sizeof(__pyx_k_enter), 0, 1, 1}, /* PyObject cname: __pyx_n_u_enter */
   {__pyx_k_execute_morsels, sizeof(__pyx_k_execute_morsels), 0, 1, 1}, /* PyObject cname: __pyx_n_u_execute_morsels */
   {__pyx_k_execution_mode, sizeof(__pyx_k_execution_mode), 0, 1, 1}, /* PyObject cname: __pyx_n_u_execution_mode */
+  {__pyx_k_exit, sizeof(__pyx_k_exit), 0, 1, 1}, /* PyObject cname: __pyx_n_u_exit */
+  {__pyx_k_falling_back_to_ThreadPoolExecu, sizeof(__pyx_k_falling_back_to_ThreadPoolExecu), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_falling_back_to_ThreadPoolExecu */
   {__pyx_k_from_batches, sizeof(__pyx_k_from_batches), 0, 1, 1}, /* PyObject cname: __pyx_n_u_from_batches */
   {__pyx_k_func, sizeof(__pyx_k_func), 0, 1, 1}, /* PyObject cname: __pyx_n_u_func */
+  {__pyx_k_futures, sizeof(__pyx_k_futures), 0, 1, 1}, /* PyObject cname: __pyx_n_u_futures */
   {__pyx_k_gc, sizeof(__pyx_k_gc), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_gc */
   {__pyx_k_get, sizeof(__pyx_k_get), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get */
+  {__pyx_k_get_agent_context, sizeof(__pyx_k_get_agent_context), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get_agent_context */
   {__pyx_k_get_event_loop, sizeof(__pyx_k_get_event_loop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get_event_loop */
-  {__pyx_k_get_field_index, sizeof(__pyx_k_get_field_index), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get_field_index */
   {__pyx_k_get_or_create_slot_manager, sizeof(__pyx_k_get_or_create_slot_manager), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get_or_create_slot_manager */
   {__pyx_k_get_partition_keys, sizeof(__pyx_k_get_partition_keys), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get_partition_keys */
   {__pyx_k_get_slot_stats, sizeof(__pyx_k_get_slot_stats), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get_slot_stats */
   {__pyx_k_get_stats, sizeof(__pyx_k_get_stats), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get_stats */
   {__pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_getstate */
-  {__pyx_k_id, sizeof(__pyx_k_id), 0, 1, 1}, /* PyObject cname: __pyx_n_u_id */
   {__pyx_k_initializing, sizeof(__pyx_k_initializing), 0, 1, 1}, /* PyObject cname: __pyx_n_u_initializing */
   {__pyx_k_is_coroutine, sizeof(__pyx_k_is_coroutine), 0, 1, 1}, /* PyObject cname: __pyx_n_u_is_coroutine */
   {__pyx_k_is_running, sizeof(__pyx_k_is_running), 0, 1, 1}, /* PyObject cname: __pyx_n_u_is_running */
   {__pyx_k_isenabled, sizeof(__pyx_k_isenabled), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_isenabled */
   {__pyx_k_key_columns, sizeof(__pyx_k_key_columns), 0, 1, 1}, /* PyObject cname: __pyx_n_u_key_columns */
+  {__pyx_k_length, sizeof(__pyx_k_length), 0, 1, 1}, /* PyObject cname: __pyx_n_u_length */
+  {__pyx_k_logging, sizeof(__pyx_k_logging), 0, 1, 1}, /* PyObject cname: __pyx_n_u_logging */
   {__pyx_k_main, sizeof(__pyx_k_main), 0, 1, 1}, /* PyObject cname: __pyx_n_u_main */
+  {__pyx_k_map, sizeof(__pyx_k_map), 0, 1, 1}, /* PyObject cname: __pyx_n_u_map */
+  {__pyx_k_max_workers, sizeof(__pyx_k_max_workers), 0, 1, 1}, /* PyObject cname: __pyx_n_u_max_workers */
   {__pyx_k_module, sizeof(__pyx_k_module), 0, 1, 1}, /* PyObject cname: __pyx_n_u_module */
   {__pyx_k_morsel_batch, sizeof(__pyx_k_morsel_batch), 0, 1, 1}, /* PyObject cname: __pyx_n_u_morsel_batch */
   {__pyx_k_morsel_size_kb, sizeof(__pyx_k_morsel_size_kb), 0, 1, 1}, /* PyObject cname: __pyx_n_u_morsel_size_kb */
@@ -14447,16 +16574,17 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_new_event_loop, sizeof(__pyx_k_new_event_loop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_new_event_loop */
   {__pyx_k_next, sizeof(__pyx_k_next), 0, 1, 1}, /* PyObject cname: __pyx_n_u_next */
   {__pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_no_default___reduce___due_to_non */
-  {__pyx_k_not_initialized, sizeof(__pyx_k_not_initialized), 0, 1, 1}, /* PyObject cname: __pyx_n_u_not_initialized */
   {__pyx_k_num_rows, sizeof(__pyx_k_num_rows), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_rows */
   {__pyx_k_num_slots, sizeof(__pyx_k_num_slots), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_slots */
   {__pyx_k_num_workers, sizeof(__pyx_k_num_workers), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_workers */
+  {__pyx_k_offset, sizeof(__pyx_k_offset), 0, 1, 1}, /* PyObject cname: __pyx_n_u_offset */
   {__pyx_k_partition_batch, sizeof(__pyx_k_partition_batch), 0, 1, 1}, /* PyObject cname: __pyx_n_u_partition_batch */
   {__pyx_k_partition_keys, sizeof(__pyx_k_partition_keys), 0, 1, 1}, /* PyObject cname: __pyx_n_u_partition_keys */
   {__pyx_k_partitioner, sizeof(__pyx_k_partitioner), 0, 1, 1}, /* PyObject cname: __pyx_n_u_partitioner */
   {__pyx_k_partitions, sizeof(__pyx_k_partitions), 0, 1, 1}, /* PyObject cname: __pyx_n_u_partitions */
   {__pyx_k_pop, sizeof(__pyx_k_pop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pop */
   {__pyx_k_process_batch, sizeof(__pyx_k_process_batch), 0, 1, 1}, /* PyObject cname: __pyx_n_u_process_batch */
+  {__pyx_k_process_morsel, sizeof(__pyx_k_process_morsel), 0, 1, 1}, /* PyObject cname: __pyx_n_u_process_morsel */
   {__pyx_k_process_morsel_callback, sizeof(__pyx_k_process_morsel_callback), 0, 1, 1}, /* PyObject cname: __pyx_n_u_process_morsel_callback */
   {__pyx_k_pyx_state, sizeof(__pyx_k_pyx_state), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_state */
   {__pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_vtable */
@@ -14483,18 +16611,24 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate */
   {__pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate_cython */
   {__pyx_k_should_use_morsel_execution, sizeof(__pyx_k_should_use_morsel_execution), 0, 1, 1}, /* PyObject cname: __pyx_n_u_should_use_morsel_execution */
+  {__pyx_k_slice, sizeof(__pyx_k_slice), 0, 1, 1}, /* PyObject cname: __pyx_n_u_slice */
+  {__pyx_k_slice_info, sizeof(__pyx_k_slice_info), 0, 1, 1}, /* PyObject cname: __pyx_n_u_slice_info */
   {__pyx_k_slot_stats, sizeof(__pyx_k_slot_stats), 0, 1, 1}, /* PyObject cname: __pyx_n_u_slot_stats */
   {__pyx_k_source, sizeof(__pyx_k_source), 0, 1, 1}, /* PyObject cname: __pyx_n_u_source */
   {__pyx_k_source_2, sizeof(__pyx_k_source_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_source_2 */
   {__pyx_k_spec, sizeof(__pyx_k_spec), 0, 1, 1}, /* PyObject cname: __pyx_n_u_spec */
+  {__pyx_k_start_row, sizeof(__pyx_k_start_row), 0, 1, 1}, /* PyObject cname: __pyx_n_u_start_row */
   {__pyx_k_stateful, sizeof(__pyx_k_stateful), 0, 1, 1}, /* PyObject cname: __pyx_n_u_stateful */
   {__pyx_k_stats, sizeof(__pyx_k_stats), 0, 1, 1}, /* PyObject cname: __pyx_n_u_stats */
   {__pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_stringsource */
+  {__pyx_k_task_slot_manager, sizeof(__pyx_k_task_slot_manager), 0, 1, 1}, /* PyObject cname: __pyx_n_u_task_slot_manager */
   {__pyx_k_test, sizeof(__pyx_k_test), 0, 1, 1}, /* PyObject cname: __pyx_n_u_test */
+  {__pyx_k_thread_pool_executor_fallback, sizeof(__pyx_k_thread_pool_executor_fallback), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_thread_pool_executor_fallback */
   {__pyx_k_throw, sizeof(__pyx_k_throw), 0, 1, 1}, /* PyObject cname: __pyx_n_u_throw */
-  {__pyx_k_unified_task_slots, sizeof(__pyx_k_unified_task_slots), 0, 1, 1}, /* PyObject cname: __pyx_n_u_unified_task_slots */
+  {__pyx_k_to_batches, sizeof(__pyx_k_to_batches), 0, 1, 1}, /* PyObject cname: __pyx_n_u_to_batches */
   {__pyx_k_update, sizeof(__pyx_k_update), 0, 1, 1}, /* PyObject cname: __pyx_n_u_update */
   {__pyx_k_value, sizeof(__pyx_k_value), 0, 1, 1}, /* PyObject cname: __pyx_n_u_value */
+  {__pyx_k_warning, sizeof(__pyx_k_warning), 0, 1, 1}, /* PyObject cname: __pyx_n_u_warning */
   {__pyx_k_wrapped_operator, sizeof(__pyx_k_wrapped_operator), 0, 1, 1}, /* PyObject cname: __pyx_n_u_wrapped_operator */
   {0, 0, 0, 0, 0}
 };
@@ -14505,8 +16639,8 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, c
 
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 166, __pyx_L1_error)
-  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 218, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 168, __pyx_L1_error)
+  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 269, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -14518,8 +16652,33 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   __Pyx_RefNannyDeclarations
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":204
+ *             # Fallback to ThreadPoolExecutor if TaskSlotManager unavailable
+ *             import logging
+ *             import concurrent.futures             # <<<<<<<<<<<<<<
+ *             logging.warning(f"TaskSlotManager unavailable ({e}), falling back to ThreadPoolExecutor")
+ * 
+*/
+  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(2, __pyx_mstate_global->__pyx_n_u_concurrent, __pyx_mstate_global->__pyx_n_u_futures); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 204, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[0]);
+  __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[0]);
+
+  /* "sabot/_cython/operators/morsel_operator.pyx":228
+ *                 return self._wrapped_operator.process_batch(morsel_batch)
+ * 
+ *             with concurrent.futures.ThreadPoolExecutor(max_workers=self._num_workers) as executor:             # <<<<<<<<<<<<<<
+ *                 result_batches = list(executor.map(process_morsel, morsel_slices))
+ * 
+*/
+  __pyx_mstate_global->__pyx_tuple[1] = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_mstate_global->__pyx_tuple[1])) __PYX_ERR(0, 228, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[1]);
+  __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[1]);
   __Pyx_RefNannyFinishContext();
   return 0;
+  __pyx_L1_error:;
+  __Pyx_RefNannyFinishContext();
+  return -1;
 }
 /* #### Code section: init_constants ### */
 
@@ -14533,6 +16692,7 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate->__pyx_umethod_PyDict_Type__update.method_name = &__pyx_mstate->__pyx_n_u_update;
   if (__Pyx_InitStrings(__pyx_string_tab, __pyx_mstate->__pyx_string_tab, __pyx_string_tab_encodings) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   __pyx_mstate->__pyx_int_0 = PyLong_FromLong(0); if (unlikely(!__pyx_mstate->__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_100 = PyLong_FromLong(100); if (unlikely(!__pyx_mstate->__pyx_int_100)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_10000 = PyLong_FromLong(10000L); if (unlikely(!__pyx_mstate->__pyx_int_10000)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -14564,39 +16724,49 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 171, 16};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 178, 16};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_morsel_batch};
-    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_morsel_o_2, __pyx_mstate->__pyx_n_u_process_morsel_callback, __pyx_k_4_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_morsel_o_2, __pyx_mstate->__pyx_n_u_process_morsel_callback, __pyx_k_A_t_1A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 233, 2};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 223, 44};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_slice_info, __pyx_mstate->__pyx_n_u_start_row, __pyx_mstate->__pyx_n_u_end_row, __pyx_mstate->__pyx_n_u_morsel_batch};
+    __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_morsel_o_2, __pyx_mstate->__pyx_n_u_process_morsel, __pyx_k_A_Q_uF_7_XXRq_t_1A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
+  }
+  {
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 284, 2};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_ShuffleClient, __pyx_mstate->__pyx_n_u_partition_keys, __pyx_mstate->__pyx_n_u_HashPartitioner, __pyx_mstate->__pyx_n_u_partitioner, __pyx_mstate->__pyx_n_u_partitions};
-    __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_morsel_o_2, __pyx_mstate->__pyx_n_u_async_process_with_network_shuf, __pyx_k__3, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_morsel_o_2, __pyx_mstate->__pyx_n_u_async_process_with_network_shuf, __pyx_k__3, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 79, 63};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 313, 2};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch};
-    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_morsel_o_2, __pyx_mstate->__pyx_n_u_should_use_morsel_execution, __pyx_k_A_4t1_1_4_S_1_6_E_E_2Q_1_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_morsel_o_2, __pyx_mstate->__pyx_n_u_async_process_with_morsels, __pyx_k__3, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 105, 91};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 75, 63};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch};
-    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_morsel_o_2, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_6_A_1_4t_q_4_q_4_2_4_5Qa_4_31A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_morsel_o_2, __pyx_mstate->__pyx_n_u_should_use_morsel_execution, __pyx_k_A_4t1_1_4_S_1_6_E_E_2Q_1_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 262, 116};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_stats, __pyx_mstate->__pyx_n_u_slot_stats};
-    __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_morsel_o_2, __pyx_mstate->__pyx_n_u_get_stats, __pyx_k_A_4q_d_t1_4_7_0_q_T_4A_4_t_6a_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 101, 91};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch};
+    __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_morsel_o_2, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_6_A_1_4t_q_4_q_4_2_4_5Qa_4_31A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
+  }
+  {
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 343, 135};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_stats, __pyx_mstate->__pyx_n_u_get_agent_context, __pyx_mstate->__pyx_n_u_ctx, __pyx_mstate->__pyx_n_u_slot_stats};
+    __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_morsel_o_2, __pyx_mstate->__pyx_n_u_get_stats, __pyx_k_A_4q_d_t1_a_4A_1_s_WA_S_2_WA_6a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 3, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;
@@ -14619,6 +16789,20 @@ if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1, __pyx_L1_error)
     typesModule = PyImport_ImportModule("types");
     if (typesModule) {
         __pyx_mstate_global->__Pyx_CachedMethodType = PyObject_GetAttrString(typesModule, "MethodType");
+        Py_DECREF(typesModule);
+    }
+} // error handling follows
+#endif
+
+if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1, __pyx_L1_error)
+
+  /* Coro_CheckExact.init */
+  #if CYTHON_COMPILING_IN_LIMITED_API
+{
+    PyObject *typesModule=NULL;
+    typesModule = PyImport_ImportModule("types");
+    if (typesModule) {
+        __pyx_mstate_global->__Pyx_CachedCoroType = PyObject_GetAttrString(typesModule, "CoroutineType");
         Py_DECREF(typesModule);
     }
 } // error handling follows
@@ -16041,6 +18225,89 @@ static void __Pyx_RaiseClosureNameError(const char *varname) {
     PyErr_Format(PyExc_NameError, "free variable '%s' referenced before assignment in enclosing scope", varname);
 }
 
+/* RaiseTooManyValuesToUnpack */
+static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected) {
+    PyErr_Format(PyExc_ValueError,
+                 "too many values to unpack (expected %" CYTHON_FORMAT_SSIZE_T "d)", expected);
+}
+
+/* RaiseNeedMoreValuesToUnpack */
+static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index) {
+    PyErr_Format(PyExc_ValueError,
+                 "need more than %" CYTHON_FORMAT_SSIZE_T "d value%.1s to unpack",
+                 index, (index == 1) ? "" : "s");
+}
+
+/* IterFinish */
+static CYTHON_INLINE int __Pyx_IterFinish(void) {
+    PyObject* exc_type;
+    __Pyx_PyThreadState_declare
+    __Pyx_PyThreadState_assign
+    exc_type = __Pyx_PyErr_CurrentExceptionType();
+    if (unlikely(exc_type)) {
+        if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration)))
+            return -1;
+        __Pyx_PyErr_Clear();
+        return 0;
+    }
+    return 0;
+}
+
+/* UnpackItemEndCheck */
+static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected) {
+    if (unlikely(retval)) {
+        Py_DECREF(retval);
+        __Pyx_RaiseTooManyValuesError(expected);
+        return -1;
+    }
+    return __Pyx_IterFinish();
+}
+
+/* PyObjectVectorCallKwBuilder */
+#if CYTHON_VECTORCALL
+static int __Pyx_VectorcallBuilder_AddArg(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
+    (void)__Pyx_PyObject_FastCallDict;
+    if (__Pyx_PyTuple_SET_ITEM(builder, n, key) != (0)) return -1;
+    Py_INCREF(key);
+    args[n] = value;
+    return 0;
+}
+CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
+    (void)__Pyx_VectorcallBuilder_AddArgStr;
+    if (unlikely(!PyUnicode_Check(key))) {
+        PyErr_SetString(PyExc_TypeError, "keywords must be strings");
+        return -1;
+    }
+    return __Pyx_VectorcallBuilder_AddArg(key, value, builder, args, n);
+}
+static int __Pyx_VectorcallBuilder_AddArgStr(const char *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
+    PyObject *pyKey = PyUnicode_FromString(key);
+    if (!pyKey) return -1;
+    return __Pyx_VectorcallBuilder_AddArg(pyKey, value, builder, args, n);
+}
+#else // CYTHON_VECTORCALL
+CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, CYTHON_UNUSED PyObject **args, CYTHON_UNUSED int n) {
+    if (unlikely(!PyUnicode_Check(key))) {
+        PyErr_SetString(PyExc_TypeError, "keywords must be strings");
+        return -1;
+    }
+    return PyDict_SetItem(builder, key, value);
+}
+#endif
+
+/* PyObjectVectorCallMethodKwBuilder */
+#if !CYTHON_VECTORCALL || PY_VERSION_HEX < 0x03090000
+static PyObject *__Pyx_Object_VectorcallMethod_CallFromBuilder(PyObject *name, PyObject *const *args, size_t nargsf, PyObject *kwnames) {
+    PyObject *result;
+    PyObject *obj = PyObject_GetAttr(args[0], name);
+    if (unlikely(!obj))
+        return NULL;
+    result = __Pyx_Object_Vectorcall_CallFromBuilder(obj, args+1, nargsf-1, kwnames);
+    Py_DECREF(obj);
+    return result;
+}
+#endif
+
 /* Import */
 static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level) {
     PyObject *module = 0;
@@ -16110,38 +18377,6 @@ static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name) {
     }
     return value;
 }
-
-/* PyObjectVectorCallKwBuilder */
-#if CYTHON_VECTORCALL
-static int __Pyx_VectorcallBuilder_AddArg(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
-    (void)__Pyx_PyObject_FastCallDict;
-    if (__Pyx_PyTuple_SET_ITEM(builder, n, key) != (0)) return -1;
-    Py_INCREF(key);
-    args[n] = value;
-    return 0;
-}
-CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
-    (void)__Pyx_VectorcallBuilder_AddArgStr;
-    if (unlikely(!PyUnicode_Check(key))) {
-        PyErr_SetString(PyExc_TypeError, "keywords must be strings");
-        return -1;
-    }
-    return __Pyx_VectorcallBuilder_AddArg(key, value, builder, args, n);
-}
-static int __Pyx_VectorcallBuilder_AddArgStr(const char *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
-    PyObject *pyKey = PyUnicode_FromString(key);
-    if (!pyKey) return -1;
-    return __Pyx_VectorcallBuilder_AddArg(pyKey, value, builder, args, n);
-}
-#else // CYTHON_VECTORCALL
-CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, CYTHON_UNUSED PyObject **args, CYTHON_UNUSED int n) {
-    if (unlikely(!PyUnicode_Check(key))) {
-        PyErr_SetString(PyExc_TypeError, "keywords must be strings");
-        return -1;
-    }
-    return PyDict_SetItem(builder, key, value);
-}
-#endif
 
 /* LimitedApiGetTypeDict */
 #if CYTHON_COMPILING_IN_LIMITED_API
@@ -17718,120 +19953,6 @@ static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, 
     return __Pyx_GetItemInt_Generic(o, PyLong_FromSsize_t(i));
 }
 
-/* ImportDottedModule */
-static PyObject *__Pyx__ImportDottedModule_Error(PyObject *name, PyObject *parts_tuple, Py_ssize_t count) {
-    PyObject *partial_name = NULL, *slice = NULL, *sep = NULL;
-    Py_ssize_t size;
-    if (unlikely(PyErr_Occurred())) {
-        PyErr_Clear();
-    }
-#if CYTHON_ASSUME_SAFE_SIZE
-    size = PyTuple_GET_SIZE(parts_tuple);
-#else
-    size = PyTuple_Size(parts_tuple);
-    if (size < 0) goto bad;
-#endif
-    if (likely(size == count)) {
-        partial_name = name;
-    } else {
-        slice = PySequence_GetSlice(parts_tuple, 0, count);
-        if (unlikely(!slice))
-            goto bad;
-        sep = PyUnicode_FromStringAndSize(".", 1);
-        if (unlikely(!sep))
-            goto bad;
-        partial_name = PyUnicode_Join(sep, slice);
-    }
-    PyErr_Format(
-        PyExc_ModuleNotFoundError,
-        "No module named '%U'", partial_name);
-bad:
-    Py_XDECREF(sep);
-    Py_XDECREF(slice);
-    Py_XDECREF(partial_name);
-    return NULL;
-}
-static PyObject *__Pyx__ImportDottedModule_Lookup(PyObject *name) {
-    PyObject *imported_module;
-#if (CYTHON_COMPILING_IN_PYPY && PYPY_VERSION_NUM  < 0x07030400) ||\
-        CYTHON_COMPILING_IN_GRAAL
-    PyObject *modules = PyImport_GetModuleDict();
-    if (unlikely(!modules))
-        return NULL;
-    imported_module = __Pyx_PyDict_GetItemStr(modules, name);
-    Py_XINCREF(imported_module);
-#else
-    imported_module = PyImport_GetModule(name);
-#endif
-    return imported_module;
-}
-static PyObject *__Pyx_ImportDottedModule_WalkParts(PyObject *module, PyObject *name, PyObject *parts_tuple) {
-    Py_ssize_t i, nparts;
-#if CYTHON_ASSUME_SAFE_SIZE
-    nparts = PyTuple_GET_SIZE(parts_tuple);
-#else
-    nparts = PyTuple_Size(parts_tuple);
-    if (nparts < 0) return NULL;
-#endif
-    for (i=1; i < nparts && module; i++) {
-        PyObject *part, *submodule;
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        part = PyTuple_GET_ITEM(parts_tuple, i);
-#else
-        part = __Pyx_PySequence_ITEM(parts_tuple, i);
-        if (!part) return NULL;
-#endif
-        submodule = __Pyx_PyObject_GetAttrStrNoError(module, part);
-#if !(CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS)
-        Py_DECREF(part);
-#endif
-        Py_DECREF(module);
-        module = submodule;
-    }
-    if (unlikely(!module)) {
-        return __Pyx__ImportDottedModule_Error(name, parts_tuple, i);
-    }
-    return module;
-}
-static PyObject *__Pyx__ImportDottedModule(PyObject *name, PyObject *parts_tuple) {
-    PyObject *imported_module;
-    PyObject *module = __Pyx_Import(name, NULL, 0);
-    if (!parts_tuple || unlikely(!module))
-        return module;
-    imported_module = __Pyx__ImportDottedModule_Lookup(name);
-    if (likely(imported_module)) {
-        Py_DECREF(module);
-        return imported_module;
-    }
-    PyErr_Clear();
-    return __Pyx_ImportDottedModule_WalkParts(module, name, parts_tuple);
-}
-static PyObject *__Pyx_ImportDottedModule(PyObject *name, PyObject *parts_tuple) {
-#if CYTHON_COMPILING_IN_CPYTHON
-    PyObject *module = __Pyx__ImportDottedModule_Lookup(name);
-    if (likely(module)) {
-        PyObject *spec = __Pyx_PyObject_GetAttrStrNoError(module, __pyx_mstate_global->__pyx_n_u_spec);
-        if (likely(spec)) {
-            PyObject *unsafe = __Pyx_PyObject_GetAttrStrNoError(spec, __pyx_mstate_global->__pyx_n_u_initializing);
-            if (likely(!unsafe || !__Pyx_PyObject_IsTrue(unsafe))) {
-                Py_DECREF(spec);
-                spec = NULL;
-            }
-            Py_XDECREF(unsafe);
-        }
-        if (likely(!spec)) {
-            PyErr_Clear();
-            return module;
-        }
-        Py_DECREF(spec);
-        Py_DECREF(module);
-    } else if (PyErr_Occurred()) {
-        PyErr_Clear();
-    }
-#endif
-    return __Pyx__ImportDottedModule(name, parts_tuple);
-}
-
 /* GetTopmostException */
 #if CYTHON_USE_EXC_INFO_STACK && CYTHON_FAST_THREAD_STATE
 static _PyErr_StackItem *
@@ -18017,6 +20138,277 @@ bad:
 #endif
 }
 
+/* ImportDottedModule */
+static PyObject *__Pyx__ImportDottedModule_Error(PyObject *name, PyObject *parts_tuple, Py_ssize_t count) {
+    PyObject *partial_name = NULL, *slice = NULL, *sep = NULL;
+    Py_ssize_t size;
+    if (unlikely(PyErr_Occurred())) {
+        PyErr_Clear();
+    }
+#if CYTHON_ASSUME_SAFE_SIZE
+    size = PyTuple_GET_SIZE(parts_tuple);
+#else
+    size = PyTuple_Size(parts_tuple);
+    if (size < 0) goto bad;
+#endif
+    if (likely(size == count)) {
+        partial_name = name;
+    } else {
+        slice = PySequence_GetSlice(parts_tuple, 0, count);
+        if (unlikely(!slice))
+            goto bad;
+        sep = PyUnicode_FromStringAndSize(".", 1);
+        if (unlikely(!sep))
+            goto bad;
+        partial_name = PyUnicode_Join(sep, slice);
+    }
+    PyErr_Format(
+        PyExc_ModuleNotFoundError,
+        "No module named '%U'", partial_name);
+bad:
+    Py_XDECREF(sep);
+    Py_XDECREF(slice);
+    Py_XDECREF(partial_name);
+    return NULL;
+}
+static PyObject *__Pyx__ImportDottedModule_Lookup(PyObject *name) {
+    PyObject *imported_module;
+#if (CYTHON_COMPILING_IN_PYPY && PYPY_VERSION_NUM  < 0x07030400) ||\
+        CYTHON_COMPILING_IN_GRAAL
+    PyObject *modules = PyImport_GetModuleDict();
+    if (unlikely(!modules))
+        return NULL;
+    imported_module = __Pyx_PyDict_GetItemStr(modules, name);
+    Py_XINCREF(imported_module);
+#else
+    imported_module = PyImport_GetModule(name);
+#endif
+    return imported_module;
+}
+static PyObject *__Pyx_ImportDottedModule_WalkParts(PyObject *module, PyObject *name, PyObject *parts_tuple) {
+    Py_ssize_t i, nparts;
+#if CYTHON_ASSUME_SAFE_SIZE
+    nparts = PyTuple_GET_SIZE(parts_tuple);
+#else
+    nparts = PyTuple_Size(parts_tuple);
+    if (nparts < 0) return NULL;
+#endif
+    for (i=1; i < nparts && module; i++) {
+        PyObject *part, *submodule;
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+        part = PyTuple_GET_ITEM(parts_tuple, i);
+#else
+        part = __Pyx_PySequence_ITEM(parts_tuple, i);
+        if (!part) return NULL;
+#endif
+        submodule = __Pyx_PyObject_GetAttrStrNoError(module, part);
+#if !(CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS)
+        Py_DECREF(part);
+#endif
+        Py_DECREF(module);
+        module = submodule;
+    }
+    if (unlikely(!module)) {
+        return __Pyx__ImportDottedModule_Error(name, parts_tuple, i);
+    }
+    return module;
+}
+static PyObject *__Pyx__ImportDottedModule(PyObject *name, PyObject *parts_tuple) {
+    PyObject *imported_module;
+    PyObject *module = __Pyx_Import(name, NULL, 0);
+    if (!parts_tuple || unlikely(!module))
+        return module;
+    imported_module = __Pyx__ImportDottedModule_Lookup(name);
+    if (likely(imported_module)) {
+        Py_DECREF(module);
+        return imported_module;
+    }
+    PyErr_Clear();
+    return __Pyx_ImportDottedModule_WalkParts(module, name, parts_tuple);
+}
+static PyObject *__Pyx_ImportDottedModule(PyObject *name, PyObject *parts_tuple) {
+#if CYTHON_COMPILING_IN_CPYTHON
+    PyObject *module = __Pyx__ImportDottedModule_Lookup(name);
+    if (likely(module)) {
+        PyObject *spec = __Pyx_PyObject_GetAttrStrNoError(module, __pyx_mstate_global->__pyx_n_u_spec);
+        if (likely(spec)) {
+            PyObject *unsafe = __Pyx_PyObject_GetAttrStrNoError(spec, __pyx_mstate_global->__pyx_n_u_initializing);
+            if (likely(!unsafe || !__Pyx_PyObject_IsTrue(unsafe))) {
+                Py_DECREF(spec);
+                spec = NULL;
+            }
+            Py_XDECREF(unsafe);
+        }
+        if (likely(!spec)) {
+            PyErr_Clear();
+            return module;
+        }
+        Py_DECREF(spec);
+        Py_DECREF(module);
+    } else if (PyErr_Occurred()) {
+        PyErr_Clear();
+    }
+#endif
+    return __Pyx__ImportDottedModule(name, parts_tuple);
+}
+
+/* JoinPyUnicode */
+static PyObject* __Pyx_PyUnicode_Join(PyObject** values, Py_ssize_t value_count, Py_ssize_t result_ulength,
+                                      Py_UCS4 max_char) {
+#if CYTHON_USE_UNICODE_INTERNALS && CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    PyObject *result_uval;
+    int result_ukind, kind_shift;
+    Py_ssize_t i, char_pos;
+    void *result_udata;
+    if (max_char > 1114111) max_char = 1114111;
+    result_uval = PyUnicode_New(result_ulength, max_char);
+    if (unlikely(!result_uval)) return NULL;
+    result_ukind = (max_char <= 255) ? PyUnicode_1BYTE_KIND : (max_char <= 65535) ? PyUnicode_2BYTE_KIND : PyUnicode_4BYTE_KIND;
+    kind_shift = (result_ukind == PyUnicode_4BYTE_KIND) ? 2 : result_ukind - 1;
+    result_udata = PyUnicode_DATA(result_uval);
+    assert(kind_shift == 2 || kind_shift == 1 || kind_shift == 0);
+    if (unlikely((PY_SSIZE_T_MAX >> kind_shift) - result_ulength < 0))
+        goto overflow;
+    char_pos = 0;
+    for (i=0; i < value_count; i++) {
+        int ukind;
+        Py_ssize_t ulength;
+        void *udata;
+        PyObject *uval = values[i];
+        #if !CYTHON_COMPILING_IN_LIMITED_API
+        if (__Pyx_PyUnicode_READY(uval) == (-1))
+            goto bad;
+        #endif
+        ulength = __Pyx_PyUnicode_GET_LENGTH(uval);
+        #if !CYTHON_ASSUME_SAFE_SIZE
+        if (unlikely(ulength < 0)) goto bad;
+        #endif
+        if (unlikely(!ulength))
+            continue;
+        if (unlikely((PY_SSIZE_T_MAX >> kind_shift) - ulength < char_pos))
+            goto overflow;
+        ukind = __Pyx_PyUnicode_KIND(uval);
+        udata = __Pyx_PyUnicode_DATA(uval);
+        if (ukind == result_ukind) {
+            memcpy((char *)result_udata + (char_pos << kind_shift), udata, (size_t) (ulength << kind_shift));
+        } else {
+            #if PY_VERSION_HEX >= 0x030d0000
+            if (unlikely(PyUnicode_CopyCharacters(result_uval, char_pos, uval, 0, ulength) < 0)) goto bad;
+            #elif CYTHON_COMPILING_IN_CPYTHON || defined(_PyUnicode_FastCopyCharacters)
+            _PyUnicode_FastCopyCharacters(result_uval, char_pos, uval, 0, ulength);
+            #else
+            Py_ssize_t j;
+            for (j=0; j < ulength; j++) {
+                Py_UCS4 uchar = __Pyx_PyUnicode_READ(ukind, udata, j);
+                __Pyx_PyUnicode_WRITE(result_ukind, result_udata, char_pos+j, uchar);
+            }
+            #endif
+        }
+        char_pos += ulength;
+    }
+    return result_uval;
+overflow:
+    PyErr_SetString(PyExc_OverflowError, "join() result is too long for a Python string");
+bad:
+    Py_DECREF(result_uval);
+    return NULL;
+#else
+    Py_ssize_t i;
+    PyObject *result = NULL;
+    PyObject *value_tuple = PyTuple_New(value_count);
+    if (unlikely(!value_tuple)) return NULL;
+    CYTHON_UNUSED_VAR(max_char);
+    CYTHON_UNUSED_VAR(result_ulength);
+    for (i=0; i<value_count; i++) {
+        if (__Pyx_PyTuple_SET_ITEM(value_tuple, i, values[i]) != (0)) goto bad;
+        Py_INCREF(values[i]);
+    }
+    result = PyUnicode_Join(__pyx_mstate_global->__pyx_empty_unicode, value_tuple);
+bad:
+    Py_DECREF(value_tuple);
+    return result;
+#endif
+}
+
+/* PyObjectLookupSpecial */
+#if CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PyObject* __Pyx__PyObject_LookupSpecial(PyObject* obj, PyObject* attr_name, int with_error) {
+    PyObject *res;
+    PyTypeObject *tp = Py_TYPE(obj);
+    res = _PyType_Lookup(tp, attr_name);
+    if (likely(res)) {
+        descrgetfunc f = Py_TYPE(res)->tp_descr_get;
+        if (!f) {
+            Py_INCREF(res);
+        } else {
+            res = f(res, obj, (PyObject *)tp);
+        }
+    } else if (with_error) {
+        PyErr_SetObject(PyExc_AttributeError, attr_name);
+    }
+    return res;
+}
+#endif
+
+/* RaiseUnboundLocalError */
+static void __Pyx_RaiseUnboundLocalError(const char *varname) {
+    PyErr_Format(PyExc_UnboundLocalError, "local variable '%s' referenced before assignment", varname);
+}
+
+/* SwapException */
+#if CYTHON_FAST_THREAD_STATE
+static CYTHON_INLINE void __Pyx__ExceptionSwap(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+  #if CYTHON_USE_EXC_INFO_STACK && PY_VERSION_HEX >= 0x030B00a4
+    _PyErr_StackItem *exc_info = tstate->exc_info;
+    tmp_value = exc_info->exc_value;
+    exc_info->exc_value = *value;
+    if (tmp_value == NULL || tmp_value == Py_None) {
+        Py_XDECREF(tmp_value);
+        tmp_value = NULL;
+        tmp_type = NULL;
+        tmp_tb = NULL;
+    } else {
+        tmp_type = (PyObject*) Py_TYPE(tmp_value);
+        Py_INCREF(tmp_type);
+        #if CYTHON_COMPILING_IN_CPYTHON
+        tmp_tb = ((PyBaseExceptionObject*) tmp_value)->traceback;
+        Py_XINCREF(tmp_tb);
+        #else
+        tmp_tb = PyException_GetTraceback(tmp_value);
+        #endif
+    }
+  #elif CYTHON_USE_EXC_INFO_STACK
+    _PyErr_StackItem *exc_info = tstate->exc_info;
+    tmp_type = exc_info->exc_type;
+    tmp_value = exc_info->exc_value;
+    tmp_tb = exc_info->exc_traceback;
+    exc_info->exc_type = *type;
+    exc_info->exc_value = *value;
+    exc_info->exc_traceback = *tb;
+  #else
+    tmp_type = tstate->exc_type;
+    tmp_value = tstate->exc_value;
+    tmp_tb = tstate->exc_traceback;
+    tstate->exc_type = *type;
+    tstate->exc_value = *value;
+    tstate->exc_traceback = *tb;
+  #endif
+    *type = tmp_type;
+    *value = tmp_value;
+    *tb = tmp_tb;
+}
+#else
+static CYTHON_INLINE void __Pyx_ExceptionSwap(PyObject **type, PyObject **value, PyObject **tb) {
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    PyErr_GetExcInfo(&tmp_type, &tmp_value, &tmp_tb);
+    PyErr_SetExcInfo(*type, *value, *tb);
+    *type = tmp_type;
+    *value = tmp_value;
+    *tb = tmp_tb;
+}
+#endif
+
 /* pep479 */
 static void __Pyx_Generator_Replace_StopIteration(int in_async_gen) {
     PyObject *exc, *val, *tb, *cur_exc, *new_exc;
@@ -18045,27 +20437,6 @@ static void __Pyx_Generator_Replace_StopIteration(int in_async_gen) {
     }
     PyException_SetCause(new_exc, val); // steals ref to val
     PyErr_SetObject(PyExc_RuntimeError, new_exc);
-}
-
-/* RejectKeywords */
-static void __Pyx_RejectKeywords(const char* function_name, PyObject *kwds) {
-    PyObject *key = NULL;
-    if (CYTHON_METH_FASTCALL && likely(PyTuple_Check(kwds))) {
-        key = __Pyx_PySequence_ITEM(kwds, 0);
-    } else {
-        Py_ssize_t pos = 0;
-#if !CYTHON_COMPILING_IN_PYPY || defined(PyArg_ValidateKeywordArguments)
-        if (unlikely(!PyArg_ValidateKeywordArguments(kwds))) return;
-#endif
-        PyDict_Next(kwds, &pos, &key, NULL);
-        Py_INCREF(key);
-    }
-    if (likely(key)) {
-        PyErr_Format(PyExc_TypeError,
-            "%s() got an unexpected keyword argument '%U'",
-            function_name, key);
-        Py_DECREF(key);
-    }
 }
 
 /* RaiseException */
@@ -18176,150 +20547,27 @@ bad:
     return;
 }
 
-/* CallNextTpDealloc */
-static void __Pyx_call_next_tp_dealloc(PyObject* obj, destructor current_tp_dealloc) {
-    PyTypeObject* type = Py_TYPE(obj);
-    destructor tp_dealloc = NULL;
-    while (type && __Pyx_PyType_GetSlot(type, tp_dealloc, destructor) != current_tp_dealloc)
-        type = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
-    while (type && (tp_dealloc = __Pyx_PyType_GetSlot(type, tp_dealloc, destructor)) == current_tp_dealloc)
-        type = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
-    if (type)
-        tp_dealloc(obj);
+/* IterNextPlain */
+#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030A0000
+static PyObject *__Pyx_GetBuiltinNext_LimitedAPI(void) {
+    if (unlikely(!__pyx_mstate_global->__Pyx_GetBuiltinNext_LimitedAPI_cache))
+        __pyx_mstate_global->__Pyx_GetBuiltinNext_LimitedAPI_cache = __Pyx_GetBuiltinName(__pyx_mstate_global->__pyx_n_u_next);
+    return __pyx_mstate_global->__Pyx_GetBuiltinNext_LimitedAPI_cache;
 }
-
-/* CallNextTpTraverse */
-static int __Pyx_call_next_tp_traverse(PyObject* obj, visitproc v, void *a, traverseproc current_tp_traverse) {
-    PyTypeObject* type = Py_TYPE(obj);
-    traverseproc tp_traverse = NULL;
-    while (type && __Pyx_PyType_GetSlot(type, tp_traverse, traverseproc) != current_tp_traverse)
-        type = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
-    while (type && (tp_traverse = __Pyx_PyType_GetSlot(type, tp_traverse, traverseproc)) == current_tp_traverse)
-        type = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
-    if (type && tp_traverse)
-        return tp_traverse(obj, v, a);
-    return 0;
-}
-
-/* CallNextTpClear */
-static void __Pyx_call_next_tp_clear(PyObject* obj, inquiry current_tp_clear) {
-    PyTypeObject* type = Py_TYPE(obj);
-    inquiry tp_clear = NULL;
-    while (type && __Pyx_PyType_GetSlot(type, tp_clear, inquiry) != current_tp_clear)
-        type = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
-    while (type && (tp_clear = __Pyx_PyType_GetSlot(type, tp_clear, inquiry)) == current_tp_clear)
-        type = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
-    if (type && tp_clear)
-        tp_clear(obj);
-}
-
-/* TypeImport */
-#ifndef __PYX_HAVE_RT_ImportType_3_1_4
-#define __PYX_HAVE_RT_ImportType_3_1_4
-static PyTypeObject *__Pyx_ImportType_3_1_4(PyObject *module, const char *module_name, const char *class_name,
-    size_t size, size_t alignment, enum __Pyx_ImportType_CheckSize_3_1_4 check_size)
-{
-    PyObject *result = 0;
-    Py_ssize_t basicsize;
-    Py_ssize_t itemsize;
-#ifdef Py_LIMITED_API
-    PyObject *py_basicsize;
-    PyObject *py_itemsize;
 #endif
-    result = PyObject_GetAttrString(module, class_name);
-    if (!result)
-        goto bad;
-    if (!PyType_Check(result)) {
-        PyErr_Format(PyExc_TypeError,
-            "%.200s.%.200s is not a type object",
-            module_name, class_name);
-        goto bad;
-    }
-#ifndef Py_LIMITED_API
-    basicsize = ((PyTypeObject *)result)->tp_basicsize;
-    itemsize = ((PyTypeObject *)result)->tp_itemsize;
+static CYTHON_INLINE PyObject *__Pyx_PyIter_Next_Plain(PyObject *iterator) {
+#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030A0000
+    PyObject *result;
+    PyObject *next = __Pyx_GetBuiltinNext_LimitedAPI();
+    if (unlikely(!next)) return NULL;
+    result = PyObject_CallFunctionObjArgs(next, iterator, NULL);
+    return result;
 #else
-    if (size == 0) {
-        return (PyTypeObject *)result;
-    }
-    py_basicsize = PyObject_GetAttrString(result, "__basicsize__");
-    if (!py_basicsize)
-        goto bad;
-    basicsize = PyLong_AsSsize_t(py_basicsize);
-    Py_DECREF(py_basicsize);
-    py_basicsize = 0;
-    if (basicsize == (Py_ssize_t)-1 && PyErr_Occurred())
-        goto bad;
-    py_itemsize = PyObject_GetAttrString(result, "__itemsize__");
-    if (!py_itemsize)
-        goto bad;
-    itemsize = PyLong_AsSsize_t(py_itemsize);
-    Py_DECREF(py_itemsize);
-    py_itemsize = 0;
-    if (itemsize == (Py_ssize_t)-1 && PyErr_Occurred())
-        goto bad;
+    (void)__Pyx_GetBuiltinName; // only for early limited API
+    iternextfunc iternext = __Pyx_PyObject_GetIterNextFunc(iterator);
+    assert(iternext);
+    return iternext(iterator);
 #endif
-    if (itemsize) {
-        if (size % alignment) {
-            alignment = size % alignment;
-        }
-        if (itemsize < (Py_ssize_t)alignment)
-            itemsize = (Py_ssize_t)alignment;
-    }
-    if ((size_t)(basicsize + itemsize) < size) {
-        PyErr_Format(PyExc_ValueError,
-            "%.200s.%.200s size changed, may indicate binary incompatibility. "
-            "Expected %zd from C header, got %zd from PyObject",
-            module_name, class_name, size, basicsize+itemsize);
-        goto bad;
-    }
-    if (check_size == __Pyx_ImportType_CheckSize_Error_3_1_4 &&
-            ((size_t)basicsize > size || (size_t)(basicsize + itemsize) < size)) {
-        PyErr_Format(PyExc_ValueError,
-            "%.200s.%.200s size changed, may indicate binary incompatibility. "
-            "Expected %zd from C header, got %zd-%zd from PyObject",
-            module_name, class_name, size, basicsize, basicsize+itemsize);
-        goto bad;
-    }
-    else if (check_size == __Pyx_ImportType_CheckSize_Warn_3_1_4 && (size_t)basicsize > size) {
-        if (PyErr_WarnFormat(NULL, 0,
-                "%.200s.%.200s size changed, may indicate binary incompatibility. "
-                "Expected %zd from C header, got %zd from PyObject",
-                module_name, class_name, size, basicsize) < 0) {
-            goto bad;
-        }
-    }
-    return (PyTypeObject *)result;
-bad:
-    Py_XDECREF(result);
-    return NULL;
-}
-#endif
-
-/* GetVTable */
-static void* __Pyx_GetVtable(PyTypeObject *type) {
-    void* ptr;
-#if CYTHON_COMPILING_IN_LIMITED_API
-    PyObject *ob = PyObject_GetAttr((PyObject *)type, __pyx_mstate_global->__pyx_n_u_pyx_vtable);
-#else
-    PyObject *ob = PyObject_GetItem(type->tp_dict, __pyx_mstate_global->__pyx_n_u_pyx_vtable);
-#endif
-    if (!ob)
-        goto bad;
-    ptr = PyCapsule_GetPointer(ob, 0);
-    if (!ptr && !PyErr_Occurred())
-        PyErr_SetString(PyExc_RuntimeError, "invalid vtable found for imported type");
-    Py_DECREF(ob);
-    return ptr;
-bad:
-    Py_XDECREF(ob);
-    return NULL;
-}
-
-/* PyObjectCallNoArg */
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func) {
-    PyObject *arg[2] = {NULL, NULL};
-    return __Pyx_PyObject_FastCall(func, arg + 1, 0 | __Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET);
 }
 
 /* PyObjectCallOneArg */
@@ -18418,1938 +20666,6 @@ try_unpack:
     return 0;
 }
 
-/* PyObjectCallMethod0 */
-static PyObject* __Pyx_PyObject_CallMethod0(PyObject* obj, PyObject* method_name) {
-#if CYTHON_VECTORCALL && (__PYX_LIMITED_VERSION_HEX >= 0x030C0000 || (!CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX >= 0x03090000))
-    PyObject *args[1] = {obj};
-    (void) __Pyx_PyObject_GetMethod;
-    (void) __Pyx_PyObject_CallOneArg;
-    (void) __Pyx_PyObject_CallNoArg;
-    return PyObject_VectorcallMethod(method_name, args, 1 | PY_VECTORCALL_ARGUMENTS_OFFSET, NULL);
-#else
-    PyObject *method = NULL, *result = NULL;
-    int is_method = __Pyx_PyObject_GetMethod(obj, method_name, &method);
-    if (likely(is_method)) {
-        result = __Pyx_PyObject_CallOneArg(method, obj);
-        Py_DECREF(method);
-        return result;
-    }
-    if (unlikely(!method)) goto bad;
-    result = __Pyx_PyObject_CallNoArg(method);
-    Py_DECREF(method);
-bad:
-    return result;
-#endif
-}
-
-/* ValidateBasesTuple */
-#if CYTHON_COMPILING_IN_CPYTHON || CYTHON_COMPILING_IN_LIMITED_API || CYTHON_USE_TYPE_SPECS
-static int __Pyx_validate_bases_tuple(const char *type_name, Py_ssize_t dictoffset, PyObject *bases) {
-    Py_ssize_t i, n;
-#if CYTHON_ASSUME_SAFE_SIZE
-    n = PyTuple_GET_SIZE(bases);
-#else
-    n = PyTuple_Size(bases);
-    if (unlikely(n < 0)) return -1;
-#endif
-    for (i = 1; i < n; i++)
-    {
-        PyTypeObject *b;
-#if CYTHON_AVOID_BORROWED_REFS
-        PyObject *b0 = PySequence_GetItem(bases, i);
-        if (!b0) return -1;
-#elif CYTHON_ASSUME_SAFE_MACROS
-        PyObject *b0 = PyTuple_GET_ITEM(bases, i);
-#else
-        PyObject *b0 = PyTuple_GetItem(bases, i);
-        if (!b0) return -1;
-#endif
-        b = (PyTypeObject*) b0;
-        if (!__Pyx_PyType_HasFeature(b, Py_TPFLAGS_HEAPTYPE))
-        {
-            __Pyx_TypeName b_name = __Pyx_PyType_GetFullyQualifiedName(b);
-            PyErr_Format(PyExc_TypeError,
-                "base class '" __Pyx_FMT_TYPENAME "' is not a heap type", b_name);
-            __Pyx_DECREF_TypeName(b_name);
-#if CYTHON_AVOID_BORROWED_REFS
-            Py_DECREF(b0);
-#endif
-            return -1;
-        }
-        if (dictoffset == 0)
-        {
-            Py_ssize_t b_dictoffset = 0;
-#if CYTHON_USE_TYPE_SLOTS
-            b_dictoffset = b->tp_dictoffset;
-#else
-            PyObject *py_b_dictoffset = PyObject_GetAttrString((PyObject*)b, "__dictoffset__");
-            if (!py_b_dictoffset) goto dictoffset_return;
-            b_dictoffset = PyLong_AsSsize_t(py_b_dictoffset);
-            Py_DECREF(py_b_dictoffset);
-            if (b_dictoffset == -1 && PyErr_Occurred()) goto dictoffset_return;
-#endif
-            if (b_dictoffset) {
-                {
-                    __Pyx_TypeName b_name = __Pyx_PyType_GetFullyQualifiedName(b);
-                    PyErr_Format(PyExc_TypeError,
-                        "extension type '%.200s' has no __dict__ slot, "
-                        "but base type '" __Pyx_FMT_TYPENAME "' has: "
-                        "either add 'cdef dict __dict__' to the extension type "
-                        "or add '__slots__ = [...]' to the base type",
-                        type_name, b_name);
-                    __Pyx_DECREF_TypeName(b_name);
-                }
-#if !CYTHON_USE_TYPE_SLOTS
-              dictoffset_return:
-#endif
-#if CYTHON_AVOID_BORROWED_REFS
-                Py_DECREF(b0);
-#endif
-                return -1;
-            }
-        }
-#if CYTHON_AVOID_BORROWED_REFS
-        Py_DECREF(b0);
-#endif
-    }
-    return 0;
-}
-#endif
-
-/* PyType_Ready */
-CYTHON_UNUSED static int __Pyx_PyType_HasMultipleInheritance(PyTypeObject *t) {
-    while (t) {
-        PyObject *bases = __Pyx_PyType_GetSlot(t, tp_bases, PyObject*);
-        if (bases) {
-            return 1;
-        }
-        t = __Pyx_PyType_GetSlot(t, tp_base, PyTypeObject*);
-    }
-    return 0;
-}
-static int __Pyx_PyType_Ready(PyTypeObject *t) {
-#if CYTHON_USE_TYPE_SPECS || !CYTHON_COMPILING_IN_CPYTHON || defined(PYSTON_MAJOR_VERSION)
-    (void)__Pyx_PyObject_CallMethod0;
-#if CYTHON_USE_TYPE_SPECS
-    (void)__Pyx_validate_bases_tuple;
-#endif
-    return PyType_Ready(t);
-#else
-    int r;
-    if (!__Pyx_PyType_HasMultipleInheritance(t)) {
-        return PyType_Ready(t);
-    }
-    PyObject *bases = __Pyx_PyType_GetSlot(t, tp_bases, PyObject*);
-    if (bases && unlikely(__Pyx_validate_bases_tuple(t->tp_name, t->tp_dictoffset, bases) == -1))
-        return -1;
-#if !defined(PYSTON_MAJOR_VERSION)
-    {
-        int gc_was_enabled;
-    #if PY_VERSION_HEX >= 0x030A00b1
-        gc_was_enabled = PyGC_Disable();
-        (void)__Pyx_PyObject_CallMethod0;
-    #else
-        PyObject *ret, *py_status;
-        PyObject *gc = NULL;
-        #if (!CYTHON_COMPILING_IN_PYPY || PYPY_VERSION_NUM+0 >= 0x07030400) &&\
-                !CYTHON_COMPILING_IN_GRAAL
-        gc = PyImport_GetModule(__pyx_mstate_global->__pyx_kp_u_gc);
-        #endif
-        if (unlikely(!gc)) gc = PyImport_Import(__pyx_mstate_global->__pyx_kp_u_gc);
-        if (unlikely(!gc)) return -1;
-        py_status = __Pyx_PyObject_CallMethod0(gc, __pyx_mstate_global->__pyx_kp_u_isenabled);
-        if (unlikely(!py_status)) {
-            Py_DECREF(gc);
-            return -1;
-        }
-        gc_was_enabled = __Pyx_PyObject_IsTrue(py_status);
-        Py_DECREF(py_status);
-        if (gc_was_enabled > 0) {
-            ret = __Pyx_PyObject_CallMethod0(gc, __pyx_mstate_global->__pyx_kp_u_disable);
-            if (unlikely(!ret)) {
-                Py_DECREF(gc);
-                return -1;
-            }
-            Py_DECREF(ret);
-        } else if (unlikely(gc_was_enabled == -1)) {
-            Py_DECREF(gc);
-            return -1;
-        }
-    #endif
-        t->tp_flags |= Py_TPFLAGS_HEAPTYPE;
-#if PY_VERSION_HEX >= 0x030A0000
-        t->tp_flags |= Py_TPFLAGS_IMMUTABLETYPE;
-#endif
-#else
-        (void)__Pyx_PyObject_CallMethod0;
-#endif
-    r = PyType_Ready(t);
-#if !defined(PYSTON_MAJOR_VERSION)
-        t->tp_flags &= ~Py_TPFLAGS_HEAPTYPE;
-    #if PY_VERSION_HEX >= 0x030A00b1
-        if (gc_was_enabled)
-            PyGC_Enable();
-    #else
-        if (gc_was_enabled) {
-            PyObject *tp, *v, *tb;
-            PyErr_Fetch(&tp, &v, &tb);
-            ret = __Pyx_PyObject_CallMethod0(gc, __pyx_mstate_global->__pyx_kp_u_enable);
-            if (likely(ret || r == -1)) {
-                Py_XDECREF(ret);
-                PyErr_Restore(tp, v, tb);
-            } else {
-                Py_XDECREF(tp);
-                Py_XDECREF(v);
-                Py_XDECREF(tb);
-                r = -1;
-            }
-        }
-        Py_DECREF(gc);
-    #endif
-    }
-#endif
-    return r;
-#endif
-}
-
-/* SetVTable */
-static int __Pyx_SetVtable(PyTypeObject *type, void *vtable) {
-    PyObject *ob = PyCapsule_New(vtable, 0, 0);
-    if (unlikely(!ob))
-        goto bad;
-#if CYTHON_COMPILING_IN_LIMITED_API
-    if (unlikely(PyObject_SetAttr((PyObject *) type, __pyx_mstate_global->__pyx_n_u_pyx_vtable, ob) < 0))
-#else
-    if (unlikely(PyDict_SetItem(type->tp_dict, __pyx_mstate_global->__pyx_n_u_pyx_vtable, ob) < 0))
-#endif
-        goto bad;
-    Py_DECREF(ob);
-    return 0;
-bad:
-    Py_XDECREF(ob);
-    return -1;
-}
-
-/* MergeVTables */
-static int __Pyx_MergeVtables(PyTypeObject *type) {
-    int i=0;
-    Py_ssize_t size;
-    void** base_vtables;
-    __Pyx_TypeName tp_base_name = NULL;
-    __Pyx_TypeName base_name = NULL;
-    void* unknown = (void*)-1;
-    PyObject* bases = __Pyx_PyType_GetSlot(type, tp_bases, PyObject*);
-    int base_depth = 0;
-    {
-        PyTypeObject* base = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
-        while (base) {
-            base_depth += 1;
-            base = __Pyx_PyType_GetSlot(base, tp_base, PyTypeObject*);
-        }
-    }
-    base_vtables = (void**) PyMem_Malloc(sizeof(void*) * (size_t)(base_depth + 1));
-    base_vtables[0] = unknown;
-#if CYTHON_COMPILING_IN_LIMITED_API
-    size = PyTuple_Size(bases);
-    if (size < 0) goto other_failure;
-#else
-    size = PyTuple_GET_SIZE(bases);
-#endif
-    for (i = 1; i < size; i++) {
-        PyObject *basei;
-        void* base_vtable;
-#if CYTHON_AVOID_BORROWED_REFS
-        basei = PySequence_GetItem(bases, i);
-        if (unlikely(!basei)) goto other_failure;
-#elif !CYTHON_ASSUME_SAFE_MACROS
-        basei = PyTuple_GetItem(bases, i);
-        if (unlikely(!basei)) goto other_failure;
-#else
-        basei = PyTuple_GET_ITEM(bases, i);
-#endif
-        base_vtable = __Pyx_GetVtable((PyTypeObject*)basei);
-#if CYTHON_AVOID_BORROWED_REFS
-        Py_DECREF(basei);
-#endif
-        if (base_vtable != NULL) {
-            int j;
-            PyTypeObject* base = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
-            for (j = 0; j < base_depth; j++) {
-                if (base_vtables[j] == unknown) {
-                    base_vtables[j] = __Pyx_GetVtable(base);
-                    base_vtables[j + 1] = unknown;
-                }
-                if (base_vtables[j] == base_vtable) {
-                    break;
-                } else if (base_vtables[j] == NULL) {
-                    goto bad;
-                }
-                base = __Pyx_PyType_GetSlot(base, tp_base, PyTypeObject*);
-            }
-        }
-    }
-    PyErr_Clear();
-    PyMem_Free(base_vtables);
-    return 0;
-bad:
-    {
-        PyTypeObject* basei = NULL;
-        PyTypeObject* tp_base = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
-        tp_base_name = __Pyx_PyType_GetFullyQualifiedName(tp_base);
-#if CYTHON_AVOID_BORROWED_REFS
-        basei = (PyTypeObject*)PySequence_GetItem(bases, i);
-        if (unlikely(!basei)) goto really_bad;
-#elif !CYTHON_ASSUME_SAFE_MACROS
-        basei = (PyTypeObject*)PyTuple_GetItem(bases, i);
-        if (unlikely(!basei)) goto really_bad;
-#else
-        basei = (PyTypeObject*)PyTuple_GET_ITEM(bases, i);
-#endif
-        base_name = __Pyx_PyType_GetFullyQualifiedName(basei);
-#if CYTHON_AVOID_BORROWED_REFS
-        Py_DECREF(basei);
-#endif
-    }
-    PyErr_Format(PyExc_TypeError,
-        "multiple bases have vtable conflict: '" __Pyx_FMT_TYPENAME "' and '" __Pyx_FMT_TYPENAME "'", tp_base_name, base_name);
-#if CYTHON_AVOID_BORROWED_REFS || !CYTHON_ASSUME_SAFE_MACROS
-really_bad: // bad has failed!
-#endif
-    __Pyx_DECREF_TypeName(tp_base_name);
-    __Pyx_DECREF_TypeName(base_name);
-#if CYTHON_COMPILING_IN_LIMITED_API || CYTHON_AVOID_BORROWED_REFS || !CYTHON_ASSUME_SAFE_MACROS
-other_failure:
-#endif
-    PyMem_Free(base_vtables);
-    return -1;
-}
-
-/* DelItemOnTypeDict */
-static int __Pyx__DelItemOnTypeDict(PyTypeObject *tp, PyObject *k) {
-    int result;
-    PyObject *tp_dict;
-#if CYTHON_COMPILING_IN_LIMITED_API
-    tp_dict = __Pyx_GetTypeDict(tp);
-    if (unlikely(!tp_dict)) return -1;
-#else
-    tp_dict = tp->tp_dict;
-#endif
-    result = PyDict_DelItem(tp_dict, k);
-    if (likely(!result)) PyType_Modified(tp);
-    return result;
-}
-
-/* SetupReduce */
-static int __Pyx_setup_reduce_is_named(PyObject* meth, PyObject* name) {
-  int ret;
-  PyObject *name_attr;
-  name_attr = __Pyx_PyObject_GetAttrStrNoError(meth, __pyx_mstate_global->__pyx_n_u_name);
-  if (likely(name_attr)) {
-      ret = PyObject_RichCompareBool(name_attr, name, Py_EQ);
-  } else {
-      ret = -1;
-  }
-  if (unlikely(ret < 0)) {
-      PyErr_Clear();
-      ret = 0;
-  }
-  Py_XDECREF(name_attr);
-  return ret;
-}
-static int __Pyx_setup_reduce(PyObject* type_obj) {
-    int ret = 0;
-    PyObject *object_reduce = NULL;
-    PyObject *object_getstate = NULL;
-    PyObject *object_reduce_ex = NULL;
-    PyObject *reduce = NULL;
-    PyObject *reduce_ex = NULL;
-    PyObject *reduce_cython = NULL;
-    PyObject *setstate = NULL;
-    PyObject *setstate_cython = NULL;
-    PyObject *getstate = NULL;
-#if CYTHON_USE_PYTYPE_LOOKUP
-    getstate = _PyType_Lookup((PyTypeObject*)type_obj, __pyx_mstate_global->__pyx_n_u_getstate);
-#else
-    getstate = __Pyx_PyObject_GetAttrStrNoError(type_obj, __pyx_mstate_global->__pyx_n_u_getstate);
-    if (!getstate && PyErr_Occurred()) {
-        goto __PYX_BAD;
-    }
-#endif
-    if (getstate) {
-#if CYTHON_USE_PYTYPE_LOOKUP
-        object_getstate = _PyType_Lookup(&PyBaseObject_Type, __pyx_mstate_global->__pyx_n_u_getstate);
-#else
-        object_getstate = __Pyx_PyObject_GetAttrStrNoError((PyObject*)&PyBaseObject_Type, __pyx_mstate_global->__pyx_n_u_getstate);
-        if (!object_getstate && PyErr_Occurred()) {
-            goto __PYX_BAD;
-        }
-#endif
-        if (object_getstate != getstate) {
-            goto __PYX_GOOD;
-        }
-    }
-#if CYTHON_USE_PYTYPE_LOOKUP
-    object_reduce_ex = _PyType_Lookup(&PyBaseObject_Type, __pyx_mstate_global->__pyx_n_u_reduce_ex); if (!object_reduce_ex) goto __PYX_BAD;
-#else
-    object_reduce_ex = __Pyx_PyObject_GetAttrStr((PyObject*)&PyBaseObject_Type, __pyx_mstate_global->__pyx_n_u_reduce_ex); if (!object_reduce_ex) goto __PYX_BAD;
-#endif
-    reduce_ex = __Pyx_PyObject_GetAttrStr(type_obj, __pyx_mstate_global->__pyx_n_u_reduce_ex); if (unlikely(!reduce_ex)) goto __PYX_BAD;
-    if (reduce_ex == object_reduce_ex) {
-#if CYTHON_USE_PYTYPE_LOOKUP
-        object_reduce = _PyType_Lookup(&PyBaseObject_Type, __pyx_mstate_global->__pyx_n_u_reduce); if (!object_reduce) goto __PYX_BAD;
-#else
-        object_reduce = __Pyx_PyObject_GetAttrStr((PyObject*)&PyBaseObject_Type, __pyx_mstate_global->__pyx_n_u_reduce); if (!object_reduce) goto __PYX_BAD;
-#endif
-        reduce = __Pyx_PyObject_GetAttrStr(type_obj, __pyx_mstate_global->__pyx_n_u_reduce); if (unlikely(!reduce)) goto __PYX_BAD;
-        if (reduce == object_reduce || __Pyx_setup_reduce_is_named(reduce, __pyx_mstate_global->__pyx_n_u_reduce_cython)) {
-            reduce_cython = __Pyx_PyObject_GetAttrStrNoError(type_obj, __pyx_mstate_global->__pyx_n_u_reduce_cython);
-            if (likely(reduce_cython)) {
-                ret = __Pyx_SetItemOnTypeDict((PyTypeObject*)type_obj, __pyx_mstate_global->__pyx_n_u_reduce, reduce_cython); if (unlikely(ret < 0)) goto __PYX_BAD;
-                ret = __Pyx_DelItemOnTypeDict((PyTypeObject*)type_obj, __pyx_mstate_global->__pyx_n_u_reduce_cython); if (unlikely(ret < 0)) goto __PYX_BAD;
-            } else if (reduce == object_reduce || PyErr_Occurred()) {
-                goto __PYX_BAD;
-            }
-            setstate = __Pyx_PyObject_GetAttrStrNoError(type_obj, __pyx_mstate_global->__pyx_n_u_setstate);
-            if (!setstate) PyErr_Clear();
-            if (!setstate || __Pyx_setup_reduce_is_named(setstate, __pyx_mstate_global->__pyx_n_u_setstate_cython)) {
-                setstate_cython = __Pyx_PyObject_GetAttrStrNoError(type_obj, __pyx_mstate_global->__pyx_n_u_setstate_cython);
-                if (likely(setstate_cython)) {
-                    ret = __Pyx_SetItemOnTypeDict((PyTypeObject*)type_obj, __pyx_mstate_global->__pyx_n_u_setstate, setstate_cython); if (unlikely(ret < 0)) goto __PYX_BAD;
-                    ret = __Pyx_DelItemOnTypeDict((PyTypeObject*)type_obj, __pyx_mstate_global->__pyx_n_u_setstate_cython); if (unlikely(ret < 0)) goto __PYX_BAD;
-                } else if (!setstate || PyErr_Occurred()) {
-                    goto __PYX_BAD;
-                }
-            }
-            PyType_Modified((PyTypeObject*)type_obj);
-        }
-    }
-    goto __PYX_GOOD;
-__PYX_BAD:
-    if (!PyErr_Occurred()) {
-        __Pyx_TypeName type_obj_name =
-            __Pyx_PyType_GetFullyQualifiedName((PyTypeObject*)type_obj);
-        PyErr_Format(PyExc_RuntimeError,
-            "Unable to initialize pickling for " __Pyx_FMT_TYPENAME, type_obj_name);
-        __Pyx_DECREF_TypeName(type_obj_name);
-    }
-    ret = -1;
-__PYX_GOOD:
-#if !CYTHON_USE_PYTYPE_LOOKUP
-    Py_XDECREF(object_reduce);
-    Py_XDECREF(object_reduce_ex);
-    Py_XDECREF(object_getstate);
-    Py_XDECREF(getstate);
-#endif
-    Py_XDECREF(reduce);
-    Py_XDECREF(reduce_ex);
-    Py_XDECREF(reduce_cython);
-    Py_XDECREF(setstate);
-    Py_XDECREF(setstate_cython);
-    return ret;
-}
-
-/* CLineInTraceback */
-#if CYTHON_CLINE_IN_TRACEBACK && CYTHON_CLINE_IN_TRACEBACK_RUNTIME
-static int __Pyx_CLineForTraceback(PyThreadState *tstate, int c_line) {
-    PyObject *use_cline;
-    PyObject *ptype, *pvalue, *ptraceback;
-#if CYTHON_COMPILING_IN_CPYTHON
-    PyObject **cython_runtime_dict;
-#endif
-    CYTHON_MAYBE_UNUSED_VAR(tstate);
-    if (unlikely(!__pyx_mstate_global->__pyx_cython_runtime)) {
-        return c_line;
-    }
-    __Pyx_ErrFetchInState(tstate, &ptype, &pvalue, &ptraceback);
-#if CYTHON_COMPILING_IN_CPYTHON
-    cython_runtime_dict = _PyObject_GetDictPtr(__pyx_mstate_global->__pyx_cython_runtime);
-    if (likely(cython_runtime_dict)) {
-        __Pyx_BEGIN_CRITICAL_SECTION(*cython_runtime_dict);
-        __PYX_PY_DICT_LOOKUP_IF_MODIFIED(
-            use_cline, *cython_runtime_dict,
-            __Pyx_PyDict_GetItemStr(*cython_runtime_dict, __pyx_mstate_global->__pyx_n_u_cline_in_traceback))
-        Py_XINCREF(use_cline);
-        __Pyx_END_CRITICAL_SECTION();
-    } else
-#endif
-    {
-      PyObject *use_cline_obj = __Pyx_PyObject_GetAttrStrNoError(__pyx_mstate_global->__pyx_cython_runtime, __pyx_mstate_global->__pyx_n_u_cline_in_traceback);
-      if (use_cline_obj) {
-        use_cline = PyObject_Not(use_cline_obj) ? Py_False : Py_True;
-        Py_INCREF(use_cline);
-        Py_DECREF(use_cline_obj);
-      } else {
-        PyErr_Clear();
-        use_cline = NULL;
-      }
-    }
-    if (!use_cline) {
-        c_line = 0;
-        (void) PyObject_SetAttr(__pyx_mstate_global->__pyx_cython_runtime, __pyx_mstate_global->__pyx_n_u_cline_in_traceback, Py_False);
-    }
-    else if (use_cline == Py_False || (use_cline != Py_True && PyObject_Not(use_cline) != 0)) {
-        c_line = 0;
-    }
-    Py_XDECREF(use_cline);
-    __Pyx_ErrRestoreInState(tstate, ptype, pvalue, ptraceback);
-    return c_line;
-}
-#endif
-
-/* CodeObjectCache */
-static int __pyx_bisect_code_objects(__Pyx_CodeObjectCacheEntry* entries, int count, int code_line) {
-    int start = 0, mid = 0, end = count - 1;
-    if (end >= 0 && code_line > entries[end].code_line) {
-        return count;
-    }
-    while (start < end) {
-        mid = start + (end - start) / 2;
-        if (code_line < entries[mid].code_line) {
-            end = mid;
-        } else if (code_line > entries[mid].code_line) {
-             start = mid + 1;
-        } else {
-            return mid;
-        }
-    }
-    if (code_line <= entries[mid].code_line) {
-        return mid;
-    } else {
-        return mid + 1;
-    }
-}
-static __Pyx_CachedCodeObjectType *__pyx__find_code_object(struct __Pyx_CodeObjectCache *code_cache, int code_line) {
-    __Pyx_CachedCodeObjectType* code_object;
-    int pos;
-    if (unlikely(!code_line) || unlikely(!code_cache->entries)) {
-        return NULL;
-    }
-    pos = __pyx_bisect_code_objects(code_cache->entries, code_cache->count, code_line);
-    if (unlikely(pos >= code_cache->count) || unlikely(code_cache->entries[pos].code_line != code_line)) {
-        return NULL;
-    }
-    code_object = code_cache->entries[pos].code_object;
-    Py_INCREF(code_object);
-    return code_object;
-}
-static __Pyx_CachedCodeObjectType *__pyx_find_code_object(int code_line) {
-#if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING && !CYTHON_ATOMICS
-    (void)__pyx__find_code_object;
-    return NULL; // Most implementation should have atomics. But otherwise, don't make it thread-safe, just miss.
-#else
-    struct __Pyx_CodeObjectCache *code_cache = &__pyx_mstate_global->__pyx_code_cache;
-#if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
-    __pyx_nonatomic_int_type old_count = __pyx_atomic_incr_acq_rel(&code_cache->accessor_count);
-    if (old_count < 0) {
-        __pyx_atomic_decr_acq_rel(&code_cache->accessor_count);
-        return NULL;
-    }
-#endif
-    __Pyx_CachedCodeObjectType *result = __pyx__find_code_object(code_cache, code_line);
-#if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
-    __pyx_atomic_decr_acq_rel(&code_cache->accessor_count);
-#endif
-    return result;
-#endif
-}
-static void __pyx__insert_code_object(struct __Pyx_CodeObjectCache *code_cache, int code_line, __Pyx_CachedCodeObjectType* code_object)
-{
-    int pos, i;
-    __Pyx_CodeObjectCacheEntry* entries = code_cache->entries;
-    if (unlikely(!code_line)) {
-        return;
-    }
-    if (unlikely(!entries)) {
-        entries = (__Pyx_CodeObjectCacheEntry*)PyMem_Malloc(64*sizeof(__Pyx_CodeObjectCacheEntry));
-        if (likely(entries)) {
-            code_cache->entries = entries;
-            code_cache->max_count = 64;
-            code_cache->count = 1;
-            entries[0].code_line = code_line;
-            entries[0].code_object = code_object;
-            Py_INCREF(code_object);
-        }
-        return;
-    }
-    pos = __pyx_bisect_code_objects(code_cache->entries, code_cache->count, code_line);
-    if ((pos < code_cache->count) && unlikely(code_cache->entries[pos].code_line == code_line)) {
-        __Pyx_CachedCodeObjectType* tmp = entries[pos].code_object;
-        entries[pos].code_object = code_object;
-        Py_INCREF(code_object);
-        Py_DECREF(tmp);
-        return;
-    }
-    if (code_cache->count == code_cache->max_count) {
-        int new_max = code_cache->max_count + 64;
-        entries = (__Pyx_CodeObjectCacheEntry*)PyMem_Realloc(
-            code_cache->entries, ((size_t)new_max) * sizeof(__Pyx_CodeObjectCacheEntry));
-        if (unlikely(!entries)) {
-            return;
-        }
-        code_cache->entries = entries;
-        code_cache->max_count = new_max;
-    }
-    for (i=code_cache->count; i>pos; i--) {
-        entries[i] = entries[i-1];
-    }
-    entries[pos].code_line = code_line;
-    entries[pos].code_object = code_object;
-    code_cache->count++;
-    Py_INCREF(code_object);
-}
-static void __pyx_insert_code_object(int code_line, __Pyx_CachedCodeObjectType* code_object) {
-#if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING && !CYTHON_ATOMICS
-    (void)__pyx__insert_code_object;
-    return; // Most implementation should have atomics. But otherwise, don't make it thread-safe, just fail.
-#else
-    struct __Pyx_CodeObjectCache *code_cache = &__pyx_mstate_global->__pyx_code_cache;
-#if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
-    __pyx_nonatomic_int_type expected = 0;
-    if (!__pyx_atomic_int_cmp_exchange(&code_cache->accessor_count, &expected, INT_MIN)) {
-        return;
-    }
-#endif
-    __pyx__insert_code_object(code_cache, code_line, code_object);
-#if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
-    __pyx_atomic_sub(&code_cache->accessor_count, INT_MIN);
-#endif
-#endif
-}
-
-/* AddTraceback */
-#include "compile.h"
-#include "frameobject.h"
-#include "traceback.h"
-#if PY_VERSION_HEX >= 0x030b00a6 && !CYTHON_COMPILING_IN_LIMITED_API && !defined(PYPY_VERSION)
-  #ifndef Py_BUILD_CORE
-    #define Py_BUILD_CORE 1
-  #endif
-  #include "internal/pycore_frame.h"
-#endif
-#if CYTHON_COMPILING_IN_LIMITED_API
-static PyObject *__Pyx_PyCode_Replace_For_AddTraceback(PyObject *code, PyObject *scratch_dict,
-                                                       PyObject *firstlineno, PyObject *name) {
-    PyObject *replace = NULL;
-    if (unlikely(PyDict_SetItemString(scratch_dict, "co_firstlineno", firstlineno))) return NULL;
-    if (unlikely(PyDict_SetItemString(scratch_dict, "co_name", name))) return NULL;
-    replace = PyObject_GetAttrString(code, "replace");
-    if (likely(replace)) {
-        PyObject *result = PyObject_Call(replace, __pyx_mstate_global->__pyx_empty_tuple, scratch_dict);
-        Py_DECREF(replace);
-        return result;
-    }
-    PyErr_Clear();
-    return NULL;
-}
-static void __Pyx_AddTraceback(const char *funcname, int c_line,
-                               int py_line, const char *filename) {
-    PyObject *code_object = NULL, *py_py_line = NULL, *py_funcname = NULL, *dict = NULL;
-    PyObject *replace = NULL, *getframe = NULL, *frame = NULL;
-    PyObject *exc_type, *exc_value, *exc_traceback;
-    int success = 0;
-    if (c_line) {
-        (void) __pyx_cfilenm;
-        (void) __Pyx_CLineForTraceback(__Pyx_PyThreadState_Current, c_line);
-    }
-    PyErr_Fetch(&exc_type, &exc_value, &exc_traceback);
-    code_object = __pyx_find_code_object(c_line ? -c_line : py_line);
-    if (!code_object) {
-        code_object = Py_CompileString("_getframe()", filename, Py_eval_input);
-        if (unlikely(!code_object)) goto bad;
-        py_py_line = PyLong_FromLong(py_line);
-        if (unlikely(!py_py_line)) goto bad;
-        py_funcname = PyUnicode_FromString(funcname);
-        if (unlikely(!py_funcname)) goto bad;
-        dict = PyDict_New();
-        if (unlikely(!dict)) goto bad;
-        {
-            PyObject *old_code_object = code_object;
-            code_object = __Pyx_PyCode_Replace_For_AddTraceback(code_object, dict, py_py_line, py_funcname);
-            Py_DECREF(old_code_object);
-        }
-        if (unlikely(!code_object)) goto bad;
-        __pyx_insert_code_object(c_line ? -c_line : py_line, code_object);
-    } else {
-        dict = PyDict_New();
-    }
-    getframe = PySys_GetObject("_getframe");
-    if (unlikely(!getframe)) goto bad;
-    if (unlikely(PyDict_SetItemString(dict, "_getframe", getframe))) goto bad;
-    frame = PyEval_EvalCode(code_object, dict, dict);
-    if (unlikely(!frame) || frame == Py_None) goto bad;
-    success = 1;
-  bad:
-    PyErr_Restore(exc_type, exc_value, exc_traceback);
-    Py_XDECREF(code_object);
-    Py_XDECREF(py_py_line);
-    Py_XDECREF(py_funcname);
-    Py_XDECREF(dict);
-    Py_XDECREF(replace);
-    if (success) {
-        PyTraceBack_Here(
-            (struct _frame*)frame);
-    }
-    Py_XDECREF(frame);
-}
-#else
-static PyCodeObject* __Pyx_CreateCodeObjectForTraceback(
-            const char *funcname, int c_line,
-            int py_line, const char *filename) {
-    PyCodeObject *py_code = NULL;
-    PyObject *py_funcname = NULL;
-    if (c_line) {
-        py_funcname = PyUnicode_FromFormat( "%s (%s:%d)", funcname, __pyx_cfilenm, c_line);
-        if (!py_funcname) goto bad;
-        funcname = PyUnicode_AsUTF8(py_funcname);
-        if (!funcname) goto bad;
-    }
-    py_code = PyCode_NewEmpty(filename, funcname, py_line);
-    Py_XDECREF(py_funcname);
-    return py_code;
-bad:
-    Py_XDECREF(py_funcname);
-    return NULL;
-}
-static void __Pyx_AddTraceback(const char *funcname, int c_line,
-                               int py_line, const char *filename) {
-    PyCodeObject *py_code = 0;
-    PyFrameObject *py_frame = 0;
-    PyThreadState *tstate = __Pyx_PyThreadState_Current;
-    PyObject *ptype, *pvalue, *ptraceback;
-    if (c_line) {
-        c_line = __Pyx_CLineForTraceback(tstate, c_line);
-    }
-    py_code = __pyx_find_code_object(c_line ? -c_line : py_line);
-    if (!py_code) {
-        __Pyx_ErrFetchInState(tstate, &ptype, &pvalue, &ptraceback);
-        py_code = __Pyx_CreateCodeObjectForTraceback(
-            funcname, c_line, py_line, filename);
-        if (!py_code) {
-            /* If the code object creation fails, then we should clear the
-               fetched exception references and propagate the new exception */
-            Py_XDECREF(ptype);
-            Py_XDECREF(pvalue);
-            Py_XDECREF(ptraceback);
-            goto bad;
-        }
-        __Pyx_ErrRestoreInState(tstate, ptype, pvalue, ptraceback);
-        __pyx_insert_code_object(c_line ? -c_line : py_line, py_code);
-    }
-    py_frame = PyFrame_New(
-        tstate,            /*PyThreadState *tstate,*/
-        py_code,           /*PyCodeObject *code,*/
-        __pyx_mstate_global->__pyx_d,    /*PyObject *globals,*/
-        0                  /*PyObject *locals*/
-    );
-    if (!py_frame) goto bad;
-    __Pyx_PyFrame_SetLineNumber(py_frame, py_line);
-    PyTraceBack_Here(py_frame);
-bad:
-    Py_XDECREF(py_code);
-    Py_XDECREF(py_frame);
-}
-#endif
-
-/* CIntFromPyVerify */
-#define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
-    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
-#define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
-    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
-#define __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, exc)\
-    {\
-        func_type value = func_value;\
-        if (sizeof(target_type) < sizeof(func_type)) {\
-            if (unlikely(value != (func_type) (target_type) value)) {\
-                func_type zero = 0;\
-                if (exc && unlikely(value == (func_type)-1 && PyErr_Occurred()))\
-                    return (target_type) -1;\
-                if (is_unsigned && unlikely(value < zero))\
-                    goto raise_neg_overflow;\
-                else\
-                    goto raise_overflow;\
-            }\
-        }\
-        return (target_type) value;\
-    }
-
-/* CIntFromPy */
-static CYTHON_INLINE int __Pyx_PyLong_As_int(PyObject *x) {
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-    const int neg_one = (int) -1, const_zero = (int) 0;
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic pop
-#endif
-    const int is_unsigned = neg_one > const_zero;
-    if (unlikely(!PyLong_Check(x))) {
-        int val;
-        PyObject *tmp = __Pyx_PyNumber_Long(x);
-        if (!tmp) return (int) -1;
-        val = __Pyx_PyLong_As_int(tmp);
-        Py_DECREF(tmp);
-        return val;
-    }
-    if (is_unsigned) {
-#if CYTHON_USE_PYLONG_INTERNALS
-        if (unlikely(__Pyx_PyLong_IsNeg(x))) {
-            goto raise_neg_overflow;
-        } else if (__Pyx_PyLong_IsCompact(x)) {
-            __PYX_VERIFY_RETURN_INT(int, __Pyx_compact_upylong, __Pyx_PyLong_CompactValueUnsigned(x))
-        } else {
-            const digit* digits = __Pyx_PyLong_Digits(x);
-            assert(__Pyx_PyLong_DigitCount(x) > 1);
-            switch (__Pyx_PyLong_DigitCount(x)) {
-                case 2:
-                    if ((8 * sizeof(int) > 1 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) >= 2 * PyLong_SHIFT)) {
-                            return (int) (((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
-                        }
-                    }
-                    break;
-                case 3:
-                    if ((8 * sizeof(int) > 2 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) >= 3 * PyLong_SHIFT)) {
-                            return (int) (((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
-                        }
-                    }
-                    break;
-                case 4:
-                    if ((8 * sizeof(int) > 3 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) >= 4 * PyLong_SHIFT)) {
-                            return (int) (((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
-                        }
-                    }
-                    break;
-            }
-        }
-#endif
-#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX < 0x030C00A7
-        if (unlikely(Py_SIZE(x) < 0)) {
-            goto raise_neg_overflow;
-        }
-#else
-        {
-            int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
-            if (unlikely(result < 0))
-                return (int) -1;
-            if (unlikely(result == 1))
-                goto raise_neg_overflow;
-        }
-#endif
-        if ((sizeof(int) <= sizeof(unsigned long))) {
-            __PYX_VERIFY_RETURN_INT_EXC(int, unsigned long, PyLong_AsUnsignedLong(x))
-#ifdef HAVE_LONG_LONG
-        } else if ((sizeof(int) <= sizeof(unsigned PY_LONG_LONG))) {
-            __PYX_VERIFY_RETURN_INT_EXC(int, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
-#endif
-        }
-    } else {
-#if CYTHON_USE_PYLONG_INTERNALS
-        if (__Pyx_PyLong_IsCompact(x)) {
-            __PYX_VERIFY_RETURN_INT(int, __Pyx_compact_pylong, __Pyx_PyLong_CompactValue(x))
-        } else {
-            const digit* digits = __Pyx_PyLong_Digits(x);
-            assert(__Pyx_PyLong_DigitCount(x) > 1);
-            switch (__Pyx_PyLong_SignedDigitCount(x)) {
-                case -2:
-                    if ((8 * sizeof(int) - 1 > 1 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) - 1 > 2 * PyLong_SHIFT)) {
-                            return (int) (((int)-1)*(((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case 2:
-                    if ((8 * sizeof(int) > 1 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) - 1 > 2 * PyLong_SHIFT)) {
-                            return (int) ((((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case -3:
-                    if ((8 * sizeof(int) - 1 > 2 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) - 1 > 3 * PyLong_SHIFT)) {
-                            return (int) (((int)-1)*(((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case 3:
-                    if ((8 * sizeof(int) > 2 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) - 1 > 3 * PyLong_SHIFT)) {
-                            return (int) ((((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case -4:
-                    if ((8 * sizeof(int) - 1 > 3 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) - 1 > 4 * PyLong_SHIFT)) {
-                            return (int) (((int)-1)*(((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case 4:
-                    if ((8 * sizeof(int) > 3 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(int) - 1 > 4 * PyLong_SHIFT)) {
-                            return (int) ((((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-            }
-        }
-#endif
-        if ((sizeof(int) <= sizeof(long))) {
-            __PYX_VERIFY_RETURN_INT_EXC(int, long, PyLong_AsLong(x))
-#ifdef HAVE_LONG_LONG
-        } else if ((sizeof(int) <= sizeof(PY_LONG_LONG))) {
-            __PYX_VERIFY_RETURN_INT_EXC(int, PY_LONG_LONG, PyLong_AsLongLong(x))
-#endif
-        }
-    }
-    {
-        int val;
-        int ret = -1;
-#if PY_VERSION_HEX >= 0x030d00A6 && !CYTHON_COMPILING_IN_LIMITED_API
-        Py_ssize_t bytes_copied = PyLong_AsNativeBytes(
-            x, &val, sizeof(val), Py_ASNATIVEBYTES_NATIVE_ENDIAN | (is_unsigned ? Py_ASNATIVEBYTES_UNSIGNED_BUFFER | Py_ASNATIVEBYTES_REJECT_NEGATIVE : 0));
-        if (unlikely(bytes_copied == -1)) {
-        } else if (unlikely(bytes_copied > (Py_ssize_t) sizeof(val))) {
-            goto raise_overflow;
-        } else {
-            ret = 0;
-        }
-#elif PY_VERSION_HEX < 0x030d0000 && !(CYTHON_COMPILING_IN_PYPY || CYTHON_COMPILING_IN_LIMITED_API) || defined(_PyLong_AsByteArray)
-        int one = 1; int is_little = (int)*(unsigned char *)&one;
-        unsigned char *bytes = (unsigned char *)&val;
-        ret = _PyLong_AsByteArray((PyLongObject *)x,
-                                    bytes, sizeof(val),
-                                    is_little, !is_unsigned);
-#else
-        PyObject *v;
-        PyObject *stepval = NULL, *mask = NULL, *shift = NULL;
-        int bits, remaining_bits, is_negative = 0;
-        int chunk_size = (sizeof(long) < 8) ? 30 : 62;
-        if (likely(PyLong_CheckExact(x))) {
-            v = __Pyx_NewRef(x);
-        } else {
-            v = PyNumber_Long(x);
-            if (unlikely(!v)) return (int) -1;
-            assert(PyLong_CheckExact(v));
-        }
-        {
-            int result = PyObject_RichCompareBool(v, Py_False, Py_LT);
-            if (unlikely(result < 0)) {
-                Py_DECREF(v);
-                return (int) -1;
-            }
-            is_negative = result == 1;
-        }
-        if (is_unsigned && unlikely(is_negative)) {
-            Py_DECREF(v);
-            goto raise_neg_overflow;
-        } else if (is_negative) {
-            stepval = PyNumber_Invert(v);
-            Py_DECREF(v);
-            if (unlikely(!stepval))
-                return (int) -1;
-        } else {
-            stepval = v;
-        }
-        v = NULL;
-        val = (int) 0;
-        mask = PyLong_FromLong((1L << chunk_size) - 1); if (unlikely(!mask)) goto done;
-        shift = PyLong_FromLong(chunk_size); if (unlikely(!shift)) goto done;
-        for (bits = 0; bits < (int) sizeof(int) * 8 - chunk_size; bits += chunk_size) {
-            PyObject *tmp, *digit;
-            long idigit;
-            digit = PyNumber_And(stepval, mask);
-            if (unlikely(!digit)) goto done;
-            idigit = PyLong_AsLong(digit);
-            Py_DECREF(digit);
-            if (unlikely(idigit < 0)) goto done;
-            val |= ((int) idigit) << bits;
-            tmp = PyNumber_Rshift(stepval, shift);
-            if (unlikely(!tmp)) goto done;
-            Py_DECREF(stepval); stepval = tmp;
-        }
-        Py_DECREF(shift); shift = NULL;
-        Py_DECREF(mask); mask = NULL;
-        {
-            long idigit = PyLong_AsLong(stepval);
-            if (unlikely(idigit < 0)) goto done;
-            remaining_bits = ((int) sizeof(int) * 8) - bits - (is_unsigned ? 0 : 1);
-            if (unlikely(idigit >= (1L << remaining_bits)))
-                goto raise_overflow;
-            val |= ((int) idigit) << bits;
-        }
-        if (!is_unsigned) {
-            if (unlikely(val & (((int) 1) << (sizeof(int) * 8 - 1))))
-                goto raise_overflow;
-            if (is_negative)
-                val = ~val;
-        }
-        ret = 0;
-    done:
-        Py_XDECREF(shift);
-        Py_XDECREF(mask);
-        Py_XDECREF(stepval);
-#endif
-        if (unlikely(ret))
-            return (int) -1;
-        return val;
-    }
-raise_overflow:
-    PyErr_SetString(PyExc_OverflowError,
-        "value too large to convert to int");
-    return (int) -1;
-raise_neg_overflow:
-    PyErr_SetString(PyExc_OverflowError,
-        "can't convert negative value to int");
-    return (int) -1;
-}
-
-/* CIntFromPy */
-static CYTHON_INLINE PY_LONG_LONG __Pyx_PyLong_As_PY_LONG_LONG(PyObject *x) {
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-    const PY_LONG_LONG neg_one = (PY_LONG_LONG) -1, const_zero = (PY_LONG_LONG) 0;
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic pop
-#endif
-    const int is_unsigned = neg_one > const_zero;
-    if (unlikely(!PyLong_Check(x))) {
-        PY_LONG_LONG val;
-        PyObject *tmp = __Pyx_PyNumber_Long(x);
-        if (!tmp) return (PY_LONG_LONG) -1;
-        val = __Pyx_PyLong_As_PY_LONG_LONG(tmp);
-        Py_DECREF(tmp);
-        return val;
-    }
-    if (is_unsigned) {
-#if CYTHON_USE_PYLONG_INTERNALS
-        if (unlikely(__Pyx_PyLong_IsNeg(x))) {
-            goto raise_neg_overflow;
-        } else if (__Pyx_PyLong_IsCompact(x)) {
-            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, __Pyx_compact_upylong, __Pyx_PyLong_CompactValueUnsigned(x))
-        } else {
-            const digit* digits = __Pyx_PyLong_Digits(x);
-            assert(__Pyx_PyLong_DigitCount(x) > 1);
-            switch (__Pyx_PyLong_DigitCount(x)) {
-                case 2:
-                    if ((8 * sizeof(PY_LONG_LONG) > 1 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(PY_LONG_LONG) >= 2 * PyLong_SHIFT)) {
-                            return (PY_LONG_LONG) (((((PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0]));
-                        }
-                    }
-                    break;
-                case 3:
-                    if ((8 * sizeof(PY_LONG_LONG) > 2 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(PY_LONG_LONG) >= 3 * PyLong_SHIFT)) {
-                            return (PY_LONG_LONG) (((((((PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0]));
-                        }
-                    }
-                    break;
-                case 4:
-                    if ((8 * sizeof(PY_LONG_LONG) > 3 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(PY_LONG_LONG) >= 4 * PyLong_SHIFT)) {
-                            return (PY_LONG_LONG) (((((((((PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0]));
-                        }
-                    }
-                    break;
-            }
-        }
-#endif
-#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX < 0x030C00A7
-        if (unlikely(Py_SIZE(x) < 0)) {
-            goto raise_neg_overflow;
-        }
-#else
-        {
-            int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
-            if (unlikely(result < 0))
-                return (PY_LONG_LONG) -1;
-            if (unlikely(result == 1))
-                goto raise_neg_overflow;
-        }
-#endif
-        if ((sizeof(PY_LONG_LONG) <= sizeof(unsigned long))) {
-            __PYX_VERIFY_RETURN_INT_EXC(PY_LONG_LONG, unsigned long, PyLong_AsUnsignedLong(x))
-#ifdef HAVE_LONG_LONG
-        } else if ((sizeof(PY_LONG_LONG) <= sizeof(unsigned PY_LONG_LONG))) {
-            __PYX_VERIFY_RETURN_INT_EXC(PY_LONG_LONG, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
-#endif
-        }
-    } else {
-#if CYTHON_USE_PYLONG_INTERNALS
-        if (__Pyx_PyLong_IsCompact(x)) {
-            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, __Pyx_compact_pylong, __Pyx_PyLong_CompactValue(x))
-        } else {
-            const digit* digits = __Pyx_PyLong_Digits(x);
-            assert(__Pyx_PyLong_DigitCount(x) > 1);
-            switch (__Pyx_PyLong_SignedDigitCount(x)) {
-                case -2:
-                    if ((8 * sizeof(PY_LONG_LONG) - 1 > 1 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT)) {
-                            return (PY_LONG_LONG) (((PY_LONG_LONG)-1)*(((((PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0])));
-                        }
-                    }
-                    break;
-                case 2:
-                    if ((8 * sizeof(PY_LONG_LONG) > 1 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT)) {
-                            return (PY_LONG_LONG) ((((((PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0])));
-                        }
-                    }
-                    break;
-                case -3:
-                    if ((8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT)) {
-                            return (PY_LONG_LONG) (((PY_LONG_LONG)-1)*(((((((PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0])));
-                        }
-                    }
-                    break;
-                case 3:
-                    if ((8 * sizeof(PY_LONG_LONG) > 2 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT)) {
-                            return (PY_LONG_LONG) ((((((((PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0])));
-                        }
-                    }
-                    break;
-                case -4:
-                    if ((8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT)) {
-                            return (PY_LONG_LONG) (((PY_LONG_LONG)-1)*(((((((((PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0])));
-                        }
-                    }
-                    break;
-                case 4:
-                    if ((8 * sizeof(PY_LONG_LONG) > 3 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT)) {
-                            return (PY_LONG_LONG) ((((((((((PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0])));
-                        }
-                    }
-                    break;
-            }
-        }
-#endif
-        if ((sizeof(PY_LONG_LONG) <= sizeof(long))) {
-            __PYX_VERIFY_RETURN_INT_EXC(PY_LONG_LONG, long, PyLong_AsLong(x))
-#ifdef HAVE_LONG_LONG
-        } else if ((sizeof(PY_LONG_LONG) <= sizeof(PY_LONG_LONG))) {
-            __PYX_VERIFY_RETURN_INT_EXC(PY_LONG_LONG, PY_LONG_LONG, PyLong_AsLongLong(x))
-#endif
-        }
-    }
-    {
-        PY_LONG_LONG val;
-        int ret = -1;
-#if PY_VERSION_HEX >= 0x030d00A6 && !CYTHON_COMPILING_IN_LIMITED_API
-        Py_ssize_t bytes_copied = PyLong_AsNativeBytes(
-            x, &val, sizeof(val), Py_ASNATIVEBYTES_NATIVE_ENDIAN | (is_unsigned ? Py_ASNATIVEBYTES_UNSIGNED_BUFFER | Py_ASNATIVEBYTES_REJECT_NEGATIVE : 0));
-        if (unlikely(bytes_copied == -1)) {
-        } else if (unlikely(bytes_copied > (Py_ssize_t) sizeof(val))) {
-            goto raise_overflow;
-        } else {
-            ret = 0;
-        }
-#elif PY_VERSION_HEX < 0x030d0000 && !(CYTHON_COMPILING_IN_PYPY || CYTHON_COMPILING_IN_LIMITED_API) || defined(_PyLong_AsByteArray)
-        int one = 1; int is_little = (int)*(unsigned char *)&one;
-        unsigned char *bytes = (unsigned char *)&val;
-        ret = _PyLong_AsByteArray((PyLongObject *)x,
-                                    bytes, sizeof(val),
-                                    is_little, !is_unsigned);
-#else
-        PyObject *v;
-        PyObject *stepval = NULL, *mask = NULL, *shift = NULL;
-        int bits, remaining_bits, is_negative = 0;
-        int chunk_size = (sizeof(long) < 8) ? 30 : 62;
-        if (likely(PyLong_CheckExact(x))) {
-            v = __Pyx_NewRef(x);
-        } else {
-            v = PyNumber_Long(x);
-            if (unlikely(!v)) return (PY_LONG_LONG) -1;
-            assert(PyLong_CheckExact(v));
-        }
-        {
-            int result = PyObject_RichCompareBool(v, Py_False, Py_LT);
-            if (unlikely(result < 0)) {
-                Py_DECREF(v);
-                return (PY_LONG_LONG) -1;
-            }
-            is_negative = result == 1;
-        }
-        if (is_unsigned && unlikely(is_negative)) {
-            Py_DECREF(v);
-            goto raise_neg_overflow;
-        } else if (is_negative) {
-            stepval = PyNumber_Invert(v);
-            Py_DECREF(v);
-            if (unlikely(!stepval))
-                return (PY_LONG_LONG) -1;
-        } else {
-            stepval = v;
-        }
-        v = NULL;
-        val = (PY_LONG_LONG) 0;
-        mask = PyLong_FromLong((1L << chunk_size) - 1); if (unlikely(!mask)) goto done;
-        shift = PyLong_FromLong(chunk_size); if (unlikely(!shift)) goto done;
-        for (bits = 0; bits < (int) sizeof(PY_LONG_LONG) * 8 - chunk_size; bits += chunk_size) {
-            PyObject *tmp, *digit;
-            long idigit;
-            digit = PyNumber_And(stepval, mask);
-            if (unlikely(!digit)) goto done;
-            idigit = PyLong_AsLong(digit);
-            Py_DECREF(digit);
-            if (unlikely(idigit < 0)) goto done;
-            val |= ((PY_LONG_LONG) idigit) << bits;
-            tmp = PyNumber_Rshift(stepval, shift);
-            if (unlikely(!tmp)) goto done;
-            Py_DECREF(stepval); stepval = tmp;
-        }
-        Py_DECREF(shift); shift = NULL;
-        Py_DECREF(mask); mask = NULL;
-        {
-            long idigit = PyLong_AsLong(stepval);
-            if (unlikely(idigit < 0)) goto done;
-            remaining_bits = ((int) sizeof(PY_LONG_LONG) * 8) - bits - (is_unsigned ? 0 : 1);
-            if (unlikely(idigit >= (1L << remaining_bits)))
-                goto raise_overflow;
-            val |= ((PY_LONG_LONG) idigit) << bits;
-        }
-        if (!is_unsigned) {
-            if (unlikely(val & (((PY_LONG_LONG) 1) << (sizeof(PY_LONG_LONG) * 8 - 1))))
-                goto raise_overflow;
-            if (is_negative)
-                val = ~val;
-        }
-        ret = 0;
-    done:
-        Py_XDECREF(shift);
-        Py_XDECREF(mask);
-        Py_XDECREF(stepval);
-#endif
-        if (unlikely(ret))
-            return (PY_LONG_LONG) -1;
-        return val;
-    }
-raise_overflow:
-    PyErr_SetString(PyExc_OverflowError,
-        "value too large to convert to PY_LONG_LONG");
-    return (PY_LONG_LONG) -1;
-raise_neg_overflow:
-    PyErr_SetString(PyExc_OverflowError,
-        "can't convert negative value to PY_LONG_LONG");
-    return (PY_LONG_LONG) -1;
-}
-
-/* CIntToPy */
-static CYTHON_INLINE PyObject* __Pyx_PyLong_From_int(int value) {
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-    const int neg_one = (int) -1, const_zero = (int) 0;
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic pop
-#endif
-    const int is_unsigned = neg_one > const_zero;
-    if (is_unsigned) {
-        if (sizeof(int) < sizeof(long)) {
-            return PyLong_FromLong((long) value);
-        } else if (sizeof(int) <= sizeof(unsigned long)) {
-            return PyLong_FromUnsignedLong((unsigned long) value);
-#if defined(HAVE_LONG_LONG) && !CYTHON_COMPILING_IN_PYPY
-        } else if (sizeof(int) <= sizeof(unsigned PY_LONG_LONG)) {
-            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
-#endif
-        }
-    } else {
-        if (sizeof(int) <= sizeof(long)) {
-            return PyLong_FromLong((long) value);
-#ifdef HAVE_LONG_LONG
-        } else if (sizeof(int) <= sizeof(PY_LONG_LONG)) {
-            return PyLong_FromLongLong((PY_LONG_LONG) value);
-#endif
-        }
-    }
-    {
-        unsigned char *bytes = (unsigned char *)&value;
-#if !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX >= 0x030d00A4
-        if (is_unsigned) {
-            return PyLong_FromUnsignedNativeBytes(bytes, sizeof(value), -1);
-        } else {
-            return PyLong_FromNativeBytes(bytes, sizeof(value), -1);
-        }
-#elif !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x030d0000
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        return _PyLong_FromByteArray(bytes, sizeof(int),
-                                     little, !is_unsigned);
-#else
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        PyObject *from_bytes, *result = NULL, *kwds = NULL;
-        PyObject *py_bytes = NULL, *order_str = NULL;
-        from_bytes = PyObject_GetAttrString((PyObject*)&PyLong_Type, "from_bytes");
-        if (!from_bytes) return NULL;
-        py_bytes = PyBytes_FromStringAndSize((char*)bytes, sizeof(int));
-        if (!py_bytes) goto limited_bad;
-        order_str = PyUnicode_FromString(little ? "little" : "big");
-        if (!order_str) goto limited_bad;
-        {
-            PyObject *args[3+(CYTHON_VECTORCALL ? 1 : 0)] = { NULL, py_bytes, order_str };
-            if (!is_unsigned) {
-                kwds = __Pyx_MakeVectorcallBuilderKwds(1);
-                if (!kwds) goto limited_bad;
-                if (__Pyx_VectorcallBuilder_AddArgStr("signed", __Pyx_NewRef(Py_True), kwds, args+3, 0) < 0) goto limited_bad;
-            }
-            result = __Pyx_Object_Vectorcall_CallFromBuilder(from_bytes, args+1, 2 | __Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET, kwds);
-        }
-        limited_bad:
-        Py_XDECREF(kwds);
-        Py_XDECREF(order_str);
-        Py_XDECREF(py_bytes);
-        Py_XDECREF(from_bytes);
-        return result;
-#endif
-    }
-}
-
-/* CIntToPy */
-static CYTHON_INLINE PyObject* __Pyx_PyLong_From_PY_LONG_LONG(PY_LONG_LONG value) {
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-    const PY_LONG_LONG neg_one = (PY_LONG_LONG) -1, const_zero = (PY_LONG_LONG) 0;
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic pop
-#endif
-    const int is_unsigned = neg_one > const_zero;
-    if (is_unsigned) {
-        if (sizeof(PY_LONG_LONG) < sizeof(long)) {
-            return PyLong_FromLong((long) value);
-        } else if (sizeof(PY_LONG_LONG) <= sizeof(unsigned long)) {
-            return PyLong_FromUnsignedLong((unsigned long) value);
-#if defined(HAVE_LONG_LONG) && !CYTHON_COMPILING_IN_PYPY
-        } else if (sizeof(PY_LONG_LONG) <= sizeof(unsigned PY_LONG_LONG)) {
-            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
-#endif
-        }
-    } else {
-        if (sizeof(PY_LONG_LONG) <= sizeof(long)) {
-            return PyLong_FromLong((long) value);
-#ifdef HAVE_LONG_LONG
-        } else if (sizeof(PY_LONG_LONG) <= sizeof(PY_LONG_LONG)) {
-            return PyLong_FromLongLong((PY_LONG_LONG) value);
-#endif
-        }
-    }
-    {
-        unsigned char *bytes = (unsigned char *)&value;
-#if !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX >= 0x030d00A4
-        if (is_unsigned) {
-            return PyLong_FromUnsignedNativeBytes(bytes, sizeof(value), -1);
-        } else {
-            return PyLong_FromNativeBytes(bytes, sizeof(value), -1);
-        }
-#elif !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x030d0000
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        return _PyLong_FromByteArray(bytes, sizeof(PY_LONG_LONG),
-                                     little, !is_unsigned);
-#else
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        PyObject *from_bytes, *result = NULL, *kwds = NULL;
-        PyObject *py_bytes = NULL, *order_str = NULL;
-        from_bytes = PyObject_GetAttrString((PyObject*)&PyLong_Type, "from_bytes");
-        if (!from_bytes) return NULL;
-        py_bytes = PyBytes_FromStringAndSize((char*)bytes, sizeof(PY_LONG_LONG));
-        if (!py_bytes) goto limited_bad;
-        order_str = PyUnicode_FromString(little ? "little" : "big");
-        if (!order_str) goto limited_bad;
-        {
-            PyObject *args[3+(CYTHON_VECTORCALL ? 1 : 0)] = { NULL, py_bytes, order_str };
-            if (!is_unsigned) {
-                kwds = __Pyx_MakeVectorcallBuilderKwds(1);
-                if (!kwds) goto limited_bad;
-                if (__Pyx_VectorcallBuilder_AddArgStr("signed", __Pyx_NewRef(Py_True), kwds, args+3, 0) < 0) goto limited_bad;
-            }
-            result = __Pyx_Object_Vectorcall_CallFromBuilder(from_bytes, args+1, 2 | __Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET, kwds);
-        }
-        limited_bad:
-        Py_XDECREF(kwds);
-        Py_XDECREF(order_str);
-        Py_XDECREF(py_bytes);
-        Py_XDECREF(from_bytes);
-        return result;
-#endif
-    }
-}
-
-/* CIntToPy */
-static CYTHON_INLINE PyObject* __Pyx_PyLong_From_long(long value) {
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-    const long neg_one = (long) -1, const_zero = (long) 0;
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic pop
-#endif
-    const int is_unsigned = neg_one > const_zero;
-    if (is_unsigned) {
-        if (sizeof(long) < sizeof(long)) {
-            return PyLong_FromLong((long) value);
-        } else if (sizeof(long) <= sizeof(unsigned long)) {
-            return PyLong_FromUnsignedLong((unsigned long) value);
-#if defined(HAVE_LONG_LONG) && !CYTHON_COMPILING_IN_PYPY
-        } else if (sizeof(long) <= sizeof(unsigned PY_LONG_LONG)) {
-            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
-#endif
-        }
-    } else {
-        if (sizeof(long) <= sizeof(long)) {
-            return PyLong_FromLong((long) value);
-#ifdef HAVE_LONG_LONG
-        } else if (sizeof(long) <= sizeof(PY_LONG_LONG)) {
-            return PyLong_FromLongLong((PY_LONG_LONG) value);
-#endif
-        }
-    }
-    {
-        unsigned char *bytes = (unsigned char *)&value;
-#if !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX >= 0x030d00A4
-        if (is_unsigned) {
-            return PyLong_FromUnsignedNativeBytes(bytes, sizeof(value), -1);
-        } else {
-            return PyLong_FromNativeBytes(bytes, sizeof(value), -1);
-        }
-#elif !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x030d0000
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        return _PyLong_FromByteArray(bytes, sizeof(long),
-                                     little, !is_unsigned);
-#else
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        PyObject *from_bytes, *result = NULL, *kwds = NULL;
-        PyObject *py_bytes = NULL, *order_str = NULL;
-        from_bytes = PyObject_GetAttrString((PyObject*)&PyLong_Type, "from_bytes");
-        if (!from_bytes) return NULL;
-        py_bytes = PyBytes_FromStringAndSize((char*)bytes, sizeof(long));
-        if (!py_bytes) goto limited_bad;
-        order_str = PyUnicode_FromString(little ? "little" : "big");
-        if (!order_str) goto limited_bad;
-        {
-            PyObject *args[3+(CYTHON_VECTORCALL ? 1 : 0)] = { NULL, py_bytes, order_str };
-            if (!is_unsigned) {
-                kwds = __Pyx_MakeVectorcallBuilderKwds(1);
-                if (!kwds) goto limited_bad;
-                if (__Pyx_VectorcallBuilder_AddArgStr("signed", __Pyx_NewRef(Py_True), kwds, args+3, 0) < 0) goto limited_bad;
-            }
-            result = __Pyx_Object_Vectorcall_CallFromBuilder(from_bytes, args+1, 2 | __Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET, kwds);
-        }
-        limited_bad:
-        Py_XDECREF(kwds);
-        Py_XDECREF(order_str);
-        Py_XDECREF(py_bytes);
-        Py_XDECREF(from_bytes);
-        return result;
-#endif
-    }
-}
-
-/* FormatTypeName */
-#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030d0000
-static __Pyx_TypeName
-__Pyx_PyType_GetFullyQualifiedName(PyTypeObject* tp)
-{
-    PyObject *module = NULL, *name = NULL, *result = NULL;
-    #if __PYX_LIMITED_VERSION_HEX < 0x030b0000
-    name = __Pyx_PyObject_GetAttrStr((PyObject *)tp,
-                                               __pyx_mstate_global->__pyx_n_u_qualname);
-    #else
-    name = PyType_GetQualName(tp);
-    #endif
-    if (unlikely(name == NULL) || unlikely(!PyUnicode_Check(name))) goto bad;
-    module = __Pyx_PyObject_GetAttrStr((PyObject *)tp,
-                                               __pyx_mstate_global->__pyx_n_u_module);
-    if (unlikely(module == NULL) || unlikely(!PyUnicode_Check(module))) goto bad;
-    if (PyUnicode_CompareWithASCIIString(module, "builtins") == 0) {
-        result = name;
-        name = NULL;
-        goto done;
-    }
-    result = PyUnicode_FromFormat("%U.%U", module, name);
-    if (unlikely(result == NULL)) goto bad;
-  done:
-    Py_XDECREF(name);
-    Py_XDECREF(module);
-    return result;
-  bad:
-    PyErr_Clear();
-    if (name) {
-        result = name;
-        name = NULL;
-    } else {
-        result = __Pyx_NewRef(__pyx_mstate_global->__pyx_kp_u__2);
-    }
-    goto done;
-}
-#endif
-
-/* CIntFromPy */
-static CYTHON_INLINE long __Pyx_PyLong_As_long(PyObject *x) {
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-    const long neg_one = (long) -1, const_zero = (long) 0;
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic pop
-#endif
-    const int is_unsigned = neg_one > const_zero;
-    if (unlikely(!PyLong_Check(x))) {
-        long val;
-        PyObject *tmp = __Pyx_PyNumber_Long(x);
-        if (!tmp) return (long) -1;
-        val = __Pyx_PyLong_As_long(tmp);
-        Py_DECREF(tmp);
-        return val;
-    }
-    if (is_unsigned) {
-#if CYTHON_USE_PYLONG_INTERNALS
-        if (unlikely(__Pyx_PyLong_IsNeg(x))) {
-            goto raise_neg_overflow;
-        } else if (__Pyx_PyLong_IsCompact(x)) {
-            __PYX_VERIFY_RETURN_INT(long, __Pyx_compact_upylong, __Pyx_PyLong_CompactValueUnsigned(x))
-        } else {
-            const digit* digits = __Pyx_PyLong_Digits(x);
-            assert(__Pyx_PyLong_DigitCount(x) > 1);
-            switch (__Pyx_PyLong_DigitCount(x)) {
-                case 2:
-                    if ((8 * sizeof(long) > 1 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(long, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(long) >= 2 * PyLong_SHIFT)) {
-                            return (long) (((((long)digits[1]) << PyLong_SHIFT) | (long)digits[0]));
-                        }
-                    }
-                    break;
-                case 3:
-                    if ((8 * sizeof(long) > 2 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(long, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(long) >= 3 * PyLong_SHIFT)) {
-                            return (long) (((((((long)digits[2]) << PyLong_SHIFT) | (long)digits[1]) << PyLong_SHIFT) | (long)digits[0]));
-                        }
-                    }
-                    break;
-                case 4:
-                    if ((8 * sizeof(long) > 3 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(long, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(long) >= 4 * PyLong_SHIFT)) {
-                            return (long) (((((((((long)digits[3]) << PyLong_SHIFT) | (long)digits[2]) << PyLong_SHIFT) | (long)digits[1]) << PyLong_SHIFT) | (long)digits[0]));
-                        }
-                    }
-                    break;
-            }
-        }
-#endif
-#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX < 0x030C00A7
-        if (unlikely(Py_SIZE(x) < 0)) {
-            goto raise_neg_overflow;
-        }
-#else
-        {
-            int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
-            if (unlikely(result < 0))
-                return (long) -1;
-            if (unlikely(result == 1))
-                goto raise_neg_overflow;
-        }
-#endif
-        if ((sizeof(long) <= sizeof(unsigned long))) {
-            __PYX_VERIFY_RETURN_INT_EXC(long, unsigned long, PyLong_AsUnsignedLong(x))
-#ifdef HAVE_LONG_LONG
-        } else if ((sizeof(long) <= sizeof(unsigned PY_LONG_LONG))) {
-            __PYX_VERIFY_RETURN_INT_EXC(long, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
-#endif
-        }
-    } else {
-#if CYTHON_USE_PYLONG_INTERNALS
-        if (__Pyx_PyLong_IsCompact(x)) {
-            __PYX_VERIFY_RETURN_INT(long, __Pyx_compact_pylong, __Pyx_PyLong_CompactValue(x))
-        } else {
-            const digit* digits = __Pyx_PyLong_Digits(x);
-            assert(__Pyx_PyLong_DigitCount(x) > 1);
-            switch (__Pyx_PyLong_SignedDigitCount(x)) {
-                case -2:
-                    if ((8 * sizeof(long) - 1 > 1 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(long, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(long) - 1 > 2 * PyLong_SHIFT)) {
-                            return (long) (((long)-1)*(((((long)digits[1]) << PyLong_SHIFT) | (long)digits[0])));
-                        }
-                    }
-                    break;
-                case 2:
-                    if ((8 * sizeof(long) > 1 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(long, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(long) - 1 > 2 * PyLong_SHIFT)) {
-                            return (long) ((((((long)digits[1]) << PyLong_SHIFT) | (long)digits[0])));
-                        }
-                    }
-                    break;
-                case -3:
-                    if ((8 * sizeof(long) - 1 > 2 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(long, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(long) - 1 > 3 * PyLong_SHIFT)) {
-                            return (long) (((long)-1)*(((((((long)digits[2]) << PyLong_SHIFT) | (long)digits[1]) << PyLong_SHIFT) | (long)digits[0])));
-                        }
-                    }
-                    break;
-                case 3:
-                    if ((8 * sizeof(long) > 2 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(long, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(long) - 1 > 3 * PyLong_SHIFT)) {
-                            return (long) ((((((((long)digits[2]) << PyLong_SHIFT) | (long)digits[1]) << PyLong_SHIFT) | (long)digits[0])));
-                        }
-                    }
-                    break;
-                case -4:
-                    if ((8 * sizeof(long) - 1 > 3 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(long, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(long) - 1 > 4 * PyLong_SHIFT)) {
-                            return (long) (((long)-1)*(((((((((long)digits[3]) << PyLong_SHIFT) | (long)digits[2]) << PyLong_SHIFT) | (long)digits[1]) << PyLong_SHIFT) | (long)digits[0])));
-                        }
-                    }
-                    break;
-                case 4:
-                    if ((8 * sizeof(long) > 3 * PyLong_SHIFT)) {
-                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
-                            __PYX_VERIFY_RETURN_INT(long, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if ((8 * sizeof(long) - 1 > 4 * PyLong_SHIFT)) {
-                            return (long) ((((((((((long)digits[3]) << PyLong_SHIFT) | (long)digits[2]) << PyLong_SHIFT) | (long)digits[1]) << PyLong_SHIFT) | (long)digits[0])));
-                        }
-                    }
-                    break;
-            }
-        }
-#endif
-        if ((sizeof(long) <= sizeof(long))) {
-            __PYX_VERIFY_RETURN_INT_EXC(long, long, PyLong_AsLong(x))
-#ifdef HAVE_LONG_LONG
-        } else if ((sizeof(long) <= sizeof(PY_LONG_LONG))) {
-            __PYX_VERIFY_RETURN_INT_EXC(long, PY_LONG_LONG, PyLong_AsLongLong(x))
-#endif
-        }
-    }
-    {
-        long val;
-        int ret = -1;
-#if PY_VERSION_HEX >= 0x030d00A6 && !CYTHON_COMPILING_IN_LIMITED_API
-        Py_ssize_t bytes_copied = PyLong_AsNativeBytes(
-            x, &val, sizeof(val), Py_ASNATIVEBYTES_NATIVE_ENDIAN | (is_unsigned ? Py_ASNATIVEBYTES_UNSIGNED_BUFFER | Py_ASNATIVEBYTES_REJECT_NEGATIVE : 0));
-        if (unlikely(bytes_copied == -1)) {
-        } else if (unlikely(bytes_copied > (Py_ssize_t) sizeof(val))) {
-            goto raise_overflow;
-        } else {
-            ret = 0;
-        }
-#elif PY_VERSION_HEX < 0x030d0000 && !(CYTHON_COMPILING_IN_PYPY || CYTHON_COMPILING_IN_LIMITED_API) || defined(_PyLong_AsByteArray)
-        int one = 1; int is_little = (int)*(unsigned char *)&one;
-        unsigned char *bytes = (unsigned char *)&val;
-        ret = _PyLong_AsByteArray((PyLongObject *)x,
-                                    bytes, sizeof(val),
-                                    is_little, !is_unsigned);
-#else
-        PyObject *v;
-        PyObject *stepval = NULL, *mask = NULL, *shift = NULL;
-        int bits, remaining_bits, is_negative = 0;
-        int chunk_size = (sizeof(long) < 8) ? 30 : 62;
-        if (likely(PyLong_CheckExact(x))) {
-            v = __Pyx_NewRef(x);
-        } else {
-            v = PyNumber_Long(x);
-            if (unlikely(!v)) return (long) -1;
-            assert(PyLong_CheckExact(v));
-        }
-        {
-            int result = PyObject_RichCompareBool(v, Py_False, Py_LT);
-            if (unlikely(result < 0)) {
-                Py_DECREF(v);
-                return (long) -1;
-            }
-            is_negative = result == 1;
-        }
-        if (is_unsigned && unlikely(is_negative)) {
-            Py_DECREF(v);
-            goto raise_neg_overflow;
-        } else if (is_negative) {
-            stepval = PyNumber_Invert(v);
-            Py_DECREF(v);
-            if (unlikely(!stepval))
-                return (long) -1;
-        } else {
-            stepval = v;
-        }
-        v = NULL;
-        val = (long) 0;
-        mask = PyLong_FromLong((1L << chunk_size) - 1); if (unlikely(!mask)) goto done;
-        shift = PyLong_FromLong(chunk_size); if (unlikely(!shift)) goto done;
-        for (bits = 0; bits < (int) sizeof(long) * 8 - chunk_size; bits += chunk_size) {
-            PyObject *tmp, *digit;
-            long idigit;
-            digit = PyNumber_And(stepval, mask);
-            if (unlikely(!digit)) goto done;
-            idigit = PyLong_AsLong(digit);
-            Py_DECREF(digit);
-            if (unlikely(idigit < 0)) goto done;
-            val |= ((long) idigit) << bits;
-            tmp = PyNumber_Rshift(stepval, shift);
-            if (unlikely(!tmp)) goto done;
-            Py_DECREF(stepval); stepval = tmp;
-        }
-        Py_DECREF(shift); shift = NULL;
-        Py_DECREF(mask); mask = NULL;
-        {
-            long idigit = PyLong_AsLong(stepval);
-            if (unlikely(idigit < 0)) goto done;
-            remaining_bits = ((int) sizeof(long) * 8) - bits - (is_unsigned ? 0 : 1);
-            if (unlikely(idigit >= (1L << remaining_bits)))
-                goto raise_overflow;
-            val |= ((long) idigit) << bits;
-        }
-        if (!is_unsigned) {
-            if (unlikely(val & (((long) 1) << (sizeof(long) * 8 - 1))))
-                goto raise_overflow;
-            if (is_negative)
-                val = ~val;
-        }
-        ret = 0;
-    done:
-        Py_XDECREF(shift);
-        Py_XDECREF(mask);
-        Py_XDECREF(stepval);
-#endif
-        if (unlikely(ret))
-            return (long) -1;
-        return val;
-    }
-raise_overflow:
-    PyErr_SetString(PyExc_OverflowError,
-        "value too large to convert to long");
-    return (long) -1;
-raise_neg_overflow:
-    PyErr_SetString(PyExc_OverflowError,
-        "can't convert negative value to long");
-    return (long) -1;
-}
-
-/* FastTypeChecks */
-#if CYTHON_COMPILING_IN_CPYTHON
-static int __Pyx_InBases(PyTypeObject *a, PyTypeObject *b) {
-    while (a) {
-        a = __Pyx_PyType_GetSlot(a, tp_base, PyTypeObject*);
-        if (a == b)
-            return 1;
-    }
-    return b == &PyBaseObject_Type;
-}
-static CYTHON_INLINE int __Pyx_IsSubtype(PyTypeObject *a, PyTypeObject *b) {
-    PyObject *mro;
-    if (a == b) return 1;
-    mro = a->tp_mro;
-    if (likely(mro)) {
-        Py_ssize_t i, n;
-        n = PyTuple_GET_SIZE(mro);
-        for (i = 0; i < n; i++) {
-            if (PyTuple_GET_ITEM(mro, i) == (PyObject *)b)
-                return 1;
-        }
-        return 0;
-    }
-    return __Pyx_InBases(a, b);
-}
-static CYTHON_INLINE int __Pyx_IsAnySubtype2(PyTypeObject *cls, PyTypeObject *a, PyTypeObject *b) {
-    PyObject *mro;
-    if (cls == a || cls == b) return 1;
-    mro = cls->tp_mro;
-    if (likely(mro)) {
-        Py_ssize_t i, n;
-        n = PyTuple_GET_SIZE(mro);
-        for (i = 0; i < n; i++) {
-            PyObject *base = PyTuple_GET_ITEM(mro, i);
-            if (base == (PyObject *)a || base == (PyObject *)b)
-                return 1;
-        }
-        return 0;
-    }
-    return __Pyx_InBases(cls, a) || __Pyx_InBases(cls, b);
-}
-static CYTHON_INLINE int __Pyx_inner_PyErr_GivenExceptionMatches2(PyObject *err, PyObject* exc_type1, PyObject *exc_type2) {
-    if (exc_type1) {
-        return __Pyx_IsAnySubtype2((PyTypeObject*)err, (PyTypeObject*)exc_type1, (PyTypeObject*)exc_type2);
-    } else {
-        return __Pyx_IsSubtype((PyTypeObject*)err, (PyTypeObject*)exc_type2);
-    }
-}
-static int __Pyx_PyErr_GivenExceptionMatchesTuple(PyObject *exc_type, PyObject *tuple) {
-    Py_ssize_t i, n;
-    assert(PyExceptionClass_Check(exc_type));
-    n = PyTuple_GET_SIZE(tuple);
-    for (i=0; i<n; i++) {
-        if (exc_type == PyTuple_GET_ITEM(tuple, i)) return 1;
-    }
-    for (i=0; i<n; i++) {
-        PyObject *t = PyTuple_GET_ITEM(tuple, i);
-        if (likely(PyExceptionClass_Check(t))) {
-            if (__Pyx_inner_PyErr_GivenExceptionMatches2(exc_type, NULL, t)) return 1;
-        } else {
-        }
-    }
-    return 0;
-}
-static CYTHON_INLINE int __Pyx_PyErr_GivenExceptionMatches(PyObject *err, PyObject* exc_type) {
-    if (likely(err == exc_type)) return 1;
-    if (likely(PyExceptionClass_Check(err))) {
-        if (likely(PyExceptionClass_Check(exc_type))) {
-            return __Pyx_inner_PyErr_GivenExceptionMatches2(err, NULL, exc_type);
-        } else if (likely(PyTuple_Check(exc_type))) {
-            return __Pyx_PyErr_GivenExceptionMatchesTuple(err, exc_type);
-        } else {
-        }
-    }
-    return PyErr_GivenExceptionMatches(err, exc_type);
-}
-static CYTHON_INLINE int __Pyx_PyErr_GivenExceptionMatches2(PyObject *err, PyObject *exc_type1, PyObject *exc_type2) {
-    assert(PyExceptionClass_Check(exc_type1));
-    assert(PyExceptionClass_Check(exc_type2));
-    if (likely(err == exc_type1 || err == exc_type2)) return 1;
-    if (likely(PyExceptionClass_Check(err))) {
-        return __Pyx_inner_PyErr_GivenExceptionMatches2(err, exc_type1, exc_type2);
-    }
-    return (PyErr_GivenExceptionMatches(err, exc_type1) || PyErr_GivenExceptionMatches(err, exc_type2));
-}
-#endif
-
-/* SwapException */
-#if CYTHON_FAST_THREAD_STATE
-static CYTHON_INLINE void __Pyx__ExceptionSwap(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-  #if CYTHON_USE_EXC_INFO_STACK && PY_VERSION_HEX >= 0x030B00a4
-    _PyErr_StackItem *exc_info = tstate->exc_info;
-    tmp_value = exc_info->exc_value;
-    exc_info->exc_value = *value;
-    if (tmp_value == NULL || tmp_value == Py_None) {
-        Py_XDECREF(tmp_value);
-        tmp_value = NULL;
-        tmp_type = NULL;
-        tmp_tb = NULL;
-    } else {
-        tmp_type = (PyObject*) Py_TYPE(tmp_value);
-        Py_INCREF(tmp_type);
-        #if CYTHON_COMPILING_IN_CPYTHON
-        tmp_tb = ((PyBaseExceptionObject*) tmp_value)->traceback;
-        Py_XINCREF(tmp_tb);
-        #else
-        tmp_tb = PyException_GetTraceback(tmp_value);
-        #endif
-    }
-  #elif CYTHON_USE_EXC_INFO_STACK
-    _PyErr_StackItem *exc_info = tstate->exc_info;
-    tmp_type = exc_info->exc_type;
-    tmp_value = exc_info->exc_value;
-    tmp_tb = exc_info->exc_traceback;
-    exc_info->exc_type = *type;
-    exc_info->exc_value = *value;
-    exc_info->exc_traceback = *tb;
-  #else
-    tmp_type = tstate->exc_type;
-    tmp_value = tstate->exc_value;
-    tmp_tb = tstate->exc_traceback;
-    tstate->exc_type = *type;
-    tstate->exc_value = *value;
-    tstate->exc_traceback = *tb;
-  #endif
-    *type = tmp_type;
-    *value = tmp_value;
-    *tb = tmp_tb;
-}
-#else
-static CYTHON_INLINE void __Pyx_ExceptionSwap(PyObject **type, PyObject **value, PyObject **tb) {
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-    PyErr_GetExcInfo(&tmp_type, &tmp_value, &tmp_tb);
-    PyErr_SetExcInfo(*type, *value, *tb);
-    *type = tmp_type;
-    *value = tmp_value;
-    *tb = tmp_tb;
-}
-#endif
-
-/* IterNextPlain */
-#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030A0000
-static PyObject *__Pyx_GetBuiltinNext_LimitedAPI(void) {
-    if (unlikely(!__pyx_mstate_global->__Pyx_GetBuiltinNext_LimitedAPI_cache))
-        __pyx_mstate_global->__Pyx_GetBuiltinNext_LimitedAPI_cache = __Pyx_GetBuiltinName(__pyx_mstate_global->__pyx_n_u_next);
-    return __pyx_mstate_global->__Pyx_GetBuiltinNext_LimitedAPI_cache;
-}
-#endif
-static CYTHON_INLINE PyObject *__Pyx_PyIter_Next_Plain(PyObject *iterator) {
-#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030A0000
-    PyObject *result;
-    PyObject *next = __Pyx_GetBuiltinNext_LimitedAPI();
-    if (unlikely(!next)) return NULL;
-    result = PyObject_CallFunctionObjArgs(next, iterator, NULL);
-    return result;
-#else
-    (void)__Pyx_GetBuiltinName; // only for early limited API
-    iternextfunc iternext = __Pyx_PyObject_GetIterNextFunc(iterator);
-    assert(iternext);
-    return iternext(iterator);
-#endif
-}
-
 /* PyObjectCallMethod1 */
 #if !(CYTHON_VECTORCALL && (__PYX_LIMITED_VERSION_HEX >= 0x030C0000 || (!CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX >= 0x03090000)))
 static PyObject* __Pyx__PyObject_CallMethod1(PyObject* method, PyObject* arg) {
@@ -20376,6 +20692,12 @@ static PyObject* __Pyx_PyObject_CallMethod1(PyObject* obj, PyObject* method_name
     if (unlikely(!method)) return NULL;
     return __Pyx__PyObject_CallMethod1(method, arg);
 #endif
+}
+
+/* PyObjectCallNoArg */
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func) {
+    PyObject *arg[2] = {NULL, NULL};
+    return __Pyx_PyObject_FastCall(func, arg + 1, 0 | __Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET);
 }
 
 /* ReturnWithStopIteration */
@@ -21583,8 +21905,2210 @@ static int __pyx_Coroutine_init(PyObject *module) {
     return 0;
 }
 
+/* CoroutineSetYieldFrom */
+static void
+__Pyx_Coroutine_Set_Owned_Yield_From(__pyx_CoroutineObject *gen, PyObject *yf) {
+    assert (!gen->yieldfrom);
+#if CYTHON_USE_AM_SEND
+    assert (!gen->yieldfrom_am_send);
+    #if PY_VERSION_HEX < 0x030A00F0
+    if (__Pyx_PyType_HasFeature(Py_TYPE(yf), __Pyx_TPFLAGS_HAVE_AM_SEND))
+    #endif
+    {
+        __Pyx_pyiter_sendfunc am_send;
+        #if __PYX_LIMITED_VERSION_HEX >= 0x030A0000
+        am_send = __Pyx_PyObject_TryGetSubSlot(yf, tp_as_async, am_send, __Pyx_pyiter_sendfunc);
+        #else
+        __Pyx_PyAsyncMethodsStruct* tp_as_async = (__Pyx_PyAsyncMethodsStruct*) Py_TYPE(yf)->tp_as_async;
+        am_send = tp_as_async ? tp_as_async->am_send : NULL;
+        #endif
+        if (likely(am_send)) {
+            gen->yieldfrom_am_send = am_send;
+        }
+    }
+#endif
+    gen->yieldfrom = yf;
+}
+
+/* Coro_CheckExact */
+#if CYTHON_COMPILING_IN_LIMITED_API
+static int __Pyx_PyCoro_CheckExact(PyObject *o) {
+    return (PyObject*)Py_TYPE(o) == __pyx_mstate_global->__Pyx_CachedCoroType;
+}
+#endif
+
+/* GetAwaitIter */
+static CYTHON_INLINE PyObject *__Pyx_Coroutine_GetAwaitableIter(PyObject *o) {
+#ifdef __Pyx_Coroutine_USED
+    if (__Pyx_Coroutine_Check(o)) {
+        return __Pyx_NewRef(o);
+    }
+#endif
+    return __Pyx__Coroutine_GetAwaitableIter(o);
+}
+static void __Pyx_Coroutine_AwaitableIterError(PyObject *source) {
+#if (PY_VERSION_HEX < 0x030d0000 || defined(_PyErr_FormatFromCause)) && !CYTHON_COMPILING_IN_LIMITED_API
+    __Pyx_TypeName source_type_name = __Pyx_PyType_GetFullyQualifiedName(Py_TYPE(source));
+    _PyErr_FormatFromCause(PyExc_TypeError,
+        "'async for' received an invalid object from __anext__: " __Pyx_FMT_TYPENAME, source_type_name);
+    __Pyx_DECREF_TypeName(source_type_name);
+#else
+    PyObject *exc, *val, *val2, *tb;
+    __Pyx_TypeName source_type_name = __Pyx_PyType_GetFullyQualifiedName(Py_TYPE(source));
+    assert(PyErr_Occurred());
+    PyErr_Fetch(&exc, &val, &tb);
+    PyErr_NormalizeException(&exc, &val, &tb);
+    if (tb != NULL) {
+        PyException_SetTraceback(val, tb);
+        Py_DECREF(tb);
+    }
+    Py_DECREF(exc);
+    assert(!PyErr_Occurred());
+    PyErr_Format(PyExc_TypeError,
+        "'async for' received an invalid object from __anext__: " __Pyx_FMT_TYPENAME, source_type_name);
+    __Pyx_DECREF_TypeName(source_type_name);
+    PyErr_Fetch(&exc, &val2, &tb);
+    PyErr_NormalizeException(&exc, &val2, &tb);
+    Py_INCREF(val);
+    PyException_SetCause(val2, val);
+    PyException_SetContext(val2, val);
+    PyErr_Restore(exc, val2, tb);
+#endif
+}
+static PyObject *__Pyx__Coroutine_GetAwaitableIter(PyObject *obj) {
+    PyObject *res;
+    unaryfunc am_await;
+    am_await = __Pyx_PyObject_TryGetSubSlot(obj, tp_as_async, am_await, unaryfunc);
+    if (likely(am_await)) {
+        res = (*am_await)(obj);
+    } else
+#if CYTHON_COMPILING_IN_CPYTHON && defined(CO_ITERABLE_COROUTINE)
+#if PY_VERSION_HEX >= 0x030C00A6
+    if (PyGen_CheckExact(obj) && (PyGen_GetCode((PyGenObject*)obj)->co_flags & CO_ITERABLE_COROUTINE)) {
+#else
+    if (PyGen_CheckExact(obj) && ((PyGenObject*)obj)->gi_code && ((PyCodeObject *)((PyGenObject*)obj)->gi_code)->co_flags & CO_ITERABLE_COROUTINE) {
+#endif
+        return __Pyx_NewRef(obj);
+    } else
+#endif
+    {
+        PyObject *method = NULL;
+        int is_method = __Pyx_PyObject_GetMethod(obj, __pyx_mstate_global->__pyx_n_u_await, &method);
+        if (likely(is_method)) {
+            res = __Pyx_PyObject_CallOneArg(method, obj);
+        } else if (likely(method)) {
+            res = __Pyx_PyObject_CallNoArg(method);
+        } else
+            goto slot_error;
+        Py_DECREF(method);
+    }
+    if (unlikely(!res)) {
+        __Pyx_Coroutine_AwaitableIterError(obj);
+        goto bad;
+    }
+    if (unlikely(!PyIter_Check(res))) {
+        __Pyx_TypeName res_type_name = __Pyx_PyType_GetFullyQualifiedName(Py_TYPE(res));
+        PyErr_Format(PyExc_TypeError,
+            "__await__() returned non-iterator of type '" __Pyx_FMT_TYPENAME "'", res_type_name);
+        __Pyx_DECREF_TypeName(res_type_name);
+        Py_CLEAR(res);
+    } else {
+        int is_coroutine = 0;
+        #ifdef __Pyx_Coroutine_USED
+        is_coroutine |= __Pyx_Coroutine_Check(res);
+        #endif
+        is_coroutine |= __Pyx_PyCoro_CheckExact(res);
+        if (unlikely(is_coroutine)) {
+            /* __await__ must return an *iterator*, not
+               a coroutine or another awaitable (see PEP 492) */
+            PyErr_SetString(PyExc_TypeError,
+                            "__await__() returned a coroutine");
+            Py_CLEAR(res);
+        }
+    }
+    return res;
+slot_error:
+    {
+        __Pyx_TypeName obj_type_name = __Pyx_PyType_GetFullyQualifiedName(Py_TYPE(obj));
+        PyErr_Format(PyExc_TypeError,
+            "object " __Pyx_FMT_TYPENAME " can't be used in 'await' expression", obj_type_name);
+        __Pyx_DECREF_TypeName(obj_type_name);
+    }
+bad:
+    return NULL;
+}
+
+/* CoroutineYieldFrom */
+  static __Pyx_PySendResult __Pyx_Coroutine_Yield_From_Coroutine(__pyx_CoroutineObject *gen, PyObject *source, PyObject **retval) {
+    __Pyx_PySendResult result;
+    if (unlikely(((__pyx_CoroutineObject*)source)->yieldfrom)) {
+        PyErr_SetString(
+            PyExc_RuntimeError,
+            "coroutine is being awaited already");
+        return PYGEN_ERROR;
+    }
+    result = __Pyx_Coroutine_AmSend(source, Py_None, retval);
+    if (result == PYGEN_NEXT) {
+        Py_INCREF(source);
+        __Pyx_Coroutine_Set_Owned_Yield_From(gen, source);
+    }
+    return result;
+}
+static __Pyx_PySendResult __Pyx_Coroutine_Yield_From_Generic(__pyx_CoroutineObject *gen, PyObject *source, PyObject **retval) {
+    __Pyx_PySendResult result;
+    PyObject *source_gen = NULL;
+    source_gen = __Pyx_Coroutine_GetAwaitableIter(source);
+    if (unlikely(!source_gen)) return PYGEN_ERROR;
+    if (__Pyx_Coroutine_Check(source_gen)) {
+        result = __Pyx_Coroutine_Yield_From_Coroutine(gen, source_gen, retval);
+        Py_DECREF(source_gen);
+        return result;
+    }
+    *retval = __Pyx_PyIter_Next_Plain(source_gen);
+    if (*retval) {
+        __Pyx_Coroutine_Set_Owned_Yield_From(gen, source_gen);
+        return PYGEN_NEXT;
+    }
+    result = __Pyx_Coroutine_status_from_result(retval);
+    Py_XDECREF(source_gen);
+    return result;
+}
+static CYTHON_INLINE __Pyx_PySendResult __Pyx_Coroutine_Yield_From(__pyx_CoroutineObject *gen, PyObject *source, PyObject **retval) {
+    if (__Pyx_Coroutine_Check(source)) {
+        return __Pyx_Coroutine_Yield_From_Coroutine(gen, source, retval);
+    }
+#ifdef __Pyx_AsyncGen_USED
+    if (__pyx_PyAsyncGenASend_CheckExact(source)) {
+        *retval = __Pyx_async_gen_asend_iternext(source);
+        if (*retval) {
+            Py_INCREF(source);
+            __Pyx_Coroutine_Set_Owned_Yield_From(gen, source);
+            return PYGEN_NEXT;
+        }
+        return __Pyx_Coroutine_status_from_result(retval);
+    }
+#endif
+    return __Pyx_Coroutine_Yield_From_Generic(gen, source, retval);
+}
+
+/* RejectKeywords */
+  static void __Pyx_RejectKeywords(const char* function_name, PyObject *kwds) {
+    PyObject *key = NULL;
+    if (CYTHON_METH_FASTCALL && likely(PyTuple_Check(kwds))) {
+        key = __Pyx_PySequence_ITEM(kwds, 0);
+    } else {
+        Py_ssize_t pos = 0;
+#if !CYTHON_COMPILING_IN_PYPY || defined(PyArg_ValidateKeywordArguments)
+        if (unlikely(!PyArg_ValidateKeywordArguments(kwds))) return;
+#endif
+        PyDict_Next(kwds, &pos, &key, NULL);
+        Py_INCREF(key);
+    }
+    if (likely(key)) {
+        PyErr_Format(PyExc_TypeError,
+            "%s() got an unexpected keyword argument '%U'",
+            function_name, key);
+        Py_DECREF(key);
+    }
+}
+
+/* CallNextTpDealloc */
+  static void __Pyx_call_next_tp_dealloc(PyObject* obj, destructor current_tp_dealloc) {
+    PyTypeObject* type = Py_TYPE(obj);
+    destructor tp_dealloc = NULL;
+    while (type && __Pyx_PyType_GetSlot(type, tp_dealloc, destructor) != current_tp_dealloc)
+        type = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
+    while (type && (tp_dealloc = __Pyx_PyType_GetSlot(type, tp_dealloc, destructor)) == current_tp_dealloc)
+        type = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
+    if (type)
+        tp_dealloc(obj);
+}
+
+/* CallNextTpTraverse */
+  static int __Pyx_call_next_tp_traverse(PyObject* obj, visitproc v, void *a, traverseproc current_tp_traverse) {
+    PyTypeObject* type = Py_TYPE(obj);
+    traverseproc tp_traverse = NULL;
+    while (type && __Pyx_PyType_GetSlot(type, tp_traverse, traverseproc) != current_tp_traverse)
+        type = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
+    while (type && (tp_traverse = __Pyx_PyType_GetSlot(type, tp_traverse, traverseproc)) == current_tp_traverse)
+        type = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
+    if (type && tp_traverse)
+        return tp_traverse(obj, v, a);
+    return 0;
+}
+
+/* CallNextTpClear */
+  static void __Pyx_call_next_tp_clear(PyObject* obj, inquiry current_tp_clear) {
+    PyTypeObject* type = Py_TYPE(obj);
+    inquiry tp_clear = NULL;
+    while (type && __Pyx_PyType_GetSlot(type, tp_clear, inquiry) != current_tp_clear)
+        type = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
+    while (type && (tp_clear = __Pyx_PyType_GetSlot(type, tp_clear, inquiry)) == current_tp_clear)
+        type = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
+    if (type && tp_clear)
+        tp_clear(obj);
+}
+
+/* TypeImport */
+  #ifndef __PYX_HAVE_RT_ImportType_3_1_4
+#define __PYX_HAVE_RT_ImportType_3_1_4
+static PyTypeObject *__Pyx_ImportType_3_1_4(PyObject *module, const char *module_name, const char *class_name,
+    size_t size, size_t alignment, enum __Pyx_ImportType_CheckSize_3_1_4 check_size)
+{
+    PyObject *result = 0;
+    Py_ssize_t basicsize;
+    Py_ssize_t itemsize;
+#ifdef Py_LIMITED_API
+    PyObject *py_basicsize;
+    PyObject *py_itemsize;
+#endif
+    result = PyObject_GetAttrString(module, class_name);
+    if (!result)
+        goto bad;
+    if (!PyType_Check(result)) {
+        PyErr_Format(PyExc_TypeError,
+            "%.200s.%.200s is not a type object",
+            module_name, class_name);
+        goto bad;
+    }
+#ifndef Py_LIMITED_API
+    basicsize = ((PyTypeObject *)result)->tp_basicsize;
+    itemsize = ((PyTypeObject *)result)->tp_itemsize;
+#else
+    if (size == 0) {
+        return (PyTypeObject *)result;
+    }
+    py_basicsize = PyObject_GetAttrString(result, "__basicsize__");
+    if (!py_basicsize)
+        goto bad;
+    basicsize = PyLong_AsSsize_t(py_basicsize);
+    Py_DECREF(py_basicsize);
+    py_basicsize = 0;
+    if (basicsize == (Py_ssize_t)-1 && PyErr_Occurred())
+        goto bad;
+    py_itemsize = PyObject_GetAttrString(result, "__itemsize__");
+    if (!py_itemsize)
+        goto bad;
+    itemsize = PyLong_AsSsize_t(py_itemsize);
+    Py_DECREF(py_itemsize);
+    py_itemsize = 0;
+    if (itemsize == (Py_ssize_t)-1 && PyErr_Occurred())
+        goto bad;
+#endif
+    if (itemsize) {
+        if (size % alignment) {
+            alignment = size % alignment;
+        }
+        if (itemsize < (Py_ssize_t)alignment)
+            itemsize = (Py_ssize_t)alignment;
+    }
+    if ((size_t)(basicsize + itemsize) < size) {
+        PyErr_Format(PyExc_ValueError,
+            "%.200s.%.200s size changed, may indicate binary incompatibility. "
+            "Expected %zd from C header, got %zd from PyObject",
+            module_name, class_name, size, basicsize+itemsize);
+        goto bad;
+    }
+    if (check_size == __Pyx_ImportType_CheckSize_Error_3_1_4 &&
+            ((size_t)basicsize > size || (size_t)(basicsize + itemsize) < size)) {
+        PyErr_Format(PyExc_ValueError,
+            "%.200s.%.200s size changed, may indicate binary incompatibility. "
+            "Expected %zd from C header, got %zd-%zd from PyObject",
+            module_name, class_name, size, basicsize, basicsize+itemsize);
+        goto bad;
+    }
+    else if (check_size == __Pyx_ImportType_CheckSize_Warn_3_1_4 && (size_t)basicsize > size) {
+        if (PyErr_WarnFormat(NULL, 0,
+                "%.200s.%.200s size changed, may indicate binary incompatibility. "
+                "Expected %zd from C header, got %zd from PyObject",
+                module_name, class_name, size, basicsize) < 0) {
+            goto bad;
+        }
+    }
+    return (PyTypeObject *)result;
+bad:
+    Py_XDECREF(result);
+    return NULL;
+}
+#endif
+
+/* GetVTable */
+  static void* __Pyx_GetVtable(PyTypeObject *type) {
+    void* ptr;
+#if CYTHON_COMPILING_IN_LIMITED_API
+    PyObject *ob = PyObject_GetAttr((PyObject *)type, __pyx_mstate_global->__pyx_n_u_pyx_vtable);
+#else
+    PyObject *ob = PyObject_GetItem(type->tp_dict, __pyx_mstate_global->__pyx_n_u_pyx_vtable);
+#endif
+    if (!ob)
+        goto bad;
+    ptr = PyCapsule_GetPointer(ob, 0);
+    if (!ptr && !PyErr_Occurred())
+        PyErr_SetString(PyExc_RuntimeError, "invalid vtable found for imported type");
+    Py_DECREF(ob);
+    return ptr;
+bad:
+    Py_XDECREF(ob);
+    return NULL;
+}
+
+/* PyObjectCallMethod0 */
+  static PyObject* __Pyx_PyObject_CallMethod0(PyObject* obj, PyObject* method_name) {
+#if CYTHON_VECTORCALL && (__PYX_LIMITED_VERSION_HEX >= 0x030C0000 || (!CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX >= 0x03090000))
+    PyObject *args[1] = {obj};
+    (void) __Pyx_PyObject_GetMethod;
+    (void) __Pyx_PyObject_CallOneArg;
+    (void) __Pyx_PyObject_CallNoArg;
+    return PyObject_VectorcallMethod(method_name, args, 1 | PY_VECTORCALL_ARGUMENTS_OFFSET, NULL);
+#else
+    PyObject *method = NULL, *result = NULL;
+    int is_method = __Pyx_PyObject_GetMethod(obj, method_name, &method);
+    if (likely(is_method)) {
+        result = __Pyx_PyObject_CallOneArg(method, obj);
+        Py_DECREF(method);
+        return result;
+    }
+    if (unlikely(!method)) goto bad;
+    result = __Pyx_PyObject_CallNoArg(method);
+    Py_DECREF(method);
+bad:
+    return result;
+#endif
+}
+
+/* ValidateBasesTuple */
+  #if CYTHON_COMPILING_IN_CPYTHON || CYTHON_COMPILING_IN_LIMITED_API || CYTHON_USE_TYPE_SPECS
+static int __Pyx_validate_bases_tuple(const char *type_name, Py_ssize_t dictoffset, PyObject *bases) {
+    Py_ssize_t i, n;
+#if CYTHON_ASSUME_SAFE_SIZE
+    n = PyTuple_GET_SIZE(bases);
+#else
+    n = PyTuple_Size(bases);
+    if (unlikely(n < 0)) return -1;
+#endif
+    for (i = 1; i < n; i++)
+    {
+        PyTypeObject *b;
+#if CYTHON_AVOID_BORROWED_REFS
+        PyObject *b0 = PySequence_GetItem(bases, i);
+        if (!b0) return -1;
+#elif CYTHON_ASSUME_SAFE_MACROS
+        PyObject *b0 = PyTuple_GET_ITEM(bases, i);
+#else
+        PyObject *b0 = PyTuple_GetItem(bases, i);
+        if (!b0) return -1;
+#endif
+        b = (PyTypeObject*) b0;
+        if (!__Pyx_PyType_HasFeature(b, Py_TPFLAGS_HEAPTYPE))
+        {
+            __Pyx_TypeName b_name = __Pyx_PyType_GetFullyQualifiedName(b);
+            PyErr_Format(PyExc_TypeError,
+                "base class '" __Pyx_FMT_TYPENAME "' is not a heap type", b_name);
+            __Pyx_DECREF_TypeName(b_name);
+#if CYTHON_AVOID_BORROWED_REFS
+            Py_DECREF(b0);
+#endif
+            return -1;
+        }
+        if (dictoffset == 0)
+        {
+            Py_ssize_t b_dictoffset = 0;
+#if CYTHON_USE_TYPE_SLOTS
+            b_dictoffset = b->tp_dictoffset;
+#else
+            PyObject *py_b_dictoffset = PyObject_GetAttrString((PyObject*)b, "__dictoffset__");
+            if (!py_b_dictoffset) goto dictoffset_return;
+            b_dictoffset = PyLong_AsSsize_t(py_b_dictoffset);
+            Py_DECREF(py_b_dictoffset);
+            if (b_dictoffset == -1 && PyErr_Occurred()) goto dictoffset_return;
+#endif
+            if (b_dictoffset) {
+                {
+                    __Pyx_TypeName b_name = __Pyx_PyType_GetFullyQualifiedName(b);
+                    PyErr_Format(PyExc_TypeError,
+                        "extension type '%.200s' has no __dict__ slot, "
+                        "but base type '" __Pyx_FMT_TYPENAME "' has: "
+                        "either add 'cdef dict __dict__' to the extension type "
+                        "or add '__slots__ = [...]' to the base type",
+                        type_name, b_name);
+                    __Pyx_DECREF_TypeName(b_name);
+                }
+#if !CYTHON_USE_TYPE_SLOTS
+              dictoffset_return:
+#endif
+#if CYTHON_AVOID_BORROWED_REFS
+                Py_DECREF(b0);
+#endif
+                return -1;
+            }
+        }
+#if CYTHON_AVOID_BORROWED_REFS
+        Py_DECREF(b0);
+#endif
+    }
+    return 0;
+}
+#endif
+
+/* PyType_Ready */
+  CYTHON_UNUSED static int __Pyx_PyType_HasMultipleInheritance(PyTypeObject *t) {
+    while (t) {
+        PyObject *bases = __Pyx_PyType_GetSlot(t, tp_bases, PyObject*);
+        if (bases) {
+            return 1;
+        }
+        t = __Pyx_PyType_GetSlot(t, tp_base, PyTypeObject*);
+    }
+    return 0;
+}
+static int __Pyx_PyType_Ready(PyTypeObject *t) {
+#if CYTHON_USE_TYPE_SPECS || !CYTHON_COMPILING_IN_CPYTHON || defined(PYSTON_MAJOR_VERSION)
+    (void)__Pyx_PyObject_CallMethod0;
+#if CYTHON_USE_TYPE_SPECS
+    (void)__Pyx_validate_bases_tuple;
+#endif
+    return PyType_Ready(t);
+#else
+    int r;
+    if (!__Pyx_PyType_HasMultipleInheritance(t)) {
+        return PyType_Ready(t);
+    }
+    PyObject *bases = __Pyx_PyType_GetSlot(t, tp_bases, PyObject*);
+    if (bases && unlikely(__Pyx_validate_bases_tuple(t->tp_name, t->tp_dictoffset, bases) == -1))
+        return -1;
+#if !defined(PYSTON_MAJOR_VERSION)
+    {
+        int gc_was_enabled;
+    #if PY_VERSION_HEX >= 0x030A00b1
+        gc_was_enabled = PyGC_Disable();
+        (void)__Pyx_PyObject_CallMethod0;
+    #else
+        PyObject *ret, *py_status;
+        PyObject *gc = NULL;
+        #if (!CYTHON_COMPILING_IN_PYPY || PYPY_VERSION_NUM+0 >= 0x07030400) &&\
+                !CYTHON_COMPILING_IN_GRAAL
+        gc = PyImport_GetModule(__pyx_mstate_global->__pyx_kp_u_gc);
+        #endif
+        if (unlikely(!gc)) gc = PyImport_Import(__pyx_mstate_global->__pyx_kp_u_gc);
+        if (unlikely(!gc)) return -1;
+        py_status = __Pyx_PyObject_CallMethod0(gc, __pyx_mstate_global->__pyx_kp_u_isenabled);
+        if (unlikely(!py_status)) {
+            Py_DECREF(gc);
+            return -1;
+        }
+        gc_was_enabled = __Pyx_PyObject_IsTrue(py_status);
+        Py_DECREF(py_status);
+        if (gc_was_enabled > 0) {
+            ret = __Pyx_PyObject_CallMethod0(gc, __pyx_mstate_global->__pyx_kp_u_disable);
+            if (unlikely(!ret)) {
+                Py_DECREF(gc);
+                return -1;
+            }
+            Py_DECREF(ret);
+        } else if (unlikely(gc_was_enabled == -1)) {
+            Py_DECREF(gc);
+            return -1;
+        }
+    #endif
+        t->tp_flags |= Py_TPFLAGS_HEAPTYPE;
+#if PY_VERSION_HEX >= 0x030A0000
+        t->tp_flags |= Py_TPFLAGS_IMMUTABLETYPE;
+#endif
+#else
+        (void)__Pyx_PyObject_CallMethod0;
+#endif
+    r = PyType_Ready(t);
+#if !defined(PYSTON_MAJOR_VERSION)
+        t->tp_flags &= ~Py_TPFLAGS_HEAPTYPE;
+    #if PY_VERSION_HEX >= 0x030A00b1
+        if (gc_was_enabled)
+            PyGC_Enable();
+    #else
+        if (gc_was_enabled) {
+            PyObject *tp, *v, *tb;
+            PyErr_Fetch(&tp, &v, &tb);
+            ret = __Pyx_PyObject_CallMethod0(gc, __pyx_mstate_global->__pyx_kp_u_enable);
+            if (likely(ret || r == -1)) {
+                Py_XDECREF(ret);
+                PyErr_Restore(tp, v, tb);
+            } else {
+                Py_XDECREF(tp);
+                Py_XDECREF(v);
+                Py_XDECREF(tb);
+                r = -1;
+            }
+        }
+        Py_DECREF(gc);
+    #endif
+    }
+#endif
+    return r;
+#endif
+}
+
+/* SetVTable */
+  static int __Pyx_SetVtable(PyTypeObject *type, void *vtable) {
+    PyObject *ob = PyCapsule_New(vtable, 0, 0);
+    if (unlikely(!ob))
+        goto bad;
+#if CYTHON_COMPILING_IN_LIMITED_API
+    if (unlikely(PyObject_SetAttr((PyObject *) type, __pyx_mstate_global->__pyx_n_u_pyx_vtable, ob) < 0))
+#else
+    if (unlikely(PyDict_SetItem(type->tp_dict, __pyx_mstate_global->__pyx_n_u_pyx_vtable, ob) < 0))
+#endif
+        goto bad;
+    Py_DECREF(ob);
+    return 0;
+bad:
+    Py_XDECREF(ob);
+    return -1;
+}
+
+/* MergeVTables */
+  static int __Pyx_MergeVtables(PyTypeObject *type) {
+    int i=0;
+    Py_ssize_t size;
+    void** base_vtables;
+    __Pyx_TypeName tp_base_name = NULL;
+    __Pyx_TypeName base_name = NULL;
+    void* unknown = (void*)-1;
+    PyObject* bases = __Pyx_PyType_GetSlot(type, tp_bases, PyObject*);
+    int base_depth = 0;
+    {
+        PyTypeObject* base = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
+        while (base) {
+            base_depth += 1;
+            base = __Pyx_PyType_GetSlot(base, tp_base, PyTypeObject*);
+        }
+    }
+    base_vtables = (void**) PyMem_Malloc(sizeof(void*) * (size_t)(base_depth + 1));
+    base_vtables[0] = unknown;
+#if CYTHON_COMPILING_IN_LIMITED_API
+    size = PyTuple_Size(bases);
+    if (size < 0) goto other_failure;
+#else
+    size = PyTuple_GET_SIZE(bases);
+#endif
+    for (i = 1; i < size; i++) {
+        PyObject *basei;
+        void* base_vtable;
+#if CYTHON_AVOID_BORROWED_REFS
+        basei = PySequence_GetItem(bases, i);
+        if (unlikely(!basei)) goto other_failure;
+#elif !CYTHON_ASSUME_SAFE_MACROS
+        basei = PyTuple_GetItem(bases, i);
+        if (unlikely(!basei)) goto other_failure;
+#else
+        basei = PyTuple_GET_ITEM(bases, i);
+#endif
+        base_vtable = __Pyx_GetVtable((PyTypeObject*)basei);
+#if CYTHON_AVOID_BORROWED_REFS
+        Py_DECREF(basei);
+#endif
+        if (base_vtable != NULL) {
+            int j;
+            PyTypeObject* base = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
+            for (j = 0; j < base_depth; j++) {
+                if (base_vtables[j] == unknown) {
+                    base_vtables[j] = __Pyx_GetVtable(base);
+                    base_vtables[j + 1] = unknown;
+                }
+                if (base_vtables[j] == base_vtable) {
+                    break;
+                } else if (base_vtables[j] == NULL) {
+                    goto bad;
+                }
+                base = __Pyx_PyType_GetSlot(base, tp_base, PyTypeObject*);
+            }
+        }
+    }
+    PyErr_Clear();
+    PyMem_Free(base_vtables);
+    return 0;
+bad:
+    {
+        PyTypeObject* basei = NULL;
+        PyTypeObject* tp_base = __Pyx_PyType_GetSlot(type, tp_base, PyTypeObject*);
+        tp_base_name = __Pyx_PyType_GetFullyQualifiedName(tp_base);
+#if CYTHON_AVOID_BORROWED_REFS
+        basei = (PyTypeObject*)PySequence_GetItem(bases, i);
+        if (unlikely(!basei)) goto really_bad;
+#elif !CYTHON_ASSUME_SAFE_MACROS
+        basei = (PyTypeObject*)PyTuple_GetItem(bases, i);
+        if (unlikely(!basei)) goto really_bad;
+#else
+        basei = (PyTypeObject*)PyTuple_GET_ITEM(bases, i);
+#endif
+        base_name = __Pyx_PyType_GetFullyQualifiedName(basei);
+#if CYTHON_AVOID_BORROWED_REFS
+        Py_DECREF(basei);
+#endif
+    }
+    PyErr_Format(PyExc_TypeError,
+        "multiple bases have vtable conflict: '" __Pyx_FMT_TYPENAME "' and '" __Pyx_FMT_TYPENAME "'", tp_base_name, base_name);
+#if CYTHON_AVOID_BORROWED_REFS || !CYTHON_ASSUME_SAFE_MACROS
+really_bad: // bad has failed!
+#endif
+    __Pyx_DECREF_TypeName(tp_base_name);
+    __Pyx_DECREF_TypeName(base_name);
+#if CYTHON_COMPILING_IN_LIMITED_API || CYTHON_AVOID_BORROWED_REFS || !CYTHON_ASSUME_SAFE_MACROS
+other_failure:
+#endif
+    PyMem_Free(base_vtables);
+    return -1;
+}
+
+/* DelItemOnTypeDict */
+  static int __Pyx__DelItemOnTypeDict(PyTypeObject *tp, PyObject *k) {
+    int result;
+    PyObject *tp_dict;
+#if CYTHON_COMPILING_IN_LIMITED_API
+    tp_dict = __Pyx_GetTypeDict(tp);
+    if (unlikely(!tp_dict)) return -1;
+#else
+    tp_dict = tp->tp_dict;
+#endif
+    result = PyDict_DelItem(tp_dict, k);
+    if (likely(!result)) PyType_Modified(tp);
+    return result;
+}
+
+/* SetupReduce */
+  static int __Pyx_setup_reduce_is_named(PyObject* meth, PyObject* name) {
+  int ret;
+  PyObject *name_attr;
+  name_attr = __Pyx_PyObject_GetAttrStrNoError(meth, __pyx_mstate_global->__pyx_n_u_name);
+  if (likely(name_attr)) {
+      ret = PyObject_RichCompareBool(name_attr, name, Py_EQ);
+  } else {
+      ret = -1;
+  }
+  if (unlikely(ret < 0)) {
+      PyErr_Clear();
+      ret = 0;
+  }
+  Py_XDECREF(name_attr);
+  return ret;
+}
+static int __Pyx_setup_reduce(PyObject* type_obj) {
+    int ret = 0;
+    PyObject *object_reduce = NULL;
+    PyObject *object_getstate = NULL;
+    PyObject *object_reduce_ex = NULL;
+    PyObject *reduce = NULL;
+    PyObject *reduce_ex = NULL;
+    PyObject *reduce_cython = NULL;
+    PyObject *setstate = NULL;
+    PyObject *setstate_cython = NULL;
+    PyObject *getstate = NULL;
+#if CYTHON_USE_PYTYPE_LOOKUP
+    getstate = _PyType_Lookup((PyTypeObject*)type_obj, __pyx_mstate_global->__pyx_n_u_getstate);
+#else
+    getstate = __Pyx_PyObject_GetAttrStrNoError(type_obj, __pyx_mstate_global->__pyx_n_u_getstate);
+    if (!getstate && PyErr_Occurred()) {
+        goto __PYX_BAD;
+    }
+#endif
+    if (getstate) {
+#if CYTHON_USE_PYTYPE_LOOKUP
+        object_getstate = _PyType_Lookup(&PyBaseObject_Type, __pyx_mstate_global->__pyx_n_u_getstate);
+#else
+        object_getstate = __Pyx_PyObject_GetAttrStrNoError((PyObject*)&PyBaseObject_Type, __pyx_mstate_global->__pyx_n_u_getstate);
+        if (!object_getstate && PyErr_Occurred()) {
+            goto __PYX_BAD;
+        }
+#endif
+        if (object_getstate != getstate) {
+            goto __PYX_GOOD;
+        }
+    }
+#if CYTHON_USE_PYTYPE_LOOKUP
+    object_reduce_ex = _PyType_Lookup(&PyBaseObject_Type, __pyx_mstate_global->__pyx_n_u_reduce_ex); if (!object_reduce_ex) goto __PYX_BAD;
+#else
+    object_reduce_ex = __Pyx_PyObject_GetAttrStr((PyObject*)&PyBaseObject_Type, __pyx_mstate_global->__pyx_n_u_reduce_ex); if (!object_reduce_ex) goto __PYX_BAD;
+#endif
+    reduce_ex = __Pyx_PyObject_GetAttrStr(type_obj, __pyx_mstate_global->__pyx_n_u_reduce_ex); if (unlikely(!reduce_ex)) goto __PYX_BAD;
+    if (reduce_ex == object_reduce_ex) {
+#if CYTHON_USE_PYTYPE_LOOKUP
+        object_reduce = _PyType_Lookup(&PyBaseObject_Type, __pyx_mstate_global->__pyx_n_u_reduce); if (!object_reduce) goto __PYX_BAD;
+#else
+        object_reduce = __Pyx_PyObject_GetAttrStr((PyObject*)&PyBaseObject_Type, __pyx_mstate_global->__pyx_n_u_reduce); if (!object_reduce) goto __PYX_BAD;
+#endif
+        reduce = __Pyx_PyObject_GetAttrStr(type_obj, __pyx_mstate_global->__pyx_n_u_reduce); if (unlikely(!reduce)) goto __PYX_BAD;
+        if (reduce == object_reduce || __Pyx_setup_reduce_is_named(reduce, __pyx_mstate_global->__pyx_n_u_reduce_cython)) {
+            reduce_cython = __Pyx_PyObject_GetAttrStrNoError(type_obj, __pyx_mstate_global->__pyx_n_u_reduce_cython);
+            if (likely(reduce_cython)) {
+                ret = __Pyx_SetItemOnTypeDict((PyTypeObject*)type_obj, __pyx_mstate_global->__pyx_n_u_reduce, reduce_cython); if (unlikely(ret < 0)) goto __PYX_BAD;
+                ret = __Pyx_DelItemOnTypeDict((PyTypeObject*)type_obj, __pyx_mstate_global->__pyx_n_u_reduce_cython); if (unlikely(ret < 0)) goto __PYX_BAD;
+            } else if (reduce == object_reduce || PyErr_Occurred()) {
+                goto __PYX_BAD;
+            }
+            setstate = __Pyx_PyObject_GetAttrStrNoError(type_obj, __pyx_mstate_global->__pyx_n_u_setstate);
+            if (!setstate) PyErr_Clear();
+            if (!setstate || __Pyx_setup_reduce_is_named(setstate, __pyx_mstate_global->__pyx_n_u_setstate_cython)) {
+                setstate_cython = __Pyx_PyObject_GetAttrStrNoError(type_obj, __pyx_mstate_global->__pyx_n_u_setstate_cython);
+                if (likely(setstate_cython)) {
+                    ret = __Pyx_SetItemOnTypeDict((PyTypeObject*)type_obj, __pyx_mstate_global->__pyx_n_u_setstate, setstate_cython); if (unlikely(ret < 0)) goto __PYX_BAD;
+                    ret = __Pyx_DelItemOnTypeDict((PyTypeObject*)type_obj, __pyx_mstate_global->__pyx_n_u_setstate_cython); if (unlikely(ret < 0)) goto __PYX_BAD;
+                } else if (!setstate || PyErr_Occurred()) {
+                    goto __PYX_BAD;
+                }
+            }
+            PyType_Modified((PyTypeObject*)type_obj);
+        }
+    }
+    goto __PYX_GOOD;
+__PYX_BAD:
+    if (!PyErr_Occurred()) {
+        __Pyx_TypeName type_obj_name =
+            __Pyx_PyType_GetFullyQualifiedName((PyTypeObject*)type_obj);
+        PyErr_Format(PyExc_RuntimeError,
+            "Unable to initialize pickling for " __Pyx_FMT_TYPENAME, type_obj_name);
+        __Pyx_DECREF_TypeName(type_obj_name);
+    }
+    ret = -1;
+__PYX_GOOD:
+#if !CYTHON_USE_PYTYPE_LOOKUP
+    Py_XDECREF(object_reduce);
+    Py_XDECREF(object_reduce_ex);
+    Py_XDECREF(object_getstate);
+    Py_XDECREF(getstate);
+#endif
+    Py_XDECREF(reduce);
+    Py_XDECREF(reduce_ex);
+    Py_XDECREF(reduce_cython);
+    Py_XDECREF(setstate);
+    Py_XDECREF(setstate_cython);
+    return ret;
+}
+
+/* CLineInTraceback */
+  #if CYTHON_CLINE_IN_TRACEBACK && CYTHON_CLINE_IN_TRACEBACK_RUNTIME
+static int __Pyx_CLineForTraceback(PyThreadState *tstate, int c_line) {
+    PyObject *use_cline;
+    PyObject *ptype, *pvalue, *ptraceback;
+#if CYTHON_COMPILING_IN_CPYTHON
+    PyObject **cython_runtime_dict;
+#endif
+    CYTHON_MAYBE_UNUSED_VAR(tstate);
+    if (unlikely(!__pyx_mstate_global->__pyx_cython_runtime)) {
+        return c_line;
+    }
+    __Pyx_ErrFetchInState(tstate, &ptype, &pvalue, &ptraceback);
+#if CYTHON_COMPILING_IN_CPYTHON
+    cython_runtime_dict = _PyObject_GetDictPtr(__pyx_mstate_global->__pyx_cython_runtime);
+    if (likely(cython_runtime_dict)) {
+        __Pyx_BEGIN_CRITICAL_SECTION(*cython_runtime_dict);
+        __PYX_PY_DICT_LOOKUP_IF_MODIFIED(
+            use_cline, *cython_runtime_dict,
+            __Pyx_PyDict_GetItemStr(*cython_runtime_dict, __pyx_mstate_global->__pyx_n_u_cline_in_traceback))
+        Py_XINCREF(use_cline);
+        __Pyx_END_CRITICAL_SECTION();
+    } else
+#endif
+    {
+      PyObject *use_cline_obj = __Pyx_PyObject_GetAttrStrNoError(__pyx_mstate_global->__pyx_cython_runtime, __pyx_mstate_global->__pyx_n_u_cline_in_traceback);
+      if (use_cline_obj) {
+        use_cline = PyObject_Not(use_cline_obj) ? Py_False : Py_True;
+        Py_INCREF(use_cline);
+        Py_DECREF(use_cline_obj);
+      } else {
+        PyErr_Clear();
+        use_cline = NULL;
+      }
+    }
+    if (!use_cline) {
+        c_line = 0;
+        (void) PyObject_SetAttr(__pyx_mstate_global->__pyx_cython_runtime, __pyx_mstate_global->__pyx_n_u_cline_in_traceback, Py_False);
+    }
+    else if (use_cline == Py_False || (use_cline != Py_True && PyObject_Not(use_cline) != 0)) {
+        c_line = 0;
+    }
+    Py_XDECREF(use_cline);
+    __Pyx_ErrRestoreInState(tstate, ptype, pvalue, ptraceback);
+    return c_line;
+}
+#endif
+
+/* CodeObjectCache */
+  static int __pyx_bisect_code_objects(__Pyx_CodeObjectCacheEntry* entries, int count, int code_line) {
+    int start = 0, mid = 0, end = count - 1;
+    if (end >= 0 && code_line > entries[end].code_line) {
+        return count;
+    }
+    while (start < end) {
+        mid = start + (end - start) / 2;
+        if (code_line < entries[mid].code_line) {
+            end = mid;
+        } else if (code_line > entries[mid].code_line) {
+             start = mid + 1;
+        } else {
+            return mid;
+        }
+    }
+    if (code_line <= entries[mid].code_line) {
+        return mid;
+    } else {
+        return mid + 1;
+    }
+}
+static __Pyx_CachedCodeObjectType *__pyx__find_code_object(struct __Pyx_CodeObjectCache *code_cache, int code_line) {
+    __Pyx_CachedCodeObjectType* code_object;
+    int pos;
+    if (unlikely(!code_line) || unlikely(!code_cache->entries)) {
+        return NULL;
+    }
+    pos = __pyx_bisect_code_objects(code_cache->entries, code_cache->count, code_line);
+    if (unlikely(pos >= code_cache->count) || unlikely(code_cache->entries[pos].code_line != code_line)) {
+        return NULL;
+    }
+    code_object = code_cache->entries[pos].code_object;
+    Py_INCREF(code_object);
+    return code_object;
+}
+static __Pyx_CachedCodeObjectType *__pyx_find_code_object(int code_line) {
+#if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING && !CYTHON_ATOMICS
+    (void)__pyx__find_code_object;
+    return NULL; // Most implementation should have atomics. But otherwise, don't make it thread-safe, just miss.
+#else
+    struct __Pyx_CodeObjectCache *code_cache = &__pyx_mstate_global->__pyx_code_cache;
+#if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
+    __pyx_nonatomic_int_type old_count = __pyx_atomic_incr_acq_rel(&code_cache->accessor_count);
+    if (old_count < 0) {
+        __pyx_atomic_decr_acq_rel(&code_cache->accessor_count);
+        return NULL;
+    }
+#endif
+    __Pyx_CachedCodeObjectType *result = __pyx__find_code_object(code_cache, code_line);
+#if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
+    __pyx_atomic_decr_acq_rel(&code_cache->accessor_count);
+#endif
+    return result;
+#endif
+}
+static void __pyx__insert_code_object(struct __Pyx_CodeObjectCache *code_cache, int code_line, __Pyx_CachedCodeObjectType* code_object)
+{
+    int pos, i;
+    __Pyx_CodeObjectCacheEntry* entries = code_cache->entries;
+    if (unlikely(!code_line)) {
+        return;
+    }
+    if (unlikely(!entries)) {
+        entries = (__Pyx_CodeObjectCacheEntry*)PyMem_Malloc(64*sizeof(__Pyx_CodeObjectCacheEntry));
+        if (likely(entries)) {
+            code_cache->entries = entries;
+            code_cache->max_count = 64;
+            code_cache->count = 1;
+            entries[0].code_line = code_line;
+            entries[0].code_object = code_object;
+            Py_INCREF(code_object);
+        }
+        return;
+    }
+    pos = __pyx_bisect_code_objects(code_cache->entries, code_cache->count, code_line);
+    if ((pos < code_cache->count) && unlikely(code_cache->entries[pos].code_line == code_line)) {
+        __Pyx_CachedCodeObjectType* tmp = entries[pos].code_object;
+        entries[pos].code_object = code_object;
+        Py_INCREF(code_object);
+        Py_DECREF(tmp);
+        return;
+    }
+    if (code_cache->count == code_cache->max_count) {
+        int new_max = code_cache->max_count + 64;
+        entries = (__Pyx_CodeObjectCacheEntry*)PyMem_Realloc(
+            code_cache->entries, ((size_t)new_max) * sizeof(__Pyx_CodeObjectCacheEntry));
+        if (unlikely(!entries)) {
+            return;
+        }
+        code_cache->entries = entries;
+        code_cache->max_count = new_max;
+    }
+    for (i=code_cache->count; i>pos; i--) {
+        entries[i] = entries[i-1];
+    }
+    entries[pos].code_line = code_line;
+    entries[pos].code_object = code_object;
+    code_cache->count++;
+    Py_INCREF(code_object);
+}
+static void __pyx_insert_code_object(int code_line, __Pyx_CachedCodeObjectType* code_object) {
+#if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING && !CYTHON_ATOMICS
+    (void)__pyx__insert_code_object;
+    return; // Most implementation should have atomics. But otherwise, don't make it thread-safe, just fail.
+#else
+    struct __Pyx_CodeObjectCache *code_cache = &__pyx_mstate_global->__pyx_code_cache;
+#if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
+    __pyx_nonatomic_int_type expected = 0;
+    if (!__pyx_atomic_int_cmp_exchange(&code_cache->accessor_count, &expected, INT_MIN)) {
+        return;
+    }
+#endif
+    __pyx__insert_code_object(code_cache, code_line, code_object);
+#if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
+    __pyx_atomic_sub(&code_cache->accessor_count, INT_MIN);
+#endif
+#endif
+}
+
+/* AddTraceback */
+  #include "compile.h"
+#include "frameobject.h"
+#include "traceback.h"
+#if PY_VERSION_HEX >= 0x030b00a6 && !CYTHON_COMPILING_IN_LIMITED_API && !defined(PYPY_VERSION)
+  #ifndef Py_BUILD_CORE
+    #define Py_BUILD_CORE 1
+  #endif
+  #include "internal/pycore_frame.h"
+#endif
+#if CYTHON_COMPILING_IN_LIMITED_API
+static PyObject *__Pyx_PyCode_Replace_For_AddTraceback(PyObject *code, PyObject *scratch_dict,
+                                                       PyObject *firstlineno, PyObject *name) {
+    PyObject *replace = NULL;
+    if (unlikely(PyDict_SetItemString(scratch_dict, "co_firstlineno", firstlineno))) return NULL;
+    if (unlikely(PyDict_SetItemString(scratch_dict, "co_name", name))) return NULL;
+    replace = PyObject_GetAttrString(code, "replace");
+    if (likely(replace)) {
+        PyObject *result = PyObject_Call(replace, __pyx_mstate_global->__pyx_empty_tuple, scratch_dict);
+        Py_DECREF(replace);
+        return result;
+    }
+    PyErr_Clear();
+    return NULL;
+}
+static void __Pyx_AddTraceback(const char *funcname, int c_line,
+                               int py_line, const char *filename) {
+    PyObject *code_object = NULL, *py_py_line = NULL, *py_funcname = NULL, *dict = NULL;
+    PyObject *replace = NULL, *getframe = NULL, *frame = NULL;
+    PyObject *exc_type, *exc_value, *exc_traceback;
+    int success = 0;
+    if (c_line) {
+        (void) __pyx_cfilenm;
+        (void) __Pyx_CLineForTraceback(__Pyx_PyThreadState_Current, c_line);
+    }
+    PyErr_Fetch(&exc_type, &exc_value, &exc_traceback);
+    code_object = __pyx_find_code_object(c_line ? -c_line : py_line);
+    if (!code_object) {
+        code_object = Py_CompileString("_getframe()", filename, Py_eval_input);
+        if (unlikely(!code_object)) goto bad;
+        py_py_line = PyLong_FromLong(py_line);
+        if (unlikely(!py_py_line)) goto bad;
+        py_funcname = PyUnicode_FromString(funcname);
+        if (unlikely(!py_funcname)) goto bad;
+        dict = PyDict_New();
+        if (unlikely(!dict)) goto bad;
+        {
+            PyObject *old_code_object = code_object;
+            code_object = __Pyx_PyCode_Replace_For_AddTraceback(code_object, dict, py_py_line, py_funcname);
+            Py_DECREF(old_code_object);
+        }
+        if (unlikely(!code_object)) goto bad;
+        __pyx_insert_code_object(c_line ? -c_line : py_line, code_object);
+    } else {
+        dict = PyDict_New();
+    }
+    getframe = PySys_GetObject("_getframe");
+    if (unlikely(!getframe)) goto bad;
+    if (unlikely(PyDict_SetItemString(dict, "_getframe", getframe))) goto bad;
+    frame = PyEval_EvalCode(code_object, dict, dict);
+    if (unlikely(!frame) || frame == Py_None) goto bad;
+    success = 1;
+  bad:
+    PyErr_Restore(exc_type, exc_value, exc_traceback);
+    Py_XDECREF(code_object);
+    Py_XDECREF(py_py_line);
+    Py_XDECREF(py_funcname);
+    Py_XDECREF(dict);
+    Py_XDECREF(replace);
+    if (success) {
+        PyTraceBack_Here(
+            (struct _frame*)frame);
+    }
+    Py_XDECREF(frame);
+}
+#else
+static PyCodeObject* __Pyx_CreateCodeObjectForTraceback(
+            const char *funcname, int c_line,
+            int py_line, const char *filename) {
+    PyCodeObject *py_code = NULL;
+    PyObject *py_funcname = NULL;
+    if (c_line) {
+        py_funcname = PyUnicode_FromFormat( "%s (%s:%d)", funcname, __pyx_cfilenm, c_line);
+        if (!py_funcname) goto bad;
+        funcname = PyUnicode_AsUTF8(py_funcname);
+        if (!funcname) goto bad;
+    }
+    py_code = PyCode_NewEmpty(filename, funcname, py_line);
+    Py_XDECREF(py_funcname);
+    return py_code;
+bad:
+    Py_XDECREF(py_funcname);
+    return NULL;
+}
+static void __Pyx_AddTraceback(const char *funcname, int c_line,
+                               int py_line, const char *filename) {
+    PyCodeObject *py_code = 0;
+    PyFrameObject *py_frame = 0;
+    PyThreadState *tstate = __Pyx_PyThreadState_Current;
+    PyObject *ptype, *pvalue, *ptraceback;
+    if (c_line) {
+        c_line = __Pyx_CLineForTraceback(tstate, c_line);
+    }
+    py_code = __pyx_find_code_object(c_line ? -c_line : py_line);
+    if (!py_code) {
+        __Pyx_ErrFetchInState(tstate, &ptype, &pvalue, &ptraceback);
+        py_code = __Pyx_CreateCodeObjectForTraceback(
+            funcname, c_line, py_line, filename);
+        if (!py_code) {
+            /* If the code object creation fails, then we should clear the
+               fetched exception references and propagate the new exception */
+            Py_XDECREF(ptype);
+            Py_XDECREF(pvalue);
+            Py_XDECREF(ptraceback);
+            goto bad;
+        }
+        __Pyx_ErrRestoreInState(tstate, ptype, pvalue, ptraceback);
+        __pyx_insert_code_object(c_line ? -c_line : py_line, py_code);
+    }
+    py_frame = PyFrame_New(
+        tstate,            /*PyThreadState *tstate,*/
+        py_code,           /*PyCodeObject *code,*/
+        __pyx_mstate_global->__pyx_d,    /*PyObject *globals,*/
+        0                  /*PyObject *locals*/
+    );
+    if (!py_frame) goto bad;
+    __Pyx_PyFrame_SetLineNumber(py_frame, py_line);
+    PyTraceBack_Here(py_frame);
+bad:
+    Py_XDECREF(py_code);
+    Py_XDECREF(py_frame);
+}
+#endif
+
+/* CIntFromPyVerify */
+  #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
+    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
+#define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
+    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
+#define __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, exc)\
+    {\
+        func_type value = func_value;\
+        if (sizeof(target_type) < sizeof(func_type)) {\
+            if (unlikely(value != (func_type) (target_type) value)) {\
+                func_type zero = 0;\
+                if (exc && unlikely(value == (func_type)-1 && PyErr_Occurred()))\
+                    return (target_type) -1;\
+                if (is_unsigned && unlikely(value < zero))\
+                    goto raise_neg_overflow;\
+                else\
+                    goto raise_overflow;\
+            }\
+        }\
+        return (target_type) value;\
+    }
+
+/* CIntFromPy */
+  static CYTHON_INLINE int __Pyx_PyLong_As_int(PyObject *x) {
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+    const int neg_one = (int) -1, const_zero = (int) 0;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif
+    const int is_unsigned = neg_one > const_zero;
+    if (unlikely(!PyLong_Check(x))) {
+        int val;
+        PyObject *tmp = __Pyx_PyNumber_Long(x);
+        if (!tmp) return (int) -1;
+        val = __Pyx_PyLong_As_int(tmp);
+        Py_DECREF(tmp);
+        return val;
+    }
+    if (is_unsigned) {
+#if CYTHON_USE_PYLONG_INTERNALS
+        if (unlikely(__Pyx_PyLong_IsNeg(x))) {
+            goto raise_neg_overflow;
+        } else if (__Pyx_PyLong_IsCompact(x)) {
+            __PYX_VERIFY_RETURN_INT(int, __Pyx_compact_upylong, __Pyx_PyLong_CompactValueUnsigned(x))
+        } else {
+            const digit* digits = __Pyx_PyLong_Digits(x);
+            assert(__Pyx_PyLong_DigitCount(x) > 1);
+            switch (__Pyx_PyLong_DigitCount(x)) {
+                case 2:
+                    if ((8 * sizeof(int) > 1 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) >= 2 * PyLong_SHIFT)) {
+                            return (int) (((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
+                        }
+                    }
+                    break;
+                case 3:
+                    if ((8 * sizeof(int) > 2 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) >= 3 * PyLong_SHIFT)) {
+                            return (int) (((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
+                        }
+                    }
+                    break;
+                case 4:
+                    if ((8 * sizeof(int) > 3 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) >= 4 * PyLong_SHIFT)) {
+                            return (int) (((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
+                        }
+                    }
+                    break;
+            }
+        }
+#endif
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX < 0x030C00A7
+        if (unlikely(Py_SIZE(x) < 0)) {
+            goto raise_neg_overflow;
+        }
+#else
+        {
+            int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
+            if (unlikely(result < 0))
+                return (int) -1;
+            if (unlikely(result == 1))
+                goto raise_neg_overflow;
+        }
+#endif
+        if ((sizeof(int) <= sizeof(unsigned long))) {
+            __PYX_VERIFY_RETURN_INT_EXC(int, unsigned long, PyLong_AsUnsignedLong(x))
+#ifdef HAVE_LONG_LONG
+        } else if ((sizeof(int) <= sizeof(unsigned PY_LONG_LONG))) {
+            __PYX_VERIFY_RETURN_INT_EXC(int, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
+#endif
+        }
+    } else {
+#if CYTHON_USE_PYLONG_INTERNALS
+        if (__Pyx_PyLong_IsCompact(x)) {
+            __PYX_VERIFY_RETURN_INT(int, __Pyx_compact_pylong, __Pyx_PyLong_CompactValue(x))
+        } else {
+            const digit* digits = __Pyx_PyLong_Digits(x);
+            assert(__Pyx_PyLong_DigitCount(x) > 1);
+            switch (__Pyx_PyLong_SignedDigitCount(x)) {
+                case -2:
+                    if ((8 * sizeof(int) - 1 > 1 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) - 1 > 2 * PyLong_SHIFT)) {
+                            return (int) (((int)-1)*(((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case 2:
+                    if ((8 * sizeof(int) > 1 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) - 1 > 2 * PyLong_SHIFT)) {
+                            return (int) ((((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case -3:
+                    if ((8 * sizeof(int) - 1 > 2 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) - 1 > 3 * PyLong_SHIFT)) {
+                            return (int) (((int)-1)*(((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case 3:
+                    if ((8 * sizeof(int) > 2 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) - 1 > 3 * PyLong_SHIFT)) {
+                            return (int) ((((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case -4:
+                    if ((8 * sizeof(int) - 1 > 3 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) - 1 > 4 * PyLong_SHIFT)) {
+                            return (int) (((int)-1)*(((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case 4:
+                    if ((8 * sizeof(int) > 3 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(int) - 1 > 4 * PyLong_SHIFT)) {
+                            return (int) ((((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+            }
+        }
+#endif
+        if ((sizeof(int) <= sizeof(long))) {
+            __PYX_VERIFY_RETURN_INT_EXC(int, long, PyLong_AsLong(x))
+#ifdef HAVE_LONG_LONG
+        } else if ((sizeof(int) <= sizeof(PY_LONG_LONG))) {
+            __PYX_VERIFY_RETURN_INT_EXC(int, PY_LONG_LONG, PyLong_AsLongLong(x))
+#endif
+        }
+    }
+    {
+        int val;
+        int ret = -1;
+#if PY_VERSION_HEX >= 0x030d00A6 && !CYTHON_COMPILING_IN_LIMITED_API
+        Py_ssize_t bytes_copied = PyLong_AsNativeBytes(
+            x, &val, sizeof(val), Py_ASNATIVEBYTES_NATIVE_ENDIAN | (is_unsigned ? Py_ASNATIVEBYTES_UNSIGNED_BUFFER | Py_ASNATIVEBYTES_REJECT_NEGATIVE : 0));
+        if (unlikely(bytes_copied == -1)) {
+        } else if (unlikely(bytes_copied > (Py_ssize_t) sizeof(val))) {
+            goto raise_overflow;
+        } else {
+            ret = 0;
+        }
+#elif PY_VERSION_HEX < 0x030d0000 && !(CYTHON_COMPILING_IN_PYPY || CYTHON_COMPILING_IN_LIMITED_API) || defined(_PyLong_AsByteArray)
+        int one = 1; int is_little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&val;
+        ret = _PyLong_AsByteArray((PyLongObject *)x,
+                                    bytes, sizeof(val),
+                                    is_little, !is_unsigned);
+#else
+        PyObject *v;
+        PyObject *stepval = NULL, *mask = NULL, *shift = NULL;
+        int bits, remaining_bits, is_negative = 0;
+        int chunk_size = (sizeof(long) < 8) ? 30 : 62;
+        if (likely(PyLong_CheckExact(x))) {
+            v = __Pyx_NewRef(x);
+        } else {
+            v = PyNumber_Long(x);
+            if (unlikely(!v)) return (int) -1;
+            assert(PyLong_CheckExact(v));
+        }
+        {
+            int result = PyObject_RichCompareBool(v, Py_False, Py_LT);
+            if (unlikely(result < 0)) {
+                Py_DECREF(v);
+                return (int) -1;
+            }
+            is_negative = result == 1;
+        }
+        if (is_unsigned && unlikely(is_negative)) {
+            Py_DECREF(v);
+            goto raise_neg_overflow;
+        } else if (is_negative) {
+            stepval = PyNumber_Invert(v);
+            Py_DECREF(v);
+            if (unlikely(!stepval))
+                return (int) -1;
+        } else {
+            stepval = v;
+        }
+        v = NULL;
+        val = (int) 0;
+        mask = PyLong_FromLong((1L << chunk_size) - 1); if (unlikely(!mask)) goto done;
+        shift = PyLong_FromLong(chunk_size); if (unlikely(!shift)) goto done;
+        for (bits = 0; bits < (int) sizeof(int) * 8 - chunk_size; bits += chunk_size) {
+            PyObject *tmp, *digit;
+            long idigit;
+            digit = PyNumber_And(stepval, mask);
+            if (unlikely(!digit)) goto done;
+            idigit = PyLong_AsLong(digit);
+            Py_DECREF(digit);
+            if (unlikely(idigit < 0)) goto done;
+            val |= ((int) idigit) << bits;
+            tmp = PyNumber_Rshift(stepval, shift);
+            if (unlikely(!tmp)) goto done;
+            Py_DECREF(stepval); stepval = tmp;
+        }
+        Py_DECREF(shift); shift = NULL;
+        Py_DECREF(mask); mask = NULL;
+        {
+            long idigit = PyLong_AsLong(stepval);
+            if (unlikely(idigit < 0)) goto done;
+            remaining_bits = ((int) sizeof(int) * 8) - bits - (is_unsigned ? 0 : 1);
+            if (unlikely(idigit >= (1L << remaining_bits)))
+                goto raise_overflow;
+            val |= ((int) idigit) << bits;
+        }
+        if (!is_unsigned) {
+            if (unlikely(val & (((int) 1) << (sizeof(int) * 8 - 1))))
+                goto raise_overflow;
+            if (is_negative)
+                val = ~val;
+        }
+        ret = 0;
+    done:
+        Py_XDECREF(shift);
+        Py_XDECREF(mask);
+        Py_XDECREF(stepval);
+#endif
+        if (unlikely(ret))
+            return (int) -1;
+        return val;
+    }
+raise_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "value too large to convert to int");
+    return (int) -1;
+raise_neg_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "can't convert negative value to int");
+    return (int) -1;
+}
+
+/* CIntFromPy */
+  static CYTHON_INLINE PY_LONG_LONG __Pyx_PyLong_As_PY_LONG_LONG(PyObject *x) {
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+    const PY_LONG_LONG neg_one = (PY_LONG_LONG) -1, const_zero = (PY_LONG_LONG) 0;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif
+    const int is_unsigned = neg_one > const_zero;
+    if (unlikely(!PyLong_Check(x))) {
+        PY_LONG_LONG val;
+        PyObject *tmp = __Pyx_PyNumber_Long(x);
+        if (!tmp) return (PY_LONG_LONG) -1;
+        val = __Pyx_PyLong_As_PY_LONG_LONG(tmp);
+        Py_DECREF(tmp);
+        return val;
+    }
+    if (is_unsigned) {
+#if CYTHON_USE_PYLONG_INTERNALS
+        if (unlikely(__Pyx_PyLong_IsNeg(x))) {
+            goto raise_neg_overflow;
+        } else if (__Pyx_PyLong_IsCompact(x)) {
+            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, __Pyx_compact_upylong, __Pyx_PyLong_CompactValueUnsigned(x))
+        } else {
+            const digit* digits = __Pyx_PyLong_Digits(x);
+            assert(__Pyx_PyLong_DigitCount(x) > 1);
+            switch (__Pyx_PyLong_DigitCount(x)) {
+                case 2:
+                    if ((8 * sizeof(PY_LONG_LONG) > 1 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(PY_LONG_LONG) >= 2 * PyLong_SHIFT)) {
+                            return (PY_LONG_LONG) (((((PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0]));
+                        }
+                    }
+                    break;
+                case 3:
+                    if ((8 * sizeof(PY_LONG_LONG) > 2 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(PY_LONG_LONG) >= 3 * PyLong_SHIFT)) {
+                            return (PY_LONG_LONG) (((((((PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0]));
+                        }
+                    }
+                    break;
+                case 4:
+                    if ((8 * sizeof(PY_LONG_LONG) > 3 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(PY_LONG_LONG) >= 4 * PyLong_SHIFT)) {
+                            return (PY_LONG_LONG) (((((((((PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0]));
+                        }
+                    }
+                    break;
+            }
+        }
+#endif
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX < 0x030C00A7
+        if (unlikely(Py_SIZE(x) < 0)) {
+            goto raise_neg_overflow;
+        }
+#else
+        {
+            int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
+            if (unlikely(result < 0))
+                return (PY_LONG_LONG) -1;
+            if (unlikely(result == 1))
+                goto raise_neg_overflow;
+        }
+#endif
+        if ((sizeof(PY_LONG_LONG) <= sizeof(unsigned long))) {
+            __PYX_VERIFY_RETURN_INT_EXC(PY_LONG_LONG, unsigned long, PyLong_AsUnsignedLong(x))
+#ifdef HAVE_LONG_LONG
+        } else if ((sizeof(PY_LONG_LONG) <= sizeof(unsigned PY_LONG_LONG))) {
+            __PYX_VERIFY_RETURN_INT_EXC(PY_LONG_LONG, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
+#endif
+        }
+    } else {
+#if CYTHON_USE_PYLONG_INTERNALS
+        if (__Pyx_PyLong_IsCompact(x)) {
+            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, __Pyx_compact_pylong, __Pyx_PyLong_CompactValue(x))
+        } else {
+            const digit* digits = __Pyx_PyLong_Digits(x);
+            assert(__Pyx_PyLong_DigitCount(x) > 1);
+            switch (__Pyx_PyLong_SignedDigitCount(x)) {
+                case -2:
+                    if ((8 * sizeof(PY_LONG_LONG) - 1 > 1 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT)) {
+                            return (PY_LONG_LONG) (((PY_LONG_LONG)-1)*(((((PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0])));
+                        }
+                    }
+                    break;
+                case 2:
+                    if ((8 * sizeof(PY_LONG_LONG) > 1 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT)) {
+                            return (PY_LONG_LONG) ((((((PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0])));
+                        }
+                    }
+                    break;
+                case -3:
+                    if ((8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT)) {
+                            return (PY_LONG_LONG) (((PY_LONG_LONG)-1)*(((((((PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0])));
+                        }
+                    }
+                    break;
+                case 3:
+                    if ((8 * sizeof(PY_LONG_LONG) > 2 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT)) {
+                            return (PY_LONG_LONG) ((((((((PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0])));
+                        }
+                    }
+                    break;
+                case -4:
+                    if ((8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT)) {
+                            return (PY_LONG_LONG) (((PY_LONG_LONG)-1)*(((((((((PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0])));
+                        }
+                    }
+                    break;
+                case 4:
+                    if ((8 * sizeof(PY_LONG_LONG) > 3 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(PY_LONG_LONG, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT)) {
+                            return (PY_LONG_LONG) ((((((((((PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (PY_LONG_LONG)digits[0])));
+                        }
+                    }
+                    break;
+            }
+        }
+#endif
+        if ((sizeof(PY_LONG_LONG) <= sizeof(long))) {
+            __PYX_VERIFY_RETURN_INT_EXC(PY_LONG_LONG, long, PyLong_AsLong(x))
+#ifdef HAVE_LONG_LONG
+        } else if ((sizeof(PY_LONG_LONG) <= sizeof(PY_LONG_LONG))) {
+            __PYX_VERIFY_RETURN_INT_EXC(PY_LONG_LONG, PY_LONG_LONG, PyLong_AsLongLong(x))
+#endif
+        }
+    }
+    {
+        PY_LONG_LONG val;
+        int ret = -1;
+#if PY_VERSION_HEX >= 0x030d00A6 && !CYTHON_COMPILING_IN_LIMITED_API
+        Py_ssize_t bytes_copied = PyLong_AsNativeBytes(
+            x, &val, sizeof(val), Py_ASNATIVEBYTES_NATIVE_ENDIAN | (is_unsigned ? Py_ASNATIVEBYTES_UNSIGNED_BUFFER | Py_ASNATIVEBYTES_REJECT_NEGATIVE : 0));
+        if (unlikely(bytes_copied == -1)) {
+        } else if (unlikely(bytes_copied > (Py_ssize_t) sizeof(val))) {
+            goto raise_overflow;
+        } else {
+            ret = 0;
+        }
+#elif PY_VERSION_HEX < 0x030d0000 && !(CYTHON_COMPILING_IN_PYPY || CYTHON_COMPILING_IN_LIMITED_API) || defined(_PyLong_AsByteArray)
+        int one = 1; int is_little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&val;
+        ret = _PyLong_AsByteArray((PyLongObject *)x,
+                                    bytes, sizeof(val),
+                                    is_little, !is_unsigned);
+#else
+        PyObject *v;
+        PyObject *stepval = NULL, *mask = NULL, *shift = NULL;
+        int bits, remaining_bits, is_negative = 0;
+        int chunk_size = (sizeof(long) < 8) ? 30 : 62;
+        if (likely(PyLong_CheckExact(x))) {
+            v = __Pyx_NewRef(x);
+        } else {
+            v = PyNumber_Long(x);
+            if (unlikely(!v)) return (PY_LONG_LONG) -1;
+            assert(PyLong_CheckExact(v));
+        }
+        {
+            int result = PyObject_RichCompareBool(v, Py_False, Py_LT);
+            if (unlikely(result < 0)) {
+                Py_DECREF(v);
+                return (PY_LONG_LONG) -1;
+            }
+            is_negative = result == 1;
+        }
+        if (is_unsigned && unlikely(is_negative)) {
+            Py_DECREF(v);
+            goto raise_neg_overflow;
+        } else if (is_negative) {
+            stepval = PyNumber_Invert(v);
+            Py_DECREF(v);
+            if (unlikely(!stepval))
+                return (PY_LONG_LONG) -1;
+        } else {
+            stepval = v;
+        }
+        v = NULL;
+        val = (PY_LONG_LONG) 0;
+        mask = PyLong_FromLong((1L << chunk_size) - 1); if (unlikely(!mask)) goto done;
+        shift = PyLong_FromLong(chunk_size); if (unlikely(!shift)) goto done;
+        for (bits = 0; bits < (int) sizeof(PY_LONG_LONG) * 8 - chunk_size; bits += chunk_size) {
+            PyObject *tmp, *digit;
+            long idigit;
+            digit = PyNumber_And(stepval, mask);
+            if (unlikely(!digit)) goto done;
+            idigit = PyLong_AsLong(digit);
+            Py_DECREF(digit);
+            if (unlikely(idigit < 0)) goto done;
+            val |= ((PY_LONG_LONG) idigit) << bits;
+            tmp = PyNumber_Rshift(stepval, shift);
+            if (unlikely(!tmp)) goto done;
+            Py_DECREF(stepval); stepval = tmp;
+        }
+        Py_DECREF(shift); shift = NULL;
+        Py_DECREF(mask); mask = NULL;
+        {
+            long idigit = PyLong_AsLong(stepval);
+            if (unlikely(idigit < 0)) goto done;
+            remaining_bits = ((int) sizeof(PY_LONG_LONG) * 8) - bits - (is_unsigned ? 0 : 1);
+            if (unlikely(idigit >= (1L << remaining_bits)))
+                goto raise_overflow;
+            val |= ((PY_LONG_LONG) idigit) << bits;
+        }
+        if (!is_unsigned) {
+            if (unlikely(val & (((PY_LONG_LONG) 1) << (sizeof(PY_LONG_LONG) * 8 - 1))))
+                goto raise_overflow;
+            if (is_negative)
+                val = ~val;
+        }
+        ret = 0;
+    done:
+        Py_XDECREF(shift);
+        Py_XDECREF(mask);
+        Py_XDECREF(stepval);
+#endif
+        if (unlikely(ret))
+            return (PY_LONG_LONG) -1;
+        return val;
+    }
+raise_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "value too large to convert to PY_LONG_LONG");
+    return (PY_LONG_LONG) -1;
+raise_neg_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "can't convert negative value to PY_LONG_LONG");
+    return (PY_LONG_LONG) -1;
+}
+
+/* CIntToPy */
+  static CYTHON_INLINE PyObject* __Pyx_PyLong_From_int(int value) {
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+    const int neg_one = (int) -1, const_zero = (int) 0;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(int) < sizeof(long)) {
+            return PyLong_FromLong((long) value);
+        } else if (sizeof(int) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+#if defined(HAVE_LONG_LONG) && !CYTHON_COMPILING_IN_PYPY
+        } else if (sizeof(int) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+#endif
+        }
+    } else {
+        if (sizeof(int) <= sizeof(long)) {
+            return PyLong_FromLong((long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(int) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+#endif
+        }
+    }
+    {
+        unsigned char *bytes = (unsigned char *)&value;
+#if !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX >= 0x030d00A4
+        if (is_unsigned) {
+            return PyLong_FromUnsignedNativeBytes(bytes, sizeof(value), -1);
+        } else {
+            return PyLong_FromNativeBytes(bytes, sizeof(value), -1);
+        }
+#elif !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x030d0000
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        return _PyLong_FromByteArray(bytes, sizeof(int),
+                                     little, !is_unsigned);
+#else
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        PyObject *from_bytes, *result = NULL, *kwds = NULL;
+        PyObject *py_bytes = NULL, *order_str = NULL;
+        from_bytes = PyObject_GetAttrString((PyObject*)&PyLong_Type, "from_bytes");
+        if (!from_bytes) return NULL;
+        py_bytes = PyBytes_FromStringAndSize((char*)bytes, sizeof(int));
+        if (!py_bytes) goto limited_bad;
+        order_str = PyUnicode_FromString(little ? "little" : "big");
+        if (!order_str) goto limited_bad;
+        {
+            PyObject *args[3+(CYTHON_VECTORCALL ? 1 : 0)] = { NULL, py_bytes, order_str };
+            if (!is_unsigned) {
+                kwds = __Pyx_MakeVectorcallBuilderKwds(1);
+                if (!kwds) goto limited_bad;
+                if (__Pyx_VectorcallBuilder_AddArgStr("signed", __Pyx_NewRef(Py_True), kwds, args+3, 0) < 0) goto limited_bad;
+            }
+            result = __Pyx_Object_Vectorcall_CallFromBuilder(from_bytes, args+1, 2 | __Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET, kwds);
+        }
+        limited_bad:
+        Py_XDECREF(kwds);
+        Py_XDECREF(order_str);
+        Py_XDECREF(py_bytes);
+        Py_XDECREF(from_bytes);
+        return result;
+#endif
+    }
+}
+
+/* CIntToPy */
+  static CYTHON_INLINE PyObject* __Pyx_PyLong_From_PY_LONG_LONG(PY_LONG_LONG value) {
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+    const PY_LONG_LONG neg_one = (PY_LONG_LONG) -1, const_zero = (PY_LONG_LONG) 0;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(PY_LONG_LONG) < sizeof(long)) {
+            return PyLong_FromLong((long) value);
+        } else if (sizeof(PY_LONG_LONG) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+#if defined(HAVE_LONG_LONG) && !CYTHON_COMPILING_IN_PYPY
+        } else if (sizeof(PY_LONG_LONG) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+#endif
+        }
+    } else {
+        if (sizeof(PY_LONG_LONG) <= sizeof(long)) {
+            return PyLong_FromLong((long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(PY_LONG_LONG) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+#endif
+        }
+    }
+    {
+        unsigned char *bytes = (unsigned char *)&value;
+#if !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX >= 0x030d00A4
+        if (is_unsigned) {
+            return PyLong_FromUnsignedNativeBytes(bytes, sizeof(value), -1);
+        } else {
+            return PyLong_FromNativeBytes(bytes, sizeof(value), -1);
+        }
+#elif !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x030d0000
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        return _PyLong_FromByteArray(bytes, sizeof(PY_LONG_LONG),
+                                     little, !is_unsigned);
+#else
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        PyObject *from_bytes, *result = NULL, *kwds = NULL;
+        PyObject *py_bytes = NULL, *order_str = NULL;
+        from_bytes = PyObject_GetAttrString((PyObject*)&PyLong_Type, "from_bytes");
+        if (!from_bytes) return NULL;
+        py_bytes = PyBytes_FromStringAndSize((char*)bytes, sizeof(PY_LONG_LONG));
+        if (!py_bytes) goto limited_bad;
+        order_str = PyUnicode_FromString(little ? "little" : "big");
+        if (!order_str) goto limited_bad;
+        {
+            PyObject *args[3+(CYTHON_VECTORCALL ? 1 : 0)] = { NULL, py_bytes, order_str };
+            if (!is_unsigned) {
+                kwds = __Pyx_MakeVectorcallBuilderKwds(1);
+                if (!kwds) goto limited_bad;
+                if (__Pyx_VectorcallBuilder_AddArgStr("signed", __Pyx_NewRef(Py_True), kwds, args+3, 0) < 0) goto limited_bad;
+            }
+            result = __Pyx_Object_Vectorcall_CallFromBuilder(from_bytes, args+1, 2 | __Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET, kwds);
+        }
+        limited_bad:
+        Py_XDECREF(kwds);
+        Py_XDECREF(order_str);
+        Py_XDECREF(py_bytes);
+        Py_XDECREF(from_bytes);
+        return result;
+#endif
+    }
+}
+
+/* CIntToPy */
+  static CYTHON_INLINE PyObject* __Pyx_PyLong_From_long(long value) {
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+    const long neg_one = (long) -1, const_zero = (long) 0;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(long) < sizeof(long)) {
+            return PyLong_FromLong((long) value);
+        } else if (sizeof(long) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+#if defined(HAVE_LONG_LONG) && !CYTHON_COMPILING_IN_PYPY
+        } else if (sizeof(long) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+#endif
+        }
+    } else {
+        if (sizeof(long) <= sizeof(long)) {
+            return PyLong_FromLong((long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(long) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+#endif
+        }
+    }
+    {
+        unsigned char *bytes = (unsigned char *)&value;
+#if !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX >= 0x030d00A4
+        if (is_unsigned) {
+            return PyLong_FromUnsignedNativeBytes(bytes, sizeof(value), -1);
+        } else {
+            return PyLong_FromNativeBytes(bytes, sizeof(value), -1);
+        }
+#elif !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x030d0000
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        return _PyLong_FromByteArray(bytes, sizeof(long),
+                                     little, !is_unsigned);
+#else
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        PyObject *from_bytes, *result = NULL, *kwds = NULL;
+        PyObject *py_bytes = NULL, *order_str = NULL;
+        from_bytes = PyObject_GetAttrString((PyObject*)&PyLong_Type, "from_bytes");
+        if (!from_bytes) return NULL;
+        py_bytes = PyBytes_FromStringAndSize((char*)bytes, sizeof(long));
+        if (!py_bytes) goto limited_bad;
+        order_str = PyUnicode_FromString(little ? "little" : "big");
+        if (!order_str) goto limited_bad;
+        {
+            PyObject *args[3+(CYTHON_VECTORCALL ? 1 : 0)] = { NULL, py_bytes, order_str };
+            if (!is_unsigned) {
+                kwds = __Pyx_MakeVectorcallBuilderKwds(1);
+                if (!kwds) goto limited_bad;
+                if (__Pyx_VectorcallBuilder_AddArgStr("signed", __Pyx_NewRef(Py_True), kwds, args+3, 0) < 0) goto limited_bad;
+            }
+            result = __Pyx_Object_Vectorcall_CallFromBuilder(from_bytes, args+1, 2 | __Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET, kwds);
+        }
+        limited_bad:
+        Py_XDECREF(kwds);
+        Py_XDECREF(order_str);
+        Py_XDECREF(py_bytes);
+        Py_XDECREF(from_bytes);
+        return result;
+#endif
+    }
+}
+
+/* FormatTypeName */
+  #if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030d0000
+static __Pyx_TypeName
+__Pyx_PyType_GetFullyQualifiedName(PyTypeObject* tp)
+{
+    PyObject *module = NULL, *name = NULL, *result = NULL;
+    #if __PYX_LIMITED_VERSION_HEX < 0x030b0000
+    name = __Pyx_PyObject_GetAttrStr((PyObject *)tp,
+                                               __pyx_mstate_global->__pyx_n_u_qualname);
+    #else
+    name = PyType_GetQualName(tp);
+    #endif
+    if (unlikely(name == NULL) || unlikely(!PyUnicode_Check(name))) goto bad;
+    module = __Pyx_PyObject_GetAttrStr((PyObject *)tp,
+                                               __pyx_mstate_global->__pyx_n_u_module);
+    if (unlikely(module == NULL) || unlikely(!PyUnicode_Check(module))) goto bad;
+    if (PyUnicode_CompareWithASCIIString(module, "builtins") == 0) {
+        result = name;
+        name = NULL;
+        goto done;
+    }
+    result = PyUnicode_FromFormat("%U.%U", module, name);
+    if (unlikely(result == NULL)) goto bad;
+  done:
+    Py_XDECREF(name);
+    Py_XDECREF(module);
+    return result;
+  bad:
+    PyErr_Clear();
+    if (name) {
+        result = name;
+        name = NULL;
+    } else {
+        result = __Pyx_NewRef(__pyx_mstate_global->__pyx_kp_u__2);
+    }
+    goto done;
+}
+#endif
+
+/* CIntFromPy */
+  static CYTHON_INLINE long __Pyx_PyLong_As_long(PyObject *x) {
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+    const long neg_one = (long) -1, const_zero = (long) 0;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif
+    const int is_unsigned = neg_one > const_zero;
+    if (unlikely(!PyLong_Check(x))) {
+        long val;
+        PyObject *tmp = __Pyx_PyNumber_Long(x);
+        if (!tmp) return (long) -1;
+        val = __Pyx_PyLong_As_long(tmp);
+        Py_DECREF(tmp);
+        return val;
+    }
+    if (is_unsigned) {
+#if CYTHON_USE_PYLONG_INTERNALS
+        if (unlikely(__Pyx_PyLong_IsNeg(x))) {
+            goto raise_neg_overflow;
+        } else if (__Pyx_PyLong_IsCompact(x)) {
+            __PYX_VERIFY_RETURN_INT(long, __Pyx_compact_upylong, __Pyx_PyLong_CompactValueUnsigned(x))
+        } else {
+            const digit* digits = __Pyx_PyLong_Digits(x);
+            assert(__Pyx_PyLong_DigitCount(x) > 1);
+            switch (__Pyx_PyLong_DigitCount(x)) {
+                case 2:
+                    if ((8 * sizeof(long) > 1 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(long, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(long) >= 2 * PyLong_SHIFT)) {
+                            return (long) (((((long)digits[1]) << PyLong_SHIFT) | (long)digits[0]));
+                        }
+                    }
+                    break;
+                case 3:
+                    if ((8 * sizeof(long) > 2 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(long, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(long) >= 3 * PyLong_SHIFT)) {
+                            return (long) (((((((long)digits[2]) << PyLong_SHIFT) | (long)digits[1]) << PyLong_SHIFT) | (long)digits[0]));
+                        }
+                    }
+                    break;
+                case 4:
+                    if ((8 * sizeof(long) > 3 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(long, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(long) >= 4 * PyLong_SHIFT)) {
+                            return (long) (((((((((long)digits[3]) << PyLong_SHIFT) | (long)digits[2]) << PyLong_SHIFT) | (long)digits[1]) << PyLong_SHIFT) | (long)digits[0]));
+                        }
+                    }
+                    break;
+            }
+        }
+#endif
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX < 0x030C00A7
+        if (unlikely(Py_SIZE(x) < 0)) {
+            goto raise_neg_overflow;
+        }
+#else
+        {
+            int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
+            if (unlikely(result < 0))
+                return (long) -1;
+            if (unlikely(result == 1))
+                goto raise_neg_overflow;
+        }
+#endif
+        if ((sizeof(long) <= sizeof(unsigned long))) {
+            __PYX_VERIFY_RETURN_INT_EXC(long, unsigned long, PyLong_AsUnsignedLong(x))
+#ifdef HAVE_LONG_LONG
+        } else if ((sizeof(long) <= sizeof(unsigned PY_LONG_LONG))) {
+            __PYX_VERIFY_RETURN_INT_EXC(long, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
+#endif
+        }
+    } else {
+#if CYTHON_USE_PYLONG_INTERNALS
+        if (__Pyx_PyLong_IsCompact(x)) {
+            __PYX_VERIFY_RETURN_INT(long, __Pyx_compact_pylong, __Pyx_PyLong_CompactValue(x))
+        } else {
+            const digit* digits = __Pyx_PyLong_Digits(x);
+            assert(__Pyx_PyLong_DigitCount(x) > 1);
+            switch (__Pyx_PyLong_SignedDigitCount(x)) {
+                case -2:
+                    if ((8 * sizeof(long) - 1 > 1 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(long, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(long) - 1 > 2 * PyLong_SHIFT)) {
+                            return (long) (((long)-1)*(((((long)digits[1]) << PyLong_SHIFT) | (long)digits[0])));
+                        }
+                    }
+                    break;
+                case 2:
+                    if ((8 * sizeof(long) > 1 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(long, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(long) - 1 > 2 * PyLong_SHIFT)) {
+                            return (long) ((((((long)digits[1]) << PyLong_SHIFT) | (long)digits[0])));
+                        }
+                    }
+                    break;
+                case -3:
+                    if ((8 * sizeof(long) - 1 > 2 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(long, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(long) - 1 > 3 * PyLong_SHIFT)) {
+                            return (long) (((long)-1)*(((((((long)digits[2]) << PyLong_SHIFT) | (long)digits[1]) << PyLong_SHIFT) | (long)digits[0])));
+                        }
+                    }
+                    break;
+                case 3:
+                    if ((8 * sizeof(long) > 2 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(long, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(long) - 1 > 3 * PyLong_SHIFT)) {
+                            return (long) ((((((((long)digits[2]) << PyLong_SHIFT) | (long)digits[1]) << PyLong_SHIFT) | (long)digits[0])));
+                        }
+                    }
+                    break;
+                case -4:
+                    if ((8 * sizeof(long) - 1 > 3 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(long, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(long) - 1 > 4 * PyLong_SHIFT)) {
+                            return (long) (((long)-1)*(((((((((long)digits[3]) << PyLong_SHIFT) | (long)digits[2]) << PyLong_SHIFT) | (long)digits[1]) << PyLong_SHIFT) | (long)digits[0])));
+                        }
+                    }
+                    break;
+                case 4:
+                    if ((8 * sizeof(long) > 3 * PyLong_SHIFT)) {
+                        if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                            __PYX_VERIFY_RETURN_INT(long, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if ((8 * sizeof(long) - 1 > 4 * PyLong_SHIFT)) {
+                            return (long) ((((((((((long)digits[3]) << PyLong_SHIFT) | (long)digits[2]) << PyLong_SHIFT) | (long)digits[1]) << PyLong_SHIFT) | (long)digits[0])));
+                        }
+                    }
+                    break;
+            }
+        }
+#endif
+        if ((sizeof(long) <= sizeof(long))) {
+            __PYX_VERIFY_RETURN_INT_EXC(long, long, PyLong_AsLong(x))
+#ifdef HAVE_LONG_LONG
+        } else if ((sizeof(long) <= sizeof(PY_LONG_LONG))) {
+            __PYX_VERIFY_RETURN_INT_EXC(long, PY_LONG_LONG, PyLong_AsLongLong(x))
+#endif
+        }
+    }
+    {
+        long val;
+        int ret = -1;
+#if PY_VERSION_HEX >= 0x030d00A6 && !CYTHON_COMPILING_IN_LIMITED_API
+        Py_ssize_t bytes_copied = PyLong_AsNativeBytes(
+            x, &val, sizeof(val), Py_ASNATIVEBYTES_NATIVE_ENDIAN | (is_unsigned ? Py_ASNATIVEBYTES_UNSIGNED_BUFFER | Py_ASNATIVEBYTES_REJECT_NEGATIVE : 0));
+        if (unlikely(bytes_copied == -1)) {
+        } else if (unlikely(bytes_copied > (Py_ssize_t) sizeof(val))) {
+            goto raise_overflow;
+        } else {
+            ret = 0;
+        }
+#elif PY_VERSION_HEX < 0x030d0000 && !(CYTHON_COMPILING_IN_PYPY || CYTHON_COMPILING_IN_LIMITED_API) || defined(_PyLong_AsByteArray)
+        int one = 1; int is_little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&val;
+        ret = _PyLong_AsByteArray((PyLongObject *)x,
+                                    bytes, sizeof(val),
+                                    is_little, !is_unsigned);
+#else
+        PyObject *v;
+        PyObject *stepval = NULL, *mask = NULL, *shift = NULL;
+        int bits, remaining_bits, is_negative = 0;
+        int chunk_size = (sizeof(long) < 8) ? 30 : 62;
+        if (likely(PyLong_CheckExact(x))) {
+            v = __Pyx_NewRef(x);
+        } else {
+            v = PyNumber_Long(x);
+            if (unlikely(!v)) return (long) -1;
+            assert(PyLong_CheckExact(v));
+        }
+        {
+            int result = PyObject_RichCompareBool(v, Py_False, Py_LT);
+            if (unlikely(result < 0)) {
+                Py_DECREF(v);
+                return (long) -1;
+            }
+            is_negative = result == 1;
+        }
+        if (is_unsigned && unlikely(is_negative)) {
+            Py_DECREF(v);
+            goto raise_neg_overflow;
+        } else if (is_negative) {
+            stepval = PyNumber_Invert(v);
+            Py_DECREF(v);
+            if (unlikely(!stepval))
+                return (long) -1;
+        } else {
+            stepval = v;
+        }
+        v = NULL;
+        val = (long) 0;
+        mask = PyLong_FromLong((1L << chunk_size) - 1); if (unlikely(!mask)) goto done;
+        shift = PyLong_FromLong(chunk_size); if (unlikely(!shift)) goto done;
+        for (bits = 0; bits < (int) sizeof(long) * 8 - chunk_size; bits += chunk_size) {
+            PyObject *tmp, *digit;
+            long idigit;
+            digit = PyNumber_And(stepval, mask);
+            if (unlikely(!digit)) goto done;
+            idigit = PyLong_AsLong(digit);
+            Py_DECREF(digit);
+            if (unlikely(idigit < 0)) goto done;
+            val |= ((long) idigit) << bits;
+            tmp = PyNumber_Rshift(stepval, shift);
+            if (unlikely(!tmp)) goto done;
+            Py_DECREF(stepval); stepval = tmp;
+        }
+        Py_DECREF(shift); shift = NULL;
+        Py_DECREF(mask); mask = NULL;
+        {
+            long idigit = PyLong_AsLong(stepval);
+            if (unlikely(idigit < 0)) goto done;
+            remaining_bits = ((int) sizeof(long) * 8) - bits - (is_unsigned ? 0 : 1);
+            if (unlikely(idigit >= (1L << remaining_bits)))
+                goto raise_overflow;
+            val |= ((long) idigit) << bits;
+        }
+        if (!is_unsigned) {
+            if (unlikely(val & (((long) 1) << (sizeof(long) * 8 - 1))))
+                goto raise_overflow;
+            if (is_negative)
+                val = ~val;
+        }
+        ret = 0;
+    done:
+        Py_XDECREF(shift);
+        Py_XDECREF(mask);
+        Py_XDECREF(stepval);
+#endif
+        if (unlikely(ret))
+            return (long) -1;
+        return val;
+    }
+raise_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "value too large to convert to long");
+    return (long) -1;
+raise_neg_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "can't convert negative value to long");
+    return (long) -1;
+}
+
+/* FastTypeChecks */
+  #if CYTHON_COMPILING_IN_CPYTHON
+static int __Pyx_InBases(PyTypeObject *a, PyTypeObject *b) {
+    while (a) {
+        a = __Pyx_PyType_GetSlot(a, tp_base, PyTypeObject*);
+        if (a == b)
+            return 1;
+    }
+    return b == &PyBaseObject_Type;
+}
+static CYTHON_INLINE int __Pyx_IsSubtype(PyTypeObject *a, PyTypeObject *b) {
+    PyObject *mro;
+    if (a == b) return 1;
+    mro = a->tp_mro;
+    if (likely(mro)) {
+        Py_ssize_t i, n;
+        n = PyTuple_GET_SIZE(mro);
+        for (i = 0; i < n; i++) {
+            if (PyTuple_GET_ITEM(mro, i) == (PyObject *)b)
+                return 1;
+        }
+        return 0;
+    }
+    return __Pyx_InBases(a, b);
+}
+static CYTHON_INLINE int __Pyx_IsAnySubtype2(PyTypeObject *cls, PyTypeObject *a, PyTypeObject *b) {
+    PyObject *mro;
+    if (cls == a || cls == b) return 1;
+    mro = cls->tp_mro;
+    if (likely(mro)) {
+        Py_ssize_t i, n;
+        n = PyTuple_GET_SIZE(mro);
+        for (i = 0; i < n; i++) {
+            PyObject *base = PyTuple_GET_ITEM(mro, i);
+            if (base == (PyObject *)a || base == (PyObject *)b)
+                return 1;
+        }
+        return 0;
+    }
+    return __Pyx_InBases(cls, a) || __Pyx_InBases(cls, b);
+}
+static CYTHON_INLINE int __Pyx_inner_PyErr_GivenExceptionMatches2(PyObject *err, PyObject* exc_type1, PyObject *exc_type2) {
+    if (exc_type1) {
+        return __Pyx_IsAnySubtype2((PyTypeObject*)err, (PyTypeObject*)exc_type1, (PyTypeObject*)exc_type2);
+    } else {
+        return __Pyx_IsSubtype((PyTypeObject*)err, (PyTypeObject*)exc_type2);
+    }
+}
+static int __Pyx_PyErr_GivenExceptionMatchesTuple(PyObject *exc_type, PyObject *tuple) {
+    Py_ssize_t i, n;
+    assert(PyExceptionClass_Check(exc_type));
+    n = PyTuple_GET_SIZE(tuple);
+    for (i=0; i<n; i++) {
+        if (exc_type == PyTuple_GET_ITEM(tuple, i)) return 1;
+    }
+    for (i=0; i<n; i++) {
+        PyObject *t = PyTuple_GET_ITEM(tuple, i);
+        if (likely(PyExceptionClass_Check(t))) {
+            if (__Pyx_inner_PyErr_GivenExceptionMatches2(exc_type, NULL, t)) return 1;
+        } else {
+        }
+    }
+    return 0;
+}
+static CYTHON_INLINE int __Pyx_PyErr_GivenExceptionMatches(PyObject *err, PyObject* exc_type) {
+    if (likely(err == exc_type)) return 1;
+    if (likely(PyExceptionClass_Check(err))) {
+        if (likely(PyExceptionClass_Check(exc_type))) {
+            return __Pyx_inner_PyErr_GivenExceptionMatches2(err, NULL, exc_type);
+        } else if (likely(PyTuple_Check(exc_type))) {
+            return __Pyx_PyErr_GivenExceptionMatchesTuple(err, exc_type);
+        } else {
+        }
+    }
+    return PyErr_GivenExceptionMatches(err, exc_type);
+}
+static CYTHON_INLINE int __Pyx_PyErr_GivenExceptionMatches2(PyObject *err, PyObject *exc_type1, PyObject *exc_type2) {
+    assert(PyExceptionClass_Check(exc_type1));
+    assert(PyExceptionClass_Check(exc_type2));
+    if (likely(err == exc_type1 || err == exc_type2)) return 1;
+    if (likely(PyExceptionClass_Check(err))) {
+        return __Pyx_inner_PyErr_GivenExceptionMatches2(err, exc_type1, exc_type2);
+    }
+    return (PyErr_GivenExceptionMatches(err, exc_type1) || PyErr_GivenExceptionMatches(err, exc_type2));
+}
+#endif
+
 /* GetRuntimeVersion */
-static unsigned long __Pyx_get_runtime_version(void) {
+  static unsigned long __Pyx_get_runtime_version(void) {
 #if __PYX_LIMITED_VERSION_HEX >= 0x030b0000
     return Py_Version & ~0xFFUL;
 #else
@@ -21614,7 +24138,7 @@ static unsigned long __Pyx_get_runtime_version(void) {
 }
 
 /* CheckBinaryVersion */
-static int __Pyx_check_binary_version(unsigned long ct_version, unsigned long rt_version, int allow_newer) {
+  static int __Pyx_check_binary_version(unsigned long ct_version, unsigned long rt_version, int allow_newer) {
     const unsigned long MAJOR_MINOR = 0xFFFF0000UL;
     if ((rt_version & MAJOR_MINOR) == (ct_version & MAJOR_MINOR))
         return 0;
@@ -21637,7 +24161,7 @@ static int __Pyx_check_binary_version(unsigned long ct_version, unsigned long rt
 }
 
 /* NewCodeObj */
-#if CYTHON_COMPILING_IN_LIMITED_API
+  #if CYTHON_COMPILING_IN_LIMITED_API
     static PyObject* __Pyx__PyCode_New(int a, int p, int k, int l, int s, int f,
                                        PyObject *code, PyObject *c, PyObject* n, PyObject *v,
                                        PyObject *fv, PyObject *cell, PyObject* fn,
@@ -21778,7 +24302,7 @@ done:
 }
 
 /* InitStrings */
-static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, const char* const* encoding_names) {
+  static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, const char* const* encoding_names) {
     while (t->s) {
         PyObject *str;
         if (t->is_unicode) {
@@ -22029,8 +24553,8 @@ static CYTHON_INLINE PyObject * __Pyx_PyLong_FromSize_t(size_t ival) {
 }
 
 
-/* MultiPhaseInitModuleState */
-#if CYTHON_PEP489_MULTI_PHASE_INIT && CYTHON_USE_MODULE_STATE
+  /* MultiPhaseInitModuleState */
+  #if CYTHON_PEP489_MULTI_PHASE_INIT && CYTHON_USE_MODULE_STATE
 #ifndef CYTHON_MODULE_STATE_LOOKUP_THREAD_SAFE
 #if (CYTHON_COMPILING_IN_LIMITED_API || PY_VERSION_HEX >= 0x030C0000)
   #define CYTHON_MODULE_STATE_LOOKUP_THREAD_SAFE 1

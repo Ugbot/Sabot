@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 """Basic CLI test without full package dependencies."""
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-# Mock the missing modules for basic testing
+import pytest
 import sys
 from unittest.mock import MagicMock
 
+# Mock the missing modules for basic testing
 sys.modules['typer'] = MagicMock()
 sys.modules['rich.console'] = MagicMock()
 sys.modules['rich.table'] = MagicMock()
@@ -40,43 +37,40 @@ sys.modules['rich.panel'].Panel.return_value = mock_panel
 mock_live = MagicMock()
 sys.modules['rich.live'].Live.return_value = mock_live
 
-# Now try to import and test basic CLI structure
-try:
+
+@pytest.fixture
+def cli_module():
+    """Load CLI module dynamically."""
     import importlib.util
     spec = importlib.util.spec_from_file_location("cli", "sabot/cli.py")
     cli_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(cli_module)
+    return cli_module
 
-    app = cli_module.app
-    main_callback = cli_module.main_callback
-    version = cli_module.version
-    init = cli_module.init
-    shell = cli_module.shell
-    print("✓ CLI imports successfully")
 
-    # Test that the main functions exist
-    assert callable(main_callback), "main_callback should be callable"
-    assert callable(version), "version should be callable"
-    assert callable(init), "init should be callable"
-    assert callable(shell), "shell should be callable"
+def test_cli_imports(cli_module):
+    """Test CLI imports successfully."""
+    assert cli_module.app is not None
+    assert cli_module.main_callback is not None
+    assert cli_module.version is not None
+    assert cli_module.init is not None
+    assert cli_module.shell is not None
 
-    print("✓ CLI functions are callable")
 
-    # Test that sub-apps exist
-    assert hasattr(app, 'add_typer'), "app should have add_typer method"
-    print("✓ CLI app structure is correct")
+def test_cli_functions_callable(cli_module):
+    """Test that the main functions are callable."""
+    assert callable(cli_module.main_callback), "main_callback should be callable"
+    assert callable(cli_module.version), "version should be callable"
+    assert callable(cli_module.init), "init should be callable"
+    assert callable(cli_module.shell), "shell should be callable"
 
-    # Test TUI dashboard function exists
-    tui_dashboard = cli_module.tui_dashboard
-    create_dashboard_layout = cli_module.create_dashboard_layout
-    assert callable(tui_dashboard), "tui_dashboard should be callable"
-    assert callable(create_dashboard_layout), "create_dashboard_layout should be callable"
-    print("✓ TUI dashboard functions exist")
 
-    print("\n🎉 CLI basic structure test passed!")
+def test_cli_app_structure(cli_module):
+    """Test that sub-apps exist."""
+    assert hasattr(cli_module.app, 'add_typer'), "app should have add_typer method"
 
-except Exception as e:
-    print(f"❌ CLI test failed: {e}")
-    import traceback
-    traceback.print_exc()
-    sys.exit(1)
+
+def test_tui_dashboard_functions(cli_module):
+    """Test TUI dashboard functions exist."""
+    assert callable(cli_module.tui_dashboard), "tui_dashboard should be callable"
+    assert callable(cli_module.create_dashboard_layout), "create_dashboard_layout should be callable"

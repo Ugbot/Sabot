@@ -219,4 +219,4 @@ markers = [
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests",
 ]
-asyncio_mode = "auto"
+# asyncio_mode = "auto"  # Disabled - C++ threading conflicts with asyncio event loop

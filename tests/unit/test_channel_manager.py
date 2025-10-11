@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 """Test for Sabot channel manager system."""
 
-import asyncio
+import pytest
+from unittest.mock import MagicMock
 import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Mock dependencies for basic testing
-from unittest.mock import MagicMock
 sys.modules['typer'] = MagicMock()
 sys.modules['rich.console'] = MagicMock()
 sys.modules['rich.table'] = MagicMock()
@@ -30,77 +28,92 @@ mock_typer.Option = lambda *args, **kwargs: args[0] if args else None
 mock_console = MagicMock()
 sys.modules['rich.console'].Console.return_value = mock_console
 
-try:
-    # Test channel manager imports
-    from sabot.channel_manager import (
-        ChannelManager, ChannelBackend, ChannelPolicy,
-        MemoryChannelFactory, KafkaChannelFactory
-    )
-    print("✓ Channel manager imports successful")
 
-    # Create mock app
+@pytest.fixture
+def mock_app():
+    """Create mock app for testing."""
     class MockApp:
         def __init__(self):
             self.conf = MagicMock()
             self.conf.stream_buffer_maxsize = 1000
+    return MockApp()
 
-    app = MockApp()
 
-    # Test channel manager creation
-    manager = ChannelManager(app)
-    print("✓ Channel manager creation successful")
+def test_channel_manager_imports():
+    """Test channel manager imports."""
+    from sabot.channel_manager import (
+        ChannelManager, ChannelBackend, ChannelPolicy,
+        MemoryChannelFactory, KafkaChannelFactory
+    )
+    # If imports succeed, test passes
+    assert ChannelManager is not None
+    assert ChannelBackend is not None
+    assert ChannelPolicy is not None
 
-    # Test backend registration
+
+def test_channel_manager_creation(mock_app):
+    """Test channel manager creation."""
+    from sabot.channel_manager import ChannelManager
+    manager = ChannelManager(mock_app)
+    assert manager is not None
+
+
+def test_backend_registration(mock_app):
+    """Test backend registration."""
+    from sabot.channel_manager import ChannelManager, ChannelBackend
+    manager = ChannelManager(mock_app)
     assert ChannelBackend.MEMORY in manager._backends
-    print("✓ Memory backend registered")
 
-    # Test policy selection
+
+def test_policy_selection(mock_app):
+    """Test policy-based backend selection."""
+    from sabot.channel_manager import ChannelManager, ChannelBackend, ChannelPolicy
+    manager = ChannelManager(mock_app)
     backend = manager._select_backend_by_policy(ChannelPolicy.PERFORMANCE)
     assert backend == ChannelBackend.MEMORY
-    print("✓ Policy-based backend selection works")
 
-    # Test synchronous channel creation (memory only)
-    channel = app.channel("test-memory")
+
+def test_synchronous_channel_creation(mock_app):
+    """Test synchronous channel creation."""
+    channel = mock_app.channel("test-memory")
     assert channel is not None
-    print("✓ Synchronous channel creation works")
 
-    # Test channel naming
-    auto_channel = app.channel()  # Should get auto-generated name
+
+def test_auto_generated_channel_names(mock_app):
+    """Test auto-generated channel names."""
+    auto_channel = mock_app.channel()  # Should get auto-generated name
     assert auto_channel is not None
-    print("✓ Auto-generated channel names work")
 
-    # Test memory channel method
-    memory_channel = app.memory_channel("test-memory-explicit", maxsize=500)
+
+def test_memory_channel_method(mock_app):
+    """Test memory channel method."""
+    memory_channel = mock_app.memory_channel("test-memory-explicit", maxsize=500)
     assert memory_channel is not None
-    print("✓ Memory channel method works")
 
-    # Test channel retrieval
+
+def test_channel_retrieval(mock_app):
+    """Test channel retrieval."""
+    from sabot.channel_manager import ChannelManager
+    manager = ChannelManager(mock_app)
+    mock_app.channel("test-memory")
     retrieved = manager.get_channel("test-memory")
     assert retrieved is not None
-    print("✓ Channel retrieval works")
 
-    # Test channel listing
+
+def test_channel_listing(mock_app):
+    """Test channel listing."""
+    from sabot.channel_manager import ChannelManager
+    manager = ChannelManager(mock_app)
+    mock_app.channel("test-memory")
+    mock_app.channel()  # Auto-generated name
     channels = manager.list_channels()
     assert len(channels) >= 2  # test-memory and auto-generated
-    print(f"✓ Channel listing works: {len(channels)} channels")
 
-    # Test backend listing
+
+def test_backend_listing(mock_app):
+    """Test backend listing."""
+    from sabot.channel_manager import ChannelManager, ChannelBackend
+    manager = ChannelManager(mock_app)
     backends = manager.list_backends()
     assert ChannelBackend.MEMORY in backends
-    print(f"✓ Backend listing works: {len(backends)} backends available")
-
-    print("\n🎉 Channel manager tests passed!")
-    print("\nVerified functionality:")
-    print("• Channel manager creation and backend registration")
-    print("• Policy-based backend selection")
-    print("• Synchronous channel creation (memory)")
-    print("• Auto-generated channel names")
-    print("• Memory channel convenience method")
-    print("• Channel retrieval and listing")
-    print("• Backend enumeration")
-
-except Exception as e:
-    print(f"❌ Channel manager test failed: {e}")
-    import traceback
-    traceback.print_exc()
-    sys.exit(1)
+    assert len(backends) > 0

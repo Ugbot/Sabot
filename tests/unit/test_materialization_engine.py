@@ -247,7 +247,7 @@ print("\n25. Testing error handling - missing key...")
 try:
     result = py_dim['SEC999']
     print("   ✗ Should have raised KeyError")
-    sys.exit(1)
+    raise AssertionError("Should have raised KeyError")
 except KeyError as e:
     print(f"   ✓ Raised KeyError for missing key: {e}")
 
@@ -261,7 +261,7 @@ try:
     )
     missing_file_dim.populate_from_arrow_file('/nonexistent/path/file.arrow')
     print("   ✗ Should have raised FileNotFoundError")
-    sys.exit(1)
+    raise AssertionError("Should have raised FileNotFoundError")
 except FileNotFoundError as e:
     print(f"   ✓ Raised FileNotFoundError for missing file")
 

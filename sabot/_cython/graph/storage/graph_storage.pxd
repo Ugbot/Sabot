@@ -135,6 +135,8 @@ cdef class PyPropertyGraph:
     cpdef ca.Int64Array get_neighbors(self, int64_t v)
     cpdef ca.Int64Array get_in_neighbors(self, int64_t v)
     cpdef ca.RecordBatch match_pattern(self, str src_label, str edge_type, str dst_label)
+    cpdef void add_vertices_from_table(self, ca.Table new_vertices)
+    cpdef void add_edges_from_table(self, ca.Table new_edges)
 
 
 cdef class PyRDFTripleStore:

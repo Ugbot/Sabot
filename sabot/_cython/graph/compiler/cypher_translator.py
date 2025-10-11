@@ -486,6 +486,14 @@ class CypherTranslator:
         """
         Apply RETURN clause projection to result table.
 
+        Handles:
+        - Property access (a.name, b.age)
+        - Aggregations (count(*), sum(a.value), avg(b.score))
+        - Aliases (... AS alias)
+        - DISTINCT
+        - ORDER BY
+        - SKIP/LIMIT
+
         Args:
             table: Result table from MATCH
             return_clause: ReturnClause AST node
@@ -493,23 +501,250 @@ class CypherTranslator:
         Returns:
             Projected table with selected columns
         """
-        # For now, just return the table as-is
-        # Full implementation would:
-        # 1. Project only requested columns
-        # 2. Rename columns based on aliases
-        # 3. Apply DISTINCT if requested
-        # 4. Apply ORDER BY
-        # 5. Apply SKIP/LIMIT
+        # Check if query has aggregations
+        has_aggregations = any(
+            isinstance(item.expression, FunctionCall)
+            for item in return_clause.items
+        )
 
-        # Apply LIMIT if present
-        if return_clause.limit:
-            table = table.slice(0, return_clause.limit)
+        if has_aggregations:
+            # Aggregation query
+            table = self._apply_aggregation(table, return_clause)
+        else:
+            # Regular projection
+            table = self._apply_projection(table, return_clause)
 
-        # Apply SKIP if present
+        # Apply DISTINCT if requested
+        if return_clause.distinct:
+            # Use unique() to deduplicate
+            table = table.group_by(table.column_names).aggregate([])
+
+        # Apply ORDER BY
+        if return_clause.order_by:
+            table = self._apply_order_by(table, return_clause.order_by)
+
+        # Apply SKIP
         if return_clause.skip:
             table = table.slice(return_clause.skip)
 
+        # Apply LIMIT
+        if return_clause.limit:
+            if return_clause.skip:
+                # Already skipped, just limit the remaining
+                table = table.slice(0, return_clause.limit)
+            else:
+                table = table.slice(0, return_clause.limit)
+
         return table
+
+    def _apply_aggregation(self, table: pa.Table, return_clause: ReturnClause) -> pa.Table:
+        """
+        Apply aggregation to result table.
+
+        Handles queries like:
+        - RETURN count(*) → global aggregation
+        - RETURN a, count(*) → grouped aggregation
+        - RETURN avg(b.age) → global aggregation with property access
+        """
+        # Separate aggregations from group-by columns
+        agg_funcs = []
+        group_cols = []
+        col_aliases = {}
+
+        for item in return_clause.items:
+            if isinstance(item.expression, FunctionCall):
+                # Aggregation function
+                agg_funcs.append(item)
+            elif isinstance(item.expression, (Variable, PropertyAccess)):
+                # Group-by column
+                group_cols.append(item)
+            else:
+                raise NotImplementedError(f"Unsupported expression in aggregation: {item.expression}")
+
+        # If no group-by columns, it's a global aggregation
+        if not group_cols:
+            return self._global_aggregation(table, agg_funcs, col_aliases)
+
+        # Otherwise, it's a grouped aggregation
+        return self._grouped_aggregation(table, group_cols, agg_funcs, col_aliases)
+
+    def _global_aggregation(self, table: pa.Table, agg_funcs: List, col_aliases: Dict) -> pa.Table:
+        """Execute global aggregation (no GROUP BY)."""
+        result_dict = {}
+
+        for item in agg_funcs:
+            func_call = item.expression
+            func_name = func_call.name.lower()
+            alias = item.alias if item.alias else func_name
+
+            # Evaluate aggregation
+            if func_name == 'count':
+                if len(func_call.args) == 0 or (len(func_call.args) == 1 and isinstance(func_call.args[0], Variable) and func_call.args[0].name == '*'):
+                    # count(*)
+                    result_dict[alias] = [table.num_rows]
+                else:
+                    # count(expr) - count non-null values
+                    arg_col = self._evaluate_expression(table, func_call.args[0])
+                    non_null = pc.sum(pc.is_valid(arg_col)).as_py()
+                    result_dict[alias] = [non_null]
+
+            elif func_name in ('sum', 'avg', 'mean', 'min', 'max'):
+                # Compute aggregation on column
+                arg_col = self._evaluate_expression(table, func_call.args[0])
+                if func_name == 'sum':
+                    result_dict[alias] = [pc.sum(arg_col).as_py()]
+                elif func_name in ('avg', 'mean'):
+                    result_dict[alias] = [pc.mean(arg_col).as_py()]
+                elif func_name == 'min':
+                    result_dict[alias] = [pc.min(arg_col).as_py()]
+                elif func_name == 'max':
+                    result_dict[alias] = [pc.max(arg_col).as_py()]
+            else:
+                raise NotImplementedError(f"Aggregation function not supported: {func_name}")
+
+        return pa.table(result_dict)
+
+    def _grouped_aggregation(self, table: pa.Table, group_cols: List, agg_funcs: List, col_aliases: Dict) -> pa.Table:
+        """Execute grouped aggregation (with GROUP BY)."""
+        # Extract group-by column names
+        group_col_names = []
+        for item in group_cols:
+            if isinstance(item.expression, Variable):
+                group_col_names.append(item.expression.name)
+            elif isinstance(item.expression, PropertyAccess):
+                # Need to join with vertex table to get property
+                # For now, use column name pattern (variable_property)
+                col_name = f"{item.expression.variable}_{item.expression.property_name}"
+                if col_name not in table.column_names:
+                    raise ValueError(f"Column {col_name} not found in table")
+                group_col_names.append(col_name)
+
+        # Build aggregation list for Arrow group_by
+        agg_list = []
+        for item in agg_funcs:
+            func_call = item.expression
+            func_name = func_call.name.lower()
+
+            if func_name == 'count':
+                # Count rows per group
+                agg_list.append((group_col_names[0], 'count'))
+            elif func_name in ('sum', 'avg', 'mean', 'min', 'max'):
+                arg_col_name = self._get_column_name(table, func_call.args[0])
+                agg_list.append((arg_col_name, func_name if func_name != 'mean' else 'avg'))
+
+        # Execute grouped aggregation
+        result = table.group_by(group_col_names).aggregate(agg_list)
+
+        # Rename columns based on aliases
+        # TODO: Implement column renaming
+
+        return result
+
+    def _apply_projection(self, table: pa.Table, return_clause: ReturnClause) -> pa.Table:
+        """Apply regular projection (no aggregations)."""
+        result_dict = {}
+
+        for item in return_clause.items:
+            alias = item.alias if item.alias else self._default_alias(item.expression)
+
+            if isinstance(item.expression, Variable):
+                # Simple variable reference
+                var_name = item.expression.name
+                if var_name in table.column_names:
+                    result_dict[alias] = table.column(var_name)
+                else:
+                    # Try with _id suffix (pattern matching results)
+                    id_col = f"{var_name}_id"
+                    if id_col in table.column_names:
+                        result_dict[alias] = table.column(id_col)
+                    else:
+                        raise ValueError(f"Column {var_name} not found in table")
+
+            elif isinstance(item.expression, PropertyAccess):
+                # Property access - need to join with vertex table
+                prop_col = self._evaluate_property_access(table, item.expression)
+                result_dict[alias] = prop_col
+
+            else:
+                raise NotImplementedError(f"Unsupported expression: {item.expression}")
+
+        return pa.table(result_dict)
+
+    def _apply_order_by(self, table: pa.Table, order_by_list: List[OrderBy]) -> pa.Table:
+        """Apply ORDER BY to table."""
+        # Build sort specification
+        sort_keys = []
+        for order_spec in order_by_list:
+            col_name = self._get_column_name(table, order_spec.expression)
+            direction = 'ascending' if order_spec.ascending else 'descending'
+            sort_keys.append((col_name, direction))
+
+        return table.sort_by(sort_keys)
+
+    def _evaluate_expression(self, table: pa.Table, expr: Expression):
+        """Evaluate an expression and return the resulting column."""
+        if isinstance(expr, Variable):
+            return table.column(expr.name)
+        elif isinstance(expr, PropertyAccess):
+            return self._evaluate_property_access(table, expr)
+        elif isinstance(expr, Literal):
+            # Create a constant column
+            return pa.array([expr.value] * table.num_rows)
+        else:
+            raise NotImplementedError(f"Expression evaluation not supported: {expr}")
+
+    def _evaluate_property_access(self, table: pa.Table, prop_access: PropertyAccess) -> pa.Array:
+        """Evaluate property access by joining with vertex table."""
+        var_name = prop_access.variable
+        prop_name = prop_access.property_name
+
+        # Get vertex IDs from pattern match result
+        id_col_name = f"{var_name}_id"
+        if id_col_name not in table.column_names:
+            raise ValueError(f"Variable {var_name} not found in pattern match results")
+
+        vertex_ids = table.column(id_col_name)
+
+        # Join with vertex table to get properties
+        vertices = self.graph_engine._vertices_table
+        if vertices is None:
+            raise ValueError("No vertices loaded in graph")
+
+        # Build lookup: vertex_id -> property_value
+        # For now, use a simple filter approach
+        # TODO: Optimize with hash join
+        result_values = []
+        for vid in vertex_ids.to_pylist():
+            mask = pc.equal(vertices.column('id'), pa.scalar(vid))
+            matching = vertices.filter(mask)
+            if matching.num_rows > 0 and prop_name in matching.column_names:
+                result_values.append(matching.column(prop_name)[0].as_py())
+            else:
+                result_values.append(None)
+
+        return pa.array(result_values)
+
+    def _get_column_name(self, table: pa.Table, expr: Expression) -> str:
+        """Get column name from expression."""
+        if isinstance(expr, Variable):
+            return expr.name
+        elif isinstance(expr, PropertyAccess):
+            # For ORDER BY, property should already be in table from projection
+            # Use the variable_property naming convention
+            return f"{expr.variable}_{expr.property_name}"
+        else:
+            raise NotImplementedError(f"Cannot get column name for: {expr}")
+
+    def _default_alias(self, expr: Expression) -> str:
+        """Generate default alias for expression."""
+        if isinstance(expr, Variable):
+            return expr.name
+        elif isinstance(expr, PropertyAccess):
+            return f"{expr.variable}.{expr.property_name}"
+        elif isinstance(expr, FunctionCall):
+            return expr.name
+        else:
+            return "column"
 
     # ========================================================================
     # Query Optimization Methods

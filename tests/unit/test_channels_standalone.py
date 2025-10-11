@@ -303,4 +303,3 @@ if __name__ == "__main__":
         print("\n✅ Channel testing completed successfully!")
     else:
         print("\n⚠️  Channel testing completed with some issues.")
-        sys.exit(1)

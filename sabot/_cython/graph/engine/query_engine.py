@@ -85,7 +85,10 @@ class GraphQueryEngine:
         state_store: Optional[Any] = None,
         num_vertices_hint: int = 10000,
         num_edges_hint: int = 100000,
-        enable_continuous: bool = True
+        enable_continuous: bool = True,
+        distributed: bool = False,
+        agent_addresses: Optional[List[str]] = None,
+        local_agent_id: int = 0
     ):
         """
         Initialize graph query engine.
@@ -96,11 +99,17 @@ class GraphQueryEngine:
             num_vertices_hint: Hint for initial vertex capacity
             num_edges_hint: Hint for initial edge capacity
             enable_continuous: Enable continuous query support
+            distributed: Enable distributed execution across multiple agents
+            agent_addresses: List of agent addresses ["host:port"] for distributed mode
+            local_agent_id: This agent's partition ID (0-based index in agent_addresses)
         """
         self.state_store = state_store
         self.num_vertices_hint = num_vertices_hint
         self.num_edges_hint = num_edges_hint
         self.enable_continuous = enable_continuous
+        self.distributed = distributed
+        self.agent_addresses = agent_addresses
+        self.local_agent_id = local_agent_id
 
         # State manager handles graph persistence
         self.state_manager = GraphStateManager(
@@ -116,13 +125,38 @@ class GraphQueryEngine:
         self._vertices_table: Optional[pa.Table] = None
         self._edges_table: Optional[pa.Table] = None
 
-        # Continuous query tracking
+        # Continuous query tracking (Phase 4.6)
+        if enable_continuous:
+            from .continuous_query_manager import ContinuousQueryManager
+            self.continuous_query_manager = ContinuousQueryManager(
+                query_engine=self,
+                bloom_size=1_000_000,
+                max_exact_matches=100_000
+            )
+        else:
+            self.continuous_query_manager = None
+
+        # Legacy continuous query tracking (deprecated - use continuous_query_manager)
         self.continuous_queries: Dict[str, Dict[str, Any]] = {}
         self.next_query_id: int = 0
 
         # Query compiler instances (will be initialized in Phase 4.2-4.3)
         self._sparql_compiler = None
         self._cypher_compiler = None
+
+        # Initialize shuffle transport for distributed mode
+        if distributed and agent_addresses and len(agent_addresses) > 1:
+            try:
+                from sabot._cython.shuffle.shuffle_transport import ShuffleTransport
+                self.shuffle_transport = ShuffleTransport()
+                host, port = agent_addresses[local_agent_id].split(':')
+                self.shuffle_transport.start(host.encode('utf-8'), int(port))
+            except ImportError:
+                print("Warning: ShuffleTransport not available, distributed mode disabled")
+                self.shuffle_transport = None
+                self.distributed = False
+        else:
+            self.shuffle_transport = None
 
     def load_vertices(self, vertices: pa.Table, persist: bool = True) -> None:
         """
@@ -200,25 +234,41 @@ class GraphQueryEngine:
     def query_cypher(
         self,
         query: str,
-        config: Optional[QueryConfig] = None
-    ) -> QueryResult:
+        config: Optional[QueryConfig] = None,
+        as_operator: bool = False,
+        mode: str = 'incremental',
+        timestamp_column: Optional[str] = None
+    ):
         """
-        Execute Cypher query on the graph.
+        Execute Cypher query (batch) or create streaming operator (UNIFIED API).
+
+        **Main API (Recommended)**: Use this method for both batch and streaming queries.
+        Same query works on finite sources (batch) or infinite sources (streaming).
 
         Args:
             query: Cypher query string
             config: Query configuration (mode, timeout, etc.)
+            as_operator: If True, return GraphStreamOperator for streaming (default: False)
+            mode: 'incremental' (dedupe) or 'continuous' (all matches) - only used when as_operator=True
+            timestamp_column: Column for event timestamps (optional) - only used when as_operator=True
 
         Returns:
-            QueryResult with Arrow table of results
+            QueryResult (batch) or GraphStreamOperator (streaming)
 
-        Example:
-            >>> result = engine.query_cypher('''
-            ...     MATCH (a:Person)-[:KNOWS]->(b:Person)
-            ...     WHERE a.age > 18
-            ...     RETURN a.name, b.name, a.age
-            ... ''')
+        Examples:
+            # Batch query (finite source)
+            >>> result = engine.query_cypher("MATCH (a)-[:KNOWS]->(b) RETURN a, b")
             >>> print(result.to_pandas())
+
+            # Streaming query (infinite source) - SAME QUERY!
+            >>> operator = engine.query_cypher(
+            ...     "MATCH (a)-[:KNOWS]->(b) RETURN a, b",
+            ...     as_operator=True,
+            ...     mode='incremental'
+            ... )
+            >>> # Use with Stream API
+            >>> updates = Stream.from_kafka("localhost:9092", "graph_updates", "group")
+            >>> matches = updates.transform(operator)
 
         Supported Cypher features (Phase 4.3):
         - MATCH patterns: (a)-[r]->(b), (a)-[r1]->(b)-[r2]->(c)
@@ -237,6 +287,27 @@ class GraphQueryEngine:
         """
         config = config or QueryConfig()
 
+        # If as_operator=True, return GraphStreamOperator for streaming
+        if as_operator:
+            try:
+                from ..executor.graph_stream_operator import GraphStreamOperator
+            except ImportError:
+                raise RuntimeError("GraphStreamOperator not available. Build graph executor modules.")
+
+            if self.graph is None:
+                raise RuntimeError("Graph not loaded. Call load_vertices() and load_edges() first.")
+
+            # Create streaming operator
+            return GraphStreamOperator(
+                graph=self.graph,
+                query_engine=self,
+                query=query,
+                language='cypher',
+                mode=mode,
+                timestamp_column=timestamp_column
+            )
+
+        # Otherwise, execute batch query
         if config.explain:
             return self._explain_cypher(query)
 
@@ -262,28 +333,47 @@ class GraphQueryEngine:
     def query_sparql(
         self,
         query: str,
-        config: Optional[QueryConfig] = None
-    ) -> QueryResult:
+        config: Optional[QueryConfig] = None,
+        as_operator: bool = False,
+        mode: str = 'incremental',
+        timestamp_column: Optional[str] = None
+    ):
         """
-        Execute SPARQL query on the graph.
+        Execute SPARQL query (batch) or create streaming operator (UNIFIED API).
+
+        **Main API (Recommended)**: Use this method for both batch and streaming queries.
+        Same query works on finite sources (batch) or infinite sources (streaming).
 
         Args:
             query: SPARQL query string
             config: Query configuration (mode, timeout, etc.)
+            as_operator: If True, return GraphStreamOperator for streaming (default: False)
+            mode: 'incremental' (dedupe) or 'continuous' (all matches) - only used when as_operator=True
+            timestamp_column: Column for event timestamps (optional) - only used when as_operator=True
 
         Returns:
-            QueryResult with Arrow table of results
+            QueryResult (batch) or GraphStreamOperator (streaming)
 
-        Example:
+        Examples:
+            # Batch query (finite source)
             >>> result = engine.query_sparql('''
             ...     SELECT ?person ?friend
             ...     WHERE {
             ...         ?person rdf:type :Person .
             ...         ?person :knows ?friend .
-            ...         FILTER(?person != ?friend)
             ...     }
             ... ''')
             >>> print(result.to_pandas())
+
+            # Streaming query (infinite source) - SAME QUERY!
+            >>> operator = engine.query_sparql(
+            ...     "SELECT ?a ?b WHERE { ?a :knows ?b }",
+            ...     as_operator=True,
+            ...     mode='incremental'
+            ... )
+            >>> # Use with Stream API
+            >>> updates = Stream.from_kafka("localhost:9092", "graph_updates", "group")
+            >>> matches = updates.transform(operator)
 
         Supported SPARQL features (Phase 4.2):
         - SELECT with projection (SELECT * or SELECT ?var1 ?var2)
@@ -304,6 +394,27 @@ class GraphQueryEngine:
         """
         config = config or QueryConfig()
 
+        # If as_operator=True, return GraphStreamOperator for streaming
+        if as_operator:
+            try:
+                from ..executor.graph_stream_operator import GraphStreamOperator
+            except ImportError:
+                raise RuntimeError("GraphStreamOperator not available. Build graph executor modules.")
+
+            if self.graph is None:
+                raise RuntimeError("Graph not loaded. Call load_vertices() and load_edges() first.")
+
+            # Create streaming operator
+            return GraphStreamOperator(
+                graph=self.graph,
+                query_engine=self,
+                query=query,
+                language='sparql',
+                mode=mode,
+                timestamp_column=timestamp_column
+            )
+
+        # Otherwise, execute batch query
         if config.explain:
             return self._explain_sparql(query)
 
@@ -336,16 +447,21 @@ class GraphQueryEngine:
         query: str,
         callback: Callable[[QueryResult], None],
         language: str = "cypher",
-        mode: str = "incremental"
+        mode: str = "incremental",
+        timestamp_column: Optional[str] = None
     ) -> str:
         """
-        Register a continuous query that executes on graph updates.
+        **Advanced API**: Register a continuous query with callback.
+
+        For most use cases, use query_cypher(..., as_operator=True) instead.
+        This method provides fine-grained control over query lifecycle and callbacks.
 
         Args:
             query: Query string (Cypher or SPARQL)
             callback: Function to call with query results
             language: 'cypher' or 'sparql'
             mode: 'continuous' (all results) or 'incremental' (only new results)
+            timestamp_column: Column name for event timestamps (optional)
 
         Returns:
             Query ID for later reference
@@ -361,21 +477,45 @@ class GraphQueryEngine:
             ... )
 
         Note:
-            Phase 4.6 will implement continuous query support.
-            For now, this is a stub that will raise NotImplementedError.
+            This is an advanced API for power users who need callback-based processing
+            and query lifecycle management. For simpler use cases, prefer the unified API:
+
+                operator = engine.query_cypher(query, as_operator=True)
+                matches = updates.transform(operator)
         """
         if not self.enable_continuous:
             raise ValueError("Continuous queries not enabled. Set enable_continuous=True")
 
-        # Phase 4.6: Implement continuous query manager
-        raise NotImplementedError(
-            "Continuous query support not yet implemented. "
-            "This will be added in Phase 4.6."
+        if self.continuous_query_manager is None:
+            raise RuntimeError("ContinuousQueryManager not initialized")
+
+        # Convert callback signature: QueryResult → pa.Table
+        def table_callback(table: pa.Table):
+            result = QueryResult(table)
+            callback(result)
+
+        # Register with continuous query manager
+        query_id = self.continuous_query_manager.register_query(
+            query=query,
+            callback=table_callback,
+            language=language,
+            mode=mode,
+            timestamp_column=timestamp_column
         )
+
+        # Add to legacy tracking
+        self.continuous_queries[query_id] = {
+            'query': query,
+            'language': language,
+            'mode': mode,
+            'callback': callback
+        }
+
+        return query_id
 
     def unregister_continuous_query(self, query_id: str) -> None:
         """
-        Unregister a continuous query.
+        **Advanced API**: Unregister a continuous query.
 
         Args:
             query_id: ID returned by register_continuous_query
@@ -383,7 +523,62 @@ class GraphQueryEngine:
         if query_id not in self.continuous_queries:
             raise ValueError(f"Query ID {query_id} not found")
 
+        # Unregister from continuous query manager
+        if self.continuous_query_manager is not None:
+            self.continuous_query_manager.unregister_query(query_id)
+
+        # Remove from legacy tracking
         del self.continuous_queries[query_id]
+
+    def create_continuous_operator(self, query_id: str) -> 'GraphStreamOperator':
+        """
+        **Advanced API**: Create GraphStreamOperator for a registered continuous query.
+
+        For most use cases, use query_cypher(..., as_operator=True) instead.
+        This method is useful when working with registered queries (callbacks).
+
+        Args:
+            query_id: Query ID from register_continuous_query()
+
+        Returns:
+            GraphStreamOperator instance
+
+        Example:
+            # Register query with callback
+            query_id = engine.register_continuous_query(...)
+
+            # Create operator
+            operator = engine.create_continuous_operator(query_id)
+
+            # Use in Stream pipeline
+            updates = Stream.from_kafka("localhost:9092", "graph_updates", "group")
+            matches = updates.transform(operator)
+
+        Note:
+            For simpler use cases without callbacks, prefer the unified API:
+
+                operator = engine.query_cypher(query, as_operator=True)
+                matches = updates.transform(operator)
+        """
+        if self.continuous_query_manager is None:
+            raise RuntimeError("Continuous queries not enabled")
+
+        return self.continuous_query_manager.create_operator(query_id)
+
+    def get_continuous_query_stats(self, query_id: str) -> Dict[str, Any]:
+        """
+        **Advanced API**: Get statistics for a registered continuous query.
+
+        Args:
+            query_id: Query ID from register_continuous_query()
+
+        Returns:
+            Dict with query statistics
+        """
+        if self.continuous_query_manager is None:
+            raise RuntimeError("Continuous queries not enabled")
+
+        return self.continuous_query_manager.get_query_stats(query_id)
 
     def _build_property_graph(self) -> None:
         """
