@@ -85,11 +85,18 @@ arrow::Result<std::shared_ptr<arrow::Array>> ExpressionEvaluator::EvaluateNode(
         case ExprOperator::Str:
             return EvaluateStr(expr->arguments[0], batch);
 
-        // Not yet implemented
         case ExprOperator::Lang:
+            return EvaluateLang(expr->arguments[0], batch);
+
         case ExprOperator::Datatype:
-        case ExprOperator::Regex:
-            return arrow::Status::NotImplemented("Expression operator not yet implemented");
+            return EvaluateDatatype(expr->arguments[0], batch);
+
+        case ExprOperator::Regex: {
+            if (expr->arguments.size() != 2) {
+                return arrow::Status::Invalid("REGEX requires 2 arguments (text, pattern)");
+            }
+            return EvaluateRegex(expr->arguments[0], expr->arguments[1], batch);
+        }
 
         default:
             return arrow::Status::Invalid("Unknown expression operator");
@@ -383,6 +390,189 @@ arrow::Result<std::shared_ptr<arrow::Array>> ExpressionEvaluator::EvaluateStr(
     std::shared_ptr<arrow::Array> result;
     ARROW_RETURN_NOT_OK(builder.Finish(&result));
     return result;
+}
+
+// LANG(?var) - Extract language tag from literal
+arrow::Result<std::shared_ptr<arrow::Array>> ExpressionEvaluator::EvaluateLang(
+    const std::shared_ptr<Expression>& arg,
+    const std::shared_ptr<arrow::RecordBatch>& batch) {
+
+    ARROW_ASSIGN_OR_RAISE(auto column, EvaluateNode(arg, batch));
+
+    if (column->type()->id() != arrow::Type::UINT64) {
+        return arrow::Status::Invalid("LANG() requires ValueId column (uint64)");
+    }
+
+    auto value_ids = std::static_pointer_cast<arrow::UInt64Array>(column);
+
+    // Extract language tags from literals
+    arrow::StringBuilder builder;
+    ARROW_RETURN_NOT_OK(builder.Reserve(value_ids->length()));
+
+    for (int64_t i = 0; i < value_ids->length(); ++i) {
+        if (value_ids->IsNull(i)) {
+            ARROW_RETURN_NOT_OK(builder.AppendNull());
+        } else {
+            ValueId vid = value_ids->Value(i);
+
+            // LANG only applies to literals
+            if (vid.GetType() != ValueType::Literal) {
+                ARROW_RETURN_NOT_OK(builder.Append(""));  // Empty string for non-literals
+                continue;
+            }
+
+            // Lookup term in vocabulary
+            auto term_result = ctx_.vocab->GetTerm(vid);
+            if (!term_result.ok()) {
+                return arrow::Status::Invalid("Failed to lookup term in vocabulary");
+            }
+
+            auto term = term_result.ValueOrDie();
+
+            // Extract language tag from literal
+            if (std::holds_alternative<Term::LiteralType>(term.value)) {
+                const auto& literal = std::get<Term::LiteralType>(term.value);
+                ARROW_RETURN_NOT_OK(builder.Append(literal.language));
+            } else {
+                ARROW_RETURN_NOT_OK(builder.Append(""));  // Empty string if not a literal
+            }
+        }
+    }
+
+    std::shared_ptr<arrow::Array> result;
+    ARROW_RETURN_NOT_OK(builder.Finish(&result));
+    return result;
+}
+
+// DATATYPE(?var) - Extract datatype IRI from literal
+arrow::Result<std::shared_ptr<arrow::Array>> ExpressionEvaluator::EvaluateDatatype(
+    const std::shared_ptr<Expression>& arg,
+    const std::shared_ptr<arrow::RecordBatch>& batch) {
+
+    ARROW_ASSIGN_OR_RAISE(auto column, EvaluateNode(arg, batch));
+
+    if (column->type()->id() != arrow::Type::UINT64) {
+        return arrow::Status::Invalid("DATATYPE() requires ValueId column (uint64)");
+    }
+
+    auto value_ids = std::static_pointer_cast<arrow::UInt64Array>(column);
+
+    // Extract datatype IRIs from literals
+    arrow::StringBuilder builder;
+    ARROW_RETURN_NOT_OK(builder.Reserve(value_ids->length()));
+
+    for (int64_t i = 0; i < value_ids->length(); ++i) {
+        if (value_ids->IsNull(i)) {
+            ARROW_RETURN_NOT_OK(builder.AppendNull());
+        } else {
+            ValueId vid = value_ids->Value(i);
+
+            // DATATYPE only applies to literals
+            if (vid.GetType() != ValueType::Literal) {
+                ARROW_RETURN_NOT_OK(builder.Append(""));  // Empty string for non-literals
+                continue;
+            }
+
+            // Lookup term in vocabulary
+            auto term_result = ctx_.vocab->GetTerm(vid);
+            if (!term_result.ok()) {
+                return arrow::Status::Invalid("Failed to lookup term in vocabulary");
+            }
+
+            auto term = term_result.ValueOrDie();
+
+            // Extract datatype from literal
+            if (std::holds_alternative<Term::LiteralType>(term.value)) {
+                const auto& literal = std::get<Term::LiteralType>(term.value);
+
+                // If no explicit datatype, use xsd:string as default
+                std::string datatype = literal.datatype.empty()
+                    ? "http://www.w3.org/2001/XMLSchema#string"
+                    : literal.datatype;
+
+                ARROW_RETURN_NOT_OK(builder.Append(datatype));
+            } else {
+                ARROW_RETURN_NOT_OK(builder.Append(""));  // Empty string if not a literal
+            }
+        }
+    }
+
+    std::shared_ptr<arrow::Array> result;
+    ARROW_RETURN_NOT_OK(builder.Finish(&result));
+    return result;
+}
+
+// REGEX(?text, pattern) - Regular expression matching
+arrow::Result<std::shared_ptr<arrow::BooleanArray>> ExpressionEvaluator::EvaluateRegex(
+    const std::shared_ptr<Expression>& text_arg,
+    const std::shared_ptr<Expression>& pattern_arg,
+    const std::shared_ptr<arrow::RecordBatch>& batch) {
+
+    // Evaluate text argument (typically a variable)
+    ARROW_ASSIGN_OR_RAISE(auto text_column, EvaluateNode(text_arg, batch));
+
+    // Pattern must be a constant string literal
+    if (!pattern_arg->IsConstant()) {
+        return arrow::Status::Invalid("REGEX pattern must be a constant");
+    }
+
+    // Extract pattern string
+    const auto* lit = std::get_if<Literal>(&pattern_arg->constant.value());
+    if (!lit) {
+        return arrow::Status::Invalid("REGEX pattern must be a string literal");
+    }
+    std::string pattern = lit->value;
+
+    // Convert ValueIds to strings for regex matching
+    if (text_column->type()->id() != arrow::Type::UINT64) {
+        return arrow::Status::Invalid("REGEX text argument must be ValueId column (uint64)");
+    }
+
+    auto value_ids = std::static_pointer_cast<arrow::UInt64Array>(text_column);
+
+    // Build string array from ValueIds
+    arrow::StringBuilder string_builder;
+    ARROW_RETURN_NOT_OK(string_builder.Reserve(value_ids->length()));
+
+    for (int64_t i = 0; i < value_ids->length(); ++i) {
+        if (value_ids->IsNull(i)) {
+            ARROW_RETURN_NOT_OK(string_builder.AppendNull());
+        } else {
+            ValueId vid = value_ids->Value(i);
+
+            // Lookup term in vocabulary
+            auto term_result = ctx_.vocab->GetTerm(vid);
+            if (!term_result.ok()) {
+                return arrow::Status::Invalid("Failed to lookup term in vocabulary");
+            }
+
+            auto term = term_result.ValueOrDie();
+            std::string str_value;
+
+            // Extract string representation based on term type
+            if (std::holds_alternative<Term::IRIType>(term.value)) {
+                str_value = std::get<Term::IRIType>(term.value);
+            } else if (std::holds_alternative<Term::LiteralType>(term.value)) {
+                str_value = std::get<Term::LiteralType>(term.value).value;
+            } else if (std::holds_alternative<Term::BlankNodeType>(term.value)) {
+                str_value = std::get<Term::BlankNodeType>(term.value);
+            } else {
+                return arrow::Status::Invalid("Unknown term type");
+            }
+
+            ARROW_RETURN_NOT_OK(string_builder.Append(str_value));
+        }
+    }
+
+    std::shared_ptr<arrow::Array> string_array;
+    ARROW_RETURN_NOT_OK(string_builder.Finish(&string_array));
+
+    // Apply regex matching using Arrow compute
+    cp::MatchSubstringOptions options(pattern);
+    options.ignore_case = false;  // Case-sensitive by default
+
+    ARROW_ASSIGN_OR_RAISE(auto match_result, cp::MatchSubstring(string_array, options));
+    return std::static_pointer_cast<arrow::BooleanArray>(match_result.make_array());
 }
 
 // Helper: Get column for variable

@@ -81,6 +81,19 @@ private:
         const std::shared_ptr<Expression>& arg,
         const std::shared_ptr<arrow::RecordBatch>& batch);
 
+    arrow::Result<std::shared_ptr<arrow::Array>> EvaluateLang(
+        const std::shared_ptr<Expression>& arg,
+        const std::shared_ptr<arrow::RecordBatch>& batch);
+
+    arrow::Result<std::shared_ptr<arrow::Array>> EvaluateDatatype(
+        const std::shared_ptr<Expression>& arg,
+        const std::shared_ptr<arrow::RecordBatch>& batch);
+
+    arrow::Result<std::shared_ptr<arrow::BooleanArray>> EvaluateRegex(
+        const std::shared_ptr<Expression>& text_arg,
+        const std::shared_ptr<Expression>& pattern_arg,
+        const std::shared_ptr<arrow::RecordBatch>& batch);
+
     // Helper methods
     arrow::Result<std::shared_ptr<arrow::Array>> GetColumnForVariable(
         const Variable& var,

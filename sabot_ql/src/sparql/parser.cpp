@@ -425,6 +425,8 @@ Token SPARQLTokenizer::MakeError(std::string message) {
 
 std::optional<TokenType> SPARQLTokenizer::LookupKeyword(const std::string& text) const {
     static const std::unordered_map<std::string, TokenType> keywords = {
+        {"PREFIX", TokenType::PREFIX},
+        {"BASE", TokenType::BASE},
         {"SELECT", TokenType::SELECT},
         {"WHERE", TokenType::WHERE},
         {"FILTER", TokenType::FILTER},
@@ -438,6 +440,7 @@ std::optional<TokenType> SPARQLTokenizer::LookupKeyword(const std::string& text)
         {"LIMIT", TokenType::LIMIT},
         {"OFFSET", TokenType::OFFSET},
         {"AS", TokenType::AS},
+        {"GROUP", TokenType::GROUP},
 
         // Built-in functions
         {"BOUND", TokenType::BOUND},
@@ -448,6 +451,15 @@ std::optional<TokenType> SPARQLTokenizer::LookupKeyword(const std::string& text)
         {"LANG", TokenType::LANG},
         {"DATATYPE", TokenType::DATATYPE},
         {"REGEX", TokenType::REGEX},
+
+        // Aggregate functions
+        {"COUNT", TokenType::COUNT},
+        {"SUM", TokenType::SUM},
+        {"AVG", TokenType::AVG},
+        {"MIN", TokenType::MIN},
+        {"MAX", TokenType::MAX},
+        {"GROUP_CONCAT", TokenType::GROUP_CONCAT},
+        {"SAMPLE", TokenType::SAMPLE},
 
         // Boolean literals
         {"true", TokenType::BOOLEAN},
@@ -480,6 +492,20 @@ SPARQLParser::SPARQLParser(std::vector<Token> tokens)
     : tokens_(std::move(tokens)) {}
 
 arrow::Result<Query> SPARQLParser::Parse() {
+    // Parse PREFIX declarations (optional, can be multiple)
+    while (Check(TokenType::PREFIX)) {
+        ARROW_RETURN_NOT_OK(ParsePrefixDeclaration());
+    }
+
+    // Parse BASE declaration (optional)
+    if (Match(TokenType::BASE)) {
+        // BASE support not yet implemented, skip for now
+        if (CurrentToken().type == TokenType::IRI_REF) {
+            Advance();
+        }
+    }
+
+    // Parse query
     ARROW_ASSIGN_OR_RAISE(auto select_query, ParseSelectQuery());
     return Query(std::move(select_query));
 }
@@ -547,6 +573,64 @@ arrow::Status SPARQLParser::Error(const std::string& message) const {
 // Parser methods for SPARQL grammar
 // ============================================================================
 
+arrow::Status SPARQLParser::ParsePrefixDeclaration() {
+    ARROW_RETURN_NOT_OK(Expect(TokenType::PREFIX, "Expected PREFIX keyword"));
+
+    // Parse prefix label (e.g., "schema:")
+    if (CurrentToken().type != TokenType::PREFIX_LABEL) {
+        return Error("Expected prefix label after PREFIX");
+    }
+
+    std::string prefix_label = CurrentToken().text;
+
+    // Remove trailing ':' if present
+    if (!prefix_label.empty() && prefix_label.back() == ':') {
+        prefix_label = prefix_label.substr(0, prefix_label.size() - 1);
+    }
+
+    Advance();
+
+    // Parse IRI
+    if (CurrentToken().type != TokenType::IRI_REF) {
+        return Error("Expected IRI after prefix label");
+    }
+
+    std::string iri = CurrentToken().text;
+    // Remove '<' and '>'
+    if (iri.size() >= 2 && iri.front() == '<' && iri.back() == '>') {
+        iri = iri.substr(1, iri.size() - 2);
+    }
+
+    Advance();
+
+    // Store prefix mapping
+    prefixes_[prefix_label] = iri;
+
+    return arrow::Status::OK();
+}
+
+arrow::Result<std::string> SPARQLParser::ExpandPrefixedName(const std::string& prefixed_name) {
+    // Check if it contains ':'
+    size_t colon_pos = prefixed_name.find(':');
+    if (colon_pos == std::string::npos) {
+        // No prefix, return as-is
+        return prefixed_name;
+    }
+
+    // Split into prefix and local name
+    std::string prefix = prefixed_name.substr(0, colon_pos);
+    std::string local_name = prefixed_name.substr(colon_pos + 1);
+
+    // Look up prefix
+    auto it = prefixes_.find(prefix);
+    if (it == prefixes_.end()) {
+        return arrow::Status::Invalid("Undefined prefix '", prefix, "'");
+    }
+
+    // Expand to full IRI
+    return it->second + local_name;
+}
+
 arrow::Result<SelectQuery> SPARQLParser::ParseSelectQuery() {
     SelectQuery query;
 
@@ -556,6 +640,12 @@ arrow::Result<SelectQuery> SPARQLParser::ParseSelectQuery() {
     // Parse WHERE clause
     ARROW_RETURN_NOT_OK(Expect(TokenType::WHERE, "Expected WHERE keyword"));
     ARROW_ASSIGN_OR_RAISE(query.where, ParseWhereClause());
+
+    // Parse optional GROUP BY clause
+    if (Check(TokenType::GROUP)) {
+        ARROW_ASSIGN_OR_RAISE(auto group_by, ParseGroupByClause());
+        query.group_by = group_by;
+    }
 
     // Parse optional ORDER BY clause
     if (Check(TokenType::ORDER)) {
@@ -599,10 +689,78 @@ arrow::Result<SelectClause> SPARQLParser::ParseSelectClause() {
         return clause;
     }
 
-    // Parse variable list
-    while (Check(TokenType::VARIABLE)) {
-        ARROW_ASSIGN_OR_RAISE(auto var, ParseVariable());
-        clause.variables.push_back(var);
+    // Parse variable list or aggregate expressions
+    while (Check(TokenType::VARIABLE) || Check(TokenType::LPAREN)) {
+        if (Check(TokenType::LPAREN)) {
+            // Parse aggregate expression: (COUNT(?x) AS ?count)
+            Advance(); // Consume '('
+
+            // Parse aggregate function (COUNT, SUM, AVG, MIN, MAX, GROUP_CONCAT, SAMPLE)
+            if (!Check(TokenType::COUNT) && !Check(TokenType::SUM) && !Check(TokenType::AVG) &&
+                !Check(TokenType::MIN) && !Check(TokenType::MAX) && !Check(TokenType::GROUP_CONCAT) &&
+                !Check(TokenType::SAMPLE)) {
+                return Error("Expected aggregate function (COUNT, SUM, AVG, MIN, MAX, GROUP_CONCAT, SAMPLE)");
+            }
+
+            ExprOperator agg_op;
+            TokenType func_type = CurrentToken().type;
+            if (func_type == TokenType::COUNT) {
+                agg_op = ExprOperator::Count;
+            } else if (func_type == TokenType::SUM) {
+                agg_op = ExprOperator::Sum;
+            } else if (func_type == TokenType::AVG) {
+                agg_op = ExprOperator::Avg;
+            } else if (func_type == TokenType::MIN) {
+                agg_op = ExprOperator::Min;
+            } else if (func_type == TokenType::MAX) {
+                agg_op = ExprOperator::Max;
+            } else if (func_type == TokenType::GROUP_CONCAT) {
+                agg_op = ExprOperator::GroupConcat;
+            } else if (func_type == TokenType::SAMPLE) {
+                agg_op = ExprOperator::Sample;
+            }
+
+            Advance(); // Consume aggregate function name
+
+            ARROW_RETURN_NOT_OK(Expect(TokenType::LPAREN, "Expected '(' after aggregate function"));
+
+            // Check for DISTINCT modifier (only valid for COUNT)
+            bool distinct = false;
+            if (agg_op == ExprOperator::Count && Match(TokenType::DISTINCT)) {
+                distinct = true;
+            }
+
+            // Parse argument (variable or * for COUNT)
+            auto agg_expr = std::make_shared<Expression>(agg_op);
+            if (agg_op == ExprOperator::Count && Check(TokenType::MULTIPLY)) {
+                // COUNT(*) - no argument
+                Advance();
+            } else if (Check(TokenType::VARIABLE)) {
+                ARROW_ASSIGN_OR_RAISE(auto arg_var, ParseVariable());
+                auto arg_expr = std::make_shared<Expression>(RDFTerm(arg_var));
+                agg_expr->arguments.push_back(arg_expr);
+            } else {
+                return Error("Expected variable or * as aggregate function argument");
+            }
+
+            ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after aggregate function argument"));
+
+            ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' to close aggregate expression"));
+
+            // Parse AS alias
+            ARROW_RETURN_NOT_OK(Expect(TokenType::AS, "Expected AS keyword after aggregate expression"));
+
+            ARROW_ASSIGN_OR_RAISE(auto alias, ParseVariable());
+
+            // Create AggregateExpression
+            AggregateExpression agg(agg_expr, alias, distinct);
+            clause.items.push_back(SelectItem(agg));
+
+        } else {
+            // Parse simple variable
+            ARROW_ASSIGN_OR_RAISE(auto var, ParseVariable());
+            clause.items.push_back(SelectItem(var));
+        }
 
         // Continue if there's a comma
         if (!Match(TokenType::COMMA)) {
@@ -610,8 +768,8 @@ arrow::Result<SelectClause> SPARQLParser::ParseSelectClause() {
         }
     }
 
-    if (clause.variables.empty()) {
-        return Error("Expected variable list or * after SELECT");
+    if (clause.items.empty()) {
+        return Error("Expected variable list or aggregate expressions after SELECT");
     }
 
     return clause;
@@ -706,10 +864,12 @@ arrow::Result<RDFTerm> SPARQLParser::ParseRDFTerm() {
         Advance();
         return RDFTerm(BlankNode(id));
     } else if (token.type == TokenType::PREFIX_LABEL) {
-        // Treat as IRI for now
-        std::string iri = token.text;
+        // Expand prefixed name to full IRI
+        std::string prefixed_name = token.text;
         Advance();
-        return RDFTerm(IRI(iri));
+
+        ARROW_ASSIGN_OR_RAISE(auto full_iri, ExpandPrefixedName(prefixed_name));
+        return RDFTerm(IRI(full_iri));
     }
 
     return Error("Expected RDF term (variable, IRI, literal, or blank node)");
@@ -1011,6 +1171,30 @@ arrow::Result<std::vector<OrderBy>> SPARQLParser::ParseOrderByClause() {
     return order_by_list;
 }
 
+arrow::Result<GroupByClause> SPARQLParser::ParseGroupByClause() {
+    GroupByClause clause;
+
+    ARROW_RETURN_NOT_OK(Expect(TokenType::GROUP, "Expected GROUP keyword"));
+    ARROW_RETURN_NOT_OK(Expect(TokenType::BY, "Expected BY keyword after GROUP"));
+
+    // Parse comma-separated list of variables
+    while (Check(TokenType::VARIABLE)) {
+        ARROW_ASSIGN_OR_RAISE(auto var, ParseVariable());
+        clause.variables.push_back(var);
+
+        // Continue if there's a comma
+        if (!Match(TokenType::COMMA)) {
+            break;
+        }
+    }
+
+    if (clause.variables.empty()) {
+        return Error("Expected at least one variable in GROUP BY clause");
+    }
+
+    return clause;
+}
+
 // Helper methods
 
 arrow::Result<Variable> SPARQLParser::ParseVariable() {
@@ -1058,13 +1242,15 @@ arrow::Result<Literal> SPARQLParser::ParseLiteral() {
             language = CurrentToken().text;
             Advance();
         } else if (Match(TokenType::DATATYPE_MARKER)) {
-            // Datatype: ^^<http://www.w3.org/2001/XMLSchema#integer>
+            // Datatype: ^^<http://www.w3.org/2001/XMLSchema#integer> or ^^xsd:integer
             if (CurrentToken().type == TokenType::IRI_REF) {
                 ARROW_ASSIGN_OR_RAISE(auto dt_iri, ParseIRI());
                 datatype = dt_iri.iri;
             } else if (CurrentToken().type == TokenType::PREFIX_LABEL) {
-                datatype = CurrentToken().text;
+                std::string prefixed_name = CurrentToken().text;
                 Advance();
+                // Expand prefixed name to full IRI
+                ARROW_ASSIGN_OR_RAISE(datatype, ExpandPrefixedName(prefixed_name));
             } else {
                 return Error("Expected IRI after '^^'");
             }

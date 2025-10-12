@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <unordered_map>
 #include <arrow/status.h>
 #include <arrow/result.h>
 
@@ -13,11 +14,15 @@ namespace sparql {
 // Token types for SPARQL lexical analysis
 enum class TokenType {
     // Keywords
+    PREFIX, BASE,
     SELECT, WHERE, FILTER, OPTIONAL, UNION, ORDER, BY, ASC, DESC,
-    DISTINCT, LIMIT, OFFSET, AS,
+    DISTINCT, LIMIT, OFFSET, AS, GROUP,
 
     // Built-in functions
     BOUND, ISIRI, ISLITERAL, ISBLANK, STR, LANG, DATATYPE, REGEX,
+
+    // Aggregate functions
+    COUNT, SUM, AVG, MIN, MAX, GROUP_CONCAT, SAMPLE,
 
     // Operators
     LPAREN,          // (
@@ -135,6 +140,7 @@ public:
 private:
     std::vector<Token> tokens_;
     size_t pos_ = 0;
+    std::unordered_map<std::string, std::string> prefixes_;  // prefix -> IRI mapping
 
     // Token navigation
     const Token& CurrentToken() const;
@@ -151,6 +157,7 @@ private:
     arrow::Status Error(const std::string& message) const;
 
     // Parsing methods (top-down)
+    arrow::Status ParsePrefixDeclaration();
     arrow::Result<SelectQuery> ParseSelectQuery();
     arrow::Result<SelectClause> ParseSelectClause();
     arrow::Result<QueryPattern> ParseWhereClause();
@@ -169,6 +176,7 @@ private:
     arrow::Result<std::shared_ptr<Expression>> ParseBuiltInCall();
     arrow::Result<OptionalPattern> ParseOptionalClause();
     arrow::Result<UnionPattern> ParseUnionClause();
+    arrow::Result<GroupByClause> ParseGroupByClause();
     arrow::Result<std::vector<OrderBy>> ParseOrderByClause();
 
     // Helper methods
@@ -176,6 +184,7 @@ private:
     arrow::Result<IRI> ParseIRI();
     arrow::Result<Literal> ParseLiteral();
     arrow::Result<ExprOperator> TokenTypeToOperator(TokenType type) const;
+    arrow::Result<std::string> ExpandPrefixedName(const std::string& prefixed_name);
 };
 
 // Convenience function for parsing SPARQL queries from text

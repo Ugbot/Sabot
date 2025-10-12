@@ -128,6 +128,27 @@ std::string Expression::ToString() const {
         case ExprOperator::Regex:
             oss << "REGEX(" << arguments[0]->ToString() << ", " << arguments[1]->ToString() << ")";
             break;
+        case ExprOperator::Count:
+            oss << "COUNT(" << (arguments.empty() ? "*" : arguments[0]->ToString()) << ")";
+            break;
+        case ExprOperator::Sum:
+            oss << "SUM(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Avg:
+            oss << "AVG(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Min:
+            oss << "MIN(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Max:
+            oss << "MAX(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::GroupConcat:
+            oss << "GROUP_CONCAT(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Sample:
+            oss << "SAMPLE(" << arguments[0]->ToString() << ")";
+            break;
     }
 
     return oss.str();
@@ -185,6 +206,44 @@ std::string OrderBy::ToString() const {
     return oss.str();
 }
 
+std::string AggregateExpression::ToString() const {
+    std::ostringstream oss;
+    oss << "(";
+    if (distinct) {
+        // Insert DISTINCT into the aggregate function string
+        std::string expr_str = expr->ToString();
+        size_t paren_pos = expr_str.find('(');
+        if (paren_pos != std::string::npos) {
+            oss << expr_str.substr(0, paren_pos + 1) << "DISTINCT " << expr_str.substr(paren_pos + 1);
+        } else {
+            oss << expr_str;
+        }
+    } else {
+        oss << expr->ToString();
+    }
+    oss << " AS " << alias.ToString() << ")";
+    return oss.str();
+}
+
+std::string GroupByClause::ToString() const {
+    std::ostringstream oss;
+    oss << "GROUP BY";
+    for (size_t i = 0; i < variables.size(); ++i) {
+        if (i > 0) oss << ",";
+        oss << " " << variables[i].ToString();
+    }
+    return oss.str();
+}
+
+bool SelectClause::HasAggregates() const {
+    for (const auto& item : items) {
+        if (std::holds_alternative<AggregateExpression>(item)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 std::string SelectClause::ToString() const {
     std::ostringstream oss;
     oss << "SELECT ";
@@ -195,9 +254,14 @@ std::string SelectClause::ToString() const {
     if (IsSelectAll()) {
         oss << "*";
     } else {
-        for (size_t i = 0; i < variables.size(); ++i) {
+        for (size_t i = 0; i < items.size(); ++i) {
             if (i > 0) oss << " ";
-            oss << variables[i].ToString();
+
+            if (auto* var = std::get_if<Variable>(&items[i])) {
+                oss << var->ToString();
+            } else if (auto* agg = std::get_if<AggregateExpression>(&items[i])) {
+                oss << agg->ToString();
+            }
         }
     }
 
@@ -211,6 +275,10 @@ std::string SelectQuery::ToString() const {
     oss << "WHERE {\n";
     oss << where.ToString();
     oss << "}\n";
+
+    if (group_by.has_value() && !group_by->IsEmpty()) {
+        oss << group_by->ToString() << "\n";
+    }
 
     if (!order_by.empty()) {
         oss << "ORDER BY ";
