@@ -4,10 +4,39 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <unordered_set>
 #include <arrow/api.h>
 #include <arrow/result.h>
 
 namespace sabot_ql {
+
+// Forward declarations
+class TripleStore;
+class Vocabulary;
+
+// TriplePattern definition (from storage/triple_store.h)
+// Moved here to avoid circular dependency
+struct TriplePattern {
+    std::optional<uint64_t> subject;
+    std::optional<uint64_t> predicate;
+    std::optional<uint64_t> object;
+
+    // Count bound variables
+    size_t BoundCount() const {
+        return (subject.has_value() ? 1 : 0) +
+               (predicate.has_value() ? 1 : 0) +
+               (object.has_value() ? 1 : 0);
+    }
+
+    // Get bound positions (for index selection)
+    std::string BoundPositions() const {
+        std::string result;
+        if (subject.has_value()) result += 'S';
+        if (predicate.has_value()) result += 'P';
+        if (object.has_value()) result += 'O';
+        return result;
+    }
+};
 
 // Operator statistics for query profiling
 struct OperatorStats {
@@ -88,9 +117,9 @@ protected:
 // This is a leaf operator (no inputs)
 class TripleScanOperator : public Operator {
 public:
-    TripleScanOperator(std::shared_ptr<class TripleStore> store,
-                       std::shared_ptr<class Vocabulary> vocab,
-                       const struct TriplePattern& pattern);
+    TripleScanOperator(std::shared_ptr<TripleStore> store,
+                       std::shared_ptr<Vocabulary> vocab,
+                       const TriplePattern& pattern);
 
     arrow::Result<std::shared_ptr<arrow::Schema>> GetOutputSchema() const override;
     arrow::Result<std::shared_ptr<arrow::RecordBatch>> GetNextBatch() override;
@@ -99,9 +128,9 @@ public:
     size_t EstimateCardinality() const override;
 
 private:
-    std::shared_ptr<class TripleStore> store_;
-    std::shared_ptr<class Vocabulary> vocab_;
-    struct TriplePattern pattern_;
+    std::shared_ptr<TripleStore> store_;
+    std::shared_ptr<Vocabulary> vocab_;
+    TriplePattern pattern_;
     std::shared_ptr<arrow::Table> results_;
     size_t current_batch_ = 0;
     size_t batch_size_ = 10000;  // 10K rows per batch

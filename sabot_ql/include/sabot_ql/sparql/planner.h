@@ -2,11 +2,13 @@
 
 #include <sabot_ql/sparql/ast.h>
 #include <sabot_ql/operators/operator.h>
+#include <sabot_ql/operators/aggregate.h>
 #include <sabot_ql/storage/triple_store.h>
 #include <sabot_ql/storage/vocabulary.h>
 #include <arrow/result.h>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace sabot_ql {
 namespace sparql {
@@ -83,6 +85,19 @@ public:
         const std::vector<OrderBy>& order_by,
         PlanningContext& ctx);
 
+    // Plan GROUP BY with aggregates
+    arrow::Result<std::shared_ptr<Operator>> PlanGroupBy(
+        std::shared_ptr<Operator> input,
+        const GroupByClause& group_by,
+        const std::vector<AggregateExpression>& aggregates,
+        PlanningContext& ctx);
+
+    // Plan aggregates without GROUP BY
+    arrow::Result<std::shared_ptr<Operator>> PlanAggregateOnly(
+        std::shared_ptr<Operator> input,
+        const std::vector<AggregateExpression>& aggregates,
+        PlanningContext& ctx);
+
     // Convert SPARQL RDFTerm to storage-level ValueId
     arrow::Result<std::optional<ValueId>> TermToValueId(
         const RDFTerm& term,
@@ -106,6 +121,14 @@ private:
     std::string GetColumnNameForPosition(
         const TriplePattern& pattern,
         const std::string& position);  // "subject", "predicate", or "object"
+
+    // Helper: Convert SPARQL ExprOperator to AggregateFunction
+    arrow::Result<AggregateFunction> ExprOperatorToAggregateFunction(
+        ExprOperator op) const;
+
+    // Helper: Extract aggregate expressions from SelectClause
+    std::vector<AggregateExpression> ExtractAggregates(
+        const SelectClause& select) const;
 };
 
 // Simple query optimizer: Reorders joins for better performance

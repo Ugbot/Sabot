@@ -104,7 +104,39 @@ arrow::Result<PhysicalPlan> QueryPlanner::PlanSelectQuery(const SelectQuery& que
         );
     }
 
-    // 5. Plan ORDER BY
+    // 5. Plan GROUP BY and aggregates
+    if (query.HasAggregates()) {
+        // Extract aggregate expressions from SELECT clause
+        auto aggregates = ExtractAggregates(query.select);
+
+        if (query.HasGroupBy()) {
+            // GROUP BY with aggregates
+            ARROW_ASSIGN_OR_RAISE(
+                plan.root_operator,
+                PlanGroupBy(plan.root_operator, *query.group_by, aggregates, ctx)
+            );
+        } else {
+            // Aggregates without GROUP BY (aggregate over entire input)
+            ARROW_ASSIGN_OR_RAISE(
+                plan.root_operator,
+                PlanAggregateOnly(plan.root_operator, aggregates, ctx)
+            );
+        }
+    } else if (query.HasGroupBy()) {
+        // GROUP BY without aggregates - this is technically invalid SPARQL
+        // but we'll handle it by treating it as SELECT DISTINCT on the group keys
+        std::vector<std::string> group_cols;
+        for (const auto& var : query.group_by->variables) {
+            group_cols.push_back(planning::VariableToColumnName(var));
+        }
+        plan.root_operator = std::make_shared<ProjectOperator>(
+            plan.root_operator,
+            group_cols
+        );
+        plan.root_operator = std::make_shared<DistinctOperator>(plan.root_operator);
+    }
+
+    // 6. Plan ORDER BY
     if (!query.order_by.empty()) {
         ARROW_ASSIGN_OR_RAISE(
             plan.root_operator,
@@ -112,11 +144,13 @@ arrow::Result<PhysicalPlan> QueryPlanner::PlanSelectQuery(const SelectQuery& que
         );
     }
 
-    // 6. Plan projection (SELECT clause)
-    if (!query.select.IsSelectAll()) {
+    // 7. Plan projection (SELECT clause) - only if not aggregating
+    if (!query.HasAggregates() && !query.HasGroupBy() && !query.select.IsSelectAll()) {
         std::vector<std::string> select_cols;
-        for (const auto& var : query.select.variables) {
-            select_cols.push_back(planning::VariableToColumnName(var));
+        for (const auto& item : query.select.items) {
+            if (auto* var = std::get_if<Variable>(&item)) {
+                select_cols.push_back(planning::VariableToColumnName(*var));
+            }
         }
 
         plan.root_operator = std::make_shared<ProjectOperator>(
@@ -125,12 +159,12 @@ arrow::Result<PhysicalPlan> QueryPlanner::PlanSelectQuery(const SelectQuery& que
         );
     }
 
-    // 7. Plan DISTINCT
-    if (query.select.distinct) {
+    // 8. Plan DISTINCT (only if not already handled by GROUP BY)
+    if (query.select.distinct && !query.HasGroupBy()) {
         plan.root_operator = std::make_shared<DistinctOperator>(plan.root_operator);
     }
 
-    // 8. Plan LIMIT
+    // 9. Plan LIMIT
     if (query.limit.has_value()) {
         plan.root_operator = std::make_shared<LimitOperator>(
             plan.root_operator,
@@ -152,13 +186,19 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanTriplePattern(
     sabot_ql::TriplePattern storage_pattern;
 
     // Convert subject
-    ARROW_ASSIGN_OR_RAISE(storage_pattern.subject, TermToValueId(pattern.subject, ctx));
+    ARROW_ASSIGN_OR_RAISE(auto subject_vid, TermToValueId(pattern.subject, ctx));
+    storage_pattern.subject = subject_vid.has_value() ?
+        std::optional<uint64_t>(subject_vid->getBits()) : std::nullopt;
 
     // Convert predicate
-    ARROW_ASSIGN_OR_RAISE(storage_pattern.predicate, TermToValueId(pattern.predicate, ctx));
+    ARROW_ASSIGN_OR_RAISE(auto predicate_vid, TermToValueId(pattern.predicate, ctx));
+    storage_pattern.predicate = predicate_vid.has_value() ?
+        std::optional<uint64_t>(predicate_vid->getBits()) : std::nullopt;
 
     // Convert object
-    ARROW_ASSIGN_OR_RAISE(storage_pattern.object, TermToValueId(pattern.object, ctx));
+    ARROW_ASSIGN_OR_RAISE(auto object_vid, TermToValueId(pattern.object, ctx));
+    storage_pattern.object = object_vid.has_value() ?
+        std::optional<uint64_t>(object_vid->getBits()) : std::nullopt;
 
     // Create scan operator
     auto scan_op = std::make_shared<TripleScanOperator>(
@@ -515,6 +555,159 @@ std::string QueryPlanner::GetColumnNameForPosition(
     }
 
     return position;
+}
+
+arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanGroupBy(
+    std::shared_ptr<Operator> input,
+    const GroupByClause& group_by,
+    const std::vector<AggregateExpression>& aggregates,
+    PlanningContext& ctx) {
+
+    // Convert GROUP BY variables to column names
+    std::vector<std::string> group_keys;
+    for (const auto& var : group_by.variables) {
+        group_keys.push_back(planning::VariableToColumnName(var));
+    }
+
+    // Convert SPARQL aggregates to AggregateSpec
+    std::vector<AggregateSpec> aggregate_specs;
+    for (const auto& agg : aggregates) {
+        // Convert aggregate operator to function
+        ARROW_ASSIGN_OR_RAISE(
+            auto agg_func,
+            ExprOperatorToAggregateFunction(agg.expr->op)
+        );
+
+        // Get input column name from aggregate expression
+        std::string input_column;
+        if (agg_func == AggregateFunction::Count && agg.expr->arguments.empty()) {
+            // COUNT(*) - no input column needed
+            input_column = "*";
+        } else if (!agg.expr->arguments.empty()) {
+            // Extract variable from first argument
+            auto& arg_expr = agg.expr->arguments[0];
+            if (arg_expr->IsConstant() && arg_expr->constant.has_value()) {
+                if (auto* var = std::get_if<Variable>(&*arg_expr->constant)) {
+                    input_column = planning::VariableToColumnName(*var);
+                } else {
+                    return arrow::Status::Invalid("Aggregate argument must be a variable");
+                }
+            } else {
+                return arrow::Status::Invalid("Aggregate argument must be a simple variable");
+            }
+        } else {
+            return arrow::Status::Invalid("Aggregate function requires an argument");
+        }
+
+        // Get output column name (alias)
+        std::string output_column = planning::VariableToColumnName(agg.alias);
+
+        // Create AggregateSpec
+        aggregate_specs.emplace_back(
+            agg_func,
+            input_column,
+            output_column,
+            agg.distinct
+        );
+    }
+
+    // Create GroupByOperator
+    return std::make_shared<GroupByOperator>(
+        input,
+        group_keys,
+        aggregate_specs
+    );
+}
+
+arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanAggregateOnly(
+    std::shared_ptr<Operator> input,
+    const std::vector<AggregateExpression>& aggregates,
+    PlanningContext& ctx) {
+
+    // Convert SPARQL aggregates to AggregateSpec
+    std::vector<AggregateSpec> aggregate_specs;
+    for (const auto& agg : aggregates) {
+        // Convert aggregate operator to function
+        ARROW_ASSIGN_OR_RAISE(
+            auto agg_func,
+            ExprOperatorToAggregateFunction(agg.expr->op)
+        );
+
+        // Get input column name from aggregate expression
+        std::string input_column;
+        if (agg_func == AggregateFunction::Count && agg.expr->arguments.empty()) {
+            // COUNT(*) - no input column needed
+            input_column = "*";
+        } else if (!agg.expr->arguments.empty()) {
+            // Extract variable from first argument
+            auto& arg_expr = agg.expr->arguments[0];
+            if (arg_expr->IsConstant() && arg_expr->constant.has_value()) {
+                if (auto* var = std::get_if<Variable>(&*arg_expr->constant)) {
+                    input_column = planning::VariableToColumnName(*var);
+                } else {
+                    return arrow::Status::Invalid("Aggregate argument must be a variable");
+                }
+            } else {
+                return arrow::Status::Invalid("Aggregate argument must be a simple variable");
+            }
+        } else {
+            return arrow::Status::Invalid("Aggregate function requires an argument");
+        }
+
+        // Get output column name (alias)
+        std::string output_column = planning::VariableToColumnName(agg.alias);
+
+        // Create AggregateSpec
+        aggregate_specs.emplace_back(
+            agg_func,
+            input_column,
+            output_column,
+            agg.distinct
+        );
+    }
+
+    // Create AggregateOperator (no grouping)
+    return std::make_shared<AggregateOperator>(
+        input,
+        aggregate_specs
+    );
+}
+
+arrow::Result<AggregateFunction> QueryPlanner::ExprOperatorToAggregateFunction(
+    ExprOperator op) const {
+
+    switch (op) {
+        case ExprOperator::Count:
+            return AggregateFunction::Count;
+        case ExprOperator::Sum:
+            return AggregateFunction::Sum;
+        case ExprOperator::Avg:
+            return AggregateFunction::Avg;
+        case ExprOperator::Min:
+            return AggregateFunction::Min;
+        case ExprOperator::Max:
+            return AggregateFunction::Max;
+        case ExprOperator::GroupConcat:
+            return AggregateFunction::GroupConcat;
+        case ExprOperator::Sample:
+            return AggregateFunction::Sample;
+        default:
+            return arrow::Status::Invalid("Not an aggregate function operator");
+    }
+}
+
+std::vector<AggregateExpression> QueryPlanner::ExtractAggregates(
+    const SelectClause& select) const {
+
+    std::vector<AggregateExpression> aggregates;
+
+    for (const auto& item : select.items) {
+        if (auto* agg = std::get_if<AggregateExpression>(&item)) {
+            aggregates.push_back(*agg);
+        }
+    }
+
+    return aggregates;
 }
 
 // QueryOptimizer implementation

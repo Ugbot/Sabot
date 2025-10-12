@@ -109,33 +109,39 @@ arrow::Result<std::shared_ptr<arrow::BooleanArray>> ExpressionEvaluator::Evaluat
     const std::shared_ptr<arrow::Array>& left,
     const std::shared_ptr<arrow::Array>& right) {
 
-    // Map SPARQL operators to Arrow compute functions
-    cp::CompareOperator arrow_op;
+    // Arrow 22.0 doesn't have a generic Compare() function
+    // Use specific comparison functions for each operator
+    arrow::Datum result;
+
     switch (op) {
-        case ExprOperator::Equal:
-            arrow_op = cp::CompareOperator::EQUAL;
+        case ExprOperator::Equal: {
+            ARROW_ASSIGN_OR_RAISE(result, cp::CallFunction("equal", {left, right}));
             break;
-        case ExprOperator::NotEqual:
-            arrow_op = cp::CompareOperator::NOT_EQUAL;
+        }
+        case ExprOperator::NotEqual: {
+            ARROW_ASSIGN_OR_RAISE(result, cp::CallFunction("not_equal", {left, right}));
             break;
-        case ExprOperator::LessThan:
-            arrow_op = cp::CompareOperator::LESS;
+        }
+        case ExprOperator::LessThan: {
+            ARROW_ASSIGN_OR_RAISE(result, cp::CallFunction("less", {left, right}));
             break;
-        case ExprOperator::LessThanEqual:
-            arrow_op = cp::CompareOperator::LESS_EQUAL;
+        }
+        case ExprOperator::LessThanEqual: {
+            ARROW_ASSIGN_OR_RAISE(result, cp::CallFunction("less_equal", {left, right}));
             break;
-        case ExprOperator::GreaterThan:
-            arrow_op = cp::CompareOperator::GREATER;
+        }
+        case ExprOperator::GreaterThan: {
+            ARROW_ASSIGN_OR_RAISE(result, cp::CallFunction("greater", {left, right}));
             break;
-        case ExprOperator::GreaterThanEqual:
-            arrow_op = cp::CompareOperator::GREATER_EQUAL;
+        }
+        case ExprOperator::GreaterThanEqual: {
+            ARROW_ASSIGN_OR_RAISE(result, cp::CallFunction("greater_equal", {left, right}));
             break;
+        }
         default:
             return arrow::Status::Invalid("Not a comparison operator");
     }
 
-    // Use Arrow compute kernel
-    ARROW_ASSIGN_OR_RAISE(auto result, cp::Compare(left, right, arrow_op));
     return std::static_pointer_cast<arrow::BooleanArray>(result.make_array());
 }
 
@@ -267,8 +273,18 @@ arrow::Result<std::shared_ptr<arrow::BooleanArray>> ExpressionEvaluator::Evaluat
         if (value_ids->IsNull(i)) {
             ARROW_RETURN_NOT_OK(builder.AppendNull());
         } else {
-            ValueId vid = value_ids->Value(i);
-            bool is_iri = (vid.GetType() == ValueType::IRI);
+            ValueId vid = ValueId::fromBits(value_ids->Value(i));
+
+            // IRIs are stored in vocabulary with VocabIndex datatype
+            // We need to look up the term to check its kind
+            bool is_iri = false;
+            if (vid.getDatatype() == Datatype::VocabIndex) {
+                auto term_result = ctx_.vocab->GetTerm(vid);
+                if (term_result.ok()) {
+                    is_iri = (term_result.ValueOrDie().kind == TermKind::IRI);
+                }
+            }
+
             ARROW_RETURN_NOT_OK(builder.Append(is_iri));
         }
     }
@@ -298,8 +314,18 @@ arrow::Result<std::shared_ptr<arrow::BooleanArray>> ExpressionEvaluator::Evaluat
         if (value_ids->IsNull(i)) {
             ARROW_RETURN_NOT_OK(builder.AppendNull());
         } else {
-            ValueId vid = value_ids->Value(i);
-            bool is_literal = (vid.GetType() == ValueType::Literal);
+            ValueId vid = ValueId::fromBits(value_ids->Value(i));
+
+            // Literals are stored in vocabulary with VocabIndex datatype
+            // We need to look up the term to check its kind
+            bool is_literal = false;
+            if (vid.getDatatype() == Datatype::VocabIndex) {
+                auto term_result = ctx_.vocab->GetTerm(vid);
+                if (term_result.ok()) {
+                    is_literal = (term_result.ValueOrDie().kind == TermKind::Literal);
+                }
+            }
+
             ARROW_RETURN_NOT_OK(builder.Append(is_literal));
         }
     }
@@ -329,8 +355,10 @@ arrow::Result<std::shared_ptr<arrow::BooleanArray>> ExpressionEvaluator::Evaluat
         if (value_ids->IsNull(i)) {
             ARROW_RETURN_NOT_OK(builder.AppendNull());
         } else {
-            ValueId vid = value_ids->Value(i);
-            bool is_blank = (vid.GetType() == ValueType::BlankNode);
+            ValueId vid = ValueId::fromBits(value_ids->Value(i));
+
+            // Blank nodes use BlankNodeIndex datatype
+            bool is_blank = (vid.getDatatype() == Datatype::BlankNodeIndex);
             ARROW_RETURN_NOT_OK(builder.Append(is_blank));
         }
     }
@@ -361,7 +389,7 @@ arrow::Result<std::shared_ptr<arrow::Array>> ExpressionEvaluator::EvaluateStr(
         if (value_ids->IsNull(i)) {
             ARROW_RETURN_NOT_OK(builder.AppendNull());
         } else {
-            ValueId vid = value_ids->Value(i);
+            ValueId vid = ValueId::fromBits(value_ids->Value(i));
 
             // Lookup term in vocabulary
             auto term_result = ctx_.vocab->GetTerm(vid);
@@ -370,20 +398,9 @@ arrow::Result<std::shared_ptr<arrow::Array>> ExpressionEvaluator::EvaluateStr(
             }
 
             auto term = term_result.ValueOrDie();
-            std::string str_value;
 
-            // Extract string representation based on term type
-            if (std::holds_alternative<Term::IRIType>(term.value)) {
-                str_value = std::get<Term::IRIType>(term.value);
-            } else if (std::holds_alternative<Term::LiteralType>(term.value)) {
-                str_value = std::get<Term::LiteralType>(term.value).value;
-            } else if (std::holds_alternative<Term::BlankNodeType>(term.value)) {
-                str_value = std::get<Term::BlankNodeType>(term.value);
-            } else {
-                return arrow::Status::Invalid("Unknown term type");
-            }
-
-            ARROW_RETURN_NOT_OK(builder.Append(str_value));
+            // All term types store their string value in the lexical field
+            ARROW_RETURN_NOT_OK(builder.Append(term.lexical));
         }
     }
 
@@ -413,13 +430,7 @@ arrow::Result<std::shared_ptr<arrow::Array>> ExpressionEvaluator::EvaluateLang(
         if (value_ids->IsNull(i)) {
             ARROW_RETURN_NOT_OK(builder.AppendNull());
         } else {
-            ValueId vid = value_ids->Value(i);
-
-            // LANG only applies to literals
-            if (vid.GetType() != ValueType::Literal) {
-                ARROW_RETURN_NOT_OK(builder.Append(""));  // Empty string for non-literals
-                continue;
-            }
+            ValueId vid = ValueId::fromBits(value_ids->Value(i));
 
             // Lookup term in vocabulary
             auto term_result = ctx_.vocab->GetTerm(vid);
@@ -429,12 +440,11 @@ arrow::Result<std::shared_ptr<arrow::Array>> ExpressionEvaluator::EvaluateLang(
 
             auto term = term_result.ValueOrDie();
 
-            // Extract language tag from literal
-            if (std::holds_alternative<Term::LiteralType>(term.value)) {
-                const auto& literal = std::get<Term::LiteralType>(term.value);
-                ARROW_RETURN_NOT_OK(builder.Append(literal.language));
+            // LANG only applies to literals
+            if (term.kind == TermKind::Literal) {
+                ARROW_RETURN_NOT_OK(builder.Append(term.language));
             } else {
-                ARROW_RETURN_NOT_OK(builder.Append(""));  // Empty string if not a literal
+                ARROW_RETURN_NOT_OK(builder.Append(""));  // Empty string for non-literals
             }
         }
     }
@@ -465,13 +475,7 @@ arrow::Result<std::shared_ptr<arrow::Array>> ExpressionEvaluator::EvaluateDataty
         if (value_ids->IsNull(i)) {
             ARROW_RETURN_NOT_OK(builder.AppendNull());
         } else {
-            ValueId vid = value_ids->Value(i);
-
-            // DATATYPE only applies to literals
-            if (vid.GetType() != ValueType::Literal) {
-                ARROW_RETURN_NOT_OK(builder.Append(""));  // Empty string for non-literals
-                continue;
-            }
+            ValueId vid = ValueId::fromBits(value_ids->Value(i));
 
             // Lookup term in vocabulary
             auto term_result = ctx_.vocab->GetTerm(vid);
@@ -481,18 +485,16 @@ arrow::Result<std::shared_ptr<arrow::Array>> ExpressionEvaluator::EvaluateDataty
 
             auto term = term_result.ValueOrDie();
 
-            // Extract datatype from literal
-            if (std::holds_alternative<Term::LiteralType>(term.value)) {
-                const auto& literal = std::get<Term::LiteralType>(term.value);
-
+            // DATATYPE only applies to literals
+            if (term.kind == TermKind::Literal) {
                 // If no explicit datatype, use xsd:string as default
-                std::string datatype = literal.datatype.empty()
+                std::string datatype = term.datatype.empty()
                     ? "http://www.w3.org/2001/XMLSchema#string"
-                    : literal.datatype;
+                    : term.datatype;
 
                 ARROW_RETURN_NOT_OK(builder.Append(datatype));
             } else {
-                ARROW_RETURN_NOT_OK(builder.Append(""));  // Empty string if not a literal
+                ARROW_RETURN_NOT_OK(builder.Append(""));  // Empty string for non-literals
             }
         }
     }
@@ -538,7 +540,7 @@ arrow::Result<std::shared_ptr<arrow::BooleanArray>> ExpressionEvaluator::Evaluat
         if (value_ids->IsNull(i)) {
             ARROW_RETURN_NOT_OK(string_builder.AppendNull());
         } else {
-            ValueId vid = value_ids->Value(i);
+            ValueId vid = ValueId::fromBits(value_ids->Value(i));
 
             // Lookup term in vocabulary
             auto term_result = ctx_.vocab->GetTerm(vid);
@@ -547,20 +549,9 @@ arrow::Result<std::shared_ptr<arrow::BooleanArray>> ExpressionEvaluator::Evaluat
             }
 
             auto term = term_result.ValueOrDie();
-            std::string str_value;
 
-            // Extract string representation based on term type
-            if (std::holds_alternative<Term::IRIType>(term.value)) {
-                str_value = std::get<Term::IRIType>(term.value);
-            } else if (std::holds_alternative<Term::LiteralType>(term.value)) {
-                str_value = std::get<Term::LiteralType>(term.value).value;
-            } else if (std::holds_alternative<Term::BlankNodeType>(term.value)) {
-                str_value = std::get<Term::BlankNodeType>(term.value);
-            } else {
-                return arrow::Status::Invalid("Unknown term type");
-            }
-
-            ARROW_RETURN_NOT_OK(string_builder.Append(str_value));
+            // All term types store their string value in the lexical field
+            ARROW_RETURN_NOT_OK(string_builder.Append(term.lexical));
         }
     }
 
@@ -571,7 +562,8 @@ arrow::Result<std::shared_ptr<arrow::BooleanArray>> ExpressionEvaluator::Evaluat
     cp::MatchSubstringOptions options(pattern);
     options.ignore_case = false;  // Case-sensitive by default
 
-    ARROW_ASSIGN_OR_RAISE(auto match_result, cp::MatchSubstring(string_array, options));
+    ARROW_ASSIGN_OR_RAISE(auto match_result,
+                          cp::CallFunction("match_substring", {string_array}, &options));
     return std::static_pointer_cast<arrow::BooleanArray>(match_result.make_array());
 }
 
@@ -609,8 +601,9 @@ arrow::Result<std::shared_ptr<arrow::Array>> ExpressionEvaluator::CreateConstant
     arrow::UInt64Builder builder;
     ARROW_RETURN_NOT_OK(builder.Reserve(length));
 
+    uint64_t bits = value_id.getBits();
     for (int64_t i = 0; i < length; ++i) {
-        ARROW_RETURN_NOT_OK(builder.Append(value_id.value));
+        ARROW_RETURN_NOT_OK(builder.Append(bits));
     }
 
     std::shared_ptr<arrow::Array> result;

@@ -47,7 +47,7 @@ public:
 
 private:
     // Execute union operation
-    arrow::Result<void> ExecuteUnion();
+    arrow::Status ExecuteUnion();
 
     // Unify schemas across all inputs
     arrow::Result<std::shared_ptr<arrow::Schema>> UnifySchemas();

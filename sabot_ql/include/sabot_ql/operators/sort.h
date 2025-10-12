@@ -51,7 +51,7 @@ public:
 private:
     // Sort all data at once
     // We need to collect all input batches, sort them, then return sorted batches
-    arrow::Result<void> SortAllData();
+    arrow::Status SortAllData();
 
     // Check if sorting has been performed
     bool IsSorted() const { return sorted_table_ != nullptr; }

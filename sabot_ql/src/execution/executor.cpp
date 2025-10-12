@@ -136,8 +136,8 @@ arrow::Result<std::string> QueryExecutor::ExplainAnalyze(
 // QueryBuilder implementation
 QueryBuilder& QueryBuilder::Scan(const TriplePattern& pattern) {
     current_operator_ = std::make_shared<TripleScanOperator>(
-        executor_.store_,
-        executor_.vocab_,
+        executor_.GetStore(),
+        executor_.GetVocab(),
         pattern
     );
     return *this;

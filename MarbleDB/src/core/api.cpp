@@ -359,6 +359,24 @@ void CloseDatabase(std::unique_ptr<MarbleDB>* db) {
 }
 
 //==============================================================================
+// MarbleDB Static Factory Method
+//==============================================================================
+
+// Static factory method for MarbleDB class (required by header declaration)
+Status MarbleDB::Open(const DBOptions& options,
+                     std::shared_ptr<Schema> schema,
+                     std::unique_ptr<MarbleDB>* db) {
+    // Delegate to the existing OpenDatabase function
+    // Note: schema parameter is ignored for now (SimpleMarbleDB is schema-agnostic)
+    try {
+        *db = std::make_unique<SimpleMarbleDB>(options.db_path);
+        return Status::OK();
+    } catch (const std::exception& e) {
+        return Status::InternalError("Failed to open MarbleDB: " + std::string(e.what()));
+    }
+}
+
+//==============================================================================
 // Table Management API Implementation
 //==============================================================================
 

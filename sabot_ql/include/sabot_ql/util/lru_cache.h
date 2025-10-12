@@ -1,16 +1,16 @@
 #pragma once
 
-// LRU Cache implementation from QLever
-// High-performance LRU eviction with absl::flat_hash_map
+// LRU Cache implementation
+// High-performance LRU eviction with std::unordered_map
 
-#include <absl/container/flat_hash_map.h>
+#include <unordered_map>
 #include <cstdint>
 #include <list>
 #include <optional>
 
 namespace sabot_ql {
 
-// Simple LRU cache implementation (from QLever)
+// Simple LRU cache implementation
 // Stores key-value pairs up to a configurable threshold
 // Discards least recently used element when threshold exceeded
 template <typename K, typename V>
@@ -19,7 +19,7 @@ private:
     size_t capacity_;
     // Stores keys in order of usage (MRU at front)
     std::list<K> keys_;
-    absl::flat_hash_map<K, std::pair<V, typename std::list<K>::iterator>> cache_;
+    std::unordered_map<K, std::pair<V, typename std::list<K>::iterator>> cache_;
 
 public:
     explicit LRUCache(size_t capacity) : capacity_(capacity) {
