@@ -48,6 +48,7 @@ set(SABOT_QL_SOURCES
 
     # SPARQL engine
     src/sparql/ast.cpp
+    src/sparql/parser.cpp
     src/sparql/planner.cpp
     src/sparql/expression_evaluator.cpp
     src/sparql/query_engine.cpp
