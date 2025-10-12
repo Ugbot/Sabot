@@ -22,3 +22,12 @@
 [submodule "vendor/kuzu"]
 	path = vendor/kuzu
 	url = https://github.com/kuzudb/kuzu.git
+[submodule "benchmarks/rdf_benchmarks/KROWN"]
+	path = benchmarks/rdf_benchmarks/KROWN
+	url = https://github.com/kg-construct/KROWN
+[submodule "vendor/rdflib"]
+	path = vendor/rdflib
+	url = https://github.com/RDFLib/rdflib
+[submodule "vendor/qlever"]
+	path = vendor/qlever
+	url = https://github.com/ad-freiburg/qlever
