@@ -8,7 +8,7 @@
 #include <arrow/result.h>
 
 // DuckDB includes
-#include "duckdb.hpp"
+#include "duckdb/duckdb.hpp"
 #include "duckdb/planner/logical_operator.hpp"
 #include "duckdb/execution/physical_operator.hpp"
 #include "duckdb/common/enums/logical_operator_type.hpp"

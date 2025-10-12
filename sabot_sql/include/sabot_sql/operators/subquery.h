@@ -38,7 +38,7 @@ enum class SubqueryType {
  *   - IN: SELECT * FROM products WHERE category_id IN (SELECT id FROM categories WHERE ...);
  *   - Correlated: SELECT * FROM customers c WHERE (SELECT COUNT(*) FROM orders o WHERE o.customer_id = c.id) > 10;
  */
-class SubqueryOperator : public UnaryOperator {
+class SubqueryOperator : public operators::Operator {
 public:
     /**
      * @brief Create a subquery operator
@@ -46,8 +46,8 @@ public:
      * @param subquery Subquery operator
      * @param type Subquery type
      */
-    SubqueryOperator(std::shared_ptr<Operator> outer,
-                     std::shared_ptr<Operator> subquery,
+    SubqueryOperator(std::shared_ptr<operators::Operator> outer,
+                     std::shared_ptr<operators::Operator> subquery,
                      SubqueryType type);
     
     ~SubqueryOperator() override = default;
@@ -57,6 +57,7 @@ public:
     arrow::Result<std::shared_ptr<arrow::RecordBatch>> GetNextBatch() override;
     std::string ToString() const override;
     size_t EstimateCardinality() const override;
+    arrow::Result<std::shared_ptr<arrow::Table>> GetAllResults() override;
     
     /**
      * @brief Set correlation predicate (for correlated subqueries)
@@ -72,7 +73,7 @@ public:
     SubqueryType GetSubqueryType() const { return type_; }
     
 private:
-    std::shared_ptr<Operator> subquery_;
+    std::shared_ptr<operators::Operator> subquery_;
     SubqueryType type_;
     
     // For correlated subqueries

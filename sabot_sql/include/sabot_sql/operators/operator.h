@@ -46,6 +46,11 @@ public:
     virtual size_t EstimateCardinality() const = 0;
     
     /**
+     * @brief Get all results as a single Arrow table
+     */
+    virtual arrow::Result<std::shared_ptr<arrow::Table>> GetAllResults() = 0;
+    
+    /**
      * @brief Get operator statistics
      */
     struct Statistics {

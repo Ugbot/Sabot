@@ -1,0 +1,1184 @@
+{
+  "scalability": {
+    "10000_rows": {
+      "dataset_size": 10000,
+      "python": {
+        "status": "success",
+        "configurations": {
+          "1_agents": {
+            "distribution_time": 0.0002949237823486328,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 0.004357814788818359,
+                "successful_agents": 1,
+                "total_agents": 1
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 0.00020503997802734375,
+                "successful_agents": 1,
+                "total_agents": 1
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 0.00014591217041015625,
+                "successful_agents": 1,
+                "total_agents": 1
+              }
+            },
+            "stats": {
+              "total_agents": 1,
+              "total_queries": 3,
+              "total_execution_time": 0.004492282867431641,
+              "average_execution_time": 0.0014974276224772136,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 0.004492282867431641,
+                  "average_execution_time": 0.0014974276224772136,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                }
+              }
+            }
+          },
+          "2_agents": {
+            "distribution_time": 1.5974044799804688e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 2.7179718017578125e-05,
+                "successful_agents": 2,
+                "total_agents": 2
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 1.5974044799804688e-05,
+                "successful_agents": 2,
+                "total_agents": 2
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 3.314018249511719e-05,
+                "successful_agents": 2,
+                "total_agents": 2
+              }
+            },
+            "stats": {
+              "total_agents": 2,
+              "total_queries": 6,
+              "total_execution_time": 5.9604644775390625e-05,
+              "average_execution_time": 9.934107462565104e-06,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 3.4809112548828125e-05,
+                  "average_execution_time": 1.1603037516276041e-05,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                },
+                "agent_2": {
+                  "query_count": 3,
+                  "total_execution_time": 2.47955322265625e-05,
+                  "average_execution_time": 8.265177408854166e-06,
+                  "tables": [
+                    "sales_agent_2"
+                  ]
+                }
+              }
+            }
+          },
+          "4_agents": {
+            "distribution_time": 1.1920928955078125e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 3.0040740966796875e-05,
+                "successful_agents": 4,
+                "total_agents": 4
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 2.47955322265625e-05,
+                "successful_agents": 4,
+                "total_agents": 4
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 5.3882598876953125e-05,
+                "successful_agents": 4,
+                "total_agents": 4
+              }
+            },
+            "stats": {
+              "total_agents": 4,
+              "total_queries": 12,
+              "total_execution_time": 9.250640869140625e-05,
+              "average_execution_time": 7.708867390950521e-06,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 2.6464462280273438e-05,
+                  "average_execution_time": 8.821487426757812e-06,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                },
+                "agent_2": {
+                  "query_count": 3,
+                  "total_execution_time": 2.1696090698242188e-05,
+                  "average_execution_time": 7.2320302327473956e-06,
+                  "tables": [
+                    "sales_agent_2"
+                  ]
+                },
+                "agent_3": {
+                  "query_count": 3,
+                  "total_execution_time": 2.3365020751953125e-05,
+                  "average_execution_time": 7.788340250651041e-06,
+                  "tables": [
+                    "sales_agent_3"
+                  ]
+                },
+                "agent_4": {
+                  "query_count": 3,
+                  "total_execution_time": 2.09808349609375e-05,
+                  "average_execution_time": 6.993611653645833e-06,
+                  "tables": [
+                    "sales_agent_4"
+                  ]
+                }
+              }
+            }
+          },
+          "8_agents": {
+            "distribution_time": 1.9073486328125e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 4.696846008300781e-05,
+                "successful_agents": 8,
+                "total_agents": 8
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 4.410743713378906e-05,
+                "successful_agents": 8,
+                "total_agents": 8
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 9.799003601074219e-05,
+                "successful_agents": 8,
+                "total_agents": 8
+              }
+            },
+            "stats": {
+              "total_agents": 8,
+              "total_queries": 24,
+              "total_execution_time": 0.0001614093780517578,
+              "average_execution_time": 6.725390752156575e-06,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 2.4318695068359375e-05,
+                  "average_execution_time": 8.106231689453125e-06,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                },
+                "agent_2": {
+                  "query_count": 3,
+                  "total_execution_time": 1.9788742065429688e-05,
+                  "average_execution_time": 6.5962473551432294e-06,
+                  "tables": [
+                    "sales_agent_2"
+                  ]
+                },
+                "agent_3": {
+                  "query_count": 3,
+                  "total_execution_time": 1.9311904907226562e-05,
+                  "average_execution_time": 6.4373016357421875e-06,
+                  "tables": [
+                    "sales_agent_3"
+                  ]
+                },
+                "agent_4": {
+                  "query_count": 3,
+                  "total_execution_time": 2.0265579223632812e-05,
+                  "average_execution_time": 6.7551930745442706e-06,
+                  "tables": [
+                    "sales_agent_4"
+                  ]
+                },
+                "agent_5": {
+                  "query_count": 3,
+                  "total_execution_time": 2.09808349609375e-05,
+                  "average_execution_time": 6.993611653645833e-06,
+                  "tables": [
+                    "sales_agent_5"
+                  ]
+                },
+                "agent_6": {
+                  "query_count": 3,
+                  "total_execution_time": 1.9788742065429688e-05,
+                  "average_execution_time": 6.5962473551432294e-06,
+                  "tables": [
+                    "sales_agent_6"
+                  ]
+                },
+                "agent_7": {
+                  "query_count": 3,
+                  "total_execution_time": 1.8835067749023438e-05,
+                  "average_execution_time": 6.2783559163411456e-06,
+                  "tables": [
+                    "sales_agent_7"
+                  ]
+                },
+                "agent_8": {
+                  "query_count": 3,
+                  "total_execution_time": 1.811981201171875e-05,
+                  "average_execution_time": 6.039937337239583e-06,
+                  "tables": [
+                    "sales_agent_8"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "dataset_size": 10000
+      },
+      "cpp": {
+        "status": "success",
+        "tests": {
+          "basic_functionality": {
+            "status": "success",
+            "execution_time": 0.0069386959075927734,
+            "output": ""
+          },
+          "flink_extensions": {
+            "status": "success",
+            "execution_time": 0.005578041076660156,
+            "output": ""
+          },
+          "comprehensive": {
+            "status": "success",
+            "execution_time": 0.010504007339477539,
+            "output": ""
+          }
+        },
+        "dataset_size": 10000
+      }
+    },
+    "100000_rows": {
+      "dataset_size": 100000,
+      "python": {
+        "status": "success",
+        "configurations": {
+          "1_agents": {
+            "distribution_time": 2.09808349609375e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 7.081031799316406e-05,
+                "successful_agents": 1,
+                "total_agents": 1
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 2.002716064453125e-05,
+                "successful_agents": 1,
+                "total_agents": 1
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 2.7894973754882812e-05,
+                "successful_agents": 1,
+                "total_agents": 1
+              }
+            },
+            "stats": {
+              "total_agents": 1,
+              "total_queries": 3,
+              "total_execution_time": 9.560585021972656e-05,
+              "average_execution_time": 3.186861673990885e-05,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 9.560585021972656e-05,
+                  "average_execution_time": 3.186861673990885e-05,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                }
+              }
+            }
+          },
+          "2_agents": {
+            "distribution_time": 6.9141387939453125e-06,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 2.09808349609375e-05,
+                "successful_agents": 2,
+                "total_agents": 2
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 1.52587890625e-05,
+                "successful_agents": 2,
+                "total_agents": 2
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 3.3855438232421875e-05,
+                "successful_agents": 2,
+                "total_agents": 2
+              }
+            },
+            "stats": {
+              "total_agents": 2,
+              "total_queries": 6,
+              "total_execution_time": 5.698204040527344e-05,
+              "average_execution_time": 9.49700673421224e-06,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 3.1948089599609375e-05,
+                  "average_execution_time": 1.0649363199869791e-05,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                },
+                "agent_2": {
+                  "query_count": 3,
+                  "total_execution_time": 2.5033950805664062e-05,
+                  "average_execution_time": 8.344650268554688e-06,
+                  "tables": [
+                    "sales_agent_2"
+                  ]
+                }
+              }
+            }
+          },
+          "4_agents": {
+            "distribution_time": 9.775161743164062e-06,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 2.5987625122070312e-05,
+                "successful_agents": 4,
+                "total_agents": 4
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 2.3126602172851562e-05,
+                "successful_agents": 4,
+                "total_agents": 4
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 5.412101745605469e-05,
+                "successful_agents": 4,
+                "total_agents": 4
+              }
+            },
+            "stats": {
+              "total_agents": 4,
+              "total_queries": 12,
+              "total_execution_time": 8.58306884765625e-05,
+              "average_execution_time": 7.152557373046875e-06,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 2.4080276489257812e-05,
+                  "average_execution_time": 8.026758829752604e-06,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                },
+                "agent_2": {
+                  "query_count": 3,
+                  "total_execution_time": 2.002716064453125e-05,
+                  "average_execution_time": 6.67572021484375e-06,
+                  "tables": [
+                    "sales_agent_2"
+                  ]
+                },
+                "agent_3": {
+                  "query_count": 3,
+                  "total_execution_time": 2.1696090698242188e-05,
+                  "average_execution_time": 7.2320302327473956e-06,
+                  "tables": [
+                    "sales_agent_3"
+                  ]
+                },
+                "agent_4": {
+                  "query_count": 3,
+                  "total_execution_time": 2.002716064453125e-05,
+                  "average_execution_time": 6.67572021484375e-06,
+                  "tables": [
+                    "sales_agent_4"
+                  ]
+                }
+              }
+            }
+          },
+          "8_agents": {
+            "distribution_time": 2.47955322265625e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 4.9114227294921875e-05,
+                "successful_agents": 8,
+                "total_agents": 8
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 0.1996159553527832,
+                "successful_agents": 8,
+                "total_agents": 8
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 0.0002620220184326172,
+                "successful_agents": 8,
+                "total_agents": 8
+              }
+            },
+            "stats": {
+              "total_agents": 8,
+              "total_queries": 24,
+              "total_execution_time": 0.1998586654663086,
+              "average_execution_time": 0.008327444394429525,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 0.19951629638671875,
+                  "average_execution_time": 0.06650543212890625,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                },
+                "agent_2": {
+                  "query_count": 3,
+                  "total_execution_time": 7.128715515136719e-05,
+                  "average_execution_time": 2.376238505045573e-05,
+                  "tables": [
+                    "sales_agent_2"
+                  ]
+                },
+                "agent_3": {
+                  "query_count": 3,
+                  "total_execution_time": 4.649162292480469e-05,
+                  "average_execution_time": 1.5497207641601562e-05,
+                  "tables": [
+                    "sales_agent_3"
+                  ]
+                },
+                "agent_4": {
+                  "query_count": 3,
+                  "total_execution_time": 5.3882598876953125e-05,
+                  "average_execution_time": 1.7960866292317707e-05,
+                  "tables": [
+                    "sales_agent_4"
+                  ]
+                },
+                "agent_5": {
+                  "query_count": 3,
+                  "total_execution_time": 4.267692565917969e-05,
+                  "average_execution_time": 1.4225641886393229e-05,
+                  "tables": [
+                    "sales_agent_5"
+                  ]
+                },
+                "agent_6": {
+                  "query_count": 3,
+                  "total_execution_time": 4.792213439941406e-05,
+                  "average_execution_time": 1.5974044799804688e-05,
+                  "tables": [
+                    "sales_agent_6"
+                  ]
+                },
+                "agent_7": {
+                  "query_count": 3,
+                  "total_execution_time": 4.00543212890625e-05,
+                  "average_execution_time": 1.33514404296875e-05,
+                  "tables": [
+                    "sales_agent_7"
+                  ]
+                },
+                "agent_8": {
+                  "query_count": 3,
+                  "total_execution_time": 4.00543212890625e-05,
+                  "average_execution_time": 1.33514404296875e-05,
+                  "tables": [
+                    "sales_agent_8"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "dataset_size": 100000
+      },
+      "cpp": {
+        "status": "success",
+        "tests": {
+          "basic_functionality": {
+            "status": "success",
+            "execution_time": 0.009928226470947266,
+            "output": ""
+          },
+          "flink_extensions": {
+            "status": "success",
+            "execution_time": 0.0062999725341796875,
+            "output": ""
+          },
+          "comprehensive": {
+            "status": "success",
+            "execution_time": 0.00838613510131836,
+            "output": ""
+          }
+        },
+        "dataset_size": 100000
+      }
+    },
+    "500000_rows": {
+      "dataset_size": 500000,
+      "python": {
+        "status": "success",
+        "configurations": {
+          "1_agents": {
+            "distribution_time": 2.5033950805664062e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 4.792213439941406e-05,
+                "successful_agents": 1,
+                "total_agents": 1
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 1.2159347534179688e-05,
+                "successful_agents": 1,
+                "total_agents": 1
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 2.384185791015625e-05,
+                "successful_agents": 1,
+                "total_agents": 1
+              }
+            },
+            "stats": {
+              "total_agents": 1,
+              "total_queries": 3,
+              "total_execution_time": 6.341934204101562e-05,
+              "average_execution_time": 2.1139780680338543e-05,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 6.341934204101562e-05,
+                  "average_execution_time": 2.1139780680338543e-05,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                }
+              }
+            }
+          },
+          "2_agents": {
+            "distribution_time": 1.4066696166992188e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 2.002716064453125e-05,
+                "successful_agents": 2,
+                "total_agents": 2
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 1.4066696166992188e-05,
+                "successful_agents": 2,
+                "total_agents": 2
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 3.0994415283203125e-05,
+                "successful_agents": 2,
+                "total_agents": 2
+              }
+            },
+            "stats": {
+              "total_agents": 2,
+              "total_queries": 6,
+              "total_execution_time": 5.1021575927734375e-05,
+              "average_execution_time": 8.503595987955729e-06,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 2.574920654296875e-05,
+                  "average_execution_time": 8.58306884765625e-06,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                },
+                "agent_2": {
+                  "query_count": 3,
+                  "total_execution_time": 2.5272369384765625e-05,
+                  "average_execution_time": 8.424123128255209e-06,
+                  "tables": [
+                    "sales_agent_2"
+                  ]
+                }
+              }
+            }
+          },
+          "4_agents": {
+            "distribution_time": 1.71661376953125e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 2.6941299438476562e-05,
+                "successful_agents": 4,
+                "total_agents": 4
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 2.4080276489257812e-05,
+                "successful_agents": 4,
+                "total_agents": 4
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 5.5789947509765625e-05,
+                "successful_agents": 4,
+                "total_agents": 4
+              }
+            },
+            "stats": {
+              "total_agents": 4,
+              "total_queries": 12,
+              "total_execution_time": 9.202957153320312e-05,
+              "average_execution_time": 7.66913096110026e-06,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 2.3603439331054688e-05,
+                  "average_execution_time": 7.867813110351562e-06,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                },
+                "agent_2": {
+                  "query_count": 3,
+                  "total_execution_time": 2.7418136596679688e-05,
+                  "average_execution_time": 9.139378865559896e-06,
+                  "tables": [
+                    "sales_agent_2"
+                  ]
+                },
+                "agent_3": {
+                  "query_count": 3,
+                  "total_execution_time": 2.0742416381835938e-05,
+                  "average_execution_time": 6.9141387939453125e-06,
+                  "tables": [
+                    "sales_agent_3"
+                  ]
+                },
+                "agent_4": {
+                  "query_count": 3,
+                  "total_execution_time": 2.0265579223632812e-05,
+                  "average_execution_time": 6.7551930745442706e-06,
+                  "tables": [
+                    "sales_agent_4"
+                  ]
+                }
+              }
+            }
+          },
+          "8_agents": {
+            "distribution_time": 2.193450927734375e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 5.412101745605469e-05,
+                "successful_agents": 8,
+                "total_agents": 8
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 4.315376281738281e-05,
+                "successful_agents": 8,
+                "total_agents": 8
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 9.417533874511719e-05,
+                "successful_agents": 8,
+                "total_agents": 8
+              }
+            },
+            "stats": {
+              "total_agents": 8,
+              "total_queries": 24,
+              "total_execution_time": 0.00016260147094726562,
+              "average_execution_time": 6.775061289469401e-06,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 2.3126602172851562e-05,
+                  "average_execution_time": 7.708867390950521e-06,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                },
+                "agent_2": {
+                  "query_count": 3,
+                  "total_execution_time": 1.8835067749023438e-05,
+                  "average_execution_time": 6.2783559163411456e-06,
+                  "tables": [
+                    "sales_agent_2"
+                  ]
+                },
+                "agent_3": {
+                  "query_count": 3,
+                  "total_execution_time": 2.3126602172851562e-05,
+                  "average_execution_time": 7.708867390950521e-06,
+                  "tables": [
+                    "sales_agent_3"
+                  ]
+                },
+                "agent_4": {
+                  "query_count": 3,
+                  "total_execution_time": 2.1219253540039062e-05,
+                  "average_execution_time": 7.0730845133463544e-06,
+                  "tables": [
+                    "sales_agent_4"
+                  ]
+                },
+                "agent_5": {
+                  "query_count": 3,
+                  "total_execution_time": 1.9788742065429688e-05,
+                  "average_execution_time": 6.5962473551432294e-06,
+                  "tables": [
+                    "sales_agent_5"
+                  ]
+                },
+                "agent_6": {
+                  "query_count": 3,
+                  "total_execution_time": 1.6927719116210938e-05,
+                  "average_execution_time": 5.6425730387369794e-06,
+                  "tables": [
+                    "sales_agent_6"
+                  ]
+                },
+                "agent_7": {
+                  "query_count": 3,
+                  "total_execution_time": 1.8835067749023438e-05,
+                  "average_execution_time": 6.2783559163411456e-06,
+                  "tables": [
+                    "sales_agent_7"
+                  ]
+                },
+                "agent_8": {
+                  "query_count": 3,
+                  "total_execution_time": 2.0742416381835938e-05,
+                  "average_execution_time": 6.9141387939453125e-06,
+                  "tables": [
+                    "sales_agent_8"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "dataset_size": 500000
+      },
+      "cpp": {
+        "status": "success",
+        "tests": {
+          "basic_functionality": {
+            "status": "success",
+            "execution_time": 0.010165929794311523,
+            "output": ""
+          },
+          "flink_extensions": {
+            "status": "success",
+            "execution_time": 0.008033990859985352,
+            "output": ""
+          },
+          "comprehensive": {
+            "status": "success",
+            "execution_time": 0.008919954299926758,
+            "output": ""
+          }
+        },
+        "dataset_size": 500000
+      }
+    },
+    "1000000_rows": {
+      "dataset_size": 1000000,
+      "python": {
+        "status": "success",
+        "configurations": {
+          "1_agents": {
+            "distribution_time": 4.482269287109375e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 7.176399230957031e-05,
+                "successful_agents": 1,
+                "total_agents": 1
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 1.4066696166992188e-05,
+                "successful_agents": 1,
+                "total_agents": 1
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 2.7894973754882812e-05,
+                "successful_agents": 1,
+                "total_agents": 1
+              }
+            },
+            "stats": {
+              "total_agents": 1,
+              "total_queries": 3,
+              "total_execution_time": 9.083747863769531e-05,
+              "average_execution_time": 3.0279159545898438e-05,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 9.083747863769531e-05,
+                  "average_execution_time": 3.0279159545898438e-05,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                }
+              }
+            }
+          },
+          "2_agents": {
+            "distribution_time": 1.621246337890625e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 1.8835067749023438e-05,
+                "successful_agents": 2,
+                "total_agents": 2
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 1.6927719116210938e-05,
+                "successful_agents": 2,
+                "total_agents": 2
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 3.314018249511719e-05,
+                "successful_agents": 2,
+                "total_agents": 2
+              }
+            },
+            "stats": {
+              "total_agents": 2,
+              "total_queries": 6,
+              "total_execution_time": 5.5789947509765625e-05,
+              "average_execution_time": 9.298324584960938e-06,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 3.314018249511719e-05,
+                  "average_execution_time": 1.1046727498372396e-05,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                },
+                "agent_2": {
+                  "query_count": 3,
+                  "total_execution_time": 2.2649765014648438e-05,
+                  "average_execution_time": 7.5499216715494794e-06,
+                  "tables": [
+                    "sales_agent_2"
+                  ]
+                }
+              }
+            }
+          },
+          "4_agents": {
+            "distribution_time": 1.9073486328125e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 2.5987625122070312e-05,
+                "successful_agents": 4,
+                "total_agents": 4
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 4.100799560546875e-05,
+                "successful_agents": 4,
+                "total_agents": 4
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 0.00018310546875,
+                "successful_agents": 4,
+                "total_agents": 4
+              }
+            },
+            "stats": {
+              "total_agents": 4,
+              "total_queries": 12,
+              "total_execution_time": 0.0002319812774658203,
+              "average_execution_time": 1.933177312215169e-05,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 2.8133392333984375e-05,
+                  "average_execution_time": 9.377797444661459e-06,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                },
+                "agent_2": {
+                  "query_count": 3,
+                  "total_execution_time": 0.00013256072998046875,
+                  "average_execution_time": 4.4186909993489586e-05,
+                  "tables": [
+                    "sales_agent_2"
+                  ]
+                },
+                "agent_3": {
+                  "query_count": 3,
+                  "total_execution_time": 3.1948089599609375e-05,
+                  "average_execution_time": 1.0649363199869791e-05,
+                  "tables": [
+                    "sales_agent_3"
+                  ]
+                },
+                "agent_4": {
+                  "query_count": 3,
+                  "total_execution_time": 3.933906555175781e-05,
+                  "average_execution_time": 1.3113021850585938e-05,
+                  "tables": [
+                    "sales_agent_4"
+                  ]
+                }
+              }
+            }
+          },
+          "8_agents": {
+            "distribution_time": 4.601478576660156e-05,
+            "queries": {
+              "query_1": {
+                "query": "SELECT COUNT(*) FROM sales",
+                "execution_time": 6.008148193359375e-05,
+                "successful_agents": 8,
+                "total_agents": 8
+              },
+              "query_2": {
+                "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+                "execution_time": 4.696846008300781e-05,
+                "successful_agents": 8,
+                "total_agents": 8
+              },
+              "query_3": {
+                "query": "SELECT user_id, AVG(price) FROM sales GROUP BY user_id LIMIT 100",
+                "execution_time": 0.00010013580322265625,
+                "successful_agents": 8,
+                "total_agents": 8
+              }
+            },
+            "stats": {
+              "total_agents": 8,
+              "total_queries": 24,
+              "total_execution_time": 0.00017333030700683594,
+              "average_execution_time": 7.222096125284831e-06,
+              "agents": {
+                "agent_1": {
+                  "query_count": 3,
+                  "total_execution_time": 3.218650817871094e-05,
+                  "average_execution_time": 1.0728836059570312e-05,
+                  "tables": [
+                    "sales_agent_1"
+                  ]
+                },
+                "agent_2": {
+                  "query_count": 3,
+                  "total_execution_time": 2.288818359375e-05,
+                  "average_execution_time": 7.62939453125e-06,
+                  "tables": [
+                    "sales_agent_2"
+                  ]
+                },
+                "agent_3": {
+                  "query_count": 3,
+                  "total_execution_time": 2.0742416381835938e-05,
+                  "average_execution_time": 6.9141387939453125e-06,
+                  "tables": [
+                    "sales_agent_3"
+                  ]
+                },
+                "agent_4": {
+                  "query_count": 3,
+                  "total_execution_time": 2.002716064453125e-05,
+                  "average_execution_time": 6.67572021484375e-06,
+                  "tables": [
+                    "sales_agent_4"
+                  ]
+                },
+                "agent_5": {
+                  "query_count": 3,
+                  "total_execution_time": 2.0742416381835938e-05,
+                  "average_execution_time": 6.9141387939453125e-06,
+                  "tables": [
+                    "sales_agent_5"
+                  ]
+                },
+                "agent_6": {
+                  "query_count": 3,
+                  "total_execution_time": 2.002716064453125e-05,
+                  "average_execution_time": 6.67572021484375e-06,
+                  "tables": [
+                    "sales_agent_6"
+                  ]
+                },
+                "agent_7": {
+                  "query_count": 3,
+                  "total_execution_time": 1.9550323486328125e-05,
+                  "average_execution_time": 6.516774495442708e-06,
+                  "tables": [
+                    "sales_agent_7"
+                  ]
+                },
+                "agent_8": {
+                  "query_count": 3,
+                  "total_execution_time": 1.71661376953125e-05,
+                  "average_execution_time": 5.7220458984375e-06,
+                  "tables": [
+                    "sales_agent_8"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "dataset_size": 1000000
+      },
+      "cpp": {
+        "status": "success",
+        "tests": {
+          "basic_functionality": {
+            "status": "success",
+            "execution_time": 0.00818490982055664,
+            "output": ""
+          },
+          "flink_extensions": {
+            "status": "success",
+            "execution_time": 0.006451129913330078,
+            "output": ""
+          },
+          "comprehensive": {
+            "status": "success",
+            "execution_time": 0.0063817501068115234,
+            "output": ""
+          }
+        },
+        "dataset_size": 1000000
+      }
+    }
+  },
+  "query_types": {
+    "status": "success",
+    "query_types": {
+      "count": {
+        "query": "SELECT COUNT(*) FROM sales",
+        "avg_time": 3.123283386230469e-05,
+        "min_time": 2.002716064453125e-05,
+        "max_time": 6.818771362304688e-05,
+        "times": [
+          6.818771362304688e-05,
+          2.47955322265625e-05,
+          2.2172927856445312e-05,
+          2.09808349609375e-05,
+          2.002716064453125e-05
+        ]
+      },
+      "filter": {
+        "query": "SELECT * FROM sales WHERE price > 500 LIMIT 1000",
+        "avg_time": 0.14347538948059083,
+        "min_time": 0.14083194732666016,
+        "max_time": 0.14832520484924316,
+        "times": [
+          0.14832520484924316,
+          0.14364290237426758,
+          0.14237093925476074,
+          0.14220595359802246,
+          0.14083194732666016
+        ]
+      },
+      "group_by": {
+        "query": "SELECT category, COUNT(*) FROM sales GROUP BY category",
+        "avg_time": 3.1995773315429685e-05,
+        "min_time": 2.09808349609375e-05,
+        "max_time": 7.009506225585938e-05,
+        "times": [
+          7.009506225585938e-05,
+          2.5033950805664062e-05,
+          2.193450927734375e-05,
+          2.193450927734375e-05,
+          2.09808349609375e-05
+        ]
+      },
+      "aggregation": {
+        "query": "SELECT user_id, AVG(price), SUM(quantity) FROM sales GROUP BY user_id LIMIT 100",
+        "avg_time": 8.955001831054688e-05,
+        "min_time": 5.078315734863281e-05,
+        "max_time": 0.00021004676818847656,
+        "times": [
+          6.103515625e-05,
+          5.1975250244140625e-05,
+          5.078315734863281e-05,
+          0.00021004676818847656,
+          7.390975952148438e-05
+        ]
+      },
+      "order_by": {
+        "query": "SELECT * FROM sales ORDER BY price DESC LIMIT 1000",
+        "avg_time": 0.1532057762145996,
+        "min_time": 0.14162182807922363,
+        "max_time": 0.1929318904876709,
+        "times": [
+          0.14599895477294922,
+          0.14189529418945312,
+          0.14162182807922363,
+          0.14358091354370117,
+          0.1929318904876709
+        ]
+      },
+      "complex": {
+        "query": "SELECT category, AVG(price) FROM sales WHERE price > 100 GROUP BY category ORDER BY AVG(price) DESC",
+        "avg_time": 0.00010180473327636719,
+        "min_time": 5.91278076171875e-05,
+        "max_time": 0.00019311904907226562,
+        "times": [
+          0.00019311904907226562,
+          7.867813110351562e-05,
+          5.91278076171875e-05,
+          6.508827209472656e-05,
+          0.00011301040649414062
+        ]
+      }
+    }
+  },
+  "timestamp": 1760291634.558458
+}

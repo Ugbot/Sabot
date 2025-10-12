@@ -57,7 +57,7 @@ TableScanOperator::FromParquet(
     
     std::unique_ptr<parquet::arrow::FileReader> reader;
     ARROW_RETURN_NOT_OK(
-        parquet::arrow::OpenFile(input_file, arrow::default_memory_pool(), &reader));
+        parquet::arrow::OpenFile(input_file, arrow::default_memory_pool()));
     
     std::shared_ptr<arrow::Table> table;
     ARROW_RETURN_NOT_OK(reader->ReadTable(&table));
@@ -143,8 +143,8 @@ TableScanOperator::GetNextBatch() {
             if (chunked_col) {
                 // Flatten chunked array
                 ARROW_ASSIGN_OR_RAISE(auto combined, 
-                    chunked_col->CombineChunks(arrow::default_memory_pool()));
-                columns.push_back(combined);
+                    chunked_col->Flatten(arrow::default_memory_pool()));
+                columns.push_back(combined[0]);
                 
                 auto field = sliced_table->schema()->GetFieldByName(col_name);
                 fields.push_back(field);
@@ -176,7 +176,7 @@ TableScanOperator::GetNextBatch() {
     }
     
     // No projection pushdown - convert table to batch
-    ARROW_ASSIGN_OR_RAISE(auto batch, sliced_table->CombineChunksToBatch());
+    ARROW_ASSIGN_OR_RAISE(auto batch, sliced_table->ToRecordBatches()[0]);
     
     // Apply predicates
     bool passes = true;
@@ -255,6 +255,31 @@ void TableScanOperator::AddProjectionPushdown(
     const std::vector<std::string>& column_names) {
     projected_columns_ = column_names;
     has_projection_pushdown_ = true;
+}
+
+arrow::Result<std::shared_ptr<arrow::Table>> 
+TableScanOperator::GetAllResults() {
+    // Reset state
+    current_batch_ = 0;
+    exhausted_ = false;
+    
+    // Collect all batches
+    std::vector<std::shared_ptr<arrow::RecordBatch>> batches;
+    
+    while (HasNextBatch()) {
+        ARROW_ASSIGN_OR_RAISE(auto batch, GetNextBatch());
+        if (batch) {
+            batches.push_back(batch);
+        }
+    }
+    
+    // Combine batches into a single table
+    if (batches.empty()) {
+        return arrow::Table::Make(table_->schema(), {});
+    }
+    
+    ARROW_ASSIGN_OR_RAISE(auto table, arrow::Table::FromRecordBatches(batches));
+    return table;
 }
 
 } // namespace sabot_sql

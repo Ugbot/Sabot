@@ -22,7 +22,7 @@ namespace sabot_sql {
  * - Support for multiple formats (Arrow, CSV, Parquet)
  * - Batch-based streaming (memory efficient)
  */
-class TableScanOperator : public Operator {
+class TableScanOperator : public operators::Operator {
 public:
     /**
      * @brief Scan from an in-memory Arrow table
@@ -59,6 +59,7 @@ public:
     bool HasNextBatch() const override;
     std::string ToString() const override;
     size_t EstimateCardinality() const override;
+    arrow::Result<std::shared_ptr<arrow::Table>> GetAllResults() override;
     
     /**
      * @brief Add predicate pushdown filter

@@ -4,10 +4,10 @@
 namespace sabot_sql {
 
 SubqueryOperator::SubqueryOperator(
-    std::shared_ptr<Operator> outer,
-    std::shared_ptr<Operator> subquery,
+    std::shared_ptr<operators::Operator> outer,
+    std::shared_ptr<operators::Operator> subquery,
     SubqueryType type)
-    : UnaryOperator(std::move(outer))
+    : operators::Operator()
     , subquery_(std::move(subquery))
     , type_(type)
     , result_cached_(false) {
@@ -16,7 +16,7 @@ SubqueryOperator::SubqueryOperator(
 arrow::Result<std::shared_ptr<arrow::Schema>> 
 SubqueryOperator::GetOutputSchema() const {
     // Output schema depends on outer query
-    return input_->GetOutputSchema();
+    return subquery_->GetOutputSchema();
 }
 
 arrow::Result<std::shared_ptr<arrow::RecordBatch>> 
@@ -58,7 +58,12 @@ std::string SubqueryOperator::ToString() const {
 
 size_t SubqueryOperator::EstimateCardinality() const {
     // Cardinality is same as outer query
-    return input_->EstimateCardinality();
+    return subquery_->EstimateCardinality();
+}
+
+arrow::Result<std::shared_ptr<arrow::Table>> 
+SubqueryOperator::GetAllResults() {
+    return subquery_->GetAllResults();
 }
 
 void SubqueryOperator::SetCorrelationPredicate(
@@ -79,7 +84,7 @@ SubqueryOperator::ExecuteScalarSubquery() {
     ARROW_ASSIGN_OR_RAISE(auto scalar, SubqueryResultConverter::TableToScalar(cached_result_));
     
     // Get next batch from outer query
-    ARROW_ASSIGN_OR_RAISE(auto outer_batch, input_->GetNextBatch());
+    ARROW_ASSIGN_OR_RAISE(auto outer_batch, subquery_->GetNextBatch());
     if (!outer_batch) {
         return nullptr;
     }
@@ -105,7 +110,7 @@ SubqueryOperator::ExecuteExistsSubquery() {
     ARROW_ASSIGN_OR_RAISE(bool exists, SubqueryResultConverter::TableToExists(cached_result_));
     
     // Get next batch from outer query
-    ARROW_ASSIGN_OR_RAISE(auto outer_batch, input_->GetNextBatch());
+    ARROW_ASSIGN_OR_RAISE(auto outer_batch, subquery_->GetNextBatch());
     if (!outer_batch) {
         return nullptr;
     }
@@ -130,7 +135,7 @@ SubqueryOperator::ExecuteInSubquery() {
     }
     
     // Get next batch from outer query
-    ARROW_ASSIGN_OR_RAISE(auto outer_batch, input_->GetNextBatch());
+    ARROW_ASSIGN_OR_RAISE(auto outer_batch, subquery_->GetNextBatch());
     if (!outer_batch) {
         return nullptr;
     }
@@ -147,7 +152,7 @@ SubqueryOperator::ExecuteInSubquery() {
 arrow::Result<std::shared_ptr<arrow::RecordBatch>> 
 SubqueryOperator::ExecuteCorrelatedSubquery() {
     // Get next batch from outer query
-    ARROW_ASSIGN_OR_RAISE(auto outer_batch, input_->GetNextBatch());
+    ARROW_ASSIGN_OR_RAISE(auto outer_batch, subquery_->GetNextBatch());
     if (!outer_batch) {
         return nullptr;
     }
@@ -173,7 +178,7 @@ SubqueryOperator::ExecuteUncorrelatedSubquery() {
     }
     
     // Get next batch from outer query
-    ARROW_ASSIGN_OR_RAISE(auto outer_batch, input_->GetNextBatch());
+    ARROW_ASSIGN_OR_RAISE(auto outer_batch, subquery_->GetNextBatch());
     if (!outer_batch) {
         return nullptr;
     }
@@ -203,7 +208,7 @@ SubqueryResultConverter::TableToSet(
     }
     
     // Combine chunks and return as single array
-    return column->CombineChunks(arrow::default_memory_pool());
+    return column->Flatten(arrow::default_memory_pool());
 }
 
 arrow::Result<bool> 
