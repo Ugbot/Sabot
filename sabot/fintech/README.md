@@ -322,6 +322,39 @@ stream = (
 )
 ```
 
+## Larger-than-Memory State
+
+**NEW**: Support for persistent state backends when state exceeds RAM:
+
+```python
+from sabot._cython.fintech.stateful_kernels import (
+    create_stateful_ewma_operator
+)
+
+# RocksDB backend for persistent state (10K-100K symbols)
+ewma_op = create_stateful_ewma_operator(
+    source=stream,
+    alpha=0.94,
+    state_backend='rocksdb',  # ← Persistent to disk
+    state_path='./state/ewma_db'
+)
+
+# Tonbo backend for large-scale (>100K symbols)
+ewma_op = create_stateful_ewma_operator(
+    source=stream,
+    alpha=0.94,
+    state_backend='tonbo',  # ← Columnar LSM storage
+    state_path='./state/ewma_tonbo'
+)
+```
+
+**Three backends**:
+- **Memory**: <10K symbols, ~10ns, fastest
+- **RocksDB**: 10K-100K symbols, ~1μs, persistent
+- **Tonbo**: >100K symbols, ~10μs, columnar
+
+**See**: `sabot/fintech/STATE_BACKENDS.md` for complete guide
+
 ## Building from Source
 
 Kernels are Cython extensions that must be compiled:

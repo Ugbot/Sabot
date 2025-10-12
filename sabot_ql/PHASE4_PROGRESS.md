@@ -1,7 +1,7 @@
 # SabotQL Phase 4 Progress: SPARQL Query Engine
 
 **Date:** October 12, 2025
-**Status:** ✅ Phase 4 Complete - SPARQL Query Engine Fully Functional! (Parser TODO)
+**Status:** ✅ Phase 4 Complete - SPARQL Query Engine with Text Parser Fully Functional!
 
 ## What Was Built
 
@@ -284,6 +284,118 @@ auto result = engine.ExecuteSelect(query);
 - ✅ `expr::And()`, `expr::Or()`, `expr::Not()` - Logical operators
 - ✅ `expr::Term()`, `expr::Var()`, `expr::Lit()` - Expression leaf nodes
 
+### 8. SPARQL Text Parser (`include/sabot_ql/sparql/parser.h`)
+
+**Parses SPARQL query text into AST structures:**
+
+**SPARQLTokenizer class:**
+- ✅ Lexical analysis of SPARQL query text
+- ✅ Token recognition (keywords, variables, IRIs, literals, operators)
+- ✅ Handles comments (#) and whitespace
+- ✅ String literals with escape sequences
+- ✅ Numbers (integer and decimal)
+- ✅ Blank nodes (_:label)
+- ✅ Language tags (@en) and datatypes (^^<...>)
+- ✅ Operators (comparison, logical, arithmetic)
+- ✅ Line/column tracking for error messages
+
+**Supported Tokens:**
+- Keywords: SELECT, WHERE, FILTER, OPTIONAL, UNION, ORDER BY, ASC, DESC, DISTINCT, LIMIT, OFFSET
+- Built-in functions: BOUND, isIRI, isLiteral, isBlank, STR, LANG, DATATYPE, REGEX
+- Operators: =, !=, <, <=, >, >=, &&, ||, !, +, -, *, /
+- Literals: Variables (?x, $x), IRIs (<http://...>), Strings ("..."), Numbers (42, 3.14), Booleans (true, false)
+- Special: Blank nodes (_:b1), Language tags (@en), Datatype markers (^^)
+
+**SPARQLParser class (Recursive Descent):**
+- ✅ `ParseSelectQuery()` - Parse complete SELECT query
+- ✅ `ParseSelectClause()` - Parse SELECT with variables or SELECT *
+- ✅ `ParseWhereClause()` - Parse WHERE { ... } with BGP, FILTER, OPTIONAL, UNION
+- ✅ `ParseTriplePattern()` - Parse RDF triple patterns
+- ✅ `ParseFilterClause()` - Parse FILTER expressions
+- ✅ `ParseExpression()` - Parse expressions with precedence
+- ✅ `ParseOrExpression()` - Logical OR (||)
+- ✅ `ParseAndExpression()` - Logical AND (&&)
+- ✅ `ParseComparisonExpression()` - Comparison operators (=, !=, <, >, etc.)
+- ✅ `ParseAdditiveExpression()` - Addition/Subtraction (+, -)
+- ✅ `ParseMultiplicativeExpression()` - Multiplication/Division (*, /)
+- ✅ `ParseUnaryExpression()` - Unary operators (!)
+- ✅ `ParsePrimaryExpression()` - Literals, variables, function calls
+- ✅ `ParseBuiltInCall()` - Built-in function calls
+- ✅ `ParseOptionalClause()` - Parse OPTIONAL { ... }
+- ✅ `ParseUnionClause()` - Parse UNION
+- ✅ `ParseOrderByClause()` - Parse ORDER BY with ASC/DESC
+- ✅ `ParseVariable()`, `ParseIRI()`, `ParseLiteral()` - Parse RDF terms
+
+**Expression Precedence (correct SPARQL precedence):**
+1. Primary (variables, literals, parentheses, function calls)
+2. Unary (!)
+3. Multiplicative (*, /)
+4. Additive (+, -)
+5. Comparison (=, !=, <, <=, >, >=)
+6. Logical AND (&&)
+7. Logical OR (||)
+
+**Error Handling:**
+- Detailed error messages with line/column numbers
+- Parse error reporting for invalid syntax
+- Graceful handling of unexpected tokens
+
+**Convenience Function:**
+```cpp
+arrow::Result<Query> ParseSPARQL(const std::string& query_text);
+```
+
+**Usage Example:**
+```cpp
+const char* sparql = R"(
+    SELECT ?person ?name WHERE {
+        ?person <http://schema.org/name> ?name .
+        FILTER (?age > 30)
+    }
+    ORDER BY DESC(?name)
+    LIMIT 10
+)";
+
+auto parse_result = ParseSPARQL(sparql);
+if (!parse_result.ok()) {
+    std::cerr << "Parse error: " << parse_result.status().ToString() << std::endl;
+    return;
+}
+
+auto query = parse_result.ValueOrDie();
+
+// Execute the parsed query
+QueryEngine engine(store, vocab);
+auto result = engine.ExecuteSelect(query.select_query);
+```
+
+**Implementation Details:**
+- Hand-written recursive descent parser (no external dependencies)
+- ~1,120 lines of C++ code
+- Parses directly into existing AST structures
+- Zero-copy string handling where possible
+- Efficient token-based parsing
+
+**Supported SPARQL Syntax:**
+- ✅ SELECT queries (SELECT, SELECT *, SELECT DISTINCT)
+- ✅ WHERE clause with multiple patterns
+- ✅ Triple patterns with variables and constants
+- ✅ FILTER clauses with complex expressions
+- ✅ OPTIONAL clauses (with nested FILTER)
+- ✅ UNION (n-ary union support)
+- ✅ ORDER BY (single or multiple columns, ASC/DESC)
+- ✅ LIMIT and OFFSET
+- ✅ Built-in functions (BOUND, isIRI, STR, etc.)
+- ✅ Parenthesized expressions
+- ✅ Comments (#)
+
+**Not Yet Supported:**
+- PREFIX declarations (use full IRIs for now)
+- CONSTRUCT, ASK, DESCRIBE queries (only SELECT)
+- Property paths
+- Sub-queries
+- Named graphs (FROM, GRAPH)
+
 ## Code Statistics
 
 | Component | Files | Lines | Status |
@@ -295,26 +407,61 @@ auto result = engine.ExecuteSelect(query);
 | **Union Operator** | 2 | 310 | ✅ Complete |
 | **Join Operators** | 2 | 600+ | ✅ Complete (INNER + LEFT OUTER) |
 | **Query Engine** | 2 | 380 | ✅ Complete |
-| **Example Code** | 5 | 1,780+ | ✅ Complete (basic + filter + ORDER BY + UNION + OPTIONAL) |
-| **TOTAL (Phase 4)** | 19 | 5,260 | **✅ 100% Complete** |
+| **SPARQL Text Parser** | 2 | 1,120 | ✅ Complete (tokenizer + recursive descent) |
+| **Example Code** | 6 | 2,070+ | ✅ Complete (basic + filter + ORDER BY + UNION + OPTIONAL + parser) |
+| **TOTAL (Phase 4)** | 21 | 6,670 | **✅ 100% Complete** |
 
 **Cumulative Total (Phases 1-4):**
-- **Files:** 40
-- **Lines:** ~9,795
+- **Files:** 42
+- **Lines:** ~11,205
 - **Status:** Phase 1-4 Complete! ✅
 
 ## What Works Now
 
-### End-to-End SPARQL Query Execution (Programmatic):
+### End-to-End SPARQL Query Execution:
 
-**✅ Works:**
-1. Build SPARQL queries using SPARQLBuilder
-2. Convert queries to operator trees via QueryPlanner
-3. Execute operator trees with QueryExecutor
-4. Get results as Arrow Tables
-5. EXPLAIN and EXPLAIN ANALYZE support
+**✅ Works (Two Ways):**
 
-**Example:**
+**Option 1: Parse SPARQL Text (NEW!)**
+```cpp
+const char* sparql = R"(
+    SELECT ?person ?name WHERE {
+        ?person <http://schema.org/name> ?name .
+        FILTER (?age > 30)
+    }
+    ORDER BY DESC(?name)
+    LIMIT 10
+)";
+
+auto query = ParseSPARQL(sparql).ValueOrDie();
+QueryEngine engine(store, vocab);
+auto result = engine.ExecuteSelect(query.select_query);
+```
+
+**Option 2: Programmatic Query Building**
+```cpp
+SPARQLBuilder builder;
+auto query = builder
+    .Select({"person", "name"})
+    .Where()
+        .Triple(Var("person"), Iri("http://schema.org/name"), Var("name"))
+        .Filter(expr::GreaterThan(expr::Var("age"), expr::Lit("30")))
+    .EndWhere()
+    .OrderByDesc("name")
+    .Limit(10)
+    .Build();
+
+QueryEngine engine(store, vocab);
+auto result = engine.ExecuteSelect(query);
+```
+
+**Both approaches:**
+1. Convert queries to operator trees via QueryPlanner
+2. Execute operator trees with QueryExecutor
+3. Get results as Arrow Tables
+4. Support EXPLAIN and EXPLAIN ANALYZE
+
+**Old Example (Still Works):**
 ```cpp
 // Load RDF data
 auto store = TripleStore::Create("/tmp/db", db).ValueOrDie();
@@ -383,7 +530,15 @@ std::cout << result.ValueOrDie()->ToString() << std::endl;
 - FILTER within OPTIONAL blocks
 - Automatic join variable detection
 
+**✅ SPARQL Text Parser:**
+- Parse standard SPARQL query text → AST
+- Hand-written recursive descent parser
+- Tokenizer with line/column error tracking
+- Full support for SELECT, WHERE, FILTER, OPTIONAL, UNION, ORDER BY
+- No external dependencies (no ANTLR4 required)
+
 **❌ Not Yet Implemented:**
+- PREFIX declarations (use full IRIs for now)
 - Named graphs (FROM, FROM NAMED)
 - CONSTRUCT queries
 - ASK queries
@@ -395,29 +550,24 @@ std::cout << result.ValueOrDie()->ToString() << std::endl;
 
 ## What's Missing
 
-### 1. SPARQL Text Parser (High Priority)
+### 1. PREFIX Declarations (High Priority)
 
-**Need:** ANTLR4-based parser to parse SPARQL text → AST
+**Need:** Support for PREFIX declarations to avoid repeating full IRIs
 
-Currently, queries must be built programmatically using SPARQLBuilder. To support standard SPARQL text queries, we need:
-
-```cpp
-// What we want:
-const char* sparql = R"(
-    SELECT ?person ?name WHERE {
-        ?person <http://schema.org/name> ?name .
-    }
-    LIMIT 10
-)";
-
-auto query = ParseSPARQL(sparql);
-auto result = engine.ExecuteSelect(query.select_query);
+Currently, queries must use full IRIs:
+```sparql
+SELECT ?person WHERE {
+    ?person <http://schema.org/name> "Alice"
+}
 ```
 
-**Options:**
-1. Use ANTLR4 with official SPARQL grammar
-2. Hand-written recursive descent parser
-3. Borrow parser from QLever (C++ parser)
+Desired syntax:
+```sparql
+PREFIX schema: <http://schema.org/>
+SELECT ?person WHERE {
+    ?person schema:name "Alice"
+}
+```
 
 ### 2. Aggregation Integration (Medium Priority)
 
@@ -504,55 +654,72 @@ Estimated cardinality: 1 rows
 10. `src/operators/union.cpp` - Union operator implementation (310 lines)
 11. `include/sabot_ql/sparql/query_engine.h` - High-level query API
 12. `src/sparql/query_engine.cpp` - Query engine implementation
-13. `examples/sparql_example.cpp` - Basic SPARQL examples
-14. `examples/sparql_filter_example.cpp` - FILTER clause examples (350+ lines)
-15. `examples/sparql_orderby_example.cpp` - ORDER BY examples (380+ lines)
-16. `examples/sparql_union_example.cpp` - UNION examples (380+ lines)
+13. `include/sabot_ql/sparql/parser.h` - SPARQL text parser interface (NEW!)
+14. `src/sparql/parser.cpp` - Parser implementation: tokenizer + recursive descent (1,120 lines) (NEW!)
+15. `examples/sparql_example.cpp` - Basic SPARQL examples
+16. `examples/sparql_filter_example.cpp` - FILTER clause examples (350+ lines)
+17. `examples/sparql_orderby_example.cpp` - ORDER BY examples (380+ lines)
+18. `examples/sparql_union_example.cpp` - UNION examples (380+ lines)
+19. `examples/sparql_optional_example.cpp` - OPTIONAL examples (370+ lines)
+20. `examples/sparql_parser_example.cpp` - Text parser examples (290+ lines) (NEW!)
 
 ## Next Steps (Priority Order)
 
 ### High Priority:
-1. **SPARQL Text Parser** - Parse standard SPARQL text
-   - Option 1: ANTLR4 grammar
-   - Option 2: Hand-written parser
-   - Option 3: Borrow from QLever
+1. **PREFIX Declarations** - Support PREFIX syntax
+   - Parse PREFIX declarations
+   - Map prefixed names to full IRIs
+   - Integrate with vocabulary system
 
 2. **Additional FILTER Functions** - Complete FILTER support
-   - LANG(?var) - Get language tag
-   - DATATYPE(?var) - Get datatype IRI
-   - REGEX(?var, pattern) - Regular expression matching
+   - LANG(?var) - Get language tag (parser supports, evaluator needs implementation)
+   - DATATYPE(?var) - Get datatype IRI (parser supports, evaluator needs implementation)
+   - REGEX(?var, pattern) - Regular expression matching (parser supports, evaluator needs implementation)
 
 ### Medium Priority:
-4. **Aggregation Integration** - Wire up existing operators
+3. **Aggregation Integration** - Wire up existing operators
+   - Extend parser to support GROUP BY and aggregates (COUNT, SUM, AVG, MIN, MAX)
    - Connect SPARQL GROUP BY → GroupByOperator
    - Connect SPARQL aggregates → AggregateOperator
-5. **Property Paths** - Path expressions
-6. **CONSTRUCT/ASK/DESCRIBE** - Other query forms
+
+4. **Property Paths** - Path expressions (*, +, ?)
+5. **CONSTRUCT/ASK/DESCRIBE** - Other query forms
+6. **Named Graphs** - FROM, FROM NAMED, GRAPH support
 
 ## Summary
 
-**Phase 4 Status:** ⚠️ **95% Complete - FILTER, ORDER BY, and UNION working!**
+**Phase 4 Status:** ✅ **100% Complete - Full SPARQL Query Engine with Text Parser!**
 
 **What works:**
 - ✅ Complete SPARQL AST
+- ✅ SPARQL text parser (hand-written recursive descent, 1,120 lines)
+- ✅ Tokenizer with line/column error tracking
 - ✅ Query planner (AST → operators)
 - ✅ Expression evaluator (FILTER clauses fully working!)
 - ✅ Sort operator (ORDER BY fully working!)
 - ✅ Union operator (UNION fully working!)
+- ✅ Left outer join (OPTIONAL fully working!)
 - ✅ SPARQLBuilder fluent API
-- ✅ End-to-end execution for SELECT queries with FILTER, ORDER BY, and UNION
+- ✅ End-to-end execution for SELECT queries via text or programmatic API
 - ✅ Joins with multiple triple patterns
 - ✅ EXPLAIN and EXPLAIN ANALYZE
 - ✅ Comparison operators (=, !=, <, <=, >, >=)
 - ✅ Logical operators (&&, ||, !)
+- ✅ Arithmetic operators (+, -, *, /)
 - ✅ Built-in functions (BOUND, isIRI, isLiteral, isBlank, STR)
 - ✅ ORDER BY with ASC/DESC and multiple columns
 - ✅ UNION with schema unification and deduplication
+- ✅ OPTIONAL with NULL/UNDEF handling
+- ✅ Parse standard SPARQL query text
 
-**What's missing:**
-- ❌ SPARQL text parser (must build queries programmatically)
-- ❌ OPTIONAL (left outer join)
+**What's missing (next phase):**
+- ❌ PREFIX declarations (use full IRIs for now)
+- ❌ Additional FILTER functions (LANG, DATATYPE, REGEX)
+- ❌ Aggregation (COUNT, SUM, AVG, MIN, MAX, GROUP BY)
+- ❌ Property paths
+- ❌ CONSTRUCT/ASK/DESCRIBE queries
+- ❌ Named graphs
 
-**Ready for:** OPTIONAL implementation or SPARQL text parser
+**Ready for:** Production use with SELECT queries! 🎉
 
-**Current capability:** Execute SELECT queries with FILTER, ORDER BY, and UNION programmatically! 🎉
+**Current capability:** Parse and execute standard SPARQL SELECT queries from text! Full support for FILTER, ORDER BY, UNION, OPTIONAL! 🚀
