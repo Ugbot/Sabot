@@ -1,0 +1,28 @@
+add_library(
+  sabot_sql_bind_tableref
+  STATIC
+  bind_basetableref.cpp
+  bind_bound_table_ref.cpp
+  bind_delimgetref.cpp
+  bind_emptytableref.cpp
+  bind_expressionlistref.cpp
+  bind_column_data_ref.cpp
+  bind_joinref.cpp
+  bind_pivot.cpp
+  bind_showref.cpp
+  bind_subqueryref.cpp
+  bind_table_function.cpp
+  bind_named_parameters.cpp
+  plan_basetableref.cpp
+  plan_delimgetref.cpp
+  plan_dummytableref.cpp
+  plan_expressionlistref.cpp
+  plan_column_data_ref.cpp
+  plan_joinref.cpp
+  plan_subqueryref.cpp
+  plan_table_function.cpp
+  plan_cteref.cpp
+  plan_pivotref.cpp)
+set(ALL_STATIC_FILES
+    ${ALL_STATIC_FILES} $<TARGET_STATICS:sabot_sql_bind_tableref>
+    PARENT_SCOPE)

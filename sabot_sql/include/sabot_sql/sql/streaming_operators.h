@@ -71,9 +71,9 @@ struct WindowSpec {
  * 
  * Creates fixed-size, non-overlapping windows.
  */
-class TumblingWindowOperator : public Operator {
+class TumblingWindowOperator : public operators::Operator {
 public:
-    TumblingWindowOperator(std::shared_ptr<Operator> source,
+    TumblingWindowOperator(std::shared_ptr<operators::Operator> source,
                           const WindowSpec& window_spec);
     
     ~TumblingWindowOperator() override = default;
@@ -97,7 +97,7 @@ public:
     
 private:
     WindowSpec window_spec_;
-    std::shared_ptr<Operator> source_;
+    std::shared_ptr<operators::Operator> source_;
     
     // Window state
     std::unordered_map<std::string, std::vector<std::shared_ptr<arrow::RecordBatch>>> window_buffers_;
@@ -121,9 +121,9 @@ private:
  * 
  * Creates fixed-size, overlapping windows.
  */
-class SlidingWindowOperator : public Operator {
+class SlidingWindowOperator : public operators::Operator {
 public:
-    SlidingWindowOperator(std::shared_ptr<Operator> source,
+    SlidingWindowOperator(std::shared_ptr<operators::Operator> source,
                          const WindowSpec& window_spec);
     
     ~SlidingWindowOperator() override = default;
@@ -142,7 +142,7 @@ public:
     
 private:
     WindowSpec window_spec_;
-    std::shared_ptr<Operator> source_;
+    std::shared_ptr<operators::Operator> source_;
     
     // Window state
     std::unordered_map<std::string, std::vector<std::shared_ptr<arrow::RecordBatch>>> window_buffers_;
@@ -166,9 +166,9 @@ private:
  * 
  * Creates variable-size windows based on inactivity periods.
  */
-class SessionWindowOperator : public Operator {
+class SessionWindowOperator : public operators::Operator {
 public:
-    SessionWindowOperator(std::shared_ptr<Operator> source,
+    SessionWindowOperator(std::shared_ptr<operators::Operator> source,
                          const WindowSpec& window_spec);
     
     ~SessionWindowOperator() override = default;
@@ -187,7 +187,7 @@ public:
     
 private:
     WindowSpec window_spec_;
-    std::shared_ptr<Operator> source_;
+    std::shared_ptr<operators::Operator> source_;
     
     // Session state
     struct SessionState {
@@ -218,9 +218,9 @@ private:
  * 
  * Groups data by time intervals for time-series analysis.
  */
-class SampleByOperator : public Operator {
+class SampleByOperator : public operators::Operator {
 public:
-    SampleByOperator(std::shared_ptr<Operator> source,
+    SampleByOperator(std::shared_ptr<operators::Operator> source,
                     const std::string& time_column,
                     const std::string& interval,
                     const std::vector<std::string>& group_by_columns = {},
@@ -246,7 +246,7 @@ public:
     void SetInterval(const std::string& interval) { interval_ = interval; }
     
 private:
-    std::shared_ptr<Operator> source_;
+    std::shared_ptr<operators::Operator> source_;
     std::string time_column_;
     std::string interval_;
     std::vector<std::string> group_by_columns_;
@@ -273,9 +273,9 @@ private:
  * 
  * Returns the latest record for each group.
  */
-class LatestByOperator : public Operator {
+class LatestByOperator : public operators::Operator {
 public:
-    LatestByOperator(std::shared_ptr<Operator> source,
+    LatestByOperator(std::shared_ptr<operators::Operator> source,
                     const std::string& time_column,
                     const std::vector<std::string>& group_by_columns);
     
@@ -294,7 +294,7 @@ public:
     const std::vector<std::string>& GetGroupByColumns() const { return group_by_columns_; }
     
 private:
-    std::shared_ptr<Operator> source_;
+    std::shared_ptr<operators::Operator> source_;
     std::string time_column_;
     std::vector<std::string> group_by_columns_;
     
@@ -375,7 +375,7 @@ public:
     const std::vector<FunctionSpec>& GetFunctionSpecs() const { return function_specs_; }
     
 private:
-    std::shared_ptr<Operator> source_;
+    std::shared_ptr<operators::Operator> source_;
     std::vector<FunctionSpec> function_specs_;
     
     // Window state

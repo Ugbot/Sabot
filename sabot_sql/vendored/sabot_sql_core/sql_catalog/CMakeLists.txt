@@ -1,0 +1,63 @@
+add_subdirectory(standard_entry)
+add_subdirectory(dependency_manager)
+
+add_library(
+  sabot_sql_catalog
+  STATIC
+  catalog.cpp
+  catalog_entry.cpp
+  catalog_search_path.cpp
+  catalog_set.cpp
+  catalog_transaction.cpp
+  dependency_catalog.cpp
+  duck_catalog.cpp
+  duck_schema.cpp
+  duck_table_entry.cpp
+  duck_view_entry.cpp
+  duck_index_entry.cpp
+  duck_type_entry.cpp
+  duck_scalar_function_entry.cpp
+  duck_table_function_entry.cpp
+  duck_aggregate_function_entry.cpp
+  duck_pragma_function_entry.cpp
+  duck_copy_function_entry.cpp
+  duck_macro_entry.cpp
+  duck_sequence_entry.cpp
+  duck_collation_entry.cpp
+  duck_schema_entry.cpp
+  duck_database_entry.cpp
+  duck_catalog_entry.cpp
+  duck_table_catalog_entry.cpp
+  duck_view_catalog_entry.cpp
+  duck_index_catalog_entry.cpp
+  duck_type_catalog_entry.cpp
+  duck_scalar_function_catalog_entry.cpp
+  duck_table_function_catalog_entry.cpp
+  duck_aggregate_function_catalog_entry.cpp
+  duck_pragma_function_catalog_entry.cpp
+  duck_copy_function_catalog_entry.cpp
+  duck_macro_catalog_entry.cpp
+  duck_sequence_catalog_entry.cpp
+  duck_collation_catalog_entry.cpp
+  duck_schema_catalog_entry.cpp
+  duck_database_catalog_entry.cpp
+  duck_catalog_catalog_entry.cpp
+  duck_table_catalog_catalog_entry.cpp
+  duck_view_catalog_catalog_entry.cpp
+  duck_index_catalog_catalog_entry.cpp
+  duck_type_catalog_catalog_entry.cpp
+  duck_scalar_function_catalog_catalog_entry.cpp
+  duck_table_function_catalog_catalog_entry.cpp
+  duck_aggregate_function_catalog_catalog_entry.cpp
+  duck_pragma_function_catalog_catalog_entry.cpp
+  duck_copy_function_catalog_catalog_entry.cpp
+  duck_macro_catalog_catalog_entry.cpp
+  duck_sequence_catalog_catalog_entry.cpp
+  duck_collation_catalog_catalog_entry.cpp
+  duck_schema_catalog_catalog_entry.cpp
+  duck_database_catalog_catalog_entry.cpp
+)
+
+set(ALL_STATIC_FILES
+    ${ALL_STATIC_FILES} $<TARGET_STATICS:sabot_sql_catalog>
+    PARENT_SCOPE)

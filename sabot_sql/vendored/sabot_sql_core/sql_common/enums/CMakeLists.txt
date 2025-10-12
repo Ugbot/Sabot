@@ -1,0 +1,19 @@
+add_library(
+  sabot_sql_common_enums
+  STATIC
+  catalog_type.cpp
+  compression_type.cpp
+  date_part_specifier.cpp
+  expression_type.cpp
+  file_compression_type.cpp
+  http_status_code.cpp
+  join_type.cpp
+  logical_operator_type.cpp
+  metric_type.cpp
+  optimizer_type.cpp
+  physical_operator_type.cpp
+  statement_type.cpp
+  relation_type.cpp)
+set(ALL_STATIC_FILES
+    ${ALL_STATIC_FILES} $<TARGET_STATICS:sabot_sql_common_enums>
+    PARENT_SCOPE)

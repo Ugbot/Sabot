@@ -1,0 +1,33 @@
+//===----------------------------------------------------------------------===//
+//                         SabotSQL
+//
+// sabot_sql/parser/tableref/emptytableref.hpp
+//
+//
+//===----------------------------------------------------------------------===//
+
+#pragma once
+
+#include "sabot_sql/parser/tableref.hpp"
+
+namespace sabot_sql {
+
+class EmptyTableRef : public TableRef {
+public:
+	static constexpr const TableReferenceType TYPE = TableReferenceType::EMPTY_FROM;
+
+public:
+	EmptyTableRef() : TableRef(TableReferenceType::EMPTY_FROM) {
+	}
+
+public:
+	string ToString() const override;
+	bool Equals(const TableRef &other_p) const override;
+
+	unique_ptr<TableRef> Copy() override;
+
+	//! Deserializes a blob back into a DummyTableRef
+	void Serialize(Serializer &serializer) const override;
+	static unique_ptr<TableRef> Deserialize(Deserializer &source);
+};
+} // namespace sabot_sql

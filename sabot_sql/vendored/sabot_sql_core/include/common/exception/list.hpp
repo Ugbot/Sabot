@@ -1,0 +1,6 @@
+#include "sabot_sql/common/exception/binder_exception.hpp"
+#include "sabot_sql/common/exception/catalog_exception.hpp"
+#include "sabot_sql/common/exception/conversion_exception.hpp"
+#include "sabot_sql/common/exception/http_exception.hpp"
+#include "sabot_sql/common/exception/parser_exception.hpp"
+#include "sabot_sql/common/exception/transaction_exception.hpp"

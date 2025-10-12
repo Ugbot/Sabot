@@ -2,6 +2,7 @@
 #include <cctype>
 #include <unordered_map>
 #include <sstream>
+#include <iostream>
 
 namespace sabot_ql {
 namespace sparql {
@@ -45,7 +46,7 @@ arrow::Result<std::vector<Token>> SPARQLTokenizer::Tokenize() {
             continue;
         }
 
-        // IRI: <http://...>
+        // IRI: <...> (QLever approach: always IRI if has closing >)
         if (c == '<') {
             // Could be IRI or < operator
             if (PeekChar() == '=') {
@@ -53,27 +54,31 @@ arrow::Result<std::vector<Token>> SPARQLTokenizer::Tokenize() {
                 Advance();
                 Advance();
             } else {
-                // Check if it looks like an IRI (has :// or contains /)
+                // Look ahead to see if there's a closing > (making it an IRI)
                 size_t saved_pos = pos_;
-                size_t saved_line = line_;
-                size_t saved_column = column_;
-                Advance();
-                bool looks_like_iri = false;
-                while (!IsAtEnd() && CurrentChar() != '>') {
-                    if (CurrentChar() == ':' || CurrentChar() == '/') {
-                        looks_like_iri = true;
+                Advance();  // Skip '<'
+                bool found_close = false;
+                // Scan until we hit >, whitespace, newline, or EOF
+                while (!IsAtEnd()) {
+                    char ch = CurrentChar();
+                    if (ch == '>') {
+                        found_close = true;
+                        break;
+                    }
+                    // Stop at whitespace or newline (not an IRI)
+                    if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
                         break;
                     }
                     Advance();
                 }
                 // Restore position
                 pos_ = saved_pos;
-                line_ = saved_line;
-                column_ = saved_column;
 
-                if (looks_like_iri) {
+                if (found_close) {
+                    // It's an IRI: <...>
                     tokens.push_back(ReadIRI());
                 } else {
+                    // It's a less-than operator: <
                     tokens.push_back(MakeToken(TokenType::LESS_THAN, "<"));
                     Advance();
                 }
@@ -122,8 +127,10 @@ arrow::Result<std::vector<Token>> SPARQLTokenizer::Tokenize() {
         }
 
         // Unknown character
-        return arrow::Status::Invalid("Unknown character '", std::string(1, c),
-                                     "' at line ", line_, ", column ", column_);
+        std::ostringstream oss;
+        oss << "Unknown character '" << c << "' at line " << line_
+            << ", column " << column_;
+        return arrow::Status::Invalid(oss.str());
     }
 
     tokens.push_back(MakeToken(TokenType::END_OF_INPUT, ""));
@@ -527,7 +534,10 @@ const Token& SPARQLParser::PeekToken(size_t offset) const {
 }
 
 bool SPARQLParser::IsAtEnd() const {
-    return pos_ >= tokens_.size() || CurrentToken().type == TokenType::END_OF_INPUT;
+    if (pos_ >= tokens_.size()) return true;
+    // Check END_OF_INPUT token without calling CurrentToken() (avoid recursion)
+    if (pos_ < tokens_.size() && tokens_[pos_].type == TokenType::END_OF_INPUT) return true;
+    return false;
 }
 
 void SPARQLParser::Advance() {
@@ -624,7 +634,9 @@ arrow::Result<std::string> SPARQLParser::ExpandPrefixedName(const std::string& p
     // Look up prefix
     auto it = prefixes_.find(prefix);
     if (it == prefixes_.end()) {
-        return arrow::Status::Invalid("Undefined prefix '", prefix, "'");
+        std::ostringstream oss;
+        oss << "Undefined prefix '" << prefix << "'";
+        return arrow::Status::Invalid(oss.str());
     }
 
     // Expand to full IRI
@@ -745,12 +757,13 @@ arrow::Result<SelectClause> SPARQLParser::ParseSelectClause() {
 
             ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after aggregate function argument"));
 
-            ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' to close aggregate expression"));
-
             // Parse AS alias
-            ARROW_RETURN_NOT_OK(Expect(TokenType::AS, "Expected AS keyword after aggregate expression"));
+            ARROW_RETURN_NOT_OK(Expect(TokenType::AS, "Expected AS keyword after aggregate function"));
 
             ARROW_ASSIGN_OR_RAISE(auto alias, ParseVariable());
+
+            // Expect closing ')' for the alias expression: (COUNT(?x) AS ?count)
+            ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' to close alias expression"));
 
             // Create AggregateExpression
             AggregateExpression agg(agg_expr, alias, distinct);
@@ -762,10 +775,10 @@ arrow::Result<SelectClause> SPARQLParser::ParseSelectClause() {
             clause.items.push_back(SelectItem(var));
         }
 
-        // Continue if there's a comma
-        if (!Match(TokenType::COMMA)) {
-            break;
-        }
+        // Commas are optional in SPARQL (space-separated is valid)
+        // Continue if there's a comma, or if another variable/aggregate follows
+        Match(TokenType::COMMA);  // Optional comma
+        // Loop continues if Check(VARIABLE) || Check(LPAREN) at line 701
     }
 
     if (clause.items.empty()) {

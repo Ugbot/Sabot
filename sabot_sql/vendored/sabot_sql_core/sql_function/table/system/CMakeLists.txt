@@ -1,0 +1,43 @@
+add_library(
+  sabot_sql_table_func_system
+  STATIC
+  sabot_sql_connection_count.cpp
+  sabot_sql_approx_database_count.cpp
+  sabot_sql_columns.cpp
+  sabot_sql_constraints.cpp
+  sabot_sql_databases.cpp
+  sabot_sql_dependencies.cpp
+  sabot_sql_extensions.cpp
+  sabot_sql_external_file_cache.cpp
+  sabot_sql_functions.cpp
+  sabot_sql_keywords.cpp
+  sabot_sql_log.cpp
+  sabot_sql_log_contexts.cpp
+  sabot_sql_indexes.cpp
+  sabot_sql_memory.cpp
+  sabot_sql_optimizers.cpp
+  sabot_sql_schemas.cpp
+  sabot_sql_secrets.cpp
+  sabot_sql_prepared_statements.cpp
+  sabot_sql_which_secret.cpp
+  sabot_sql_secret_types.cpp
+  sabot_sql_sequences.cpp
+  sabot_sql_settings.cpp
+  sabot_sql_tables.cpp
+  sabot_sql_temporary_files.cpp
+  sabot_sql_types.cpp
+  sabot_sql_variables.cpp
+  sabot_sql_views.cpp
+  logging_utils.cpp
+  pragma_collations.cpp
+  pragma_database_size.cpp
+  pragma_metadata_info.cpp
+  pragma_storage_info.cpp
+  pragma_table_info.cpp
+  pragma_table_sample.cpp
+  pragma_user_agent.cpp
+  test_all_types.cpp
+  test_vector_types.cpp)
+set(ALL_STATIC_FILES
+    ${ALL_STATIC_FILES} $<TARGET_STATICS:sabot_sql_table_func_system>
+    PARENT_SCOPE)

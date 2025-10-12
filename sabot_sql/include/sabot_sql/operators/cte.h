@@ -26,7 +26,7 @@ namespace sabot_sql {
  *   )
  *   SELECT * FROM high_value_orders WHERE customer_id = 123;
  */
-class CTEOperator : public Operator {
+class CTEOperator : public operators::Operator {
 public:
     /**
      * @brief Create a CTE operator

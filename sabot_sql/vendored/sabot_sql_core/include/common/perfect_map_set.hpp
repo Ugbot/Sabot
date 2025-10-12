@@ -1,0 +1,34 @@
+//===----------------------------------------------------------------------===//
+//                         SabotSQL
+//
+// sabot_sql/common/perfect_map_set.hpp
+//
+//
+//===----------------------------------------------------------------------===//
+
+#pragma once
+
+#include "sabot_sql/common/types.hpp"
+#include "sabot_sql/common/unordered_map.hpp"
+#include "sabot_sql/common/unordered_set.hpp"
+
+namespace sabot_sql {
+
+struct PerfectHash {
+	std::size_t operator()(const idx_t &h) const {
+		return h;
+	}
+};
+
+struct PerfectEquality {
+	bool operator()(const idx_t &a, const idx_t &b) const {
+		return a == b;
+	}
+};
+
+template <typename T>
+using perfect_map_t = unordered_map<idx_t, T, PerfectHash, PerfectEquality>;
+
+using perfect_set_t = unordered_set<idx_t, PerfectHash, PerfectEquality>;
+
+} // namespace sabot_sql

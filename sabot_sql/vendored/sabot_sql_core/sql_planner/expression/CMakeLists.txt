@@ -1,0 +1,25 @@
+add_library(
+  sabot_sql_planner_expression
+  STATIC
+  bound_expression.cpp
+  bound_aggregate_expression.cpp
+  bound_between_expression.cpp
+  bound_case_expression.cpp
+  bound_cast_expression.cpp
+  bound_columnref_expression.cpp
+  bound_comparison_expression.cpp
+  bound_conjunction_expression.cpp
+  bound_constant_expression.cpp
+  bound_expanded_expression.cpp
+  bound_function_expression.cpp
+  bound_lambda_expression.cpp
+  bound_lambdaref_expression.cpp
+  bound_operator_expression.cpp
+  bound_parameter_expression.cpp
+  bound_reference_expression.cpp
+  bound_subquery_expression.cpp
+  bound_unnest_expression.cpp
+  bound_window_expression.cpp)
+set(ALL_STATIC_FILES
+    ${ALL_STATIC_FILES} $<TARGET_STATICS:sabot_sql_planner_expression>
+    PARENT_SCOPE)

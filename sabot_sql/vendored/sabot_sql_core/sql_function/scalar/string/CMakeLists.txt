@@ -1,0 +1,24 @@
+add_subdirectory(regexp)
+add_library(
+  sabot_sql_func_string_main
+  STATIC
+  caseconvert.cpp
+  concat.cpp
+  concat_ws.cpp
+  length.cpp
+  like.cpp
+  md5.cpp
+  nfc_normalize.cpp
+  regexp.cpp
+  substring.cpp
+  prefix.cpp
+  regexp_escape.cpp
+  sha1.cpp
+  sha256.cpp
+  strip_accents.cpp
+  string_split.cpp
+  suffix.cpp
+  contains.cpp)
+set(ALL_STATIC_FILES
+    ${ALL_STATIC_FILES} $<TARGET_STATICS:sabot_sql_func_string_main>
+    PARENT_SCOPE)

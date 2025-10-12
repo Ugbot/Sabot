@@ -1,0 +1,120 @@
+//===----------------------------------------------------------------------===//
+//                         SabotSQL
+//
+// sabot_sql/common/hive_partitioning.hpp
+//
+//
+//===----------------------------------------------------------------------===//
+
+#pragma once
+
+#include "sabot_sql/common/types/column/partitioned_column_data.hpp"
+#include "sabot_sql/execution/expression_executor.hpp"
+#include "sabot_sql/optimizer/filter_combiner.hpp"
+#include "sabot_sql/optimizer/statistics_propagator.hpp"
+#include "sabot_sql/planner/expression_iterator.hpp"
+#include "sabot_sql/planner/table_filter.hpp"
+#include "sabot_sql/common/open_file_info.hpp"
+#include "sabot_sql/original/std/sstream.hpp"
+
+#include <iostream>
+
+namespace sabot_sql {
+struct MultiFilePushdownInfo;
+
+struct HivePartitioningFilterInfo {
+	unordered_map<string, column_t> column_map;
+	bool hive_enabled;
+	bool filename_enabled;
+};
+
+class HivePartitioning {
+public:
+	//! Parse a filename that follows the hive partitioning scheme
+	SABOT_SQL_API static std::map<string, string> Parse(const string &filename);
+	//! Prunes a list of filenames based on a set of filters, can be used by TableFunctions in the
+	//! pushdown_complex_filter function to skip files with filename-based filters. Also removes the filters that always
+	//! evaluate to true.
+	SABOT_SQL_API static void ApplyFiltersToFileList(ClientContext &context, vector<OpenFileInfo> &files,
+	                                              vector<unique_ptr<Expression>> &filters,
+	                                              const HivePartitioningFilterInfo &filter_info,
+	                                              MultiFilePushdownInfo &info);
+
+	SABOT_SQL_API static Value GetValue(ClientContext &context, const string &key, const string &value,
+	                                 const LogicalType &type);
+	//! Escape a hive partition key or value using URL encoding
+	SABOT_SQL_API static string Escape(const string &input);
+	//! Unescape a hive partition key or value encoded using URL encoding
+	SABOT_SQL_API static string Unescape(const string &input);
+};
+
+struct HivePartitionKey {
+	//! Columns by which we want to partition
+	vector<Value> values;
+	//! Precomputed hash of values
+	hash_t hash;
+
+	struct Hash {
+		std::size_t operator()(const HivePartitionKey &k) const {
+			return k.hash;
+		}
+	};
+
+	struct Equality {
+		bool operator()(const HivePartitionKey &a, const HivePartitionKey &b) const {
+			if (a.values.size() != b.values.size()) {
+				return false;
+			}
+			for (idx_t i = 0; i < a.values.size(); i++) {
+				if (!Value::NotDistinctFrom(a.values[i], b.values[i])) {
+					return false;
+				}
+			}
+			return true;
+		}
+	};
+};
+
+//! Maps hive partitions to partition_ids
+typedef unordered_map<HivePartitionKey, idx_t, HivePartitionKey::Hash, HivePartitionKey::Equality> hive_partition_map_t;
+
+//! class shared between HivePartitionColumnData classes that synchronizes partition discovery between threads.
+//! each HivePartitionedColumnData will hold a local copy of the key->partition map
+class GlobalHivePartitionState {
+public:
+	mutex lock;
+	hive_partition_map_t partition_map;
+};
+
+class HivePartitionedColumnData : public PartitionedColumnData {
+public:
+	HivePartitionedColumnData(ClientContext &context, vector<LogicalType> types, vector<idx_t> partition_by_cols,
+	                          shared_ptr<GlobalHivePartitionState> global_state = nullptr);
+	void ComputePartitionIndices(PartitionedColumnDataAppendState &state, DataChunk &input) override;
+
+	//! Reverse lookup map to reconstruct keys from a partition id
+	std::map<idx_t, const HivePartitionKey *> GetReverseMap();
+
+protected:
+	//! Register a newly discovered partition
+	idx_t RegisterNewPartition(HivePartitionKey key, PartitionedColumnDataAppendState &state);
+	//! Add a new partition with the given partition id
+	void AddNewPartition(HivePartitionKey key, idx_t partition_id, PartitionedColumnDataAppendState &state);
+
+private:
+	void InitializeKeys();
+
+protected:
+	//! Shared HivePartitionedColumnData should always have a global state to allow parallel key discovery
+	shared_ptr<GlobalHivePartitionState> global_state;
+	//! Thread-local copy of the partition map
+	hive_partition_map_t local_partition_map;
+	//! The columns that make up the key
+	vector<idx_t> group_by_columns;
+	//! Thread-local pre-allocated vector for hashes
+	Vector hashes_v;
+	//! Thread-local pre-allocated HivePartitionKeys
+	vector<HivePartitionKey> keys;
+};
+
+} // namespace sabot_sql

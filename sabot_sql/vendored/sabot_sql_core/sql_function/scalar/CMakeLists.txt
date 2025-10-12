@@ -1,0 +1,22 @@
+add_subdirectory(compressed_materialization)
+add_subdirectory(date)
+add_subdirectory(generic)
+add_subdirectory(list)
+add_subdirectory(map)
+add_subdirectory(operator)
+add_subdirectory(sequence)
+add_subdirectory(string)
+add_subdirectory(struct)
+add_subdirectory(variant)
+add_subdirectory(system)
+add_library(
+  sabot_sql_func_scalar
+  STATIC
+  compressed_materialization_utils.cpp
+  create_sort_key.cpp
+  strftime_format.cpp
+  nested_functions.cpp
+  pragma_functions.cpp)
+set(ALL_STATIC_FILES
+    ${ALL_STATIC_FILES} $<TARGET_STATICS:sabot_sql_func_scalar>
+    PARENT_SCOPE)

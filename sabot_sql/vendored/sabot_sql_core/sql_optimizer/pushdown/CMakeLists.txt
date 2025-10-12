@@ -1,0 +1,22 @@
+add_library(
+  sabot_sql_optimizer_pushdown
+  STATIC
+  pushdown_aggregate.cpp
+  pushdown_cross_product.cpp
+  pushdown_distinct.cpp
+  pushdown_filter.cpp
+  pushdown_get.cpp
+  pushdown_inner_join.cpp
+  pushdown_limit.cpp
+  pushdown_left_join.cpp
+  pushdown_mark_join.cpp
+  pushdown_outer_join.cpp
+  pushdown_projection.cpp
+  pushdown_semi_anti_join.cpp
+  pushdown_set_operation.cpp
+  pushdown_single_join.cpp
+  pushdown_window.cpp
+  pushdown_unnest.cpp)
+set(ALL_STATIC_FILES
+    ${ALL_STATIC_FILES} $<TARGET_STATICS:sabot_sql_optimizer_pushdown>
+    PARENT_SCOPE)

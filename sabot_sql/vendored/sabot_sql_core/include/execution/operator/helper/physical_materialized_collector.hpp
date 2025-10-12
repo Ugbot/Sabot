@@ -1,0 +1,54 @@
+//===----------------------------------------------------------------------===//
+//                         SabotSQL
+//
+// sabot_sql/execution/operator/helper/physical_materialized_collector.hpp
+//
+//
+//===----------------------------------------------------------------------===//
+
+#pragma once
+
+#include "sabot_sql/execution/operator/helper/physical_result_collector.hpp"
+#include "sabot_sql/common/types/column/column_data_scan_states.hpp"
+#include "sabot_sql/common/types/column/column_data_collection.hpp"
+
+namespace sabot_sql {
+
+class PhysicalMaterializedCollector : public PhysicalResultCollector {
+public:
+	PhysicalMaterializedCollector(PhysicalPlan &physical_plan, PreparedStatementData &data, bool parallel);
+
+	bool parallel;
+
+public:
+	unique_ptr<QueryResult> GetResult(GlobalSinkState &state) override;
+
+public:
+	// Sink interface
+	SinkResultType Sink(ExecutionContext &context, DataChunk &chunk, OperatorSinkInput &input) const override;
+	SinkCombineResultType Combine(ExecutionContext &context, OperatorSinkCombineInput &input) const override;
+
+	unique_ptr<LocalSinkState> GetLocalSinkState(ExecutionContext &context) const override;
+	unique_ptr<GlobalSinkState> GetGlobalSinkState(ClientContext &context) const override;
+
+	bool ParallelSink() const override;
+	bool SinkOrderDependent() const override;
+};
+
+//===--------------------------------------------------------------------===//
+// Sink
+//===--------------------------------------------------------------------===//
+class MaterializedCollectorGlobalState : public GlobalSinkState {
+public:
+	mutex glock;
+	unique_ptr<ColumnDataCollection> collection;
+	shared_ptr<ClientContext> context;
+};
+
+class MaterializedCollectorLocalState : public LocalSinkState {
+public:
+	unique_ptr<ColumnDataCollection> collection;
+	ColumnDataAppendState append_state;
+};
+
+} // namespace sabot_sql

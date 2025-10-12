@@ -1,0 +1,31 @@
+//===----------------------------------------------------------------------===//
+//                         SabotSQL
+//
+// sabot_sql/execution/operator/scan/physical_empty_result.hpp
+//
+//
+//===----------------------------------------------------------------------===//
+
+#pragma once
+
+#include "sabot_sql/execution/physical_operator.hpp"
+
+namespace sabot_sql {
+
+class PhysicalEmptyResult : public PhysicalOperator {
+public:
+	static constexpr const PhysicalOperatorType TYPE = PhysicalOperatorType::EMPTY_RESULT;
+
+public:
+	explicit PhysicalEmptyResult(PhysicalPlan &physical_plan, vector<LogicalType> types, idx_t estimated_cardinality)
+	    : PhysicalOperator(physical_plan, PhysicalOperatorType::EMPTY_RESULT, std::move(types), estimated_cardinality) {
+	}
+
+public:
+	SourceResultType GetData(ExecutionContext &context, DataChunk &chunk, OperatorSourceInput &input) const override;
+
+	bool IsSource() const override {
+		return true;
+	}
+};
+} // namespace sabot_sql

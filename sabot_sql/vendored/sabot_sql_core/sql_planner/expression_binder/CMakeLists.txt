@@ -1,0 +1,27 @@
+add_library(
+  sabot_sql_expression_binders
+  STATIC
+  aggregate_binder.cpp
+  alter_binder.cpp
+  base_select_binder.cpp
+  check_binder.cpp
+  column_alias_binder.cpp
+  constant_binder.cpp
+  group_binder.cpp
+  having_binder.cpp
+  lateral_binder.cpp
+  qualify_binder.cpp
+  index_binder.cpp
+  insert_binder.cpp
+  order_binder.cpp
+  projection_binder.cpp
+  relation_binder.cpp
+  returning_binder.cpp
+  select_binder.cpp
+  select_bind_state.cpp
+  table_function_binder.cpp
+  update_binder.cpp
+  where_binder.cpp)
+set(ALL_STATIC_FILES
+    ${ALL_STATIC_FILES} $<TARGET_STATICS:sabot_sql_expression_binders>
+    PARENT_SCOPE)
