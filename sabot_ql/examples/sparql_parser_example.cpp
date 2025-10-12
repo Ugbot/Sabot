@@ -42,7 +42,41 @@ int main() {
     std::cout << "============================" << std::endl;
 
     // ========================================================================
-    // Example 1: Simple SELECT query
+    // Example 1: PREFIX declarations
+    // ========================================================================
+    PrintParseResult(
+        "PREFIX declarations",
+        R"(
+            PREFIX schema: <http://schema.org/>
+            PREFIX ex: <http://example.org/>
+
+            SELECT ?person ?name
+            WHERE {
+                ?person schema:name ?name
+            }
+        )"
+    );
+
+    // ========================================================================
+    // Example 2: Multiple prefixes in query
+    // ========================================================================
+    PrintParseResult(
+        "Multiple prefixes",
+        R"(
+            PREFIX schema: <http://schema.org/>
+            PREFIX ex: <http://example.org/>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+            SELECT ?person ?age
+            WHERE {
+                ?person schema:age ?age .
+                FILTER (?age > "30"^^xsd:integer)
+            }
+        )"
+    );
+
+    // ========================================================================
+    // Example 3: Simple SELECT query (without PREFIX)
     // ========================================================================
     PrintParseResult(
         "Simple SELECT",
@@ -55,7 +89,7 @@ int main() {
     );
 
     // ========================================================================
-    // Example 2: SELECT * (all variables)
+    // Example 4: SELECT * (all variables)
     // ========================================================================
     PrintParseResult(
         "SELECT *",
@@ -68,7 +102,7 @@ int main() {
     );
 
     // ========================================================================
-    // Example 3: FILTER with comparison
+    // Example 5: FILTER with comparison
     // ========================================================================
     PrintParseResult(
         "FILTER with comparison",
@@ -82,7 +116,7 @@ int main() {
     );
 
     // ========================================================================
-    // Example 4: FILTER with logical operators
+    // Example 6: FILTER with logical operators
     // ========================================================================
     PrintParseResult(
         "FILTER with AND/OR",
@@ -97,7 +131,7 @@ int main() {
     );
 
     // ========================================================================
-    // Example 5: OPTIONAL clause
+    // Example 7: OPTIONAL clause
     // ========================================================================
     PrintParseResult(
         "OPTIONAL clause",
@@ -280,12 +314,14 @@ int main() {
 
     std::cout << "Loaded " << triples.size() << " triples" << std::endl;
 
-    // 4. Parse and execute a query
+    // 4. Parse and execute a query with PREFIX
     std::string query_text = R"(
+        PREFIX schema: <http://schema.org/>
+
         SELECT ?person ?name ?age
         WHERE {
-            ?person <http://schema.org/name> ?name .
-            ?person <http://schema.org/age> ?age .
+            ?person schema:name ?name .
+            ?person schema:age ?age .
             FILTER (?age > 30)
         }
         ORDER BY DESC(?age)

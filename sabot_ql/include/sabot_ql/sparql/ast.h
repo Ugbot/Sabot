@@ -131,7 +131,16 @@ enum class ExprOperator {
     Str,             // STR(?var)
     Lang,            // LANG(?var)
     Datatype,        // DATATYPE(?var)
-    Regex            // REGEX(?var, "pattern")
+    Regex,           // REGEX(?var, "pattern")
+
+    // Aggregate functions (SPARQL 1.1)
+    Count,           // COUNT(?var) or COUNT(*)
+    Sum,             // SUM(?var)
+    Avg,             // AVG(?var)
+    Min,             // MIN(?var)
+    Max,             // MAX(?var)
+    GroupConcat,     // GROUP_CONCAT(?var; separator="sep")
+    Sample           // SAMPLE(?var)
 };
 
 // FILTER expression
@@ -212,15 +221,44 @@ struct OrderBy {
     std::string ToString() const;
 };
 
+// Aggregate expression: COUNT(?var) AS ?count
+// Represents aggregate function call with optional alias
+struct AggregateExpression {
+    std::shared_ptr<Expression> expr;  // The aggregate function expression
+    Variable alias;                     // AS ?alias (output variable name)
+    bool distinct = false;              // COUNT(DISTINCT ?var)
+
+    AggregateExpression() = default;
+    AggregateExpression(std::shared_ptr<Expression> e, Variable a, bool d = false)
+        : expr(std::move(e)), alias(std::move(a)), distinct(d) {}
+
+    std::string ToString() const;
+};
+
+// SELECT clause item: either a variable or an aggregate expression
+using SelectItem = std::variant<Variable, AggregateExpression>;
+
 // SELECT variables
 struct SelectClause {
     bool distinct = false;
-    std::vector<Variable> variables;  // Empty means SELECT *
+    std::vector<SelectItem> items;  // Empty means SELECT *
 
     SelectClause() = default;
 
-    bool IsSelectAll() const { return variables.empty(); }
+    bool IsSelectAll() const { return items.empty(); }
+    bool HasAggregates() const;
 
+    std::string ToString() const;
+};
+
+// GROUP BY clause
+struct GroupByClause {
+    std::vector<Variable> variables;  // Variables to group by
+
+    GroupByClause() = default;
+    explicit GroupByClause(std::vector<Variable> vars) : variables(std::move(vars)) {}
+
+    bool IsEmpty() const { return variables.empty(); }
     std::string ToString() const;
 };
 
@@ -228,11 +266,15 @@ struct SelectClause {
 struct SelectQuery {
     SelectClause select;
     QueryPattern where;
+    std::optional<GroupByClause> group_by;  // GROUP BY clause
     std::vector<OrderBy> order_by;
     std::optional<size_t> limit;
     std::optional<size_t> offset;
 
     SelectQuery() = default;
+
+    bool HasGroupBy() const { return group_by.has_value() && !group_by->IsEmpty(); }
+    bool HasAggregates() const { return select.HasAggregates(); }
 
     std::string ToString() const;
 };
