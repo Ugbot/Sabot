@@ -1,5 +1,8 @@
 #include <sabot_ql/operators/operator.h>
+#include <sabot_ql/storage/triple_store.h>
 #include <arrow/compute/api.h>
+#include <sstream>
+#include <chrono>
 
 namespace sabot_ql {
 
@@ -27,7 +30,8 @@ arrow::Result<std::shared_ptr<arrow::Table>> Operator::GetAllResults() {
     if (batches.empty()) {
         // Return empty table with correct schema
         ARROW_ASSIGN_OR_RAISE(auto schema, GetOutputSchema());
-        return arrow::Table::Make(schema, {});
+        std::vector<std::shared_ptr<arrow::Array>> empty_arrays;
+        return arrow::Table::Make(schema, empty_arrays);
     }
 
     return arrow::Table::FromRecordBatches(batches);
@@ -82,24 +86,15 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> TripleScanOperator::GetNextBa
         current_batch_ = 0;
     }
 
-    // Return batches one at a time
-    if (current_batch_ < static_cast<size_t>(results_->num_row_groups())) {
-        auto batch = results_->column(0)->chunks()[current_batch_];
-        auto record_batch_result = arrow::RecordBatch::Make(
-            results_->schema(),
-            batch->length(),
-            results_->columns()
-        );
+    // Convert table to batches
+    ARROW_ASSIGN_OR_RAISE(auto batches, arrow::TableBatchReader(*results_).ToRecordBatches());
 
-        if (!record_batch_result.ok()) {
-            return record_batch_result;
-        }
-
-        stats_.rows_processed += batch->length();
+    if (current_batch_ < batches.size()) {
+        auto batch = batches[current_batch_];
+        stats_.rows_processed += batch->num_rows();
         stats_.batches_processed++;
-
         current_batch_++;
-        return record_batch_result.ValueOrDie();
+        return batch;
     }
 
     exhausted_ = true;
@@ -107,13 +102,7 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> TripleScanOperator::GetNextBa
 }
 
 bool TripleScanOperator::HasNextBatch() const {
-    if (exhausted_) {
-        return false;
-    }
-    if (!results_) {
-        return true;  // Haven't scanned yet
-    }
-    return current_batch_ < static_cast<size_t>(results_->num_row_groups());
+    return !exhausted_;
 }
 
 std::string TripleScanOperator::ToString() const {

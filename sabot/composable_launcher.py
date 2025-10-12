@@ -31,7 +31,7 @@ class ComposableLauncher:
     - Docker containerized deployments
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.mode = self._detect_mode()
         self.coordinator = None
         self.worker_node = None
@@ -86,7 +86,7 @@ class ComposableLauncher:
             "target_utilization": float(os.getenv("TARGET_UTILIZATION", "0.8")),
         }
 
-    async def start(self):
+    async def start(self) -> None:
         """Start Sabot in the appropriate mode."""
         if self.running:
             return
@@ -126,7 +126,7 @@ class ComposableLauncher:
         finally:
             await self.stop()
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop Sabot."""
         if not self.running:
             return
@@ -144,7 +144,7 @@ class ComposableLauncher:
 
         logger.info("Sabot stopped")
 
-    async def _start_single_node(self):
+    async def _start_single_node(self) -> None:
         """Start Sabot in single-node mode."""
         logger.info("Starting single-node Sabot")
 

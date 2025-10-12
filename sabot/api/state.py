@@ -28,7 +28,7 @@ class State:
         self.name = name
         self._backend = state_backend or {}
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear all state."""
         if hasattr(self._backend, 'delete'):
             self._backend.delete(self.name)
@@ -49,7 +49,7 @@ class ValueState(State):
         batch = state.value(user_id)
     """
 
-    def update(self, key: str, value: Any):
+    def update(self, key: str, value: Any) -> None:
         """
         Update state value for key.
 
@@ -125,7 +125,7 @@ class ListState(State):
         all_events = state.get_all(user_id)
     """
 
-    def add(self, key: str, value: ca.RecordBatch):
+    def add(self, key: str, value: ca.RecordBatch) -> None:
         """
         Append value to list for key.
 
@@ -181,7 +181,7 @@ class ListState(State):
             return None
         return ca.Table.from_batches(batches)
 
-    def update(self, key: str, values: List[ca.RecordBatch]):
+    def update(self, key: str, values: List[ca.RecordBatch]) -> None:
         """
         Replace list for key.
 
@@ -224,7 +224,7 @@ class MapState(State):
         all_features = state.items(user_id)
     """
 
-    def put(self, key: str, map_key: str, value: Any):
+    def put(self, key: str, map_key: str, value: Any) -> None:
         """
         Put value in nested map.
 
@@ -280,7 +280,7 @@ class MapState(State):
         """Check if map key exists."""
         return self.get(key, map_key) is not None
 
-    def remove(self, key: str, map_key: str):
+    def remove(self, key: str, map_key: str) -> None:
         """Remove map key."""
         full_key = f"{self.name}:{key}:{map_key}"
 
@@ -313,7 +313,7 @@ class MapState(State):
         else:
             return []
 
-    def items(self, key: str) -> List[tuple]:
+    def items(self, key: str) -> List[tuple[str, Any]]:
         """
         Get all (map_key, value) pairs for outer key.
 
@@ -355,7 +355,7 @@ class ReducingState(State):
         self.reduce_fn = reduce_fn
         self.initial_value = initial_value
 
-    def add(self, key: str, value: Any):
+    def add(self, key: str, value: Any) -> None:
         """
         Add value using reduce function.
 

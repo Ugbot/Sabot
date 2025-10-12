@@ -46,9 +46,22 @@ public:
     ~VocabularyImpl() override = default;
 
     arrow::Status Initialize() {
+        // Create schema for vocabulary (id -> term mapping)
+        auto vocab_schema = arrow::schema({
+            arrow::field("id", arrow::int64()),
+            arrow::field("lexical", arrow::utf8()),
+            arrow::field("kind", arrow::uint8()),
+            arrow::field("language", arrow::utf8()),
+            arrow::field("datatype", arrow::utf8())
+        });
+
+        // Create column family options
+        marble::ColumnFamilyOptions cf_opts;
+        cf_opts.schema = vocab_schema;
+        cf_opts.enable_bloom_filter = true;
+
         // Create column family for vocabulary
-        marble::ColumnFamilyDescriptor vocab_cf;
-        vocab_cf.name = "vocabulary";
+        marble::ColumnFamilyDescriptor vocab_cf("vocabulary", cf_opts);
         auto status = db_->CreateColumnFamily(vocab_cf, &vocab_handle_);
         if (!status.ok()) {
             return arrow::Status::IOError("Failed to create vocabulary column family: " +
@@ -130,7 +143,7 @@ public:
             return *term;
         }
 
-        return arrow::Status::KeyError("ValueId not found: " + std::to_string(id));
+        return arrow::Status::KeyError("ValueId not found: " + std::to_string(id.getBits()));
     }
 
     arrow::Result<std::vector<ValueId>> AddTerms(
@@ -226,7 +239,7 @@ private:
                 int64_t value = std::stoll(term.lexical);
                 // Only inline if fits in 60 bits
                 if (value >= -(1LL << 59) && value < (1LL << 59)) {
-                    return value_id::EncodeInt(value);
+                    return ValueId::makeFromInt(value);
                 }
             } catch (...) {
                 // Not an integer
@@ -237,9 +250,9 @@ private:
         if (term.datatype == "http://www.w3.org/2001/XMLSchema#boolean" ||
             term.datatype == "xsd:boolean") {
             if (term.lexical == "true" || term.lexical == "1") {
-                return value_id::EncodeBool(true);
+                return ValueId::makeFromBool(true);
             } else if (term.lexical == "false" || term.lexical == "0") {
-                return value_id::EncodeBool(false);
+                return ValueId::makeFromBool(false);
             }
         }
 
@@ -248,7 +261,7 @@ private:
             term.datatype == "xsd:double") {
             try {
                 double value = std::stod(term.lexical);
-                return value_id::EncodeDouble(value);
+                return ValueId::makeFromDouble(value);
             } catch (...) {
                 // Not a double
             }
@@ -259,23 +272,20 @@ private:
 
     // Try to decode inline value
     std::optional<Term> TryDecodeInline(ValueId id) const {
-        auto kind = value_id::GetType(id);
+        auto dtype = id.getDatatype();
 
-        if (kind == TermKind::Int) {
-            if (auto value = value_id::DecodeInt(id); value.has_value()) {
-                return Term::Literal(std::to_string(*value), "",
-                                    "http://www.w3.org/2001/XMLSchema#integer");
-            }
-        } else if (kind == TermKind::Bool) {
-            if (auto value = value_id::DecodeBool(id); value.has_value()) {
-                return Term::Literal(*value ? "true" : "false", "",
-                                    "http://www.w3.org/2001/XMLSchema#boolean");
-            }
-        } else if (kind == TermKind::Double) {
-            if (auto value = value_id::DecodeDouble(id); value.has_value()) {
-                return Term::Literal(std::to_string(*value), "",
-                                    "http://www.w3.org/2001/XMLSchema#double");
-            }
+        if (dtype == Datatype::Int) {
+            int64_t value = id.getInt();
+            return Term::Literal(std::to_string(value), "",
+                                "http://www.w3.org/2001/XMLSchema#integer");
+        } else if (dtype == Datatype::Bool) {
+            bool value = id.getBool();
+            return Term::Literal(value ? "true" : "false", "",
+                                "http://www.w3.org/2001/XMLSchema#boolean");
+        } else if (dtype == Datatype::Double) {
+            double value = id.getDouble();
+            return Term::Literal(std::to_string(value), "",
+                                "http://www.w3.org/2001/XMLSchema#double");
         }
 
         return std::nullopt;
@@ -284,7 +294,7 @@ private:
     // Allocate new ID for term
     ValueId AllocateId(TermKind kind) {
         uint64_t index = next_id_++;
-        return value_id::EncodeVocabIndex(index, kind);
+        return ValueId::makeFromVocabIndex(VocabIndex::make(index));
     }
 
     // Lookup term in database
@@ -353,13 +363,16 @@ arrow::Result<std::shared_ptr<Vocabulary>> CreateVocabulary(
     options.enable_sparse_index = true;
     options.enable_bloom_filter = true;
 
-    auto db_result = marble::MarbleDB::Open(options);
-    if (!db_result.ok()) {
+    // MarbleDB::Open expects marble::Schema, pass nullptr for now
+    // (schema is defined per-column-family via ColumnFamilyOptions)
+    std::unique_ptr<marble::MarbleDB> db_ptr;
+    auto status = marble::MarbleDB::Open(options, nullptr, &db_ptr);
+    if (!status.ok()) {
         return arrow::Status::IOError("Failed to open MarbleDB: " +
-                                     db_result.status().ToString());
+                                     status.ToString());
     }
 
-    return Vocabulary::Create(db_path, db_result.value());
+    return Vocabulary::Create(db_path, std::move(db_ptr));
 }
 
 // Utility functions for N-Triples parsing
@@ -442,7 +455,7 @@ std::optional<ValueId> TryParseInline(const std::string& literal,
         try {
             int64_t value = std::stoll(literal);
             if (value >= -(1LL << 59) && value < (1LL << 59)) {
-                return value_id::EncodeInt(value);
+                return ValueId::makeFromInt(value);
             }
         } catch (...) {}
     }
@@ -451,9 +464,9 @@ std::optional<ValueId> TryParseInline(const std::string& literal,
     if (datatype == "http://www.w3.org/2001/XMLSchema#boolean" ||
         datatype == "xsd:boolean") {
         if (literal == "true" || literal == "1") {
-            return value_id::EncodeBool(true);
+            return ValueId::makeFromBool(true);
         } else if (literal == "false" || literal == "0") {
-            return value_id::EncodeBool(false);
+            return ValueId::makeFromBool(false);
         }
     }
 
@@ -462,7 +475,7 @@ std::optional<ValueId> TryParseInline(const std::string& literal,
         datatype == "xsd:double") {
         try {
             double value = std::stod(literal);
-            return value_id::EncodeDouble(value);
+            return ValueId::makeFromDouble(value);
         } catch (...) {}
     }
 

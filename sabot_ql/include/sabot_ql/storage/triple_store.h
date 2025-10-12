@@ -8,6 +8,7 @@
 #include <arrow/result.h>
 #include <marble/db.h>
 #include <sabot_ql/types/value_id.h>
+#include <sabot_ql/operators/operator.h>  // For TriplePattern definition
 
 namespace sabot_ql {
 
@@ -36,29 +37,8 @@ struct Triple {
         const std::shared_ptr<arrow::RecordBatch>& batch);
 };
 
-// Triple pattern for querying
-// std::nullopt = wildcard (?)
-struct TriplePattern {
-    std::optional<ValueId> subject;
-    std::optional<ValueId> predicate;
-    std::optional<ValueId> object;
-
-    // Count bound variables
-    size_t BoundCount() const {
-        return (subject.has_value() ? 1 : 0) +
-               (predicate.has_value() ? 1 : 0) +
-               (object.has_value() ? 1 : 0);
-    }
-
-    // Get bound positions (for index selection)
-    std::string BoundPositions() const {
-        std::string result;
-        if (subject.has_value()) result += 'S';
-        if (predicate.has_value()) result += 'P';
-        if (object.has_value()) result += 'O';
-        return result;
-    }
-};
+// TriplePattern is defined in operator.h and included above
+// Using uint64_t internally (ValueId is typedef'd to uint64_t)
 
 // Index type for triple storage
 // SPO: Subject-Predicate-Object (default)

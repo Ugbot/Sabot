@@ -51,7 +51,7 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> SortOperator::GetNextBatch() 
     return batch;
 }
 
-arrow::Result<void> SortOperator::SortAllData() {
+arrow::Status SortOperator::SortAllData() {
     auto start_time = std::chrono::high_resolution_clock::now();
 
     // 1. Collect all input batches into a table
@@ -67,7 +67,9 @@ arrow::Result<void> SortOperator::SortAllData() {
     if (batches.empty()) {
         // Empty input - create empty table
         ARROW_ASSIGN_OR_RAISE(auto schema, input_->GetOutputSchema());
-        sorted_table_ = arrow::Table::Make(schema, {});
+        // Explicitly create empty vectors for columns
+        std::vector<std::shared_ptr<arrow::ChunkedArray>> empty_columns;
+        sorted_table_ = arrow::Table::Make(schema, empty_columns);
         return arrow::Status::OK();
     }
 
@@ -96,11 +98,9 @@ arrow::Result<void> SortOperator::SortAllData() {
 
     // 3. Get sort indices
     ARROW_ASSIGN_OR_RAISE(
-        auto indices_datum,
+        auto indices,
         cp::SortIndices(input_table, cp::SortOptions(arrow_sort_keys))
     );
-
-    auto indices = indices_datum.make_array();
 
     // 4. Use Take to reorder the table
     ARROW_ASSIGN_OR_RAISE(

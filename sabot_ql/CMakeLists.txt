@@ -10,13 +10,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Arrow REQUIRED PATHS ${CMAKE_SOURCE_DIR}/../vendor/arrow/cpp/build/install NO_DEFAULT_PATH)
 find_package(ArrowFlight REQUIRED PATHS ${CMAKE_SOURCE_DIR}/../vendor/arrow/cpp/build/install NO_DEFAULT_PATH)
 
-# Find abseil (used by QLever for high-performance hash maps)
-find_package(absl REQUIRED PATHS ${CMAKE_SOURCE_DIR}/../vendor/qlever/build/_deps/abseil-cpp-build NO_DEFAULT_PATH)
-
 # MarbleDB is in ../MarbleDB
 set(MARBLE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/../MarbleDB/include)
+set(MARBLE_LIB_DIR ${CMAKE_SOURCE_DIR}/../MarbleDB/build)
 
-# QLever utilities (we use their hash map and LRU cache)
+# QLever is in ../vendor/qlever
 set(QLEVER_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/../vendor/qlever/src)
 
 # Include directories
@@ -32,9 +30,6 @@ set(SABOT_QL_SOURCES
     # Storage layer
     src/storage/triple_store_impl.cpp
     src/storage/vocabulary_impl.cpp
-
-    # Parser
-    src/parser/ntriples_parser.cpp
 
     # Operators
     src/operators/operator.cpp
@@ -54,24 +49,33 @@ set(SABOT_QL_SOURCES
     src/sparql/query_engine.cpp
 )
 
-# Main library (when we have sources)
-# add_library(sabot_ql SHARED ${SABOT_QL_SOURCES})
-# target_link_libraries(sabot_ql
-#     Arrow::arrow_shared
-#     marble_db
-# )
+# Main library
+add_library(sabot_ql SHARED ${SABOT_QL_SOURCES})
+
+target_link_libraries(sabot_ql
+    Arrow::arrow_shared
+    ArrowFlight::arrow_flight_shared
+    ${MARBLE_LIB_DIR}/libmarble.a
+)
+
+target_include_directories(sabot_ql PUBLIC
+    ${CMAKE_SOURCE_DIR}/include
+    ${MARBLE_INCLUDE_DIR}
+    ${QLEVER_INCLUDE_DIR}
+    ${ARROW_INCLUDE_DIR}
+)
 
 # Installation
-# install(TARGETS sabot_ql
-#     LIBRARY DESTINATION lib
-#     ARCHIVE DESTINATION lib
-#     RUNTIME DESTINATION bin
-# )
+install(TARGETS sabot_ql
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+)
 
-# install(DIRECTORY include/sabot_ql
-#     DESTINATION include
-#     FILES_MATCHING PATTERN "*.h"
-# )
+install(DIRECTORY include/sabot_ql
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.h"
+)
 
 # Tests (to be added)
 # enable_testing()
@@ -80,4 +84,5 @@ set(SABOT_QL_SOURCES
 message(STATUS "SabotQL configuration:")
 message(STATUS "  Arrow include: ${ARROW_INCLUDE_DIR}")
 message(STATUS "  MarbleDB include: ${MARBLE_INCLUDE_DIR}")
+message(STATUS "  QLever include: ${QLEVER_INCLUDE_DIR}")
 message(STATUS "  Build type: ${CMAKE_BUILD_TYPE}")

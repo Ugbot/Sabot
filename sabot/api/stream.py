@@ -1699,7 +1699,7 @@ class GroupedStream:
     Grouped stream for applying aggregations after group_by().
     """
 
-    def __init__(self, source, keys: List[str], schema: Optional[ca.Schema] = None):
+    def __init__(self, source: Iterable[ca.RecordBatch], keys: List[str], schema: Optional[ca.Schema] = None):
         self._source = source
         self._keys = keys
         self._schema = schema

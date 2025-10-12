@@ -18,25 +18,35 @@ public:
 
     // Initialize column families for SPO, POS, OSP indexes
     arrow::Status Initialize() {
+        // Create schema for triple storage (3 int64 columns)
+        auto triple_schema = arrow::schema({
+            arrow::field("col1", arrow::int64()),
+            arrow::field("col2", arrow::int64()),
+            arrow::field("col3", arrow::int64())
+        });
+
+        // Create column family options
+        marble::ColumnFamilyOptions cf_opts;
+        cf_opts.schema = triple_schema;
+        cf_opts.enable_bloom_filter = true;
+        cf_opts.enable_sparse_index = true;
+
         // Create column families for each index permutation
-        marble::ColumnFamilyDescriptor spo_cf;
-        spo_cf.name = "SPO";
+        marble::ColumnFamilyDescriptor spo_cf("SPO", cf_opts);
         auto status = db_->CreateColumnFamily(spo_cf, &spo_handle_);
         if (!status.ok()) {
             return arrow::Status::IOError("Failed to create SPO column family: " +
                                          status.ToString());
         }
 
-        marble::ColumnFamilyDescriptor pos_cf;
-        pos_cf.name = "POS";
+        marble::ColumnFamilyDescriptor pos_cf("POS", cf_opts);
         status = db_->CreateColumnFamily(pos_cf, &pos_handle_);
         if (!status.ok()) {
             return arrow::Status::IOError("Failed to create POS column family: " +
                                          status.ToString());
         }
 
-        marble::ColumnFamilyDescriptor osp_cf;
-        osp_cf.name = "OSP";
+        marble::ColumnFamilyDescriptor osp_cf("OSP", cf_opts);
         status = db_->CreateColumnFamily(osp_cf, &osp_handle_);
         if (!status.ok()) {
             return arrow::Status::IOError("Failed to create OSP column family: " +
@@ -182,19 +192,19 @@ private:
         for (const auto& triple : triples) {
             switch (index) {
                 case IndexType::SPO:
-                    ARROW_RETURN_NOT_OK(col1_builder.Append(triple.subject));
-                    ARROW_RETURN_NOT_OK(col2_builder.Append(triple.predicate));
-                    ARROW_RETURN_NOT_OK(col3_builder.Append(triple.object));
+                    ARROW_RETURN_NOT_OK(col1_builder.Append(triple.subject.getBits()));
+                    ARROW_RETURN_NOT_OK(col2_builder.Append(triple.predicate.getBits()));
+                    ARROW_RETURN_NOT_OK(col3_builder.Append(triple.object.getBits()));
                     break;
                 case IndexType::POS:
-                    ARROW_RETURN_NOT_OK(col1_builder.Append(triple.predicate));
-                    ARROW_RETURN_NOT_OK(col2_builder.Append(triple.object));
-                    ARROW_RETURN_NOT_OK(col3_builder.Append(triple.subject));
+                    ARROW_RETURN_NOT_OK(col1_builder.Append(triple.predicate.getBits()));
+                    ARROW_RETURN_NOT_OK(col2_builder.Append(triple.object.getBits()));
+                    ARROW_RETURN_NOT_OK(col3_builder.Append(triple.subject.getBits()));
                     break;
                 case IndexType::OSP:
-                    ARROW_RETURN_NOT_OK(col1_builder.Append(triple.object));
-                    ARROW_RETURN_NOT_OK(col2_builder.Append(triple.subject));
-                    ARROW_RETURN_NOT_OK(col3_builder.Append(triple.predicate));
+                    ARROW_RETURN_NOT_OK(col1_builder.Append(triple.object.getBits()));
+                    ARROW_RETURN_NOT_OK(col2_builder.Append(triple.subject.getBits()));
+                    ARROW_RETURN_NOT_OK(col3_builder.Append(triple.predicate.getBits()));
                     break;
             }
         }
@@ -271,11 +281,20 @@ private:
             return scan_result;
         }
 
-        // Project columns
-        ARROW_ASSIGN_OR_RAISE(auto projected,
-            arrow::compute::Project(scan_result, keep_columns));
+        // Project columns by selecting specific column indices
+        std::vector<std::shared_ptr<arrow::ChunkedArray>> projected_columns;
+        for (int col_idx : keep_columns) {
+            projected_columns.push_back(scan_result->column(col_idx));
+        }
 
-        return projected;
+        // Build new schema with selected columns
+        std::vector<std::shared_ptr<arrow::Field>> projected_fields;
+        for (int col_idx : keep_columns) {
+            projected_fields.push_back(scan_result->schema()->field(col_idx));
+        }
+        auto projected_schema = arrow::schema(projected_fields);
+
+        return arrow::Table::Make(projected_schema, projected_columns);
     }
 
     std::string db_path_;
@@ -319,13 +338,16 @@ arrow::Result<std::shared_ptr<TripleStore>> CreateTripleStore(
     options.enable_bloom_filter = true;
     options.index_granularity = 8192;  // Index every 8192 rows (ClickHouse-style)
 
-    auto db_result = marble::MarbleDB::Open(options);
-    if (!db_result.ok()) {
+    // MarbleDB::Open expects marble::Schema, pass nullptr for now
+    // (schema is defined per-column-family via ColumnFamilyOptions)
+    std::unique_ptr<marble::MarbleDB> db_ptr;
+    auto status = marble::MarbleDB::Open(options, nullptr, &db_ptr);
+    if (!status.ok()) {
         return arrow::Status::IOError("Failed to open MarbleDB: " +
-                                     db_result.status().ToString());
+                                     status.ToString());
     }
 
-    return TripleStore::Create(db_path, db_result.value());
+    return TripleStore::Create(db_path, std::move(db_ptr));
 }
 
 // Triple utility methods implementation
@@ -342,9 +364,9 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> Triple::ToArrowBatch(
     ARROW_RETURN_NOT_OK(o_builder.Reserve(triples.size()));
 
     for (const auto& triple : triples) {
-        ARROW_RETURN_NOT_OK(s_builder.Append(triple.subject));
-        ARROW_RETURN_NOT_OK(p_builder.Append(triple.predicate));
-        ARROW_RETURN_NOT_OK(o_builder.Append(triple.object));
+        ARROW_RETURN_NOT_OK(s_builder.Append(triple.subject.getBits()));
+        ARROW_RETURN_NOT_OK(p_builder.Append(triple.predicate.getBits()));
+        ARROW_RETURN_NOT_OK(o_builder.Append(triple.object.getBits()));
     }
 
     std::shared_ptr<arrow::Array> s_array;
@@ -377,9 +399,9 @@ arrow::Result<std::vector<Triple>> Triple::FromArrowBatch(
 
     for (int64_t i = 0; i < batch->num_rows(); i++) {
         triples.push_back({
-            static_cast<ValueId>(s_array->Value(i)),
-            static_cast<ValueId>(p_array->Value(i)),
-            static_cast<ValueId>(o_array->Value(i))
+            ValueId::fromBits(s_array->Value(i)),
+            ValueId::fromBits(p_array->Value(i)),
+            ValueId::fromBits(o_array->Value(i))
         });
     }
 

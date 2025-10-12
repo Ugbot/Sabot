@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sabot_ql/operators/operator.h>
+#include <sabot_ql/operators/aggregate.h>
 #include <sabot_ql/storage/triple_store.h>
 #include <sabot_ql/storage/vocabulary.h>
 #include <memory>
@@ -62,6 +63,10 @@ public:
 
     // Generate EXPLAIN ANALYZE (with execution statistics)
     arrow::Result<std::string> ExplainAnalyze(std::shared_ptr<Operator> root_operator);
+
+    // Getters for store and vocab (for QueryBuilder)
+    std::shared_ptr<TripleStore> GetStore() const { return store_; }
+    std::shared_ptr<Vocabulary> GetVocab() const { return vocab_; }
 
 private:
     // Collect statistics from operator tree

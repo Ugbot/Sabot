@@ -112,28 +112,28 @@ arrow::Status HashJoinOperator::BuildHashTable() {
         key_indices.push_back(idx);
     }
 
-    // Build hash table
-    for (int chunk_idx = 0; chunk_idx < build_table_->num_row_groups(); ++chunk_idx) {
-        auto batch_result = build_table_->column(0)->chunks()[chunk_idx];
-        auto batch = arrow::RecordBatch::Make(
-            build_table_->schema(),
-            batch_result->length(),
-            build_table_->columns()
-        );
+    // Build hash table - iterate over table using TableBatchReader
+    arrow::TableBatchReader reader(*build_table_);
+    std::shared_ptr<arrow::RecordBatch> batch;
+    int64_t global_row_offset = 0;
 
-        if (!batch.ok()) {
-            continue;
+    while (true) {
+        auto batch_result = reader.Next();
+        if (!batch_result.ok() || !batch_result.ValueOrDie()) {
+            break;
         }
 
-        auto batch_ptr = batch.ValueOrDie();
+        batch = batch_result.ValueOrDie();
 
-        for (int64_t i = 0; i < batch_ptr->num_rows(); ++i) {
-            std::string join_key = BuildJoinKey(batch_ptr, i, key_indices);
+        for (int64_t i = 0; i < batch->num_rows(); ++i) {
+            std::string join_key = BuildJoinKey(batch, i, key_indices);
 
             // Store row index (global index across all batches)
-            int64_t global_row_idx = chunk_idx * batch_ptr->num_rows() + i;
+            int64_t global_row_idx = global_row_offset + i;
             hash_table_[join_key].push_back(global_row_idx);
         }
+
+        global_row_offset += batch->num_rows();
     }
 
     auto end = std::chrono::high_resolution_clock::now();

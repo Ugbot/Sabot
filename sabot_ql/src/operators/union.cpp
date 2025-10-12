@@ -53,7 +53,7 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> UnionOperator::GetNextBatch()
     return batch;
 }
 
-arrow::Result<void> UnionOperator::ExecuteUnion() {
+arrow::Status UnionOperator::ExecuteUnion() {
     auto start_time = std::chrono::high_resolution_clock::now();
 
     // 1. Unify schemas
@@ -81,7 +81,8 @@ arrow::Result<void> UnionOperator::ExecuteUnion() {
 
     if (all_batches.empty()) {
         // Empty union - create empty table
-        union_table_ = arrow::Table::Make(unified_schema, {});
+        std::vector<std::shared_ptr<arrow::ChunkedArray>> empty_columns;
+        union_table_ = arrow::Table::Make(unified_schema, empty_columns);
         return arrow::Status::OK();
     }
 
@@ -190,8 +191,17 @@ arrow::Result<std::shared_ptr<arrow::Table>> UnionOperator::DeduplicateRows(
 
     for (int i = 0; i < table->num_columns(); ++i) {
         auto column = table->column(i);
-        // Combine chunks
-        ARROW_ASSIGN_OR_RAISE(auto combined, column->CombineChunks());
+        // Combine chunks manually (Arrow 22.0 doesn't have CombineChunks)
+        std::shared_ptr<arrow::Array> combined;
+        if (column->num_chunks() == 1) {
+            combined = column->chunk(0);
+        } else {
+            arrow::ArrayVector chunks;
+            for (int j = 0; j < column->num_chunks(); ++j) {
+                chunks.push_back(column->chunk(j));
+            }
+            ARROW_ASSIGN_OR_RAISE(combined, arrow::Concatenate(chunks));
+        }
         columns.push_back(combined);
         fields.push_back(table->schema()->field(i));
     }

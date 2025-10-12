@@ -208,7 +208,7 @@ class App(AppT):
         self._flight_app = None
         self._interactive_app = None
 
-    def _init_distributed_primitives(self):
+    def _init_distributed_primitives(self) -> None:
         """Initialize CyRedis distributed primitives for enhanced state management."""
         if not self.redis_client:
             return
@@ -218,7 +218,7 @@ class App(AppT):
         self._agent_counter = None
         self._message_counter = None
 
-    def _init_distributed_agents(self):
+    def _init_distributed_agents(self) -> None:
         """Initialize distributed agent system components."""
         if not self.redis_client:
             return
@@ -658,7 +658,7 @@ class App(AppT):
         manager = get_channel_manager(self)
         manager.set_policy(pattern, policy)
 
-    def get_channel_manager(self):
+    def get_channel_manager(self) -> Any:
         """Get the channel manager instance."""
         return get_channel_manager(self)
 

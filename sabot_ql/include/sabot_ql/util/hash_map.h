@@ -1,19 +1,20 @@
 #pragma once
 
-// High-performance hash map from QLever
-// Using absl::flat_hash_map for fast lookups
+// Hash map wrapper using STL containers
+// Note: Using std::unordered_map instead of abseil for now
+// Can upgrade to abseil later for better performance if needed
 
-#include <absl/container/flat_hash_map.h>
-#include <absl/container/flat_hash_set.h>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace sabot_ql {
 
-// Wrapper for hash maps (from QLever)
+// Wrapper for hash maps (using STL)
 template <typename... Ts>
-using HashMap = absl::flat_hash_map<Ts...>;
+using HashMap = std::unordered_map<Ts...>;
 
-// Wrapper for hash sets (from QLever)
+// Wrapper for hash sets (using STL)
 template <typename... Ts>
-using HashSet = absl::flat_hash_set<Ts...>;
+using HashSet = std::unordered_set<Ts...>;
 
 } // namespace sabot_ql

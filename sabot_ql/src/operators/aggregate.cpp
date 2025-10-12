@@ -1,5 +1,6 @@
 #include <sabot_ql/operators/aggregate.h>
 #include <sstream>
+#include <chrono>
 
 namespace sabot_ql {
 
@@ -96,26 +97,16 @@ arrow::Status GroupByOperator::ComputeAggregates() {
         key_indices.push_back(idx);
     }
 
-    // Build groups
-    for (int chunk_idx = 0; chunk_idx < input_table_->num_row_groups(); ++chunk_idx) {
-        auto batch_result = arrow::RecordBatch::Make(
-            input_table_->schema(),
-            input_table_->column(0)->chunks()[chunk_idx]->length(),
-            input_table_->columns()
-        );
+    // Build groups - iterate through table batches
+    ARROW_ASSIGN_OR_RAISE(auto batches, arrow::TableBatchReader(*input_table_).ToRecordBatches());
 
-        if (!batch_result.ok()) {
-            continue;
-        }
-
-        auto batch = batch_result.ValueOrDie();
-
+    int64_t global_row_offset = 0;
+    for (const auto& batch : batches) {
         for (int64_t i = 0; i < batch->num_rows(); ++i) {
             std::string group_key = BuildGroupKey(batch, i, key_indices);
-
-            int64_t global_row_idx = chunk_idx * batch->num_rows() + i;
-            groups_[group_key].push_back(global_row_idx);
+            groups_[group_key].push_back(global_row_offset + i);
         }
+        global_row_offset += batch->num_rows();
     }
 
     // Compute aggregates for each group
@@ -350,60 +341,77 @@ arrow::Status AggregateOperator::ComputeAggregates() {
 
         auto input_column = input_table_->column(input_col_idx);
 
-        // Combine chunks into single array
-        ARROW_ASSIGN_OR_RAISE(auto combined, input_column->CombineChunks());
+        // Combine chunks into single array manually (Arrow 22.0 doesn't have CombineChunks)
+        std::shared_ptr<arrow::Array> combined;
+        if (input_column->num_chunks() == 1) {
+            combined = input_column->chunk(0);
+        } else {
+            // Use arrow::Concatenate to combine chunks
+            arrow::ArrayVector chunks;
+            for (int i = 0; i < input_column->num_chunks(); ++i) {
+                chunks.push_back(input_column->chunk(i));
+            }
+            ARROW_ASSIGN_OR_RAISE(combined, arrow::Concatenate(chunks));
+        }
 
         std::shared_ptr<arrow::Scalar> result_scalar;
 
         switch (agg.function) {
-            case AggregateFunction::Count:
+            case AggregateFunction::Count: {
                 ARROW_ASSIGN_OR_RAISE(
                     result_scalar,
                     aggregate_helpers::ComputeCount(combined)
                 );
                 break;
+            }
 
-            case AggregateFunction::Sum:
+            case AggregateFunction::Sum: {
                 ARROW_ASSIGN_OR_RAISE(
                     result_scalar,
                     aggregate_helpers::ComputeSum(combined)
                 );
                 break;
+            }
 
-            case AggregateFunction::Avg:
+            case AggregateFunction::Avg: {
                 ARROW_ASSIGN_OR_RAISE(
                     result_scalar,
                     aggregate_helpers::ComputeAvg(combined)
                 );
                 break;
+            }
 
-            case AggregateFunction::Min:
+            case AggregateFunction::Min: {
                 ARROW_ASSIGN_OR_RAISE(
                     result_scalar,
                     aggregate_helpers::ComputeMin(combined)
                 );
                 break;
+            }
 
-            case AggregateFunction::Max:
+            case AggregateFunction::Max: {
                 ARROW_ASSIGN_OR_RAISE(
                     result_scalar,
                     aggregate_helpers::ComputeMax(combined)
                 );
                 break;
+            }
 
-            case AggregateFunction::GroupConcat:
+            case AggregateFunction::GroupConcat: {
                 ARROW_ASSIGN_OR_RAISE(
                     result_scalar,
                     aggregate_helpers::ComputeGroupConcat(combined, agg.separator)
                 );
                 break;
+            }
 
-            case AggregateFunction::Sample:
+            case AggregateFunction::Sample: {
                 ARROW_ASSIGN_OR_RAISE(
                     result_scalar,
                     aggregate_helpers::ComputeSample(combined)
                 );
                 break;
+            }
         }
 
         // Convert scalar to array of length 1
@@ -494,7 +502,7 @@ arrow::Result<std::shared_ptr<arrow::Scalar>> ComputeSum(
     arrow::compute::ExecContext ctx;
     ARROW_ASSIGN_OR_RAISE(
         auto result,
-        arrow::compute::Sum(array, &ctx)
+        arrow::compute::Sum(array, arrow::compute::ScalarAggregateOptions::Defaults(), &ctx)
     );
 
     return result.scalar();
@@ -506,7 +514,7 @@ arrow::Result<std::shared_ptr<arrow::Scalar>> ComputeAvg(
     arrow::compute::ExecContext ctx;
     ARROW_ASSIGN_OR_RAISE(
         auto result,
-        arrow::compute::Mean(array, &ctx)
+        arrow::compute::Mean(array, arrow::compute::ScalarAggregateOptions::Defaults(), &ctx)
     );
 
     return result.scalar();
@@ -518,7 +526,7 @@ arrow::Result<std::shared_ptr<arrow::Scalar>> ComputeMin(
     arrow::compute::ExecContext ctx;
     ARROW_ASSIGN_OR_RAISE(
         auto result,
-        arrow::compute::MinMax(array, &ctx)
+        arrow::compute::MinMax(array, arrow::compute::ScalarAggregateOptions::Defaults(), &ctx)
     );
 
     auto min_max_scalar = std::static_pointer_cast<arrow::StructScalar>(result.scalar());
@@ -531,7 +539,7 @@ arrow::Result<std::shared_ptr<arrow::Scalar>> ComputeMax(
     arrow::compute::ExecContext ctx;
     ARROW_ASSIGN_OR_RAISE(
         auto result,
-        arrow::compute::MinMax(array, &ctx)
+        arrow::compute::MinMax(array, arrow::compute::ScalarAggregateOptions::Defaults(), &ctx)
     );
 
     auto min_max_scalar = std::static_pointer_cast<arrow::StructScalar>(result.scalar());

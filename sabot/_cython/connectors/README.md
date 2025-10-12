@@ -12,20 +12,20 @@ High-performance C/Cython connectors that leverage **vendored DuckDB** to provid
 
 ```
 ┌────────────────────────────────────────────────────┐
-│        Sabot Stream Processing                      │
+│        Sabot Stream Processing                     │
 └──────────────┬─────────────────────────────────────┘
                │ ca.RecordBatch (zero-copy)
 ┌──────────────▼─────────────────────────────────────┐
-│   DuckDBArrowResult                                 │
+│   DuckDBArrowResult                                │
 │   - Streaming iterator over Arrow batches          │
-│   - Uses Arrow C Data Interface                     │
+│   - Uses Arrow C Data Interface                    │
 └──────────────┬─────────────────────────────────────┘
                │ ArrowArray/ArrowSchema (C structs)
 ┌──────────────▼─────────────────────────────────────┐
-│   DuckDB C API (vendor/duckdb)                      │
-│   - duckdb_query_arrow()                            │
-│   - duckdb_arrow_scan()                             │
-│   - Filter/projection pushdown                      │
+│   DuckDB C API (vendor/duckdb)                     │
+│   - duckdb_query_arrow()                           │
+│   - duckdb_arrow_scan()                            │
+│   - Filter/projection pushdown                     │
 └──────────────┬─────────────────────────────────────┘
                │
 ┌──────────────▼─────────────────────────────────────┐

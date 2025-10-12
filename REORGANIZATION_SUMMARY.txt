@@ -1,0 +1,97 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║              SQL MODULE REORGANIZATION - COMPLETE                    ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+Date: October 12, 2025
+Status: ✅ COMPLETE
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ WHAT WAS DONE                                                        │
+└──────────────────────────────────────────────────────────────────────┘
+
+✅ Created standalone sabot_sql/ module
+✅ Moved 12 C++ files from sabot_ql/ to sabot_sql/
+✅ Updated all namespaces (sabot_ql → sabot_sql)
+✅ Updated all include paths
+✅ Cleaned up sabot_ql/ (removed SQL references)
+✅ Created standalone CMakeLists.txt for sabot_sql
+✅ Updated documentation
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ NEW MODULE STRUCTURE                                                 │
+└──────────────────────────────────────────────────────────────────────┘
+
+sabot_sql/                      # Standalone SQL Module
+├── CMakeLists.txt             # Independent build
+├── README.md                  # Module docs
+├── include/sabot_sql/
+│   ├── sql/                   # SQL engine headers
+│   │   ├── duckdb_bridge.h
+│   │   ├── sql_operator_translator.h
+│   │   └── query_engine.h
+│   └── operators/             # SQL operators
+│       ├── table_scan.h
+│       ├── cte.h
+│       └── subquery.h
+└── src/
+    ├── sql/                   # SQL engine impl
+    └── operators/             # SQL operators impl
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ CLEAR SEPARATION                                                     │
+└──────────────────────────────────────────────────────────────────────┘
+
+SabotQL (sabot_ql/)           SabotSQL (sabot_sql/)
+━━━━━━━━━━━━━━━━━             ━━━━━━━━━━━━━━━━━━━
+• RDF Triple Store            • Relational SQL Engine
+• SPARQL queries              • SQL queries  
+• Graph data model            • Table data model
+• N-Triples, Turtle           • CSV, Parquet, Arrow
+• MarbleDB backend            • Arrow tables
+• Pattern matching            • DuckDB integration
+
+           Both use Sabot's Morsel Operators ⚡
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ BUILDING                                                             │
+└──────────────────────────────────────────────────────────────────────┘
+
+SabotQL (RDF/SPARQL):
+  cd sabot_ql && mkdir build && cd build
+  cmake .. && make
+
+SabotSQL (SQL):
+  cd sabot_sql && mkdir build && cd build  
+  cmake .. && make
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ PYTHON LAYER                                                         │
+└──────────────────────────────────────────────────────────────────────┘
+
+Already in correct location (no changes needed):
+  sabot/sql/controller.py      # SQL controller
+  sabot/sql/agents.py           # SQL agents
+  sabot/api/sql.py              # High-level API
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ BENEFITS                                                             │
+└──────────────────────────────────────────────────────────────────────┘
+
+✓ Clear separation: SQL ≠ SPARQL
+✓ Independent development and versioning
+✓ Users can build only what they need
+✓ Cleaner dependency management
+✓ Each module has focused purpose
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ NEXT STEPS                                                           │
+└──────────────────────────────────────────────────────────────────────┘
+
+1. Test build sabot_sql
+2. Run Python tests with new structure
+3. Update main Sabot build to include sabot_sql as option
+4. Package as separate libraries
+
+╔══════════════════════════════════════════════════════════════════════╗
+║  Reorganization Complete! SQL is now a standalone module.            ║
+╚══════════════════════════════════════════════════════════════════════╝

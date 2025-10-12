@@ -1,4 +1,5 @@
 #include <sabot_ql/sparql/query_engine.h>
+#include <sstream>
 
 namespace sabot_ql {
 namespace sparql {
@@ -48,10 +49,10 @@ arrow::Result<std::string> QueryEngine::ExplainAnalyze(const SelectQuery& query)
 // SPARQLBuilder implementation
 SPARQLBuilder& SPARQLBuilder::Select(const std::vector<std::string>& variables) {
     query_.select.distinct = false;
-    query_.select.variables.clear();
+    query_.select.items.clear();
 
     for (const auto& var : variables) {
-        query_.select.variables.push_back(Variable(var));
+        query_.select.items.push_back(Variable(var));
     }
 
     return *this;
@@ -59,16 +60,16 @@ SPARQLBuilder& SPARQLBuilder::Select(const std::vector<std::string>& variables) 
 
 SPARQLBuilder& SPARQLBuilder::SelectAll() {
     query_.select.distinct = false;
-    query_.select.variables.clear();
+    query_.select.items.clear();
     return *this;
 }
 
 SPARQLBuilder& SPARQLBuilder::SelectDistinct(const std::vector<std::string>& variables) {
     query_.select.distinct = true;
-    query_.select.variables.clear();
+    query_.select.items.clear();
 
     for (const auto& var : variables) {
-        query_.select.variables.push_back(Variable(var));
+        query_.select.items.push_back(Variable(var));
     }
 
     return *this;
