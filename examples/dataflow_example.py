@@ -37,7 +37,7 @@ async def main():
         from sabot.api.stream import Stream
         from sabot.cyarrow import compute as pc
 
-        return (Stream.from_kafka('orders')
+        return (Stream.from_kafka('localhost:9092', 'orders', 'fraud-detection')
             .filter(lambda b: pc.greater(b['amount'], 100.0))  # Filter high-value orders
             .map(lambda b: b.append_column('tax', pc.multiply(b['amount'], 0.08)))  # Add tax
             .map(lambda b: b.append_column('total', pc.add(b['amount'], b['tax'])))  # Add total

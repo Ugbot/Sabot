@@ -1,0 +1,30 @@
+# Small RDF test dataset in N-Triples format
+# 5 persons with names, ages, and friendship relationships
+
+# Person 1: Alice
+<http://example.org/alice> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://example.org/alice> <http://xmlns.com/foaf/0.1/name> "Alice" .
+<http://example.org/alice> <http://xmlns.com/foaf/0.1/age> "30"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://example.org/alice> <http://xmlns.com/foaf/0.1/knows> <http://example.org/bob> .
+
+# Person 2: Bob
+<http://example.org/bob> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://example.org/bob> <http://xmlns.com/foaf/0.1/name> "Bob" .
+<http://example.org/bob> <http://xmlns.com/foaf/0.1/age> "25"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://example.org/bob> <http://xmlns.com/foaf/0.1/knows> <http://example.org/charlie> .
+
+# Person 3: Charlie
+<http://example.org/charlie> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://example.org/charlie> <http://xmlns.com/foaf/0.1/name> "Charlie" .
+<http://example.org/charlie> <http://xmlns.com/foaf/0.1/age> "35"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://example.org/charlie> <http://xmlns.com/foaf/0.1/knows> <http://example.org/alice> .
+
+# Person 4: Diana
+<http://example.org/diana> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://example.org/diana> <http://xmlns.com/foaf/0.1/name> "Diana" .
+<http://example.org/diana> <http://xmlns.com/foaf/0.1/age> "28"^^<http://www.w3.org/2001/XMLSchema#integer> .
+
+# Person 5: Eve
+<http://example.org/eve> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://example.org/eve> <http://xmlns.com/foaf/0.1/name> "Eve" .
+<http://example.org/eve> <http://xmlns.com/foaf/0.1/age> "32"^^<http://www.w3.org/2001/XMLSchema#integer> .
