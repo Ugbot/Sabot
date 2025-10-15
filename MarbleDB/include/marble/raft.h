@@ -214,6 +214,34 @@ std::unique_ptr<RaftStateMachine> CreateMarbleWalStateMachine(
  */
 std::unique_ptr<RaftStateMachine> CreateMarbleSchemaStateMachine();
 
+/**
+ * Create a full MarbleDB state machine for distributed operations
+ */
+std::unique_ptr<RaftStateMachine> CreateMarbleDBStateMachine(std::shared_ptr<MarbleDB> db);
+
+/**
+ * Create distributed operation for Put
+ */
+std::unique_ptr<RaftOperation> CreatePutOperation(
+    const std::string& table_name,
+    std::shared_ptr<Record> record,
+    uint64_t sequence_number);
+
+/**
+ * Create distributed operation for InsertBatch
+ */
+std::unique_ptr<RaftOperation> CreateInsertBatchOperation(
+    const std::string& table_name,
+    std::shared_ptr<arrow::RecordBatch> batch,
+    uint64_t sequence_number);
+
+/**
+ * Create distributed operation for CreateTable
+ */
+std::unique_ptr<RaftOperation> CreateCreateTableOperation(
+    const TableSchema& schema,
+    uint64_t sequence_number);
+
 // Forward declarations for cluster management
 class RaftConfigManager;
 class RaftClusterManager;

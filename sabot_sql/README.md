@@ -23,6 +23,9 @@
 - **C++20 Modern Codebase**: Forked and upgraded for performance
 - **Time-Series SQL Core**: ASOF JOIN, SAMPLE BY, LATEST BY as first-class features
 - **Window Functions**: TUMBLE, HOP, SESSION built-in (Flink-inspired)
+- **Streaming SQL**: Kafka partition parallelism, dimension broadcast, stateful aggregations
+- **State Management**: Tonbo for table state, RocksDB for timers/watermarks
+- **Checkpointing**: Periodic snapshots for exactly-once processing
 - **Sabot-Only Execution**: Pure Arrow + morsel + shuffle runtime
 - **Distributed Ready**: Multi-agent orchestration
 - **Production Tested**: 12.2M rows, 8 agents, 100% success rate

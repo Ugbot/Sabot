@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(MarbleDB VERSION 0.1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -18,12 +18,33 @@ option(MARBLE_USE_TSAN "Enable ThreadSanitizer" OFF)
 option(MARBLE_USE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
 
 # Dependencies
-find_package(Boost REQUIRED COMPONENTS filesystem system)
+find_package(Boost REQUIRED COMPONENTS filesystem system coroutine)
 find_package(Threads REQUIRED)
 
 # Try to find system-installed Arrow first
 find_package(Arrow QUIET)
 find_package(Parquet QUIET)
+
+# Find Arrow Flight
+find_package(ArrowFlight QUIET)
+if(NOT ArrowFlight_FOUND)
+    # Try pkg-config for Arrow Flight
+    find_package(PkgConfig QUIET)
+    if(PKG_CONFIG_FOUND)
+        pkg_check_modules(ARROW_FLIGHT arrow-flight)
+        if(ARROW_FLIGHT_FOUND)
+            set(ArrowFlight_FOUND TRUE)
+        endif()
+    endif()
+
+    # Try to find Arrow Flight as part of Arrow
+    if(NOT ArrowFlight_FOUND AND Arrow_FOUND)
+        get_target_property(ARROW_FLIGHT_LIB Arrow::arrow_flight_static LOCATION)
+        if(ARROW_FLIGHT_LIB)
+            set(ArrowFlight_FOUND TRUE)
+        endif()
+    endif()
+endif()
 
 # Find nlohmann/json for JSON parsing
 find_package(nlohmann_json QUIET)
@@ -162,6 +183,7 @@ file(GLOB_RECURSE MARBLE_SOURCES
 
 # Remove files that should not be included
 list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/flight_service.cpp")
+list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/async.cpp")
 
 # Remove Raft sources if not enabled
 if(NOT MARBLE_ENABLE_RAFT)
@@ -176,6 +198,8 @@ set(MARBLE_SOURCES
     ${MARBLE_SOURCES}
     src/util/status.cpp
     src/core/schema.cpp
+    src/core/metrics.cpp
+    src/core/advanced_features.cpp
     src/core/task_scheduler.cpp
     src/core/file_system.cpp
     src/core/memtable.cpp
@@ -199,6 +223,8 @@ set(MARBLE_SOURCES
     src/core/temporal_reconstruction.cpp
     src/core/advanced_query.cpp
     src/core/execution_engine.cpp
+    src/core/block_optimizations.cpp
+    src/core/hot_key_cache.cpp
 )
 
 # Add Raft sources if enabled
@@ -208,6 +234,7 @@ if(MARBLE_ENABLE_RAFT)
         src/raft/raft_wrappers.cpp
         src/raft/arrow_flight_transport.cpp
         src/raft/marble_wal_state_machine.cpp
+        src/raft/marble_db_state_machine.cpp
         src/raft/marble_log_store.cpp
         src/raft/raft_config_manager.cpp
     )
@@ -235,6 +262,21 @@ if(MARBLE_BUILD_STATIC)
             PUBLIC
                 ${NURAFT_LIBRARY}
         )
+    endif()
+
+    # Link Arrow Flight if available (only when RAFT is enabled)
+    if(MARBLE_ENABLE_RAFT)
+        if(ArrowFlight_FOUND)
+            target_link_libraries(marble_static PUBLIC Arrow::arrow_flight_static)
+            target_compile_definitions(marble_static PUBLIC MARBLE_ENABLE_ARROW_FLIGHT)
+        elseif(ARROW_FLIGHT_FOUND)
+            target_link_libraries(marble_static PUBLIC ${ARROW_FLIGHT_LIBRARIES})
+            target_include_directories(marble_static PUBLIC ${ARROW_FLIGHT_INCLUDE_DIRS})
+            target_compile_definitions(marble_static PUBLIC MARBLE_ENABLE_ARROW_FLIGHT)
+        elseif(TARGET Arrow::arrow_flight_static)
+            target_link_libraries(marble_static PUBLIC Arrow::arrow_flight_static)
+            target_compile_definitions(marble_static PUBLIC MARBLE_ENABLE_ARROW_FLIGHT)
+        endif()
     endif()
 
     target_include_directories(marble_static
@@ -269,6 +311,21 @@ if(MARBLE_BUILD_SHARED)
             PUBLIC
                 ${NURAFT_LIBRARY}
         )
+    endif()
+
+    # Link Arrow Flight if available (only when RAFT is enabled)
+    if(MARBLE_ENABLE_RAFT)
+        if(ArrowFlight_FOUND)
+            target_link_libraries(marble_shared PUBLIC Arrow::arrow_flight_static)
+            target_compile_definitions(marble_shared PUBLIC MARBLE_ENABLE_ARROW_FLIGHT)
+        elseif(ARROW_FLIGHT_FOUND)
+            target_link_libraries(marble_shared PUBLIC ${ARROW_FLIGHT_LIBRARIES})
+            target_include_directories(marble_shared PUBLIC ${ARROW_FLIGHT_INCLUDE_DIRS})
+            target_compile_definitions(marble_shared PUBLIC MARBLE_ENABLE_ARROW_FLIGHT)
+        elseif(TARGET Arrow::arrow_flight_static)
+            target_link_libraries(marble_shared PUBLIC Arrow::arrow_flight_static)
+            target_compile_definitions(marble_shared PUBLIC MARBLE_ENABLE_ARROW_FLIGHT)
+        endif()
     endif()
 
     target_include_directories(marble_shared
@@ -356,7 +413,9 @@ if(MARBLE_BUILD_EXAMPLES)
         # Include marble_raft_cluster_example only if Raft is enabled
         if(NOT EXAMPLE_NAME STREQUAL "raft_example")
             if(EXAMPLE_NAME STREQUAL "marble_raft_cluster_example" OR
-                EXAMPLE_NAME STREQUAL "marble_raft_full_example")
+                EXAMPLE_NAME STREQUAL "marble_raft_full_example" OR
+                EXAMPLE_NAME STREQUAL "raft_demo" OR
+                EXAMPLE_NAME STREQUAL "arrow_flight_raft_demo")
                 if(MARBLE_ENABLE_RAFT)
                     add_executable(${EXAMPLE_NAME} ${EXAMPLE_SRC})
 

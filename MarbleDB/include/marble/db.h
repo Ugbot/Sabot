@@ -8,6 +8,7 @@
 #include <marble/column_family.h>
 #include <marble/merge_operator.h>
 #include <marble/record_ref.h>
+#include <marble/metrics.h>
 
 namespace marble {
 
@@ -222,6 +223,63 @@ public:
     virtual std::string GetProperty(const std::string& property) const = 0;
     virtual Status GetApproximateSizes(const std::vector<KeyRange>& ranges,
                                        std::vector<uint64_t>* sizes) const = 0;
+
+    // Monitoring and metrics (production features)
+    /**
+     * @brief Get metrics collector for this database
+     *
+     * Returns the metrics collector used by this database instance.
+     * Metrics include operation counts, latencies, cache statistics, etc.
+     */
+    virtual std::shared_ptr<MetricsCollector> GetMetricsCollector() const = 0;
+
+    /**
+     * @brief Export metrics in Prometheus format
+     *
+     * Returns metrics in Prometheus exposition format for monitoring systems.
+     */
+    virtual std::string ExportMetricsPrometheus() const = 0;
+
+    /**
+     * @brief Export metrics in JSON format
+     *
+     * Returns metrics in JSON format for custom monitoring or debugging.
+     */
+    virtual std::string ExportMetricsJSON() const = 0;
+
+    /**
+     * @brief Get health status of database components
+     *
+     * Returns health status of various database components like:
+     * - Storage engine
+     * - Cache systems
+     * - Background compaction
+     * - Network connectivity (if applicable)
+     */
+    virtual std::unordered_map<std::string, bool> GetHealthStatus() const = 0;
+
+    /**
+     * @brief Perform health checks and return detailed status
+     *
+     * Runs comprehensive health checks including:
+     * - File system accessibility
+     * - Data integrity verification
+     * - Memory usage validation
+     * - Background process health
+     */
+    virtual StatusWithMetrics PerformHealthCheck() const = 0;
+
+    /**
+     * @brief Get detailed system information
+     *
+     * Returns comprehensive system information including:
+     * - Database version and build info
+     * - Storage statistics (size, file count, etc.)
+     * - Cache hit rates and performance
+     * - Background operation status
+     * - Memory usage breakdown
+     */
+    virtual std::string GetSystemInfo() const = 0;
 
     // Disable copying
     MarbleDB(const MarbleDB&) = delete;

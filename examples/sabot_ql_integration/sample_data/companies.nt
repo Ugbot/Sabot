@@ -1,0 +1,33 @@
+<http://stocks.example.org/AAPL> <http://schema.org/name> "Apple Inc." .
+<http://stocks.example.org/AAPL> <http://schema.org/sector> "Technology" .
+<http://stocks.example.org/AAPL> <http://schema.org/country> "USA" .
+<http://stocks.example.org/AAPL> <http://financial.org/marketCap> "3000000000000" .
+<http://stocks.example.org/AAPL> <http://financial.org/creditRating> "AAA" .
+
+<http://stocks.example.org/GOOGL> <http://schema.org/name> "Alphabet Inc." .
+<http://stocks.example.org/GOOGL> <http://schema.org/sector> "Technology" .
+<http://stocks.example.org/GOOGL> <http://schema.org/country> "USA" .
+<http://stocks.example.org/GOOGL> <http://financial.org/marketCap> "1800000000000" .
+<http://stocks.example.org/GOOGL> <http://financial.org/creditRating> "AA+" .
+
+<http://stocks.example.org/MSFT> <http://schema.org/name> "Microsoft Corp." .
+<http://stocks.example.org/MSFT> <http://schema.org/sector> "Technology" .
+<http://stocks.example.org/MSFT> <http://schema.org/country> "USA" .
+<http://stocks.example.org/MSFT> <http://financial.org/marketCap> "2800000000000" .
+<http://stocks.example.org/MSFT> <http://financial.org/creditRating> "AAA" .
+
+<http://stocks.example.org/JPM> <http://schema.org/name> "JPMorgan Chase" .
+<http://stocks.example.org/JPM> <http://schema.org/sector> "Finance" .
+<http://stocks.example.org/JPM> <http://schema.org/country> "USA" .
+<http://stocks.example.org/JPM> <http://financial.org/creditRating> "A+" .
+
+<http://stocks.example.org/GS> <http://schema.org/name> "Goldman Sachs" .
+<http://stocks.example.org/GS> <http://schema.org/sector> "Finance" .
+<http://stocks.example.org/GS> <http://schema.org/country> "USA" .
+<http://stocks.example.org/GS> <http://financial.org/creditRating> "A" .
+
+<http://stocks.example.org/TSLA> <http://schema.org/name> "Tesla Inc." .
+<http://stocks.example.org/TSLA> <http://schema.org/sector> "Automotive" .
+<http://stocks.example.org/TSLA> <http://schema.org/country> "USA" .
+<http://stocks.example.org/TSLA> <http://financial.org/creditRating> "BB+" .
+

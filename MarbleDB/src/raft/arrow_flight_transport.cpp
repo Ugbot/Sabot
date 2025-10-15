@@ -17,12 +17,14 @@ limitations under the License.
 #include "marble/raft.h"
 #include "marble/status.h"
 
+#ifdef MARBLE_ENABLE_ARROW_FLIGHT
 #include <arrow/api.h>
 #include <arrow/flight/api.h>
 #include <arrow/flight/server.h>
 #include <arrow/flight/client.h>
 #include <arrow/buffer.h>
 #include <arrow/result.h>
+#endif
 
 #include <memory>
 #include <mutex>
@@ -33,11 +35,14 @@ limitations under the License.
 #include <condition_variable>
 #include <atomic>
 
+#ifdef MARBLE_ENABLE_ARROW_FLIGHT
 using namespace arrow;
 using namespace arrow::flight;
+#endif
 
 namespace marble {
 
+#ifdef MARBLE_ENABLE_ARROW_FLIGHT
 // Arrow Flight service for Raft communication
 class RaftFlightService : public arrow::flight::FlightServerBase {
 public:
@@ -53,25 +58,55 @@ public:
 
         if (action.type == "raft_message") {
             // Handle Raft message
-            std::string message_data(reinterpret_cast<const char*>(action.body->data()), 
+            std::string message_data(reinterpret_cast<const char*>(action.body->data()),
                                     action.body->size());
             std::string sender_endpoint = context.peer();
 
-            // Extract peer information and call handler
+            // Call message handler
             message_handler_(sender_endpoint, message_data);
 
-            // Return success response - no result stream needed for Raft messages
-            *result = nullptr;
+            // Return empty result stream for Raft messages
+            *result = std::unique_ptr<arrow::flight::ResultStream>(nullptr);
             return arrow::Status::OK();
         }
 
         return arrow::Status::NotImplemented("Unknown action: " + action.type);
     }
 
+    arrow::Status DoPut(
+        const arrow::flight::ServerCallContext& context,
+        std::unique_ptr<arrow::flight::FlightMessageReader> reader,
+        std::unique_ptr<arrow::flight::FlightMetadataWriter> writer) override {
+        return arrow::Status::NotImplemented("DoPut not supported for Raft transport");
+    }
+
+    arrow::Status DoGet(
+        const arrow::flight::ServerCallContext& context,
+        const arrow::flight::Ticket& request,
+        std::unique_ptr<arrow::flight::FlightDataStream>* stream) override {
+        return arrow::Status::NotImplemented("DoGet not supported for Raft transport");
+    }
+
+    arrow::Status DoExchange(
+        const arrow::flight::ServerCallContext& context,
+        std::unique_ptr<arrow::flight::FlightMessageReader> reader,
+        std::unique_ptr<arrow::flight::FlightMessageWriter> writer) override {
+        return arrow::Status::NotImplemented("DoExchange not supported for Raft transport");
+    }
+
+    arrow::Status ListActions(
+        const arrow::flight::ServerCallContext& context,
+        std::vector<arrow::flight::ActionType>* actions) override {
+        actions->push_back({"raft_message", "Send Raft message"});
+        return arrow::Status::OK();
+    }
+
 private:
     std::function<void(const std::string&, const std::string&)> message_handler_;
 };
+#endif
 
+#ifdef MARBLE_ENABLE_ARROW_FLIGHT
 // Arrow Flight-based transport implementation
 class ArrowFlightTransport : public RaftTransport {
 public:
@@ -103,7 +138,7 @@ public:
                 return marble::Status::InternalError("Failed to create location: " + location_result.status().ToString());
             }
             auto location = location_result.ValueUnsafe();
-            
+
             auto client_result = arrow::flight::FlightClient::Connect(location, options);
             if (!client_result.ok()) {
                 return marble::Status::InternalError("Failed to connect to peer: " + client_result.status().ToString());
@@ -162,7 +197,7 @@ public:
         return marble::Status::OK();
     }
 
-    marble::Status Start() {
+    marble::Status Start() override {
         if (running_) {
             return marble::Status::InvalidArgument("Transport already running");
         }
@@ -177,9 +212,8 @@ public:
             std::string host = local_endpoint_.substr(0, colon_pos);
             int port = std::stoi(local_endpoint_.substr(colon_pos + 1));
 
-            // Create Flight server
+            // Create Flight server location
             ARROW_ASSIGN_OR_RAISE(auto server_location, arrow::flight::Location::ForGrpcTcp(host, port));
-            arrow::flight::FlightServerOptions options(server_location);
 
             // Create service with message handler
             auto service = std::make_shared<RaftFlightService>(
@@ -187,20 +221,19 @@ public:
                     this->HandleIncomingMessage(sender, message);
                 });
 
-            server_ = std::make_unique<arrow::flight::FlightServerBase>();
-            service_ = std::move(service);
+            // Create Flight server with our service
+            arrow::flight::FlightServerOptions options(server_location);
+            server_ = std::make_unique<arrow::flight::FlightServer>(std::move(service), options);
 
             // Start server in background thread
-            server_thread_ = std::make_unique<std::thread>([this, options]() {
-                auto status = server_->Init(options);
-                if (!status.ok()) {
-                    std::cerr << "Failed to start Arrow Flight server: " << status.ToString() << std::endl;
-                    return;
-                }
-
-                auto serve_status = server_->Serve();
-                if (!serve_status.ok()) {
-                    std::cerr << "Failed to serve Flight server: " << serve_status.ToString() << std::endl;
+            server_thread_ = std::make_unique<std::thread>([this]() {
+                try {
+                    auto status = server_->Serve();
+                    if (!status.ok()) {
+                        std::cerr << "Failed to serve Arrow Flight server: " << status.ToString() << std::endl;
+                    }
+                } catch (const std::exception& e) {
+                    std::cerr << "Exception in Arrow Flight server thread: " << e.what() << std::endl;
                 }
             });
 
@@ -212,7 +245,7 @@ public:
         }
     }
 
-    marble::Status Stop() {
+    marble::Status Stop() override {
         if (!running_) {
             return marble::Status::OK();
         }
@@ -245,8 +278,7 @@ private:
     std::atomic<bool> running_;
 
     // Server components
-    std::unique_ptr<FlightServerBase> server_;
-    std::shared_ptr<RaftFlightService> service_;
+    std::unique_ptr<arrow::flight::FlightServer> server_;
     std::unique_ptr<std::thread> server_thread_;
 
     // Message queue for incoming messages
@@ -254,6 +286,44 @@ private:
     std::mutex queue_mutex_;
     std::condition_variable queue_cv_;
 };
+#else
+// Fallback transport when Arrow Flight is not available
+class ArrowFlightTransport : public RaftTransport {
+public:
+    explicit ArrowFlightTransport(const std::string& local_endpoint)
+        : local_endpoint_(local_endpoint) {}
+
+    ~ArrowFlightTransport() override = default;
+
+    marble::Status SendMessage(const std::string& peer_endpoint,
+                              const std::string& message) override {
+        return marble::Status::NotImplemented("Arrow Flight transport not available - rebuild with Arrow Flight support");
+    }
+
+    marble::Status ReceiveMessage(std::string* message) override {
+        return marble::Status::NotImplemented("Arrow Flight transport not available - rebuild with Arrow Flight support");
+    }
+
+    marble::Status ConnectToPeer(const std::string& peer_endpoint) override {
+        return marble::Status::NotImplemented("Arrow Flight transport not available - rebuild with Arrow Flight support");
+    }
+
+    marble::Status DisconnectFromPeer(const std::string& peer_endpoint) override {
+        return marble::Status::NotImplemented("Arrow Flight transport not available - rebuild with Arrow Flight support");
+    }
+
+    marble::Status Start() override {
+        return marble::Status::NotImplemented("Arrow Flight transport not available - rebuild with Arrow Flight support");
+    }
+
+    marble::Status Stop() override {
+        return marble::Status::OK();
+    }
+
+private:
+    std::string local_endpoint_;
+};
+#endif
 
 // Factory function implementation
 std::unique_ptr<RaftTransport> CreateArrowFlightTransport(

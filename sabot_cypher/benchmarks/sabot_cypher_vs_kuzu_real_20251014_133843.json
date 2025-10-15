@@ -1,0 +1,199 @@
+{
+  "metadata": {
+    "timestamp": "2025-10-14 13:38:43",
+    "python_version": "3.13.7",
+    "pyarrow_version": "21.0.0",
+    "kuzu_available": true,
+    "test_graph_size": "1000 vertices, 3000 edges",
+    "comparison_type": "real_cli"
+  },
+  "comparison_results": {
+    "Simple_Scan": {
+      "query": "MATCH (a:Person) RETURN a.name LIMIT 10",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Simple_Scan",
+        "query": "MATCH (a:Person) RETURN a.name LIMIT 10",
+        "success": true,
+        "avg_time_ms": 0.023603439331054688,
+        "min_time_ms": 0.010013580322265625,
+        "max_time_ms": 0.06699562072753906,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Simple_Scan",
+        "query": "MATCH (a:Person) RETURN a.name LIMIT 10",
+        "success": false,
+        "error": "Kuzu database not available"
+      }
+    },
+    "Filter_Query": {
+      "query": "MATCH (a:Person) WHERE a.age > 30 RETURN a.name ORDER BY a.age LIMIT 10",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Filter_Query",
+        "query": "MATCH (a:Person) WHERE a.age > 30 RETURN a.name ORDER BY a.age LIMIT 10",
+        "success": true,
+        "avg_time_ms": 0.01163482666015625,
+        "min_time_ms": 0.010967254638671875,
+        "max_time_ms": 0.012159347534179688,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Filter_Query",
+        "query": "MATCH (a:Person) WHERE a.age > 30 RETURN a.name ORDER BY a.age LIMIT 10",
+        "success": false,
+        "error": "Kuzu database not available"
+      }
+    },
+    "Aggregate_Count": {
+      "query": "MATCH (a:Person) RETURN count(*)",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Aggregate_Count",
+        "query": "MATCH (a:Person) RETURN count(*)",
+        "success": true,
+        "avg_time_ms": 0.008440017700195312,
+        "min_time_ms": 0.007867813110351562,
+        "max_time_ms": 0.009059906005859375,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Aggregate_Count",
+        "query": "MATCH (a:Person) RETURN count(*)",
+        "success": false,
+        "error": "Kuzu database not available"
+      }
+    },
+    "Aggregate_Avg": {
+      "query": "MATCH (a:Person) RETURN avg(a.age)",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Aggregate_Avg",
+        "query": "MATCH (a:Person) RETURN avg(a.age)",
+        "success": true,
+        "avg_time_ms": 0.00820159912109375,
+        "min_time_ms": 0.0069141387939453125,
+        "max_time_ms": 0.009059906005859375,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Aggregate_Avg",
+        "query": "MATCH (a:Person) RETURN avg(a.age)",
+        "success": false,
+        "error": "Kuzu database not available"
+      }
+    },
+    "Two_Hop": {
+      "query": "MATCH (a:Person)-[:KNOWS]->(b:Person) RETURN a.name, b.name LIMIT 10",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Two_Hop",
+        "query": "MATCH (a:Person)-[:KNOWS]->(b:Person) RETURN a.name, b.name LIMIT 10",
+        "success": true,
+        "avg_time_ms": 0.0316619873046875,
+        "min_time_ms": 0.010013580322265625,
+        "max_time_ms": 0.11420249938964844,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Two_Hop",
+        "query": "MATCH (a:Person)-[:KNOWS]->(b:Person) RETURN a.name, b.name LIMIT 10",
+        "success": false,
+        "error": "Kuzu database not available"
+      }
+    },
+    "Three_Hop": {
+      "query": "MATCH (a:Person)-[:KNOWS]->(b:Person)-[:KNOWS]->(c:Person) RETURN count(*)",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Three_Hop",
+        "query": "MATCH (a:Person)-[:KNOWS]->(b:Person)-[:KNOWS]->(c:Person) RETURN count(*)",
+        "success": true,
+        "avg_time_ms": 0.010013580322265625,
+        "min_time_ms": 0.010013580322265625,
+        "max_time_ms": 0.010013580322265625,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Three_Hop",
+        "query": "MATCH (a:Person)-[:KNOWS]->(b:Person)-[:KNOWS]->(c:Person) RETURN count(*)",
+        "success": false,
+        "error": "Kuzu database not available"
+      }
+    },
+    "Complex_Query": {
+      "query": "MATCH (a:Person)-[:KNOWS]->(b:Person) WHERE a.city = 'NYC' RETURN a.name, b.name ORDER BY a.age LIMIT 10",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Complex_Query",
+        "query": "MATCH (a:Person)-[:KNOWS]->(b:Person) WHERE a.city = 'NYC' RETURN a.name, b.name ORDER BY a.age LIMIT 10",
+        "success": true,
+        "avg_time_ms": 0.028562545776367188,
+        "min_time_ms": 0.011920928955078125,
+        "max_time_ms": 0.07081031799316406,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Complex_Query",
+        "query": "MATCH (a:Person)-[:KNOWS]->(b:Person) WHERE a.city = 'NYC' RETURN a.name, b.name ORDER BY a.age LIMIT 10",
+        "success": false,
+        "error": "Kuzu database not available"
+      }
+    },
+    "Multi_Aggregate": {
+      "query": "MATCH (a:Person) RETURN count(*), avg(a.age), min(a.age), max(a.age)",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Multi_Aggregate",
+        "query": "MATCH (a:Person) RETURN count(*), avg(a.age), min(a.age), max(a.age)",
+        "success": true,
+        "avg_time_ms": 0.010156631469726562,
+        "min_time_ms": 0.009059906005859375,
+        "max_time_ms": 0.010967254638671875,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Multi_Aggregate",
+        "query": "MATCH (a:Person) RETURN count(*), avg(a.age), min(a.age), max(a.age)",
+        "success": false,
+        "error": "Kuzu database not available"
+      }
+    }
+  },
+  "summary": {
+    "sabot_cypher": {
+      "total_queries": 8,
+      "successful_queries": 8,
+      "success_rate": 100.0,
+      "avg_execution_time_ms": 0.01653432846069336
+    },
+    "kuzu": {
+      "total_queries": 8,
+      "successful_queries": 0,
+      "success_rate": 0.0,
+      "avg_execution_time_ms": 0
+    },
+    "comparison": {
+      "performance_ratio": 0,
+      "sabot_faster": false,
+      "speedup_factor": 0
+    }
+  }
+}

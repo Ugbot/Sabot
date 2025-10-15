@@ -6,6 +6,7 @@ MarbleDB Checkpoint Implementation
 #include "marble/db.h"
 #include <filesystem>
 #include <fstream>
+#include <set>
 #include <sstream>
 #include <iomanip>
 

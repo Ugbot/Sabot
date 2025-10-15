@@ -161,8 +161,8 @@ std::shared_ptr<Key> ArrowRecordRef::key() const {
     if (key_column->type()->id() == arrow::Type::INT64) {
         auto array = std::static_pointer_cast<arrow::Int64Array>(key_column);
         int64_t key_val = array->Value(offset_);
-        // Return BenchKey for now (TODO: make generic)
-        return std::make_shared<BenchKey>(key_val);
+        // Return Int64Key for int64 values
+        return std::make_shared<Int64Key>(key_val);
     } else if (key_column->type()->id() == arrow::Type::STRING) {
         auto array = std::static_pointer_cast<arrow::StringArray>(key_column);
         std::string key_val = array->GetString(offset_);

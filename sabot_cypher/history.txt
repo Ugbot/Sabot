@@ -1,0 +1,562 @@
+MATCH (a) RETURN a LIMIT 1;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, city STRING, PRIMARY KEY(id));
+CREATE REL TABLE KNOWS(FROM Person TO Person);
+MATCH (a) RETURN a LIMIT 10;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, city STRING, PRIMARY KEY(id));
+CREATE REL TABLE KNOWS(FROM Person TO Person);
+MATCH (a) RETURN a LIMIT 10;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, city STRING, PRIMARY KEY(id));
+CREATE REL TABLE KNOWS(FROM Person TO Person);
+MATCH (a) RETURN a LIMIT 10;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, city STRING, PRIMARY KEY(id));
+CREATE REL TABLE KNOWS(FROM Person TO Person);
+MATCH (a) RETURN count(*);
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, city STRING, PRIMARY KEY(id));
+CREATE REL TABLE KNOWS(FROM Person TO Person);
+MATCH (a) RETURN count(*);
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, city STRING, PRIMARY KEY(id));
+CREATE REL TABLE KNOWS(FROM Person TO Person);
+MATCH (a) RETURN count(*);
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, city STRING, PRIMARY KEY(id));
+CREATE REL TABLE KNOWS(FROM Person TO Person);
+MATCH (a) WHERE a.age > 30 RETURN a.name LIMIT 5;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, city STRING, PRIMARY KEY(id));
+CREATE REL TABLE KNOWS(FROM Person TO Person);
+MATCH (a) WHERE a.age > 30 RETURN a.name LIMIT 5;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, city STRING, PRIMARY KEY(id));
+CREATE REL TABLE KNOWS(FROM Person TO Person);
+MATCH (a) WHERE a.age > 30 RETURN a.name LIMIT 5;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, city STRING, PRIMARY KEY(id));
+CREATE REL TABLE KNOWS(FROM Person TO Person);
+MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name LIMIT 5;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, city STRING, PRIMARY KEY(id));
+CREATE REL TABLE KNOWS(FROM Person TO Person);
+MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name LIMIT 5;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, city STRING, PRIMARY KEY(id));
+CREATE REL TABLE KNOWS(FROM Person TO Person);
+MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name LIMIT 5;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (follower:Person)-[:Follows]->(person:Person)
+                RETURN person.id AS personID, person.name AS name, count(follower.id) AS numFollowers
+                ORDER BY numFollowers DESC LIMIT 3
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (follower:Person)-[:Follows]->(person:Person)
+                RETURN person.id AS personID, person.name AS name, count(follower.id) AS numFollowers
+                ORDER BY numFollowers DESC LIMIT 3
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (follower:Person)-[:Follows]->(person:Person)
+                RETURN person.id AS personID, person.name AS name, count(follower.id) AS numFollowers
+                ORDER BY numFollowers DESC LIMIT 3
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (follower:Person)-[:Follows]->(person:Person)
+                RETURN person.id AS personID, person.name AS name, count(follower.id) AS numFollowers
+                ORDER BY numFollowers DESC LIMIT 3
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (follower:Person)-[:Follows]->(person:Person)
+                RETURN person.id AS personID, person.name AS name, count(follower.id) AS numFollowers
+                ORDER BY numFollowers DESC LIMIT 3
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (follower:Person)-[:Follows]->(person:Person)
+                WITH person, count(follower.id) as numFollowers
+                ORDER BY numFollowers DESC LIMIT 1
+                MATCH (person)-[:LivesIn]->(city:City)
+                RETURN person.name AS name, numFollowers, city.city AS city, city.state AS state, city.country AS country
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (follower:Person)-[:Follows]->(person:Person)
+                WITH person, count(follower.id) as numFollowers
+                ORDER BY numFollowers DESC LIMIT 1
+                MATCH (person)-[:LivesIn]->(city:City)
+                RETURN person.name AS name, numFollowers, city.city AS city, city.state AS state, city.country AS country
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (follower:Person)-[:Follows]->(person:Person)
+                WITH person, count(follower.id) as numFollowers
+                ORDER BY numFollowers DESC LIMIT 1
+                MATCH (person)-[:LivesIn]->(city:City)
+                RETURN person.name AS name, numFollowers, city.city AS city, city.state AS state, city.country AS country
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (follower:Person)-[:Follows]->(person:Person)
+                WITH person, count(follower.id) as numFollowers
+                ORDER BY numFollowers DESC LIMIT 1
+                MATCH (person)-[:LivesIn]->(city:City)
+                RETURN person.name AS name, numFollowers, city.city AS city, city.state AS state, city.country AS country
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (follower:Person)-[:Follows]->(person:Person)
+                WITH person, count(follower.id) as numFollowers
+                ORDER BY numFollowers DESC LIMIT 1
+                MATCH (person)-[:LivesIn]->(city:City)
+                RETURN person.name AS name, numFollowers, city.city AS city, city.state AS state, city.country AS country
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE c.country = 'United States'
+                RETURN c.city AS city, avg(p.age) AS averageAge
+                ORDER BY averageAge LIMIT 5
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE c.country = 'United States'
+                RETURN c.city AS city, avg(p.age) AS averageAge
+                ORDER BY averageAge LIMIT 5
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE c.country = 'United States'
+                RETURN c.city AS city, avg(p.age) AS averageAge
+                ORDER BY averageAge LIMIT 5
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE c.country = 'United States'
+                RETURN c.city AS city, avg(p.age) AS averageAge
+                ORDER BY averageAge LIMIT 5
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE c.country = 'United States'
+                RETURN c.city AS city, avg(p.age) AS averageAge
+                ORDER BY averageAge LIMIT 5
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE p.age >= 30 AND p.age <= 40
+                RETURN c.country AS countries, count(p) AS personCounts
+                ORDER BY personCounts DESC LIMIT 3
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE p.age >= 30 AND p.age <= 40
+                RETURN c.country AS countries, count(p) AS personCounts
+                ORDER BY personCounts DESC LIMIT 3
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE p.age >= 30 AND p.age <= 40
+                RETURN c.country AS countries, count(p) AS personCounts
+                ORDER BY personCounts DESC LIMIT 3
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE p.age >= 30 AND p.age <= 40
+                RETURN c.country AS countries, count(p) AS personCounts
+                ORDER BY personCounts DESC LIMIT 3
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE p.age >= 30 AND p.age <= 40
+                RETURN c.country AS countries, count(p) AS personCounts
+                ORDER BY personCounts DESC LIMIT 3
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'fine dining'
+                AND lower(p.gender) = 'male'
+                WITH p, i
+                MATCH (p)-[:LivesIn]->(c:City)
+                WHERE c.name = 'City_1' AND c.country = 'United Kingdom'
+                RETURN count(p) AS numPersons
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'fine dining'
+                AND lower(p.gender) = 'male'
+                WITH p, i
+                MATCH (p)-[:LivesIn]->(c:City)
+                WHERE c.name = 'City_1' AND c.country = 'United Kingdom'
+                RETURN count(p) AS numPersons
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'fine dining'
+                AND lower(p.gender) = 'male'
+                WITH p, i
+                MATCH (p)-[:LivesIn]->(c:City)
+                WHERE c.name = 'City_1' AND c.country = 'United Kingdom'
+                RETURN count(p) AS numPersons
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'fine dining'
+                AND lower(p.gender) = 'male'
+                WITH p, i
+                MATCH (p)-[:LivesIn]->(c:City)
+                WHERE c.name = 'City_1' AND c.country = 'United Kingdom'
+                RETURN count(p) AS numPersons
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'fine dining'
+                AND lower(p.gender) = 'male'
+                WITH p, i
+                MATCH (p)-[:LivesIn]->(c:City)
+                WHERE c.name = 'City_1' AND c.country = 'United Kingdom'
+                RETURN count(p) AS numPersons
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'tennis'
+                AND lower(p.gender) = 'female'
+                WITH p, i
+                MATCH (p)-[:LivesIn]->(c:City)
+                RETURN count(p.id) AS numPersons, c.name AS city, c.country AS country
+                ORDER BY numPersons DESC LIMIT 5
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'tennis'
+                AND lower(p.gender) = 'female'
+                WITH p, i
+                MATCH (p)-[:LivesIn]->(c:City)
+                RETURN count(p.id) AS numPersons, c.name AS city, c.country AS country
+                ORDER BY numPersons DESC LIMIT 5
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'tennis'
+                AND lower(p.gender) = 'female'
+                WITH p, i
+                MATCH (p)-[:LivesIn]->(c:City)
+                RETURN count(p.id) AS numPersons, c.name AS city, c.country AS country
+                ORDER BY numPersons DESC LIMIT 5
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'tennis'
+                AND lower(p.gender) = 'female'
+                WITH p, i
+                MATCH (p)-[:LivesIn]->(c:City)
+                RETURN count(p.id) AS numPersons, c.name AS city, c.country AS country
+                ORDER BY numPersons DESC LIMIT 5
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'tennis'
+                AND lower(p.gender) = 'female'
+                WITH p, i
+                MATCH (p)-[:LivesIn]->(c:City)
+                RETURN count(p.id) AS numPersons, c.name AS city, c.country AS country
+                ORDER BY numPersons DESC LIMIT 5
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE p.age >= 23 AND p.age <= 30 AND c.country = 'United States'
+                WITH p, c
+                MATCH (p)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'photography'
+                RETURN count(p.id) AS numPersons, c.state AS state, c.country AS country
+                ORDER BY numPersons DESC LIMIT 1
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE p.age >= 23 AND p.age <= 30 AND c.country = 'United States'
+                WITH p, c
+                MATCH (p)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'photography'
+                RETURN count(p.id) AS numPersons, c.state AS state, c.country AS country
+                ORDER BY numPersons DESC LIMIT 1
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE p.age >= 23 AND p.age <= 30 AND c.country = 'United States'
+                WITH p, c
+                MATCH (p)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'photography'
+                RETURN count(p.id) AS numPersons, c.state AS state, c.country AS country
+                ORDER BY numPersons DESC LIMIT 1
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE p.age >= 23 AND p.age <= 30 AND c.country = 'United States'
+                WITH p, c
+                MATCH (p)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'photography'
+                RETURN count(p.id) AS numPersons, c.state AS state, c.country AS country
+                ORDER BY numPersons DESC LIMIT 1
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (p:Person)-[:LivesIn]->(c:City)
+                WHERE p.age >= 23 AND p.age <= 30 AND c.country = 'United States'
+                WITH p, c
+                MATCH (p)-[:HasInterest]->(i:Interest)
+                WHERE lower(i.name) = 'photography'
+                RETURN count(p.id) AS numPersons, c.state AS state, c.country AS country
+                ORDER BY numPersons DESC LIMIT 1
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)
+                RETURN count(*) AS numPaths
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)
+                RETURN count(*) AS numPaths
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)
+                RETURN count(*) AS numPaths
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)
+                RETURN count(*) AS numPaths
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)
+                RETURN count(*) AS numPaths
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)
+                WHERE b.age < 50 AND c.age > 25
+                RETURN count(*) as numPaths
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)
+                WHERE b.age < 50 AND c.age > 25
+                RETURN count(*) as numPaths
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)
+                WHERE b.age < 50 AND c.age > 25
+                RETURN count(*) as numPaths
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)
+                WHERE b.age < 50 AND c.age > 25
+                RETURN count(*) as numPaths
+            ;
+CREATE NODE TABLE Person(id INT64, name STRING, age INT32, gender STRING, PRIMARY KEY(id));
+CREATE NODE TABLE City(id INT64, name STRING, state STRING, country STRING, PRIMARY KEY(id));
+CREATE NODE TABLE Interest(id INT64, name STRING, PRIMARY KEY(id));
+CREATE REL TABLE Follows(FROM Person TO Person);
+CREATE REL TABLE LivesIn(FROM Person TO City);
+CREATE REL TABLE HasInterest(FROM Person TO Interest);
+                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)
+                WHERE b.age < 50 AND c.age > 25
+                RETURN count(*) as numPaths
+            ;

@@ -42,34 +42,85 @@ SabotOperatorTranslator::TranslateToMorselOperators(const LogicalPlan& logical_p
     // Sketch Sabot operator pipeline (planning-level only)
     morsel_plan->operator_pipeline.clear();
     if (morsel_plan->has_joins) {
-        // Shuffle to ensure co-partitioning by join keys across agents
-        morsel_plan->operator_pipeline.push_back("ShuffleRepartitionByKeys");
-        morsel_plan->operator_descriptors.push_back({
-            "ShuffleRepartitionByKeys",
-            {{"keys", morsel_plan->join_key_columns.empty() ? "" : morsel_plan->join_key_columns.front()}}
-        });
+        // Check if dimension table join (broadcast) or stream-stream join (shuffle)
+        bool is_broadcast_join = false; // TODO: detect from logical plan
+        
+        if (!is_broadcast_join) {
+            // Stream-stream join: shuffle to ensure co-partitioning
+            morsel_plan->operator_pipeline.push_back("ShuffleRepartitionByKeys");
+            MorselPlan::OperatorDescriptor shuffle_desc;
+            shuffle_desc.type = "ShuffleRepartitionByKeys";
+            shuffle_desc.params["keys"] = morsel_plan->join_key_columns.empty() ? "" : morsel_plan->join_key_columns.front();
+            shuffle_desc.is_stateful = false;
+            shuffle_desc.is_broadcast = false;
+            morsel_plan->operator_descriptors.push_back(shuffle_desc);
+        }
+        
         if (morsel_plan->has_asof_joins) {
             AppendPartitionByKeys(*morsel_plan);
             AppendTimeSortWithinPartition(*morsel_plan);
             AppendAsOfMergeProbe(*morsel_plan);
-            morsel_plan->operator_descriptors.push_back({"PartitionByKeys", {{"keys", morsel_plan->join_key_columns.empty() ? "" : morsel_plan->join_key_columns.front()}}});
-            morsel_plan->operator_descriptors.push_back({"TimeSortWithinPartition", {{"ts", morsel_plan->join_timestamp_column}}});
-            morsel_plan->operator_descriptors.push_back({"AsOfMergeProbe", {{"ts", morsel_plan->join_timestamp_column}}});
+            
+            MorselPlan::OperatorDescriptor part_desc, sort_desc, asof_desc;
+            part_desc.type = "PartitionByKeys";
+            part_desc.params["keys"] = morsel_plan->join_key_columns.empty() ? "" : morsel_plan->join_key_columns.front();
+            part_desc.is_stateful = morsel_plan->is_streaming; // Stateful if streaming
+            
+            sort_desc.type = "TimeSortWithinPartition";
+            sort_desc.params["ts"] = morsel_plan->join_timestamp_column;
+            sort_desc.is_stateful = morsel_plan->is_streaming;
+            
+            asof_desc.type = "AsOfMergeProbe";
+            asof_desc.params["ts"] = morsel_plan->join_timestamp_column;
+            asof_desc.is_stateful = morsel_plan->is_streaming;
+            
+            morsel_plan->operator_descriptors.push_back(part_desc);
+            morsel_plan->operator_descriptors.push_back(sort_desc);
+            morsel_plan->operator_descriptors.push_back(asof_desc);
         } else {
             AppendPartitionByKeys(*morsel_plan);
             AppendHashJoin(*morsel_plan);
-            morsel_plan->operator_descriptors.push_back({"PartitionByKeys", {{"keys", morsel_plan->join_key_columns.empty() ? "" : morsel_plan->join_key_columns.front()}}});
-            morsel_plan->operator_descriptors.push_back({"HashJoin", {{"keys", morsel_plan->join_key_columns.empty() ? "" : morsel_plan->join_key_columns.front()}}});
+            
+            MorselPlan::OperatorDescriptor part_desc, join_desc;
+            part_desc.type = "PartitionByKeys";
+            part_desc.params["keys"] = morsel_plan->join_key_columns.empty() ? "" : morsel_plan->join_key_columns.front();
+            part_desc.is_stateful = false;
+            part_desc.is_broadcast = is_broadcast_join;
+            
+            join_desc.type = "HashJoin";
+            join_desc.params["keys"] = morsel_plan->join_key_columns.empty() ? "" : morsel_plan->join_key_columns.front();
+            join_desc.is_stateful = morsel_plan->is_streaming; // Streaming joins need state
+            join_desc.is_broadcast = is_broadcast_join;
+            
+            morsel_plan->operator_descriptors.push_back(part_desc);
+            morsel_plan->operator_descriptors.push_back(join_desc);
         }
     }
     if (morsel_plan->has_windows) {
-        // Shuffle by window/grouping key if needed
+        // Shuffle by window/grouping key if needed (not for broadcast joins)
         morsel_plan->operator_pipeline.push_back("ShuffleRepartitionByWindowKey");
-        morsel_plan->operator_descriptors.push_back({"ShuffleRepartitionByWindowKey", {{"interval", morsel_plan->window_interval}}});
+        
+        MorselPlan::OperatorDescriptor shuffle_desc, proj_desc, groupby_desc;
+        
+        shuffle_desc.type = "ShuffleRepartitionByWindowKey";
+        shuffle_desc.params["interval"] = morsel_plan->window_interval;
+        shuffle_desc.is_stateful = false;
+        
+        proj_desc.type = "ProjectDateTruncForWindows";
+        proj_desc.params["interval"] = morsel_plan->window_interval;
+        proj_desc.is_stateful = false;
+        
+        groupby_desc.type = "GroupByWindowFrame";
+        groupby_desc.params["interval"] = morsel_plan->window_interval;
+        groupby_desc.params["state_backend"] = morsel_plan->state_backend;
+        groupby_desc.params["timer_backend"] = morsel_plan->timer_backend;
+        groupby_desc.is_stateful = true; // Window aggregations are stateful
+        
+        morsel_plan->operator_descriptors.push_back(shuffle_desc);
         AppendProjectDateTruncForWindows(*morsel_plan);
+        morsel_plan->operator_descriptors.push_back(proj_desc);
         AppendGroupByWindowFrame(*morsel_plan);
-        morsel_plan->operator_descriptors.push_back({"ProjectDateTruncForWindows", {{"interval", morsel_plan->window_interval}}});
-        morsel_plan->operator_descriptors.push_back({"GroupByWindowFrame", {{"interval", morsel_plan->window_interval}}});
+        morsel_plan->operator_descriptors.push_back(groupby_desc);
     }
 
     // Estimate output schema

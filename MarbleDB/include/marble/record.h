@@ -424,10 +424,100 @@ public:
 
     bool operator==(const Key& other) const { return Compare(other) == 0; }
     bool operator!=(const Key& other) const { return Compare(other) != 0; }
+
+
     bool operator<(const Key& other) const { return Compare(other) < 0; }
     bool operator<=(const Key& other) const { return Compare(other) <= 0; }
     bool operator>(const Key& other) const { return Compare(other) > 0; }
     bool operator>=(const Key& other) const { return Compare(other) >= 0; }
+};
+
+//==============================================================================
+// Concrete Key Implementations
+//==============================================================================
+
+/**
+ * @brief Triple key implementation for subject-predicate-object triples
+ */
+class TripleKey : public Key {
+public:
+    TripleKey(int64_t subject, int64_t predicate, int64_t object)
+        : subject_(subject), predicate_(predicate), object_(object) {}
+
+    int Compare(const Key& other) const override {
+        const TripleKey* other_key = dynamic_cast<const TripleKey*>(&other);
+        if (!other_key) return -1;
+
+        if (subject_ != other_key->subject_) return subject_ < other_key->subject_ ? -1 : 1;
+        if (predicate_ != other_key->predicate_) return predicate_ < other_key->predicate_ ? -1 : 1;
+        if (object_ != other_key->object_) return object_ < other_key->object_ ? -1 : 1;
+        return 0;
+    }
+
+    arrow::Result<std::shared_ptr<arrow::Scalar>> ToArrowScalar() const override {
+        // Return a struct scalar representing the triple
+        return arrow::MakeNullScalar(arrow::null());
+    }
+
+    std::shared_ptr<Key> Clone() const override {
+        return std::make_shared<TripleKey>(subject_, predicate_, object_);
+    }
+
+    std::string ToString() const override {
+        return std::to_string(subject_) + "," + std::to_string(predicate_) + "," + std::to_string(object_);
+    }
+
+    size_t Hash() const override {
+        size_t h = 0;
+        h = h * 31 + std::hash<int64_t>()(subject_);
+        h = h * 31 + std::hash<int64_t>()(predicate_);
+        h = h * 31 + std::hash<int64_t>()(object_);
+        return h;
+    }
+
+    int64_t subject() const { return subject_; }
+    int64_t predicate() const { return predicate_; }
+    int64_t object() const { return object_; }
+
+private:
+    int64_t subject_;
+    int64_t predicate_;
+    int64_t object_;
+};
+
+/**
+ * @brief Simple int64 key for benchmarking and testing
+ */
+class Int64Key : public Key {
+public:
+    explicit Int64Key(int64_t value) : value_(value) {}
+
+    int Compare(const Key& other) const override {
+        const Int64Key* other_key = dynamic_cast<const Int64Key*>(&other);
+        if (!other_key) return -1;
+        return value_ < other_key->value_ ? -1 : (value_ > other_key->value_ ? 1 : 0);
+    }
+
+    arrow::Result<std::shared_ptr<arrow::Scalar>> ToArrowScalar() const override {
+        return arrow::MakeScalar(value_);
+    }
+
+    std::shared_ptr<Key> Clone() const override {
+        return std::make_shared<Int64Key>(value_);
+    }
+
+    std::string ToString() const override {
+        return std::to_string(value_);
+    }
+
+    size_t Hash() const override {
+        return std::hash<int64_t>()(value_);
+    }
+
+    int64_t value() const { return value_; }
+
+private:
+    int64_t value_;
 };
 
 // Schema definition for records

@@ -105,19 +105,21 @@
 - Cache hit rate: **60-80%** (Zipfian distribution)
 - Memory: **1 MB per 10K keys** (very efficient)
 
-### 3. Negative Cache 🔨 (To Implement)
+### 3. Negative Cache ✅ (Implemented)
 
 **Bloom Filter for Misses**:
 - Remember keys that don't exist
 - Repeated failed lookups: **2 μs** (100x faster)
 - Useful for JOINs, deduplication
+- **Implementation**: `src/core/hot_key_cache.cpp` (NegativeCache class)
 
-### 4. Sorted Blocks 🔨 (To Implement)
+### 4. Sorted Blocks ✅ (Implemented)
 
 **Binary Search Within Blocks**:
 - Current: Linear scan of 8K rows (250 μs)
 - Optimized: Binary search (13 comparisons, 50 μs)
 - **5x faster** with zero memory overhead
+- **Implementation**: `src/core/sstable.cpp:236` (sorted on write), `src/core/sstable.cpp:477` (binary search on read)
 
 ### 5. SIMD Acceleration 🔨 (Future)
 
@@ -346,10 +348,10 @@ This is the opposite of Tonbo's philosophy:
 ## Next Steps
 
 ### Immediate (High Impact)
-1. ✅ Hot key cache - **Done**
-2. 🔨 Sorted blocks - **20 lines, 5x speedup**
-3. 🔨 Negative cache - **50 lines, 100x for misses**
-4. 🔨 Block bloom filters - **30 lines, 10x for misses**
+1. ✅ Hot key cache - **Done** (`src/core/hot_key_cache.cpp`)
+2. ✅ Sorted blocks - **Done** (`src/core/sstable.cpp:236, :477`)
+3. ✅ Negative cache - **Done** (`src/core/hot_key_cache.cpp`)
+4. ✅ Block bloom filters - **Done** (`src/core/block_optimizations.cpp`)
 
 ### Future (Nice to Have)
 5. 🔮 Skip lists in blocks
