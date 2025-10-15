@@ -45,6 +45,7 @@ This is an experimental research project exploring the design space of:
 **Current State (v0.1.0-alpha):**
 - ✅ **CyArrow**: Production-ready zero-copy Arrow operations (104M rows/sec joins)
 - ✅ **Graph Processing**: High-performance graph analytics (3-37M matches/sec pattern matching)
+- ✅ **SabotQL**: SPARQL query engine for RDF triple stores (23,798 queries/sec, integrated into pipelines)
 - ✅ **DataLoader**: High-performance CSV/Arrow IPC loading (52x faster than CSV)
 - ✅ **Streaming Agents**: Faust-inspired Kafka processing with columnar data
 - ✅ **Cython Acceleration**: SIMD-accelerated compute kernels

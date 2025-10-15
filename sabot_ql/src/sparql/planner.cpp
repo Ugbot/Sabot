@@ -719,20 +719,113 @@ std::vector<TriplePattern> QueryOptimizer::OptimizeBasicGraphPattern(
     // 2. Sort by cardinality (smallest first)
     // 3. Build join tree left-to-right
 
-    // For now, just return original order
-    // TODO: Implement proper join reordering
+    if (bgp.triples.empty()) {
+        return {};
+    }
 
-    return bgp.triples;
+    if (bgp.triples.size() == 1) {
+        // Only one pattern - no optimization needed
+        return bgp.triples;
+    }
+
+    // Use SelectJoinOrder to get optimal ordering
+    auto order = SelectJoinOrder(bgp.triples, nullptr);
+
+    // Reorder patterns according to optimal order
+    std::vector<TriplePattern> optimized;
+    optimized.reserve(bgp.triples.size());
+
+    for (size_t idx : order) {
+        if (idx < bgp.triples.size()) {
+            optimized.push_back(bgp.triples[idx]);
+        }
+    }
+
+    // If optimization failed to include all patterns, fall back to original order
+    if (optimized.size() != bgp.triples.size()) {
+        return bgp.triples;
+    }
+
+    return optimized;
 }
 
 arrow::Result<size_t> QueryOptimizer::EstimateCardinality(
     const TriplePattern& pattern,
     std::shared_ptr<Vocabulary> vocab) {
 
-    // TODO: Implement cardinality estimation
-    // For now, return a placeholder
+    // Convert SPARQL triple pattern to storage triple pattern
+    sabot_ql::TriplePattern storage_pattern;
 
-    return 1000;  // Placeholder
+    // Convert subject
+    if (auto var = pattern.GetSubjectVar()) {
+        // Variable - unbound
+        storage_pattern.subject = std::nullopt;
+    } else if (auto* iri = std::get_if<IRI>(&pattern.subject)) {
+        // Bound IRI - look up ValueId
+        Term term = Term::IRI(iri->iri);
+        ARROW_ASSIGN_OR_RAISE(auto maybe_id, vocab->GetValueId(term));
+        if (maybe_id.has_value()) {
+            storage_pattern.subject = maybe_id->getBits();
+        } else {
+            // IRI not in vocabulary - pattern matches nothing
+            return 0;
+        }
+    } else if (auto* literal = std::get_if<Literal>(&pattern.subject)) {
+        // Literals cannot be subjects in RDF - pattern matches nothing
+        return 0;
+    }
+
+    // Convert predicate
+    if (auto var = pattern.GetPredicateVar()) {
+        // Variable - unbound
+        storage_pattern.predicate = std::nullopt;
+    } else if (auto* iri = std::get_if<IRI>(&pattern.predicate)) {
+        // Bound IRI - look up ValueId
+        Term term = Term::IRI(iri->iri);
+        ARROW_ASSIGN_OR_RAISE(auto maybe_id, vocab->GetValueId(term));
+        if (maybe_id.has_value()) {
+            storage_pattern.predicate = maybe_id->getBits();
+        } else {
+            // IRI not in vocabulary - pattern matches nothing
+            return 0;
+        }
+    } else if (auto* literal = std::get_if<Literal>(&pattern.predicate)) {
+        // Literals cannot be predicates in RDF - pattern matches nothing
+        return 0;
+    }
+
+    // Convert object
+    if (auto var = pattern.GetObjectVar()) {
+        // Variable - unbound
+        storage_pattern.object = std::nullopt;
+    } else if (auto* iri = std::get_if<IRI>(&pattern.object)) {
+        // Bound IRI - look up ValueId
+        Term term = Term::IRI(iri->iri);
+        ARROW_ASSIGN_OR_RAISE(auto maybe_id, vocab->GetValueId(term));
+        if (maybe_id.has_value()) {
+            storage_pattern.object = maybe_id->getBits();
+        } else {
+            // IRI not in vocabulary - pattern matches nothing
+            return 0;
+        }
+    } else if (auto* literal = std::get_if<Literal>(&pattern.object)) {
+        // Bound literal - look up ValueId
+        Term term = Term::Literal(
+            literal->value,
+            literal->language,
+            literal->datatype
+        );
+        ARROW_ASSIGN_OR_RAISE(auto maybe_id, vocab->GetValueId(term));
+        if (maybe_id.has_value()) {
+            storage_pattern.object = maybe_id->getBits();
+        } else {
+            // Literal not in vocabulary - pattern matches nothing
+            return 0;
+        }
+    }
+
+    // Use triple store's cardinality estimation
+    return store_->EstimateCardinality(storage_pattern);
 }
 
 std::vector<size_t> QueryOptimizer::SelectJoinOrder(

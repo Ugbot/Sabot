@@ -1,0 +1,5 @@
+include README.md
+include ../../include/sabot_ql/**/*.h
+include ../../src/**/*.cpp
+recursive-include ../../include *.h
+

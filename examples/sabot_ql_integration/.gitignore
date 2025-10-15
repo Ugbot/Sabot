@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Database files
+*.db
+*.db-*
+
+# Logs
+*.log
+
+# Build artifacts
+build/
+dist/
+

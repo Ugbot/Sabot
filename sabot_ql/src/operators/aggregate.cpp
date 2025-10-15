@@ -183,10 +183,106 @@ arrow::Status GroupByOperator::ComputeAggregates() {
             case AggregateFunction::Min:
             case AggregateFunction::Max:
                 {
-                    // Use Arrow compute kernels for each group
-                    // TODO: Implement using Arrow compute::GroupBy when available
-                    // For now, placeholder
-                    return arrow::Status::NotImplemented("Aggregate function not yet implemented");
+                    // Build array for this aggregate type
+                    std::unique_ptr<arrow::ArrayBuilder> agg_builder;
+                    ARROW_RETURN_NOT_OK(arrow::MakeBuilder(
+                        arrow::default_memory_pool(),
+                        arrow::float64(),  // Output type for numeric aggregates
+                        &agg_builder
+                    ));
+
+                    auto double_builder = static_cast<arrow::DoubleBuilder*>(agg_builder.get());
+
+                    // Compute aggregate for each group
+                    for (const auto& [group_key, row_indices] : groups_) {
+                        if (row_indices.empty()) {
+                            ARROW_RETURN_NOT_OK(double_builder->AppendNull());
+                            continue;
+                        }
+
+                        // Extract rows for this group into an array
+                        arrow::DoubleBuilder group_values_builder;
+                        ARROW_RETURN_NOT_OK(group_values_builder.Reserve(row_indices.size()));
+
+                        for (int64_t row_idx : row_indices) {
+                            // Find chunk and row within chunk
+                            int64_t cumulative_rows = 0;
+                            bool found = false;
+
+                            for (int chunk_idx = 0; chunk_idx < input_column->num_chunks(); ++chunk_idx) {
+                                auto chunk = input_column->chunk(chunk_idx);
+                                if (row_idx < cumulative_rows + chunk->length()) {
+                                    int64_t row_in_chunk = row_idx - cumulative_rows;
+
+                                    if (chunk->IsNull(row_in_chunk)) {
+                                        // Skip nulls in aggregation
+                                    } else {
+                                        auto scalar_result = chunk->GetScalar(row_in_chunk);
+                                        if (scalar_result.ok()) {
+                                            auto scalar = scalar_result.ValueOrDie();
+
+                                            // Convert to double
+                                            double value = 0.0;
+                                            if (scalar->type->id() == arrow::Type::INT64) {
+                                                value = static_cast<double>(
+                                                    std::static_pointer_cast<arrow::Int64Scalar>(scalar)->value);
+                                            } else if (scalar->type->id() == arrow::Type::DOUBLE) {
+                                                value = std::static_pointer_cast<arrow::DoubleScalar>(scalar)->value;
+                                            } else if (scalar->type->id() == arrow::Type::FLOAT) {
+                                                value = static_cast<double>(
+                                                    std::static_pointer_cast<arrow::FloatScalar>(scalar)->value);
+                                            }
+                                            ARROW_RETURN_NOT_OK(group_values_builder.Append(value));
+                                        }
+                                    }
+
+                                    found = true;
+                                    break;
+                                }
+                                cumulative_rows += chunk->length();
+                            }
+
+                            if (!found) {
+                                return arrow::Status::Invalid("Row index out of range");
+                            }
+                        }
+
+                        // Build array of group values
+                        ARROW_ASSIGN_OR_RAISE(auto group_array, group_values_builder.Finish());
+
+                        // Compute aggregate using helper functions (use if-else to avoid nested switch)
+                        std::shared_ptr<arrow::Scalar> agg_scalar;
+
+                        if (agg.function == AggregateFunction::Sum) {
+                            ARROW_ASSIGN_OR_RAISE(agg_scalar, aggregate_helpers::ComputeSum(group_array));
+                        } else if (agg.function == AggregateFunction::Avg) {
+                            ARROW_ASSIGN_OR_RAISE(agg_scalar, aggregate_helpers::ComputeAvg(group_array));
+                        } else if (agg.function == AggregateFunction::Min) {
+                            ARROW_ASSIGN_OR_RAISE(agg_scalar, aggregate_helpers::ComputeMin(group_array));
+                        } else if (agg.function == AggregateFunction::Max) {
+                            ARROW_ASSIGN_OR_RAISE(agg_scalar, aggregate_helpers::ComputeMax(group_array));
+                        } else {
+                            return arrow::Status::Invalid("Unexpected aggregate function");
+                        }
+
+                        // Append result to builder
+                        if (agg_scalar->is_valid) {
+                            double result_value = 0.0;
+                            if (agg_scalar->type->id() == arrow::Type::INT64) {
+                                result_value = static_cast<double>(
+                                    std::static_pointer_cast<arrow::Int64Scalar>(agg_scalar)->value);
+                            } else if (agg_scalar->type->id() == arrow::Type::DOUBLE) {
+                                result_value = std::static_pointer_cast<arrow::DoubleScalar>(agg_scalar)->value;
+                            }
+                            ARROW_RETURN_NOT_OK(double_builder->Append(result_value));
+                        } else {
+                            ARROW_RETURN_NOT_OK(double_builder->AppendNull());
+                        }
+                    }
+
+                    // Finish aggregate column
+                    ARROW_ASSIGN_OR_RAISE(auto agg_array, double_builder->Finish());
+                    output_columns.push_back(agg_array);
                 }
                 break;
 

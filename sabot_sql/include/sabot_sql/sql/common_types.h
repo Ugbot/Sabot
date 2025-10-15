@@ -57,8 +57,9 @@ struct MorselPlan {
     // Streaming config
     int max_parallelism = 1; // For Kafka partition sources
     std::string checkpoint_interval; // e.g., "60s"
-    std::string state_backend = "tonbo"; // tonbo | marbledb for table state
+    std::string state_backend = "marbledb"; // marbledb (default, with RAFT) | tonbo (pluggable)
     std::string timer_backend = "rocksdb"; // rocksdb for watermarks/timers
+    bool use_raft_for_dimensions = true; // MarbleDB: use RAFT for dimension table broadcast
 };
 
 } // namespace sql
