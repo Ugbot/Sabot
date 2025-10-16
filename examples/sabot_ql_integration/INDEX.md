@@ -249,3 +249,4 @@ query_triple_store(batch.column('key'))  # 1 query, 10-100x faster
 
 **Ready?** → `python quickstart.py` 🚀
 
+

@@ -4827,6 +4827,7 @@ dependencies = [
     { name = "confluent-kafka" },
     { name = "datadog" },
     { name = "dbos" },
+    { name = "duckdb" },
     { name = "fastapi" },
     { name = "fastavro" },
     { name = "httpx" },
@@ -4873,7 +4874,6 @@ all = [
     { name = "myst-parser" },
     { name = "notebook" },
     { name = "pre-commit" },
-    { name = "pyarrow" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
@@ -4884,7 +4884,6 @@ all = [
 channels = [
     { name = "aiokafka" },
     { name = "confluent-kafka" },
-    { name = "pyarrow" },
     { name = "redis" },
 ]
 dev = [
@@ -4905,9 +4904,6 @@ dev = [
     { name = "pytest-mock" },
     { name = "sphinx" },
     { name = "sphinx-rtd-theme" },
-]
-flight = [
-    { name = "pyarrow" },
 ]
 kafka = [
     { name = "aiokafka" },
@@ -4933,6 +4929,7 @@ requires-dist = [
     { name = "confluent-kafka", marker = "extra == 'kafka'", specifier = ">=2.0.0" },
     { name = "datadog", specifier = ">=0.44.0" },
     { name = "dbos", specifier = ">=0.1.0" },
+    { name = "duckdb", specifier = ">=1.4.0" },
     { name = "duckdb", marker = "extra == 'sql'", specifier = ">=0.7.0" },
     { name = "fastapi", specifier = ">=0.104.0" },
     { name = "fastavro", specifier = ">=1.7.0" },
@@ -4961,8 +4958,7 @@ requires-dist = [
     { name = "prometheus-client", specifier = ">=0.19.0" },
     { name = "prophet", specifier = ">=1.1.0" },
     { name = "psutil", specifier = ">=5.9.0" },
-    { name = "pyarrow", specifier = ">=10.0.0" },
-    { name = "pyarrow", extras = ["flight"], marker = "extra == 'flight'", specifier = ">=10.0.0" },
+    { name = "pyarrow", specifier = ">=21.0.0" },
     { name = "pydantic", specifier = ">=2.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.21.0" },

@@ -294,3 +294,4 @@ def sparql_to_arrow(sparql_query: str, triple_store: TripleStoreWrapper):
     """
     return triple_store.query_sparql(sparql_query)
 
+

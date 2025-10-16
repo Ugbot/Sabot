@@ -778,3 +778,4 @@ stream.triple_lookup(kg, 'key', pattern='...')  # That's it!
 **Last Updated:** October 14, 2025  
 **Next:** Load your RDF data and enrich your streams!
 
+

@@ -111,6 +111,14 @@ examples/fintech_enrichment_demo/trax_trades_1m.csv
 *.ipc
 examples/fintech_enrichment_demo/*.arrow
 examples/fintech_enrichment_demo/*.feather
+
+# ClickBench data files (large parquet datasets)
+benchmarks/clickbench/hits.parquet
+benchmarks/clickbench/benchmark_progress.json
+benchmarks/clickbench/comparison_results.json
+benchmarks/clickbench/*_results.json
+benchmarks/clickbench/duckdb_results.txt
+
 #uv.lock
 
 # poetry
@@ -224,3 +232,35 @@ test_rocksdb/
 test_rocksdb_final/
 test_tonbo/
 test_tonbo_final/
+
+# Local database files
+*.db
+*.sqlite
+*.db3
+sabot_local.db
+demo_orchestrator.db
+sabot_orchestrator.db
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
