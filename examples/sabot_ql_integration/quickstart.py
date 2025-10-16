@@ -186,3 +186,4 @@ print("  • 10K-100K enrichments/sec (uncached)")
 print("  • <2x overhead vs direct Arrow joins")
 print()
 
+

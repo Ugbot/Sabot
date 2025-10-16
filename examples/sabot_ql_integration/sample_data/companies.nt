@@ -31,3 +31,4 @@
 <http://stocks.example.org/TSLA> <http://schema.org/country> "USA" .
 <http://stocks.example.org/TSLA> <http://financial.org/creditRating> "BB+" .
 
+

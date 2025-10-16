@@ -1,0 +1,4 @@
+<frozen importlib._bootstrap>:241: RuntimeWarning: sabot._cython.cyrocks.CyOptions size changed, may indicate binary incompatibility. Expected 16 from C header, got 24 from PyObject
+<frozen importlib._bootstrap>:241: RuntimeWarning: sabot._cython.cyrocks.CyDB size changed, may indicate binary incompatibility. Expected 16 from C header, got 256 from PyObject
+CyRedis not available, using basic state management
+RAFT not available, GPU-accelerated ML operations disabled

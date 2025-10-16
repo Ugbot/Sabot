@@ -66,16 +66,18 @@ dependencies = [
     "sentry-sdk>=1.31.0",
     "python-dotenv>=1.0.0",
     "python-multipart>=0.0.6",
-    "psutil>=5.9.0",  # For system resource detection
-    "prometheus-client>=0.19.0",  # For metrics collection
-    "mode>=2.0.0",  # For service management and supervision
-    "mode-streaming>=0.1.0",  # Additional mode streaming support
+    "psutil>=5.9.0", # For system resource detection
+    "prometheus-client>=0.19.0", # For metrics collection
+    "mode>=2.0.0", # For service management and supervision
+    "mode-streaming>=0.1.0", # Additional mode streaming support
     # DBOS-inspired durable execution
     "sqlalchemy>=2.0.0",
     "alembic>=1.12.0",
     "dbos>=0.1.0",
     # High-performance Redis client (using vendored CyRedis)
     # CyRedis is vendored at vendor/cyredis/
+    "duckdb>=1.4.0",
+    "pyarrow>=21.0.0",
 ]
 
 [project.optional-dependencies]

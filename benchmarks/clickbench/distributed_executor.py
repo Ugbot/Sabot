@@ -302,3 +302,4 @@ class DistributedSQLExecutor:
         self.agent_tables.clear()
         
         logger.info("Distributed executor cleanup complete")
+
