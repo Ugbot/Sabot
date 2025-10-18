@@ -1,0 +1,140 @@
+[
+  {
+    "system": "PySpark",
+    "pipeline_name": "ETL Pipeline",
+    "dataset_size": 10000,
+    "total_execution_time": 6.4022932052612305,
+    "step_times": {
+      "data_loading": 6.235579013824463,
+      "data_cleaning": 0.07113981246948242,
+      "data_enrichment": 0.023280858993530273,
+      "product_enrichment": 0.010737895965576172,
+      "aggregations": 1760801372.111228
+    },
+    "memory_peak": 92.34375,
+    "memory_average": 89.79375,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 7.525,
+    "success": false,
+    "error_message": "all exprs should be Column",
+    "intermediate_results": null
+  },
+  {
+    "system": "PySpark",
+    "pipeline_name": "Analytics Pipeline",
+    "dataset_size": 10000,
+    "total_execution_time": 0.5717329978942871,
+    "step_times": {
+      "data_loading": 0.5619161128997803,
+      "time_aggregations": 1760801372.7347689
+    },
+    "memory_peak": 93.1875,
+    "memory_average": 93.1796875,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 0.0,
+    "success": false,
+    "error_message": "[NOT_COLUMN] Argument `col` should be a Column, got Column.",
+    "intermediate_results": null
+  },
+  {
+    "system": "PySpark",
+    "pipeline_name": "ETL Pipeline",
+    "dataset_size": 100000,
+    "total_execution_time": 0.5919969081878662,
+    "step_times": {
+      "data_loading": 0.5077650547027588,
+      "data_cleaning": 0.03811502456665039,
+      "data_enrichment": 0.005919933319091797,
+      "product_enrichment": 0.007668018341064453,
+      "aggregations": 1760801373.304398
+    },
+    "memory_peak": 94.109375,
+    "memory_average": 94.075,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 13.1,
+    "success": false,
+    "error_message": "all exprs should be Column",
+    "intermediate_results": null
+  },
+  {
+    "system": "PySpark",
+    "pipeline_name": "Analytics Pipeline",
+    "dataset_size": 100000,
+    "total_execution_time": 0.7092878818511963,
+    "step_times": {
+      "data_loading": 0.6935520172119141,
+      "time_aggregations": 1760801374.030617
+    },
+    "memory_peak": 94.1875,
+    "memory_average": 94.1796875,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 0.0,
+    "success": false,
+    "error_message": "[NOT_COLUMN] Argument `col` should be a Column, got Column.",
+    "intermediate_results": null
+  },
+  {
+    "system": "Sabot",
+    "pipeline_name": "ETL Pipeline",
+    "dataset_size": 10000,
+    "total_execution_time": 0.10576725006103516,
+    "step_times": {
+      "data_loading": 1760801374.463401
+    },
+    "memory_peak": 97.84375,
+    "memory_average": 97.84375,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 0,
+    "success": false,
+    "error_message": "cannot import name 'DuckDBConnection' from 'sabot._cython.connectors' (/Users/bengamble/Sabot/sabot/_cython/connectors/__init__.py)",
+    "intermediate_results": null
+  },
+  {
+    "system": "Sabot",
+    "pipeline_name": "Analytics Pipeline",
+    "dataset_size": 10000,
+    "total_execution_time": 0.00032806396484375,
+    "step_times": {
+      "data_loading": 1760801374.5693572
+    },
+    "memory_peak": 124.21875,
+    "memory_average": 124.21875,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 0,
+    "success": false,
+    "error_message": "cannot import name 'DuckDBConnection' from 'sabot._cython.connectors' (/Users/bengamble/Sabot/sabot/_cython/connectors/__init__.py)",
+    "intermediate_results": null
+  },
+  {
+    "system": "Sabot",
+    "pipeline_name": "ETL Pipeline",
+    "dataset_size": 100000,
+    "total_execution_time": 0.000141143798828125,
+    "step_times": {
+      "data_loading": 1760801374.569726
+    },
+    "memory_peak": 124.234375,
+    "memory_average": 124.234375,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 0,
+    "success": false,
+    "error_message": "cannot import name 'DuckDBConnection' from 'sabot._cython.connectors' (/Users/bengamble/Sabot/sabot/_cython/connectors/__init__.py)",
+    "intermediate_results": null
+  },
+  {
+    "system": "Sabot",
+    "pipeline_name": "Analytics Pipeline",
+    "dataset_size": 100000,
+    "total_execution_time": 0.0002989768981933594,
+    "step_times": {
+      "data_loading": 1760801374.5699
+    },
+    "memory_peak": 124.234375,
+    "memory_average": 124.234375,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 0,
+    "success": false,
+    "error_message": "cannot import name 'DuckDBConnection' from 'sabot._cython.connectors' (/Users/bengamble/Sabot/sabot/_cython/connectors/__init__.py)",
+    "intermediate_results": null
+  }
+]

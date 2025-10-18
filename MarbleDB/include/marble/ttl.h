@@ -43,6 +43,8 @@ public:
 
     // Configuration management
     Status AddTTLConfig(const TTLConfig& config);
+    Status AddTTLConfigFromCapabilities(const std::string& table_name,
+                                        const struct TableCapabilities& capabilities);
     Status RemoveTTLConfig(const std::string& table_name);
     Status UpdateTTLConfig(const TTLConfig& config);
     std::vector<TTLConfig> GetAllTTLConfigs() const;
@@ -288,6 +290,12 @@ public:
         const TTLManager::TTLConfig& ttl_config,
         const CompactionTuner::CompactionConfig& compaction_config,
         CompactionTuner::WorkloadHint workload_hint = CompactionTuner::WorkloadHint::MIXED
+    );
+
+    // Configure from TableCapabilities
+    Status ConfigureFromCapabilities(
+        const std::string& table_name,
+        const struct TableCapabilities& capabilities
     );
 
     // Health checks for advanced features

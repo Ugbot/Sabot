@@ -1,10 +1,33 @@
 #include "marble/ttl.h"
+#include "marble/json_utils.h"
+#include "marble/table_capabilities.h"
+#include "marble/column_family.h"
+#include "marble/mvcc.h"
+#include "marble/temporal.h"
 #include <algorithm>
 #include <thread>
 #include <chrono>
-#include <nlohmann/json.hpp>
 
 namespace marble {
+
+// Helper function to convert TableCapabilities::TTLSettings to TTLManager::TTLConfig
+TTLManager::TTLConfig CapabilitiesToTTLConfig(
+    const std::string& table_name,
+    const TableCapabilities::TTLSettings& ttl_settings) {
+
+    TTLManager::TTLConfig config;
+    config.table_name = table_name;
+    config.timestamp_column = ttl_settings.timestamp_column;
+
+    // Convert milliseconds to seconds
+    config.ttl_seconds = std::chrono::seconds(ttl_settings.ttl_duration_ms / 1000);
+    config.cleanup_interval = std::chrono::seconds(ttl_settings.cleanup_interval_ms / 1000);
+
+    // Always enabled when created from capabilities (since enable_ttl is checked before calling)
+    config.enabled = true;
+
+    return config;
+}
 
 // Global instances
 std::unique_ptr<AdvancedFeaturesManager> global_advanced_features_manager;
@@ -34,6 +57,31 @@ Status TTLManager::AddTTLConfig(const TTLConfig& config) {
                            " (TTL: " + std::to_string(config.ttl_seconds.count()) + "s)");
     }
     return Status::OK();
+}
+
+Status TTLManager::AddTTLConfigFromCapabilities(
+    const std::string& table_name,
+    const TableCapabilities& capabilities) {
+
+    // Check if TTL is enabled in capabilities
+    if (!capabilities.enable_ttl) {
+        if (global_logger) {
+            global_logger->debug("TTLManager", "TTL not enabled for table: " + table_name);
+        }
+        return Status::OK();  // Not an error, just not enabled
+    }
+
+    // Validate TTL settings
+    if (capabilities.ttl_settings.timestamp_column.empty()) {
+        return Status::InvalidArgument(
+            "TTL enabled but timestamp_column not specified for table: " + table_name);
+    }
+
+    // Convert capabilities to TTL config
+    TTLConfig config = CapabilitiesToTTLConfig(table_name, capabilities.ttl_settings);
+
+    // Add the config
+    return AddTTLConfig(config);
 }
 
 Status TTLManager::RemoveTTLConfig(const std::string& table_name) {
@@ -810,6 +858,71 @@ Status AdvancedFeaturesManager::ConfigureTableAdvancedFeatures(
     }
     if (global_metrics_collector) {
         global_metrics_collector->incrementCounter("marble.advanced_features.tables_configured");
+    }
+
+    return Status::OK();
+}
+
+Status AdvancedFeaturesManager::ConfigureFromCapabilities(
+    const std::string& table_name,
+    const TableCapabilities& capabilities) {
+
+    // Configure TTL from capabilities
+    if (capabilities.enable_ttl) {
+        auto ttl_status = ttl_manager_->AddTTLConfigFromCapabilities(table_name, capabilities);
+        if (!ttl_status.ok()) {
+            if (global_logger) {
+                global_logger->error("AdvancedFeaturesManager",
+                    "Failed to configure TTL for table " + table_name + ": " + ttl_status.ToString());
+            }
+            return ttl_status;
+        }
+
+        if (global_logger) {
+            global_logger->info("AdvancedFeaturesManager",
+                "Configured TTL for table " + table_name + " from capabilities");
+        }
+    }
+
+    // Configure MVCC from capabilities
+    if (capabilities.enable_mvcc) {
+        auto mvcc_status = ConfigureMVCCFromCapabilities(table_name, capabilities);
+        if (!mvcc_status.ok()) {
+            if (global_logger) {
+                global_logger->error("AdvancedFeaturesManager",
+                    "Failed to configure MVCC for table " + table_name + ": " + mvcc_status.ToString());
+            }
+            return mvcc_status;
+        }
+
+        if (global_logger) {
+            global_logger->info("AdvancedFeaturesManager",
+                "Configured MVCC for table " + table_name + " from capabilities");
+        }
+    }
+
+    // Configure Temporal from capabilities
+    if (capabilities.temporal_model != TableCapabilities::TemporalModel::kNone) {
+        auto temporal_status = ConfigureTemporalFromCapabilities(table_name, capabilities);
+        if (!temporal_status.ok()) {
+            if (global_logger) {
+                global_logger->error("AdvancedFeaturesManager",
+                    "Failed to configure Temporal for table " + table_name + ": " + temporal_status.ToString());
+            }
+            return temporal_status;
+        }
+
+        if (global_logger) {
+            global_logger->info("AdvancedFeaturesManager",
+                "Configured Temporal for table " + table_name + " from capabilities");
+        }
+    }
+
+    // TODO: Configure Search from capabilities when implemented:
+    // - Search (capabilities.enable_full_text_search)
+
+    if (global_metrics_collector) {
+        global_metrics_collector->incrementCounter("marble.advanced_features.tables_configured_from_capabilities");
     }
 
     return Status::OK();

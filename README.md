@@ -6,6 +6,33 @@
 
 Sabot is a Python framework that brings Apache Arrow's columnar performance to data processing workflows. Unlike PySpark's JVM overhead or Ray's distributed complexity, Sabot provides zero-copy Arrow operations with Cython acceleration for massive throughput on single machines.
 
+## 🎯 NEW: Unified Architecture (October 2025)
+
+Sabot now has a **unified entry point** for all functionality:
+
+```python
+from sabot import Sabot
+
+# Create unified engine
+engine = Sabot(mode='local')  # or 'distributed'
+
+# Stream processing
+stream = engine.stream.from_kafka('topic').filter(lambda b: b.column('x') > 10)
+
+# SQL processing
+result = engine.sql("SELECT * FROM table WHERE x > 10")
+
+# Graph processing
+matches = engine.graph.cypher("MATCH (a)-[:KNOWS]->(b) RETURN a, b")
+
+# Clean shutdown
+engine.shutdown()
+```
+
+**See:** [Unified Architecture Guide](README_UNIFIED_ARCHITECTURE.md)
+
+## Classic API (Still Supported)
+
 ```python
 from sabot import cyarrow as ca
 from sabot.api.stream import Stream

@@ -78,6 +78,8 @@ dependencies = [
     # CyRedis is vendored at vendor/cyredis/
     "duckdb>=1.4.0",
     "pyarrow>=21.0.0",
+    "pymysql>=1.1.2",
+    "pyspark>=4.0.1",
 ]
 
 [project.optional-dependencies]

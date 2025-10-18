@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "marble/temporal.h"
 #include "marble/table.h"
+#include "marble/table_capabilities.h"
+#include "marble/metrics.h"
 #include <arrow/api.h>
 #include <arrow/compute/api.h>
 #include <filesystem>
@@ -578,6 +580,54 @@ std::shared_ptr<TemporalTable> CreateTemporalTable(const std::string& base_path,
                                                   const TableSchema& schema,
                                                   TemporalModel model) {
     return std::make_shared<TemporalTableImpl>(base_path, schema, model);
+}
+
+// Helper function to configure temporal features from TableCapabilities
+Status ConfigureTemporalFromCapabilities(
+    const std::string& table_name,
+    const TableCapabilities& capabilities) {
+
+    // Check if temporal is enabled (temporal_model is not kNone)
+    // Note: Since kNone isn't defined in TemporalModel enum, we check for kUnitemporal
+    if (capabilities.temporal_model == TableCapabilities::TemporalModel::kNone) {
+        if (global_logger) {
+            global_logger->debug("TemporalConfig", "Temporal not enabled for table: " + table_name);
+        }
+        return Status::OK();  // Not an error, just not enabled
+    }
+
+    // Log temporal configuration
+    std::string model_str;
+    switch (capabilities.temporal_model) {
+        case TableCapabilities::TemporalModel::kSystemTime:
+            model_str = "SYSTEM_TIME";
+            break;
+        case TableCapabilities::TemporalModel::kValidTime:
+            model_str = "VALID_TIME";
+            break;
+        case TableCapabilities::TemporalModel::kBitemporal:
+            model_str = "BITEMPORAL";
+            break;
+        default:
+            model_str = "NONE";
+            break;
+    }
+
+    if (global_logger) {
+        global_logger->info("TemporalConfig",
+            "Temporal enabled for table " + table_name +
+            " with model: " + model_str);
+    }
+
+    // Temporal configuration is table-specific - actual temporal functionality
+    // is activated when the table/column family is created
+    // No global registration needed - checked at runtime via cf->GetCapabilities().temporal_model
+
+    if (global_metrics_collector) {
+        global_metrics_collector->incrementCounter("marble.temporal.tables_configured");
+    }
+
+    return Status::OK();
 }
 
 } // namespace marble

@@ -12,6 +12,7 @@
 #include "marble/analytics.h"
 #include "marble/skipping_index.h"
 #include "marble/status.h"
+#include "marble/ttl.h"
 #include <nlohmann/json.hpp>
 #include <arrow/api.h>
 #include <arrow/ipc/api.h>
@@ -750,6 +751,21 @@ public:
 
         // Create handle (we'll create a simple handle implementation)
         *handle = new ColumnFamilyHandle(descriptor.name, cf_id);
+
+        // Configure advanced features from capabilities
+        if (global_advanced_features_manager) {
+            auto config_status = global_advanced_features_manager->ConfigureFromCapabilities(
+                descriptor.name,
+                descriptor.options.capabilities);
+            if (!config_status.ok()) {
+                // Log warning but don't fail column family creation
+                if (global_logger) {
+                    global_logger->warn("CreateColumnFamily",
+                        "Failed to configure advanced features for " + descriptor.name +
+                        ": " + config_status.ToString());
+                }
+            }
+        }
 
         return Status::OK();
     }

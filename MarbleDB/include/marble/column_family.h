@@ -11,6 +11,7 @@ each with its own schema, compaction settings, and merge operators.
 #include <marble/status.h>
 #include <marble/record.h>
 #include <marble/merge_operator.h>
+#include <marble/table_capabilities.h>
 #include <arrow/api.h>
 #include <memory>
 #include <string>
@@ -55,7 +56,10 @@ struct ColumnFamilyOptions {
     // Write options
     bool enable_wal = true;
     size_t wal_buffer_size = 4 * 1024;
-    
+
+    // Feature capabilities (MVCC, temporal, search, TTL, etc.)
+    TableCapabilities capabilities;
+
     ColumnFamilyOptions() = default;
 };
 
@@ -72,7 +76,11 @@ public:
     
     const std::string& name() const { return name_; }
     uint32_t id() const { return id_; }
-    
+
+    // Get capabilities for this column family
+    const TableCapabilities& GetCapabilities() const { return options_.capabilities; }
+    TableCapabilities& MutableCapabilities() { return options_.capabilities; }
+
     // Internal access
     MemTable* mutable_memtable() { return mutable_; }
     const std::vector<std::shared_ptr<LSMSSTable>>& immutable_memtables() const {
@@ -164,12 +172,25 @@ struct ColumnFamilyMetadata {
     uint32_t id;
     std::string name;
     std::string schema_json;  // Serialized Arrow schema
-    std::string options_json;  // Serialized options
-    
+    std::string options_json;  // Serialized options (includes capabilities)
+
     // Serialize/deserialize
     std::string Serialize() const;
     static Status Deserialize(const std::string& data, ColumnFamilyMetadata* metadata);
 };
+
+// Helper functions for capability serialization
+namespace CapabilitySerialization {
+    /**
+     * @brief Serialize TableCapabilities to JSON string
+     */
+    std::string SerializeCapabilities(const TableCapabilities& caps);
+
+    /**
+     * @brief Deserialize TableCapabilities from JSON string
+     */
+    Status DeserializeCapabilities(const std::string& json, TableCapabilities* caps);
+}
 
 } // namespace marble
 

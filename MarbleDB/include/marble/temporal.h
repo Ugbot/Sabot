@@ -256,4 +256,12 @@ std::shared_ptr<TemporalTable> CreateTemporalTable(const std::string& base_path,
                                                   const TableSchema& schema,
                                                   TemporalModel model = TemporalModel::kBitemporal);
 
+// Forward declaration for TableCapabilities integration
+struct TableCapabilities;
+
+// Helper function to configure temporal features from TableCapabilities
+Status ConfigureTemporalFromCapabilities(
+    const std::string& table_name,
+    const TableCapabilities& capabilities);
+
 } // namespace marble
