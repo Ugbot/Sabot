@@ -207,7 +207,7 @@ private:
 
 /**
  * @brief MVCC transaction manager
- * 
+ *
  * Manages transaction lifecycle:
  * 1. Begin: Create snapshot
  * 2. Read: Use snapshot timestamp
@@ -218,17 +218,17 @@ class MVCCTransactionManager {
 public:
     explicit MVCCTransactionManager(TimestampOracle* oracle)
         : oracle_(oracle) {}
-    
+
     /**
      * @brief Begin new transaction
      */
     Snapshot BeginTransaction() {
         return Snapshot(oracle_->Now());
     }
-    
+
     /**
      * @brief Commit transaction
-     * 
+     *
      * @param buffer Transaction's write buffer
      * @param snapshot Transaction's snapshot
      * @param memtable Target memtable
@@ -240,59 +240,75 @@ public:
         const Snapshot& snapshot,
         MemTable* memtable,
         WAL* wal) {
-        
+
         if (buffer.empty()) {
             return Status::OK();  // Nothing to commit
         }
-        
+
         // Get commit timestamp
         Timestamp commit_ts = oracle_->Next();
-        
+
         // Collect keys being written
         std::vector<std::shared_ptr<Key>> keys;
         for (const auto& entry : buffer.entries()) {
             // Parse key from string
             // TODO: Proper key deserialization
         }
-        
+
         // Check for write conflicts
         auto conflict_key = ConflictDetector::DetectConflicts(
             keys, snapshot.timestamp(), commit_ts, memtable
         );
-        
+
         if (conflict_key) {
             return Status::Conflict("Write conflict on key: " + conflict_key->ToString());
         }
-        
+
         // Write batch to WAL
         if (wal) {
             for (const auto& entry : buffer.entries()) {
                 WalEntry wal_entry;
                 wal_entry.sequence_number = commit_ts.value();
                 // TODO: Populate wal_entry from buffer
-                
+
                 auto status = wal->Write(wal_entry);
                 if (!status.ok()) {
                     return status;
                 }
             }
-            
+
             if (wal->Sync().ok()) {
                 // WAL synced
             }
         }
-        
+
         // Apply writes to memtable
         for (const auto& entry : buffer.entries()) {
             // TODO: Apply with commit_ts
         }
-        
+
         return Status::OK();
     }
 
 private:
     TimestampOracle* oracle_;
 };
+
+// Forward declaration
+class MVCCManager;
+struct TableCapabilities;
+
+// Global MVCC manager instance
+extern std::unique_ptr<MVCCManager> global_mvcc_manager;
+
+// Initialization functions
+void initializeMVCC();
+void shutdownMVCC();
+
+// Helper function to configure MVCC from TableCapabilities
+Status ConfigureMVCCFromCapabilities(
+    const std::string& table_name,
+    const TableCapabilities& capabilities);
 
 } // namespace marble
 

@@ -154,15 +154,47 @@ Status TemporalReconstructor::ReconstructHistory(
     const std::vector<TemporalMetadata>& metadata_list,
     std::vector<std::shared_ptr<arrow::RecordBatch>>* history) {
 
-    // FIXME: This is a complete placeholder - just return empty history
-    // Real implementation needs proper version history reconstruction
     history->clear();
 
-    // For MVP, just return a copy of the first batch if available
-    if (!version_batches.empty()) {
-        // FIXME: Simplified for MVP - proper error handling needed
-        history->push_back(arrow::RecordBatch::Make(
-            version_batches[0].schema(), version_batches[0].num_rows(), version_batches[0].columns()));
+    if (version_batches.size() != metadata_list.size()) {
+        return Status::InvalidArgument("Version batches and metadata must have same size");
+    }
+
+    if (version_batches.empty()) {
+        return Status::OK();
+    }
+
+    // Build version chains to group versions by primary key
+    std::unordered_map<std::string, VersionChain> chains;
+    auto status = BuildVersionChains(version_batches, metadata_list, &chains);
+    if (!status.ok()) {
+        return status;
+    }
+
+    // Find the chain for the requested primary key
+    auto chain_it = chains.find(primary_key);
+    if (chain_it == chains.end()) {
+        // No versions found for this primary key
+        return Status::OK();
+    }
+
+    const auto& chain = chain_it->second;
+
+    // Reconstruct history from the version chain
+    // Versions are already sorted by system time (newest first) in BuildVersionChains
+    for (size_t i = 0; i < chain.version_indices.size(); ++i) {
+        size_t version_index = chain.version_indices[i];
+        if (version_index >= version_batches.size()) {
+            continue;
+        }
+
+        // Create a copy of this version
+        auto version_copy = arrow::RecordBatch::Make(
+            version_batches[version_index].schema(),
+            version_batches[version_index].num_rows(),
+            version_batches[version_index].columns());
+
+        history->push_back(version_copy);
     }
 
     return Status::OK();
@@ -227,10 +259,71 @@ Status TemporalReconstructor::BuildVersionChains(
     return Status::OK();
 }
 
-// FIXME: ResolveVersionConflicts is a complete placeholder
-// Real conflict resolution needs temporal algebra
+// Resolve temporal version conflicts using temporal algebra
+// Conflicts occur when multiple versions have overlapping valid time ranges
 Status TemporalReconstructor::ResolveVersionConflicts(VersionChain* chain) {
-    // FIXME: This is a placeholder - do nothing
+    if (!chain || chain->version_indices.size() <= 1) {
+        // No conflicts possible with 0 or 1 versions
+        return Status::OK();
+    }
+
+    // Detect conflicts: versions with overlapping valid time ranges
+    std::vector<std::pair<size_t, size_t>> conflicts;
+
+    for (size_t i = 0; i < chain->metadata.size(); ++i) {
+        for (size_t j = i + 1; j < chain->metadata.size(); ++j) {
+            const auto& meta_i = chain->metadata[i];
+            const auto& meta_j = chain->metadata[j];
+
+            // Check for overlapping valid time ranges
+            bool overlaps = (meta_i.valid_from < meta_j.valid_to) &&
+                           (meta_j.valid_from < meta_i.valid_to);
+
+            if (overlaps) {
+                conflicts.push_back({i, j});
+            }
+        }
+    }
+
+    if (conflicts.empty()) {
+        // No conflicts to resolve
+        return Status::OK();
+    }
+
+    // Resolve conflicts using "last writer wins" based on system time
+    // Keep only the version with the most recent system time for overlapping ranges
+    std::set<size_t> versions_to_remove;
+
+    for (const auto& conflict : conflicts) {
+        size_t idx1 = conflict.first;
+        size_t idx2 = conflict.second;
+
+        const auto& meta1 = chain->metadata[idx1];
+        const auto& meta2 = chain->metadata[idx2];
+
+        // Compare system times - keep the more recent one
+        if (meta1.system_time < meta2.system_time) {
+            // Version 2 is more recent, remove version 1
+            versions_to_remove.insert(idx1);
+        } else {
+            // Version 1 is more recent (or equal), remove version 2
+            versions_to_remove.insert(idx2);
+        }
+    }
+
+    // Remove conflicting versions (in reverse order to maintain indices)
+    std::vector<size_t> sorted_removals(versions_to_remove.begin(), versions_to_remove.end());
+    std::sort(sorted_removals.rbegin(), sorted_removals.rend());  // Reverse sort
+
+    for (size_t idx : sorted_removals) {
+        if (idx < chain->version_indices.size()) {
+            chain->version_indices.erase(chain->version_indices.begin() + idx);
+        }
+        if (idx < chain->metadata.size()) {
+            chain->metadata.erase(chain->metadata.begin() + idx);
+        }
+    }
+
     return Status::OK();
 }
 
@@ -242,11 +335,27 @@ Status TemporalReconstructor::ApplyValidTimeFilter(
     uint64_t valid_end,
     std::vector<size_t>* matching_versions) {
 
-    // FIXME: This is a placeholder - return all versions
     matching_versions->clear();
+
+    // Filter versions by valid time range
+    // A version matches if its valid time range overlaps with the query range
     for (size_t i = 0; i < chain.version_indices.size(); ++i) {
-        matching_versions->push_back(i);
+        if (i >= chain.metadata.size()) {
+            continue;
+        }
+
+        const auto& metadata = chain.metadata[i];
+
+        // Check if this version's valid time range overlaps with the query range
+        // Overlap condition: (valid_from <= query_end) AND (valid_to >= query_start)
+        bool overlaps = (metadata.valid_from <= valid_end) &&
+                       (metadata.valid_to >= valid_start);
+
+        if (overlaps) {
+            matching_versions->push_back(i);
+        }
     }
+
     return Status::OK();
 }
 
@@ -355,10 +464,51 @@ Status TemporalReconstructor::SortByPrimaryKey(
     const std::string& key_column,
     std::shared_ptr<arrow::RecordBatch>* result) {
 
-    // FIXME: This is a placeholder - just return unsorted copy
-    // FIXME: Simplified for MVP - proper error handling needed
-    *result = arrow::RecordBatch::Make(
-        batch.schema(), batch.num_rows(), batch.columns());
+    if (batch.num_rows() == 0) {
+        *result = arrow::RecordBatch::Make(batch.schema(), 0, batch.columns());
+        return Status::OK();
+    }
+
+    // Determine which column to sort by
+    int sort_column_index = 0;
+    if (!key_column.empty()) {
+        sort_column_index = batch.schema()->GetFieldIndex(key_column);
+        if (sort_column_index == -1) {
+            return Status::InvalidArgument("Key column not found: " + key_column);
+        }
+    }
+
+    // Convert RecordBatch to Table for sorting
+    auto table_result = arrow::Table::FromRecordBatches({std::make_shared<arrow::RecordBatch>(batch)});
+    if (!table_result.ok()) {
+        return Status::FromArrowStatus(table_result.status());
+    }
+    auto table = *table_result;
+
+    // Create sort options
+    arrow::compute::SortOptions sort_options;
+    sort_options.sort_keys.push_back(
+        arrow::compute::SortKey(sort_column_index, arrow::compute::SortOrder::Ascending));
+
+    // Perform the sort using Arrow compute
+    auto sort_indices_result = arrow::compute::SortIndices(table->column(sort_column_index)->chunk(0), sort_options);
+    if (!sort_indices_result.ok()) {
+        return Status::FromArrowStatus(sort_indices_result.status());
+    }
+    auto sort_indices = *sort_indices_result;
+
+    // Apply the sort indices to reorder the batch
+    std::vector<std::shared_ptr<arrow::Array>> sorted_columns;
+    for (int i = 0; i < batch.num_columns(); ++i) {
+        auto take_result = arrow::compute::Take(batch.column(i), sort_indices);
+        if (!take_result.ok()) {
+            return Status::FromArrowStatus(take_result.status());
+        }
+        sorted_columns.push_back((*take_result).make_array());
+    }
+
+    // Create sorted RecordBatch
+    *result = arrow::RecordBatch::Make(batch.schema(), batch.num_rows(), sorted_columns);
     return Status::OK();
 }
 

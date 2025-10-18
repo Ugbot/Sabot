@@ -25,8 +25,24 @@ struct LSMTreeConfig {
 
     // SSTable settings
     size_t sstable_max_size_bytes = 128 * 1024 * 1024; // 128MB
-    size_t sstable_block_size = 4096;                  // 4KB blocks
+    size_t sstable_block_size = 4096;                  // 4KB blocks (legacy)
     double sstable_bloom_filter_fp_rate = 0.01;        // 1% false positive rate
+
+    // Step 2: Large Block Write Settings
+    size_t write_block_size_mb = 8;                    // 8MiB write blocks for better throughput
+    size_t flush_size_kb = 128;                        // 128KB flush size (NVMe optimal)
+    bool enable_large_block_writes = false;            // Enable large block writes (Step 2)
+
+    // Step 3: Write Buffer Back-Pressure Settings (NEW)
+    size_t max_write_buffer_mb = 128;                  // Maximum write buffer memory (128MB)
+    size_t backpressure_threshold_percent = 80;        // Apply back-pressure at 80% full
+    bool enable_write_backpressure = false;            // Enable back-pressure (Step 3)
+    enum BackPressureStrategy {
+        BLOCK,          // Block writes until space available
+        SLOW_DOWN,      // Gradually slow down writes
+        DROP_OLDEST     // Drop oldest buffered writes (least preferred)
+    };
+    BackPressureStrategy backpressure_strategy = SLOW_DOWN;  // Default strategy
 
     // Compaction settings
     size_t l0_compaction_trigger = 4;                  // Trigger compaction when L0 has 4 files

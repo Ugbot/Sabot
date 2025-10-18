@@ -4,5 +4,5 @@ alwaysApply: true
 Don't mock things outside of tests. 
 Dont rush development, just do things correctly.
 Performance requires correctness.
-Follow performance engineering princples, avoid copies, and prefer things that can me simd optimising.
+Follow performance engineering princples, avoid copies, and prefer things that can be simd optimising.
 maintain the project layout

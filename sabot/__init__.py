@@ -16,23 +16,56 @@ from .sabot_types import (
     AgentFun, SinkT, WindowT, SQLQuery
 )
 
-# Checkpoint coordination
-from .checkpoint import Barrier, BarrierTracker, Coordinator, CheckpointStorage, RecoveryManager
+# Checkpoint coordination (optional - requires tonbo)
+try:
+    from .checkpoint import Barrier, BarrierTracker, Coordinator, CheckpointStorage, RecoveryManager
+    CHECKPOINT_AVAILABLE = True
+except ImportError:
+    CHECKPOINT_AVAILABLE = False
+    Barrier = None
+    BarrierTracker = None
+    Coordinator = None
+    CheckpointStorage = None
+    RecoveryManager = None
 
-# State management
-from .state import (
-    BackendConfig,
-    MemoryBackend,
-    OptimizedMemoryBackend,
-    RocksDBBackend,
-    ValueState,
-    MapState,
-    ListState,
-    ReducingState,
-    AggregatingState,
-    StoreTransaction,
-    MemoryTransaction,
-)
+# State management (old imports - maintain backward compatibility)
+try:
+    from .stores import (
+        BackendConfig,
+        MemoryBackend,
+        OptimizedMemoryBackend,
+        RocksDBBackend,
+    )
+except ImportError:
+    # New unified state system doesn't have these yet
+    BackendConfig = None
+    MemoryBackend = None
+    OptimizedMemoryBackend = None
+    RocksDBBackend = None
+
+try:
+    from .api.state import (
+        ValueState,
+        MapState,
+        ListState,
+        ReducingState,
+    )
+except ImportError:
+    ValueState = None
+    MapState = None
+    ListState = None
+    ReducingState = None
+
+try:
+    from .stores.base import StoreTransaction, MemoryTransaction
+except ImportError:
+    StoreTransaction = None
+    MemoryTransaction = None
+
+try:
+    from sabot._cython.state.aggregating_state import AggregatingState
+except ImportError:
+    AggregatingState = None
 
 # Time management
 from .time import WatermarkTracker, Timers, EventTime, TimeService
@@ -54,8 +87,15 @@ from . import cyarrow
 from .api import Stream, OutputStream, tumbling, sliding, session
 from .api import ValueState as APIValueState, ListState as APIListState
 
+# Unified engine (architecture unification)
+from .engine import Sabot, create_engine
+
 __version__ = "0.1.0"
 __all__ = [
+    # Unified Engine (NEW)
+    "Sabot",
+    "create_engine",
+    
     # Core
     "App",
     "RAFTStream",
@@ -86,6 +126,7 @@ __all__ = [
     "SQLQuery",
 
     # Checkpoint
+    "CHECKPOINT_AVAILABLE",
     "Barrier",
     "BarrierTracker",
     "Coordinator",

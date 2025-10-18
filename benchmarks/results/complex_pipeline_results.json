@@ -1,0 +1,194 @@
+[
+  {
+    "pipeline_name": "ETL Pipeline",
+    "dataset_size": 10000,
+    "total_execution_time": 0.3291630744934082,
+    "step_times": {
+      "data_loading": 0.0781562328338623,
+      "data_cleaning": 0.004011869430541992,
+      "data_enrichment": 0.00863194465637207,
+      "product_enrichment": 0.002797842025756836,
+      "aggregations": 0.235306978225708,
+      "quality_checks": 1760800434.602274
+    },
+    "memory_peak": 357.40625,
+    "memory_average": 346.0078125,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 68.72,
+    "success": false,
+    "error_message": "'name'",
+    "intermediate_results": null
+  },
+  {
+    "pipeline_name": "Analytics Pipeline",
+    "dataset_size": 10000,
+    "total_execution_time": 0.13646388053894043,
+    "step_times": {
+      "data_loading": 0.0882868766784668,
+      "time_aggregations": 0.013213157653808594,
+      "customer_segmentation": 0.01957416534423828,
+      "product_analysis": 0.010861873626708984,
+      "advanced_analytics": 1760800434.737988
+    },
+    "memory_peak": 366.5,
+    "memory_average": 360.1375,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 65.825,
+    "success": false,
+    "error_message": "Cannot set a DataFrame with multiple columns to the single column avg_order_value",
+    "intermediate_results": null
+  },
+  {
+    "pipeline_name": "ML Feature Pipeline",
+    "dataset_size": 10000,
+    "total_execution_time": 0.2525062561035156,
+    "step_times": {
+      "data_loading": 0.07202315330505371,
+      "feature_engineering": 0.01889491081237793,
+      "advanced_features": 0.14276671409606934,
+      "feature_transformation": 0.00438690185546875,
+      "feature_validation": 0.014241933822631836
+    },
+    "memory_peak": 365.71875,
+    "memory_average": 362.2760416666667,
+    "throughput_rows_per_sec": 39602.9791669814,
+    "cpu_percent": 75.24000000000001,
+    "success": true,
+    "error_message": null,
+    "intermediate_results": {
+      "total_features": 10000,
+      "feature_count": 24,
+      "correlation_count": 5,
+      "customer_features": 9067,
+      "product_features": 6291
+    }
+  },
+  {
+    "pipeline_name": "ETL Pipeline",
+    "dataset_size": 100000,
+    "total_execution_time": 1.396334171295166,
+    "step_times": {
+      "data_loading": 0.14870619773864746,
+      "data_cleaning": 0.010914087295532227,
+      "data_enrichment": 0.014841079711914062,
+      "product_enrichment": 0.01798701286315918,
+      "aggregations": 1.2035982608795166,
+      "quality_checks": 1760800436.397544
+    },
+    "memory_peak": 415.5,
+    "memory_average": 375.0833333333333,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 77.9,
+    "success": false,
+    "error_message": "'name'",
+    "intermediate_results": null
+  },
+  {
+    "pipeline_name": "Analytics Pipeline",
+    "dataset_size": 100000,
+    "total_execution_time": 0.4299020767211914,
+    "step_times": {
+      "data_loading": 0.3092679977416992,
+      "time_aggregations": 0.04607415199279785,
+      "customer_segmentation": 0.0406649112701416,
+      "product_analysis": 0.022795915603637695,
+      "advanced_analytics": 1760800436.8278122
+    },
+    "memory_peak": 353.890625,
+    "memory_average": 334.196875,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 71.6,
+    "success": false,
+    "error_message": "Cannot set a DataFrame with multiple columns to the single column avg_order_value",
+    "intermediate_results": null
+  },
+  {
+    "pipeline_name": "ML Feature Pipeline",
+    "dataset_size": 100000,
+    "total_execution_time": 1.032088041305542,
+    "step_times": {
+      "data_loading": 0.21906399726867676,
+      "feature_engineering": 0.048497915267944336,
+      "advanced_features": 0.6748840808868408,
+      "feature_transformation": 0.030169963836669922,
+      "feature_validation": 0.059191226959228516
+    },
+    "memory_peak": 331.921875,
+    "memory_average": 310.0677083333333,
+    "throughput_rows_per_sec": 96890.95890841326,
+    "cpu_percent": 75.6,
+    "success": true,
+    "error_message": null,
+    "intermediate_results": {
+      "total_features": 100000,
+      "feature_count": 24,
+      "correlation_count": 5,
+      "customer_features": 43242,
+      "product_features": 9998
+    }
+  },
+  {
+    "pipeline_name": "ETL Pipeline",
+    "dataset_size": 500000,
+    "total_execution_time": 3.11637806892395,
+    "step_times": {
+      "data_loading": 0.8273210525512695,
+      "data_cleaning": 0.06519603729248047,
+      "data_enrichment": 0.06962394714355469,
+      "product_enrichment": 0.08344888687133789,
+      "aggregations": 2.070230007171631,
+      "quality_checks": 1760800441.004333
+    },
+    "memory_peak": 571.84375,
+    "memory_average": 421.7447916666667,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 72.5,
+    "success": false,
+    "error_message": "'name'",
+    "intermediate_results": null
+  },
+  {
+    "pipeline_name": "Analytics Pipeline",
+    "dataset_size": 500000,
+    "total_execution_time": 1.8263628482818604,
+    "step_times": {
+      "data_loading": 1.4539999961853027,
+      "time_aggregations": 0.1844010353088379,
+      "customer_segmentation": 0.056732177734375,
+      "product_analysis": 0.106719970703125,
+      "advanced_analytics": 1760800442.921681
+    },
+    "memory_peak": 682.53125,
+    "memory_average": 624.3125,
+    "throughput_rows_per_sec": 0,
+    "cpu_percent": 73.25,
+    "success": false,
+    "error_message": "Cannot set a DataFrame with multiple columns to the single column avg_order_value",
+    "intermediate_results": null
+  },
+  {
+    "pipeline_name": "ML Feature Pipeline",
+    "dataset_size": 500000,
+    "total_execution_time": 2.162349224090576,
+    "step_times": {
+      "data_loading": 0.6661078929901123,
+      "feature_engineering": 0.14507699012756348,
+      "advanced_features": 0.9891810417175293,
+      "feature_transformation": 0.10721397399902344,
+      "feature_validation": 0.2545778751373291
+    },
+    "memory_peak": 884.984375,
+    "memory_average": 622.6822916666666,
+    "throughput_rows_per_sec": 231229.994872954,
+    "cpu_percent": 79.28,
+    "success": true,
+    "error_message": null,
+    "intermediate_results": {
+      "total_features": 500000,
+      "feature_count": 24,
+      "correlation_count": 5,
+      "customer_features": 49996,
+      "product_features": 9999
+    }
+  }
+]
