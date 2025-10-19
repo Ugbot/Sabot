@@ -185,8 +185,8 @@ class DataFrame:
             DataFrame
         """
         if isinstance(condition, Column):
-            # Column expression
-            filter_func = condition._expr if callable(condition._expr) else lambda b: condition._expr
+            # Column expression - evaluate it
+            filter_func = lambda b: condition._get_array(b)
         elif isinstance(condition, str):
             # SQL-like string condition
             filter_func = lambda b: b.column(condition)

@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-Debug DataFrame operations
+Debug filtering operations
 """
 
 import pandas as pd
 import tempfile
 import os
 
-def test_dataframe_debug():
-    """Test DataFrame operations step by step."""
+def test_filtering_debug():
+    """Test filtering operations step by step."""
     
     # Create test data
     data = {
         'id': [1, 2, 3, 4, 5],
-        'amount': [100, 200, 300, 400, 500],
-        'name': ['Alice', 'Bob', 'Charlie', 'David', 'Eve']
+        'value': [100, 200, 300, 400, 500],
+        'category': ['A', 'B', 'A', 'B', 'A']
     }
     df = pd.DataFrame(data)
     
@@ -29,39 +29,44 @@ def test_dataframe_debug():
     try:
         # Test Sabot SparkSession
         from sabot.spark import SparkSession
+        from sabot.spark.functions import col
         
         print("\n=== Testing Sabot SparkSession ===")
         spark = SparkSession.builder.master("local[*]").getOrCreate()
-        print(f"SparkSession created: {spark}")
-        print(f"Engine: {spark._engine}")
-        print(f"Stream API: {spark._engine.stream}")
         
         # Test DataFrameReader
         print("\n=== Testing DataFrameReader ===")
         reader = spark.read
-        print(f"Reader: {reader}")
-        print(f"Reader session: {reader._session}")
         
         # Test CSV reading
         print("\n=== Testing CSV Reading ===")
         df_sabot = reader.csv(csv_path, header=True, inferSchema=True)
         print(f"DataFrame created: {df_sabot}")
-        print(f"DataFrame stream: {df_sabot._stream}")
-        print(f"DataFrame session: {df_sabot._session}")
         
         # Test count
         print("\n=== Testing Count ===")
         count = df_sabot.count()
         print(f"Count result: {count}")
         
-        # Test collect
-        print("\n=== Testing Collect ===")
-        rows = df_sabot.collect()
-        print(f"Collect result: {rows}")
+        # Test filtering
+        print("\n=== Testing Filtering ===")
+        print("Creating filter condition...")
+        filter_condition = col("value") > 300
+        print(f"Filter condition: {filter_condition}")
+        print(f"Filter condition type: {type(filter_condition)}")
         
-        # Test show
-        print("\n=== Testing Show ===")
-        df_sabot.show()
+        print("Applying filter...")
+        filtered_df = df_sabot.filter(filter_condition)
+        print(f"Filtered DataFrame: {filtered_df}")
+        
+        print("Counting filtered results...")
+        filtered_count = filtered_df.count()
+        print(f"Filtered count result: {filtered_count}")
+        
+        # Test collect
+        print("\n=== Testing Filtered Collect ===")
+        filtered_rows = filtered_df.collect()
+        print(f"Filtered collect result: {filtered_rows}")
         
         spark.stop()
         
@@ -76,4 +81,4 @@ def test_dataframe_debug():
             os.unlink(csv_path)
 
 if __name__ == "__main__":
-    test_dataframe_debug()
+    test_filtering_debug()
