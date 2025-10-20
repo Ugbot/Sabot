@@ -71,7 +71,7 @@ cdef class CythonGroupByOperator(ShuffledOperator):
         )
     """
 
-    def __init__(self, source, keys: List[str], aggregations: Dict[str, tuple], schema=None):
+    def __cinit__(self, source=None, keys=None, aggregations=None, schema=None, **kwargs):
         """
         Initialize groupBy operator with shuffle support.
 
@@ -82,16 +82,19 @@ cdef class CythonGroupByOperator(ShuffledOperator):
                          Functions: sum, mean, count, min, max, stddev, variance
             schema: Output schema (inferred if None)
         """
-        # Initialize ShuffledOperator with group keys as partition keys
-        super().__init__(
-            source=source,
-            partition_keys=keys,  # Group keys are partition keys for shuffle
-            num_partitions=4,  # Will be overridden by JobManager
-            schema=schema
-        )
+        # NOTE: Cython automatically calls parent __cinit__ - don't call super().__init__()
+        # Set BaseOperator attributes
+        self._source = source
+        self._schema = schema
 
-        self._keys = keys
-        self._aggregations = aggregations
+        # Set ShuffledOperator attributes
+        self._partition_keys = keys if keys else []
+        self._num_partitions = kwargs.get('num_partitions', 4)
+        self._stateful = True
+
+        # Set our own attributes
+        self._keys = keys if keys else []
+        self._aggregations = aggregations if aggregations else {}
         # In-memory aggregation state (will use Tonbo for persistence)
         self._tonbo_state = defaultdict(lambda: defaultdict(list))
 

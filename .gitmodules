@@ -31,3 +31,6 @@
 [submodule "vendor/qlever"]
 	path = vendor/qlever
 	url = https://github.com/ad-freiburg/qlever
+[submodule "vendor/librdkafka"]
+	path = vendor/librdkafka
+	url = https://github.com/confluentinc/librdkafka.git

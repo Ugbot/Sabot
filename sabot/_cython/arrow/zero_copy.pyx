@@ -25,11 +25,9 @@ Example:
 
 from libc.stdint cimport int8_t, int16_t, int32_t, int64_t, uint8_t, uint16_t, uint32_t, uint64_t
 from libc.string cimport memcpy
-from libcpp cimport bool as cbool
 import cython
 
-cimport pyarrow.lib as pa
-import pyarrow as pa_module
+import pyarrow as pa
 
 
 cpdef const int64_t[:] get_int64_buffer(object array):
@@ -50,18 +48,12 @@ cpdef const int64_t[:] get_int64_buffer(object array):
         >>> print(buf[0])  # Direct access!
         1
     """
-    # Get Arrow array buffer
-    cdef pa_module.Int64Array typed_arr = array
-    cdef object buffers = typed_arr.buffers()
-    
-    if len(buffers) < 2 or buffers[1] is None:
-        raise ValueError("Array has no data buffer")
-    
-    # Get data buffer as memoryview
-    cdef object data_buffer = buffers[1]
-    cdef const int64_t[:] view = data_buffer
-    
-    return view[:len(array)]
+    # Use PyArrow's to_numpy with zero_copy_only flag
+    # This gives us a view without copying
+    import numpy as np
+    np_array = array.to_numpy(zero_copy_only=True)
+    cdef const int64_t[:] view = np_array
+    return view
 
 
 cpdef const double[:] get_float64_buffer(object array):
@@ -70,44 +62,26 @@ cpdef const double[:] get_float64_buffer(object array):
     
     Performance: <5ns
     """
-    cdef pa_module.DoubleArray typed_arr = array
-    cdef object buffers = typed_arr.buffers()
-    
-    if len(buffers) < 2 or buffers[1] is None:
-        raise ValueError("Array has no data buffer")
-    
-    cdef object data_buffer = buffers[1]
-    cdef const double[:] view = data_buffer
-    
-    return view[:len(array)]
+    import numpy as np
+    np_array = array.to_numpy(zero_copy_only=True)
+    cdef const double[:] view = np_array
+    return view
 
 
 cpdef const float[:] get_float32_buffer(object array):
     """Get zero-copy view of float32 array"""
-    cdef pa_module.FloatArray typed_arr = array
-    cdef object buffers = typed_arr.buffers()
-    
-    if len(buffers) < 2 or buffers[1] is None:
-        raise ValueError("Array has no data buffer")
-    
-    cdef object data_buffer = buffers[1]
-    cdef const float[:] view = data_buffer
-    
-    return view[:len(array)]
+    import numpy as np
+    np_array = array.to_numpy(zero_copy_only=True)
+    cdef const float[:] view = np_array
+    return view
 
 
 cpdef const int32_t[:] get_int32_buffer(object array):
     """Get zero-copy view of int32 array"""
-    cdef pa_module.Int32Array typed_arr = array
-    cdef object buffers = typed_arr.buffers()
-    
-    if len(buffers) < 2 or buffers[1] is None:
-        raise ValueError("Array has no data buffer")
-    
-    cdef object data_buffer = buffers[1]
-    cdef const int32_t[:] view = data_buffer
-    
-    return view[:len(array)]
+    import numpy as np
+    np_array = array.to_numpy(zero_copy_only=True)
+    cdef const int32_t[:] view = np_array
+    return view
 
 
 cpdef const uint8_t[:] get_null_bitmap(object array):
@@ -125,13 +99,17 @@ cpdef const uint8_t[:] get_null_bitmap(object array):
         # No nulls
         return None
     
+    # PyArrow buffers are signed char, need to work with that
+    import numpy as np
     cdef object null_buffer = buffers[0]
-    cdef const uint8_t[:] view = null_buffer
+    # Convert to numpy view
+    null_array = np.frombuffer(null_buffer, dtype=np.uint8)
+    cdef const uint8_t[:] view = null_array
     
     return view
 
 
-cpdef cbool has_nulls(object array):
+cpdef bint has_nulls(object array):
     """
     Check if array has any nulls
     
@@ -209,7 +187,7 @@ cpdef const double[:] get_float64_column(object batch, str column_name):
 
 
 # Helper to check if conversion is safe
-cpdef cbool can_zero_copy(object array):
+cpdef bint can_zero_copy(object array):
     """
     Check if array supports zero-copy access
     

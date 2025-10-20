@@ -5,6 +5,7 @@ Cython declarations for C++ query optimizer
 Provides Python bindings with <10ns overhead for optimizer access.
 """
 
+from libc.stdint cimport int64_t
 from libcpp.string cimport string
 from libcpp.memory cimport shared_ptr, unique_ptr
 from libcpp.vector cimport vector
@@ -33,8 +34,8 @@ cdef extern from "sabot/query/logical_plan.h" namespace "sabot::query":
         shared_ptr[LogicalPlan] Clone() const
 
 cdef extern from "sabot/query/optimizer.h" namespace "sabot::query":
-    cdef cppclass QueryOptimizer:
-        QueryOptimizer() except +
+    cdef cppclass CppQueryOptimizer "sabot::query::QueryOptimizer":
+        CppQueryOptimizer() except +
         
         shared_ptr[LogicalPlan] Optimize(const shared_ptr[LogicalPlan]& plan)
         
@@ -47,7 +48,7 @@ cdef extern from "sabot/query/optimizer.h" namespace "sabot::query":
         OptimizerStats GetStats() const
         void EnableRule(const string& rule_name, cbool enabled)
     
-    unique_ptr[QueryOptimizer] CreateDefaultOptimizer()
+    unique_ptr[CppQueryOptimizer] CreateDefaultOptimizer()
 
 cdef extern from "sabot/query/optimizer_type.h" namespace "sabot::query":
     cdef enum class OptimizerType:

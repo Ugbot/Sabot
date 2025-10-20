@@ -16,13 +16,14 @@ Example:
     >>> print(optimizer.get_stats())
 """
 
+from libc.stdint cimport int64_t
 from libcpp.string cimport string
 from libcpp.memory cimport shared_ptr, unique_ptr, make_unique
 from libcpp.vector cimport vector
 from libcpp cimport bool as cbool
 
 from .optimizer_bridge cimport (
-    QueryOptimizer as CppQueryOptimizer,
+    CppQueryOptimizer,
     LogicalPlan as CppLogicalPlan,
     CreateDefaultOptimizer,
     OptimizerType,
@@ -119,7 +120,7 @@ cdef class QueryOptimizer:
         
         return stats
     
-    cpdef void enable_rule(self, str rule_name, cbool enabled=True):
+    cpdef void enable_rule(self, str rule_name, bint enabled=True):
         """
         Enable or disable optimization rule
         

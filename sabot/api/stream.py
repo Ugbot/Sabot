@@ -1718,7 +1718,8 @@ class GroupedStream:
             operator = CythonGroupByOperator(
                 self._source, self._keys, aggregations
             )
-            operator = self._wrap_with_morsel_parallelism(operator)
+            # Note: GroupedStream doesn't have _wrap_with_morsel_parallelism
+            # Use operator directly for now (can add morsel parallelism later)
             return Stream(operator, None)
         else:
             raise NotImplementedError("GroupBy requires Cython operators")
