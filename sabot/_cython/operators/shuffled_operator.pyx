@@ -41,7 +41,7 @@ cdef class ShuffledOperator(BaseOperator):
 
     def __cinit__(self, *args, **kwargs):
         """Initialize shuffle operator."""
-        super().__init__(*args, **kwargs)
+        # NOTE: Cython automatically calls parent __cinit__ - don't call super().__init__()
 
         # Store operator_id and parallelism (expected by tests and metadata)
         self.operator_id = kwargs.get('operator_id', 'shuffled-op')

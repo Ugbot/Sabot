@@ -6,6 +6,15 @@ add_library(sabot_query STATIC
     optimizer_type.cpp
     rules.cpp
     pushdown/filter_pushdown.cpp
+    pushdown/projection_pushdown.cpp
+    join_order/cardinality_estimator.cpp
+    join_order/cost_model.cpp
+    join_order/join_order_optimizer.cpp
+    rule/constant_folding.cpp
+    rule/arithmetic_simplification.cpp
+    rule/comparison_simplification.cpp
+    rule/conjunction_simplification.cpp
+    expression_rewriter.cpp
 )
 
 target_include_directories(sabot_query PUBLIC

@@ -22,5 +22,11 @@ include_directories(
 # Build query optimizer library
 add_subdirectory(src/query)
 
+# Build operator registry
+add_subdirectory(src/operators)
+
+# Build shuffle coordinator
+add_subdirectory(src/shuffle)
+
 # Installation
 install(DIRECTORY include/sabot DESTINATION include)

@@ -10,10 +10,19 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Arrow REQUIRED PATHS ${CMAKE_SOURCE_DIR}/../vendor/arrow/cpp/build/install NO_DEFAULT_PATH)
 find_package(ArrowFlight REQUIRED PATHS ${CMAKE_SOURCE_DIR}/../vendor/arrow/cpp/build/install NO_DEFAULT_PATH)
 
+# Add librdkafka (vendored source)
+set(RDKAFKA_BUILD_STATIC ON CACHE BOOL "Build static library")
+set(RDKAFKA_BUILD_EXAMPLES OFF CACHE BOOL "Build examples")
+set(RDKAFKA_BUILD_TESTS OFF CACHE BOOL "Build tests")
+add_subdirectory(${CMAKE_SOURCE_DIR}/../vendor/librdkafka ${CMAKE_BINARY_DIR}/librdkafka)
+
 # Include directories
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${ARROW_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/../vendor/librdkafka/src-cpp
+    ${CMAKE_SOURCE_DIR}/../vendor/librdkafka/src
+    ${CMAKE_SOURCE_DIR}/../vendor
 )
 
 # SabotSQL library sources
@@ -24,6 +33,9 @@ set(SABOT_SQL_SOURCES
     src/sql/binder_rewrites.cpp
     # Execution
     src/execution/morsel_executor.cpp
+    # Streaming connectors
+    src/streaming/source_connector.cpp
+    src/streaming/kafka_connector.cpp
 )
 
 # Main library
@@ -32,6 +44,7 @@ add_library(sabot_sql SHARED ${SABOT_SQL_SOURCES})
 target_link_libraries(sabot_sql
     Arrow::arrow_shared
     ArrowFlight::arrow_flight_shared
+    rdkafka++
 )
 
 target_include_directories(sabot_sql PUBLIC
@@ -49,6 +62,10 @@ install(TARGETS sabot_sql
 )
 
 install(DIRECTORY include/ DESTINATION include)
+
+# Examples/Tests
+add_executable(test_kafka_connector examples/test_kafka_connector.cpp)
+target_link_libraries(test_kafka_connector sabot_sql)
 
 message(STATUS "SabotSQL minimal configuration:")
 message(STATUS "  Arrow include: ${ARROW_INCLUDE_DIR}")

@@ -21,7 +21,7 @@ from libcpp.memory cimport shared_ptr
 import pyarrow as pa
 
 # Check if MarbleDB memory pool is available
-cdef cbool marbledb_available = False
+cdef bint marbledb_available = False
 
 try:
     # Try to import MarbleDB memory pool
@@ -45,9 +45,9 @@ cdef class CustomMemoryPool:
     cdef object _pa_pool
     cdef int64_t _bytes_allocated
     cdef int64_t _max_memory
-    cdef cbool _track_allocations
+    cdef bint _track_allocations
     
-    def __cinit__(self, int64_t max_memory=-1, cbool track_allocations=True):
+    def __cinit__(self, int64_t max_memory=-1, bint track_allocations=True):
         """
         Initialize custom memory pool
         
