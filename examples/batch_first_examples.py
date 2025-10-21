@@ -10,6 +10,7 @@ Run: python examples/batch_first_examples.py
 
 import asyncio
 from sabot import cyarrow as ca
+import pyarrow as pa  # For test data creation
 from sabot.api.stream import Stream
 from pathlib import Path
 import tempfile

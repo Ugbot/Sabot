@@ -391,6 +391,7 @@ class Stream:
         codec_type: str = "json",
         codec_options: Optional[Dict[str, Any]] = None,
         batch_size: int = 1000,
+        use_cpp: bool = True,
         **consumer_kwargs
     ) -> 'Stream':
         """
@@ -403,20 +404,21 @@ class Stream:
             codec_type: Codec type (json, avro, protobuf, json_schema, msgpack, string, bytes)
             codec_options: Codec-specific options (e.g., schema_registry_url for Avro)
             batch_size: Number of messages to batch into RecordBatch
+            use_cpp: Use C++ librdkafka (default: True for performance)
             **consumer_kwargs: Additional Kafka consumer config
 
         Returns:
             Stream from Kafka
 
         Examples:
-            # Simple JSON stream
+            # Simple JSON stream (uses C++ librdkafka by default)
             stream = Stream.from_kafka(
                 "localhost:9092",
                 "transactions",
                 "my-group"
             )
 
-            # Avro stream with Schema Registry
+            # Avro stream with Schema Registry (uses Python fallback)
             stream = Stream.from_kafka(
                 "localhost:9092",
                 "transactions",
@@ -425,9 +427,27 @@ class Stream:
                 codec_options={
                     'schema_registry_url': 'http://localhost:8081',
                     'subject': 'transactions-value'
-                }
+                },
+                use_cpp=False  # Python supports Schema Registry
             )
         """
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        # Try C++ implementation first (if requested and codec_type is json)
+        if use_cpp and codec_type == "json":
+            try:
+                from sabot._cython.kafka import LibrdkafkaSource, LIBRDKAFKA_AVAILABLE
+                if LIBRDKAFKA_AVAILABLE:
+                    logger.info(f"Using C++ librdkafka source for {topic} (high performance)")
+                    return cls._from_kafka_cpp(
+                        bootstrap_servers, topic, group_id, batch_size, consumer_kwargs
+                    )
+            except (ImportError, RuntimeError) as e:
+                logger.warning(f"C++ Kafka unavailable ({e}), using Python fallback")
+        
+        # Use Python fallback (supports all codecs)
+        logger.info(f"Using Python aiokafka source for {topic} (codec: {codec_type})")
         from ..kafka import from_kafka as create_kafka_source
         import asyncio
 
@@ -472,6 +492,58 @@ class Stream:
                 loop.close()
 
         return cls(kafka_batches())
+    
+    @classmethod
+    def _from_kafka_cpp(
+        cls,
+        bootstrap_servers: str,
+        topic: str,
+        group_id: str,
+        batch_size: int,
+        consumer_kwargs: dict
+    ) -> 'Stream':
+        """
+        Create stream using C++ librdkafka (high performance).
+        
+        Currently JSON-only. Falls back to Python for other codecs.
+        """
+        from sabot._cython.kafka import LibrdkafkaSource
+        import asyncio
+        
+        # Create C++ source
+        source = LibrdkafkaSource(
+            bootstrap_servers=bootstrap_servers,
+            topic=topic,
+            group_id=group_id,
+            partition_id=consumer_kwargs.get('partition_id', -1),
+            properties=consumer_kwargs
+        )
+        
+        # Convert to batch generator
+        def cpp_kafka_batches():
+            async def consume():
+                while True:
+                    batch = await source.get_next_batch(batch_size)
+                    if batch is None:
+                        break
+                    yield batch
+            
+            # Run async generator
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                async_gen = consume()
+                while True:
+                    try:
+                        batch = loop.run_until_complete(async_gen.__anext__())
+                        yield batch
+                    except StopAsyncIteration:
+                        break
+            finally:
+                source.shutdown()
+                loop.close()
+        
+        return cls(cpp_kafka_batches())
 
     @classmethod
     def from_postgres_cdc(
@@ -1258,7 +1330,9 @@ class Stream:
         """
         batches = list(self)
         if not batches:
-            return ca.Table.from_batches([])
+            # Return empty table with basic schema
+            schema = ca.schema([])
+            return ca.Table.from_batches([], schema=schema)
         return ca.Table.from_batches(batches)
 
     def to_pylist(self) -> List[Dict[str, Any]]:
@@ -1507,6 +1581,7 @@ class Stream:
         codec_options: Optional[Dict[str, Any]] = None,
         compression_type: str = "lz4",
         key_extractor: Optional[Callable[[Dict], bytes]] = None,
+        use_cpp: bool = True,
         **producer_kwargs
     ) -> 'OutputStream':
         """
@@ -1519,6 +1594,7 @@ class Stream:
             codec_options: Codec-specific options (e.g., schema_registry_url for Avro)
             compression_type: Compression (gzip, snappy, lz4, zstd)
             key_extractor: Optional function to extract key from message
+            use_cpp: Use C++ librdkafka (default: True for performance)
             **producer_kwargs: Additional Kafka producer config
 
         Returns:

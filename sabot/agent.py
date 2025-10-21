@@ -65,12 +65,13 @@ class TaskExecutor:
     - Push results to output stream (potentially via shuffle)
     """
 
-    def __init__(self, task, slot, morsel_processor, shuffle_client, is_local_mode=False):
+    def __init__(self, task, slot, morsel_processor, shuffle_client, is_local_mode=False, marbledb=None):
         self.task = task
         self.slot = slot
         self.morsel_processor = morsel_processor
         self.shuffle_client = shuffle_client
         self.is_local_mode = is_local_mode
+        self.marbledb = marbledb  # Embedded MarbleDB for streaming SQL state
 
         # Create operator instance
         self.operator = self._create_operator()
@@ -220,6 +221,7 @@ class Agent:
     Worker node that executes streaming operator tasks.
 
     An Agent is NOT user code - it's a runtime component.
+    Now uses C++ agent core for high-performance execution.
     """
 
     def __init__(self, config: AgentConfig, job_manager=None):
@@ -227,27 +229,53 @@ class Agent:
         self.agent_id = config.agent_id
         self.job_manager = job_manager
 
-        # Task execution
-        self.active_tasks: Dict[str, TaskExecutor] = {}
-        self.slots: List[Slot] = [
-            Slot(i, config.memory_mb // config.num_slots)
-            for i in range(config.num_slots)
-        ]
-
-        # Morsel parallelism
-        from .morsel_parallelism import ParallelProcessor
-        self.morsel_processor = ParallelProcessor(
-            num_workers=config.num_slots * config.workers_per_slot,
-            morsel_size_kb=64
-        )
-
-        # Shuffle transport
-        from ._cython.shuffle.shuffle_transport import ShuffleTransport
-        self.shuffle_transport = ShuffleTransport()
-
         # State
         self.running = False
         self.is_local_mode = job_manager.is_local_mode if job_manager else True
+
+        # C++ Agent Core - High-performance execution engine
+        self.agent_core = None
+        try:
+            from ._cython.agent_core import AgentCore
+            
+            self.agent_core = AgentCore(
+                agent_id=self.agent_id,
+                host=config.host,
+                port=config.port,
+                memory_mb=config.memory_mb,
+                num_slots=config.num_slots,
+                workers_per_slot=config.workers_per_slot,
+                is_local_mode=self.is_local_mode
+            )
+            
+            logger.info(f"C++ agent core initialized for agent: {self.agent_id}")
+            
+        except ImportError:
+            logger.warning("C++ agent core not available, using Python fallback")
+            self.agent_core = None
+            
+            # Fallback to Python implementation
+            self.active_tasks: Dict[str, TaskExecutor] = {}
+            self.slots: List[Slot] = [
+                Slot(i, config.memory_mb // config.num_slots)
+                for i in range(config.num_slots)
+            ]
+
+            # Morsel parallelism
+            from .morsel_parallelism import ParallelProcessor
+            self.morsel_processor = ParallelProcessor(
+                num_workers=config.num_slots * config.workers_per_slot,
+                morsel_size_kb=64
+            )
+
+            # Shuffle transport
+            from ._cython.shuffle.shuffle_transport import ShuffleTransport
+            self.shuffle_transport = ShuffleTransport()
+
+            # Embedded MarbleDB for streaming SQL state (fallback for distributed mode)
+            self.marbledb = None
+            self.marbledb_path = f"./agent_{self.agent_id}_marbledb"
+            self.enable_raft = not self.is_local_mode  # Enable RAFT in distributed mode
 
         logger.info(f"Agent initialized: {self.agent_id} (local_mode={self.is_local_mode})")
 
@@ -258,14 +286,12 @@ class Agent:
 
         self.running = True
 
-        # Start morsel processor
-        await self.morsel_processor.start()
-
-        # Start shuffle transport with agent's address
-        self.shuffle_transport.start(
-            self.config.host.encode('utf-8'),
-            self.config.port
-        )
+        # Use C++ agent core if available
+        if self.agent_core:
+            await self._start_cpp_agent_core()
+        else:
+            # Fallback to Python implementation
+            await self._start_python_fallback()
 
         if not self.is_local_mode:
             # Start HTTP server for task deployment
@@ -294,6 +320,12 @@ class Agent:
         await self.morsel_processor.stop()
         self.shuffle_transport.stop()  # Synchronous Cython method
 
+        # Shutdown C++ agent core or Python fallback
+        if self.agent_core:
+            await self._stop_cpp_agent_core()
+        else:
+            await self._stop_python_fallback()
+
         logger.info(f"Agent stopped: {self.agent_id}")
 
     async def deploy_task(self, task):
@@ -303,13 +335,14 @@ class Agent:
         if slot is None:
             raise RuntimeError(f"No available slots for task {task.task_id}")
 
-        # Create task executor
+        # Create task executor with embedded MarbleDB access
         executor = TaskExecutor(
             task=task,
             slot=slot,
             morsel_processor=self.morsel_processor,
             shuffle_client=self.shuffle_transport,
-            is_local_mode=self.is_local_mode
+            is_local_mode=self.is_local_mode,
+            marbledb=self.marbledb
         )
 
         # Configure shuffle if operator requires it
@@ -546,3 +579,136 @@ class Agent:
 
         status = self.get_status()
         return web.json_response(status)
+
+    async def _initialize_marbledb(self):
+        """Initialize embedded MarbleDB for streaming SQL state"""
+        try:
+            # Import MarbleDB integration from sabot_sql
+            import sys
+            import os
+            sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'sabot_sql'))
+            
+            from sabot_sql.streaming.marbledb_integration import MarbleDBIntegration
+            
+            # Create embedded MarbleDB instance
+            self.marbledb = MarbleDBIntegration()
+            
+            # Initialize with agent-specific path and RAFT configuration
+            status = self.marbledb.Initialize(
+                self.agent_id,
+                self.marbledb_path,
+                self.enable_raft
+            )
+            
+            if not status.ok():
+                logger.error(f"Failed to initialize embedded MarbleDB: {status.message()}")
+                self.marbledb = None
+                return
+            
+            logger.info(f"Embedded MarbleDB initialized: {self.marbledb_path} (RAFT={self.enable_raft})")
+            
+        except ImportError as e:
+            logger.warning(f"MarbleDB integration not available: {e}")
+            logger.warning("Streaming SQL will use fallback state management")
+            self.marbledb = None
+        except Exception as e:
+            logger.error(f"Failed to initialize MarbleDB: {e}")
+            self.marbledb = None
+
+    async def _shutdown_marbledb(self):
+        """Shutdown embedded MarbleDB"""
+        if self.marbledb:
+            try:
+                status = self.marbledb.Shutdown()
+                if not status.ok():
+                    logger.error(f"Failed to shutdown MarbleDB: {status.message()}")
+                else:
+                    logger.info("Embedded MarbleDB shutdown complete")
+            except Exception as e:
+                logger.error(f"Error during MarbleDB shutdown: {e}")
+            finally:
+                self.marbledb = None
+
+    def get_marbledb(self):
+        """Get embedded MarbleDB instance for morsel access"""
+        if self.agent_core:
+            return self.agent_core.get_marbledb()
+        return self.marbledb
+
+    async def _start_cpp_agent_core(self):
+        """Start C++ agent core"""
+        if not self.agent_core:
+            return
+        
+        try:
+            # Initialize C++ agent core
+            status = self.agent_core.initialize()
+            if not status.ok():
+                logger.error(f"Failed to initialize C++ agent core: {status.message()}")
+                return
+            
+            # Start C++ agent core
+            status = self.agent_core.start()
+            if not status.ok():
+                logger.error(f"Failed to start C++ agent core: {status.message()}")
+                return
+            
+            logger.info(f"C++ agent core started for agent: {self.agent_id}")
+        except Exception as e:
+            logger.error(f"Failed to start C++ agent core: {e}")
+            self.agent_core = None
+
+    async def _stop_cpp_agent_core(self):
+        """Stop C++ agent core"""
+        if self.agent_core:
+            try:
+                # Stop C++ agent core
+                status = self.agent_core.stop()
+                if not status.ok():
+                    logger.error(f"Failed to stop C++ agent core: {status.message()}")
+                
+                # Shutdown C++ agent core
+                status = self.agent_core.shutdown()
+                if not status.ok():
+                    logger.error(f"Failed to shutdown C++ agent core: {status.message()}")
+                
+                logger.info("C++ agent core shutdown complete")
+            except Exception as e:
+                logger.error(f"Error during C++ agent core shutdown: {e}")
+            finally:
+                self.agent_core = None
+
+    async def _start_python_fallback(self):
+        """Start Python fallback implementation"""
+        try:
+            # Initialize embedded MarbleDB (for distributed mode)
+            await self._initialize_marbledb()
+
+            # Start morsel processor
+            await self.morsel_processor.start()
+
+            # Start shuffle transport with agent's address
+            self.shuffle_transport.start(
+                self.config.host.encode('utf-8'),
+                self.config.port
+            )
+            
+            logger.info(f"Python fallback started for agent: {self.agent_id}")
+        except Exception as e:
+            logger.error(f"Failed to start Python fallback: {e}")
+
+    async def _stop_python_fallback(self):
+        """Stop Python fallback implementation"""
+        try:
+            # Stop morsel processor
+            await self.morsel_processor.stop()
+            
+            # Stop shuffle transport
+            self.shuffle_transport.stop()
+            
+            # Shutdown embedded MarbleDB
+            await self._shutdown_marbledb()
+            
+            logger.info("Python fallback shutdown complete")
+        except Exception as e:
+            logger.error(f"Error during Python fallback shutdown: {e}")

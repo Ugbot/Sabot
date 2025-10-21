@@ -63,6 +63,10 @@ private:
     // Execute morsel operators
     arrow::Result<std::shared_ptr<arrow::Table>>
         ExecuteMorselOperators(std::shared_ptr<void> morsel_plan);
+    
+    // Execute streaming operators
+    arrow::Result<std::shared_ptr<arrow::RecordBatch>>
+        ExecuteStreamingOperators(std::shared_ptr<void> morsel_plan);
 };
 
 } // namespace execution

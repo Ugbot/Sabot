@@ -51,50 +51,52 @@ Used for enrichment (no network overhead)
 
 ### State Management
 
-**All Table Data** → **MarbleDB** (default, unified storage)
+**All Table Data** → **Embedded MarbleDB** (default, unified storage)
+
+**Architecture**: MarbleDB is embedded into each agent and accessed directly by morsels
 
 - **Dimension Tables**: `is_raft_replicated=true`
-  - Stored in RAFT group
-  - Automatically replicated to all agents
-  - Each agent reads from local MarbleDB replica
-  - Updates via RAFT consensus
+  - Stored in embedded MarbleDB with RAFT replication
+  - Automatically replicated to all agents via RAFT consensus
+  - Each agent reads from local embedded MarbleDB replica
+  - Updates propagate via RAFT consensus
   - Example: securities, products, reference data
   
 - **Connector State** (Kafka offsets, file positions): `is_raft_replicated=true`
-  - Table: `connector_offsets` in MarbleDB RAFT
+  - Table: `connector_offsets` in embedded MarbleDB RAFT
   - Columns: `[connector_id, partition, offset, timestamp]`
   - RAFT replicates offset commits to all agents
-  - On node loss: new node reads committed offsets from MarbleDB RAFT
+  - On node loss: new node reads committed offsets from embedded MarbleDB RAFT
   - Resumes Kafka consumption from last checkpoint
   - Exactly-once processing guaranteed
-  - Note: Long-term goal is ALL state in MarbleDB
   
 - **Streaming State** (aggregates, buffers): `is_raft_replicated=false`
-  - Local tables per agent
+  - Local tables in embedded MarbleDB per agent
   - Partitioned by key (symbol, window)
   - No replication overhead
   - Example: window aggregates, join buffers
 
-- **Format**: Arrow-compatible tables in MarbleDB
+- **Format**: Arrow-compatible tables in embedded MarbleDB
 - **Example Rows**: 
   - Window state: `[key: "AAPL", window_start: 100000, count: 150, sum: 22500.0]`
   - Connector state: `[connector: "kafka-trades", partition: 0, offset: 12345, ts: 1609459300]`
 
-**Timer State** (watermarks, triggers) → **RocksDB**
-- **Backend**: RocksDB (unchanged)
-- **Format**: Pickled Python dicts
+**Timer State** (watermarks, triggers) → **Embedded MarbleDB**
+- **Backend**: Embedded MarbleDB (using its internal timer capabilities)
+- **Format**: Key-value pairs in embedded MarbleDB
 - **Example**: `{'watermark': 100500, 'pending_windows': [100000, 100060]}`
-- **Use**: Small metadata, fast random access
 
 **Optional**: **Tonbo** as pluggable alternative
-- Can replace MarbleDB for streaming state
+- Can replace embedded MarbleDB for streaming state
 - Config: `state_backend='tonbo'`
 - Same interface, different backend
 
-**Long-Term Vision**: Move ALL state to MarbleDB
-- Currently: MarbleDB for tables, RocksDB for timers
-- Goal: Everything in MarbleDB (unified storage)
-- Benefit: Single storage system, RAFT for all replication needs
+**Embedded MarbleDB Benefits**:
+- **Direct Access**: Morsels access MarbleDB directly (no client overhead)
+- **Performance**: Native Arrow columnar format
+- **Consistency**: RAFT consensus for distributed tables
+- **Simplicity**: Single storage system per agent
+- **Fault Tolerance**: Automatic replication and recovery
 
 ### Checkpointing
 

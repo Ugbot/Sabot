@@ -5,15 +5,17 @@ This module provides Python bindings for SabotSQL, enabling agent-based
 distributed SQL execution through Sabot's orchestrator.
 """
 
-from .sabot_sql_python import (
-    SabotSQLBridge,
-    SabotOperatorTranslator,
-    SabotSQLOrchestrator,
-    create_sabot_sql_bridge,
-    create_operator_translator,
-    execute_sql_on_agent,
-    distribute_sql_query
-)
+# Import Cython implementation (real SQL execution)
+try:
+    from .sabot_sql import SabotSQLBridge, create_sabot_sql_bridge
+    SQL_BACKEND = "cython"
+except ImportError as e:
+    # Use DuckDB directly for real SQL execution (temporary until Cython builds)
+    from .sabot_sql_duckdb_direct import (
+        SabotSQLBridge,
+        create_sabot_sql_bridge
+    )
+    SQL_BACKEND = "duckdb_direct"
 
 # Streaming SQL (optional import)
 try:
@@ -28,12 +30,7 @@ except ImportError:
 __version__ = "0.1.0"
 __all__ = [
     "SabotSQLBridge",
-    "SabotOperatorTranslator", 
-    "SabotSQLOrchestrator",
     "create_sabot_sql_bridge",
-    "create_operator_translator",
-    "execute_sql_on_agent",
-    "distribute_sql_query",
     "STREAMING_AVAILABLE"
 ]
 

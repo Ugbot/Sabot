@@ -41,7 +41,7 @@ async def main():
             .filter(lambda b: pc.greater(b['amount'], 100.0))  # Filter high-value orders
             .map(lambda b: b.append_column('tax', pc.multiply(b['amount'], 0.08)))  # Add tax
             .map(lambda b: b.append_column('total', pc.add(b['amount'], b['tax'])))  # Add total
-            .to_kafka('processed_orders'))
+            .to_kafka('localhost:9092', 'processed_orders'))
 
     # ========================================================================
     # EXAMPLE 2: OLD @app.agent API (deprecated but still works)
