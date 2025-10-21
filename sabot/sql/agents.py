@@ -22,7 +22,7 @@ class SQLScanAgent:
     """
     
     @staticmethod
-    async def process(stream: AsyncIterator[Dict[str, Any]]) -> AsyncIterator[pa.RecordBatch]:
+    async def process(stream: AsyncIterator[Dict[str, Any]]) -> AsyncIterator[ca.RecordBatch]:
         """
         Process scan requests
         
@@ -62,7 +62,7 @@ class SQLJoinAgent:
     """
     
     @staticmethod
-    async def process(stream: AsyncIterator[Dict[str, Any]]) -> AsyncIterator[pa.RecordBatch]:
+    async def process(stream: AsyncIterator[Dict[str, Any]]) -> AsyncIterator[ca.RecordBatch]:
         """
         Process join requests
         
@@ -106,7 +106,7 @@ class SQLAggregateAgent:
     """
     
     @staticmethod
-    async def process(stream: AsyncIterator[Dict[str, Any]]) -> AsyncIterator[pa.RecordBatch]:
+    async def process(stream: AsyncIterator[Dict[str, Any]]) -> AsyncIterator[ca.RecordBatch]:
         """
         Process aggregation requests
         
@@ -147,7 +147,7 @@ class SQLFilterAgent:
     """
     
     @staticmethod
-    async def process(stream: AsyncIterator[Dict[str, Any]]) -> AsyncIterator[pa.RecordBatch]:
+    async def process(stream: AsyncIterator[Dict[str, Any]]) -> AsyncIterator[ca.RecordBatch]:
         """
         Process filter requests
         
@@ -183,7 +183,7 @@ class SQLProjectAgent:
     """
     
     @staticmethod
-    async def process(stream: AsyncIterator[Dict[str, Any]]) -> AsyncIterator[pa.RecordBatch]:
+    async def process(stream: AsyncIterator[Dict[str, Any]]) -> AsyncIterator[ca.RecordBatch]:
         """
         Process projection requests
         

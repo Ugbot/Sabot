@@ -1,4 +1,6 @@
 #include "sabot_sql/streaming/kafka_connector.h"
+// #include "sabot_sql/streaming/avro_decoder.h"  // TODO: Fix and re-enable
+// #include "sabot_sql/streaming/protobuf_decoder.h"  // TODO: Fix and re-enable
 #include <arrow/compute/api.h>
 #include <sstream>
 
@@ -35,6 +37,9 @@ arrow::Status KafkaConnector::Initialize(const ConnectorConfig& config) {
     
     // Initialize MarbleDB offset store
     ARROW_RETURN_NOT_OK(InitializeOffsetStore());
+    
+    // Initialize Schema Registry if URL is provided
+    ARROW_RETURN_NOT_OK(InitializeSchemaRegistry());
     
     return arrow::Status::OK();
 }
@@ -209,7 +214,27 @@ KafkaConnector::GetNextBatch(size_t max_rows) {
     }
     
     // Convert messages to Arrow batch
-    auto result = ConvertMessagesToBatch(messages);
+    // Use Schema Registry if configured, otherwise use simdjson for JSON
+    arrow::Result<std::shared_ptr<arrow::RecordBatch>> result;
+    
+    if (schema_registry_) {
+        // Check if first message has Schema Registry wire format
+        if (!messages.empty() && messages[0]->len() >= 5) {
+            const uint8_t* data = reinterpret_cast<const uint8_t*>(messages[0]->payload());
+            if (data[0] == 0x00) {
+                // Magic byte present - use Schema Registry decoding
+                result = DecodeWithSchemaRegistry(messages);
+            } else {
+                // No magic byte - use regular JSON decoding
+                result = ConvertMessagesToBatch(messages);
+            }
+        } else {
+            result = ConvertMessagesToBatch(messages);
+        }
+    } else {
+        // No Schema Registry - use simdjson for JSON
+        result = ConvertMessagesToBatch(messages);
+    }
     
     // Clean up messages
     for (auto* msg : messages) {
@@ -239,12 +264,31 @@ KafkaConnector::ConvertMessagesToBatch(
         return arrow::RecordBatch::Make(schema_, 0, empty_arrays);
     }
     
-    // For now, simple JSON parsing of message values
-    // TODO: Support Avro, Protobuf, etc. via schema registry
+    // Use simdjson for fast JSON parsing
+    std::vector<simdjson::padded_string> json_docs;
+    json_docs.reserve(messages.size());
     
-    // Build arrays for each column
+    // First pass: Parse all JSON documents
+    for (const auto* msg : messages) {
+        if (msg->len() > 0) {
+            json_docs.emplace_back(
+                reinterpret_cast<const char*>(msg->payload()),
+                msg->len()
+            );
+        }
+    }
+    
+    // Infer or validate schema from first document
+    if (!schema_ && !json_docs.empty()) {
+        auto first_doc = json_parser_.iterate(json_docs[0]);
+        if (first_doc.error()) {
+            return arrow::Status::Invalid("Failed to parse first JSON document");
+        }
+        ARROW_ASSIGN_OR_RAISE(schema_, InferSchemaFromJSON(first_doc.value()));
+    }
+    
+    // Build arrays for metadata columns (always present)
     arrow::StringBuilder key_builder;
-    arrow::StringBuilder value_builder;
     arrow::TimestampBuilder timestamp_builder(
         arrow::timestamp(arrow::TimeUnit::MILLI),
         arrow::default_memory_pool()
@@ -263,11 +307,7 @@ KafkaConnector::ConvertMessagesToBatch(
             ARROW_RETURN_NOT_OK(key_builder.AppendNull());
         }
         
-        // Value
-        ARROW_RETURN_NOT_OK(value_builder.Append(
-            reinterpret_cast<const char*>(msg->payload()),
-            static_cast<int32_t>(msg->len())
-        ));
+        // Note: Value is parsed later via simdjson, not stored as raw string
         
         // Timestamp
         ARROW_RETURN_NOT_OK(timestamp_builder.Append(msg->timestamp().timestamp));
@@ -279,36 +319,55 @@ KafkaConnector::ConvertMessagesToBatch(
         ARROW_RETURN_NOT_OK(offset_builder.Append(msg->offset()));
     }
     
-    // Finish arrays
+    // Finish metadata arrays
     std::shared_ptr<arrow::Array> key_array;
-    std::shared_ptr<arrow::Array> value_array;
     std::shared_ptr<arrow::Array> timestamp_array;
     std::shared_ptr<arrow::Array> partition_array;
     std::shared_ptr<arrow::Array> offset_array;
     
     ARROW_RETURN_NOT_OK(key_builder.Finish(&key_array));
-    ARROW_RETURN_NOT_OK(value_builder.Finish(&value_array));
     ARROW_RETURN_NOT_OK(timestamp_builder.Finish(&timestamp_array));
     ARROW_RETURN_NOT_OK(partition_builder.Finish(&partition_array));
     ARROW_RETURN_NOT_OK(offset_builder.Finish(&offset_array));
     
-    // Create schema if not exists
-    if (!schema_) {
-        schema_ = arrow::schema({
+    // Build data arrays from JSON using simdjson
+    std::vector<std::shared_ptr<arrow::Array>> data_arrays;
+    if (schema_ && schema_->num_fields() > 4) {
+        // Build arrays for JSON fields (schema fields beyond metadata)
+        for (int i = 4; i < schema_->num_fields(); ++i) {
+            auto field = schema_->field(i);
+            ARROW_ASSIGN_OR_RAISE(auto array, BuildArrayFromJSON(json_docs, field));
+            data_arrays.push_back(array);
+        }
+    }
+    
+    // Combine metadata and data arrays
+    std::vector<std::shared_ptr<arrow::Array>> all_arrays = {
+        key_array, timestamp_array, partition_array, offset_array
+    };
+    all_arrays.insert(all_arrays.end(), data_arrays.begin(), data_arrays.end());
+    
+    // Update schema to include both metadata and data fields
+    if (!schema_ || schema_->num_fields() <= 4) {
+        std::vector<std::shared_ptr<arrow::Field>> all_fields = {
             arrow::field("key", arrow::utf8()),
-            arrow::field("value", arrow::utf8()),
             arrow::field("timestamp", arrow::timestamp(arrow::TimeUnit::MILLI)),
             arrow::field("partition", arrow::int32()),
             arrow::field("offset", arrow::int64())
-        });
+        };
+        
+        // Add data fields if schema exists
+        if (schema_) {
+            for (int i = 4; i < schema_->num_fields(); ++i) {
+                all_fields.push_back(schema_->field(i));
+            }
+        }
+        
+        schema_ = arrow::schema(all_fields);
     }
     
     // Create record batch
-    return arrow::RecordBatch::Make(
-        schema_,
-        messages.size(),
-        {key_array, value_array, timestamp_array, partition_array, offset_array}
-    );
+    return arrow::RecordBatch::Make(schema_, messages.size(), all_arrays);
 }
 
 // ========== Offset Management ==========
@@ -455,6 +514,301 @@ KafkaConnector::GetSchema() const {
         return arrow::Status::Invalid("Schema not yet available (no data consumed)");
     }
     return schema_;
+}
+
+// ========== Schema Registry Integration ==========
+
+arrow::Status KafkaConnector::InitializeSchemaRegistry() {
+    // Check if Schema Registry URL is configured
+    auto it = config_.properties.find("schema.registry.url");
+    if (it == config_.properties.end()) {
+        // Schema Registry not configured - will use plain JSON
+        return arrow::Status::OK();
+    }
+    
+    std::string registry_url = it->second;
+    
+    // Create Schema Registry client
+    schema_registry_ = std::make_unique<SchemaRegistryClient>(registry_url);
+    
+    return arrow::Status::OK();
+}
+
+arrow::Result<std::shared_ptr<arrow::RecordBatch>> 
+KafkaConnector::DecodeWithSchemaRegistry(
+    const std::vector<RdKafka::Message*>& messages) {
+    
+    if (!schema_registry_) {
+        return arrow::Status::Invalid("Schema Registry not initialized");
+    }
+    
+    // Extract schema ID from first message
+    if (messages.empty() || messages[0]->len() < 5) {
+        return arrow::Status::Invalid("Message too short for Schema Registry wire format");
+    }
+    
+    const uint8_t* first_payload = reinterpret_cast<const uint8_t*>(messages[0]->payload());
+    ARROW_ASSIGN_OR_RAISE(
+        int schema_id,
+        SchemaRegistryClient::ExtractSchemaId(first_payload, messages[0]->len())
+    );
+    
+    // Get schema from registry (cached)
+    ARROW_ASSIGN_OR_RAISE(auto registered_schema, schema_registry_->GetSchemaById(schema_id));
+    
+    // Extract payloads (skip wire format header)
+    std::vector<const uint8_t*> payloads;
+    std::vector<size_t> lengths;
+    
+    for (const auto* msg : messages) {
+        const uint8_t* data = reinterpret_cast<const uint8_t*>(msg->payload());
+        size_t len = msg->len();
+        
+        ARROW_ASSIGN_OR_RAISE(
+            auto payload_info,
+            SchemaRegistryClient::ExtractPayload(data, len)
+        );
+        
+        payloads.push_back(payload_info.first);
+        lengths.push_back(payload_info.second);
+    }
+    
+    // Decode based on schema type
+    if (registered_schema.schema_type == "AVRO") {
+        // TODO: Re-enable Avro decoder
+        return arrow::Status::NotImplemented("Avro decoding temporarily disabled");
+        
+    } else if (registered_schema.schema_type == "PROTOBUF") {
+        // TODO: Re-enable Protobuf decoder
+        return arrow::Status::NotImplemented("Protobuf decoding temporarily disabled");
+        
+    } else if (registered_schema.schema_type == "JSON") {
+        // Use simdjson for JSON Schema
+        // For now, just parse as regular JSON
+        std::vector<simdjson::padded_string> json_docs;
+        for (size_t i = 0; i < payloads.size(); ++i) {
+            json_docs.emplace_back(
+                reinterpret_cast<const char*>(payloads[i]),
+                lengths[i]
+            );
+        }
+        
+        // Infer schema from first doc if not available
+        if (!schema_) {
+            auto first_doc = json_parser_.iterate(json_docs[0]);
+            if (first_doc.error()) {
+                return arrow::Status::Invalid("Failed to parse JSON document");
+            }
+            ARROW_ASSIGN_OR_RAISE(schema_, InferSchemaFromJSON(first_doc.value()));
+        }
+        
+        // Build arrays using simdjson
+        std::vector<std::shared_ptr<arrow::Array>> arrays;
+        for (const auto& field : schema_->fields()) {
+            ARROW_ASSIGN_OR_RAISE(auto array, BuildArrayFromJSON(json_docs, field));
+            arrays.push_back(array);
+        }
+        
+        return arrow::RecordBatch::Make(schema_, json_docs.size(), arrays);
+    }
+    
+    return arrow::Status::Invalid("Unknown schema type: " + registered_schema.schema_type);
+}
+
+arrow::Result<std::shared_ptr<arrow::Schema>> 
+KafkaConnector::AvroSchemaToArrow(const std::string& avro_schema) {
+    // TODO: Re-enable Avro decoder
+    return arrow::Status::NotImplemented("Avro schema conversion temporarily disabled");
+}
+
+arrow::Result<std::shared_ptr<arrow::Array>> 
+KafkaConnector::DecodeAvroArray(
+    const std::vector<const uint8_t*>& payloads,
+    const std::vector<size_t>& lengths,
+    const std::shared_ptr<arrow::Field>& field,
+    const std::string& avro_schema) {
+    
+    // TODO: Re-enable Avro decoder
+    return arrow::Status::NotImplemented("Avro array decoding temporarily disabled");
+}
+
+// ========== simdjson JSON Parsing Helpers ==========
+
+arrow::Result<std::shared_ptr<arrow::Schema>> 
+KafkaConnector::InferSchemaFromJSON(simdjson::ondemand::document& doc) {
+    std::vector<std::shared_ptr<arrow::Field>> fields;
+    
+    auto obj = doc.get_object();
+    if (obj.error()) {
+        return arrow::Status::Invalid("JSON document is not an object");
+    }
+    
+    // Iterate over JSON fields to infer schema
+    for (auto field : obj.value()) {
+        std::string_view field_name = field.unescaped_key();
+        auto value = field.value();
+        
+        std::shared_ptr<arrow::DataType> arrow_type;
+        
+        // Infer Arrow type from JSON type
+        auto value_type_result = value.type();
+        if (value_type_result.error()) {
+            continue;  // Skip this field
+        }
+        auto value_type = value_type_result.value();
+        
+        switch (value_type) {
+            case simdjson::ondemand::json_type::number: {
+                // Check if integer or double
+                auto int_val = value.get_int64();
+                if (!int_val.error()) {
+                    arrow_type = arrow::int64();
+                } else {
+                    arrow_type = arrow::float64();
+                }
+                break;
+            }
+            case simdjson::ondemand::json_type::string:
+                arrow_type = arrow::utf8();
+                break;
+            case simdjson::ondemand::json_type::boolean:
+                arrow_type = arrow::boolean();
+                break;
+            case simdjson::ondemand::json_type::array:
+                // For now, serialize arrays as JSON strings
+                // TODO: Support nested arrays
+                arrow_type = arrow::utf8();
+                break;
+            case simdjson::ondemand::json_type::object:
+                // For now, serialize objects as JSON strings
+                // TODO: Support nested structs
+                arrow_type = arrow::utf8();
+                break;
+            case simdjson::ondemand::json_type::null:
+                // Default to string for null fields
+                arrow_type = arrow::utf8();
+                break;
+        }
+        
+        fields.push_back(arrow::field(std::string(field_name), arrow_type));
+    }
+    
+    return arrow::schema(fields);
+}
+
+arrow::Result<std::shared_ptr<arrow::Array>> 
+KafkaConnector::BuildArrayFromJSON(
+    const std::vector<simdjson::padded_string>& json_docs,
+    const std::shared_ptr<arrow::Field>& field) {
+    
+    std::string field_name = field->name();
+    
+    switch (field->type()->id()) {
+        case arrow::Type::INT64: {
+            arrow::Int64Builder builder;
+            for (const auto& json_str : json_docs) {
+                auto doc = json_parser_.iterate(json_str);
+                if (doc.error()) {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                    continue;
+                }
+                
+                auto value = doc.value()[field_name].get_int64();
+                if (value.error()) {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                } else {
+                    ARROW_RETURN_NOT_OK(builder.Append(value.value()));
+                }
+            }
+            return builder.Finish();
+        }
+        
+        case arrow::Type::DOUBLE: {
+            arrow::DoubleBuilder builder;
+            for (const auto& json_str : json_docs) {
+                auto doc = json_parser_.iterate(json_str);
+                if (doc.error()) {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                    continue;
+                }
+                
+                auto value = doc.value()[field_name].get_double();
+                if (value.error()) {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                } else {
+                    ARROW_RETURN_NOT_OK(builder.Append(value.value()));
+                }
+            }
+            return builder.Finish();
+        }
+        
+        case arrow::Type::STRING: {
+            arrow::StringBuilder builder;
+            for (const auto& json_str : json_docs) {
+                auto doc = json_parser_.iterate(json_str);
+                if (doc.error()) {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                    continue;
+                }
+                
+                auto value = doc.value()[field_name].get_string();
+                if (value.error()) {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                } else {
+                    ARROW_RETURN_NOT_OK(builder.Append(
+                        std::string(value.value())
+                    ));
+                }
+            }
+            return builder.Finish();
+        }
+        
+        case arrow::Type::BOOL: {
+            arrow::BooleanBuilder builder;
+            for (const auto& json_str : json_docs) {
+                auto doc = json_parser_.iterate(json_str);
+                if (doc.error()) {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                    continue;
+                }
+                
+                auto value = doc.value()[field_name].get_bool();
+                if (value.error()) {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                } else {
+                    ARROW_RETURN_NOT_OK(builder.Append(value.value()));
+                }
+            }
+            return builder.Finish();
+        }
+        
+        case arrow::Type::TIMESTAMP: {
+            arrow::TimestampBuilder builder(
+                arrow::timestamp(arrow::TimeUnit::MILLI),
+                arrow::default_memory_pool()
+            );
+            for (const auto& json_str : json_docs) {
+                auto doc = json_parser_.iterate(json_str);
+                if (doc.error()) {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                    continue;
+                }
+                
+                auto value = doc.value()[field_name].get_int64();
+                if (value.error()) {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                } else {
+                    ARROW_RETURN_NOT_OK(builder.Append(value.value()));
+                }
+            }
+            return builder.Finish();
+        }
+        
+        default:
+            return arrow::Status::NotImplemented(
+                "Arrow type not yet supported for JSON: " + field->type()->ToString()
+            );
+    }
 }
 
 // ========== Connector Registration ==========

@@ -142,7 +142,19 @@ def main():
     
     # Show sample
     print("\n📊 Sample enriched records:")
-    print(result.slice(0, 3).to_pandas()[['instrumentId', 'side', 'price', 'size', 'securityName', 'sector']].to_string())
+    # Arrow-native display without pandas dependency
+    sample = result.slice(0, 3)
+    sample_dict = sample.to_pydict()
+    print("Sample enriched records:")
+    for i in range(min(3, sample.num_rows)):
+        row = sample.slice(i, 1)
+        row_dict = row.to_pydict()
+        print(f"Row {i}: instrumentId={row_dict.get('instrumentId', ['N/A'])[0]}, "
+              f"side={row_dict.get('side', ['N/A'])[0]}, "
+              f"price={row_dict.get('price', ['N/A'])[0]}, "
+              f"size={row_dict.get('size', ['N/A'])[0]}, "
+              f"securityName={row_dict.get('securityName', ['N/A'])[0]}, "
+              f"sector={row_dict.get('sector', ['N/A'])[0]}")
     
     return 0
 

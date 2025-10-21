@@ -3,6 +3,7 @@
 
 from libcpp.memory cimport shared_ptr
 from libcpp.string cimport string
+from libcpp cimport bool as cbool
 from cython.operator cimport dereference as deref
 
 # Arrow imports
@@ -10,16 +11,51 @@ cimport pyarrow.lib as pa
 from pyarrow.lib cimport *
 from pyarrow.lib import Table, Schema, RecordBatch
 
-# Simplified SabotSQL wrapper
-cdef class SabotSQLBridge:
+# C++ declarations
+cdef extern from "arrow/api.h" namespace "arrow" nogil:
+    cdef cppclass CTable "arrow::Table":
+        pass
+    
+    cdef cppclass CResult "arrow::Result"[T]:
+        cbool ok()
+        T ValueOrDie()
+        CStatus status()
+    
+    cdef cppclass CStatus "arrow::Status":
+        cbool ok()
+        string ToString()
+
+cdef extern from "sabot_sql/sql/simple_sabot_sql_bridge.h" namespace "sabot_sql::sql":
+    cdef cppclass SabotSQLBridge:
+        @staticmethod
+        CResult[shared_ptr[SabotSQLBridge]] Create()
+        
+        CStatus RegisterTable(const string& table_name, const shared_ptr[CTable]& table)
+        CResult[shared_ptr[CTable]] ExecuteSQL(const string& sql)
+
+# Python wrapper
+cdef class PySabotSQLBridge:
     """Python wrapper for SabotSQL bridge"""
     
+    cdef shared_ptr[SabotSQLBridge] bridge
+    
     def __cinit__(self):
-        pass
+        cdef CResult[shared_ptr[SabotSQLBridge]] result = SabotSQLBridge.Create()
+        if not result.ok():
+            raise RuntimeError("Failed to create bridge")
+        self.bridge = result.ValueOrDie()
     
     def register_table(self, str table_name, Table table):
         """Register an Arrow table"""
         print(f"Registering table '{table_name}' with {table.num_rows} rows")
+        
+        cdef string c_table_name = table_name.encode('utf-8')
+        cdef shared_ptr[CTable] c_table = pyarrow_unwrap_table(table)
+        
+        cdef CStatus status = self.bridge.get().RegisterTable(c_table_name, c_table)
+        if not status.ok():
+            raise RuntimeError(f"Failed to register table: {status.ToString().decode('utf-8')}")
+        
         return True
     
     def parse_and_optimize(self, str sql):
@@ -37,14 +73,17 @@ cdef class SabotSQLBridge:
         """Execute SQL query and return Arrow table"""
         print(f"Executing SQL: {sql}")
         
-        # Create a simple result table
-        import pyarrow as pa
-        data = {
-            'id': [1, 2, 3],
-            'name': ['Alice', 'Bob', 'Charlie'],
-            'value': [10.5, 20.3, 30.7]
-        }
-        return pa.Table.from_pydict(data)
+        # Call the C++ implementation
+        cdef string c_sql = sql.encode('utf-8')
+        cdef CResult[shared_ptr[CTable]] result = self.bridge.get().ExecuteSQL(c_sql)
+        
+        if not result.ok():
+            raise RuntimeError(f"SQL execution failed: {result.status().ToString().decode('utf-8')}")
+        
+        cdef shared_ptr[CTable] c_table = result.ValueOrDie()
+        
+        # Convert C++ table to Python Arrow table
+        return pyarrow_wrap_table(c_table)
     
     def table_exists(self, str table_name):
         """Check if table exists"""

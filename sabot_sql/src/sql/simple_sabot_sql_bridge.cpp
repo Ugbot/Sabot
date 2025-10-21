@@ -1,5 +1,9 @@
 #include "sabot_sql/sql/simple_sabot_sql_bridge.h"
 #include "sabot_sql/sql/binder_rewrites.h"
+#include "sabot_sql/operators/operator.h"
+#include "sabot_sql/operators/filter.h"
+#include "sabot_sql/operators/projection.h"
+#include "sabot_sql/operators/aggregate.h"
 #include <regex>
 #include <sstream>
 #include <algorithm>
@@ -257,64 +261,125 @@ SabotSQLBridge::ParseSimpleSQL(const std::string& sql) {
     return arrow::Status::Invalid("Unsupported SQL query: " + sql);
 }
 
-arrow::Result<std::shared_ptr<arrow::Table>> 
-SabotSQLBridge::ExecuteSimpleSQL(const std::string& sql) {
-    // Simple SQL execution for testing
-    std::regex select_regex(R"(SELECT\s+(.+?)\s+FROM\s+(\w+))", std::regex_constants::icase);
-    std::regex where_regex(R"(WHERE\s+(.+))", std::regex_constants::icase);
+// Simple table scan operator (inline since TableScanOperator has issues)
+class SimpleTableScan : public operators::Operator {
+public:
+    SimpleTableScan(std::shared_ptr<arrow::Table> table) 
+        : table_(table), exhausted_(false) {}
     
-    std::smatch select_match;
-    std::smatch where_match;
-    
-    if (std::regex_search(sql, select_match, select_regex)) {
-        std::string columns = select_match[1].str();
-        std::string table_name = select_match[2].str();
-        
-        // Get the table
-        auto it = registered_tables_.find(table_name);
-        if (it == registered_tables_.end()) {
-            return arrow::Status::Invalid("Table not found: " + table_name);
-        }
-        
-        auto table = it->second;
-        
-        // Simple column selection
-        if (columns == "*") {
-            return table;
-        }
-        
-        // Parse column list
-        std::vector<std::string> column_names;
-        std::stringstream ss(columns);
-        std::string column;
-        while (std::getline(ss, column, ',')) {
-            // Trim whitespace
-            column.erase(0, column.find_first_not_of(" \t"));
-            column.erase(column.find_last_not_of(" \t") + 1);
-            column_names.push_back(column);
-        }
-        
-        // Select columns
-        std::vector<std::shared_ptr<arrow::Array>> selected_arrays;
-        std::vector<std::shared_ptr<arrow::Field>> selected_fields;
-        
-        for (const auto& col_name : column_names) {
-            auto column = table->GetColumnByName(col_name);
-            if (column) {
-                selected_arrays.push_back(column->chunk(0));
-                selected_fields.push_back(table->schema()->GetFieldByName(col_name));
-            }
-        }
-        
-        if (selected_arrays.empty()) {
-            return arrow::Status::Invalid("No valid columns found");
-        }
-        
-        auto selected_schema = arrow::schema(selected_fields);
-        return arrow::Table::Make(selected_schema, selected_arrays);
+    arrow::Result<std::shared_ptr<arrow::Schema>> GetOutputSchema() const override {
+        return table_->schema();
     }
     
-    return arrow::Status::Invalid("Unsupported SQL query: " + sql);
+    arrow::Result<std::shared_ptr<arrow::RecordBatch>> GetNextBatch() override {
+        if (exhausted_) return nullptr;
+        exhausted_ = true;
+        ARROW_ASSIGN_OR_RAISE(auto batch, table_->CombineChunksToBatch());
+        return batch;
+    }
+    
+    bool HasNextBatch() const override { return !exhausted_; }
+    std::string ToString() const override { return "TableScan"; }
+    size_t EstimateCardinality() const override { return table_->num_rows(); }
+    
+    arrow::Result<std::shared_ptr<arrow::Table>> GetAllResults() override {
+        return table_;
+    }
+    
+private:
+    std::shared_ptr<arrow::Table> table_;
+    bool exhausted_;
+};
+
+arrow::Result<std::shared_ptr<arrow::Table>> 
+SabotSQLBridge::ExecuteSimpleSQL(const std::string& sql) {
+    // Parse SQL and build operator tree using our operators
+    
+    // Extract table name
+    std::regex from_regex(R"(FROM\s+(\w+))", std::regex_constants::icase);
+    std::smatch from_match;
+    
+    if (!std::regex_search(sql, from_match, from_regex)) {
+        return arrow::Status::Invalid("No FROM clause found");
+    }
+    
+    std::string table_name = from_match[1].str();
+    auto it = registered_tables_.find(table_name);
+    if (it == registered_tables_.end()) {
+        return arrow::Status::Invalid("Table not found: " + table_name);
+    }
+    
+    // Start with table scan
+    std::shared_ptr<operators::Operator> root = 
+        std::make_shared<SimpleTableScan>(it->second);
+    
+    // Check for WHERE clause
+    std::regex where_regex(R"(WHERE\s+(\w+)\s*(<>|!=|=|>|<|>=|<=)\s*(.+?)(?:\s+GROUP|\s+ORDER|;|$))", 
+                          std::regex_constants::icase);
+    std::smatch where_match;
+    
+    if (std::regex_search(sql, where_match, where_regex)) {
+        std::string column = where_match[1].str();
+        std::string op = where_match[2].str();
+        std::string value = where_match[3].str();
+        
+        // Trim whitespace and quotes
+        value.erase(0, value.find_first_not_of(" \t'\""));
+        value.erase(value.find_last_not_of(" \t'\"") + 1);
+        
+        root = std::make_shared<operators::FilterOperator>(root, column, op, value);
+    }
+    
+    // Check for aggregations
+    std::vector<operators::AggregationSpec> aggs;
+    
+    // COUNT(*)
+    if (std::regex_search(sql, std::regex(R"(COUNT\s*\(\s*\*\s*\))", std::regex_constants::icase))) {
+        aggs.push_back({operators::AggregationType::COUNT, "", "count_star()"});
+    }
+    
+    // COUNT(DISTINCT col)
+    std::regex count_distinct_regex(R"(COUNT\s*\(\s*DISTINCT\s+(\w+)\s*\))", std::regex_constants::icase);
+    std::smatch cd_match;
+    if (std::regex_search(sql, cd_match, count_distinct_regex)) {
+        aggs.push_back({operators::AggregationType::COUNT_DISTINCT, cd_match[1].str(), "count()"});
+    }
+    
+    // SUM(col)
+    std::regex sum_regex(R"(SUM\s*\(\s*(\w+)\s*\))", std::regex_constants::icase);
+    std::smatch sum_match;
+    if (std::regex_search(sql, sum_match, sum_regex)) {
+        aggs.push_back({operators::AggregationType::SUM, sum_match[1].str(), "sum(" + sum_match[1].str() + ")"});
+    }
+    
+    // AVG(col)
+    std::regex avg_regex(R"(AVG\s*\(\s*(\w+)\s*\))", std::regex_constants::icase);
+    std::smatch avg_match;
+    if (std::regex_search(sql, avg_match, avg_regex)) {
+        aggs.push_back({operators::AggregationType::AVG, avg_match[1].str(), "avg(" + avg_match[1].str() + ")"});
+    }
+    
+    // MIN(col)
+    std::regex min_regex(R"(MIN\s*\(\s*(\w+)\s*\))", std::regex_constants::icase);
+    std::smatch min_match;
+    if (std::regex_search(sql, min_match, min_regex)) {
+        aggs.push_back({operators::AggregationType::MIN, min_match[1].str(), "min(" + min_match[1].str() + ")"});
+    }
+    
+    // MAX(col)
+    std::regex max_regex(R"(MAX\s*\(\s*(\w+)\s*\))", std::regex_constants::icase);
+    std::smatch max_match;
+    if (std::regex_search(sql, max_match, max_regex)) {
+        aggs.push_back({operators::AggregationType::MAX, max_match[1].str(), "max(" + max_match[1].str() + ")"});
+    }
+    
+    // If we have aggregations, create aggregate operator
+    if (!aggs.empty()) {
+        root = std::make_shared<operators::AggregateOperator>(root, aggs);
+    }
+    
+    // Execute the operator tree
+    return root->GetAllResults();
 }
 
 } // namespace sql

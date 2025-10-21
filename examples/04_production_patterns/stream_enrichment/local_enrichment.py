@@ -50,7 +50,7 @@ def create_sample_data():
         'ID': list(range(1, 21)),
         'CUSIP': [f'CUSIP{i:05d}' for i in range(1, 21)],
         'NAME': [f'Security {i}' for i in range(1, 21)],
-        'SECTOR': ['Technology', 'Finance', 'Healthcare'][i % 3 for i in range(20)]
+        'SECTOR': [['Technology', 'Finance', 'Healthcare'][i % 3] for i in range(20)]
     })
 
     print(f"✅ Created {quotes.num_rows} quotes × {securities.num_rows} securities")
@@ -120,10 +120,14 @@ def main():
 
     # Show samples
     print("\n\nSample quotes (first 5):")
-    print(quotes.slice(0, 5).to_pandas().to_string(index=False))
+    for i in range(min(5, quotes.num_rows)):
+        row = quotes.slice(i, 1).to_pydict()
+        print(f"  {i}: instrumentId={row['instrumentId'][0]}, price={row['price'][0]}, size={row['size'][0]}")
 
     print("\n\nSample securities (first 5):")
-    print(securities.slice(0, 5).to_pandas().to_string(index=False))
+    for i in range(min(5, securities.num_rows)):
+        row = securities.slice(i, 1).to_pydict()
+        print(f"  {i}: ID={row['ID'][0]}, CUSIP={row['CUSIP'][0]}, NAME={row['NAME'][0]}, SECTOR={row['SECTOR'][0]}")
 
     # Enrich
     start_time = time.perf_counter()
@@ -139,7 +143,11 @@ def main():
 
     print(f"\nEnriched data: {enriched.num_rows} rows")
     print("\nSample enriched quotes (first 5):")
-    print(enriched.slice(0, 5).to_pandas().to_string(index=False))
+    for i in range(min(5, enriched.num_rows)):
+        row = enriched.slice(i, 1).to_pydict()
+        print(f"  {i}: instrumentId={row['instrumentId'][0]}, price={row['price'][0]}, "
+              f"CUSIP={row.get('CUSIP', ['N/A'])[0]}, NAME={row.get('NAME', ['N/A'])[0]}, "
+              f"SECTOR={row.get('SECTOR', ['N/A'])[0]}")
 
     # Verify enrichment
     print("\n\n✅ Verification")

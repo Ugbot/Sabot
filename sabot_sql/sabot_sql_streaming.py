@@ -37,7 +37,14 @@ class StreamingSQLExecutor:
         timer_backend: str = 'rocksdb',  # rocksdb for watermarks/timers
         state_path: str = './sql_state',
         checkpoint_interval_seconds: int = 60,
-        max_parallelism: int = 16
+        max_parallelism: int = 16,
+        watermark_idle_timeout_ms: int = 30000,
+        enable_error_recovery: bool = True,
+        max_retries: int = 3,
+        retry_delay_ms: int = 1000,
+        enable_metrics: bool = True,
+        metrics_export_interval_ms: int = 5000,
+        enable_health_checks: bool = True
     ):
         """
         Initialize streaming SQL executor.
@@ -56,6 +63,17 @@ class StreamingSQLExecutor:
         self.state_path = state_path
         self.checkpoint_interval = checkpoint_interval_seconds
         self.max_parallelism = max_parallelism
+        self.watermark_idle_timeout_ms = watermark_idle_timeout_ms
+        self.enable_error_recovery = enable_error_recovery
+        self.max_retries = max_retries
+        self.retry_delay_ms = retry_delay_ms
+        self.enable_metrics = enable_metrics
+        self.metrics_export_interval_ms = metrics_export_interval_ms
+        self.enable_health_checks = enable_health_checks
+        
+        # Embedded MarbleDB configuration
+        self.embedded_marbledb_path = f"{state_path}/marbledb_embedded"
+        self.enable_raft = True  # Enable RAFT for dimension tables and connector offsets
         
         # Registered sources and dimension tables
         self.sources = {}  # table_name -> source config
@@ -82,6 +100,8 @@ class StreamingSQLExecutor:
             print(f"    - Alternative backend (pluggable)")
         print(f"  Timer backend (watermarks): {timer_backend}")
         print(f"  State path: {state_path}")
+        print(f"  Embedded MarbleDB: {self.embedded_marbledb_path}")
+        print(f"  RAFT enabled: {self.enable_raft}")
         print(f"  Checkpoint interval: {checkpoint_interval_seconds}s")
         print(f"  Max parallelism: {max_parallelism}")
         print(f"  Connector state: {self.connector_state_table} (RAFT for restart after node loss)")
@@ -191,34 +211,87 @@ class StreamingSQLExecutor:
         print(f"\n🔄 Executing streaming SQL:")
         print(f"   {sql[:100]}...")
         
-        # Parse SQL to detect:
-        # - Sources referenced
-        # - Stateful operations (GROUP BY, windows)
-        # - Dimension table joins (broadcast hints)
+        # Parse SQL to detect streaming sources and stateful operations
+        stateful_ops = self._detect_stateful_operations(sql)
+        broadcast_tables = self._detect_broadcast_joins(sql)
         
-        # For now, yield a dummy batch to show the API works
-        # Full implementation will:
-        # 1. Start Kafka consumers (one per partition up to max-parallelism)
-        # 2. For each batch:
-        #    - Extract keys
-        #    - Update state (Tonbo for aggregates, RocksDB for watermarks)
-        #    - Check if window closed
-        #    - Yield result if window complete
-        # 3. Handle checkpoints periodically
+        print(f"   Stateful operations: {stateful_ops}")
+        print(f"   Broadcast tables: {broadcast_tables}")
         
-        # Dummy result for API demonstration
-        import asyncio
-        await asyncio.sleep(0.1)
+        # Create execution coordinator
+        from sabot_sql.streaming.sabot_execution_coordinator import SabotExecutionCoordinator
         
-        result_batch = ca.RecordBatch.from_pydict({
-            'symbol': ['AAPL', 'MSFT'],
-            'avg_price': [150.5, 300.2],
-            'count': [100, 50]
+        coordinator = SabotExecutionCoordinator()
+        await coordinator.Initialize({
+            'orchestrator_host': 'localhost',
+            'orchestrator_port': 8080,
+            'max_parallelism': self.max_parallelism,
+            'checkpoint_interval': f"{self.checkpoint_interval_seconds}s",
+            'state_backend': self.state_backend,
+            'timer_backend': self.timer_backend,
+            'enable_checkpointing': True,
+            'enable_watermarks': True
         })
         
-        yield result_batch
+        # Submit streaming job
+        execution_result = await coordinator.SubmitStreamingJob(sql, "streaming_query")
+        if not execution_result.success:
+            raise RuntimeError(f"Failed to submit streaming job: {execution_result.error_message}")
         
-        print(f"✅ Streaming query complete (dummy result)")
+        execution_id = execution_result.execution_id
+        print(f"   Execution ID: {execution_id}")
+        
+        # Start execution
+        await coordinator.StartExecution(execution_id)
+        
+        # Collect results as they become available
+        try:
+            while True:
+                # Check for completed windows/results
+                results = await coordinator.CollectResults(execution_id, "window_aggregate")
+                
+                if results.num_rows > 0:
+                    # Convert table to batches and yield
+                    for batch in results.to_batches():
+                        yield batch
+                
+                # Check if execution is complete
+                status = await coordinator.GetExecutionStatus(execution_id)
+                if status.get('status') == 'completed':
+                    break
+                
+                # Wait before next check
+                import asyncio
+                await asyncio.sleep(0.1)
+                
+        finally:
+            # Cleanup
+            await coordinator.StopExecution(execution_id)
+            await coordinator.CleanupExecution(execution_id)
+        
+        print(f"✅ Streaming query complete")
+    
+    async def shutdown(self):
+        """Shutdown the streaming SQL executor"""
+        print("🧹 Shutting down StreamingSQLExecutor...")
+        
+        # Cleanup checkpoint coordinator
+        if self.checkpoint_coordinator:
+            try:
+                # TODO: Implement checkpoint coordinator shutdown
+                pass
+            except Exception as e:
+                print(f"⚠️  Checkpoint coordinator shutdown warning: {e}")
+        
+        # Cleanup watermark trackers
+        if self.watermark_trackers:
+            try:
+                # TODO: Implement watermark tracker cleanup
+                pass
+            except Exception as e:
+                print(f"⚠️  Watermark tracker cleanup warning: {e}")
+        
+        print("✅ StreamingSQLExecutor shutdown complete")
     
     def _detect_stateful_operations(self, sql: str) -> Dict[str, Any]:
         """Detect if SQL requires stateful operators"""

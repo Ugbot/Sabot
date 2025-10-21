@@ -90,7 +90,11 @@ def main():
 
     print(f"\n🔥 Hot readings: {hot_readings.num_rows} / {sum(b.num_rows for b in batches)}")
     print(f"\nFirst 5 hot readings:")
-    print(hot_readings.slice(0, min(5, hot_readings.num_rows)).to_pandas())
+    # Arrow-native display without pandas dependency
+    for i in range(min(5, hot_readings.num_rows)):
+        row = hot_readings.slice(i, 1)
+        row_dict = row.to_pydict()
+        print(f"Row {i}: {row_dict}")
 
     # ========================================================================
     # Example 2: Map - Add temperature conversions
@@ -117,8 +121,15 @@ def main():
 
     print(f"\n✓ Added Fahrenheit column to {result.num_rows} readings")
     print(f"\nFirst 5 readings with both temperatures:")
-    df = result.slice(0, min(5, result.num_rows)).to_pandas()
-    print(df[['sensor_id', 'temperature', 'temp_fahrenheit', 'humidity']])
+    # Arrow-native display without pandas dependency
+    for i in range(min(5, result.num_rows)):
+        row = result.slice(i, 1)
+        row_dict = row.to_pydict()
+        # Extract specific columns
+        print(f"Row {i}: sensor_id={row_dict.get('sensor_id', ['N/A'])[0]}, "
+              f"temperature={row_dict.get('temperature', ['N/A'])[0]}, "
+              f"temp_fahrenheit={row_dict.get('temp_fahrenheit', ['N/A'])[0]}, "
+              f"humidity={row_dict.get('humidity', ['N/A'])[0]}")
 
     # ========================================================================
     # Example 3: Aggregation - Statistics
@@ -193,9 +204,13 @@ def main():
     print(f"   MEDIUM alerts: {level_counts.get('MEDIUM', 0)}")
 
     print(f"\nSample alerts:")
-    print(alerts.slice(0, min(5, alerts.num_rows)).to_pandas()[
-        ['sensor_id', 'temperature', 'alert_level']
-    ])
+    # Arrow-native display without pandas dependency
+    for i in range(min(5, alerts.num_rows)):
+        row = alerts.slice(i, 1)
+        row_dict = row.to_pydict()
+        print(f"Row {i}: sensor_id={row_dict.get('sensor_id', ['N/A'])[0]}, "
+              f"temperature={row_dict.get('temperature', ['N/A'])[0]}, "
+              f"alert_level={row_dict.get('alert_level', ['N/A'])[0]}")
 
     # ========================================================================
     # Example 5: Per-Sensor Analytics

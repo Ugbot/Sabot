@@ -5,7 +5,7 @@ Stateful Processing Example - Running Totals
 
 **What this demonstrates:**
 - Stateful stream processing (maintaining state across batches)
-- Using MemoryBackend for state storage
+- Using StateBackend for state storage
 - Running aggregations (cumulative sum, count)
 - Per-key state management
 - Local execution (no distributed agents)
@@ -33,7 +33,22 @@ from typing import Iterator, Dict
 import time
 
 # Import Sabot state backend
-from sabot._cython.state.memory_backend import MemoryBackend
+try:
+    from sabot._cython.state.rocksdb_state import RocksDBState as StateBackend
+except ImportError:
+    # Fallback to simple dict-based state
+    class StateBackend:
+        def __init__(self, path=None):
+            self.state = {}
+        
+        def get(self, key):
+            return self.state.get(key)
+        
+        def put(self, key, value):
+            self.state[key] = value
+        
+        def close(self):
+            pass
 
 
 def transaction_stream(num_batches: int = 10, batch_size: int = 10) -> Iterator[pa.Table]:
@@ -79,7 +94,7 @@ def transaction_stream(num_batches: int = 10, batch_size: int = 10) -> Iterator[
 
 class StatefulAggregator:
     """
-    Stateful aggregator using MemoryBackend.
+    Stateful aggregator using StateBackend.
 
     Maintains running totals per account:
     - Total amount
@@ -87,8 +102,8 @@ class StatefulAggregator:
     """
 
     def __init__(self):
-        """Initialize with MemoryBackend."""
-        self.state_backend = MemoryBackend()
+        """Initialize with StateBackend."""
+        self.state_backend = StateBackend()
 
         # State keys
         self.TOTAL_KEY = "total_amount"
@@ -216,14 +231,14 @@ def main():
     print("\n\n💡 Key Takeaways:")
     print("=" * 50)
     print("1. Stateful processing maintains state across batches")
-    print("2. MemoryBackend stores key-value state in-memory")
+    print("2. StateBackend stores key-value state in-memory")
     print("3. State is per-key (per account in this example)")
     print("4. Running aggregations: total, count, average")
     print("5. State survives batch boundaries")
 
     print("\n\n🔗 State Backend Options:")
     print("=" * 50)
-    print("MemoryBackend:   Fast, volatile, <1GB state")
+    print("StateBackend:    Fast, volatile, <1GB state")
     print("RocksDBBackend:  Persistent, large state (>100GB)")
     print("RedisBackend:    Distributed, shared state")
 

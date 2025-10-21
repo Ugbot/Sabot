@@ -141,10 +141,17 @@ TableScanOperator::GetNextBatch() {
         for (const auto& col_name : projected_columns_) {
             auto chunked_col = sliced_table->GetColumnByName(col_name);
             if (chunked_col) {
-                // Flatten chunked array
-                ARROW_ASSIGN_OR_RAISE(auto combined, 
-                    chunked_col->Flatten(arrow::default_memory_pool()));
-                columns.push_back(combined[0]);
+                // Combine chunks to single array
+                if (chunked_col->num_chunks() == 1) {
+                    columns.push_back(chunked_col->chunk(0));
+                } else {
+                    // Concatenate chunks
+                    ARROW_ASSIGN_OR_RAISE(
+                        auto combined,
+                        arrow::Concatenate(chunked_col->chunks())
+                    );
+                    columns.push_back(combined);
+                }
                 
                 auto field = sliced_table->schema()->GetFieldByName(col_name);
                 fields.push_back(field);
@@ -176,7 +183,7 @@ TableScanOperator::GetNextBatch() {
     }
     
     // No projection pushdown - convert table to batch
-    ARROW_ASSIGN_OR_RAISE(auto batch, sliced_table->ToRecordBatches()[0]);
+    ARROW_ASSIGN_OR_RAISE(auto batch, sliced_table->CombineChunksToBatch());
     
     // Apply predicates
     bool passes = true;
@@ -275,7 +282,8 @@ TableScanOperator::GetAllResults() {
     
     // Combine batches into a single table
     if (batches.empty()) {
-        return arrow::Table::Make(table_->schema(), {});
+        std::vector<std::shared_ptr<arrow::Array>> empty_arrays;
+        return arrow::Table::Make(table_->schema(), empty_arrays);
     }
     
     ARROW_ASSIGN_OR_RAISE(auto table, arrow::Table::FromRecordBatches(batches));

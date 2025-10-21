@@ -1,7 +1,9 @@
 #pragma once
 
 #include "sabot_sql/streaming/source_connector.h"
+#include "sabot_sql/streaming/schema_registry_client.h"
 #include <librdkafka/rdkafkacpp.h>
+#include <simdjson.h>
 #include <memory>
 #include <atomic>
 
@@ -64,6 +66,12 @@ private:
     // Schema (inferred or provided)
     std::shared_ptr<arrow::Schema> schema_;
     
+    // JSON parser (SIMD-accelerated)
+    simdjson::ondemand::parser json_parser_;
+    
+    // Schema Registry client (for Avro/Protobuf/JSON Schema)
+    std::unique_ptr<SchemaRegistryClient> schema_registry_;
+    
     // MarbleDB client for offset storage (RAFT table)
     std::shared_ptr<marble::Client> offset_store_;
     
@@ -81,6 +89,30 @@ private:
     arrow::Result<int64_t> ExtractTimestampFromBatch(
         const std::shared_ptr<arrow::RecordBatch>& batch,
         const std::string& column_name
+    );
+    
+    // JSON parsing helpers (using simdjson)
+    arrow::Result<std::shared_ptr<arrow::Schema>> InferSchemaFromJSON(
+        simdjson::ondemand::document& doc
+    );
+    arrow::Result<std::shared_ptr<arrow::Array>> BuildArrayFromJSON(
+        const std::vector<simdjson::padded_string>& json_docs,
+        const std::shared_ptr<arrow::Field>& field
+    );
+    
+    // Schema Registry helpers
+    arrow::Status InitializeSchemaRegistry();
+    arrow::Result<std::shared_ptr<arrow::RecordBatch>> DecodeWithSchemaRegistry(
+        const std::vector<RdKafka::Message*>& messages
+    );
+    arrow::Result<std::shared_ptr<arrow::Schema>> AvroSchemaToArrow(
+        const std::string& avro_schema
+    );
+    arrow::Result<std::shared_ptr<arrow::Array>> DecodeAvroArray(
+        const std::vector<const uint8_t*>& payloads,
+        const std::vector<size_t>& lengths,
+        const std::shared_ptr<arrow::Field>& field,
+        const std::string& avro_schema
     );
 };
 

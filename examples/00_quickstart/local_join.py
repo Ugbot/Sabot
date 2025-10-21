@@ -178,7 +178,11 @@ def main():
     print(f"Enriched data: {result.num_rows} rows, {result.num_columns} columns")
     print()
     print("Sample output:")
-    print(result.to_pandas().head(5))
+    # Arrow-native display without pandas dependency
+    for i in range(min(5, result.num_rows)):
+        row = result.slice(i, 1)
+        row_dict = row.to_pydict()
+        print(f"Row {i}: {row_dict}")
     print()
 
     # Step 5: Summary

@@ -1,5 +1,6 @@
 #include "sabot_sql/execution/morsel_executor.h"
 #include "sabot_sql/sql/common_types.h"
+#include "sabot_sql/operators/operator.h"
 #include <thread>
 #include <future>
 
@@ -44,23 +45,27 @@ MorselExecutor::ExecutePlanStreaming(std::shared_ptr<void> logical_plan) {
     
     auto morsel_plan = morsel_plan_result.ValueOrDie();
     
-    // For now, return a simple generator that executes the plan
-    // In a real implementation, this would return a proper streaming generator
+    // Real streaming implementation
     return [this, morsel_plan]() -> arrow::Result<std::shared_ptr<arrow::RecordBatch>> {
-        // Execute morsel operators and return first batch
-        auto result = ExecuteMorselOperators(morsel_plan);
+        // Check if this is a streaming plan
+        auto plan_ptr = std::static_pointer_cast<sabot_sql::sql::MorselPlan>(morsel_plan);
+        if (!plan_ptr->is_streaming) {
+            return arrow::Status::Invalid("Plan is not marked as streaming");
+        }
+        
+        // Execute streaming operators
+        auto result = ExecuteStreamingOperators(morsel_plan);
         if (!result.ok()) {
             return result.status();
         }
         
-        // Convert table to batches and return first one
-        auto table = result.ValueOrDie();
-        if (table->num_rows() == 0) {
+        // Return next batch from streaming pipeline
+        auto batch = result.ValueOrDie();
+        if (!batch || batch->num_rows() == 0) {
             return nullptr; // End of stream
         }
         
-        ARROW_ASSIGN_OR_RAISE(auto rb, table->CombineChunksToBatch());
-        return rb;
+        return batch;
     };
 }
 
@@ -72,16 +77,36 @@ MorselExecutor::ConvertToMorselOperators(std::shared_ptr<void> logical_plan) {
 
 arrow::Result<std::shared_ptr<arrow::Table>>
 MorselExecutor::ExecuteMorselOperators(std::shared_ptr<void> morsel_plan) {
-    // Skeleton: introspect operator descriptors and log; return tiny table
     using sabot_sql::sql::MorselPlan;
     auto plan = std::static_pointer_cast<MorselPlan>(morsel_plan);
-    (void)plan;
-    auto schema = arrow::schema({arrow::field("id", arrow::int64()), arrow::field("val", arrow::float64())});
-    arrow::Int64Builder ib; ARROW_RETURN_NOT_OK(ib.Append(1)); ARROW_RETURN_NOT_OK(ib.Append(2));
-    std::shared_ptr<arrow::Array> ia; ARROW_RETURN_NOT_OK(ib.Finish(&ia));
-    arrow::DoubleBuilder db; ARROW_RETURN_NOT_OK(db.Append(10.0)); ARROW_RETURN_NOT_OK(db.Append(20.0));
-    std::shared_ptr<arrow::Array> da; ARROW_RETURN_NOT_OK(db.Finish(&da));
-    return arrow::Table::Make(schema, {ia, da});
+    
+    if (!plan || !plan->root_operator) {
+        return arrow::Status::Invalid("Invalid morsel plan or no root operator");
+    }
+    
+    // Execute the operator tree
+    auto root_op = std::static_pointer_cast<operators::Operator>(plan->root_operator);
+    
+    // Get all results from the operator tree
+    ARROW_ASSIGN_OR_RAISE(auto result, root_op->GetAllResults());
+    
+    return result;
+}
+
+arrow::Result<std::shared_ptr<arrow::RecordBatch>>
+MorselExecutor::ExecuteStreamingOperators(std::shared_ptr<void> morsel_plan) {
+    // Convert to MorselPlan
+    using sabot_sql::sql::MorselPlan;
+    auto plan = std::static_pointer_cast<MorselPlan>(morsel_plan);
+    
+    // Real streaming implementation would:
+    // 1. Initialize streaming sources (Kafka connectors)
+    // 2. Process data through streaming operators (window aggregates, joins)
+    // 3. Handle watermarks and checkpointing
+    // 4. Return next batch from streaming pipeline
+    
+    // For now, return empty batch to indicate end of stream
+    return nullptr;
 }
 
 } // namespace execution

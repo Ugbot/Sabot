@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import sabot as sb
 from sabot import cyarrow as ca
+import pyarrow as pa  # For test data creation
 
 print("=" * 70)
 print("Sabot Dimension Tables Demo")

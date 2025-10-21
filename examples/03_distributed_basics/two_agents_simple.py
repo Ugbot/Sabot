@@ -261,7 +261,11 @@ async def main():
     print(f"✅ Enriched data: {enriched.num_rows} rows")
     print()
     print("Sample results:")
-    print(enriched.to_pandas().head(5))
+    # Arrow-native display without pandas dependency
+    for i in range(min(5, enriched.num_rows)):
+        row = enriched.slice(i, 1)
+        row_dict = row.to_pydict()
+        print(f"Row {i}: {row_dict}")
     print()
 
     # Step 6: Show agent stats
