@@ -36,6 +36,7 @@ os.environ['DYLD_LIBRARY_PATH'] = '/Users/bengamble/Sabot/vendor/arrow/cpp/build
 from data_loader import load_all_data
 from sabot._cython.graph.engine.query_engine import GraphQueryEngine
 from sabot import cyarrow as pa
+import pyarrow
 
 
 class CypherBenchmarkRunner:
@@ -90,13 +91,13 @@ class CypherBenchmarkRunner:
             'state': cities.column('state'),
             'country': cities.column('country'),
             'lat': cities.column('lat'),
-            'lon': cities.column('lon')
+            'lng': cities.column('lng')
         })
         all_vertices.append(city_vertices)
         print(f"  - {cities.num_rows:,} City nodes")
 
         # Combine all vertices
-        vertices = pa.concat_tables(all_vertices, promote=True)
+        vertices = pyarrow.concat_tables(all_vertices, promote=True)
         self.engine.load_vertices(vertices, persist=False)
         print(f"✅ Total vertices loaded: {vertices.num_rows:,}")
 
@@ -125,7 +126,7 @@ class CypherBenchmarkRunner:
         print(f"  - {lives_in.num_rows:,} LivesIn edges")
 
         # Combine all edges
-        edges = pa.concat_tables(all_edges)
+        edges = pyarrow.concat_tables(all_edges)
         self.engine.load_edges(edges, persist=False)
         print(f"✅ Total edges loaded: {edges.num_rows:,}\n")
 

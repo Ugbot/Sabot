@@ -9,34 +9,54 @@ from pathlib import Path
 from sabot import cyarrow as ca
 
 
+def _read_parquet_table(path: str) -> ca.Table:
+    """Read parquet file using vendored Arrow's parquet reader.
+
+    Uses direct file I/O to avoid filesystem registration issues.
+    """
+    # Import vendored pyarrow directly
+    import pyarrow.parquet as pq
+
+    # Read using simple file path
+    # Note: We may see KeyError warnings about filesystem registration, but these can be ignored
+    try:
+        return pq.read_table(path)
+    except Exception as e:
+        # If there's a filesystem registration issue, try reading directly from file object
+        if "already registered" in str(e):
+            with open(path, 'rb') as f:
+                return pq.read_table(f)
+        raise
+
+
 def load_nodes_persons(data_dir: Path) -> ca.Table:
     """Load Person nodes."""
     persons_path = data_dir / "nodes" / "persons.parquet"
-    return ca.parquet.read_table(str(persons_path))
+    return _read_parquet_table(str(persons_path))
 
 
 def load_nodes_cities(data_dir: Path) -> ca.Table:
     """Load City nodes."""
     cities_path = data_dir / "nodes" / "cities.parquet"
-    return ca.parquet.read_table(str(cities_path))
+    return _read_parquet_table(str(cities_path))
 
 
 def load_nodes_states(data_dir: Path) -> ca.Table:
     """Load State nodes."""
     states_path = data_dir / "nodes" / "states.parquet"
-    return ca.parquet.read_table(str(states_path))
+    return _read_parquet_table(str(states_path))
 
 
 def load_nodes_countries(data_dir: Path) -> ca.Table:
     """Load Country nodes."""
     countries_path = data_dir / "nodes" / "countries.parquet"
-    return ca.parquet.read_table(str(countries_path))
+    return _read_parquet_table(str(countries_path))
 
 
 def load_nodes_interests(data_dir: Path) -> ca.Table:
     """Load Interest nodes."""
     interests_path = data_dir / "nodes" / "interests.parquet"
-    return ca.parquet.read_table(str(interests_path))
+    return _read_parquet_table(str(interests_path))
 
 
 def _rename_edge_columns(table: ca.Table) -> ca.Table:
@@ -56,35 +76,35 @@ def _rename_edge_columns(table: ca.Table) -> ca.Table:
 def load_edges_follows(data_dir: Path) -> ca.Table:
     """Load Follows edges."""
     follows_path = data_dir / "edges" / "follows.parquet"
-    table = ca.parquet.read_table(str(follows_path))
+    table = _read_parquet_table(str(follows_path))
     return _rename_edge_columns(table)
 
 
 def load_edges_lives_in(data_dir: Path) -> ca.Table:
     """Load LivesIn edges."""
     lives_in_path = data_dir / "edges" / "lives_in.parquet"
-    table = ca.parquet.read_table(str(lives_in_path))
+    table = _read_parquet_table(str(lives_in_path))
     return _rename_edge_columns(table)
 
 
 def load_edges_interested_in(data_dir: Path) -> ca.Table:
     """Load HasInterest edges."""
     interested_path = data_dir / "edges" / "interested_in.parquet"
-    table = ca.parquet.read_table(str(interested_path))
+    table = _read_parquet_table(str(interested_path))
     return _rename_edge_columns(table)
 
 
 def load_edges_city_in(data_dir: Path) -> ca.Table:
     """Load CityIn edges."""
     city_in_path = data_dir / "edges" / "city_in.parquet"
-    table = ca.parquet.read_table(str(city_in_path))
+    table = _read_parquet_table(str(city_in_path))
     return _rename_edge_columns(table)
 
 
 def load_edges_state_in(data_dir: Path) -> ca.Table:
     """Load StateIn edges."""
     state_in_path = data_dir / "edges" / "state_in.parquet"
-    table = ca.parquet.read_table(str(state_in_path))
+    table = _read_parquet_table(str(state_in_path))
     return _rename_edge_columns(table)
 
 
