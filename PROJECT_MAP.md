@@ -13,6 +13,7 @@
 - ✅ Stream API with Arrow operations
 - ✅ Distributed execution (2-4 agents tested)
 - ✅ SQL via DuckDB integration
+- ✅ Graph queries (Cypher) with Arrow storage - 23,798 q/s parsing, 3-37M matches/sec
 - ✅ 70+ Cython modules built
 
 **What's Being Improved**:
@@ -34,7 +35,13 @@ Sabot/
 │   │   ├── state/            # State backends
 │   │   ├── shuffle/          # Network shuffle
 │   │   ├── operators/        # Stream operators
-│   │   └── fintech/          # Fintech kernels (11 built)
+│   │   ├── fintech/          # Fintech kernels (11 built)
+│   │   └── graph/            # Graph query engine (Cypher/SPARQL) ✅
+│   │       ├── compiler/     # Cypher & SPARQL parsers
+│   │       ├── engine/       # GraphQueryEngine (main API)
+│   │       ├── query/        # Pattern matching kernels (3-37M matches/sec)
+│   │       ├── storage/      # PyPropertyGraph (Arrow storage)
+│   │       └── traversal/    # Graph algorithms (BFS, PageRank, etc.)
 │   ├── api/                  # Public Stream API
 │   ├── kafka/                # Kafka Python layer
 │   ├── agent.py              # Agent with C++ core integration
@@ -73,10 +80,65 @@ Sabot/
 │   ├── duckdb/               # DuckDB
 │   └── tonbo/                # Tonbo Rust DB
 │
+├── archive/                  # Archived code (not in active use)
+│   └── graph_implementations/  # Abandoned graph implementation attempts
+│       ├── abandoned_kuzu_fork/     # sabot_cypher (Kuzu vendor, never built)
+│       └── abandoned_cpp_bridge/    # sabot_graph (C++ bridge, not implemented)
+│
 ├── examples/                 # Working examples (14 core examples)
-├── benchmarks/               # Performance benchmarks
-├── tests/                    # Test suite
-└── docs/                     # Documentation
+├── benchmarks/               # Performance benchmarks (organized)
+│   ├── vs_pyspark/           # PySpark comparison benchmarks (6 files)
+│   ├── vs_duckdb/            # DuckDB/ClickBench comparisons (11 files)
+│   ├── internal/             # Component benchmarks (14 files)
+│   │   ├── operators/        # Operator benchmarks
+│   │   ├── state/            # State backend benchmarks
+│   │   ├── shuffle/          # Shuffle benchmarks
+│   │   ├── memory/           # Memory benchmarks
+│   │   ├── graph/            # Graph benchmarks
+│   │   └── cpp/              # C++ optimization benchmarks
+│   ├── pipelines/            # Full pipeline benchmarks (5 files)
+│   ├── domain/               # Domain-specific benchmarks (4 files)
+│   ├── studies/              # Research studies (kuzu, rdf, postgresql_cdc)
+│   └── results/              # Benchmark results
+├── tests/                    # Test suite (organized)
+│   ├── unit/                 # Unit tests (117 files)
+│   │   ├── agent/            # Agent tests (3 files)
+│   │   ├── sql/              # SQL engine tests (6 files)
+│   │   ├── graph/            # Graph/Cypher tests (27 files)
+│   │   ├── sparql/           # SPARQL/RDF tests (1 file)
+│   │   ├── operators/        # Operator tests (10 files)
+│   │   ├── api/              # API tests
+│   │   ├── arrow/            # Arrow tests
+│   │   ├── cython/           # Cython tests
+│   │   ├── compiler/         # Compiler tests
+│   │   ├── shuffle/          # Shuffle tests
+│   │   └── state/            # State tests
+│   ├── integration/          # Integration tests (52 files)
+│   │   ├── agent/            # Agent integration (1 file)
+│   │   ├── sql/              # SQL integration (1 file)
+│   │   ├── sparql/           # SPARQL integration (1 file)
+│   │   ├── test_asof_join.py # Fintech ASOF join tests
+│   │   ├── test_fintech_kernels.py # Fintech kernel tests
+│   │   └── postgresql_cdc/   # PostgreSQL CDC tests
+│   ├── debug/                # Debug/diagnostic tests (5 files)
+│   ├── cpp/                  # C++ test executables and sources (9 files)
+│   ├── manual/               # Manual tests
+│   ├── performance/          # Performance tests
+│   ├── test_venv/            # Test virtual environment
+│   ├── qlever_test/          # QLever test data
+│   └── .qlever_test_env/     # QLever test environment
+└── docs/                     # Documentation (organized)
+    ├── architecture/         # Architecture and design docs
+    ├── benchmarks/           # Benchmark results and analysis
+    ├── features/             # Feature-specific documentation
+    │   ├── kafka/            # Kafka integration docs
+    │   ├── sql/              # SQL engine docs
+    │   ├── graph/            # Graph/Cypher docs
+    │   ├── fintech/          # Fintech kernels docs
+    │   └── cpp_agent/        # C++ agent docs
+    ├── guides/               # User guides and tutorials
+    ├── planning/             # Roadmaps and planning docs
+    └── session-reports/      # Historical session reports
 ```
 
 ## Core Components Status
@@ -297,9 +359,23 @@ Sabot/
 **Kafka**: `sabot/kafka/`, `sabot/_cython/kafka/`, `sabot_sql/src/streaming/kafka_connector.cpp`
 **SQL**: `sabot_sql/`, currently using `sabot_sql_duckdb_direct.py`
 **Examples**: `examples/00_quickstart/`, `examples/kafka_integration_example.py`
-**Benchmarks**: `benchmarks/sabot_vs_pyspark_comprehensive.py`, `benchmarks/clickbench_full_test.py`
-**Tests**: `tests/`
-**Docs**: Scattered across root (many .md files)
+**Benchmarks**:
+- PySpark comparisons: `benchmarks/vs_pyspark/`
+- DuckDB/ClickBench: `benchmarks/vs_duckdb/`
+- Component benchmarks: `benchmarks/internal/`
+- Pipeline benchmarks: `benchmarks/pipelines/`
+**Tests**:
+- Unit tests: `tests/unit/` (agent, sql, graph, sparql, operators, etc.)
+- Integration tests: `tests/integration/` (agent, sql, sparql, fintech, etc.)
+- Debug tests: `tests/debug/`
+- C++ tests: `tests/cpp/` (test executables and source files)
+**Docs**:
+- Architecture: `docs/architecture/`
+- Benchmark results: `docs/benchmarks/`
+- Feature docs: `docs/features/` (kafka, sql, graph, fintech, cpp_agent)
+- User guides: `docs/guides/` (QUICKSTART.md, DOCUMENTATION.md)
+- Planning: `docs/planning/` (NEXT_STEPS.md, ACCOMPLISHMENTS.md)
+- Session reports: `docs/session-reports/` (historical session summaries)
 
 ## Key Metrics
 
@@ -312,6 +388,13 @@ Sabot/
 **Modules Built**: 70/108 Cython modules
 **Examples Working**: 14/14 core examples
 **Performance**: 5-10,000x vs PySpark, competitive with DuckDB
+
+**Organization**:
+- Tests organized: 174 Python files + 9 C++ files across unit/, integration/, debug/, cpp/
+- Test directories moved: test_venv, qlever_test, .qlever_test_env
+- Benchmarks organized: 40+ files by purpose (vs_pyspark, vs_duckdb, internal, etc.)
+- Documentation organized: 125+ markdown files in docs/ folders
+- Root directory clean: 0 test files, only essential files remain
 
 ## Critical Findings
 
@@ -343,12 +426,16 @@ Sabot/
 
 ## Documentation
 
-**Architecture**: Scattered across root directory
-**Guides**: Multiple .md files in root
+**Architecture**: `docs/architecture/` - Design docs, unification reports
+**Benchmarks**: `docs/benchmarks/` - All performance analysis and results
+**Features**: `docs/features/` - Kafka, SQL, Graph, Fintech, C++ Agent docs
+**Guides**: `docs/guides/` - QUICKSTART.md, user-facing documentation
+**Planning**: `docs/planning/` - Roadmaps, next steps, accomplishments
+**Session Reports**: `docs/session-reports/` - Historical development sessions
 **Examples**: README files in examples/
 **API**: Inline docstrings
 
-**Recommendation**: Consolidate documentation
+**Status**: ✅ Documentation organized into logical folders (125+ files)
 
 ---
 

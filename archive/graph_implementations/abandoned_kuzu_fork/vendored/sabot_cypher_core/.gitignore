@@ -1,0 +1,86 @@
+.idea/
+.vscode
+.vs
+bazel-*
+.clwb
+.cache
+.ccls-cache
+.bazelrc
+**/test_list
+mm-256KB
+history.txt
+
+test_temp/
+build/
+install/
+
+compile_commands.json
+
+### Python
+# Byte-compiled / optimized / DLL files
+__pycache__/
+.venv/
+*.py[cod]
+*$py.class
+cmake-build-debug/
+cmake-build-release/
+test/unittest_temp_*
+dataset/parquet_temp_*
+tools/python_api/test/test_PYTHON_CSV.csv
+test.db/
+
+# antlr4 jar
+scripts/antlr4/antlr4.jar
+# .antlr
+src/antlr4/.antlr/
+
+# macOS
+.DS_Store
+
+# Dataset
+dataset/ldbc-1
+
+### Node.js
+tools/nodejs_api/node_modules/
+tools/nodejs_api/cmake_install.cmake
+tools/nodejs_api/package-lock.json
+tools/nodejs_api/prebuilt/
+
+### WASM
+tools/wasm/node_modules/
+tools/wasm/examples/browser*/node_modules/
+tools/wasm/examples/browser*/public/index.js
+tools/wasm/examples/browser*/public/kuzu_wasm_worker.js
+tools/wasm/examples/nodejs/node_modules/
+tools/wasm/package/
+
+# Archive files
+*.zip
+*.tar.gz
+scripts/pre-compiled-bins/headers
+scripts/pre-compiled-bins/lib*
+scripts/pre-compiled-bins/kuzu*
+
+# Java API
+tools/java_api/build
+tools/java_api/test_db/
+tools/java_api/*.jar
+tools/java_api/*.class
+tools/java_api/*.log
+tools/java_api/.gradle
+tools/java_api/.idea
+tools/java_api/src/main/resources/libkuzu*
+tools/java_api/*.iml
+tools/java_api/example/.gradle
+tools/java_api/bin
+
+# Generated docs
+scripts/generate-cpp-docs/c/kuzu.h
+scripts/generate-cpp-docs/cpp/headers
+scripts/generate-cpp-docs/cpp/docs
+scripts/generate-cpp-docs/c/docs
+
+# Generated datasets
+dataset/binary-demo
+dataset/databases/tinysnb
+dataset/ldbc-1/csv

@@ -1,5 +1,6 @@
+- NO Fake Data, No Fake code, no placeholders that cause us to think things work.
 - dont simplfy thigns to get a fix as that makes it harder to get it right in the long run. refactor and clarify only
-- we always prefer using Cython to python for perfomance critical code in streaming libraries
+- we always prefer using C++ to Cython, and Cython to python for perfomance critical code in streaming libraries
 - if  we are vendoring a library that has cython bindings we should use the cython directly rather than go in via ptyhon.
 - use the vendored librarys over hte ones from pip (arrow, tonbo, rocksdb)
 - always use our version of arrow, not one from pip
@@ -15,6 +16,8 @@
 - we build arrow and use our own. we do not import the system arrow ever
 - dont build simplfied versions that work with missing components, this are not helpful.
 - dont use pyarrow. use cyarrow
-- if we are missing functinos in cyarrow we should build them in rather than do without.
+- if we are missing functions in cyarrow we should build them in rather than do without.
 - use inbuilt arrow functions from the vendored arrow lib @vendor/arrow/  if we can to get the perf we want
 - never claim things as done when not finished, no lying
+
+- do not use placeholder functions, variables, or "TODO" code in implementation files; all committed code must be functional and complete. This ensures we know the actual working state of the codebase at all times.

@@ -11,26 +11,37 @@ from sabot import cyarrow as ca
 class CypherOperator:
     """
     Cypher query operator for Sabot streams.
-    
+
     Usage in Sabot flow:
         stream.cypher("MATCH (a)-[:KNOWS]->(b) RETURN b.id", graph_store)
+
+    NOTE: Not yet implemented for streaming. Use GraphQueryEngine directly:
+        from sabot._cython.graph.engine.query_engine import GraphQueryEngine
+        engine = GraphQueryEngine()
+        result = engine.query_cypher(query)
     """
-    
+
     def __init__(self, query, graph_store=None):
         """
         Create Cypher operator.
-        
+
         Args:
             query: Cypher query string
-            graph_store: SabotGraphBridge instance (optional)
+            graph_store: GraphQueryEngine instance (optional)
         """
         self.query = query
         self.graph_store = graph_store
-        
+
         if not graph_store:
-            # Create default graph store
-            from sabot_graph import create_sabot_graph_bridge
-            self.graph_store = create_sabot_graph_bridge()
+            # Graph streaming operators not yet implemented
+            # Use GraphQueryEngine directly
+            raise NotImplementedError(
+                "Graph streaming operators not yet implemented.\n"
+                "Use GraphQueryEngine directly:\n"
+                "  from sabot._cython.graph.engine.query_engine import GraphQueryEngine\n"
+                "  engine = GraphQueryEngine()\n"
+                "  result = engine.query_cypher(query)"
+            )
     
     def __iter__(self):
         """Sync iteration (batch mode)."""
@@ -60,26 +71,33 @@ class CypherOperator:
 class SPARQLOperator:
     """
     SPARQL query operator for Sabot streams.
-    
+
     Usage in Sabot flow:
         stream.sparql("SELECT ?s ?o WHERE { ?s <knows> ?o }", graph_store)
+
+    NOTE: Not yet implemented for streaming. SPARQL support is partial.
     """
-    
+
     def __init__(self, query, graph_store=None):
         """
         Create SPARQL operator.
-        
+
         Args:
             query: SPARQL query string
-            graph_store: SabotGraphBridge instance (optional)
+            graph_store: GraphQueryEngine instance (optional)
         """
         self.query = query
         self.graph_store = graph_store
-        
+
         if not graph_store:
-            # Create default graph store
-            from sabot_graph import create_sabot_graph_bridge
-            self.graph_store = create_sabot_graph_bridge()
+            # Graph streaming operators not yet implemented
+            raise NotImplementedError(
+                "Graph streaming operators not yet implemented.\n"
+                "SPARQL support is partial. Use Cypher instead:\n"
+                "  from sabot._cython.graph.engine.query_engine import GraphQueryEngine\n"
+                "  engine = GraphQueryEngine()\n"
+                "  result = engine.query_cypher(query)"
+            )
     
     def __iter__(self):
         """Sync iteration (batch mode)."""
@@ -145,16 +163,8 @@ class GraphEnrichOperator:
     
     def _enrich_batch(self, batch):
         """Enrich batch with graph lookups."""
-        if batch is None or batch.num_rows == 0:
-            return batch
-        
-        # Extract vertex IDs
-        vertex_ids = batch.column(self.vertex_column)
-        
-        # Batch graph lookups
-        # TODO: Optimize with batch vertex lookup
-        
-        print(f"Enriching {batch.num_rows} rows with graph data")
-        
-        return batch  # For now, pass through
+        raise NotImplementedError(
+            "_enrich_batch() not yet implemented. Requires graph lookup implementation.\n"
+            "Implementation needed: Batch vertex lookup and join with stream data."
+        )
 

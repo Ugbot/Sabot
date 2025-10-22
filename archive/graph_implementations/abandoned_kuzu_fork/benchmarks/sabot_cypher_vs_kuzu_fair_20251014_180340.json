@@ -1,0 +1,258 @@
+{
+  "metadata": {
+    "timestamp": "2025-10-14 18:03:40",
+    "python_version": "3.13.7",
+    "pyarrow_version": "21.0.0",
+    "kuzu_version": "0.11.3",
+    "kuzu_available": true,
+    "test_graph_size": "1000 vertices, 3999 edges",
+    "comparison_type": "fair_python_api",
+    "study_reference": "https://github.com/prrao87/kuzudb-study"
+  },
+  "comparison_results": {
+    "Q1": {
+      "query": "\n                MATCH (follower:Person)-[:Follows]->(person:Person)\n                RETURN person.id AS personID, person.name AS name, count(follower.id) AS numFollowers\n                ORDER BY numFollowers DESC LIMIT 3\n            ",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Q1",
+        "query": "\n                MATCH (follower:Person)-[:Follows]->(person:Person)\n                RETURN person.id AS personID, person.name AS name, count(follower.id) AS numFollowers\n                ORDER BY numFollowers DESC LIMIT 3\n            ",
+        "success": true,
+        "avg_time_ms": 0.04963874816894531,
+        "min_time_ms": 0.03504753112792969,
+        "max_time_ms": 0.07295608520507812,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Q1",
+        "query": "\n                MATCH (follower:Person)-[:Follows]->(person:Person)\n                RETURN person.id AS personID, person.name AS name, count(follower.id) AS numFollowers\n                ORDER BY numFollowers DESC LIMIT 3\n            ",
+        "success": true,
+        "avg_time_ms": 1.5205860137939453,
+        "min_time_ms": 1.2240409851074219,
+        "max_time_ms": 1.979827880859375,
+        "success_count": 5,
+        "iterations": 5
+      }
+    },
+    "Q2": {
+      "query": "\n                MATCH (follower:Person)-[:Follows]->(person:Person)\n                WITH person, count(follower.id) as numFollowers\n                ORDER BY numFollowers DESC LIMIT 1\n                MATCH (person)\n                RETURN person.name AS name, numFollowers\n            ",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Q2",
+        "query": "\n                MATCH (follower:Person)-[:Follows]->(person:Person)\n                WITH person, count(follower.id) as numFollowers\n                ORDER BY numFollowers DESC LIMIT 1\n                MATCH (person)\n                RETURN person.name AS name, numFollowers\n            ",
+        "success": true,
+        "avg_time_ms": 0.019598007202148438,
+        "min_time_ms": 0.01811981201171875,
+        "max_time_ms": 0.0209808349609375,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Q2",
+        "query": "\n                MATCH (follower:Person)-[:Follows]->(person:Person)\n                WITH person, count(follower.id) as numFollowers\n                ORDER BY numFollowers DESC LIMIT 1\n                MATCH (person)\n                RETURN person.name AS name, numFollowers\n            ",
+        "success": true,
+        "avg_time_ms": 1.4098167419433594,
+        "min_time_ms": 1.2788772583007812,
+        "max_time_ms": 1.52587890625,
+        "success_count": 5,
+        "iterations": 5
+      }
+    },
+    "Q3": {
+      "query": "\n                MATCH (p:Person)\n                WHERE p.country = 'United States'\n                RETURN p.city AS city, avg(p.age) AS averageAge\n                ORDER BY averageAge LIMIT 5\n            ",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Q3",
+        "query": "\n                MATCH (p:Person)\n                WHERE p.country = 'United States'\n                RETURN p.city AS city, avg(p.age) AS averageAge\n                ORDER BY averageAge LIMIT 5\n            ",
+        "success": true,
+        "avg_time_ms": 0.0133514404296875,
+        "min_time_ms": 0.011682510375976562,
+        "max_time_ms": 0.01621246337890625,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Q3",
+        "query": "\n                MATCH (p:Person)\n                WHERE p.country = 'United States'\n                RETURN p.city AS city, avg(p.age) AS averageAge\n                ORDER BY averageAge LIMIT 5\n            ",
+        "success": true,
+        "avg_time_ms": 0.9470462799072266,
+        "min_time_ms": 0.8320808410644531,
+        "max_time_ms": 1.132965087890625,
+        "success_count": 5,
+        "iterations": 5
+      }
+    },
+    "Q4": {
+      "query": "\n                MATCH (p:Person)\n                WHERE p.age >= 30 AND p.age <= 40\n                RETURN p.country AS countries, count(p) AS personCounts\n                ORDER BY personCounts DESC LIMIT 3\n            ",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Q4",
+        "query": "\n                MATCH (p:Person)\n                WHERE p.age >= 30 AND p.age <= 40\n                RETURN p.country AS countries, count(p) AS personCounts\n                ORDER BY personCounts DESC LIMIT 3\n            ",
+        "success": true,
+        "avg_time_ms": 0.016641616821289062,
+        "min_time_ms": 0.014066696166992188,
+        "max_time_ms": 0.024080276489257812,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Q4",
+        "query": "\n                MATCH (p:Person)\n                WHERE p.age >= 30 AND p.age <= 40\n                RETURN p.country AS countries, count(p) AS personCounts\n                ORDER BY personCounts DESC LIMIT 3\n            ",
+        "success": true,
+        "avg_time_ms": 0.8916854858398438,
+        "min_time_ms": 0.7021427154541016,
+        "max_time_ms": 1.0678768157958984,
+        "success_count": 5,
+        "iterations": 5
+      }
+    },
+    "Q5": {
+      "query": "\n                MATCH (p:Person)\n                WHERE lower(p.gender) = 'male' AND p.city = 'City_1' AND p.country = 'United Kingdom'\n                RETURN count(p) AS numPersons\n            ",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Q5",
+        "query": "\n                MATCH (p:Person)\n                WHERE lower(p.gender) = 'male' AND p.city = 'City_1' AND p.country = 'United Kingdom'\n                RETURN count(p) AS numPersons\n            ",
+        "success": true,
+        "avg_time_ms": 0.0156402587890625,
+        "min_time_ms": 0.013113021850585938,
+        "max_time_ms": 0.0209808349609375,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Q5",
+        "query": "\n                MATCH (p:Person)\n                WHERE lower(p.gender) = 'male' AND p.city = 'City_1' AND p.country = 'United Kingdom'\n                RETURN count(p) AS numPersons\n            ",
+        "success": true,
+        "avg_time_ms": 0.47245025634765625,
+        "min_time_ms": 0.4229545593261719,
+        "max_time_ms": 0.5311965942382812,
+        "success_count": 5,
+        "iterations": 5
+      }
+    },
+    "Q6": {
+      "query": "\n                MATCH (p:Person)\n                WHERE lower(p.gender) = 'female'\n                RETURN count(p.id) AS numPersons, p.city AS city, p.country AS country\n                ORDER BY numPersons DESC LIMIT 5\n            ",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Q6",
+        "query": "\n                MATCH (p:Person)\n                WHERE lower(p.gender) = 'female'\n                RETURN count(p.id) AS numPersons, p.city AS city, p.country AS country\n                ORDER BY numPersons DESC LIMIT 5\n            ",
+        "success": true,
+        "avg_time_ms": 0.014543533325195312,
+        "min_time_ms": 0.012874603271484375,
+        "max_time_ms": 0.015974044799804688,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Q6",
+        "query": "\n                MATCH (p:Person)\n                WHERE lower(p.gender) = 'female'\n                RETURN count(p.id) AS numPersons, p.city AS city, p.country AS country\n                ORDER BY numPersons DESC LIMIT 5\n            ",
+        "success": true,
+        "avg_time_ms": 0.9005546569824219,
+        "min_time_ms": 0.8249282836914062,
+        "max_time_ms": 1.0287761688232422,
+        "success_count": 5,
+        "iterations": 5
+      }
+    },
+    "Q7": {
+      "query": "\n                MATCH (p:Person)\n                WHERE p.age >= 23 AND p.age <= 30 AND p.country = 'United States'\n                RETURN count(p.id) AS numPersons, p.state AS state, p.country AS country\n                ORDER BY numPersons DESC LIMIT 1\n            ",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Q7",
+        "query": "\n                MATCH (p:Person)\n                WHERE p.age >= 23 AND p.age <= 30 AND p.country = 'United States'\n                RETURN count(p.id) AS numPersons, p.state AS state, p.country AS country\n                ORDER BY numPersons DESC LIMIT 1\n            ",
+        "success": true,
+        "avg_time_ms": 0.014019012451171875,
+        "min_time_ms": 0.012874603271484375,
+        "max_time_ms": 0.015020370483398438,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Q7",
+        "query": "\n                MATCH (p:Person)\n                WHERE p.age >= 23 AND p.age <= 30 AND p.country = 'United States'\n                RETURN count(p.id) AS numPersons, p.state AS state, p.country AS country\n                ORDER BY numPersons DESC LIMIT 1\n            ",
+        "success": true,
+        "avg_time_ms": 0.820159912109375,
+        "min_time_ms": 0.7989406585693359,
+        "max_time_ms": 0.8628368377685547,
+        "success_count": 5,
+        "iterations": 5
+      }
+    },
+    "Q8": {
+      "query": "\n                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)\n                RETURN count(*) AS numPaths\n            ",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Q8",
+        "query": "\n                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)\n                RETURN count(*) AS numPaths\n            ",
+        "success": true,
+        "avg_time_ms": 0.01220703125,
+        "min_time_ms": 0.010013580322265625,
+        "max_time_ms": 0.01621246337890625,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Q8",
+        "query": "\n                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)\n                RETURN count(*) AS numPaths\n            ",
+        "success": true,
+        "avg_time_ms": 0.6690502166748047,
+        "min_time_ms": 0.6048679351806641,
+        "max_time_ms": 0.7753372192382812,
+        "success_count": 5,
+        "iterations": 5
+      }
+    },
+    "Q9": {
+      "query": "\n                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)\n                WHERE b.age < 50 AND c.age > 25\n                RETURN count(*) as numPaths\n            ",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Q9",
+        "query": "\n                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)\n                WHERE b.age < 50 AND c.age > 25\n                RETURN count(*) as numPaths\n            ",
+        "success": true,
+        "avg_time_ms": 0.012969970703125,
+        "min_time_ms": 0.011920928955078125,
+        "max_time_ms": 0.014781951904296875,
+        "success_count": 5,
+        "iterations": 5
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Q9",
+        "query": "\n                MATCH (a:Person)-[:Follows]->(b:Person)-[:Follows]->(c:Person)\n                WHERE b.age < 50 AND c.age > 25\n                RETURN count(*) as numPaths\n            ",
+        "success": true,
+        "avg_time_ms": 1.2842178344726562,
+        "min_time_ms": 1.1730194091796875,
+        "max_time_ms": 1.3709068298339844,
+        "success_count": 5,
+        "iterations": 5
+      }
+    }
+  },
+  "summary": {
+    "sabot_cypher": {
+      "total_queries": 9,
+      "successful_queries": 9,
+      "success_rate": 100.0,
+      "avg_execution_time_ms": 0.018734402126736112
+    },
+    "kuzu": {
+      "total_queries": 9,
+      "successful_queries": 9,
+      "success_rate": 100.0,
+      "avg_execution_time_ms": 0.9906185997856988
+    },
+    "comparison": {
+      "performance_ratio": 52.87697963800905,
+      "sabot_faster": true,
+      "speedup_factor": 52.87697963800905
+    }
+  }
+}

@@ -7,13 +7,12 @@
 #include <arrow/api.h>
 #include <arrow/result.h>
 
-// SabotSQL core includes
-#include "sabot_sql.hpp"
-#include "sabot_sql/planner/logical_operator.hpp"
-#include "sabot_sql/parser/parser.hpp"
-#include "sabot_sql/planner/binder.hpp"
-#include "sabot_sql/planner/planner.hpp"
-#include "sabot_sql/optimizer/optimizer.hpp"
+// Forward declarations from sabot_sql_core
+namespace sabot_sql {
+    class SabotSQL;  // Main database class (NOT Database!)
+    class Connection;
+    class LogicalOperator;
+}
 
 // SabotSQL execution
 #include "sabot_sql/execution/morsel_executor.h"
@@ -78,8 +77,9 @@ public:
     
     /**
      * @brief Get SabotSQL connection (for advanced use)
+     * @note Not available in minimal parser-only implementation
      */
-    sabot_sql::Connection& GetConnection() { return *connection_; }
+    // sabot_sql::Connection& GetConnection() { return *connection_; }
     
     /**
      * @brief Check if a table exists
@@ -89,10 +89,12 @@ public:
 private:
     explicit SabotSQLBridge(const std::string& database_path);
 
-    std::unique_ptr<sabot_sql::Database> database_;
-    std::unique_ptr<sabot_sql::Connection> connection_;
+    // Minimal implementation doesn't use database/connection
+    // std::unique_ptr<sabot_sql::SabotSQL> database_;
+    // std::unique_ptr<sabot_sql::Connection> connection_;
+    std::string database_path_;
     std::unordered_map<std::string, std::shared_ptr<arrow::Table>> registered_tables_;
-    
+
     // Morsel executor for Sabot's execution engine
     std::shared_ptr<execution::MorselExecutor> morsel_executor_;
 

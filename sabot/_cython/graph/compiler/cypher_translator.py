@@ -311,26 +311,38 @@ class CypherTranslator:
 
     def _translate_2hop(self, pattern: Pattern, where: Optional[Expression]) -> pa.Table:
         """
-        Translate 2-hop pattern: (a)-[r]->(b)
+        Translate simple edge pattern: (a)-[r]->(b)
+
+        This is a 1-edge pattern (confusingly named "2hop" because it has 2 nodes).
+        Just return edges that match the pattern, not multi-hop paths.
 
         Example:
             MATCH (a:Person)-[:KNOWS]->(b:Person) WHERE a.age > 18
 
         Translation:
-            1. Filter vertices by label 'Person'
-            2. Filter edges by type 'KNOWS'
-            3. Apply WHERE filter on 'a' vertices
-            4. Call match_2hop(filtered_vertices, edges)
+            1. Get edges table
+            2. Filter edges by type if specified
+            3. Join with vertices if labels or filters needed
+            4. Return matched edges
         """
         element = pattern.elements[0]
         node_a, node_b = element.nodes[0], element.nodes[1]
         edge = element.edges[0]
 
         # Get base edge table
-        if not self.graph_engine._edges_table:
+        if self.graph_engine._edges_table is None:
             raise ValueError("No edges loaded in graph")
 
         edges_table = self.graph_engine._edges_table
+
+        # Handle empty edge table
+        if edges_table.num_rows == 0:
+            # Return empty result with correct schema
+            # Use _id suffix for property access support
+            return pa.table({
+                f"{node_a.variable}_id": pa.array([], type=pa.int64()),
+                f"{node_b.variable}_id": pa.array([], type=pa.int64())
+            })
 
         # Filter edges by type if specified
         if edge.types:
@@ -339,17 +351,39 @@ class CypherTranslator:
             mask = pc.equal(edges_table.column('label'), pa.scalar(edge_type))
             edges_table = edges_table.filter(mask)
 
-        # Convert to simple edge table for pattern matching
-        edge_pattern_table = pa.table({
-            'source': edges_table.column('source'),
-            'target': edges_table.column('target')
+        # Filter by node labels if specified
+        if node_a.labels or node_b.labels:
+            vertices_table = self.graph_engine._vertices_table
+            if vertices_table is None:
+                raise ValueError("No vertices loaded in graph")
+
+            # Filter source nodes by label
+            if node_a.labels:
+                label_a = node_a.labels[0]
+                mask = pc.equal(vertices_table.column('label'), pa.scalar(label_a))
+                valid_sources = vertices_table.filter(mask).column('id')
+                # Filter edges to only those with valid sources
+                mask = pc.is_in(edges_table.column('source'), value_set=valid_sources)
+                edges_table = edges_table.filter(mask)
+
+            # Filter target nodes by label
+            if node_b.labels:
+                label_b = node_b.labels[0]
+                mask = pc.equal(vertices_table.column('label'), pa.scalar(label_b))
+                valid_targets = vertices_table.filter(mask).column('id')
+                # Filter edges to only those with valid targets
+                mask = pc.is_in(edges_table.column('target'), value_set=valid_targets)
+                edges_table = edges_table.filter(mask)
+
+        # Build result table with source and target
+        # Use _id suffix for variable names to support property access
+        # For MATCH (a)-[r]->(b), return table with columns 'a_id' and 'b_id'
+        result_table = pa.table({
+            f"{node_a.variable}_id": edges_table.column('source'),
+            f"{node_b.variable}_id": edges_table.column('target')
         })
 
-        # Execute 2-hop pattern match
-        result = match_2hop(edge_pattern_table, edge_pattern_table)
-        result_table = result.result_table()
-
-        # Apply WHERE filters
+        # Apply WHERE filters if present
         if where:
             result_table = self._apply_where_filter(result_table, where, element)
 
@@ -357,18 +391,30 @@ class CypherTranslator:
 
     def _translate_3hop(self, pattern: Pattern, where: Optional[Expression]) -> pa.Table:
         """
-        Translate 3-hop pattern: (a)-[r1]->(b)-[r2]->(c)
+        Translate 2-hop pattern (3 nodes): (a)-[r1]->(b)-[r2]->(c)
+
+        This is called "3hop" because it has 3 nodes, but it's actually a 2-hop path.
 
         Example:
             MATCH (a:Person)-[:KNOWS]->(b)-[:KNOWS]->(c)
         """
         element = pattern.elements[0]
+        node_a, node_b, node_c = element.nodes[0], element.nodes[1], element.nodes[2]
         edge1, edge2 = element.edges[0], element.edges[1]
 
         # Get base edge table
         edges_table = self.graph_engine._edges_table
-        if not edges_table:
+        if edges_table is None:
             raise ValueError("No edges loaded in graph")
+
+        # Handle empty edge table
+        if edges_table.num_rows == 0:
+            # Return empty result with correct schema
+            return pa.table({
+                f"{node_a.variable}_id": pa.array([], type=pa.int64()),
+                f"{node_b.variable}_id": pa.array([], type=pa.int64()),
+                f"{node_c.variable}_id": pa.array([], type=pa.int64())
+            })
 
         # Filter edge1 by type
         edges1_table = edges_table
@@ -382,6 +428,40 @@ class CypherTranslator:
             mask = pc.equal(edges_table.column('label'), pa.scalar(edge2.types[0]))
             edges2_table = edges_table.filter(mask)
 
+        # Filter by node labels if specified
+        if node_a.labels or node_b.labels or node_c.labels:
+            vertices_table = self.graph_engine._vertices_table
+            if vertices_table is None:
+                raise ValueError("No vertices loaded in graph")
+
+            # Filter source nodes (node_a)
+            if node_a.labels:
+                label_a = node_a.labels[0]
+                mask = pc.equal(vertices_table.column('label'), pa.scalar(label_a))
+                valid_sources = vertices_table.filter(mask).column('id')
+                mask = pc.is_in(edges1_table.column('source'), value_set=valid_sources)
+                edges1_table = edges1_table.filter(mask)
+
+            # Filter intermediate nodes (node_b) - must match in both edges
+            if node_b.labels:
+                label_b = node_b.labels[0]
+                mask = pc.equal(vertices_table.column('label'), pa.scalar(label_b))
+                valid_intermediates = vertices_table.filter(mask).column('id')
+                # Filter edge1 targets
+                mask = pc.is_in(edges1_table.column('target'), value_set=valid_intermediates)
+                edges1_table = edges1_table.filter(mask)
+                # Filter edge2 sources
+                mask = pc.is_in(edges2_table.column('source'), value_set=valid_intermediates)
+                edges2_table = edges2_table.filter(mask)
+
+            # Filter target nodes (node_c)
+            if node_c.labels:
+                label_c = node_c.labels[0]
+                mask = pc.equal(vertices_table.column('label'), pa.scalar(label_c))
+                valid_targets = vertices_table.filter(mask).column('id')
+                mask = pc.is_in(edges2_table.column('target'), value_set=valid_targets)
+                edges2_table = edges2_table.filter(mask)
+
         # Convert to pattern matching format
         e1 = pa.table({
             'source': edges1_table.column('source'),
@@ -392,9 +472,31 @@ class CypherTranslator:
             'target': edges2_table.column('target')
         })
 
-        # Execute 3-hop pattern match
-        result = match_3hop(e1, e2, e2)
+        # Execute 2-hop pattern match to find paths A->B->C
+        # Use simple variable names for match_2hop
+        result = match_2hop(
+            e1, e2,
+            source_name=node_a.variable,
+            intermediate_name=node_b.variable,
+            target_name=node_c.variable
+        )
         result_table = result.result_table()
+
+        # Rename columns to use _id suffix for property access support
+        # match_2hop returns columns named 'a', 'b', 'c' - we need 'a_id', 'b_id', 'c_id'
+        column_mapping = {
+            node_a.variable: f"{node_a.variable}_id",
+            node_b.variable: f"{node_b.variable}_id",
+            node_c.variable: f"{node_c.variable}_id"
+        }
+
+        # Rename columns
+        new_columns = {}
+        for old_name in result_table.column_names:
+            new_name = column_mapping.get(old_name, old_name)
+            new_columns[new_name] = result_table.column(old_name)
+
+        result_table = pa.table(new_columns)
 
         # Apply WHERE filters
         if where:

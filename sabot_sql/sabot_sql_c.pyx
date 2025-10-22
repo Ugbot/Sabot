@@ -111,3 +111,4 @@ def create_sabot_sql_bridge():
     """Create a new SabotSQL bridge"""
     return SabotSQLBridge()
 
+

@@ -1,0 +1,131 @@
+{
+  "metadata": {
+    "timestamp": "2025-10-14 13:39:04",
+    "python_version": "3.13.7",
+    "pyarrow_version": "21.0.0",
+    "kuzu_available": true,
+    "test_graph_size": "100 vertices, 300 edges",
+    "comparison_type": "simple_cli"
+  },
+  "comparison_results": {
+    "Simple_Scan": {
+      "query": "MATCH (a) RETURN a LIMIT 10",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Simple_Scan",
+        "query": "MATCH (a) RETURN a LIMIT 10",
+        "success": true,
+        "avg_time_ms": 0.16538302103678384,
+        "min_time_ms": 0.011920928955078125,
+        "max_time_ms": 0.3142356872558594,
+        "success_count": 3,
+        "iterations": 3
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Simple_Scan",
+        "query": "MATCH (a) RETURN a LIMIT 10",
+        "success": true,
+        "avg_time_ms": 38.56166203816732,
+        "min_time_ms": 33.85210037231445,
+        "max_time_ms": 47.63388633728027,
+        "success_count": 3,
+        "iterations": 3
+      }
+    },
+    "Count_All": {
+      "query": "MATCH (a) RETURN count(*)",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Count_All",
+        "query": "MATCH (a) RETURN count(*)",
+        "success": true,
+        "avg_time_ms": 0.033696492513020836,
+        "min_time_ms": 0.013113021850585938,
+        "max_time_ms": 0.07319450378417969,
+        "success_count": 3,
+        "iterations": 3
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Count_All",
+        "query": "MATCH (a) RETURN count(*)",
+        "success": true,
+        "avg_time_ms": 32.9428513844808,
+        "min_time_ms": 32.270193099975586,
+        "max_time_ms": 33.61940383911133,
+        "success_count": 3,
+        "iterations": 3
+      }
+    },
+    "Filter_Age": {
+      "query": "MATCH (a) WHERE a.age > 30 RETURN a.name LIMIT 5",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Filter_Age",
+        "query": "MATCH (a) WHERE a.age > 30 RETURN a.name LIMIT 5",
+        "success": true,
+        "avg_time_ms": 0.025351842244466145,
+        "min_time_ms": 0.010013580322265625,
+        "max_time_ms": 0.051975250244140625,
+        "success_count": 3,
+        "iterations": 3
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Filter_Age",
+        "query": "MATCH (a) WHERE a.age > 30 RETURN a.name LIMIT 5",
+        "success": true,
+        "avg_time_ms": 36.02210680643717,
+        "min_time_ms": 35.12406349182129,
+        "max_time_ms": 37.13202476501465,
+        "success_count": 3,
+        "iterations": 3
+      }
+    },
+    "Two_Hop": {
+      "query": "MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name LIMIT 5",
+      "sabot_cypher": {
+        "engine": "SabotCypher",
+        "query_id": "Two_Hop",
+        "query": "MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name LIMIT 5",
+        "success": true,
+        "avg_time_ms": 0.02964337666829427,
+        "min_time_ms": 0.010967254638671875,
+        "max_time_ms": 0.0629425048828125,
+        "success_count": 3,
+        "iterations": 3
+      },
+      "kuzu": {
+        "engine": "Kuzu",
+        "query_id": "Two_Hop",
+        "query": "MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name LIMIT 5",
+        "success": true,
+        "avg_time_ms": 35.63531239827474,
+        "min_time_ms": 33.31112861633301,
+        "max_time_ms": 38.728952407836914,
+        "success_count": 3,
+        "iterations": 3
+      }
+    }
+  },
+  "summary": {
+    "sabot_cypher": {
+      "total_queries": 4,
+      "successful_queries": 4,
+      "success_rate": 100.0,
+      "avg_execution_time_ms": 0.06351868311564127
+    },
+    "kuzu": {
+      "total_queries": 4,
+      "successful_queries": 4,
+      "success_rate": 100.0,
+      "avg_execution_time_ms": 35.79048315684001
+    },
+    "comparison": {
+      "performance_ratio": 563.4638723803567,
+      "sabot_faster": true,
+      "speedup_factor": 563.4638723803567
+    }
+  }
+}

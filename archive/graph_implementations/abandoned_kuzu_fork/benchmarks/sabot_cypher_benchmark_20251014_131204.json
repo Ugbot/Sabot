@@ -1,0 +1,231 @@
+{
+  "metadata": {
+    "timestamp": "2025-10-14 13:12:04",
+    "python_version": "3.13.7",
+    "pyarrow_version": "21.0.0"
+  },
+  "q1_q9": {
+    "Q1": {
+      "query_id": "Q1",
+      "query": "MATCH (a:Person) RETURN a.name LIMIT 10",
+      "success": true,
+      "avg_time_ms": 0.2063910166422526,
+      "min_time_ms": 0.011920928955078125,
+      "max_time_ms": 0.39005279541015625,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Q2": {
+      "query_id": "Q2",
+      "query": "MATCH (a:Person) WITH a, count(*) as c RETURN c ORDER BY c LIMIT 5",
+      "success": true,
+      "avg_time_ms": 0.011682510375976562,
+      "min_time_ms": 0.010967254638671875,
+      "max_time_ms": 0.013113021850585938,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Q3": {
+      "query_id": "Q3",
+      "query": "MATCH (a:Person)-[:KNOWS]->(b:Person) RETURN a.name, b.name LIMIT 10",
+      "success": true,
+      "avg_time_ms": 0.008980433146158854,
+      "min_time_ms": 0.008821487426757812,
+      "max_time_ms": 0.009059906005859375,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Q4": {
+      "query_id": "Q4",
+      "query": "MATCH (a:Person)-[:KNOWS]->(b:Person)-[:KNOWS]->(c:Person) RETURN count(*)",
+      "success": true,
+      "avg_time_ms": 0.007867813110351562,
+      "min_time_ms": 0.007867813110351562,
+      "max_time_ms": 0.007867813110351562,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Q5": {
+      "query_id": "Q5",
+      "query": "MATCH (a:Person) WITH a, count(*) as c WHERE c > 1 RETURN a.name ORDER BY c LIMIT 10",
+      "success": true,
+      "avg_time_ms": 0.010013580322265625,
+      "min_time_ms": 0.010013580322265625,
+      "max_time_ms": 0.010013580322265625,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Q6": {
+      "query_id": "Q6",
+      "query": "MATCH (a:Person) WHERE a.age > 30 RETURN a.name ORDER BY a.age LIMIT 10",
+      "success": true,
+      "avg_time_ms": 0.008344650268554688,
+      "min_time_ms": 0.007867813110351562,
+      "max_time_ms": 0.008821487426757812,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Q7": {
+      "query_id": "Q7",
+      "query": "MATCH (a:Person) WITH a, count(*) as c ORDER BY c LIMIT 5 RETURN a.name",
+      "success": true,
+      "avg_time_ms": 0.010649363199869791,
+      "min_time_ms": 0.009775161743164062,
+      "max_time_ms": 0.011205673217773438,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Q8": {
+      "query_id": "Q8",
+      "query": "MATCH (a:Person)-[:KNOWS]->(b:Person) WHERE a.city = 'NYC' RETURN a.name, b.name LIMIT 10",
+      "success": true,
+      "avg_time_ms": 0.009139378865559896,
+      "min_time_ms": 0.009059906005859375,
+      "max_time_ms": 0.009298324584960938,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Q9": {
+      "query_id": "Q9",
+      "query": "MATCH (a:Person)-[:KNOWS]->(b:Person)-[:KNOWS]->(c:Person) WHERE a.age > b.age RETURN count(*)",
+      "success": true,
+      "avg_time_ms": 0.03131230672200521,
+      "min_time_ms": 0.009298324584960938,
+      "max_time_ms": 0.05984306335449219,
+      "success_count": 3,
+      "iterations": 3
+    }
+  },
+  "operators": {
+    "Scan": {
+      "query_id": "Scan",
+      "query": "MATCH (a:Person) RETURN a.id LIMIT 100",
+      "success": true,
+      "avg_time_ms": 0.008980433146158854,
+      "min_time_ms": 0.007867813110351562,
+      "max_time_ms": 0.010013580322265625,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Filter": {
+      "query_id": "Filter",
+      "query": "MATCH (a:Person) WHERE a.age > 25 AND a.age < 35 RETURN a.name LIMIT 50",
+      "success": true,
+      "avg_time_ms": 0.010649363199869791,
+      "min_time_ms": 0.008821487426757812,
+      "max_time_ms": 0.012159347534179688,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Project": {
+      "query_id": "Project",
+      "query": "MATCH (a:Person) RETURN a.name, a.age, a.city LIMIT 100",
+      "success": true,
+      "avg_time_ms": 0.008344650268554688,
+      "min_time_ms": 0.007867813110351562,
+      "max_time_ms": 0.009059906005859375,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Aggregate": {
+      "query_id": "Aggregate",
+      "query": "MATCH (a:Person) RETURN count(*)",
+      "success": true,
+      "avg_time_ms": 0.0073909759521484375,
+      "min_time_ms": 0.0069141387939453125,
+      "max_time_ms": 0.008344650268554688,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "OrderBy": {
+      "query_id": "OrderBy",
+      "query": "MATCH (a:Person) RETURN a.name ORDER BY a.age LIMIT 100",
+      "success": true,
+      "avg_time_ms": 0.008344650268554688,
+      "min_time_ms": 0.007867813110351562,
+      "max_time_ms": 0.009059906005859375,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Limit": {
+      "query_id": "Limit",
+      "query": "MATCH (a:Person) RETURN a.name LIMIT 1",
+      "success": true,
+      "avg_time_ms": 0.0077088673909505205,
+      "min_time_ms": 0.0069141387939453125,
+      "max_time_ms": 0.008106231689453125,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Match2Hop": {
+      "query_id": "Match2Hop",
+      "query": "MATCH (a:Person)-[:KNOWS]->(b:Person) RETURN a.id, b.id LIMIT 50",
+      "success": true,
+      "avg_time_ms": 0.009059906005859375,
+      "min_time_ms": 0.008106231689453125,
+      "max_time_ms": 0.010013580322265625,
+      "success_count": 3,
+      "iterations": 3
+    },
+    "Match3Hop": {
+      "query_id": "Match3Hop",
+      "query": "MATCH (a:Person)-[:KNOWS]->(b:Person)-[:KNOWS]->(c:Person) RETURN a.id, c.id LIMIT 20",
+      "success": true,
+      "avg_time_ms": 0.009695688883463541,
+      "min_time_ms": 0.009059906005859375,
+      "max_time_ms": 0.010013580322265625,
+      "success_count": 3,
+      "iterations": 3
+    }
+  },
+  "scalability": {
+    "100v_300e": {
+      "query_id": "Scale_100v",
+      "query": "MATCH (a:Person) RETURN a.name LIMIT 10",
+      "success": true,
+      "avg_time_ms": 0.015338261922200521,
+      "min_time_ms": 0.009059906005859375,
+      "max_time_ms": 0.027179718017578125,
+      "success_count": 3,
+      "iterations": 3,
+      "num_vertices": 100,
+      "num_edges": 300
+    },
+    "500v_1500e": {
+      "query_id": "Scale_500v",
+      "query": "MATCH (a:Person) RETURN a.name LIMIT 10",
+      "success": true,
+      "avg_time_ms": 0.013987223307291666,
+      "min_time_ms": 0.007867813110351562,
+      "max_time_ms": 0.025033950805664062,
+      "success_count": 3,
+      "iterations": 3,
+      "num_vertices": 500,
+      "num_edges": 1500
+    },
+    "1000v_3000e": {
+      "query_id": "Scale_1000v",
+      "query": "MATCH (a:Person) RETURN a.name LIMIT 10",
+      "success": true,
+      "avg_time_ms": 0.009059906005859375,
+      "min_time_ms": 0.007152557373046875,
+      "max_time_ms": 0.012159347534179688,
+      "success_count": 3,
+      "iterations": 3,
+      "num_vertices": 1000,
+      "num_edges": 3000
+    },
+    "2000v_6000e": {
+      "query_id": "Scale_2000v",
+      "query": "MATCH (a:Person) RETURN a.name LIMIT 10",
+      "success": true,
+      "avg_time_ms": 0.010013580322265625,
+      "min_time_ms": 0.007867813110351562,
+      "max_time_ms": 0.014066696166992188,
+      "success_count": 3,
+      "iterations": 3,
+      "num_vertices": 2000,
+      "num_edges": 6000
+    }
+  }
+}

@@ -45,15 +45,15 @@ class GraphAPI:
         """Lazy-load Cypher engine."""
         if self._cypher_engine is None:
             try:
-                from sabot_cypher import create_cypher_engine
-                self._cypher_engine = create_cypher_engine()
-                logger.info("Initialized Cypher engine")
+                from sabot._cython.graph.engine.query_engine import GraphQueryEngine
+                self._cypher_engine = GraphQueryEngine()
+                logger.info("Initialized Cypher engine (GraphQueryEngine)")
             except ImportError as e:
-                logger.error(f"Failed to load sabot_cypher: {e}")
+                logger.error(f"Failed to load GraphQueryEngine: {e}")
                 raise ImportError(
-                    "sabot_cypher not available. Ensure it's built and installed."
+                    "GraphQueryEngine not available. Check sabot._cython.graph installation."
                 ) from e
-        
+
         return self._cypher_engine
     
     def _get_sparql_engine(self):
@@ -90,10 +90,10 @@ class GraphAPI:
             ''')
         """
         cypher_engine = self._get_cypher_engine()
-        
+
         try:
-            result = cypher_engine.execute(query)
-            return self._wrap_result(result, 'cypher', options)
+            result = cypher_engine.query_cypher(query)
+            return self._wrap_result(result.table, 'cypher', options)
         except Exception as e:
             logger.error(f"Cypher execution failed: {e}")
             raise

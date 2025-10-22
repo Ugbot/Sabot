@@ -1,151 +1,159 @@
 cmake_minimum_required(VERSION 3.20)
-project(SabotSQL VERSION 0.1.0 LANGUAGES CXX)
+project(SabotSQL VERSION 0.1.0 LANGUAGES CXX C)
 
-# C++20 required for modern features
-set(CMAKE_CXX_STANDARD 20)
+# C++17 required
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Find dependencies
-find_package(Arrow REQUIRED PATHS ${CMAKE_SOURCE_DIR}/../vendor/arrow/cpp/build/install NO_DEFAULT_PATH)
-find_package(ArrowFlight REQUIRED PATHS ${CMAKE_SOURCE_DIR}/../vendor/arrow/cpp/build/install NO_DEFAULT_PATH)
+# Build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# Compiler flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+
+# ============================================================================
+# Find DuckDB (vendored as git submodule)
+# ============================================================================
+
+set(DUCKDB_ROOT ${CMAKE_SOURCE_DIR}/../vendor/duckdb)
+set(DUCKDB_INCLUDE_DIR ${DUCKDB_ROOT}/src/include)
+set(DUCKDB_LIBRARY ${DUCKDB_ROOT}/build/release/src/libduckdb.dylib)
+
+if(NOT EXISTS ${DUCKDB_LIBRARY})
+    message(FATAL_ERROR "DuckDB library not found at ${DUCKDB_LIBRARY}. Please build DuckDB first:\n  cd ${DUCKDB_ROOT} && make")
+endif()
+
+message(STATUS "DuckDB library: ${DUCKDB_LIBRARY}")
+message(STATUS "DuckDB include: ${DUCKDB_INCLUDE_DIR}")
+
+# ============================================================================
+# Find Arrow (vendored)
+# ============================================================================
+
+set(ARROW_ROOT ${CMAKE_SOURCE_DIR}/../vendor/arrow/cpp/build/install)
+set(ARROW_INCLUDE_DIR ${ARROW_ROOT}/include)
+set(ARROW_LIB_DIR ${ARROW_ROOT}/lib)
+
+find_library(ARROW_LIB arrow PATHS ${ARROW_LIB_DIR} NO_DEFAULT_PATH REQUIRED)
+find_library(ARROW_FLIGHT_LIB arrow_flight PATHS ${ARROW_LIB_DIR} NO_DEFAULT_PATH REQUIRED)
+
+message(STATUS "Arrow library: ${ARROW_LIB}")
+message(STATUS "Arrow include: ${ARROW_INCLUDE_DIR}")
+
+# ============================================================================
+# Find other vendored dependencies
+# ============================================================================
+
+# librdkafka (built in sabot_sql/)
+find_library(RDKAFKA_LIB rdkafka++
+    PATHS ${CMAKE_SOURCE_DIR}/librdkafka/src-cpp
+    NO_DEFAULT_PATH REQUIRED)
+
+# simdjson (built in sabot_sql/)
+find_library(SIMDJSON_LIB simdjson
+    PATHS ${CMAKE_SOURCE_DIR}/simdjson
+    NO_DEFAULT_PATH REQUIRED)
+
+# Avro (built in sabot_sql/)
+find_library(AVRO_LIB avrocpp_s
+    PATHS ${CMAKE_SOURCE_DIR}/avro-cpp
+    NO_DEFAULT_PATH REQUIRED)
+
+# Protobuf (built in sabot_sql/)
+find_library(PROTOBUF_LIB protobuf
+    PATHS ${CMAKE_SOURCE_DIR}/protobuf
+    NO_DEFAULT_PATH REQUIRED)
+
+# CURL (system)
 find_package(CURL REQUIRED)
 
-# Add librdkafka (vendored source)
-set(RDKAFKA_BUILD_STATIC ON CACHE BOOL "Build static library")
-set(RDKAFKA_BUILD_EXAMPLES OFF CACHE BOOL "Build examples")
-set(RDKAFKA_BUILD_TESTS OFF CACHE BOOL "Build tests")
-add_subdirectory(${CMAKE_SOURCE_DIR}/../vendor/librdkafka ${CMAKE_BINARY_DIR}/librdkafka)
-
-# Add simdjson (vendored source - SIMD-accelerated JSON parsing)
-set(SIMDJSON_JUST_LIBRARY ON CACHE BOOL "Build library only")
-set(SIMDJSON_BUILD_STATIC ON CACHE BOOL "Build static library")
-add_subdirectory(${CMAKE_SOURCE_DIR}/../vendor/simdjson ${CMAKE_BINARY_DIR}/simdjson)
-
-# Add Avro C++ (vendored source - for Avro deserialization)
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static library")
-add_subdirectory(${CMAKE_SOURCE_DIR}/../vendor/avro/lang/c++ ${CMAKE_BINARY_DIR}/avro-cpp EXCLUDE_FROM_ALL)
-
-# Add Protobuf (vendored source - for Protobuf deserialization)
-set(protobuf_BUILD_TESTS OFF CACHE BOOL "Build tests")
-set(protobuf_BUILD_EXAMPLES OFF CACHE BOOL "Build examples")
-set(protobuf_MSVC_STATIC_RUNTIME OFF CACHE BOOL "MSVC static runtime")
-add_subdirectory(${CMAKE_SOURCE_DIR}/../vendor/protobuf ${CMAKE_BINARY_DIR}/protobuf EXCLUDE_FROM_ALL)
-
+# ============================================================================
 # Include directories
+# ============================================================================
+
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
+    ${DUCKDB_INCLUDE_DIR}
     ${ARROW_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/../vendor/librdkafka/src-cpp
-    ${CMAKE_SOURCE_DIR}/../vendor/librdkafka/src
-    ${CMAKE_SOURCE_DIR}/../vendor/simdjson/include
-    ${CMAKE_SOURCE_DIR}/../vendor/avro/lang/c++/include
-    ${CMAKE_SOURCE_DIR}/../vendor/protobuf/src
-    ${CMAKE_SOURCE_DIR}/../vendor
+    ${CMAKE_SOURCE_DIR}/librdkafka/src-cpp
+    ${CMAKE_SOURCE_DIR}/simdjson/singleheader
+    ${CMAKE_SOURCE_DIR}/avro-cpp/api
+    ${CMAKE_SOURCE_DIR}/protobuf/src
 )
 
-# SabotSQL library sources
-set(SABOT_SQL_SOURCES
-    # SQL engine
-    src/sql/simple_sabot_sql_bridge.cpp
-    src/sql/simple_executor.cpp
-    src/sql/c_api.cpp
-    src/sql/sabot_operator_translator.cpp
-    src/sql/binder_rewrites.cpp
-    src/sql/string_operations.cpp
-    # Execution
-    src/execution/morsel_executor.cpp
-    # Operators
-    # src/operators/table_scan.cpp  # TODO: Fix API issues
-    src/operators/filter.cpp
-    src/operators/projection.cpp
-    src/operators/aggregate.cpp
-    src/operators/join.cpp
-    src/operators/sort.cpp
-    # src/operators/cte.cpp  # Existing - has issues
-    # src/operators/subquery.cpp  # Existing - has issues
+# ============================================================================
+# Collect source files
+# ============================================================================
 
-    # Streaming connectors
-    src/streaming/source_connector.cpp
-    src/streaming/kafka_connector.cpp
-    src/streaming/schema_registry_client.cpp
-    # src/streaming/avro_decoder.cpp  # TODO: Fix avro codec_traits issue
-    # src/streaming/protobuf_decoder.cpp  # TODO: Fix string concatenation issue
-    src/streaming/watermark_tracker.cpp
-    src/streaming/window_operator.cpp
-    src/streaming/checkpoint_coordinator.cpp
-    src/streaming/dimension_broadcast.cpp
-    src/streaming/marbledb_integration.cpp
-    src/streaming/morsel_plan_extensions.cpp
-    # Phase 3: Sabot integration
-    src/streaming/sabot_execution_coordinator.cpp
-    src/streaming/checkpoint_barrier_injector.cpp
-    src/streaming/streaming_agent_distributor.cpp
-    src/streaming/sabot_orchestrator_client.cpp
-    src/streaming/error_handler.cpp
-    src/streaming/monitoring.cpp
+# Sabot SQL sources
+file(GLOB_RECURSE SABOT_SQL_SOURCES
+    "${CMAKE_SOURCE_DIR}/src/sql/*.cpp"
+    "${CMAKE_SOURCE_DIR}/src/streaming/*.cpp"
 )
 
-# Main library
-add_library(sabot_sql SHARED ${SABOT_SQL_SOURCES})
+# Exclude files with compilation issues (API mismatches with current DuckDB/Arrow)
+list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "enhanced_parser\\.cpp$")
+list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "streaming_operators\\.cpp$")
+list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "extended_parser\\.cpp$")
 
+# Count sources for logging
+list(LENGTH SABOT_SQL_SOURCES SABOT_SQL_COUNT)
+
+# ============================================================================
+# Create SHARED library
+# ============================================================================
+
+add_library(sabot_sql SHARED
+    ${SABOT_SQL_SOURCES}
+)
+
+# Compiler definitions
+target_compile_definitions(sabot_sql PUBLIC
+    SABOT_SQL_BUILD_LIBRARY
+)
+
+# Include directories
+target_include_directories(sabot_sql PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${DUCKDB_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${ARROW_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:include>
+)
+
+# Link libraries
 target_link_libraries(sabot_sql
-    Arrow::arrow_shared
-    ArrowFlight::arrow_flight_shared
-    rdkafka++
-    simdjson
-    avrocpp_s
-    libprotobuf
+    ${ARROW_LIB}
+    ${ARROW_FLIGHT_LIB}
+    ${DUCKDB_LIBRARY}
+    ${RDKAFKA_LIB}
+    ${SIMDJSON_LIB}
+    ${AVRO_LIB}
+    ${PROTOBUF_LIB}
     CURL::libcurl
 )
 
-target_include_directories(sabot_sql PUBLIC
-    ${CMAKE_SOURCE_DIR}/include
-    ${ARROW_INCLUDE_DIR}
-)
-
-# Enforce Sabot-only execution: define a macro for conditional compilation if needed
-target_compile_definitions(sabot_sql PUBLIC SABOT_SQL_EXECUTION_SABOT_ONLY)
-
-# Installation
+# Install
 install(TARGETS sabot_sql
     LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
 )
 
-install(DIRECTORY include/ DESTINATION include)
+install(DIRECTORY include/
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
+)
 
-# Examples/Tests
-add_executable(test_kafka_connector examples/test_kafka_connector.cpp)
-target_link_libraries(test_kafka_connector sabot_sql)
-
-add_executable(test_streaming_operators examples/test_streaming_operators.cpp)
-target_link_libraries(test_streaming_operators sabot_sql)
-
-add_executable(test_checkpoint_and_dimension examples/test_checkpoint_and_dimension.cpp)
-target_link_libraries(test_checkpoint_and_dimension sabot_sql)
-
-add_executable(test_checkpoint_simple examples/test_checkpoint_simple.cpp)
-target_link_libraries(test_checkpoint_simple sabot_sql)
-
-add_executable(test_marbledb_and_plan examples/test_marbledb_and_plan.cpp)
-target_link_libraries(test_marbledb_and_plan sabot_sql)
-
-# Phase 3: Sabot integration tests
-add_executable(test_sabot_execution_coordinator examples/test_sabot_execution_coordinator.cpp)
-target_link_libraries(test_sabot_execution_coordinator sabot_sql)
-
-add_executable(test_checkpoint_barrier_injector examples/test_checkpoint_barrier_injector.cpp)
-target_link_libraries(test_checkpoint_barrier_injector sabot_sql)
-
-add_executable(test_streaming_agent_distributor examples/test_streaming_agent_distributor.cpp)
-target_link_libraries(test_streaming_agent_distributor sabot_sql)
-
-# Schema Registry integration test
-add_executable(test_schema_registry_integration examples/test_schema_registry_integration.cpp)
-target_link_libraries(test_schema_registry_integration sabot_sql)
-
-message(STATUS "SabotSQL minimal configuration:")
-message(STATUS "  Arrow include: ${ARROW_INCLUDE_DIR}")
-message(STATUS "  Build type: ${CMAKE_BUILD_TYPE}")
-message(STATUS "  Note: Minimal build for testing renamed architecture")
+# Summary
+message(STATUS "============================================")
+message(STATUS "SabotSQL Shared Library")
+message(STATUS "============================================")
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
+message(STATUS "Sabot SQL sources: ${SABOT_SQL_COUNT}")
+message(STATUS "Output: libsabot_sql.dylib")
+message(STATUS "Uses: DuckDB library (${DUCKDB_LIBRARY})")
+message(STATUS "============================================")

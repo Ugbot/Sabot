@@ -81,65 +81,74 @@ cdef class TripleStoreWrapper:
     def __init__(self, str db_path):
         """
         Open or create triple store.
-        
+
         Args:
             db_path: Path to MarbleDB database
         """
-        self._db_path = db_path
-        # TODO: Initialize MarbleDB and create TripleStore/Vocabulary
-        # For now, this is a stub - actual C++ initialization needed
+        raise NotImplementedError(
+            "TripleStoreWrapper not yet implemented. C++ initialization needs wiring.\n"
+            "Implementation needed: Initialize MarbleDB and create TripleStore/Vocabulary objects."
+        )
     
     def insert_triple(self, str subject, str predicate, str object):
         """
         Insert a single RDF triple.
-        
+
         Args:
             subject: Subject IRI or literal
             predicate: Predicate IRI
             object: Object IRI or literal
         """
-        # TODO: Convert to Term, add to vocabulary, insert triple
-        pass
+        raise NotImplementedError(
+            "insert_triple() not yet implemented.\n"
+            "Implementation needed: Convert to Term, add to vocabulary, insert into TripleStore."
+        )
     
     def insert_triples_batch(self, object batch):
         """
         Insert batch of triples from Arrow RecordBatch.
-        
+
         Expects schema: {subject: string, predicate: string, object: string}
-        
+
         Args:
             batch: PyArrow RecordBatch with RDF triples
         """
-        # TODO: Convert Arrow batch to triples and insert
-        pass
+        raise NotImplementedError(
+            "insert_triples_batch() not yet implemented.\n"
+            "Implementation needed: Convert Arrow batch to triples and insert into TripleStore."
+        )
     
     def query_sparql(self, str sparql_query):
         """
         Execute SPARQL query and return Arrow Table.
-        
+
         Args:
             sparql_query: SPARQL SELECT query string
-            
+
         Returns:
             PyArrow Table with query results
         """
-        # TODO: Parse SPARQL, execute, return Arrow Table
-        pass
+        raise NotImplementedError(
+            "query_sparql() not yet implemented.\n"
+            "Implementation needed: Parse SPARQL, execute with QueryEngine, return Arrow Table."
+        )
     
     def lookup_pattern(self, subject=None, predicate=None, object=None):
         """
         Lookup triples matching pattern (fast path for simple queries).
-        
+
         Args:
             subject: Subject IRI (or None for wildcard)
             predicate: Predicate IRI (or None for wildcard)
             object: Object IRI (or None for wildcard)
-            
+
         Returns:
             PyArrow Table with matching triples
         """
-        # TODO: Build TriplePattern and call ScanPattern
-        pass
+        raise NotImplementedError(
+            "lookup_pattern() not yet implemented.\n"
+            "Implementation needed: Build TriplePattern and call TripleStore.ScanPattern()."
+        )
 
 
 # ============================================================================
@@ -248,8 +257,10 @@ class TripleLookupOperator:
                 results.append(result)
         
         # Combine results with original batch
-        # TODO: Implement Arrow join/concatenation
-        return batch
+        raise NotImplementedError(
+            "_enrich_batch() not yet implemented.\n"
+            "Implementation needed: Implement Arrow join/concatenation of triple lookup results."
+        )
 
 
 # ============================================================================
@@ -272,13 +283,15 @@ def create_triple_store(db_path: str) -> TripleStoreWrapper:
 def load_ntriples(triple_store: TripleStoreWrapper, ntriples_file: str):
     """
     Load N-Triples file into triple store.
-    
+
     Args:
         triple_store: SabotQL triple store
         ntriples_file: Path to .nt file
     """
-    # TODO: Use NTriplesParser from C++ to load file
-    pass
+    raise NotImplementedError(
+        "load_ntriples() not yet implemented.\n"
+        "Implementation needed: Use NTriplesParser from C++ to parse and load file."
+    )
 
 
 def sparql_to_arrow(sparql_query: str, triple_store: TripleStoreWrapper):

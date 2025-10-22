@@ -1,0 +1,77 @@
+# Minimal CMakeLists for Kuzu Frontend Only
+# This builds parser, binder, planner, optimizer, catalog, common, function, main
+# WITHOUT processor (physical execution) or storage layers
+
+cmake_minimum_required(VERSION 3.15)
+project(KuzuFrontend VERSION 0.11.2 LANGUAGES CXX C)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# Find Threads
+find_package(Threads REQUIRED)
+
+# Include directories
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+)
+
+# Collect source files for frontend components
+file(GLOB_RECURSE KUZU_PARSER_SOURCES "src/parser/*.cpp")
+file(GLOB_RECURSE KUZU_BINDER_SOURCES "src/binder/*.cpp")
+file(GLOB_RECURSE KUZU_PLANNER_SOURCES "src/planner/*.cpp")
+file(GLOB_RECURSE KUZU_OPTIMIZER_SOURCES "src/optimizer/*.cpp")
+file(GLOB_RECURSE KUZU_CATALOG_SOURCES "src/catalog/*.cpp")
+file(GLOB_RECURSE KUZU_COMMON_SOURCES "src/common/*.cpp")
+file(GLOB_RECURSE KUZU_FUNCTION_SOURCES "src/function/*.cpp")
+file(GLOB_RECURSE KUZU_MAIN_SOURCES "src/main/*.cpp")
+file(GLOB_RECURSE KUZU_GRAPH_SOURCES "src/graph/*.cpp")
+file(GLOB_RECURSE KUZU_TRANSACTION_SOURCES "src/transaction/*.cpp")
+file(GLOB_RECURSE KUZU_EXPRESSION_EVAL_SOURCES "src/expression_evaluator/*.cpp")
+file(GLOB_RECURSE KUZU_EXTENSION_SOURCES "src/extension/*.cpp")
+file(GLOB_RECURSE KUZU_C_API_SOURCES "src/c_api/*.cpp")
+
+# Build third-party dependencies (minimal set needed)
+add_subdirectory(third_party/antlr4_cypher)
+add_subdirectory(third_party/re2)
+add_subdirectory(third_party/utf8proc)
+add_subdirectory(third_party/spdlog)
+
+# Create static library
+add_library(kuzu_frontend STATIC
+    ${KUZU_PARSER_SOURCES}
+    ${KUZU_BINDER_SOURCES}
+    ${KUZU_PLANNER_SOURCES}
+    ${KUZU_OPTIMIZER_SOURCES}
+    ${KUZU_CATALOG_SOURCES}
+    ${KUZU_COMMON_SOURCES}
+    ${KUZU_FUNCTION_SOURCES}
+    ${KUZU_MAIN_SOURCES}
+    ${KUZU_GRAPH_SOURCES}
+    ${KUZU_TRANSACTION_SOURCES}
+    ${KUZU_EXPRESSION_EVAL_SOURCES}
+    ${KUZU_EXTENSION_SOURCES}
+    ${KUZU_C_API_SOURCES}
+)
+
+target_include_directories(kuzu_frontend PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+)
+
+target_link_libraries(kuzu_frontend PUBLIC
+    Threads::Threads
+    antlr4_cypher
+    re2
+    utf8proc
+    spdlog
+)
+
+# Note: This is a minimal build
+# Some features may not work without full Kuzu build
+# But should be sufficient for parser → binder → planner → optimizer pipeline
+
+message(STATUS "Kuzu Frontend library configured (parser, binder, planner, optimizer only)")
+

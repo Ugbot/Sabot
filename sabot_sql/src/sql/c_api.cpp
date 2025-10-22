@@ -82,3 +82,4 @@ int sabot_sql_bridge_get_table_cols(ArrowTableHandle table) {
 
 } // extern "C"
 
+

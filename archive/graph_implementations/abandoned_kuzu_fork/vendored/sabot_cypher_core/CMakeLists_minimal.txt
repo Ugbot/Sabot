@@ -1,0 +1,75 @@
+cmake_minimum_required(VERSION 3.15)
+project(KuzuFrontend VERSION 0.11.2 LANGUAGES CXX C)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# Find Threads
+find_package(Threads REQUIRED)
+
+# Build third-party dependencies first
+add_subdirectory(third_party/antlr4_cypher)
+add_subdirectory(third_party/re2)
+add_subdirectory(third_party/utf8proc)
+
+# Include directories
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/antlr4_cypher/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/spdlog/spdlog
+)
+
+# Collect frontend source files
+file(GLOB_RECURSE PARSER_SOURCES "src/parser/*.cpp")
+file(GLOB_RECURSE BINDER_SOURCES "src/binder/*.cpp")
+file(GLOB_RECURSE PLANNER_SOURCES "src/planner/*.cpp")
+file(GLOB_RECURSE OPTIMIZER_SOURCES "src/optimizer/*.cpp")
+file(GLOB_RECURSE CATALOG_SOURCES "src/catalog/*.cpp")
+file(GLOB_RECURSE COMMON_SOURCES "src/common/*.cpp")
+file(GLOB_RECURSE FUNCTION_SOURCES "src/function/*.cpp")
+file(GLOB_RECURSE GRAPH_SOURCES "src/graph/*.cpp")
+file(GLOB_RECURSE TRANSACTION_SOURCES "src/transaction/*.cpp")
+file(GLOB_RECURSE EXPR_EVAL_SOURCES "src/expression_evaluator/*.cpp")
+
+# Exclude storage-dependent files
+list(FILTER COMMON_SOURCES EXCLUDE REGEX ".*buffer.*")
+list(FILTER COMMON_SOURCES EXCLUDE REGEX ".*storage.*")
+list(FILTER FUNCTION_SOURCES EXCLUDE REGEX ".*table_function.*")
+
+# Build static library
+add_library(kuzu_frontend STATIC
+    ${PARSER_SOURCES}
+    ${BINDER_SOURCES}
+    ${PLANNER_SOURCES}
+    ${OPTIMIZER_SOURCES}
+    ${CATALOG_SOURCES}
+    ${COMMON_SOURCES}
+    ${FUNCTION_SOURCES}
+    ${GRAPH_SOURCES}
+    ${TRANSACTION_SOURCES}
+    ${EXPR_EVAL_SOURCES}
+)
+
+target_include_directories(kuzu_frontend PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+)
+
+target_link_libraries(kuzu_frontend PUBLIC
+    Threads::Threads
+    antlr4_cypher
+    re2
+    utf8proc
+)
+
+target_compile_definitions(kuzu_frontend PUBLIC
+    KUZU_EXPORTS
+    ANTLR4CPP_STATIC
+)
+
+message(STATUS "Kuzu Frontend library: ${CMAKE_CURRENT_BINARY_DIR}/libkuzu_frontend.a")
+message(STATUS "  Parser, Binder, Planner, Optimizer only")
+message(STATUS "  Processor and Storage excluded")
+
