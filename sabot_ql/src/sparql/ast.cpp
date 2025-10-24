@@ -20,6 +20,11 @@ std::string ToString(const RDFTerm& term) {
     return std::visit([](const auto& t) { return t.ToString(); }, term);
 }
 
+// BlankNode constructor for RDF collections
+BlankNode::BlankNode(std::string i, std::shared_ptr<RDFTermList> items)
+    : id(std::move(i)), collection_items(std::move(items)) {
+}
+
 std::optional<std::string> TriplePattern::GetSubjectVar() const {
     if (auto* var = std::get_if<Variable>(&subject)) {
         return var->name;

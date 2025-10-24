@@ -40,9 +40,19 @@ arrow::Result<std::vector<Token>> SPARQLTokenizer::Tokenize() {
 
         char c = CurrentChar();
 
-        // Variable: ?name or $name
+        // Variable: ?name or $name (or ? quantifier in property paths)
         if (c == '?' || c == '$') {
-            tokens.push_back(ReadVariable());
+            // Check if this is a variable or a quantifier
+            // Variables must be followed by alphanumeric or underscore
+            // Quantifiers (?) appear after ), IRI, etc.
+            if (c == '?' && !IsAlphaNumeric(PeekChar()) && PeekChar() != '_') {
+                // It's a quantifier, not a variable
+                tokens.push_back(MakeToken(TokenType::QUESTION, "?"));
+                Advance();
+            } else {
+                // It's a variable
+                tokens.push_back(ReadVariable());
+            }
             continue;
         }
 
@@ -340,8 +350,12 @@ Token SPARQLTokenizer::ReadKeywordOrPrefixedName() {
         return Token(TokenType::PREFIX_LABEL, text, start_line, start_column);
     }
 
-    // Check if it's a keyword
-    auto keyword_type = LookupKeyword(text);
+    // Check if it's a keyword (case-insensitive)
+    std::string uppercase_text = text;
+    for (char& c : uppercase_text) {
+        c = std::toupper(static_cast<unsigned char>(c));
+    }
+    auto keyword_type = LookupKeyword(uppercase_text);
     if (keyword_type.has_value()) {
         return Token(*keyword_type, text, start_line, start_column);
     }
@@ -483,16 +497,20 @@ std::optional<TokenType> SPARQLTokenizer::LookupKeyword(const std::string& text)
         {"OFFSET", TokenType::OFFSET},
         {"AS", TokenType::AS},
         {"GROUP", TokenType::GROUP},
+        {"GRAPH", TokenType::GRAPH},
+        {"FROM", TokenType::FROM},
         {"VALUES", TokenType::VALUES},
         {"MINUS", TokenType::MINUS_KEYWORD},
         {"EXISTS", TokenType::EXISTS},
         {"NOT", TokenType::NOT_KEYWORD},
+        {"IN", TokenType::IN},
+        {"SEPARATOR", TokenType::SEPARATOR},
 
         // Built-in functions
         {"BOUND", TokenType::BOUND},
-        {"isIRI", TokenType::ISIRI},
-        {"isLiteral", TokenType::ISLITERAL},
-        {"isBlank", TokenType::ISBLANK},
+        {"ISIRI", TokenType::ISIRI},
+        {"ISLITERAL", TokenType::ISLITERAL},
+        {"ISBLANK", TokenType::ISBLANK},
         {"STR", TokenType::STR},
         {"LANG", TokenType::LANG},
         {"DATATYPE", TokenType::DATATYPE},
@@ -548,7 +566,8 @@ std::optional<TokenType> SPARQLTokenizer::LookupKeyword(const std::string& text)
         {"UUID", TokenType::UUID},
         {"STRUUID", TokenType::STRUUID},
         {"IRI", TokenType::IRI},
-        {"isNumeric", TokenType::ISNUMERIC},
+        {"URI", TokenType::URI},
+        {"ISNUMERIC", TokenType::ISNUMERIC},
         {"RAND", TokenType::RAND},
 
         // Aggregate functions
@@ -561,8 +580,8 @@ std::optional<TokenType> SPARQLTokenizer::LookupKeyword(const std::string& text)
         {"SAMPLE", TokenType::SAMPLE},
 
         // Boolean literals
-        {"true", TokenType::BOOLEAN},
-        {"false", TokenType::BOOLEAN},
+        {"TRUE", TokenType::BOOLEAN},
+        {"FALSE", TokenType::BOOLEAN},
     };
 
     auto it = keywords.find(text);
@@ -895,6 +914,15 @@ arrow::Result<ConstructQuery> SPARQLParser::ParseConstructQuery() {
     // Consume CONSTRUCT keyword
     ARROW_RETURN_NOT_OK(Expect(TokenType::CONSTRUCT, "Expected CONSTRUCT keyword"));
 
+    // Skip FROM clauses (we parse them but don't use them yet)
+    while (Match(TokenType::FROM)) {
+        // Expect IRI for FROM clause
+        if (!Check(TokenType::IRI_REF) && !Check(TokenType::PREFIX_LABEL)) {
+            return Error("Expected IRI after FROM");
+        }
+        Advance();  // Consume the IRI
+    }
+
     // Check for CONSTRUCT WHERE shorthand
     if (Check(TokenType::WHERE)) {
         Advance();  // Consume WHERE
@@ -966,7 +994,35 @@ arrow::Result<ConstructTemplate> SPARQLParser::ParseConstructTemplate() {
     // Parse triple patterns (same as basic graph pattern)
     while (!Check(TokenType::RBRACE) && !IsAtEnd()) {
         ARROW_ASSIGN_OR_RAISE(auto triple, ParseTriplePattern());
-        tmpl.triples.push_back(std::move(triple));
+        tmpl.triples.push_back(triple);
+
+        // Store subject and predicate for potential abbreviations
+        RDFTerm subject = triple.subject;
+        auto predicate = triple.predicate;
+
+        // Handle comma abbreviations: ?S :p ?O1, ?O2 (reuse subject+predicate)
+        while (Match(TokenType::COMMA)) {
+            ARROW_ASSIGN_OR_RAISE(auto object, ParseRDFTerm());
+            if (auto* term = std::get_if<RDFTerm>(&predicate)) {
+                tmpl.triples.push_back(TriplePattern(subject, *term, object));
+            } else if (auto* path = std::get_if<PropertyPath>(&predicate)) {
+                tmpl.triples.push_back(TriplePattern(subject, *path, object));
+            }
+        }
+
+        // Handle semicolon abbreviations: ?S :p1 ?O1 ; :p2 ?O2 (reuse subject)
+        while (Match(TokenType::SEMICOLON)) {
+            // Parse additional predicate-object pairs with same subject
+            ARROW_ASSIGN_OR_RAISE(auto new_predicate, ParsePredicatePosition());
+            ARROW_ASSIGN_OR_RAISE(auto object, ParseRDFTerm());
+
+            // Create new triple with same subject
+            if (auto* term = std::get_if<RDFTerm>(&new_predicate)) {
+                tmpl.triples.push_back(TriplePattern(subject, *term, object));
+            } else if (auto* path = std::get_if<PropertyPath>(&new_predicate)) {
+                tmpl.triples.push_back(TriplePattern(subject, *path, object));
+            }
+        }
 
         // Consume optional dot
         Match(TokenType::DOT);
@@ -1035,17 +1091,30 @@ arrow::Result<SelectClause> SPARQLParser::ParseSelectClause() {
                     distinct = true;
                 }
 
-                // Parse argument (variable or * for COUNT)
+                // Parse argument (expression, variable, or * for COUNT)
                 auto agg_expr = std::make_shared<Expression>(agg_op);
                 if (agg_op == ExprOperator::Count && Check(TokenType::MULTIPLY)) {
                     // COUNT(*) - no argument
                     Advance();
-                } else if (Check(TokenType::VARIABLE)) {
-                    ARROW_ASSIGN_OR_RAISE(auto arg_var, ParseVariable());
-                    auto arg_expr = std::make_shared<Expression>(RDFTerm(arg_var));
+                } else if (!Check(TokenType::RPAREN)) {
+                    // Accept full expressions as arguments (not just variables)
+                    ARROW_ASSIGN_OR_RAISE(auto arg_expr, ParseExpression());
                     agg_expr->arguments.push_back(arg_expr);
                 } else {
-                    return Error("Expected variable or * as aggregate function argument");
+                    return Error("Expected expression or * as aggregate function argument");
+                }
+
+                // Handle GROUP_CONCAT separator: GROUP_CONCAT(?var ; SEPARATOR="str")
+                if (agg_op == ExprOperator::GroupConcat && Match(TokenType::SEMICOLON)) {
+                    ARROW_RETURN_NOT_OK(Expect(TokenType::SEPARATOR, "Expected SEPARATOR keyword after semicolon"));
+                    ARROW_RETURN_NOT_OK(Expect(TokenType::EQUAL, "Expected '=' after SEPARATOR"));
+
+                    if (!Check(TokenType::STRING_LITERAL)) {
+                        return Error("Expected string literal after SEPARATOR=");
+                    }
+                    ARROW_ASSIGN_OR_RAISE(auto separator_lit, ParseLiteral());
+                    auto separator_expr = std::make_shared<Expression>(RDFTerm(separator_lit));
+                    agg_expr->arguments.push_back(separator_expr);
                 }
 
                 ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after aggregate function argument"));
@@ -1139,6 +1208,16 @@ arrow::Result<QueryPattern> SPARQLParser::ParseWhereClause() {
             // Parse MINUS clause
             ARROW_ASSIGN_OR_RAISE(auto minus, ParseMinusClause());
             pattern.minus_patterns.push_back(minus);
+        } else if (Check(TokenType::GRAPH)) {
+            // Parse GRAPH clause
+            ARROW_ASSIGN_OR_RAISE(auto graph, ParseGraphClause());
+            pattern.graph_patterns.push_back(graph);
+        } else if (Check(TokenType::SELECT)) {
+            // Direct subquery without braces: SELECT ... WHERE { ... }
+            ARROW_ASSIGN_OR_RAISE(auto subquery_query, ParseSelectQuery());
+            SubqueryPattern subquery;
+            subquery.query = subquery_query;
+            pattern.subqueries.push_back(subquery);
         } else if (Check(TokenType::LBRACE)) {
             // Check if this is a subquery: { SELECT ... }
             // Peek ahead to see if next token is SELECT
@@ -1146,25 +1225,51 @@ arrow::Result<QueryPattern> SPARQLParser::ParseWhereClause() {
                 ARROW_ASSIGN_OR_RAISE(auto subquery, ParseSubqueryPattern());
                 pattern.subqueries.push_back(subquery);
             } else {
-                // Not a subquery, must be a triple pattern or error
-                // Fall through to triple pattern parsing
-                if (!pattern.bgp.has_value()) {
-                    pattern.bgp = BasicGraphPattern();
-                }
+                // Group graph pattern: { ... }
+                // This creates a nested scope, parse it recursively
+                // Don't consume '{' - ParseWhereClause will consume it
+                ARROW_ASSIGN_OR_RAISE(auto nested_pattern, ParseWhereClause());
 
-                ARROW_ASSIGN_OR_RAISE(auto triple, ParseTriplePattern());
-                pattern.bgp->triples.push_back(triple);
+                // Check if this is part of a UNION: { ... } UNION { ... }
+                if (Check(TokenType::UNION)) {
+                    // This group pattern is the first part of a UNION
+                    UnionPattern union_pattern;
+                    union_pattern.patterns.push_back(std::make_shared<QueryPattern>(nested_pattern));
 
-                // Consume optional '.'
-                Match(TokenType::DOT);
+                    // Parse all UNION branches
+                    while (Match(TokenType::UNION)) {
+                        // ParseWhereClause will consume the '{'
+                        ARROW_ASSIGN_OR_RAISE(auto union_branch, ParseWhereClause());
+                        union_pattern.patterns.push_back(std::make_shared<QueryPattern>(union_branch));
+                    }
 
-                // Check if next token can start a triple pattern
-                // If not, continue loop to check for keywords or end of pattern
-                if (!Check(TokenType::VARIABLE) && !Check(TokenType::IRI_REF) &&
-                    !Check(TokenType::PREFIX_LABEL) && !Check(TokenType::BLANK_NODE) &&
-                    !Check(TokenType::LBRACE)) {
+                    pattern.unions.push_back(union_pattern);
                     continue;
                 }
+
+                // Not a UNION, just merge the nested pattern into the current pattern
+                // For now, we'll treat it as a separate scope by storing in a Union-like structure
+                // But since we don't have a dedicated GroupPattern, we'll inline it
+                if (nested_pattern.bgp.has_value()) {
+                    if (!pattern.bgp.has_value()) {
+                        pattern.bgp = BasicGraphPattern();
+                    }
+                    for (const auto& triple : nested_pattern.bgp->triples) {
+                        pattern.bgp->triples.push_back(triple);
+                    }
+                }
+                // Merge other components
+                pattern.filters.insert(pattern.filters.end(), nested_pattern.filters.begin(), nested_pattern.filters.end());
+                pattern.binds.insert(pattern.binds.end(), nested_pattern.binds.begin(), nested_pattern.binds.end());
+                pattern.optionals.insert(pattern.optionals.end(), nested_pattern.optionals.begin(), nested_pattern.optionals.end());
+                pattern.unions.insert(pattern.unions.end(), nested_pattern.unions.begin(), nested_pattern.unions.end());
+                pattern.values.insert(pattern.values.end(), nested_pattern.values.begin(), nested_pattern.values.end());
+                pattern.minus_patterns.insert(pattern.minus_patterns.end(), nested_pattern.minus_patterns.begin(), nested_pattern.minus_patterns.end());
+                pattern.graph_patterns.insert(pattern.graph_patterns.end(), nested_pattern.graph_patterns.begin(), nested_pattern.graph_patterns.end());
+                pattern.exists_patterns.insert(pattern.exists_patterns.end(), nested_pattern.exists_patterns.begin(), nested_pattern.exists_patterns.end());
+                pattern.subqueries.insert(pattern.subqueries.end(), nested_pattern.subqueries.begin(), nested_pattern.subqueries.end());
+
+                // Group pattern parsed and merged, continue to next statement
             }
         } else {
             // Parse triple pattern
@@ -1174,6 +1279,34 @@ arrow::Result<QueryPattern> SPARQLParser::ParseWhereClause() {
 
             ARROW_ASSIGN_OR_RAISE(auto triple, ParseTriplePattern());
             pattern.bgp->triples.push_back(triple);
+
+            // Store subject and predicate for potential abbreviations
+            RDFTerm subject = triple.subject;
+            auto predicate = triple.predicate;
+
+            // Handle comma abbreviations: ?S :p ?O1, ?O2 (reuse subject+predicate)
+            while (Match(TokenType::COMMA)) {
+                ARROW_ASSIGN_OR_RAISE(auto object, ParseRDFTerm());
+                if (auto* term = std::get_if<RDFTerm>(&predicate)) {
+                    pattern.bgp->triples.push_back(TriplePattern(subject, *term, object));
+                } else if (auto* path = std::get_if<PropertyPath>(&predicate)) {
+                    pattern.bgp->triples.push_back(TriplePattern(subject, *path, object));
+                }
+            }
+
+            // Handle semicolon abbreviations: ?S :p1 ?O1 ; :p2 ?O2 (reuse subject)
+            while (Match(TokenType::SEMICOLON)) {
+                // Parse additional predicate-object pairs with same subject
+                ARROW_ASSIGN_OR_RAISE(auto new_predicate, ParsePredicatePosition());
+                ARROW_ASSIGN_OR_RAISE(auto object, ParseRDFTerm());
+
+                // Create new triple with same subject
+                if (auto* term = std::get_if<RDFTerm>(&new_predicate)) {
+                    pattern.bgp->triples.push_back(TriplePattern(subject, *term, object));
+                } else if (auto* path = std::get_if<PropertyPath>(&new_predicate)) {
+                    pattern.bgp->triples.push_back(TriplePattern(subject, *path, object));
+                }
+            }
 
             // Consume optional '.'
             Match(TokenType::DOT);
@@ -1255,6 +1388,24 @@ arrow::Result<RDFTerm> SPARQLParser::ParseRDFTerm() {
         // Blank node with property list: [] or [ pred obj ]
         ARROW_ASSIGN_OR_RAISE(auto bnode, ParseBlankNodePropertyList());
         return RDFTerm(bnode);
+    } else if (token.type == TokenType::LPAREN) {
+        // RDF collection: (item1 item2 ...)
+        Advance();  // Consume '('
+
+        // Generate unique blank node ID for the collection
+        std::string collection_id = "c" + std::to_string(blank_node_counter_++);
+
+        // Parse collection items
+        auto term_list = std::make_shared<RDFTermList>();
+        while (!Check(TokenType::RPAREN) && !IsAtEnd()) {
+            ARROW_ASSIGN_OR_RAISE(auto item, ParseRDFTerm());
+            term_list->items.push_back(std::move(item));
+        }
+
+        ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' to end RDF collection"));
+
+        // Return blank node representing the collection
+        return RDFTerm(BlankNode(collection_id, term_list));
     } else if (token.type == TokenType::PREFIX_LABEL) {
         // Expand prefixed name to full IRI
         std::string prefixed_name = token.text;
@@ -1410,6 +1561,48 @@ arrow::Result<std::shared_ptr<Expression>> SPARQLParser::ParseComparisonExpressi
         expr->arguments.push_back(left);
         expr->arguments.push_back(right);
         return expr;
+    } else if (Check(TokenType::NOT_KEYWORD) && PeekToken().type == TokenType::IN) {
+        // NOT IN operator
+        Advance();  // Consume NOT
+        Advance();  // Consume IN
+        ARROW_RETURN_NOT_OK(Expect(TokenType::LPAREN, "Expected '(' after NOT IN"));
+
+        auto expr = std::make_shared<Expression>(ExprOperator::NotIn);
+        expr->arguments.push_back(left);
+
+        // Parse list of values
+        if (!Check(TokenType::RPAREN)) {
+            while (true) {
+                ARROW_ASSIGN_OR_RAISE(auto value, ParseAdditiveExpression());
+                expr->arguments.push_back(value);
+                if (!Match(TokenType::COMMA)) {
+                    break;
+                }
+            }
+        }
+
+        ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after IN list"));
+        return expr;
+    } else if (Match(TokenType::IN)) {
+        // IN operator
+        ARROW_RETURN_NOT_OK(Expect(TokenType::LPAREN, "Expected '(' after IN"));
+
+        auto expr = std::make_shared<Expression>(ExprOperator::In);
+        expr->arguments.push_back(left);
+
+        // Parse list of values
+        if (!Check(TokenType::RPAREN)) {
+            while (true) {
+                ARROW_ASSIGN_OR_RAISE(auto value, ParseAdditiveExpression());
+                expr->arguments.push_back(value);
+                if (!Match(TokenType::COMMA)) {
+                    break;
+                }
+            }
+        }
+
+        ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after IN list"));
+        return expr;
     }
 
     return left;
@@ -1470,6 +1663,21 @@ arrow::Result<std::shared_ptr<Expression>> SPARQLParser::ParsePrimaryExpression(
         return expr;
     }
 
+    // EXISTS or NOT EXISTS expression (special case - takes graph pattern, not args)
+    if (Check(TokenType::EXISTS)) {
+        ARROW_ASSIGN_OR_RAISE(auto exists_pattern, ParseExistsClause(false));
+        auto expr = std::make_shared<Expression>(ExprOperator::Exists);
+        expr->exists_pattern = exists_pattern.pattern;
+        return expr;
+    }
+    if (Check(TokenType::NOT_KEYWORD) && PeekToken().type == TokenType::EXISTS) {
+        Advance();  // Consume NOT
+        ARROW_ASSIGN_OR_RAISE(auto exists_pattern, ParseExistsClause(true));
+        auto expr = std::make_shared<Expression>(ExprOperator::NotExists);
+        expr->exists_pattern = exists_pattern.pattern;
+        return expr;
+    }
+
     // Built-in function call
     if (Check(TokenType::BOUND) || Check(TokenType::ISIRI) || Check(TokenType::ISLITERAL) ||
         Check(TokenType::ISBLANK) || Check(TokenType::STR) || Check(TokenType::LANG) ||
@@ -1495,8 +1703,43 @@ arrow::Result<std::shared_ptr<Expression>> SPARQLParser::ParsePrimaryExpression(
         // Special/Control functions
         Check(TokenType::IF) || Check(TokenType::COALESCE) || Check(TokenType::BNODE) ||
         Check(TokenType::UUID) || Check(TokenType::STRUUID) || Check(TokenType::IRI) ||
-        Check(TokenType::ISNUMERIC) || Check(TokenType::RAND)) {
+        Check(TokenType::URI) || Check(TokenType::ISNUMERIC) || Check(TokenType::RAND) ||
+        // Aggregate functions (can be used in expressions)
+        Check(TokenType::COUNT) || Check(TokenType::SUM) || Check(TokenType::AVG) ||
+        Check(TokenType::MIN) || Check(TokenType::MAX) || Check(TokenType::GROUP_CONCAT) ||
+        Check(TokenType::SAMPLE)) {
         return ParseBuiltInCall();
+    }
+
+    // Type conversion function call: xsd:double(?x), ex:myFunction(?y)
+    // This is PREFIX_LABEL followed by LPAREN
+    if (Check(TokenType::PREFIX_LABEL) && PeekToken().type == TokenType::LPAREN) {
+        std::string prefixed_name = CurrentToken().text;
+        Advance();  // Consume PREFIX_LABEL
+
+        // Expand to full IRI
+        ARROW_ASSIGN_OR_RAISE(auto full_iri, ExpandPrefixedName(prefixed_name));
+
+        // Parse function call with IRI as the function
+        ARROW_RETURN_NOT_OK(Expect(TokenType::LPAREN, "Expected '(' after IRI"));
+
+        auto expr = std::make_shared<Expression>(ExprOperator::FunctionCall);
+        expr->function_iri = full_iri;
+
+        // Parse arguments
+        if (!Check(TokenType::RPAREN)) {
+            while (true) {
+                ARROW_ASSIGN_OR_RAISE(auto arg, ParseExpression());
+                expr->arguments.push_back(arg);
+
+                if (!Match(TokenType::COMMA)) {
+                    break;
+                }
+            }
+        }
+
+        ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after function arguments"));
+        return expr;
     }
 
     // Literal value
@@ -1615,10 +1858,28 @@ arrow::Result<std::shared_ptr<Expression>> SPARQLParser::ParseBuiltInCall() {
         op = ExprOperator::StrUUID;
     } else if (func_token.type == TokenType::IRI) {
         op = ExprOperator::IRI;
+    } else if (func_token.type == TokenType::URI) {
+        op = ExprOperator::IRI;  // URI is an alias for IRI
     } else if (func_token.type == TokenType::ISNUMERIC) {
         op = ExprOperator::IsNumeric;
     } else if (func_token.type == TokenType::RAND) {
         op = ExprOperator::Rand;
+
+    // Aggregate functions
+    } else if (func_token.type == TokenType::COUNT) {
+        op = ExprOperator::Count;
+    } else if (func_token.type == TokenType::SUM) {
+        op = ExprOperator::Sum;
+    } else if (func_token.type == TokenType::AVG) {
+        op = ExprOperator::Avg;
+    } else if (func_token.type == TokenType::MIN) {
+        op = ExprOperator::Min;
+    } else if (func_token.type == TokenType::MAX) {
+        op = ExprOperator::Max;
+    } else if (func_token.type == TokenType::GROUP_CONCAT) {
+        op = ExprOperator::GroupConcat;
+    } else if (func_token.type == TokenType::SAMPLE) {
+        op = ExprOperator::Sample;
 
     } else {
         return Error("Unknown built-in function");
@@ -1630,8 +1891,19 @@ arrow::Result<std::shared_ptr<Expression>> SPARQLParser::ParseBuiltInCall() {
 
     auto expr = std::make_shared<Expression>(op);
 
-    // Parse function arguments
-    if (!Check(TokenType::RPAREN)) {
+    // Handle DISTINCT modifier for aggregates
+    if (op == ExprOperator::Count || op == ExprOperator::Sum || op == ExprOperator::Avg ||
+        op == ExprOperator::Min || op == ExprOperator::Max || op == ExprOperator::GroupConcat ||
+        op == ExprOperator::Sample) {
+        Match(TokenType::DISTINCT);  // Optional DISTINCT, ignore for now
+    }
+
+    // Handle COUNT(*) special case
+    if (op == ExprOperator::Count && Check(TokenType::MULTIPLY)) {
+        Advance();  // Consume *
+        // COUNT(*) has no arguments
+    } else if (!Check(TokenType::RPAREN)) {
+        // Parse function arguments (now accepts full expressions!)
         while (true) {
             ARROW_ASSIGN_OR_RAISE(auto arg, ParseExpression());
             expr->arguments.push_back(arg);
@@ -1639,6 +1911,18 @@ arrow::Result<std::shared_ptr<Expression>> SPARQLParser::ParseBuiltInCall() {
             if (!Match(TokenType::COMMA)) {
                 break;
             }
+        }
+
+        // Handle GROUP_CONCAT SEPARATOR
+        if (op == ExprOperator::GroupConcat && Match(TokenType::SEMICOLON)) {
+            ARROW_RETURN_NOT_OK(Expect(TokenType::SEPARATOR, "Expected SEPARATOR after semicolon"));
+            ARROW_RETURN_NOT_OK(Expect(TokenType::EQUAL, "Expected '=' after SEPARATOR"));
+            if (!Check(TokenType::STRING_LITERAL)) {
+                return Error("Expected string literal after SEPARATOR=");
+            }
+            ARROW_ASSIGN_OR_RAISE(auto separator_lit, ParseLiteral());
+            auto separator_expr = std::make_shared<Expression>(RDFTerm(separator_lit));
+            expr->arguments.push_back(separator_expr);
         }
     }
 
@@ -1709,39 +1993,58 @@ arrow::Result<ValuesClause> SPARQLParser::ParseValuesClause() {
 
     ARROW_RETURN_NOT_OK(Expect(TokenType::VALUES, "Expected VALUES keyword"));
 
-    // Parse variable list in parentheses
-    ARROW_RETURN_NOT_OK(Expect(TokenType::LPAREN, "Expected '(' after VALUES"));
+    // Check for inline syntax: VALUES ?var { val1 val2 }
+    bool inline_syntax = Check(TokenType::VARIABLE);
 
-    while (!Check(TokenType::RPAREN) && !IsAtEnd()) {
+    if (inline_syntax) {
+        // Inline syntax: single variable without parentheses
         ARROW_ASSIGN_OR_RAISE(auto var, ParseVariable());
         values.variables.push_back(std::move(var));
-    }
 
-    ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after variable list"));
+        // Parse data values in braces (without parentheses around each value)
+        ARROW_RETURN_NOT_OK(Expect(TokenType::LBRACE, "Expected '{' for VALUES data"));
 
-    // Parse data rows in braces
-    ARROW_RETURN_NOT_OK(Expect(TokenType::LBRACE, "Expected '{' for VALUES data"));
-
-    while (!Check(TokenType::RBRACE) && !IsAtEnd()) {
-        // Each row is in parentheses
-        ARROW_RETURN_NOT_OK(Expect(TokenType::LPAREN, "Expected '(' for data row"));
-
-        std::vector<RDFTerm> row;
-        while (!Check(TokenType::RPAREN) && !IsAtEnd()) {
+        while (!Check(TokenType::RBRACE) && !IsAtEnd()) {
             ARROW_ASSIGN_OR_RAISE(auto term, ParseRDFTerm());
-            row.push_back(std::move(term));
+            values.rows.push_back({std::move(term)});
         }
 
-        ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after data row"));
+        ARROW_RETURN_NOT_OK(Expect(TokenType::RBRACE, "Expected '}' after VALUES data"));
+    } else {
+        // Standard syntax: VALUES (?var1 ?var2) { (val1 val2) }
+        ARROW_RETURN_NOT_OK(Expect(TokenType::LPAREN, "Expected '(' after VALUES"));
 
-        if (row.size() != values.variables.size()) {
-            return Error("VALUES data row size does not match variable count");
+        while (!Check(TokenType::RPAREN) && !IsAtEnd()) {
+            ARROW_ASSIGN_OR_RAISE(auto var, ParseVariable());
+            values.variables.push_back(std::move(var));
         }
 
-        values.rows.push_back(std::move(row));
+        ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after variable list"));
+
+        // Parse data rows in braces
+        ARROW_RETURN_NOT_OK(Expect(TokenType::LBRACE, "Expected '{' for VALUES data"));
+
+        while (!Check(TokenType::RBRACE) && !IsAtEnd()) {
+            // Each row is in parentheses
+            ARROW_RETURN_NOT_OK(Expect(TokenType::LPAREN, "Expected '(' for data row"));
+
+            std::vector<RDFTerm> row;
+            while (!Check(TokenType::RPAREN) && !IsAtEnd()) {
+                ARROW_ASSIGN_OR_RAISE(auto term, ParseRDFTerm());
+                row.push_back(std::move(term));
+            }
+
+            ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after data row"));
+
+            if (row.size() != values.variables.size()) {
+                return Error("VALUES data row size does not match variable count");
+            }
+
+            values.rows.push_back(std::move(row));
+        }
+
+        ARROW_RETURN_NOT_OK(Expect(TokenType::RBRACE, "Expected '}' after VALUES data"));
     }
-
-    ARROW_RETURN_NOT_OK(Expect(TokenType::RBRACE, "Expected '}' after VALUES data"));
 
     return values;
 }
@@ -1756,6 +2059,18 @@ arrow::Result<MinusPattern> SPARQLParser::ParseMinusClause() {
     minus.pattern = std::make_shared<QueryPattern>(pattern_where);
 
     return minus;
+}
+
+arrow::Result<GraphPattern> SPARQLParser::ParseGraphClause() {
+    ARROW_RETURN_NOT_OK(Expect(TokenType::GRAPH, "Expected GRAPH keyword"));
+
+    // Parse graph term (variable or IRI)
+    ARROW_ASSIGN_OR_RAISE(auto graph_term, ParseRDFTerm());
+
+    // Parse pattern in braces (ParseWhereClause expects and consumes braces)
+    ARROW_ASSIGN_OR_RAISE(auto pattern_where, ParseWhereClause());
+
+    return GraphPattern(graph_term, std::make_shared<QueryPattern>(pattern_where));
 }
 
 arrow::Result<ExistsPattern> SPARQLParser::ParseExistsClause(bool negated) {
@@ -1832,10 +2147,31 @@ arrow::Result<GroupByClause> SPARQLParser::ParseGroupByClause() {
     ARROW_RETURN_NOT_OK(Expect(TokenType::GROUP, "Expected GROUP keyword"));
     ARROW_RETURN_NOT_OK(Expect(TokenType::BY, "Expected BY keyword after GROUP"));
 
-    // Parse comma-separated list of variables
-    while (Check(TokenType::VARIABLE)) {
-        ARROW_ASSIGN_OR_RAISE(auto var, ParseVariable());
-        clause.variables.push_back(var);
+    // Parse comma-separated list of variables or expressions
+    while (Check(TokenType::VARIABLE) || Check(TokenType::LPAREN)) {
+        if (Check(TokenType::LPAREN)) {
+            // Parse (expression) or (expression AS ?alias)
+            Advance();  // Consume '('
+            ARROW_ASSIGN_OR_RAISE(auto expr, ParseExpression());
+
+            // AS clause is optional
+            if (Match(TokenType::AS)) {
+                ARROW_ASSIGN_OR_RAISE(auto alias, ParseVariable());
+                ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after GROUP BY alias"));
+                clause.items.push_back(GroupByItem(expr, alias));
+            } else {
+                ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after GROUP BY expression"));
+                // Expression without alias - create GroupByItem with just the expression
+                GroupByItem item;
+                item.expression = expr;
+                clause.items.push_back(item);
+            }
+        } else {
+            // Parse simple variable
+            ARROW_ASSIGN_OR_RAISE(auto var, ParseVariable());
+            clause.variables.push_back(var);
+            clause.items.push_back(GroupByItem(var));
+        }
 
         // Continue if there's a comma
         if (!Match(TokenType::COMMA)) {
@@ -1843,8 +2179,8 @@ arrow::Result<GroupByClause> SPARQLParser::ParseGroupByClause() {
         }
     }
 
-    if (clause.variables.empty()) {
-        return Error("Expected at least one variable in GROUP BY clause");
+    if (clause.variables.empty() && clause.items.empty()) {
+        return Error("Expected at least one variable or expression in GROUP BY clause");
     }
 
     return clause;
@@ -1962,7 +2298,7 @@ arrow::Result<PredicatePosition> SPARQLParser::ParsePredicatePosition() {
     // Check if followed by property path operators
     if (Check(TokenType::DIVIDE) || Check(TokenType::PIPE) ||
         Check(TokenType::MULTIPLY) || Check(TokenType::PLUS) ||
-        Check(TokenType::QUESTION)) {
+        Check(TokenType::QUESTION) || Check(TokenType::LBRACE)) {
         // It's a property path - backtrack and parse as path
         pos_ = saved_pos;
         ARROW_ASSIGN_OR_RAISE(auto path, ParsePropertyPath());
@@ -1973,60 +2309,370 @@ arrow::Result<PredicatePosition> SPARQLParser::ParsePredicatePosition() {
     return PredicatePosition(term);
 }
 
+// ============================================================================
+// Property Path Parsing with Shunting Yard Algorithm
+// ============================================================================
+
+// Internal token type for property path parsing with operator precedence
+struct PathToken {
+    enum Type {
+        OPERAND,        // IRI, variable, or literal
+        BINARY_OP,      // / (sequence) or | (alternative)
+        UNARY_PREFIX,   // ^ (inverse) or ! (negation)
+        UNARY_POSTFIX,  // * + ? {n,m} (quantifiers)
+        LPAREN,         // (
+        RPAREN          // )
+    };
+
+    Type type;
+    std::string value;
+    int precedence;  // Higher number = tighter binding
+
+    // For OPERAND type
+    RDFTerm term;
+
+    // For UNARY_POSTFIX type (quantifiers)
+    PropertyPathQuantifier quantifier_type = PropertyPathQuantifier::None;
+    int min_count = 0;
+    int max_count = 0;
+
+    PathToken(Type t, std::string v, int prec)
+        : type(t), value(std::move(v)), precedence(prec) {}
+
+    PathToken(RDFTerm t)
+        : type(OPERAND), precedence(0), term(std::move(t)) {}
+
+    bool IsOperator() const {
+        return type == BINARY_OP || type == UNARY_PREFIX || type == UNARY_POSTFIX;
+    }
+};
+
+// Static helper to tokenize property path - needs parser context
+// This is in the .cpp to keep PathToken internal
+static arrow::Result<std::vector<PathToken>> TokenizePropertyPathTokens(SPARQLParser& parser) {
+    std::vector<PathToken> path_tokens;
+
+    while (!parser.IsAtEnd()) {
+        const Token& token = parser.CurrentToken();
+
+        // Stop conditions: tokens that can't be part of a property path
+        if (token.type == TokenType::DOT || token.type == TokenType::SEMICOLON ||
+            token.type == TokenType::RBRACE || token.type == TokenType::WHERE ||
+            token.type == TokenType::FILTER || token.type == TokenType::BIND ||
+            token.type == TokenType::OPTIONAL || token.type == TokenType::UNION ||
+            token.type == TokenType::VALUES || token.type == TokenType::ORDER ||
+            token.type == TokenType::GROUP || token.type == TokenType::LIMIT ||
+            token.type == TokenType::OFFSET || token.type == TokenType::SELECT) {
+            break;
+        }
+
+        // Operands: IRI, variable, prefixed name
+        if (token.type == TokenType::IRI_REF || token.type == TokenType::VARIABLE ||
+            token.type == TokenType::PREFIX_LABEL) {
+            ARROW_ASSIGN_OR_RAISE(auto term, parser.ParseRDFTerm());
+            path_tokens.emplace_back(term);
+            continue;
+        }
+
+        // Binary operators
+        if (token.type == TokenType::DIVIDE) {
+            path_tokens.emplace_back(PathToken::BINARY_OP, "/", 3);  // Sequence: precedence 3
+            parser.Advance();
+            continue;
+        }
+        if (token.type == TokenType::PIPE) {
+            path_tokens.emplace_back(PathToken::BINARY_OP, "|", 2);  // Alternative: precedence 2
+            parser.Advance();
+            continue;
+        }
+
+        // Unary prefix operators
+        if (token.type == TokenType::CARET) {
+            path_tokens.emplace_back(PathToken::UNARY_PREFIX, "^", 4);  // Inverse: precedence 4
+            parser.Advance();
+            continue;
+        }
+        if (token.type == TokenType::NOT) {
+            path_tokens.emplace_back(PathToken::UNARY_PREFIX, "!", 4);  // Negation: precedence 4
+            parser.Advance();
+            continue;
+        }
+
+        // Unary postfix operators (quantifiers)
+        if (token.type == TokenType::MULTIPLY) {
+            PathToken qt(PathToken::UNARY_POSTFIX, "*", 5);
+            qt.quantifier_type = PropertyPathQuantifier::ZeroOrMore;
+            path_tokens.push_back(qt);
+            parser.Advance();
+            continue;
+        }
+        if (token.type == TokenType::PLUS) {
+            PathToken qt(PathToken::UNARY_POSTFIX, "+", 5);
+            qt.quantifier_type = PropertyPathQuantifier::OneOrMore;
+            path_tokens.push_back(qt);
+            parser.Advance();
+            continue;
+        }
+        if (token.type == TokenType::QUESTION) {
+            PathToken qt(PathToken::UNARY_POSTFIX, "?", 5);
+            qt.quantifier_type = PropertyPathQuantifier::ZeroOrOne;
+            path_tokens.push_back(qt);
+            parser.Advance();
+            continue;
+        }
+        if (token.type == TokenType::LBRACE) {
+            // Counted quantifier: {n}, {n,}, {n,m}
+            parser.Advance();  // Skip {
+
+            if (!parser.Check(TokenType::INTEGER) && !parser.Check(TokenType::COMMA)) {
+                return parser.Error("Expected integer or comma in counted quantifier");
+            }
+
+            int min_val = 0;
+            int max_val = -1;
+
+            if (parser.Check(TokenType::INTEGER)) {
+                min_val = std::stoi(parser.CurrentToken().text);
+                parser.Advance();
+            }
+
+            PathToken qt(PathToken::UNARY_POSTFIX, "{}", 5);
+            if (parser.Match(TokenType::COMMA)) {
+                if (parser.Check(TokenType::INTEGER)) {
+                    max_val = std::stoi(parser.CurrentToken().text);
+                    parser.Advance();
+                    qt.quantifier_type = PropertyPathQuantifier::RangeCount;
+                } else {
+                    qt.quantifier_type = PropertyPathQuantifier::MinCount;
+                    max_val = -1;
+                }
+            } else {
+                qt.quantifier_type = PropertyPathQuantifier::ExactCount;
+                max_val = min_val;
+            }
+
+            qt.min_count = min_val;
+            qt.max_count = max_val;
+            path_tokens.push_back(qt);
+
+            ARROW_RETURN_NOT_OK(parser.Expect(TokenType::RBRACE, "Expected '}' after counted quantifier"));
+            continue;
+        }
+
+        // Parentheses
+        if (token.type == TokenType::LPAREN) {
+            path_tokens.emplace_back(PathToken::LPAREN, "(", 0);
+            parser.Advance();
+            continue;
+        }
+        if (token.type == TokenType::RPAREN) {
+            path_tokens.emplace_back(PathToken::RPAREN, ")", 0);
+            parser.Advance();
+            continue;
+        }
+
+        // If we hit something we don't recognize, stop
+        break;
+    }
+
+    if (path_tokens.empty()) {
+        return parser.Error("Empty property path");
+    }
+
+    return path_tokens;
+}
+
+// Convert infix notation to postfix (RPN) using Shunting Yard algorithm
+// This handles operator precedence automatically
+std::vector<PathToken> InfixToPostfix(const std::vector<PathToken>& infix) {
+    std::vector<PathToken> output;
+    std::vector<PathToken> operators;
+
+    for (const auto& token : infix) {
+        if (token.type == PathToken::OPERAND) {
+            // Operands go directly to output
+            output.push_back(token);
+        }
+        else if (token.IsOperator()) {
+            // Pop operators with higher or equal precedence (for left-associative ops)
+            // For right-associative, would use strictly higher (>)
+            while (!operators.empty() &&
+                   operators.back().precedence >= token.precedence &&
+                   operators.back().type != PathToken::LPAREN) {
+                output.push_back(operators.back());
+                operators.pop_back();
+            }
+            operators.push_back(token);
+        }
+        else if (token.type == PathToken::LPAREN) {
+            operators.push_back(token);
+        }
+        else if (token.type == PathToken::RPAREN) {
+            // Pop until matching LPAREN
+            while (!operators.empty() && operators.back().type != PathToken::LPAREN) {
+                output.push_back(operators.back());
+                operators.pop_back();
+            }
+            if (!operators.empty()) {
+                operators.pop_back();  // Remove the LPAREN
+            }
+        }
+    }
+
+    // Pop remaining operators
+    while (!operators.empty()) {
+        output.push_back(operators.back());
+        operators.pop_back();
+    }
+
+    return output;
+}
+
+// Build PropertyPath AST from postfix (RPN) notation using stack-based evaluation
+PropertyPath BuildPathFromPostfix(const std::vector<PathToken>& postfix) {
+    std::vector<PropertyPath> stack;
+
+    for (const auto& token : postfix) {
+        if (token.type == PathToken::OPERAND) {
+            // Create a simple path with one element
+            PropertyPath path;
+            PropertyPathElement elem(token.term);
+            path.elements.push_back(elem);
+            stack.push_back(path);
+        }
+        else if (token.type == PathToken::BINARY_OP) {
+            // Pop two operands and combine them
+            if (stack.size() < 2) {
+                // Error - not enough operands
+                PropertyPath error_path;
+                return error_path;
+            }
+
+            auto right = std::move(stack.back());
+            stack.pop_back();
+            auto left = std::move(stack.back());
+            stack.pop_back();
+
+            PropertyPath combined;
+            combined.modifier = (token.value == "/")
+                ? PropertyPathModifier::Sequence
+                : PropertyPathModifier::Alternative;
+
+            // If left has the same modifier, we can flatten it
+            if (left.modifier == combined.modifier && left.elements.size() > 0) {
+                // Flatten: just copy elements
+                combined.elements = std::move(left.elements);
+            } else {
+                // Wrap left in a nested path
+                PropertyPathElement nested_elem(std::make_shared<PropertyPath>(std::move(left)));
+                combined.elements.push_back(nested_elem);
+            }
+
+            // If right has the same modifier, we can flatten it
+            if (right.modifier == combined.modifier && right.elements.size() > 0) {
+                // Flatten: append elements
+                combined.elements.insert(combined.elements.end(),
+                                       std::make_move_iterator(right.elements.begin()),
+                                       std::make_move_iterator(right.elements.end()));
+            } else {
+                // Wrap right in a nested path
+                PropertyPathElement nested_elem(std::make_shared<PropertyPath>(std::move(right)));
+                combined.elements.push_back(nested_elem);
+            }
+
+            stack.push_back(std::move(combined));
+        }
+        else if (token.type == PathToken::UNARY_PREFIX) {
+            // Pop one operand and apply prefix operator
+            if (stack.empty()) {
+                PropertyPath error_path;
+                return error_path;
+            }
+
+            auto child = std::move(stack.back());
+            stack.pop_back();
+
+            PropertyPath wrapped;
+            wrapped.modifier = (token.value == "^")
+                ? PropertyPathModifier::Inverse
+                : PropertyPathModifier::Negated;
+
+            // Wrap the child path
+            PropertyPathElement nested_elem(std::make_shared<PropertyPath>(std::move(child)));
+            wrapped.elements.push_back(nested_elem);
+
+            stack.push_back(std::move(wrapped));
+        }
+        else if (token.type == PathToken::UNARY_POSTFIX) {
+            // Pop one operand and apply quantifier to its last element
+            if (stack.empty()) {
+                PropertyPath error_path;
+                return error_path;
+            }
+
+            auto child = std::move(stack.back());
+            stack.pop_back();
+
+            // Apply quantifier to the last element
+            if (!child.elements.empty()) {
+                child.elements.back().quantifier = token.quantifier_type;
+                child.elements.back().min_count = token.min_count;
+                child.elements.back().max_count = token.max_count;
+            }
+
+            stack.push_back(std::move(child));
+        }
+    }
+
+    // Final result should be single item on stack
+    if (stack.size() == 1) {
+        return std::move(stack.back());
+    }
+
+    // Error: should have exactly one result
+    PropertyPath error_path;
+    return error_path;
+}
+
 arrow::Result<PropertyPath> SPARQLParser::ParsePropertyPath() {
-    PropertyPath path;
+    // NEW: Shunting Yard algorithm for operator precedence
+    // Step 1: Tokenize property path from current position
+    ARROW_ASSIGN_OR_RAISE(auto path_tokens, TokenizePropertyPathTokens(*this));
 
-    // Check for inverse or negated modifier on the whole path
-    bool is_inverse = false;
-    bool is_negated = false;
+    // Step 2: Convert infix to postfix using Shunting Yard algorithm
+    auto postfix = InfixToPostfix(path_tokens);
 
-    if (Match(TokenType::CARET)) {
-        is_inverse = true;
-    } else if (Match(TokenType::NOT)) {
-        is_negated = true;
-    }
-
-    // Parse first element
-    ARROW_ASSIGN_OR_RAISE(auto first_elem, ParsePropertyPathElement());
-    path.elements.push_back(std::move(first_elem));
-
-    // Check for path operators
-    if (Check(TokenType::DIVIDE)) {
-        // Sequence path: p1 / p2 / p3
-        path.modifier = PropertyPathModifier::Sequence;
-        while (Match(TokenType::DIVIDE)) {
-            ARROW_ASSIGN_OR_RAISE(auto elem, ParsePropertyPathElement());
-            path.elements.push_back(std::move(elem));
-        }
-    } else if (Check(TokenType::PIPE)) {
-        // Alternative path: p1 | p2 | p3
-        path.modifier = PropertyPathModifier::Alternative;
-        while (Match(TokenType::PIPE)) {
-            ARROW_ASSIGN_OR_RAISE(auto elem, ParsePropertyPathElement());
-            path.elements.push_back(std::move(elem));
-        }
-    }
-
-    // Apply modifiers
-    if (is_inverse) {
-        path.modifier = PropertyPathModifier::Inverse;
-    } else if (is_negated) {
-        path.modifier = PropertyPathModifier::Negated;
-    }
+    // Step 3: Build AST from postfix notation
+    auto path = BuildPathFromPostfix(postfix);
 
     return path;
 }
 
+// OLD: This function is no longer used with Shunting Yard approach
+// Keeping it for backward compatibility if needed
 arrow::Result<PropertyPathElement> SPARQLParser::ParsePropertyPathElement() {
     PropertyPathElement elem;
 
+    // Check for inverse modifier on this element: ^p
+    if (Check(TokenType::CARET)) {
+        // Parse as a nested path with inverse modifier
+        ARROW_ASSIGN_OR_RAISE(auto nested_path, ParsePropertyPath());
+        elem.element = std::make_shared<PropertyPath>(nested_path);
+    }
     // Check for grouped path: (path)
-    if (Match(TokenType::LPAREN)) {
+    else if (Match(TokenType::LPAREN)) {
         // Parse nested path
         ARROW_ASSIGN_OR_RAISE(auto nested_path, ParsePropertyPath());
         ARROW_RETURN_NOT_OK(Expect(TokenType::RPAREN, "Expected ')' after grouped path"));
         elem.element = std::make_shared<PropertyPath>(nested_path);
-    } else {
+    }
+    // Check for negated path set: !p or !(p1|p2|...)
+    else if (Check(TokenType::NOT)) {
+        // Parse as a nested path with negation modifier
+        ARROW_ASSIGN_OR_RAISE(auto nested_path, ParsePropertyPath());
+        elem.element = std::make_shared<PropertyPath>(nested_path);
+    }
+    else {
         // Parse simple term (IRI or variable)
         ARROW_ASSIGN_OR_RAISE(auto term, ParseRDFTerm());
         elem.element = term;
@@ -2039,6 +2685,43 @@ arrow::Result<PropertyPathElement> SPARQLParser::ParsePropertyPathElement() {
         elem.quantifier = PropertyPathQuantifier::OneOrMore;
     } else if (Match(TokenType::QUESTION)) {
         elem.quantifier = PropertyPathQuantifier::ZeroOrOne;
+    } else if (Match(TokenType::LBRACE)) {
+        // Counted quantifier: {n}, {n,}, {n,m}, {,m}
+        // Parse first number (or empty for {,m})
+        if (!Check(TokenType::INTEGER) && !Check(TokenType::COMMA)) {
+            return Error("Expected integer or comma in counted quantifier");
+        }
+
+        int min_val = 0;
+        int max_val = -1;  // -1 means unbounded
+
+        if (Check(TokenType::INTEGER)) {
+            min_val = std::stoi(CurrentToken().text);
+            Advance();
+        }
+
+        // Check for comma (indicates range)
+        if (Match(TokenType::COMMA)) {
+            // {n,} or {n,m} or {,m}
+            if (Check(TokenType::INTEGER)) {
+                max_val = std::stoi(CurrentToken().text);
+                Advance();
+                elem.quantifier = PropertyPathQuantifier::RangeCount;
+            } else {
+                // {n,} - n or more
+                elem.quantifier = PropertyPathQuantifier::MinCount;
+                max_val = -1;
+            }
+        } else {
+            // {n} - exactly n
+            elem.quantifier = PropertyPathQuantifier::ExactCount;
+            max_val = min_val;
+        }
+
+        elem.min_count = min_val;
+        elem.max_count = max_val;
+
+        ARROW_RETURN_NOT_OK(Expect(TokenType::RBRACE, "Expected '}' after counted quantifier"));
     }
 
     return elem;

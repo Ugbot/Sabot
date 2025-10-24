@@ -17,8 +17,8 @@ enum class TokenType {
     PREFIX, BASE,
     SELECT, ASK, CONSTRUCT, DESCRIBE,
     WHERE, FILTER, BIND, OPTIONAL, UNION, ORDER, BY, ASC, DESC,
-    DISTINCT, LIMIT, OFFSET, AS, GROUP,
-    VALUES, MINUS_KEYWORD, EXISTS, NOT_KEYWORD,
+    DISTINCT, LIMIT, OFFSET, AS, GROUP, GRAPH, FROM,
+    VALUES, MINUS_KEYWORD, EXISTS, NOT_KEYWORD, IN, SEPARATOR,
 
     // Built-in functions
     BOUND, ISIRI, ISLITERAL, ISBLANK, STR, LANG, DATATYPE, REGEX,
@@ -40,7 +40,7 @@ enum class TokenType {
     MD5, SHA1, SHA256, SHA384, SHA512,
 
     // Special/Control functions
-    IF, COALESCE, BNODE, UUID, STRUUID, IRI, ISNUMERIC, RAND,
+    IF, COALESCE, BNODE, UUID, STRUUID, IRI, URI, ISNUMERIC, RAND,
 
     // Aggregate functions
     COUNT, SUM, AVG, MIN, MAX, GROUP_CONCAT, SAMPLE,
@@ -155,6 +155,10 @@ private:
     std::optional<TokenType> LookupKeyword(const std::string& text) const;
 };
 
+// Forward declarations for property path parsing helpers
+struct PathToken;
+arrow::Result<std::vector<PathToken>> TokenizePropertyPathTokens(SPARQLParser& parser);
+
 // SPARQL query parser (recursive descent)
 class SPARQLParser {
 public:
@@ -162,6 +166,9 @@ public:
 
     // Parse a complete SPARQL query
     arrow::Result<Query> Parse();
+
+    // Friend declarations for property path helpers
+    friend arrow::Result<std::vector<PathToken>> TokenizePropertyPathTokens(SPARQLParser& parser);
 
 private:
     std::vector<Token> tokens_;
@@ -213,6 +220,7 @@ private:
     arrow::Result<UnionPattern> ParseUnionClause();
     arrow::Result<ValuesClause> ParseValuesClause();
     arrow::Result<MinusPattern> ParseMinusClause();
+    arrow::Result<GraphPattern> ParseGraphClause();
     arrow::Result<ExistsPattern> ParseExistsClause(bool negated = false);
     arrow::Result<SubqueryPattern> ParseSubqueryPattern();
     arrow::Result<GroupByClause> ParseGroupByClause();
@@ -223,7 +231,7 @@ private:
     arrow::Result<IRI> ParseIRI();
     arrow::Result<Literal> ParseLiteral();
     arrow::Result<PropertyPath> ParsePropertyPath();
-    arrow::Result<PropertyPathElement> ParsePropertyPathElement();
+    arrow::Result<PropertyPathElement> ParsePropertyPathElement();  // Deprecated - no longer used
     arrow::Result<PredicatePosition> ParsePredicatePosition();
     arrow::Result<ExprOperator> TokenTypeToOperator(TokenType type) const;
     arrow::Result<std::string> ExpandPrefixedName(const std::string& prefixed_name);

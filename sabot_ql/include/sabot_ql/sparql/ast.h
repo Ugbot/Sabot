@@ -52,12 +52,19 @@ struct Literal {
     }
 };
 
+// Forward declaration to break circular dependency
+struct RDFTermList;
+
 // SPARQL Blank Node (e.g., _:b1)
 struct BlankNode {
     std::string id;
+    std::shared_ptr<RDFTermList> collection_items;  // For RDF collections: (item1 item2 ...)
 
     BlankNode() = default;
     explicit BlankNode(std::string i) : id(std::move(i)) {}
+
+    // Constructor for RDF collection (defined after RDFTerm)
+    BlankNode(std::string i, std::shared_ptr<RDFTermList> items);
 
     std::string ToString() const { return "_:" + id; }
     bool operator==(const BlankNode& other) const { return id == other.id; }
@@ -65,6 +72,11 @@ struct BlankNode {
 
 // RDF Term: Variable, IRI, Literal, or BlankNode
 using RDFTerm = std::variant<Variable, IRI, Literal, BlankNode>;
+
+// RDF collection items (defined after RDFTerm to break circular dependency)
+struct RDFTermList {
+    std::vector<RDFTerm> items;
+};
 
 std::string ToString(const RDFTerm& term);
 
@@ -81,7 +93,10 @@ enum class PropertyPathQuantifier {
     None,          // No quantifier (just the path)
     ZeroOrMore,    // p* (zero or more occurrences)
     OneOrMore,     // p+ (one or more occurrences)
-    ZeroOrOne      // p? (optional, zero or one occurrence)
+    ZeroOrOne,     // p? (optional, zero or one occurrence)
+    ExactCount,    // p{n} (exactly n occurrences)
+    MinCount,      // p{n,} (n or more occurrences)
+    RangeCount     // p{n,m} (between n and m occurrences)
 };
 
 // Forward declaration for recursive structure
@@ -92,6 +107,8 @@ struct PropertyPathElement {
     // Either a simple term or a complex path
     std::variant<RDFTerm, std::shared_ptr<PropertyPath>> element;
     PropertyPathQuantifier quantifier = PropertyPathQuantifier::None;
+    int min_count = 0;  // For ExactCount, MinCount, RangeCount quantifiers
+    int max_count = 0;  // For RangeCount quantifier (-1 means unbounded)
 
     PropertyPathElement() = default;
     explicit PropertyPathElement(RDFTerm term) : element(std::move(term)) {}
@@ -167,6 +184,8 @@ enum class ExprOperator {
     LessThanEqual,   // <=
     GreaterThan,     // >
     GreaterThanEqual,// >=
+    In,              // IN
+    NotIn,           // NOT IN
 
     // Logical
     And,             // &&
@@ -249,14 +268,26 @@ enum class ExprOperator {
     Min,             // MIN(?var)
     Max,             // MAX(?var)
     GroupConcat,     // GROUP_CONCAT(?var; separator="sep")
-    Sample           // SAMPLE(?var)
+    Sample,          // SAMPLE(?var)
+
+    // Graph pattern tests
+    Exists,          // EXISTS { pattern }
+    NotExists,       // NOT EXISTS { pattern }
+
+    // Generic function call (for custom functions like xsd:double)
+    FunctionCall     // Custom function call with IRI
 };
+
+// Forward declaration
+struct QueryPattern;
 
 // FILTER expression
 struct Expression {
     ExprOperator op;
     std::vector<std::shared_ptr<Expression>> arguments;
     std::optional<RDFTerm> constant;  // For leaf nodes (constants)
+    std::shared_ptr<QueryPattern> exists_pattern;  // For EXISTS/NOT EXISTS
+    std::optional<std::string> function_iri;  // For FunctionCall (custom functions like xsd:double)
 
     Expression() : op(ExprOperator::Equal) {}
 
@@ -340,6 +371,19 @@ struct MinusPattern {
     std::string ToString() const;
 };
 
+// GRAPH pattern - named graph access
+// Example: GRAPH ?g { triple patterns } or GRAPH <iri> { triple patterns }
+struct GraphPattern {
+    RDFTerm graph;  // Variable or IRI identifying the graph
+    std::shared_ptr<QueryPattern> pattern;
+
+    GraphPattern() = default;
+    GraphPattern(RDFTerm g, std::shared_ptr<QueryPattern> p)
+        : graph(std::move(g)), pattern(std::move(p)) {}
+
+    std::string ToString() const;
+};
+
 // EXISTS/NOT EXISTS filter - semi-join and anti-semi-join
 // Example: FILTER EXISTS { ?s <http://example.org/knows> ?o }
 struct ExistsPattern {
@@ -365,6 +409,7 @@ struct QueryPattern {
     std::vector<UnionPattern> unions;
     std::vector<ValuesClause> values;          // VALUES clauses
     std::vector<MinusPattern> minus_patterns;  // MINUS clauses
+    std::vector<GraphPattern> graph_patterns;  // GRAPH clauses
     std::vector<ExistsPattern> exists_patterns; // EXISTS/NOT EXISTS
     std::vector<SubqueryPattern> subqueries;   // Nested SELECT queries
 
@@ -432,13 +477,29 @@ struct SelectClause {
 };
 
 // GROUP BY clause
+// GROUP BY item - can be a variable or an expression with alias
+struct GroupByItem {
+    std::optional<Variable> variable;  // Simple variable: GROUP BY ?x
+    std::shared_ptr<Expression> expression;  // Expression: GROUP BY (expr AS ?alias)
+    std::optional<Variable> alias;  // Alias for expression
+
+    GroupByItem() = default;
+    explicit GroupByItem(Variable var) : variable(std::move(var)) {}
+    GroupByItem(std::shared_ptr<Expression> expr, Variable a)
+        : expression(std::move(expr)), alias(std::move(a)) {}
+
+    bool IsVariable() const { return variable.has_value(); }
+    std::string ToString() const;
+};
+
 struct GroupByClause {
-    std::vector<Variable> variables;  // Variables to group by
+    std::vector<Variable> variables;  // Variables to group by (legacy)
+    std::vector<GroupByItem> items;   // Variables or expressions with aliases
 
     GroupByClause() = default;
     explicit GroupByClause(std::vector<Variable> vars) : variables(std::move(vars)) {}
 
-    bool IsEmpty() const { return variables.empty(); }
+    bool IsEmpty() const { return variables.empty() && items.empty(); }
     std::string ToString() const;
 };
 
