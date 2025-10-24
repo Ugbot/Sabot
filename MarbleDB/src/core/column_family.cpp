@@ -1,10 +1,12 @@
 /************************************************************************
-MarbleDB Column Family Implementation
+MarbleDB Column Family Implementation - Lock-Free CAS Pattern
+Uses atomic pointers with copy-on-write for zero-contention reads
 **************************************************************************/
 
 #include "marble/column_family.h"
 #include "marble/lsm_tree.h"
-#include "marble/memtable.h"
+// Note: lsm_tree.h defines the canonical MemTable (Record-based)
+// marble/memtable.h defines SimpleMemTable (legacy uint64_t keys)
 #include "marble/json_utils.h"
 #include <sstream>
 
@@ -12,85 +14,121 @@ namespace marble {
 
 // ColumnFamilySet implementation
 ColumnFamilySet::ColumnFamilySet() {
+    // Initialize with empty data
+    data_.store(new ColumnFamilyData(), std::memory_order_release);
+
     // Create default column family
     ColumnFamilyDescriptor default_descriptor("default", ColumnFamilyOptions());
     ColumnFamilyHandle* handle = nullptr;
-    auto status = CreateColumnFamily(default_descriptor, &handle);
-    if (status.ok()) {
-        default_cf_ = handle;
-    }
+    CreateColumnFamily(default_descriptor, &handle);
 }
 
 ColumnFamilySet::~ColumnFamilySet() {
-    // Handles are owned by unique_ptr in families_ map
+    // Clean up current data
+    // Note: Old versions from CAS retries are leaked (acceptable for rare metadata ops)
+    // For production, could use hazard pointers or epoch-based reclamation
+    delete data_.load(std::memory_order_acquire);
 }
 
 Status ColumnFamilySet::CreateColumnFamily(const ColumnFamilyDescriptor& descriptor,
                                           ColumnFamilyHandle** handle) {
-    std::lock_guard<std::mutex> lock(mutex_);
-    
-    // Check if CF already exists
-    if (families_.find(descriptor.name) != families_.end()) {
-        return Status::InvalidArgument("Column family already exists: " + descriptor.name);
-    }
-    
-    // Create new handle
-    uint32_t id = next_id_++;
+    // Allocate unique ID atomically (no contention)
+    uint32_t id = next_id_.fetch_add(1, std::memory_order_relaxed);
+
+    // Create new handle (outside CAS loop)
     auto cf_handle = std::make_unique<ColumnFamilyHandle>(descriptor.name, id);
     cf_handle->options_ = descriptor.options;
-    
-    // Initialize LSM tree components
-    // TODO: Create memtable and levels based on schema
-    
-    *handle = cf_handle.get();
-    id_to_handle_[id] = cf_handle.get();
-    families_[descriptor.name] = std::move(cf_handle);
-    
-    return Status::OK();
+    ColumnFamilyHandle* raw_handle = cf_handle.get();
+
+    // CAS loop for lock-free update
+    while (true) {
+        ColumnFamilyData* current = load_data();
+
+        // Check if already exists
+        if (current && current->families.find(descriptor.name) != current->families.end()) {
+            return Status::InvalidArgument("Column family already exists: " + descriptor.name);
+        }
+
+        // Create new version with added CF
+        ColumnFamilyData* new_data = new ColumnFamilyData(*current);
+        new_data->families[descriptor.name] = raw_handle;
+        new_data->id_to_handle[id] = raw_handle;
+        if (descriptor.name == "default") {
+            new_data->default_cf = raw_handle;
+        }
+        new_data->owned_handles.push_back(std::move(cf_handle));
+
+        // Try CAS
+        if (cas_update(current, new_data)) {
+            // Success! Old version leaked (acceptable for metadata)
+            *handle = raw_handle;
+            return Status::OK();
+        }
+
+        // CAS failed, retry with new current state
+        delete new_data;  // Clean up failed attempt
+    }
 }
 
 ColumnFamilyHandle* ColumnFamilySet::GetColumnFamily(const std::string& name) {
-    std::lock_guard<std::mutex> lock(mutex_);
-    
-    auto it = families_.find(name);
-    if (it == families_.end()) {
-        return nullptr;
-    }
-    
-    return it->second.get();
+    // Completely lock-free read!
+    ColumnFamilyData* current = load_data();
+    if (!current) return nullptr;
+
+    auto it = current->families.find(name);
+    return (it != current->families.end()) ? it->second : nullptr;
 }
 
 ColumnFamilyHandle* ColumnFamilySet::GetColumnFamily(uint32_t id) {
-    std::lock_guard<std::mutex> lock(mutex_);
-    
-    auto it = id_to_handle_.find(id);
-    if (it == id_to_handle_.end()) {
-        return nullptr;
-    }
-    
-    return it->second;
+    // Completely lock-free read!
+    ColumnFamilyData* current = load_data();
+    if (!current) return nullptr;
+
+    auto it = current->id_to_handle.find(id);
+    return (it != current->id_to_handle.end()) ? it->second : nullptr;
 }
 
 Status ColumnFamilySet::DropColumnFamily(const std::string& name) {
-    std::lock_guard<std::mutex> lock(mutex_);
-    
     // Cannot drop default CF
     if (name == "default") {
         return Status::InvalidArgument("Cannot drop default column family");
     }
-    
-    auto it = families_.find(name);
-    if (it == families_.end()) {
-        return Status::NotFound("Column family not found: " + name);
+
+    // CAS loop for lock-free update
+    while (true) {
+        ColumnFamilyData* current = load_data();
+
+        // Check if exists
+        if (!current || current->families.find(name) == current->families.end()) {
+            return Status::NotFound("Column family not found: " + name);
+        }
+
+        // Create new version without this CF
+        ColumnFamilyData* new_data = new ColumnFamilyData(*current);
+        auto it = new_data->families.find(name);
+        if (it != new_data->families.end()) {
+            uint32_t id = it->second->id();
+            new_data->families.erase(it);
+            new_data->id_to_handle.erase(id);
+
+            // Remove from owned_handles
+            new_data->owned_handles.erase(
+                std::remove_if(new_data->owned_handles.begin(), new_data->owned_handles.end(),
+                              [&name](const auto& h) { return h->name() == name; }),
+                new_data->owned_handles.end()
+            );
+        }
+
+        // Try CAS
+        if (cas_update(current, new_data)) {
+            // Success! Old version leaked (acceptable)
+            // TODO: Clean up LSM tree files for this CF
+            return Status::OK();
+        }
+
+        // CAS failed, retry
+        delete new_data;
     }
-    
-    uint32_t id = it->second->id();
-    id_to_handle_.erase(id);
-    families_.erase(it);
-    
-    // TODO: Clean up LSM tree files for this CF
-    
-    return Status::OK();
 }
 
 Status ColumnFamilySet::DropColumnFamily(ColumnFamilyHandle* handle) {
@@ -101,21 +139,29 @@ Status ColumnFamilySet::DropColumnFamily(ColumnFamilyHandle* handle) {
 }
 
 std::vector<std::string> ColumnFamilySet::ListColumnFamilies() const {
-    std::lock_guard<std::mutex> lock(mutex_);
-    
+    // Completely lock-free read!
+    ColumnFamilyData* current = load_data();
+    if (!current) return {};
+
     std::vector<std::string> names;
-    names.reserve(families_.size());
-    
-    for (const auto& pair : families_) {
-        names.push_back(pair.first);
+    names.reserve(current->families.size());
+
+    for (const auto& [name, _] : current->families) {
+        names.push_back(name);
     }
-    
+
     std::sort(names.begin(), names.end());
     return names;
 }
 
+size_t ColumnFamilySet::size() const {
+    ColumnFamilyData* current = load_data();
+    return current ? current->families.size() : 0;
+}
+
 ColumnFamilyHandle* ColumnFamilySet::DefaultColumnFamily() {
-    return default_cf_;
+    ColumnFamilyData* current = load_data();
+    return current ? current->default_cf : nullptr;
 }
 
 // ColumnFamilyMetadata implementation

@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "marble/status.h"
 #include "marble/wal.h"
+#include "marble/db.h"
+#include "marble/table.h"
 
 #include <memory>
 #include <string>

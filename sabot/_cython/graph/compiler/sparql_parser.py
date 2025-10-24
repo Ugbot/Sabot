@@ -63,6 +63,8 @@ class SPARQLParser:
 
     def __init__(self):
         """Initialize parser with SPARQL grammar."""
+        # Storage for PREFIX declarations
+        self._custom_prefixes = {}
         self._build_grammar()
 
     def _build_grammar(self):
@@ -73,6 +75,7 @@ class SPARQLParser:
         # ====================================================================
 
         # Keywords (case-insensitive)
+        PREFIX = CaselessKeyword("PREFIX")
         SELECT = CaselessKeyword("SELECT")
         DISTINCT = CaselessKeyword("DISTINCT")
         WHERE = CaselessKeyword("WHERE")
@@ -154,8 +157,11 @@ class SPARQLParser:
         triple = Group(subject + predicate + obj)
         triple.setParseAction(self._make_triple_pattern)
 
-        # Triple block: one or more triples separated by '.'
-        triple_block = delimitedList(triple, delim=".")
+        # Triple block: one or more triples, each terminated with optional '.'
+        # SPARQL spec: dot is a terminator, not a separator
+        # Use Suppress() so the DOT doesn't appear in parse results
+        triple_with_dot = triple + Optional(Suppress(DOT))
+        triple_block = OneOrMore(triple_with_dot)
 
         # Basic Graph Pattern (BGP)
         bgp = Group(triple_block)
@@ -211,7 +217,7 @@ class SPARQLParser:
 
         # WHERE clause: WHERE { triples filters }
         where_body = bgp + ZeroOrMore(filter_expr)
-        where_clause = WHERE + LBRACE + Group(where_body) + RBRACE
+        where_clause = Suppress(WHERE) + Suppress(LBRACE) + Group(where_body) + Suppress(RBRACE)
         where_clause.setParseAction(self._make_where_clause)
 
         # Solution modifiers
@@ -225,11 +231,22 @@ class SPARQLParser:
         solution_modifier.setParseAction(self._make_solution_modifier)
 
         # ====================================================================
+        # PREFIX Declarations
+        # ====================================================================
+
+        # PREFIX declaration: PREFIX ex: <http://example.org/>
+        # Note: We need to define this after iri_ref is defined
+        prefix_name = Word(alphas, alphanums + "_")
+        prefix_decl = PREFIX + Group(prefix_name + Suppress(Literal(":")) + iri_ref)
+        prefix_decl.setParseAction(self._make_prefix_decl)
+        prefix_decls = ZeroOrMore(prefix_decl)
+
+        # ====================================================================
         # Top-Level Query
         # ====================================================================
 
-        # SELECT query
-        select_query = select_clause + where_clause + Optional(solution_modifier)
+        # SELECT query with optional PREFIX declarations
+        select_query = prefix_decls + select_clause + where_clause + Optional(solution_modifier)
         select_query.setParseAction(self._make_sparql_query)
 
         # Store top-level grammar
@@ -238,6 +255,15 @@ class SPARQLParser:
     # ========================================================================
     # Parse Actions (Convert tokens to AST nodes)
     # ========================================================================
+
+    def _make_prefix_decl(self, tokens):
+        """Store PREFIX declaration for use in expanding prefixed names."""
+        prefix_group = tokens[0]
+        prefix = prefix_group[0]
+        iri = prefix_group[1]
+        self._custom_prefixes[prefix] = iri
+        # Return None - PREFIX declarations don't produce AST nodes
+        return None
 
     def _make_variable(self, tokens):
         """Create Variable from token."""
@@ -250,25 +276,28 @@ class SPARQLParser:
     def _make_prefixed_iri(self, tokens):
         """Create IRI from prefix:name syntax."""
         # Expand prefix to full IRI
-        # For now, use simple namespace mapping
         prefix = tokens[0]
         local_name = tokens[1]
 
-        # Common prefixes
-        namespaces = {
-            'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-            'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
-            'owl': 'http://www.w3.org/2002/07/owl#',
-            'xsd': 'http://www.w3.org/2001/XMLSchema#',
-            'foaf': 'http://xmlns.com/foaf/0.1/',
-            'dc': 'http://purl.org/dc/elements/1.1/',
-        }
-
-        if prefix in namespaces:
-            full_iri = namespaces[prefix] + local_name
+        # Check custom prefixes first (from PREFIX declarations)
+        if prefix in self._custom_prefixes:
+            full_iri = self._custom_prefixes[prefix] + local_name
         else:
-            # Unknown prefix - use as-is
-            full_iri = f"{prefix}:{local_name}"
+            # Fall back to common built-in prefixes
+            namespaces = {
+                'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
+                'owl': 'http://www.w3.org/2002/07/owl#',
+                'xsd': 'http://www.w3.org/2001/XMLSchema#',
+                'foaf': 'http://xmlns.com/foaf/0.1/',
+                'dc': 'http://purl.org/dc/elements/1.1/',
+            }
+
+            if prefix in namespaces:
+                full_iri = namespaces[prefix] + local_name
+            else:
+                # Unknown prefix - use as-is
+                full_iri = f"{prefix}:{local_name}"
 
         return IRI(value=full_iri)
 

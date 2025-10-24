@@ -137,8 +137,7 @@ public:
     void collect_field_values(std::vector<std::shared_ptr<arrow::Array>>& arrays) const;
 };
 
-// Template specializations for the User record
-template<>
+// Template implementations for the User record
 template<size_t I>
 void User::set_field_values(const std::shared_ptr<arrow::RecordBatch>& batch, size_t row_index) {
     if constexpr (I < UserFields::size) {
@@ -158,7 +157,6 @@ void User::set_field_values(const std::shared_ptr<arrow::RecordBatch>& batch, si
     }
 }
 
-template<>
 template<size_t I>
 void User::collect_field_values(std::vector<std::shared_ptr<arrow::Array>>& arrays) const {
     if constexpr (I < UserFields::size) {

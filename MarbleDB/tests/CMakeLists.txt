@@ -20,7 +20,7 @@ target_link_libraries(test_utils
     marble_static
     GTest::GTest
     GTest::Main
-    Arrow::arrow_static
+    Arrow::arrow_shared
     Threads::Threads
 )
 
@@ -32,30 +32,30 @@ add_executable(test_status unit/test_status.cpp)
 target_link_libraries(test_status marble_static GTest::GTest GTest::Main)
 
 add_executable(test_record_system unit/test_record_system.cpp)
-target_link_libraries(test_record_system marble_static GTest::GTest GTest::Main Arrow::arrow_static)
+target_link_libraries(test_record_system marble_static GTest::GTest GTest::Main Arrow::arrow_shared)
 
 add_executable(test_pushdown unit/test_pushdown.cpp)
-target_link_libraries(test_pushdown marble_static GTest::GTest GTest::Main Arrow::arrow_static)
+target_link_libraries(test_pushdown marble_static GTest::GTest GTest::Main Arrow::arrow_shared)
 
 #==============================================================================
 # Integration Tests
 #==============================================================================
 
 add_executable(test_query_execution integration/test_query_execution.cpp)
-target_link_libraries(test_query_execution marble_static GTest::GTest GTest::Main Arrow::arrow_static test_utils)
+target_link_libraries(test_query_execution marble_static GTest::GTest GTest::Main Arrow::arrow_shared test_utils)
 
 add_executable(test_marble_core integration/test_marble_core.cpp)
-target_link_libraries(test_marble_core marble_static GTest::GTest GTest::Main Arrow::arrow_static)
+target_link_libraries(test_marble_core marble_static GTest::GTest GTest::Main Arrow::arrow_shared)
 
 add_executable(test_arctic_bitemporal integration/test_arctic_bitemporal.cpp)
-target_link_libraries(test_arctic_bitemporal marble_static GTest::GTest GTest::Main Arrow::arrow_static)
+target_link_libraries(test_arctic_bitemporal marble_static GTest::GTest GTest::Main Arrow::arrow_shared)
 
 #==============================================================================
 # Performance Tests
 #==============================================================================
 
 add_executable(test_pushdown_performance performance/test_pushdown_performance.cpp)
-target_link_libraries(test_pushdown_performance marble_static GTest::GTest GTest::Main Arrow::arrow_static test_utils)
+target_link_libraries(test_pushdown_performance marble_static GTest::GTest GTest::Main Arrow::arrow_shared test_utils)
 
 #==============================================================================
 # Test Suite Organization

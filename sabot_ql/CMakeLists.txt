@@ -30,9 +30,28 @@ set(SABOT_QL_SOURCES
     # Storage layer
     src/storage/triple_store_impl.cpp
     src/storage/vocabulary_impl.cpp
+    src/storage/triple_store_marbledb.cpp
+    src/storage/vocabulary_marbledb.cpp
 
-    # Operators
+    # Bindings
+    src/bindings/bindings.cpp
+
+    # Operators (base interface)
     src/operators/operator.cpp
+
+    # Execution operators (generic - work with any column family)
+    src/execution/scan_operator.cpp
+    src/execution/zipper_join.cpp
+    src/execution/filter_operator.cpp
+
+    # Generic utility operators
+    src/operators/rename.cpp
+    src/operators/metadata.cpp
+
+    # SPARQL operators
+    src/operators/bind.cpp
+
+    # Legacy operators (to be refactored)
     src/operators/join.cpp
     src/operators/aggregate.cpp
     src/operators/sort.cpp
@@ -47,6 +66,8 @@ set(SABOT_QL_SOURCES
     src/sparql/planner.cpp
     src/sparql/expression_evaluator.cpp
     src/sparql/query_engine.cpp
+    src/sparql/arrow_function_registry.cpp
+    src/sparql/arrow_expression_builder.cpp
 )
 
 # Main library
@@ -77,9 +98,9 @@ install(DIRECTORY include/sabot_ql
     FILES_MATCHING PATTERN "*.h"
 )
 
-# Tests (to be added)
-# enable_testing()
-# add_subdirectory(tests)
+# Tests
+enable_testing()
+add_subdirectory(tests)
 
 # Python bindings (optional - requires pybind11)
 option(BUILD_PYTHON_BINDINGS "Build Python bindings" OFF)

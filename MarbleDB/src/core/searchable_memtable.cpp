@@ -10,11 +10,11 @@ namespace marble {
 // ============================================================================
 
 SearchableMemTable::SearchableMemTable()
-    : skip_list_(std::make_unique<SkipListMemTable>()) {
+    : skip_list_(std::make_unique<SkipListSimpleMemTable>()) {
 }
 
 SearchableMemTable::SearchableMemTable(const MemTableConfig& config)
-    : config_(config), skip_list_(std::make_unique<SkipListMemTable>()) {
+    : config_(config), skip_list_(std::make_unique<SkipListSimpleMemTable>()) {
 
     // Create indexes from config
     for (const auto& idx_config : config.indexes) {
@@ -61,12 +61,12 @@ bool SearchableMemTable::Contains(uint64_t key) const {
     return skip_list_->Contains(key);
 }
 
-Status SearchableMemTable::GetAllEntries(std::vector<MemTableEntry>* entries) const {
+Status SearchableMemTable::GetAllEntries(std::vector<SimpleMemTableEntry>* entries) const {
     return skip_list_->GetAllEntries(entries);
 }
 
 Status SearchableMemTable::Scan(uint64_t start_key, uint64_t end_key,
-                                std::vector<MemTableEntry>* entries) const {
+                                std::vector<SimpleMemTableEntry>* entries) const {
     return skip_list_->Scan(start_key, end_key, entries);
 }
 
@@ -92,12 +92,12 @@ bool SearchableMemTable::ShouldFlush(size_t max_size_bytes) const {
     return skip_list_->ShouldFlush(max_size_bytes);
 }
 
-std::unique_ptr<MemTable> SearchableMemTable::CreateSnapshot() const {
+std::unique_ptr<SimpleMemTable> SearchableMemTable::CreateSnapshot() const {
     // Create snapshot of skip list
     auto snapshot = std::make_unique<SearchableMemTable>(config_);
 
     // Copy skip list data
-    std::vector<MemTableEntry> entries;
+    std::vector<SimpleMemTableEntry> entries;
     skip_list_->GetAllEntries(&entries);
 
     for (const auto& entry : entries) {
@@ -134,7 +134,7 @@ void SearchableMemTable::GetStats(uint64_t* min_key, uint64_t* max_key,
 
 Status SearchableMemTable::SearchByIndex(const std::string& index_name,
                                         const IndexQuery& query,
-                                        std::vector<MemTableEntry>* results) const {
+                                        std::vector<SimpleMemTableEntry>* results) const {
     std::lock_guard<std::mutex> lock(index_mutex_);
 
     auto it = indexes_.find(index_name);
@@ -183,10 +183,10 @@ Status SearchableMemTable::SearchByIndex(const std::string& index_name,
         auto status = skip_list_->Get(key, &value);
 
         if (status.ok()) {
-            MemTableEntry entry;
+            SimpleMemTableEntry entry;
             entry.key = key;
             entry.value = value;
-            entry.op = MemTableEntry::kPut;
+            entry.op = SimpleMemTableEntry::kPut;
             entry.timestamp = 0;  // Would be populated in full impl
             results->push_back(entry);
         }
@@ -215,11 +215,11 @@ Status SearchableMemTable::Configure(const MemTableConfig& config) {
     }
 
     // Rebuild indexes from existing data
-    std::vector<MemTableEntry> entries;
+    std::vector<SimpleMemTableEntry> entries;
     skip_list_->GetAllEntries(&entries);
 
     for (const auto& entry : entries) {
-        UpdateIndexes(entry.key, entry.value, entry.op == MemTableEntry::kDelete);
+        UpdateIndexes(entry.key, entry.value, entry.op == SimpleMemTableEntry::kDelete);
     }
 
     return Status::OK();
@@ -308,17 +308,17 @@ Status SearchableMemTable::UpdateIndexes(uint64_t key,
 // Factory Implementation
 // ============================================================================
 
-std::unique_ptr<MemTable> SearchableMemTableFactory::CreateMemTable() {
+std::unique_ptr<SimpleMemTable> SearchableMemTableFactory::CreateMemTable() {
     return std::make_unique<SearchableMemTable>(config_);
 }
 
-std::unique_ptr<MemTable> SearchableMemTableFactory::CreateMemTableFromEntries(
-    const std::vector<MemTableEntry>& entries) {
+std::unique_ptr<SimpleMemTable> SearchableMemTableFactory::CreateMemTableFromEntries(
+    const std::vector<SimpleMemTableEntry>& entries) {
 
     auto memtable = std::make_unique<SearchableMemTable>(config_);
 
     for (const auto& entry : entries) {
-        if (entry.op == MemTableEntry::kPut) {
+        if (entry.op == SimpleMemTableEntry::kPut) {
             memtable->Put(entry.key, entry.value);
         } else {
             memtable->Delete(entry.key);
@@ -330,7 +330,7 @@ std::unique_ptr<MemTable> SearchableMemTableFactory::CreateMemTableFromEntries(
 
 // Factory functions
 
-std::unique_ptr<MemTableFactory> CreateSearchableMemTableFactory(
+std::unique_ptr<SimpleMemTableFactory> CreateSearchableMemTableFactory(
     const MemTableConfig& config) {
     return std::make_unique<SearchableMemTableFactory>(config);
 }

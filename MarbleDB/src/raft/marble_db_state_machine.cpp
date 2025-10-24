@@ -301,7 +301,7 @@ private:
             return marble::Status::InvalidArgument("Failed to deserialize batch for InsertBatch operation");
         }
 
-        return db_->InsertBatch(op.table_name, *batch);
+        return db_->InsertBatch(op.table_name, batch);
     }
 
     marble::Status ApplyCreateTableOperation(const MarbleOperation& op) {
@@ -311,7 +311,7 @@ private:
             return marble::Status::InvalidArgument("Failed to deserialize schema for CreateTable operation");
         }
 
-        TableSchema table_schema(op.table_name, *schema);
+        TableSchema table_schema(op.table_name, schema);
         return db_->CreateTable(table_schema);
     }
 
@@ -481,7 +481,7 @@ std::unique_ptr<RaftOperation> CreateCreateTableOperation(
 
     auto marble_op = std::make_unique<MarbleOperation>();
     marble_op->type = MarbleOperationType::kCreateTable;
-    marble_op->table_name = schema.name;
+    marble_op->table_name = schema.table_name;
     marble_op->timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch()).count();
 

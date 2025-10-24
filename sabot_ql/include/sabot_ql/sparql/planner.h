@@ -68,6 +68,12 @@ public:
         const FilterClause& filter,
         PlanningContext& ctx);
 
+    // Plan a BIND clause
+    arrow::Result<std::shared_ptr<Operator>> PlanBind(
+        std::shared_ptr<Operator> input,
+        const BindClause& bind,
+        PlanningContext& ctx);
+
     // Plan an OPTIONAL clause
     arrow::Result<std::shared_ptr<Operator>> PlanOptional(
         std::shared_ptr<Operator> input,

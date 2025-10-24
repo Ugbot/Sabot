@@ -7,19 +7,19 @@
 namespace marble {
 
 // SkipListMemTable implementation
-SkipListMemTable::SkipNode::SkipNode(uint64_t k, const MemTableEntry& e, int level)
+SkipListSimpleMemTable::SkipNode::SkipNode(uint64_t k, const SimpleMemTableEntry& e, int level)
     : key(k), entry(e), forward(level + 1, nullptr) {}
 
-SkipListMemTable::SkipListMemTable()
+SkipListSimpleMemTable::SkipListSimpleMemTable()
     : max_level_(1), entry_count_(0), memory_usage_(0),
       min_key_(UINT64_MAX), max_key_(0) {
     // Create header node with maximum possible level
-    header_ = std::make_unique<SkipNode>(0, MemTableEntry(), kMaxLevel);
+    header_ = std::make_unique<SkipNode>(0, SimpleMemTableEntry(), kMaxLevel);
 }
 
-SkipListMemTable::~SkipListMemTable() = default;
+SkipListSimpleMemTable::~SkipListSimpleMemTable() = default;
 
-int SkipListMemTable::GetRandomLevel() const {
+int SkipListSimpleMemTable::GetRandomLevel() const {
     int level = 0;
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -31,7 +31,7 @@ int SkipListMemTable::GetRandomLevel() const {
     return level;
 }
 
-SkipListMemTable::SkipNode* SkipListMemTable::Find(uint64_t key) const {
+SkipListSimpleMemTable::SkipNode* SkipListSimpleMemTable::Find(uint64_t key) const {
     SkipNode* current = header_.get();
 
     // Start from the highest level
@@ -52,7 +52,7 @@ SkipListMemTable::SkipNode* SkipListMemTable::Find(uint64_t key) const {
     return nullptr;
 }
 
-Status SkipListMemTable::Put(uint64_t key, const std::string& value) {
+Status SkipListSimpleMemTable::Put(uint64_t key, const std::string& value) {
     std::lock_guard<std::mutex> lock(mutex_);
 
     // Check if key already exists
@@ -63,7 +63,7 @@ Status SkipListMemTable::Put(uint64_t key, const std::string& value) {
         size_t new_size = value.size();
 
         existing->entry.value = value;
-        existing->entry.op = MemTableEntry::kPut;
+        existing->entry.op = SimpleMemTableEntry::kPut;
         existing->entry.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
 
@@ -72,7 +72,7 @@ Status SkipListMemTable::Put(uint64_t key, const std::string& value) {
     }
 
     // Create new entry
-    MemTableEntry entry(key, value, MemTableEntry::kPut);
+    SimpleMemTableEntry entry(key, value, SimpleMemTableEntry::kPut);
     entry.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::system_clock::now().time_since_epoch()).count();
 
@@ -110,7 +110,7 @@ Status SkipListMemTable::Put(uint64_t key, const std::string& value) {
     entry_count_++;
     memory_usage_ += sizeof(SkipNode) + value.size() +
                     (level + 1) * sizeof(std::unique_ptr<SkipNode>) +
-                    sizeof(MemTableEntry);
+                    sizeof(SimpleMemTableEntry);
 
     // Store the node (transfer ownership)
     // FIXME: We need to properly manage node ownership in the skip list
@@ -120,20 +120,20 @@ Status SkipListMemTable::Put(uint64_t key, const std::string& value) {
     return Status::OK();
 }
 
-Status SkipListMemTable::Delete(uint64_t key) {
+Status SkipListSimpleMemTable::Delete(uint64_t key) {
     std::lock_guard<std::mutex> lock(mutex_);
 
     SkipNode* existing = Find(key);
     if (existing) {
         // Mark as deleted
-        existing->entry.op = MemTableEntry::kDelete;
+        existing->entry.op = SimpleMemTableEntry::kDelete;
         existing->entry.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
         return Status::OK();
     }
 
     // Create tombstone entry
-    MemTableEntry entry(key, "", MemTableEntry::kDelete);
+    SimpleMemTableEntry entry(key, "", SimpleMemTableEntry::kDelete);
     entry.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::system_clock::now().time_since_epoch()).count();
 
@@ -169,14 +169,14 @@ Status SkipListMemTable::Delete(uint64_t key) {
     // Update statistics
     entry_count_++;
     memory_usage_ += sizeof(SkipNode) + (level + 1) * sizeof(std::unique_ptr<SkipNode>) +
-                    sizeof(MemTableEntry);
+                    sizeof(SimpleMemTableEntry);
 
     new_node.release();
 
     return Status::OK();
 }
 
-Status SkipListMemTable::Get(uint64_t key, std::string* value) const {
+Status SkipListSimpleMemTable::Get(uint64_t key, std::string* value) const {
     std::lock_guard<std::mutex> lock(mutex_);
 
     SkipNode* node = Find(key);
@@ -185,7 +185,7 @@ Status SkipListMemTable::Get(uint64_t key, std::string* value) const {
     }
 
     // Check if it's a delete operation
-    if (node->entry.op == MemTableEntry::kDelete) {
+    if (node->entry.op == SimpleMemTableEntry::kDelete) {
         return Status::NotFound("Key was deleted");
     }
 
@@ -193,13 +193,13 @@ Status SkipListMemTable::Get(uint64_t key, std::string* value) const {
     return Status::OK();
 }
 
-bool SkipListMemTable::Contains(uint64_t key) const {
+bool SkipListSimpleMemTable::Contains(uint64_t key) const {
     std::lock_guard<std::mutex> lock(mutex_);
     SkipNode* node = Find(key);
-    return node && node->entry.op != MemTableEntry::kDelete;
+    return node && node->entry.op != SimpleMemTableEntry::kDelete;
 }
 
-Status SkipListMemTable::GetAllEntries(std::vector<MemTableEntry>* entries) const {
+Status SkipListSimpleMemTable::GetAllEntries(std::vector<SimpleMemTableEntry>* entries) const {
     std::lock_guard<std::mutex> lock(mutex_);
 
     entries->clear();
@@ -214,8 +214,8 @@ Status SkipListMemTable::GetAllEntries(std::vector<MemTableEntry>* entries) cons
     return Status::OK();
 }
 
-Status SkipListMemTable::Scan(uint64_t start_key, uint64_t end_key,
-                             std::vector<MemTableEntry>* entries) const {
+Status SkipListSimpleMemTable::Scan(uint64_t start_key, uint64_t end_key,
+                             std::vector<SimpleMemTableEntry>* entries) const {
     std::lock_guard<std::mutex> lock(mutex_);
 
     entries->clear();
@@ -239,25 +239,25 @@ Status SkipListMemTable::Scan(uint64_t start_key, uint64_t end_key,
     return Status::OK();
 }
 
-size_t SkipListMemTable::GetMemoryUsage() const {
+size_t SkipListSimpleMemTable::GetMemoryUsage() const {
     std::lock_guard<std::mutex> lock(mutex_);
     return memory_usage_;
 }
 
-size_t SkipListMemTable::GetEntryCount() const {
+size_t SkipListSimpleMemTable::GetEntryCount() const {
     std::lock_guard<std::mutex> lock(mutex_);
     return entry_count_;
 }
 
-bool SkipListMemTable::ShouldFlush(size_t max_size_bytes) const {
+bool SkipListSimpleMemTable::ShouldFlush(size_t max_size_bytes) const {
     std::lock_guard<std::mutex> lock(mutex_);
     return memory_usage_ >= max_size_bytes;
 }
 
-std::unique_ptr<MemTable> SkipListMemTable::CreateSnapshot() const {
+std::unique_ptr<SimpleMemTable> SkipListSimpleMemTable::CreateSnapshot() const {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    auto snapshot = std::make_unique<SkipListMemTable>();
+    auto snapshot = std::make_unique<SkipListSimpleMemTable>();
 
     // Copy all entries
     SkipNode* current = header_->forward[0];
@@ -275,11 +275,11 @@ std::unique_ptr<MemTable> SkipListMemTable::CreateSnapshot() const {
     return snapshot;
 }
 
-void SkipListMemTable::Clear() {
+void SkipListSimpleMemTable::Clear() {
     std::lock_guard<std::mutex> lock(mutex_);
 
     // Reset header
-    header_ = std::make_unique<SkipNode>(0, MemTableEntry(), kMaxLevel);
+    header_ = std::make_unique<SkipNode>(0, SimpleMemTableEntry(), kMaxLevel);
     max_level_ = 1;
     entry_count_ = 0;
     memory_usage_ = 0;
@@ -290,7 +290,7 @@ void SkipListMemTable::Clear() {
     // For now, we're leaking memory to avoid complex ownership issues
 }
 
-void SkipListMemTable::GetStats(uint64_t* min_key, uint64_t* max_key,
+void SkipListSimpleMemTable::GetStats(uint64_t* min_key, uint64_t* max_key,
                                size_t* entry_count, size_t* memory_usage) const {
     std::lock_guard<std::mutex> lock(mutex_);
     *min_key = min_key_;
@@ -299,17 +299,17 @@ void SkipListMemTable::GetStats(uint64_t* min_key, uint64_t* max_key,
     *memory_usage = memory_usage_;
 }
 
-// StandardMemTableFactory implementation
-std::unique_ptr<MemTable> StandardMemTableFactory::CreateMemTable() {
-    return std::make_unique<SkipListMemTable>();
+// StandardSimpleMemTableFactory implementation
+std::unique_ptr<SimpleMemTable> StandardSimpleMemTableFactory::CreateMemTable() {
+    return std::make_unique<SkipListSimpleMemTable>();
 }
 
-std::unique_ptr<MemTable> StandardMemTableFactory::CreateMemTableFromEntries(
-    const std::vector<MemTableEntry>& entries) {
-    auto memtable = std::make_unique<SkipListMemTable>();
+std::unique_ptr<SimpleMemTable> StandardSimpleMemTableFactory::CreateMemTableFromEntries(
+    const std::vector<SimpleMemTableEntry>& entries) {
+    auto memtable = std::make_unique<SkipListSimpleMemTable>();
 
     for (const auto& entry : entries) {
-        if (entry.op == MemTableEntry::kPut) {
+        if (entry.op == SimpleMemTableEntry::kPut) {
             memtable->Put(entry.key, entry.value);
         } else {
             memtable->Delete(entry.key);
@@ -320,8 +320,8 @@ std::unique_ptr<MemTable> StandardMemTableFactory::CreateMemTableFromEntries(
 }
 
 // Factory function
-std::unique_ptr<MemTableFactory> CreateMemTableFactory() {
-    return std::make_unique<StandardMemTableFactory>();
+std::unique_ptr<SimpleMemTableFactory> CreateSimpleMemTableFactory() {
+    return std::make_unique<StandardSimpleMemTableFactory>();
 }
 
 } // namespace marble

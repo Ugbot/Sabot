@@ -87,35 +87,7 @@ public:
                                          status.ToString());
         }
 
-        // Also populate in-memory cache for scanning (MVP approach)
-        // Reserve space for better performance
-        spo_cache_.reserve(spo_cache_.size() + triples.size());
-        pos_cache_.reserve(pos_cache_.size() + triples.size());
-        osp_cache_.reserve(osp_cache_.size() + triples.size());
-
-        for (const auto& triple : triples) {
-            // SPO index: (S, P, O)
-            spo_cache_.push_back({
-                triple.subject.getBits(),
-                triple.predicate.getBits(),
-                triple.object.getBits()
-            });
-
-            // POS index: (P, O, S)
-            pos_cache_.push_back({
-                triple.predicate.getBits(),
-                triple.object.getBits(),
-                triple.subject.getBits()
-            });
-
-            // OSP index: (O, S, P)
-            osp_cache_.push_back({
-                triple.object.getBits(),
-                triple.subject.getBits(),
-                triple.predicate.getBits()
-            });
-        }
-
+        // Update statistics
         total_triples_ += triples.size();
         return arrow::Status::OK();
     }
@@ -246,71 +218,245 @@ private:
         ARROW_RETURN_NOT_OK(col2_builder.Finish(&col2_array));
         ARROW_RETURN_NOT_OK(col3_builder.Finish(&col3_array));
 
-        // Schema depends on index type
-        std::shared_ptr<arrow::Schema> schema;
-        switch (index) {
-            case IndexType::SPO:
-                schema = arrow::schema({
-                    arrow::field("subject", arrow::int64()),
-                    arrow::field("predicate", arrow::int64()),
-                    arrow::field("object", arrow::int64())
-                });
-                break;
-            case IndexType::POS:
-                schema = arrow::schema({
-                    arrow::field("predicate", arrow::int64()),
-                    arrow::field("object", arrow::int64()),
-                    arrow::field("subject", arrow::int64())
-                });
-                break;
-            case IndexType::OSP:
-                schema = arrow::schema({
-                    arrow::field("object", arrow::int64()),
-                    arrow::field("subject", arrow::int64()),
-                    arrow::field("predicate", arrow::int64())
-                });
-                break;
-        }
+        // Schema must match column family schema (col1, col2, col3)
+        // The ordering is determined by the index type, but column names are generic
+        std::shared_ptr<arrow::Schema> schema = arrow::schema({
+            arrow::field("col1", arrow::int64()),
+            arrow::field("col2", arrow::int64()),
+            arrow::field("col3", arrow::int64())
+        });
 
         return arrow::RecordBatch::Make(schema, triples.size(),
                                        {col1_array, col2_array, col3_array});
     }
 
-    // Scan index with pattern
+    // Helper: Convert index type to column family name
+    std::string IndexTypeToString(IndexType index) const {
+        switch (index) {
+            case IndexType::SPO: return "SPO";
+            case IndexType::POS: return "POS";
+            case IndexType::OSP: return "OSP";
+            default: return "SPO";
+        }
+    }
+
+    // Helper: Build MarbleDB key range from triple pattern
+    // Inspired by QLever's ScanSpecification
+    // Uses TripleKey for proper lexicographic ordering
+    marble::KeyRange BuildKeyRange(IndexType index, const TriplePattern& pattern) {
+        // Get bound values based on index type
+        // SPO index: (subject, predicate, object)
+        // POS index: (predicate, object, subject)
+        // OSP index: (object, subject, predicate)
+
+        std::optional<uint64_t> col1, col2, col3;
+        switch (index) {
+            case IndexType::SPO:
+                col1 = pattern.subject;
+                col2 = pattern.predicate;
+                col3 = pattern.object;
+                break;
+            case IndexType::POS:
+                col1 = pattern.predicate;
+                col2 = pattern.object;
+                col3 = pattern.subject;
+                break;
+            case IndexType::OSP:
+                col1 = pattern.object;
+                col2 = pattern.subject;
+                col3 = pattern.predicate;
+                break;
+        }
+
+        // Build key range using TripleKey
+        // TripleKey compares lexicographically: first col1, then col2, then col3
+
+        if (col1.has_value()) {
+            if (col2.has_value()) {
+                if (col3.has_value()) {
+                    // All three bound - point lookup
+                    auto key = std::make_shared<marble::TripleKey>(
+                        static_cast<int64_t>(col1.value()),
+                        static_cast<int64_t>(col2.value()),
+                        static_cast<int64_t>(col3.value())
+                    );
+                    return marble::KeyRange(key, true, key, true);
+                } else {
+                    // col1 and col2 bound - range scan for col3
+                    // Start: (col1, col2, 0)
+                    // End: (col1, col2+1, 0) exclusive
+                    auto start = std::make_shared<marble::TripleKey>(
+                        static_cast<int64_t>(col1.value()),
+                        static_cast<int64_t>(col2.value()),
+                        0
+                    );
+                    auto end = std::make_shared<marble::TripleKey>(
+                        static_cast<int64_t>(col1.value()),
+                        static_cast<int64_t>(col2.value() + 1),
+                        0
+                    );
+                    return marble::KeyRange(start, true, end, false);
+                }
+            } else {
+                // Only col1 bound - range scan for col2 and col3
+                // Start: (col1, 0, 0)
+                // End: (col1+1, 0, 0) exclusive
+                auto start = std::make_shared<marble::TripleKey>(
+                    static_cast<int64_t>(col1.value()),
+                    0,
+                    0
+                );
+                auto end = std::make_shared<marble::TripleKey>(
+                    static_cast<int64_t>(col1.value() + 1),
+                    0,
+                    0
+                );
+                return marble::KeyRange(start, true, end, false);
+            }
+        } else {
+            // No columns bound - full scan
+            return marble::KeyRange::All();
+        }
+    }
+
+    // Helper: Convert MarbleDB record to triple values
+    arrow::Result<std::tuple<uint64_t, uint64_t, uint64_t>>
+    ConvertRecordToValues(const std::shared_ptr<marble::Record>& record) {
+        // Records in triple store are Arrow RecordBatches with 3 int64 columns
+        // Extract the values from the Arrow data
+
+        // Get the Arrow RecordBatch from MarbleDB record
+        ARROW_ASSIGN_OR_RAISE(auto batch, record->ToRecordBatch());
+        if (!batch || batch->num_rows() == 0) {
+            return arrow::Status::Invalid("Empty record batch");
+        }
+
+        // We expect exactly 3 columns (col1, col2, col3)
+        if (batch->num_columns() != 3) {
+            return arrow::Status::Invalid("Expected 3 columns, got " +
+                                         std::to_string(batch->num_columns()));
+        }
+
+        // Extract first row (each MarbleDB record contains one triple)
+        auto col1_array = std::static_pointer_cast<arrow::Int64Array>(batch->column(0));
+        auto col2_array = std::static_pointer_cast<arrow::Int64Array>(batch->column(1));
+        auto col3_array = std::static_pointer_cast<arrow::Int64Array>(batch->column(2));
+
+        uint64_t col1 = static_cast<uint64_t>(col1_array->Value(0));
+        uint64_t col2 = static_cast<uint64_t>(col2_array->Value(0));
+        uint64_t col3 = static_cast<uint64_t>(col3_array->Value(0));
+
+        return std::make_tuple(col1, col2, col3);
+    }
+
+    // Helper: Check if triple matches pattern (for post-filtering)
+    bool MatchesPattern(IndexType index, const TriplePattern& pattern,
+                       uint64_t col1, uint64_t col2, uint64_t col3) const {
+        // Map columns back to S, P, O based on index type
+        uint64_t s, p, o;
+        switch (index) {
+            case IndexType::SPO:
+                s = col1; p = col2; o = col3;
+                break;
+            case IndexType::POS:
+                p = col1; o = col2; s = col3;
+                break;
+            case IndexType::OSP:
+                o = col1; s = col2; p = col3;
+                break;
+        }
+
+        // Check each bound variable
+        if (pattern.subject.has_value() && pattern.subject.value() != s) return false;
+        if (pattern.predicate.has_value() && pattern.predicate.value() != p) return false;
+        if (pattern.object.has_value() && pattern.object.value() != o) return false;
+
+        return true;
+    }
+
+    // Scan index with pattern using MarbleDB Iterator API
     arrow::Result<std::shared_ptr<arrow::Table>> ScanIndex(
         IndexType index, const TriplePattern& pattern) {
 
-        // MVP Implementation: Use in-memory cache for scanning
-        // TODO: Once MarbleDB Iterator API is implemented, use range scans
+        // Build key range for MarbleDB scan
+        marble::KeyRange range = BuildKeyRange(index, pattern);
 
-        // Get cached triples for this index
-        const auto& triples_cache = GetCacheForIndex(index);
+        // Get column family name for this index
+        std::string cf_name = IndexTypeToString(index);
 
-        // Build result by filtering cached triples
+        // Create MarbleDB iterator for the specific column family
+        marble::ReadOptions read_opts;
+        read_opts.fill_cache = true;  // Cache frequently accessed data
+
+        std::unique_ptr<marble::Iterator> it;
+        auto status = db_->NewIterator(cf_name, read_opts, range, &it);
+        if (!status.ok()) {
+            return arrow::Status::IOError("Failed to create iterator for " + cf_name +
+                                         ": " + status.ToString());
+        }
+
+        // Stream results into Arrow builders
+        // Batch size: 10K rows for efficient memory usage
+        const size_t BATCH_SIZE = 10000;
         arrow::Int64Builder col1_builder;
         arrow::Int64Builder col2_builder;
         arrow::Int64Builder col3_builder;
 
-        // Estimate size for better performance
-        size_t estimated_size = total_triples_ / 10;  // Rough estimate
-        ARROW_RETURN_NOT_OK(col1_builder.Reserve(estimated_size));
-        ARROW_RETURN_NOT_OK(col2_builder.Reserve(estimated_size));
-        ARROW_RETURN_NOT_OK(col3_builder.Reserve(estimated_size));
+        // Reserve space for first batch
+        ARROW_RETURN_NOT_OK(col1_builder.Reserve(BATCH_SIZE));
+        ARROW_RETURN_NOT_OK(col2_builder.Reserve(BATCH_SIZE));
+        ARROW_RETURN_NOT_OK(col3_builder.Reserve(BATCH_SIZE));
 
-        // Scan and filter based on bound variables
-        for (const auto& triple_data : triples_cache) {
-            uint64_t col1 = triple_data.col1;
-            uint64_t col2 = triple_data.col2;
-            uint64_t col3 = triple_data.col3;
+        size_t rows_scanned = 0;
 
-            // Apply pattern filter based on index type
-            bool matches = CheckPatternMatch(index, pattern, col1, col2, col3);
+        // Seek to start of range
+        if (range.start()) {
+            it->Seek(*range.start());
+        } else {
+            // Full scan - start from the beginning using minimal key
+            auto min_key = marble::TripleKey(0, 0, 0);
+            it->Seek(min_key);
+        }
 
-            if (matches) {
+        // Iterate through matching records
+        while (it->Valid()) {
+            // Check if we've exceeded range end
+            if (range.end() && range.end_inclusive()) {
+                if (it->key()->Compare(*range.end()) > 0) {
+                    break;  // Past end of range
+                }
+            } else if (range.end() && !range.end_inclusive()) {
+                if (it->key()->Compare(*range.end()) >= 0) {
+                    break;  // At or past end of range
+                }
+            }
+
+            // Extract (col1, col2, col3) from record
+            auto record = it->value();
+
+            // Records in triple store are Arrow RecordBatches with 3 int64 columns
+            // Extract values directly from Arrow data
+            auto batch_result = ConvertRecordToValues(record);
+            if (!batch_result.ok()) {
+                return arrow::Status::IOError("Failed to extract values from record");
+            }
+            auto [col1, col2, col3] = batch_result.ValueOrDie();
+
+            // Apply additional filtering if needed
+            // (MarbleDB range scan handles prefix, but we may need exact match on later columns)
+            if (MatchesPattern(index, pattern, col1, col2, col3)) {
                 ARROW_RETURN_NOT_OK(col1_builder.Append(col1));
                 ARROW_RETURN_NOT_OK(col2_builder.Append(col2));
                 ARROW_RETURN_NOT_OK(col3_builder.Append(col3));
+                rows_scanned++;
             }
+
+            it->Next();
+        }
+
+        // Check iterator status
+        if (!it->status().ok()) {
+            return arrow::Status::IOError("Iterator error: " + it->status().ToString());
         }
 
         // Finish arrays
@@ -322,11 +468,17 @@ private:
         ARROW_RETURN_NOT_OK(col2_builder.Finish(&col2_array));
         ARROW_RETURN_NOT_OK(col3_builder.Finish(&col3_array));
 
-        // Create schema based on index type
-        auto schema = GetIndexSchema(index);
+        // Create table with columns in index order
+        auto index_table = arrow::Table::Make(
+            GetIndexSchema(index),
+            {col1_array, col2_array, col3_array}
+        );
 
-        // Create table
-        return arrow::Table::Make(schema, {col1_array, col2_array, col3_array});
+        // Un-permute columns to canonical (subject, predicate, object) order
+        // This ensures ProjectResult always sees data in S-P-O order
+        ARROW_ASSIGN_OR_RAISE(auto canonical_table, UnpermuteToSPO(index_table, index));
+
+        return canonical_table;
     }
 
     // Project scan results to requested columns
@@ -362,46 +514,55 @@ private:
         return arrow::Table::Make(projected_schema, projected_columns);
     }
 
-    // Simple triple storage for in-memory cache
-    struct TripleData {
-        uint64_t col1;
-        uint64_t col2;
-        uint64_t col3;
-    };
+    // Helper: Un-permute table columns to canonical SPO order
+    // Each index stores data in a different permutation:
+    //   SPO: (subject, predicate, object)
+    //   POS: (predicate, object, subject)
+    //   OSP: (object, subject, predicate)
+    // This function converts any permutation back to (subject, predicate, object)
+    arrow::Result<std::shared_ptr<arrow::Table>> UnpermuteToSPO(
+        const std::shared_ptr<arrow::Table>& table,
+        IndexType index) const {
 
-    // Helper: Get cache for index
-    const std::vector<TripleData>& GetCacheForIndex(IndexType index) const {
-        switch (index) {
-            case IndexType::SPO: return spo_cache_;
-            case IndexType::POS: return pos_cache_;
-            case IndexType::OSP: return osp_cache_;
-            default: return spo_cache_;
-        }
-    }
+        // SPO schema (canonical ordering)
+        auto spo_schema = arrow::schema({
+            arrow::field("subject", arrow::int64()),
+            arrow::field("predicate", arrow::int64()),
+            arrow::field("object", arrow::int64())
+        });
 
-    // Helper: Check if triple matches pattern
-    bool CheckPatternMatch(IndexType index, const TriplePattern& pattern,
-                          uint64_t col1, uint64_t col2, uint64_t col3) const {
-        // Map columns back to S, P, O based on index type
-        uint64_t s, p, o;
         switch (index) {
             case IndexType::SPO:
-                s = col1; p = col2; o = col3;
-                break;
-            case IndexType::POS:
-                p = col1; o = col2; s = col3;
-                break;
-            case IndexType::OSP:
-                o = col1; s = col2; p = col3;
-                break;
+                // Already in (subject, predicate, object) order
+                return table;
+
+            case IndexType::POS: {
+                // Convert from (predicate, object, subject) to (subject, predicate, object)
+                // Column mapping: [2, 0, 1] -> [0, 1, 2]
+                //   col0 (predicate) -> col1
+                //   col1 (object) -> col2
+                //   col2 (subject) -> col0
+                return arrow::Table::Make(
+                    spo_schema,
+                    {table->column(2), table->column(0), table->column(1)}
+                );
+            }
+
+            case IndexType::OSP: {
+                // Convert from (object, subject, predicate) to (subject, predicate, object)
+                // Column mapping: [1, 2, 0] -> [0, 1, 2]
+                //   col0 (object) -> col2
+                //   col1 (subject) -> col0
+                //   col2 (predicate) -> col1
+                return arrow::Table::Make(
+                    spo_schema,
+                    {table->column(1), table->column(2), table->column(0)}
+                );
+            }
+
+            default:
+                return arrow::Status::Invalid("Unknown index type");
         }
-
-        // Check each bound variable
-        if (pattern.subject.has_value() && pattern.subject.value() != s) return false;
-        if (pattern.predicate.has_value() && pattern.predicate.value() != p) return false;
-        if (pattern.object.has_value() && pattern.object.value() != o) return false;
-
-        return true;
     }
 
     // Helper: Get schema for index
@@ -441,12 +602,6 @@ private:
     marble::ColumnFamilyHandle* spo_handle_ = nullptr;
     marble::ColumnFamilyHandle* pos_handle_ = nullptr;
     marble::ColumnFamilyHandle* osp_handle_ = nullptr;
-
-    // In-memory cache for scanning (MVP approach)
-    // TODO: Remove once MarbleDB Iterator API is implemented
-    std::vector<TripleData> spo_cache_;
-    std::vector<TripleData> pos_cache_;
-    std::vector<TripleData> osp_cache_;
 
     // Statistics
     size_t total_triples_ = 0;

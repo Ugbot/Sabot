@@ -21,3 +21,6 @@
 - never claim things as done when not finished, no lying
 
 - do not use placeholder functions, variables, or "TODO" code in implementation files; all committed code must be functional and complete. This ensures we know the actual working state of the codebase at all times.
+- no short cuts, no simplifications
+- we are buidling sabot. any thrid party system is there purely for reference. dont suggest we use them instead.
+- sabot is arrow first where ever it can be. Arrow everywhere means all operators can interop, and all thigns can be shuffled and streamed. by usign one vendored arrow we can then imporve it if eeds be.

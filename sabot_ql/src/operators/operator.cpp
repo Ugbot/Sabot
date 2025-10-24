@@ -3,6 +3,7 @@
 #include <arrow/compute/api.h>
 #include <sstream>
 #include <chrono>
+#include <iostream>
 
 namespace sabot_ql {
 
@@ -18,22 +19,33 @@ std::string OperatorStats::ToString() const {
 }
 
 arrow::Result<std::shared_ptr<arrow::Table>> Operator::GetAllResults() {
+    std::cout << "[OPERATOR] GetAllResults: Starting on " << ToString() << "\n" << std::flush;
     std::vector<std::shared_ptr<arrow::RecordBatch>> batches;
 
+    std::cout << "[OPERATOR] Calling HasNextBatch()\n" << std::flush;
     while (HasNextBatch()) {
+        std::cout << "[OPERATOR] HasNextBatch() returned true, calling GetNextBatch()\n" << std::flush;
         ARROW_ASSIGN_OR_RAISE(auto batch, GetNextBatch());
+        std::cout << "[OPERATOR] GetNextBatch() returned\n" << std::flush;
         if (batch) {
+            std::cout << "[OPERATOR] Batch has " << batch->num_rows() << " rows\n" << std::flush;
             batches.push_back(batch);
         }
+        std::cout << "[OPERATOR] Calling HasNextBatch() again\n" << std::flush;
     }
+    std::cout << "[OPERATOR] HasNextBatch() returned false\n" << std::flush;
 
     if (batches.empty()) {
+        std::cout << "[OPERATOR] No batches, creating empty table\n" << std::flush;
         // Return empty table with correct schema
+        std::cout << "[OPERATOR] Calling GetOutputSchema()\n" << std::flush;
         ARROW_ASSIGN_OR_RAISE(auto schema, GetOutputSchema());
+        std::cout << "[OPERATOR] GetOutputSchema() returned\n" << std::flush;
         std::vector<std::shared_ptr<arrow::Array>> empty_arrays;
         return arrow::Table::Make(schema, empty_arrays);
     }
 
+    std::cout << "[OPERATOR] Creating table from " << batches.size() << " batches\n" << std::flush;
     return arrow::Table::FromRecordBatches(batches);
 }
 
@@ -270,22 +282,33 @@ arrow::Result<std::shared_ptr<arrow::Schema>> ProjectOperator::GetOutputSchema()
 }
 
 arrow::Result<std::shared_ptr<arrow::RecordBatch>> ProjectOperator::GetNextBatch() {
+    std::cout << "[PROJECT] GetNextBatch: Starting\n" << std::flush;
+    std::cout << "[PROJECT] Calling input_->GetNextBatch()\n" << std::flush;
     ARROW_ASSIGN_OR_RAISE(auto batch, input_->GetNextBatch());
+    std::cout << "[PROJECT] input_->GetNextBatch() returned\n" << std::flush;
     if (!batch) {
+        std::cout << "[PROJECT] batch is null, returning nullptr\n" << std::flush;
         return nullptr;
     }
+    std::cout << "[PROJECT] batch has " << batch->num_rows() << " rows, " << batch->num_columns() << " cols\n" << std::flush;
 
     // Select columns
+    std::cout << "[PROJECT] Selecting " << column_indices_.size() << " columns\n" << std::flush;
     std::vector<std::shared_ptr<arrow::Array>> columns;
     for (int idx : column_indices_) {
+        std::cout << "[PROJECT]   Selecting column " << idx << "\n" << std::flush;
         columns.push_back(batch->column(idx));
     }
+    std::cout << "[PROJECT] Columns selected\n" << std::flush;
 
+    std::cout << "[PROJECT] Calling GetOutputSchema()\n" << std::flush;
     ARROW_ASSIGN_OR_RAISE(auto output_schema, GetOutputSchema());
+    std::cout << "[PROJECT] GetOutputSchema() returned\n" << std::flush;
 
     stats_.rows_processed += batch->num_rows();
     stats_.batches_processed++;
 
+    std::cout << "[PROJECT] Creating output batch\n" << std::flush;
     return arrow::RecordBatch::Make(output_schema, batch->num_rows(), columns);
 }
 

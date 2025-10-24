@@ -3,6 +3,7 @@
 #include <sabot_ql/operators/aggregate.h>
 #include <sstream>
 #include <chrono>
+#include <iostream>
 
 namespace sabot_ql {
 
@@ -26,13 +27,23 @@ std::string QueryStats::ToString() const {
 // QueryExecutor implementation
 arrow::Result<std::shared_ptr<arrow::Table>> QueryExecutor::Execute(
     std::shared_ptr<Operator> root_operator) {
+    std::cout << "[EXECUTOR] Execute: Starting\n" << std::flush;
+
+    if (!root_operator) {
+        std::cout << "[EXECUTOR] ERROR: root_operator is null!\n" << std::flush;
+        return arrow::Status::Invalid("root_operator is null");
+    }
+    std::cout << "[EXECUTOR] Root operator type: " << root_operator->ToString() << "\n" << std::flush;
 
     stats_ = QueryStats{};  // Reset statistics
+    std::cout << "[EXECUTOR] Stats reset\n" << std::flush;
 
     auto start = std::chrono::high_resolution_clock::now();
 
     // Execute operator pipeline
+    std::cout << "[EXECUTOR] Calling root_operator->GetAllResults()\n" << std::flush;
     ARROW_ASSIGN_OR_RAISE(auto result_table, root_operator->GetAllResults());
+    std::cout << "[EXECUTOR] GetAllResults() returned\n" << std::flush;
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);

@@ -49,33 +49,49 @@ public:
         const Key& begin_key,
         const Key& end_key,
         MemTable* memtable,
-        WAL* wal,
+        WalManager* wal,
         uint64_t sequence_number) {
-        
+
+        // TODO: Implement range tombstone support
+        // Current blockers:
+        // 1. Key is abstract - need Clone() method or concrete type
+        // 2. WAL doesn't have kRangeTombstone enum value
+        // 3. Need to store end_key in WalEntry (currently only has key+value Record)
+        (void)options;
+        (void)begin_key;
+        (void)end_key;
+        (void)memtable;
+        (void)wal;
+        (void)sequence_number;
+
+        return Status::NotImplemented("DeleteRange not yet implemented");
+
+        /* Original implementation (needs architecture updates):
         // Validate range
         if (begin_key.Compare(end_key) >= 0) {
             return Status::InvalidArgument("begin_key must be < end_key");
         }
-        
+
         // Create tombstone marker
         RangeTombstone tombstone;
-        tombstone.begin_key = std::make_shared<Key>(begin_key);
-        tombstone.end_key = std::make_shared<Key>(end_key);
+        tombstone.begin_key = begin_key.Clone();  // Need Clone() method
+        tombstone.end_key = end_key.Clone();
         tombstone.sequence_number = sequence_number;
-        
+
         // Write to WAL if enabled
         if (options.sync && wal) {
             WalEntry entry;
-            entry.type = WalEntryType::kRangeTombstone;
+            entry.entry_type = WalEntryType::kDelete;  // TODO: Add kRangeTombstone
             entry.key = tombstone.begin_key;
-            entry.value = tombstone.end_key->ToString();  // Store end_key as value
+            // TODO: Store end_key somewhere in WalEntry
             entry.sequence_number = sequence_number;
-            
-            auto status = wal->Write(entry);
+
+            auto status = wal->WriteEntry(entry);
             if (!status.ok()) {
                 return status;
             }
         }
+        */
         
         // Add to memtable (store as special marker)
         // TODO: Extend memtable to support range tombstones natively

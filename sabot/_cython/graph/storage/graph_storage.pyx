@@ -644,7 +644,7 @@ cdef class PyRDFTripleStore:
         # Linear search through term dictionary
         # (Full implementation would use hash table)
         lex_column = self._term_dict.column('lex').combine_chunks()
-        for i in range(lex_column.length()):
+        for i in range(len(lex_column)):
             if lex_column[i].as_py() == lex:
                 return self._term_dict.column('id').combine_chunks()[i].as_py()
         return -1
@@ -658,7 +658,7 @@ cdef class PyRDFTripleStore:
         id_column = self._term_dict.column('id').combine_chunks()
         lex_column = self._term_dict.column('lex').combine_chunks()
 
-        for i in range(id_column.length()):
+        for i in range(len(id_column)):
             if id_column[i].as_py() == term_id:
                 return lex_column[i].as_py()
 

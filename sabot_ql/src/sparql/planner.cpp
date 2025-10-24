@@ -1,14 +1,27 @@
 #include <sabot_ql/sparql/planner.h>
 #include <sabot_ql/sparql/expression_evaluator.h>
+#include <sabot_ql/sparql/arrow_expression_builder.h>
 #include <sabot_ql/operators/join.h>
 #include <sabot_ql/operators/aggregate.h>
 #include <sabot_ql/operators/sort.h>
 #include <sabot_ql/operators/union.h>
+#include <sabot_ql/operators/bind.h>
+// Layer 2 operators (new generic implementations)
+#include <sabot_ql/execution/scan_operator.h>
+#include <sabot_ql/execution/zipper_join.h>
+#include <sabot_ql/execution/filter_operator.h>
+#include <sabot_ql/operators/rename.h>
 #include <sstream>
 #include <algorithm>
+#include <iostream>
 
 namespace sabot_ql {
 namespace sparql {
+
+// Forward declaration for SPARQL expression converter
+arrow::Result<std::shared_ptr<FilterExpression>> SPARQLExpressionToFilterExpression(
+    const Expression& sparql_expr,
+    PlanningContext& ctx);
 
 // Helper functions
 namespace planning {
@@ -67,44 +80,64 @@ std::vector<std::string> GetVariables(const BasicGraphPattern& bgp) {
 
 // QueryPlanner implementation
 arrow::Result<PhysicalPlan> QueryPlanner::PlanSelectQuery(const SelectQuery& query) {
+    std::cout << "[PLANNER] PlanSelectQuery: Starting\n" << std::flush;
     PhysicalPlan plan;
     PlanningContext ctx(store_, vocab_);
+    std::cout << "[PLANNER] Context created\n" << std::flush;
 
     // 1. Plan WHERE clause (basic graph pattern)
     if (!query.where.bgp.has_value()) {
         return arrow::Status::Invalid("SELECT query must have WHERE clause with basic graph pattern");
     }
+    std::cout << "[PLANNER] About to plan BGP with " << query.where.bgp->triples.size() << " triples\n" << std::flush;
 
     ARROW_ASSIGN_OR_RAISE(
         plan.root_operator,
         PlanBasicGraphPattern(*query.where.bgp, ctx)
     );
+    std::cout << "[PLANNER] BGP planned successfully\n" << std::flush;
 
     // 2. Plan FILTER clauses
+    std::cout << "[PLANNER] Planning " << query.where.filters.size() << " filters\n" << std::flush;
     for (const auto& filter : query.where.filters) {
         ARROW_ASSIGN_OR_RAISE(
             plan.root_operator,
             PlanFilter(plan.root_operator, filter, ctx)
         );
     }
+    std::cout << "[PLANNER] Filters planned\n" << std::flush;
 
-    // 3. Plan OPTIONAL clauses
+    // 3. Plan BIND clauses
+    std::cout << "[PLANNER] Planning " << query.where.binds.size() << " binds\n" << std::flush;
+    for (const auto& bind : query.where.binds) {
+        ARROW_ASSIGN_OR_RAISE(
+            plan.root_operator,
+            PlanBind(plan.root_operator, bind, ctx)
+        );
+    }
+    std::cout << "[PLANNER] Binds planned\n" << std::flush;
+
+    // 5. Plan OPTIONAL clauses
+    std::cout << "[PLANNER] Planning " << query.where.optionals.size() << " optionals\n" << std::flush;
     for (const auto& optional : query.where.optionals) {
         ARROW_ASSIGN_OR_RAISE(
             plan.root_operator,
             PlanOptional(plan.root_operator, optional, ctx)
         );
     }
+    std::cout << "[PLANNER] Optionals planned\n" << std::flush;
 
-    // 4. Plan UNION clauses
+    // 6. Plan UNION clauses
+    std::cout << "[PLANNER] Planning " << query.where.unions.size() << " unions\n" << std::flush;
     for (const auto& union_pat : query.where.unions) {
         ARROW_ASSIGN_OR_RAISE(
             plan.root_operator,
             PlanUnion(union_pat, ctx)
         );
     }
+    std::cout << "[PLANNER] Unions planned\n" << std::flush;
 
-    // 5. Plan GROUP BY and aggregates
+    // 7. Plan GROUP BY and aggregates
     if (query.HasAggregates()) {
         // Extract aggregate expressions from SELECT clause
         auto aggregates = ExtractAggregates(query.select);
@@ -137,86 +170,166 @@ arrow::Result<PhysicalPlan> QueryPlanner::PlanSelectQuery(const SelectQuery& que
     }
 
     // 6. Plan ORDER BY
+    std::cout << "[PLANNER] Planning ORDER BY (" << query.order_by.size() << " clauses)\n" << std::flush;
     if (!query.order_by.empty()) {
         ARROW_ASSIGN_OR_RAISE(
             plan.root_operator,
             PlanOrderBy(plan.root_operator, query.order_by, ctx)
         );
     }
+    std::cout << "[PLANNER] ORDER BY planned\n" << std::flush;
 
     // 7. Plan projection (SELECT clause) - only if not aggregating
+    std::cout << "[PLANNER] Planning projection (HasAgg=" << query.HasAggregates()
+              << ", HasGroup=" << query.HasGroupBy()
+              << ", IsSelectAll=" << query.select.IsSelectAll() << ")\n" << std::flush;
     if (!query.HasAggregates() && !query.HasGroupBy() && !query.select.IsSelectAll()) {
+        std::cout << "[PLANNER] Projection needed for " << query.select.items.size() << " items\n" << std::flush;
         std::vector<std::string> select_cols;
+        std::unordered_map<std::string, std::string> renamings;  // col_name → var_name
+
         for (const auto& item : query.select.items) {
             if (auto* var = std::get_if<Variable>(&item)) {
-                select_cols.push_back(planning::VariableToColumnName(*var));
+                std::cout << "[PLANNER]   Processing variable: " << var->name << "\n" << std::flush;
+                // Use var_to_column mapping to get actual column name
+                auto it = ctx.var_to_column.find(var->name);
+                if (it != ctx.var_to_column.end()) {
+                    std::cout << "[PLANNER]     Found mapping: " << var->name << " -> " << it->second << "\n" << std::flush;
+                    select_cols.push_back(it->second);
+                    // Map: internal column name (subject) → SPARQL variable (s)
+                    renamings[it->second] = var->name;
+                } else {
+                    std::cout << "[PLANNER]     No mapping, using variable name directly\n" << std::flush;
+                    // Fallback: use variable name directly
+                    select_cols.push_back(planning::VariableToColumnName(*var));
+                }
             }
         }
 
+        std::cout << "[PLANNER] Creating ProjectOperator with " << select_cols.size() << " columns\n" << std::flush;
+        // ProjectOperator: Select which columns
         plan.root_operator = std::make_shared<ProjectOperator>(
             plan.root_operator,
             select_cols
         );
+        std::cout << "[PLANNER] ProjectOperator created\n" << std::flush;
+
+        // RenameOperator: Rename to SPARQL variable names
+        // This gives us "s", "o" instead of "subject", "object"
+        if (!renamings.empty()) {
+            std::cout << "[PLANNER] Creating RenameOperator with " << renamings.size() << " renamings\n" << std::flush;
+            plan.root_operator = std::make_shared<RenameOperator>(
+                plan.root_operator,
+                renamings
+            );
+            std::cout << "[PLANNER] RenameOperator created\n" << std::flush;
+        }
     }
+    std::cout << "[PLANNER] Projection complete\n" << std::flush;
 
     // 8. Plan DISTINCT (only if not already handled by GROUP BY)
+    std::cout << "[PLANNER] Planning DISTINCT\n" << std::flush;
     if (query.select.distinct && !query.HasGroupBy()) {
         plan.root_operator = std::make_shared<DistinctOperator>(plan.root_operator);
     }
+    std::cout << "[PLANNER] DISTINCT planned\n" << std::flush;
 
     // 9. Plan LIMIT
+    std::cout << "[PLANNER] Planning LIMIT\n" << std::flush;
     if (query.limit.has_value()) {
         plan.root_operator = std::make_shared<LimitOperator>(
             plan.root_operator,
             *query.limit
         );
     }
+    std::cout << "[PLANNER] LIMIT planned\n" << std::flush;
 
     // 9. Estimate cost
+    std::cout << "[PLANNER] Estimating cardinality\n" << std::flush;
     plan.estimated_cost = plan.root_operator->EstimateCardinality();
+    std::cout << "[PLANNER] Estimated cost: " << plan.estimated_cost << "\n" << std::flush;
 
+    std::cout << "[PLANNER] PlanSelectQuery complete!\n" << std::flush;
     return plan;
 }
 
 arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanTriplePattern(
     const TriplePattern& pattern,
     PlanningContext& ctx) {
+    std::cout << "[PLANNER] PlanTriplePattern: Starting\n" << std::flush;
 
     // Convert SPARQL triple pattern to storage triple pattern
     sabot_ql::TriplePattern storage_pattern;
+    std::cout << "[PLANNER] Created storage pattern\n" << std::flush;
 
     // Convert subject
+    std::cout << "[PLANNER] Converting subject\n" << std::flush;
     ARROW_ASSIGN_OR_RAISE(auto subject_vid, TermToValueId(pattern.subject, ctx));
     storage_pattern.subject = subject_vid.has_value() ?
         std::optional<uint64_t>(subject_vid->getBits()) : std::nullopt;
+    if (storage_pattern.subject.has_value()) {
+        std::cout << "[PLANNER] Subject bound to ID: " << storage_pattern.subject.value() << "\n" << std::flush;
+    } else {
+        std::cout << "[PLANNER] Subject unbound (variable)\n" << std::flush;
+    }
 
     // Convert predicate
-    ARROW_ASSIGN_OR_RAISE(auto predicate_vid, TermToValueId(pattern.predicate, ctx));
+    std::cout << "[PLANNER] Converting predicate\n" << std::flush;
+
+    // Check if it's a property path (not yet supported)
+    if (pattern.IsPredicatePropertyPath()) {
+        return arrow::Status::NotImplemented(
+            "Property paths are parsed but not yet supported in query execution");
+    }
+
+    // Extract RDFTerm from PredicatePosition
+    auto* pred_term = std::get_if<RDFTerm>(&pattern.predicate);
+    if (!pred_term) {
+        return arrow::Status::Invalid("Invalid predicate type");
+    }
+
+    ARROW_ASSIGN_OR_RAISE(auto predicate_vid, TermToValueId(*pred_term, ctx));
     storage_pattern.predicate = predicate_vid.has_value() ?
         std::optional<uint64_t>(predicate_vid->getBits()) : std::nullopt;
+    if (storage_pattern.predicate.has_value()) {
+        std::cout << "[PLANNER] Predicate bound to ID: " << storage_pattern.predicate.value() << "\n" << std::flush;
+    } else {
+        std::cout << "[PLANNER] Predicate unbound (variable)\n" << std::flush;
+    }
 
     // Convert object
+    std::cout << "[PLANNER] Converting object\n" << std::flush;
     ARROW_ASSIGN_OR_RAISE(auto object_vid, TermToValueId(pattern.object, ctx));
     storage_pattern.object = object_vid.has_value() ?
         std::optional<uint64_t>(object_vid->getBits()) : std::nullopt;
+    if (storage_pattern.object.has_value()) {
+        std::cout << "[PLANNER] Object bound to ID: " << storage_pattern.object.value() << "\n" << std::flush;
+    } else {
+        std::cout << "[PLANNER] Object unbound (variable)\n" << std::flush;
+    }
 
-    // Create scan operator
-    auto scan_op = std::make_shared<TripleScanOperator>(
-        store_,
-        vocab_,
-        storage_pattern
-    );
-
-    // Update variable-to-column mappings
+    // Build variable bindings for this scan (column_name → SPARQL variable)
+    std::unordered_map<std::string, std::string> var_bindings;
     if (auto var = pattern.GetSubjectVar()) {
+        var_bindings["subject"] = *var;
         ctx.var_to_column[*var] = "subject";
     }
     if (auto var = pattern.GetPredicateVar()) {
+        var_bindings["predicate"] = *var;
         ctx.var_to_column[*var] = "predicate";
     }
     if (auto var = pattern.GetObjectVar()) {
+        var_bindings["object"] = *var;
         ctx.var_to_column[*var] = "object";
     }
+
+    // Create scan operator with variable bindings (enables metadata)
+    auto scan_op = std::make_shared<ScanOperator>(
+        store_,
+        storage_pattern,
+        "",  // description
+        var_bindings
+    );
 
     return scan_op;
 }
@@ -224,22 +337,28 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanTriplePattern(
 arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanBasicGraphPattern(
     const BasicGraphPattern& bgp,
     PlanningContext& ctx) {
+    std::cout << "[PLANNER] PlanBasicGraphPattern: Starting\n" << std::flush;
 
     if (bgp.triples.empty()) {
         return arrow::Status::Invalid("Empty basic graph pattern");
     }
+    std::cout << "[PLANNER] BGP has " << bgp.triples.size() << " triples\n" << std::flush;
 
     // Use optimizer to reorder triple patterns
+    std::cout << "[PLANNER] Creating optimizer\n" << std::flush;
     QueryOptimizer optimizer(store_);
+    std::cout << "[PLANNER] Optimizing BGP\n" << std::flush;
     auto optimized_triples = optimizer.OptimizeBasicGraphPattern(bgp);
+    std::cout << "[PLANNER] BGP optimized, planning first triple\n" << std::flush;
 
     // Plan first triple pattern
     ARROW_ASSIGN_OR_RAISE(
         auto current_op,
         PlanTriplePattern(optimized_triples[0], ctx)
     );
+    std::cout << "[PLANNER] First triple planned\n" << std::flush;
 
-    // Join remaining triple patterns
+    // Join remaining triple patterns using ZipperJoin (merge join)
     for (size_t i = 1; i < optimized_triples.size(); ++i) {
         const auto& pattern = optimized_triples[i];
 
@@ -260,27 +379,33 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanBasicGraphPattern(
             return arrow::Status::NotImplemented("Cross product not yet supported");
         }
 
-        // Build join keys
-        std::vector<std::string> left_keys;
-        std::vector<std::string> right_keys;
+        // Build join column names (same columns on both sides for zipper join)
+        std::vector<std::string> join_columns;
 
         for (const auto& var : join_vars) {
             // Map variable to column name
             auto it = ctx.var_to_column.find(var);
             if (it != ctx.var_to_column.end()) {
-                left_keys.push_back(it->second);
-                right_keys.push_back(it->second);
+                join_columns.push_back(it->second);
             }
         }
 
-        // Create join operator
-        current_op = CreateJoin(
+        // ZipperJoin requires sorted inputs
+        // Build sort keys (all ascending for join)
+        std::vector<SortKey> sort_keys;
+        for (const auto& col : join_columns) {
+            sort_keys.emplace_back(col, SortDirection::Ascending);
+        }
+
+        // Add SortOperator before joining
+        current_op = std::make_shared<SortOperator>(current_op, sort_keys);
+        right_op = std::make_shared<SortOperator>(right_op, sort_keys);
+
+        // Create zipper join operator (Layer 2 - O(n+m) merge join)
+        current_op = std::make_shared<ZipperJoinOperator>(
             current_op,
             right_op,
-            left_keys,
-            right_keys,
-            JoinType::Inner,
-            JoinAlgorithm::Hash
+            join_columns
         );
     }
 
@@ -292,20 +417,53 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanFilter(
     const FilterClause& filter,
     PlanningContext& ctx) {
 
-    // Convert SPARQL expression to Arrow predicate
+    // Convert SPARQL expression to FilterExpression tree (Layer 2)
     ARROW_ASSIGN_OR_RAISE(
-        auto predicate,
-        ExpressionToPredicate(*filter.expr, ctx)
+        auto filter_expr,
+        SPARQLExpressionToFilterExpression(*filter.expr, ctx)
     );
 
-    // Get human-readable description
-    std::string description = GetExpressionDescription(filter.expr);
-
-    return std::make_shared<FilterOperator>(
+    // Create expression filter operator (uses Arrow compute kernels)
+    auto filter_op = std::make_shared<ExpressionFilterOperator>(
         input,
-        predicate,
-        description
+        filter_expr,
+        filter.expr->ToString()  // human-readable description
     );
+
+    return filter_op;
+}
+
+arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanBind(
+    std::shared_ptr<Operator> input,
+    const BindClause& bind,
+    PlanningContext& ctx) {
+
+    // Build variable-to-field mapping from input schema
+    ARROW_ASSIGN_OR_RAISE(auto input_schema, input->GetOutputSchema());
+    std::unordered_map<std::string, std::string> var_to_field;
+    for (int i = 0; i < input_schema->num_fields(); ++i) {
+        std::string field_name = input_schema->field(i)->name();
+        var_to_field[field_name] = field_name;
+    }
+
+    // Convert SPARQL expression to Arrow Expression
+    ARROW_ASSIGN_OR_RAISE(
+        auto arrow_expr,
+        ArrowExpressionBuilder::Build(*bind.expr, var_to_field)
+    );
+
+    // Create BIND operator
+    auto bind_op = std::make_shared<BindOperator>(
+        input,
+        arrow_expr,
+        bind.alias.name,
+        bind.expr->ToString()  // human-readable description
+    );
+
+    // Update variable mappings
+    ctx.var_to_column[bind.alias.name] = bind.alias.name;
+
+    return bind_op;
 }
 
 arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanOptional(
@@ -776,10 +934,23 @@ arrow::Result<size_t> QueryOptimizer::EstimateCardinality(
     }
 
     // Convert predicate
+    // First check if it's a property path (not yet supported in execution)
+    if (pattern.IsPredicatePropertyPath()) {
+        return arrow::Status::NotImplemented(
+            "Property paths are parsed but not yet supported in query execution. "
+            "Property path execution will be implemented in Phase 4 (optimization).");
+    }
+
+    // Handle simple predicate (RDFTerm)
+    auto* pred_term = std::get_if<RDFTerm>(&pattern.predicate);
+    if (!pred_term) {
+        return arrow::Status::Invalid("Invalid predicate type");
+    }
+
     if (auto var = pattern.GetPredicateVar()) {
         // Variable - unbound
         storage_pattern.predicate = std::nullopt;
-    } else if (auto* iri = std::get_if<IRI>(&pattern.predicate)) {
+    } else if (auto* iri = std::get_if<IRI>(pred_term)) {
         // Bound IRI - look up ValueId
         Term term = Term::IRI(iri->iri);
         ARROW_ASSIGN_OR_RAISE(auto maybe_id, vocab->GetValueId(term));
@@ -789,7 +960,7 @@ arrow::Result<size_t> QueryOptimizer::EstimateCardinality(
             // IRI not in vocabulary - pattern matches nothing
             return 0;
         }
-    } else if (auto* literal = std::get_if<Literal>(&pattern.predicate)) {
+    } else if (auto* literal = std::get_if<Literal>(pred_term)) {
         // Literals cannot be predicates in RDF - pattern matches nothing
         return 0;
     }
@@ -924,6 +1095,169 @@ double QueryOptimizer::EstimateJoinCost(
     }
 
     return 1000000.0;  // Large default cost
+}
+
+//==============================================================================
+// SPARQL Expression to FilterExpression Converter (for Layer 2)
+//==============================================================================
+
+arrow::Result<std::shared_ptr<FilterExpression>> SPARQLExpressionToFilterExpression(
+    const Expression& sparql_expr,
+    PlanningContext& ctx) {
+
+    // Handle leaf nodes (constants)
+    if (sparql_expr.IsConstant()) {
+        // For now, we don't support direct constant comparisons without operators
+        return arrow::Status::NotImplemented("Direct constant expressions not yet supported");
+    }
+
+    // Handle operator expressions
+    switch (sparql_expr.op) {
+        // Comparison operators
+        case ExprOperator::Equal: {
+            if (sparql_expr.arguments.size() != 2) {
+                return arrow::Status::Invalid("Equal requires 2 arguments");
+            }
+
+            // Get left argument (should be variable)
+            auto& left = *sparql_expr.arguments[0];
+            auto& right = *sparql_expr.arguments[1];
+
+            if (!left.IsConstant() || !std::holds_alternative<Variable>(*left.constant)) {
+                return arrow::Status::NotImplemented("Left side of comparison must be variable");
+            }
+
+            auto var = std::get<Variable>(*left.constant);
+            auto it = ctx.var_to_column.find(var.name);
+            if (it == ctx.var_to_column.end()) {
+                return arrow::Status::Invalid("Variable not found: " + var.name);
+            }
+            std::string column_name = it->second;
+
+            // Get right argument (should be literal)
+            if (!right.IsConstant() || !std::holds_alternative<Literal>(*right.constant)) {
+                return arrow::Status::NotImplemented("Right side of comparison must be literal");
+            }
+
+            auto literal = std::get<Literal>(*right.constant);
+
+            // Create Term from literal and look up its ValueID in vocabulary
+            // This ensures we compare ValueIDs with ValueIDs, not raw integers
+            Term term = Term::Literal(literal.value, literal.language, literal.datatype);
+            ARROW_ASSIGN_OR_RAISE(auto value_id, ctx.vocab->AddTerm(term));
+
+            // Use ValueID bits as the comparison value
+            int64_t value_id_bits = value_id.getBits();
+            auto scalar = arrow::MakeScalar(value_id_bits);
+
+            return std::make_shared<ComparisonExpression>(
+                column_name,
+                ComparisonOp::EQ,
+                scalar
+            );
+        }
+
+        case ExprOperator::NotEqual:
+        case ExprOperator::LessThan:
+        case ExprOperator::LessThanEqual:
+        case ExprOperator::GreaterThan:
+        case ExprOperator::GreaterThanEqual: {
+            if (sparql_expr.arguments.size() != 2) {
+                return arrow::Status::Invalid("Comparison requires 2 arguments");
+            }
+
+            auto& left = *sparql_expr.arguments[0];
+            auto& right = *sparql_expr.arguments[1];
+
+            if (!left.IsConstant() || !std::holds_alternative<Variable>(*left.constant)) {
+                return arrow::Status::NotImplemented("Left side must be variable");
+            }
+
+            auto var = std::get<Variable>(*left.constant);
+            auto it = ctx.var_to_column.find(var.name);
+            if (it == ctx.var_to_column.end()) {
+                return arrow::Status::Invalid("Variable not found: " + var.name);
+            }
+            std::string column_name = it->second;
+
+            if (!right.IsConstant() || !std::holds_alternative<Literal>(*right.constant)) {
+                return arrow::Status::NotImplemented("Right side must be literal");
+            }
+
+            auto literal = std::get<Literal>(*right.constant);
+
+            // Create Term from literal and look up its ValueID in vocabulary
+            // This ensures we compare ValueIDs with ValueIDs, not raw integers
+            Term term = Term::Literal(literal.value, literal.language, literal.datatype);
+            ARROW_ASSIGN_OR_RAISE(auto value_id, ctx.vocab->AddTerm(term));
+
+            // Use ValueID bits as the comparison value
+            int64_t value_id_bits = value_id.getBits();
+            auto scalar = arrow::MakeScalar(value_id_bits);
+
+            // Map SPARQL operator to ComparisonOp
+            ComparisonOp cmp_op;
+            switch (sparql_expr.op) {
+                case ExprOperator::NotEqual:        cmp_op = ComparisonOp::NEQ; break;
+                case ExprOperator::LessThan:        cmp_op = ComparisonOp::LT; break;
+                case ExprOperator::LessThanEqual:   cmp_op = ComparisonOp::LTE; break;
+                case ExprOperator::GreaterThan:     cmp_op = ComparisonOp::GT; break;
+                case ExprOperator::GreaterThanEqual:cmp_op = ComparisonOp::GTE; break;
+                default: return arrow::Status::Invalid("Invalid comparison operator");
+            }
+
+            return std::make_shared<ComparisonExpression>(
+                column_name,
+                cmp_op,
+                scalar
+            );
+        }
+
+        // Logical operators
+        case ExprOperator::And: {
+            std::vector<std::shared_ptr<FilterExpression>> operands;
+            for (const auto& arg : sparql_expr.arguments) {
+                ARROW_ASSIGN_OR_RAISE(
+                    auto operand,
+                    SPARQLExpressionToFilterExpression(*arg, ctx)
+                );
+                operands.push_back(operand);
+            }
+            return std::make_shared<LogicalExpression>(LogicalOp::AND, operands);
+        }
+
+        case ExprOperator::Or: {
+            std::vector<std::shared_ptr<FilterExpression>> operands;
+            for (const auto& arg : sparql_expr.arguments) {
+                ARROW_ASSIGN_OR_RAISE(
+                    auto operand,
+                    SPARQLExpressionToFilterExpression(*arg, ctx)
+                );
+                operands.push_back(operand);
+            }
+            return std::make_shared<LogicalExpression>(LogicalOp::OR, operands);
+        }
+
+        case ExprOperator::Not: {
+            if (sparql_expr.arguments.size() != 1) {
+                return arrow::Status::Invalid("NOT requires 1 argument");
+            }
+            ARROW_ASSIGN_OR_RAISE(
+                auto operand,
+                SPARQLExpressionToFilterExpression(*sparql_expr.arguments[0], ctx)
+            );
+            return std::make_shared<LogicalExpression>(
+                LogicalOp::NOT,
+                std::vector<std::shared_ptr<FilterExpression>>{operand}
+            );
+        }
+
+        default:
+            return arrow::Status::NotImplemented(
+                "SPARQL operator not yet supported in filters: " +
+                std::to_string(static_cast<int>(sparql_expr.op))
+            );
+    }
 }
 
 } // namespace sparql

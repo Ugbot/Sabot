@@ -438,7 +438,7 @@ Status TimeSeriesSkippingIndex::GetCandidateBlocks(const std::string& column_nam
     }
 
     // Use base implementation for non-time queries
-    return SkippingIndex::GetCandidateBlocks(column_name, op, value, candidate_blocks);
+    return InMemorySkippingIndex::GetCandidateBlocks(column_name, op, value, candidate_blocks);
 }
 
 Status TimeSeriesSkippingIndex::GetBlockStats(int64_t block_id, BlockStats* stats) const {

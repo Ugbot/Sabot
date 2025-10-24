@@ -21,9 +21,10 @@ option(MARBLE_USE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
 find_package(Boost REQUIRED COMPONENTS filesystem system coroutine)
 find_package(Threads REQUIRED)
 
-# Try to find system-installed Arrow first
-find_package(Arrow QUIET)
-find_package(Parquet QUIET)
+# Use ONLY vendored Arrow (never system Arrow per project requirements)
+set(ARROW_VENDORED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/arrow/cpp/build/install)
+find_package(Arrow REQUIRED PATHS ${ARROW_VENDORED_PATH}/lib/cmake/Arrow NO_DEFAULT_PATH)
+find_package(Parquet REQUIRED PATHS ${ARROW_VENDORED_PATH}/lib/cmake/Parquet NO_DEFAULT_PATH)
 
 # Find Arrow Flight
 find_package(ArrowFlight QUIET)
@@ -39,7 +40,7 @@ if(NOT ArrowFlight_FOUND)
 
     # Try to find Arrow Flight as part of Arrow
     if(NOT ArrowFlight_FOUND AND Arrow_FOUND)
-        get_target_property(ARROW_FLIGHT_LIB Arrow::arrow_flight_static LOCATION)
+        get_target_property(ARROW_FLIGHT_LIB ArrowFlight::arrow_flight_shared LOCATION)
         if(ARROW_FLIGHT_LIB)
             set(ArrowFlight_FOUND TRUE)
         endif()
@@ -59,24 +60,7 @@ if(NOT nlohmann_json_FOUND)
     endif()
 endif()
 
-if(NOT Arrow_FOUND OR NOT Parquet_FOUND)
-    message(WARNING "Arrow/Parquet not found system-wide. "
-                   "Please build Arrow from ../vendor/arrow/cpp first:\n"
-                   "  cd ../vendor/arrow/cpp\n"
-                   "  mkdir build && cd build\n"
-                   "  cmake .. -DARROW_BUILD_STATIC=ON -DARROW_BUILD_SHARED=OFF \\\n"
-                   "           -DARROW_PARQUET=ON -DARROW_CPP=ON \\\n"
-                   "           -DARROW_BUILD_TESTS=OFF -DARROW_BUILD_EXAMPLES=OFF\n"
-                   "  make -j$(nproc)\n"
-                   "  sudo make install\n"
-                   "Then re-run CMake for MarbleDB.")
-
-    # Create dummy targets to allow CMake to continue
-    add_library(Arrow::arrow_static INTERFACE IMPORTED)
-    add_library(Parquet::parquet_static INTERFACE IMPORTED)
-else()
-    message(STATUS "Found system-installed Arrow ${Arrow_VERSION} and Parquet")
-endif()
+message(STATUS "Using vendored Arrow ${Arrow_VERSION} from ${ARROW_VENDORED_PATH}")
 
 # NuRaft for Raft consensus
 if(MARBLE_ENABLE_RAFT)
@@ -193,6 +177,9 @@ if(NOT MARBLE_ENABLE_RAFT)
     endforeach()
 endif()
 
+# Remove arrow_flight_transport.cpp (requires Arrow Flight module not available)
+list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/raft/arrow_flight_transport.cpp")
+
 # Explicitly list source files to ensure they're included
 set(MARBLE_SOURCES
     ${MARBLE_SOURCES}
@@ -232,7 +219,7 @@ if(MARBLE_ENABLE_RAFT)
     list(APPEND MARBLE_SOURCES
         src/raft/raft_server.cpp
         src/raft/raft_wrappers.cpp
-        src/raft/arrow_flight_transport.cpp
+        # src/raft/arrow_flight_transport.cpp  # Disabled: requires Arrow Flight module
         src/raft/marble_wal_state_machine.cpp
         src/raft/marble_db_state_machine.cpp
         src/raft/marble_log_store.cpp
@@ -249,8 +236,8 @@ if(MARBLE_BUILD_STATIC)
     )
     target_link_libraries(marble_static
         PUBLIC
-            Arrow::arrow_static
-            Parquet::parquet_static
+            Arrow::arrow_shared
+            Parquet::parquet_shared
             Boost::filesystem
             Boost::system
             Threads::Threads
@@ -267,14 +254,14 @@ if(MARBLE_BUILD_STATIC)
     # Link Arrow Flight if available (only when RAFT is enabled)
     if(MARBLE_ENABLE_RAFT)
         if(ArrowFlight_FOUND)
-            target_link_libraries(marble_static PUBLIC Arrow::arrow_flight_static)
+            target_link_libraries(marble_static PUBLIC ArrowFlight::arrow_flight_shared)
             target_compile_definitions(marble_static PUBLIC MARBLE_ENABLE_ARROW_FLIGHT)
         elseif(ARROW_FLIGHT_FOUND)
             target_link_libraries(marble_static PUBLIC ${ARROW_FLIGHT_LIBRARIES})
             target_include_directories(marble_static PUBLIC ${ARROW_FLIGHT_INCLUDE_DIRS})
             target_compile_definitions(marble_static PUBLIC MARBLE_ENABLE_ARROW_FLIGHT)
-        elseif(TARGET Arrow::arrow_flight_static)
-            target_link_libraries(marble_static PUBLIC Arrow::arrow_flight_static)
+        elseif(TARGET ArrowFlight::arrow_flight_shared)
+            target_link_libraries(marble_static PUBLIC ArrowFlight::arrow_flight_shared)
             target_compile_definitions(marble_static PUBLIC MARBLE_ENABLE_ARROW_FLIGHT)
         endif()
     endif()
@@ -298,8 +285,8 @@ if(MARBLE_BUILD_SHARED)
     )
     target_link_libraries(marble_shared
         PUBLIC
-            Arrow::arrow_static
-            Parquet::parquet_static
+            Arrow::arrow_shared
+            Parquet::parquet_shared
             Boost::filesystem
             Boost::system
             Threads::Threads
@@ -316,14 +303,14 @@ if(MARBLE_BUILD_SHARED)
     # Link Arrow Flight if available (only when RAFT is enabled)
     if(MARBLE_ENABLE_RAFT)
         if(ArrowFlight_FOUND)
-            target_link_libraries(marble_shared PUBLIC Arrow::arrow_flight_static)
+            target_link_libraries(marble_shared PUBLIC ArrowFlight::arrow_flight_shared)
             target_compile_definitions(marble_shared PUBLIC MARBLE_ENABLE_ARROW_FLIGHT)
         elseif(ARROW_FLIGHT_FOUND)
             target_link_libraries(marble_shared PUBLIC ${ARROW_FLIGHT_LIBRARIES})
             target_include_directories(marble_shared PUBLIC ${ARROW_FLIGHT_INCLUDE_DIRS})
             target_compile_definitions(marble_shared PUBLIC MARBLE_ENABLE_ARROW_FLIGHT)
-        elseif(TARGET Arrow::arrow_flight_static)
-            target_link_libraries(marble_shared PUBLIC Arrow::arrow_flight_static)
+        elseif(TARGET ArrowFlight::arrow_flight_shared)
+            target_link_libraries(marble_shared PUBLIC ArrowFlight::arrow_flight_shared)
             target_compile_definitions(marble_shared PUBLIC MARBLE_ENABLE_ARROW_FLIGHT)
         endif()
     endif()

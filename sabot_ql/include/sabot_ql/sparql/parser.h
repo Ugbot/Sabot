@@ -15,11 +15,32 @@ namespace sparql {
 enum class TokenType {
     // Keywords
     PREFIX, BASE,
-    SELECT, WHERE, FILTER, OPTIONAL, UNION, ORDER, BY, ASC, DESC,
+    SELECT, ASK, CONSTRUCT, DESCRIBE,
+    WHERE, FILTER, BIND, OPTIONAL, UNION, ORDER, BY, ASC, DESC,
     DISTINCT, LIMIT, OFFSET, AS, GROUP,
+    VALUES, MINUS_KEYWORD, EXISTS, NOT_KEYWORD,
 
     // Built-in functions
     BOUND, ISIRI, ISLITERAL, ISBLANK, STR, LANG, DATATYPE, REGEX,
+
+    // String functions
+    STRLEN, SUBSTR, UCASE, LCASE, STRSTARTS, STRENDS, CONTAINS,
+    STRBEFORE, STRAFTER, CONCAT, LANGMATCHES, REPLACE, ENCODE_FOR_URI,
+
+    // Math functions
+    ABS, ROUND, CEIL, FLOOR,
+
+    // Date/Time functions
+    NOW, YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TIMEZONE, TZ,
+
+    // Type conversion functions
+    STRDT, STRLANG,
+
+    // Hash functions
+    MD5, SHA1, SHA256, SHA384, SHA512,
+
+    // Special/Control functions
+    IF, COALESCE, BNODE, UUID, STRUUID, IRI, ISNUMERIC, RAND,
 
     // Aggregate functions
     COUNT, SUM, AVG, MIN, MAX, GROUP_CONCAT, SAMPLE,
@@ -29,9 +50,14 @@ enum class TokenType {
     RPAREN,          // )
     LBRACE,          // {
     RBRACE,          // }
+    LBRACKET,        // [
+    RBRACKET,        // ]
     DOT,             // .
     SEMICOLON,       // ;
     COMMA,           // ,
+    PIPE,            // | (for property path alternative, different from OR)
+    CARET,           // ^ (for property path inverse)
+    QUESTION,        // ? (for property path zero-or-one)
 
     EQUAL,           // =
     NOT_EQUAL,       // !=
@@ -140,7 +166,9 @@ public:
 private:
     std::vector<Token> tokens_;
     size_t pos_ = 0;
+    std::string base_iri_;  // BASE IRI for expanding relative IRIs
     std::unordered_map<std::string, std::string> prefixes_;  // prefix -> IRI mapping
+    size_t blank_node_counter_ = 0;  // Counter for generating unique blank node IDs
 
     // Token navigation
     const Token& CurrentToken() const;
@@ -157,14 +185,21 @@ private:
     arrow::Status Error(const std::string& message) const;
 
     // Parsing methods (top-down)
+    arrow::Result<std::string> ParseBaseDeclaration();
     arrow::Status ParsePrefixDeclaration();
     arrow::Result<SelectQuery> ParseSelectQuery();
+    arrow::Result<AskQuery> ParseAskQuery();
+    arrow::Result<ConstructQuery> ParseConstructQuery();
+    arrow::Result<DescribeQuery> ParseDescribeQuery();
     arrow::Result<SelectClause> ParseSelectClause();
+    arrow::Result<ConstructTemplate> ParseConstructTemplate();
     arrow::Result<QueryPattern> ParseWhereClause();
     arrow::Result<BasicGraphPattern> ParseBasicGraphPattern();
     arrow::Result<TriplePattern> ParseTriplePattern();
     arrow::Result<RDFTerm> ParseRDFTerm();
+    arrow::Result<BlankNode> ParseBlankNodePropertyList();
     arrow::Result<FilterClause> ParseFilterClause();
+    arrow::Result<BindClause> ParseBindClause();
     arrow::Result<std::shared_ptr<Expression>> ParseExpression();
     arrow::Result<std::shared_ptr<Expression>> ParseOrExpression();
     arrow::Result<std::shared_ptr<Expression>> ParseAndExpression();
@@ -176,6 +211,10 @@ private:
     arrow::Result<std::shared_ptr<Expression>> ParseBuiltInCall();
     arrow::Result<OptionalPattern> ParseOptionalClause();
     arrow::Result<UnionPattern> ParseUnionClause();
+    arrow::Result<ValuesClause> ParseValuesClause();
+    arrow::Result<MinusPattern> ParseMinusClause();
+    arrow::Result<ExistsPattern> ParseExistsClause(bool negated = false);
+    arrow::Result<SubqueryPattern> ParseSubqueryPattern();
     arrow::Result<GroupByClause> ParseGroupByClause();
     arrow::Result<std::vector<OrderBy>> ParseOrderByClause();
 
@@ -183,8 +222,12 @@ private:
     arrow::Result<Variable> ParseVariable();
     arrow::Result<IRI> ParseIRI();
     arrow::Result<Literal> ParseLiteral();
+    arrow::Result<PropertyPath> ParsePropertyPath();
+    arrow::Result<PropertyPathElement> ParsePropertyPathElement();
+    arrow::Result<PredicatePosition> ParsePredicatePosition();
     arrow::Result<ExprOperator> TokenTypeToOperator(TokenType type) const;
     arrow::Result<std::string> ExpandPrefixedName(const std::string& prefixed_name);
+    std::string ExpandRelativeIRI(const std::string& iri) const;
 };
 
 // Convenience function for parsing SPARQL queries from text

@@ -6,3 +6,5 @@ Dont rush development, just do things correctly.
 Performance requires correctness.
 Follow performance engineering princples, avoid copies, and prefer things that can be simd optimising.
 maintain the project layout
+Execptions are slow in C++, use error codes.
+Allocations are expensive, use memory pools/ arenas

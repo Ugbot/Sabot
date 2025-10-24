@@ -203,6 +203,12 @@ public:
                                const KeyRange& range,
                                std::unique_ptr<Iterator>* iterator) = 0;
 
+    // Scanning with column family
+    virtual Status NewIterator(const std::string& table_name,
+                               const ReadOptions& options,
+                               const KeyRange& range,
+                               std::unique_ptr<Iterator>* iterator) = 0;
+
     // Database management
     virtual Status Flush() = 0;
     virtual Status CompactRange(const KeyRange& range) = 0;

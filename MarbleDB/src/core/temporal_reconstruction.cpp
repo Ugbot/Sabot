@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "marble/temporal_reconstruction.h"
 #include <algorithm>
+#include <set>
 #include <arrow/compute/api.h>
 #include <arrow/table.h>
 
@@ -479,7 +480,9 @@ Status TemporalReconstructor::SortByPrimaryKey(
     }
 
     // Convert RecordBatch to Table for sorting
-    auto table_result = arrow::Table::FromRecordBatches({std::make_shared<arrow::RecordBatch>(batch)});
+    // Create a shared_ptr from the batch using Make (since RecordBatch is abstract)
+    auto batch_copy = arrow::RecordBatch::Make(batch.schema(), batch.num_rows(), batch.columns());
+    auto table_result = arrow::Table::FromRecordBatches({batch_copy});
     if (!table_result.ok()) {
         return Status::FromArrowStatus(table_result.status());
     }

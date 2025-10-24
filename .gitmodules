@@ -34,3 +34,9 @@
 [submodule "vendor/librdkafka"]
 	path = vendor/librdkafka
 	url = https://github.com/confluentinc/librdkafka.git
+[submodule "vendor/proton"]
+	path = vendor/proton
+	url = https://github.com/timeplus-io/proton
+[submodule "sabot_ql/tests/rdf-tests"]
+	path = sabot_ql/tests/rdf-tests
+	url = https://github.com/w3c/rdf-tests.git

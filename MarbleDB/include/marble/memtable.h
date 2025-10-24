@@ -1,5 +1,9 @@
 #pragma once
 
+// NOTE: This file defines a legacy/simple MemTable interface (uint64_t keys).
+// The canonical MemTable (with full Record support) is in lsm_tree.h.
+// This file is kept for backward compatibility but renamed to avoid conflicts.
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -12,9 +16,9 @@
 namespace marble {
 
 /**
- * @brief MemTable entry - represents a key-value pair with operation type
+ * @brief Simple MemTable entry - uint64_t key version
  */
-struct MemTableEntry {
+struct SimpleMemTableEntry {
     enum Operation {
         kPut,    // Insert/update operation
         kDelete  // Tombstone delete operation
@@ -25,23 +29,20 @@ struct MemTableEntry {
     Operation op;
     uint64_t timestamp;  // For conflict resolution and ordering
 
-    MemTableEntry() : key(0), op(kPut), timestamp(0) {}
-    MemTableEntry(uint64_t k, const std::string& v, Operation operation = kPut)
+    SimpleMemTableEntry() : key(0), op(kPut), timestamp(0) {}
+    SimpleMemTableEntry(uint64_t k, const std::string& v, Operation operation = kPut)
         : key(k), value(v), op(operation), timestamp(0) {}
 };
 
 /**
- * @brief MemTable - in-memory write buffer for LSM tree
+ * @brief Simple MemTable - legacy interface (use lsm_tree.h MemTable instead)
  *
- * The MemTable provides:
- * - Fast in-memory writes using a sorted data structure
- * - Atomic operations with proper locking
- * - Size-based flushing triggers
- * - Snapshot isolation for concurrent readers
+ * This is a simple uint64_t key-based interface.
+ * For full Record-based MemTable, see lsm_tree.h
  */
-class MemTable {
+class SimpleMemTable {
 public:
-    virtual ~MemTable() = default;
+    virtual ~SimpleMemTable() = default;
 
     /**
      * @brief Insert or update a key-value pair
@@ -66,13 +67,13 @@ public:
     /**
      * @brief Get all entries in sorted order
      */
-    virtual Status GetAllEntries(std::vector<MemTableEntry>* entries) const = 0;
+    virtual Status GetAllEntries(std::vector<SimpleMemTableEntry>* entries) const = 0;
 
     /**
      * @brief Get entries in a key range
      */
     virtual Status Scan(uint64_t start_key, uint64_t end_key,
-                       std::vector<MemTableEntry>* entries) const = 0;
+                       std::vector<SimpleMemTableEntry>* entries) const = 0;
 
     /**
      * @brief Get approximate memory usage
@@ -92,7 +93,7 @@ public:
     /**
      * @brief Create a snapshot for consistent reads during flush
      */
-    virtual std::unique_ptr<MemTable> CreateSnapshot() const = 0;
+    virtual std::unique_ptr<SimpleMemTable> CreateSnapshot() const = 0;
 
     /**
      * @brief Clear all entries (after successful flush)
@@ -107,48 +108,48 @@ public:
 };
 
 /**
- * @brief MemTable Factory - creates MemTable instances
+ * @brief Simple MemTable Factory - creates SimpleMemTable instances
  */
-class MemTableFactory {
+class SimpleMemTableFactory {
 public:
-    virtual ~MemTableFactory() = default;
+    virtual ~SimpleMemTableFactory() = default;
 
     /**
-     * @brief Create a new empty MemTable
+     * @brief Create a new empty SimpleMemTable
      */
-    virtual std::unique_ptr<MemTable> CreateMemTable() = 0;
+    virtual std::unique_ptr<SimpleMemTable> CreateMemTable() = 0;
 
     /**
-     * @brief Create a MemTable from existing entries
+     * @brief Create a SimpleMemTable from existing entries
      */
-    virtual std::unique_ptr<MemTable> CreateMemTableFromEntries(
-        const std::vector<MemTableEntry>& entries) = 0;
+    virtual std::unique_ptr<SimpleMemTable> CreateMemTableFromEntries(
+        const std::vector<SimpleMemTableEntry>& entries) = 0;
 };
 
 /**
- * @brief SkipList-based MemTable implementation
+ * @brief SkipList-based SimpleMemTable implementation
  *
  * Uses a concurrent skip list for efficient sorted storage with:
  * - O(log n) insertions and lookups
- * - Lock-free reads
+ * - Lock-free reads (TODO: refactor to use disruptor pattern)
  * - Atomic writes with proper synchronization
  */
-class SkipListMemTable : public MemTable {
+class SkipListSimpleMemTable : public SimpleMemTable {
 public:
-    SkipListMemTable();
-    ~SkipListMemTable() override;
+    SkipListSimpleMemTable();
+    ~SkipListSimpleMemTable() override;
 
     Status Put(uint64_t key, const std::string& value) override;
     Status Delete(uint64_t key) override;
     Status Get(uint64_t key, std::string* value) const override;
     bool Contains(uint64_t key) const override;
-    Status GetAllEntries(std::vector<MemTableEntry>* entries) const override;
+    Status GetAllEntries(std::vector<SimpleMemTableEntry>* entries) const override;
     Status Scan(uint64_t start_key, uint64_t end_key,
-               std::vector<MemTableEntry>* entries) const override;
+               std::vector<SimpleMemTableEntry>* entries) const override;
     size_t GetMemoryUsage() const override;
     size_t GetEntryCount() const override;
     bool ShouldFlush(size_t max_size_bytes) const override;
-    std::unique_ptr<MemTable> CreateSnapshot() const override;
+    std::unique_ptr<SimpleMemTable> CreateSnapshot() const override;
     void Clear() override;
     void GetStats(uint64_t* min_key, uint64_t* max_key,
                  size_t* entry_count, size_t* memory_usage) const override;
@@ -157,10 +158,10 @@ private:
     // Skip list node structure
     struct SkipNode {
         uint64_t key;
-        MemTableEntry entry;
+        SimpleMemTableEntry entry;
         std::vector<SkipNode*> forward;
 
-        SkipNode(uint64_t k, const MemTableEntry& e, int level);
+        SkipNode(uint64_t k, const SimpleMemTableEntry& e, int level);
     };
 
     // Skip list implementation
@@ -180,17 +181,17 @@ private:
 };
 
 /**
- * @brief Standard MemTable Factory implementation
+ * @brief Standard SimpleMemTable Factory implementation
  */
-class StandardMemTableFactory : public MemTableFactory {
+class StandardSimpleMemTableFactory : public SimpleMemTableFactory {
 public:
-    std::unique_ptr<MemTable> CreateMemTable() override;
-    std::unique_ptr<MemTable> CreateMemTableFromEntries(
-        const std::vector<MemTableEntry>& entries) override;
+    std::unique_ptr<SimpleMemTable> CreateMemTable() override;
+    std::unique_ptr<SimpleMemTable> CreateMemTableFromEntries(
+        const std::vector<SimpleMemTableEntry>& entries) override;
 };
 
 // Factory functions
-std::unique_ptr<MemTableFactory> CreateMemTableFactory();
+std::unique_ptr<SimpleMemTableFactory> CreateSimpleMemTableFactory();
 
 } // namespace marble
 

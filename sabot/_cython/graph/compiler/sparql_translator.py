@@ -6,7 +6,7 @@ Uses PyRDFTripleStore from graph_storage.pyx for execution.
 
 Architecture:
 1. AST → Triple patterns with filters
-2. Triple patterns → PyRDFTripleStore.find_matching_triples()
+2. Triple patterns → PyRDFTripleStore.filter_triples()
 3. Apply filters to results
 4. Project selected variables
 5. Apply LIMIT/OFFSET
@@ -392,7 +392,7 @@ class SPARQLTranslator:
 
         Implementation:
             - Convert RDF terms to triple store query format
-            - Use PyRDFTripleStore.find_matching_triples()
+            - Use PyRDFTripleStore.filter_triples()
             - Convert results to Arrow table with variable columns
         """
         # Convert terms to triple store format
@@ -400,15 +400,16 @@ class SPARQLTranslator:
         predicate = self._term_to_value(triple.predicate, existing_bindings)
         obj = self._term_to_value(triple.object, existing_bindings)
 
+        # Check if any concrete term (IRI/Literal) was not found
+        # None means "term not found", -1 means "wildcard"
+        if subject is None or predicate is None or obj is None:
+            # Concrete term not found in dictionary - return empty result
+            return self._empty_bindings_table(triple)
+
         # Query triple store
-        # PyRDFTripleStore.find_matching_triples(subject, predicate, object, graph)
-        # Returns Arrow table with columns: subject, predicate, object, graph
-        matches = self.triple_store.find_matching_triples(
-            subject=subject,
-            predicate=predicate,
-            object=obj,
-            graph=None  # Default graph
-        )
+        # PyRDFTripleStore.filter_triples(s, p, o) where -1 = wildcard
+        # Returns Arrow table with columns: s, p, o
+        matches = self.triple_store.filter_triples(subject, predicate, obj)
 
         if matches is None or len(matches) == 0:
             return self._empty_bindings_table(triple)
@@ -434,28 +435,32 @@ class SPARQLTranslator:
         if isinstance(term, Variable):
             # Check if variable is bound
             if existing_bindings is not None and term.name in existing_bindings.column_names:
-                # Return bound value (for now, return None to get all matches)
+                # Return bound value (for now, return -1 to get all matches)
                 # TODO: Implement variable binding constraint
-                return None
-            return None  # Unbound variable - matches anything
+                return -1
+            return -1  # Unbound variable - wildcard in filter_triples
 
         elif isinstance(term, IRI):
             # Look up IRI in term dictionary
-            return self.triple_store.get_term_id(term.value)
+            term_id = self.triple_store.lookup_term_id(term.value)
+            # If not found (-1), return None to indicate "no match"
+            return None if term_id == -1 else term_id
 
         elif isinstance(term, RDFLiteral):
             # Look up literal in term dictionary
-            # For now, use value as-is
-            return self.triple_store.get_term_id(term.value)
+            term_id = self.triple_store.lookup_term_id(term.value)
+            # If not found (-1), return None to indicate "no match"
+            return None if term_id == -1 else term_id
 
         elif isinstance(term, BlankNode):
             # Blank nodes are matched by ID
             if term.id:
-                return self.triple_store.get_term_id(f"_:{term.id}")
-            return None  # Anonymous blank node
+                term_id = self.triple_store.lookup_term_id(f"_:{term.id}")
+                return None if term_id == -1 else term_id
+            return -1  # Anonymous blank node - wildcard
 
         else:
-            return None
+            return -1  # Unknown term type - wildcard
 
     def _matches_to_bindings(self, matches: pa.Table, triple: TriplePattern) -> pa.Table:
         """
@@ -478,19 +483,20 @@ class SPARQLTranslator:
         # Map subject if it's a variable
         if isinstance(triple.subject, Variable):
             # Resolve term IDs to values
-            subject_ids = matches.column('subject')
+            # filter_triples() returns columns: s, p, o (not subject, predicate, object)
+            subject_ids = matches.column('s')
             subject_values = self._resolve_term_ids(subject_ids)
             bindings[triple.subject.name] = subject_values
 
         # Map predicate if it's a variable
         if isinstance(triple.predicate, Variable):
-            predicate_ids = matches.column('predicate')
+            predicate_ids = matches.column('p')
             predicate_values = self._resolve_term_ids(predicate_ids)
             bindings[triple.predicate.name] = predicate_values
 
         # Map object if it's a variable
         if isinstance(triple.object, Variable):
-            object_ids = matches.column('object')
+            object_ids = matches.column('o')
             object_values = self._resolve_term_ids(object_ids)
             bindings[triple.object.name] = object_values
 
@@ -514,7 +520,7 @@ class SPARQLTranslator:
         # Use triple store's term dictionary to resolve IDs
         values = []
         for term_id in term_ids.to_pylist():
-            term_value = self.triple_store.get_term_value(term_id)
+            term_value = self.triple_store.lookup_term(term_id)
             values.append(term_value if term_value else "")
 
         return pa.array(values, type=pa.string())
@@ -680,18 +686,17 @@ class SPARQLTranslator:
             # SELECT * - return all columns
             return bindings
 
-        # Select specific columns
-        selected_cols = []
+        # Add NULL columns for unbound variables first
         for var in select.variables:
-            if var in bindings.column_names:
-                selected_cols.append(var)
-            else:
-                # Variable not bound - add NULL column
+            if var not in bindings.column_names:
+                # Variable not bound - add NULL column to bindings
                 logger.warning(f"Variable '{var}' not bound, adding NULL column")
-                selected_cols.append(pa.array([None] * len(bindings), type=pa.string()))
+                null_col = pa.array([None] * len(bindings), type=pa.string())
+                bindings = bindings.append_column(var, null_col)
 
-        if selected_cols:
-            return bindings.select(selected_cols)
+        # Now select the requested columns (all should exist)
+        if select.variables:
+            return bindings.select(select.variables)
         else:
             return bindings
 

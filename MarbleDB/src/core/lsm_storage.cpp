@@ -21,7 +21,7 @@ Status StandardLSMTree::Init(const LSMTreeConfig& config) {
     if (!status.ok()) return status;
 
     // Initialize components
-    memtable_factory_ = CreateMemTableFactory();
+    memtable_factory_ = CreateSimpleMemTableFactory();
     sstable_manager_ = CreateSSTableManager();
 
     // Create initial memtable
@@ -301,9 +301,9 @@ Status StandardLSMTree::SwitchMemTable() {
     return Status::OK();
 }
 
-Status StandardLSMTree::FlushMemTable(std::unique_ptr<MemTable> memtable) {
+Status StandardLSMTree::FlushMemTable(std::unique_ptr<SimpleMemTable> memtable) {
     // Get entries from memtable
-    std::vector<MemTableEntry> entries;
+    std::vector<SimpleMemTableEntry> entries;
     auto status = memtable->GetAllEntries(&entries);
     if (!status.ok()) return status;
 
@@ -322,7 +322,7 @@ Status StandardLSMTree::FlushMemTable(std::unique_ptr<MemTable> memtable) {
 
     // Write entries to SSTable
     for (const auto& entry : entries) {
-        if (entry.op == MemTableEntry::kPut) {
+        if (entry.op == SimpleMemTableEntry::kPut) {
             status = writer->Add(entry.key, entry.value);
             if (!status.ok()) return status;
         }
@@ -372,7 +372,7 @@ Status StandardLSMTree::PerformCompaction(const CompactionTask& task) {
     }
 }
 
-Status StandardLSMTree::PerformMinorCompaction(const std::vector<std::unique_ptr<MemTable>>& memtables) {
+Status StandardLSMTree::PerformMinorCompaction(const std::vector<std::unique_ptr<SimpleMemTable>>& memtables) {
     if (memtables.empty()) {
         return Status::OK();
     }
@@ -530,7 +530,7 @@ void StandardLSMTree::CompactionWorker() {
 
 void StandardLSMTree::FlushWorker() {
     while (!shutdown_requested_) {
-        std::unique_ptr<MemTable> memtable_to_flush;
+        std::unique_ptr<SimpleMemTable> memtable_to_flush;
 
         {
             std::unique_lock<std::mutex> lock(mutex_);
@@ -607,21 +607,21 @@ Status StandardLSMTree::ReadFromSSTables(uint64_t key, std::string* value) const
 Status StandardLSMTree::ScanMemTables(uint64_t start_key, uint64_t end_key,
                                      std::vector<std::pair<uint64_t, std::string>>* results) const {
     // Scan active memtable
-    std::vector<MemTableEntry> active_entries;
+    std::vector<SimpleMemTableEntry> active_entries;
     active_memtable_->Scan(start_key, end_key, &active_entries);
     for (const auto& entry : active_entries) {
-        if (entry.op == MemTableEntry::kPut) {
+        if (entry.op == SimpleMemTableEntry::kPut) {
             results->emplace_back(entry.key, entry.value);
         }
     }
 
     // Scan immutable memtables
     for (const auto& memtable : immutable_memtables_) {
-        std::vector<MemTableEntry> entries;
+        std::vector<SimpleMemTableEntry> entries;
         memtable->Scan(start_key, end_key, &entries);
 
         for (const auto& entry : entries) {
-            if (entry.op == MemTableEntry::kPut) {
+            if (entry.op == SimpleMemTableEntry::kPut) {
                 results->emplace_back(entry.key, entry.value);
             }
         }

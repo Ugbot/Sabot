@@ -10,6 +10,8 @@ Provides snapshot isolation for ACID transactions without blocking readers.
 #include <marble/status.h>
 #include <marble/record.h>
 #include <marble/record_ref.h>
+#include <marble/lsm_tree.h>  // For MemTable (full definition needed)
+#include <marble/wal.h>        // For WAL (full definition needed)
 #include <memory>
 #include <atomic>
 #include <unordered_map>
@@ -73,8 +75,9 @@ struct TimestampedKey {
  */
 class Snapshot {
 public:
+    Snapshot() : timestamp_(Timestamp(0)) {}  // Default constructor
     explicit Snapshot(Timestamp ts) : timestamp_(ts) {}
-    
+
     Timestamp timestamp() const { return timestamp_; }
     
     /**
@@ -239,7 +242,7 @@ public:
         const WriteBuffer& buffer,
         const Snapshot& snapshot,
         MemTable* memtable,
-        WAL* wal) {
+        WalManager* wal) {
 
         if (buffer.empty()) {
             return Status::OK();  // Nothing to commit
@@ -261,7 +264,7 @@ public:
         );
 
         if (conflict_key) {
-            return Status::Conflict("Write conflict on key: " + conflict_key->ToString());
+            return Status::WriteConflict("Write conflict on key: " + conflict_key->ToString());
         }
 
         // Write batch to WAL
@@ -271,7 +274,7 @@ public:
                 wal_entry.sequence_number = commit_ts.value();
                 // TODO: Populate wal_entry from buffer
 
-                auto status = wal->Write(wal_entry);
+                auto status = wal->WriteEntry(wal_entry);
                 if (!status.ok()) {
                     return status;
                 }

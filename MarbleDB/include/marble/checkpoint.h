@@ -136,15 +136,20 @@ public:
     
     /**
      * @brief Verify checkpoint integrity
-     * 
+     *
      * Checks that all files exist and checksums are valid.
-     * 
+     *
      * @param checkpoint_dir Checkpoint directory
      * @return Status OK if checkpoint is valid
      */
     static Status Verify(const std::string& checkpoint_dir);
 
-private:
+    // Friend declaration for IncrementalCheckpoint
+    friend class IncrementalCheckpoint;
+
+protected:
+    // Protected helpers - accessible to derived classes and internal implementation
+
     /**
      * @brief Copy or hard link a file
      */
@@ -153,7 +158,7 @@ private:
         const std::string& dst,
         bool use_hard_link
     );
-    
+
     /**
      * @brief Get all SSTable files from database
      */
@@ -161,7 +166,7 @@ private:
         MarbleDB* db,
         std::vector<std::string>* files
     );
-    
+
     /**
      * @brief Get all WAL files from database
      */

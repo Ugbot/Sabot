@@ -75,24 +75,24 @@ struct MemTableConfig {
  * - Index maintenance on Put/Delete
  * - Query interface for indexed access
  */
-class SearchableMemTable : public MemTable {
+class SearchableMemTable : public SimpleMemTable {
 public:
     SearchableMemTable();
     explicit SearchableMemTable(const MemTableConfig& config);
     ~SearchableMemTable() override;
 
-    // Base MemTable interface
+    // Base SimpleMemTable interface
     Status Put(uint64_t key, const std::string& value) override;
     Status Delete(uint64_t key) override;
     Status Get(uint64_t key, std::string* value) const override;
     bool Contains(uint64_t key) const override;
-    Status GetAllEntries(std::vector<MemTableEntry>* entries) const override;
+    Status GetAllEntries(std::vector<SimpleMemTableEntry>* entries) const override;
     Status Scan(uint64_t start_key, uint64_t end_key,
-               std::vector<MemTableEntry>* entries) const override;
+               std::vector<SimpleMemTableEntry>* entries) const override;
     size_t GetMemoryUsage() const override;
     size_t GetEntryCount() const override;
     bool ShouldFlush(size_t max_size_bytes) const override;
-    std::unique_ptr<MemTable> CreateSnapshot() const override;
+    std::unique_ptr<SimpleMemTable> CreateSnapshot() const override;
     void Clear() override;
     void GetStats(uint64_t* min_key, uint64_t* max_key,
                  size_t* entry_count, size_t* memory_usage) const override;
@@ -103,7 +103,7 @@ public:
      */
     Status SearchByIndex(const std::string& index_name,
                          const IndexQuery& query,
-                         std::vector<MemTableEntry>* results) const;
+                         std::vector<SimpleMemTableEntry>* results) const;
 
     /**
      * @brief Configure indexes
@@ -280,7 +280,7 @@ private:
     Status UpdateIndexes(uint64_t key, const std::string& value, bool is_delete);
 
     // Underlying skip-list implementation
-    std::unique_ptr<SkipListMemTable> skip_list_;
+    std::unique_ptr<SkipListSimpleMemTable> skip_list_;
 
     // Secondary indexes
     std::unordered_map<std::string, std::unique_ptr<InMemoryIndex>> indexes_;
@@ -295,21 +295,21 @@ private:
 /**
  * @brief Searchable MemTable Factory
  */
-class SearchableMemTableFactory : public MemTableFactory {
+class SearchableMemTableFactory : public SimpleMemTableFactory {
 public:
     explicit SearchableMemTableFactory(const MemTableConfig& config = MemTableConfig())
         : config_(config) {}
 
-    std::unique_ptr<MemTable> CreateMemTable() override;
-    std::unique_ptr<MemTable> CreateMemTableFromEntries(
-        const std::vector<MemTableEntry>& entries) override;
+    std::unique_ptr<SimpleMemTable> CreateMemTable() override;
+    std::unique_ptr<SimpleMemTable> CreateMemTableFromEntries(
+        const std::vector<SimpleMemTableEntry>& entries) override;
 
 private:
     MemTableConfig config_;
 };
 
 // Factory functions
-std::unique_ptr<MemTableFactory> CreateSearchableMemTableFactory(
+std::unique_ptr<SimpleMemTableFactory> CreateSearchableMemTableFactory(
     const MemTableConfig& config = MemTableConfig());
 
 std::unique_ptr<SearchableMemTable> CreateSearchableMemTable(

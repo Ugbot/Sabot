@@ -28,8 +28,10 @@ std::optional<std::string> TriplePattern::GetSubjectVar() const {
 }
 
 std::optional<std::string> TriplePattern::GetPredicateVar() const {
-    if (auto* var = std::get_if<Variable>(&predicate)) {
-        return var->name;
+    if (auto* term = std::get_if<RDFTerm>(&predicate)) {
+        if (auto* var = std::get_if<Variable>(term)) {
+            return var->name;
+        }
     }
     return std::nullopt;
 }
@@ -41,11 +43,84 @@ std::optional<std::string> TriplePattern::GetObjectVar() const {
     return std::nullopt;
 }
 
+std::string PropertyPathElement::ToString() const {
+    std::ostringstream oss;
+
+    // Print the element (term or nested path)
+    if (auto* term = std::get_if<RDFTerm>(&element)) {
+        oss << sparql::ToString(*term);
+    } else if (auto* path = std::get_if<std::shared_ptr<PropertyPath>>(&element)) {
+        oss << "(" << (*path)->ToString() << ")";
+    }
+
+    // Add quantifier if present
+    switch (quantifier) {
+        case PropertyPathQuantifier::ZeroOrMore:
+            oss << "*";
+            break;
+        case PropertyPathQuantifier::OneOrMore:
+            oss << "+";
+            break;
+        case PropertyPathQuantifier::ZeroOrOne:
+            oss << "?";
+            break;
+        case PropertyPathQuantifier::None:
+            // No quantifier
+            break;
+    }
+
+    return oss.str();
+}
+
+std::string PropertyPath::ToString() const {
+    if (elements.empty()) {
+        return "";
+    }
+
+    if (elements.size() == 1) {
+        // Single element, check for inverse
+        if (modifier == PropertyPathModifier::Inverse) {
+            return "^" + elements[0].ToString();
+        } else if (modifier == PropertyPathModifier::Negated) {
+            return "!" + elements[0].ToString();
+        }
+        return elements[0].ToString();
+    }
+
+    // Multiple elements - use modifier
+    std::ostringstream oss;
+    for (size_t i = 0; i < elements.size(); ++i) {
+        if (i > 0) {
+            switch (modifier) {
+                case PropertyPathModifier::Sequence:
+                    oss << "/";
+                    break;
+                case PropertyPathModifier::Alternative:
+                    oss << "|";
+                    break;
+                default:
+                    oss << " ";  // Fallback
+                    break;
+            }
+        }
+        oss << elements[i].ToString();
+    }
+
+    return oss.str();
+}
+
 std::string TriplePattern::ToString() const {
     std::ostringstream oss;
-    oss << sparql::ToString(subject) << " "
-        << sparql::ToString(predicate) << " "
-        << sparql::ToString(object) << " .";
+    oss << sparql::ToString(subject) << " ";
+
+    // Handle predicate (can be RDFTerm or PropertyPath)
+    if (auto* term = std::get_if<RDFTerm>(&predicate)) {
+        oss << sparql::ToString(*term);
+    } else if (auto* path = std::get_if<PropertyPath>(&predicate)) {
+        oss << path->ToString();
+    }
+
+    oss << " " << sparql::ToString(object) << " .";
     return oss.str();
 }
 
@@ -128,6 +203,126 @@ std::string Expression::ToString() const {
         case ExprOperator::Regex:
             oss << "REGEX(" << arguments[0]->ToString() << ", " << arguments[1]->ToString() << ")";
             break;
+
+        // String functions
+        case ExprOperator::StrLen:
+            oss << "STRLEN(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::SubStr:
+            oss << "SUBSTR(" << arguments[0]->ToString();
+            if (arguments.size() > 1) oss << ", " << arguments[1]->ToString();
+            if (arguments.size() > 2) oss << ", " << arguments[2]->ToString();
+            oss << ")";
+            break;
+        case ExprOperator::UCase:
+            oss << "UCASE(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::LCase:
+            oss << "LCASE(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::StrStarts:
+            oss << "STRSTARTS(" << arguments[0]->ToString() << ", " << arguments[1]->ToString() << ")";
+            break;
+        case ExprOperator::StrEnds:
+            oss << "STRENDS(" << arguments[0]->ToString() << ", " << arguments[1]->ToString() << ")";
+            break;
+        case ExprOperator::Contains:
+            oss << "CONTAINS(" << arguments[0]->ToString() << ", " << arguments[1]->ToString() << ")";
+            break;
+        case ExprOperator::StrBefore:
+            oss << "STRBEFORE(" << arguments[0]->ToString() << ", " << arguments[1]->ToString() << ")";
+            break;
+        case ExprOperator::StrAfter:
+            oss << "STRAFTER(" << arguments[0]->ToString() << ", " << arguments[1]->ToString() << ")";
+            break;
+        case ExprOperator::Concat:
+            oss << "CONCAT(";
+            for (size_t i = 0; i < arguments.size(); ++i) {
+                if (i > 0) oss << ", ";
+                oss << arguments[i]->ToString();
+            }
+            oss << ")";
+            break;
+        case ExprOperator::LangMatches:
+            oss << "LANGMATCHES(" << arguments[0]->ToString() << ", " << arguments[1]->ToString() << ")";
+            break;
+        case ExprOperator::Replace:
+            oss << "REPLACE(" << arguments[0]->ToString() << ", " << arguments[1]->ToString();
+            if (arguments.size() > 2) oss << ", " << arguments[2]->ToString();
+            oss << ")";
+            break;
+        case ExprOperator::EncodeForURI:
+            oss << "ENCODE_FOR_URI(" << arguments[0]->ToString() << ")";
+            break;
+
+        // Math functions
+        case ExprOperator::Abs:
+            oss << "ABS(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Round:
+            oss << "ROUND(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Ceil:
+            oss << "CEIL(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Floor:
+            oss << "FLOOR(" << arguments[0]->ToString() << ")";
+            break;
+
+        // Date/Time functions
+        case ExprOperator::Now:
+            oss << "NOW()";
+            break;
+        case ExprOperator::Year:
+            oss << "YEAR(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Month:
+            oss << "MONTH(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Day:
+            oss << "DAY(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Hours:
+            oss << "HOURS(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Minutes:
+            oss << "MINUTES(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Seconds:
+            oss << "SECONDS(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Timezone:
+            oss << "TIMEZONE(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::Tz:
+            oss << "TZ(" << arguments[0]->ToString() << ")";
+            break;
+
+        // Type conversion functions
+        case ExprOperator::StrDt:
+            oss << "STRDT(" << arguments[0]->ToString() << ", " << arguments[1]->ToString() << ")";
+            break;
+        case ExprOperator::StrLang:
+            oss << "STRLANG(" << arguments[0]->ToString() << ", " << arguments[1]->ToString() << ")";
+            break;
+
+        // Hash functions
+        case ExprOperator::MD5:
+            oss << "MD5(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::SHA1:
+            oss << "SHA1(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::SHA256:
+            oss << "SHA256(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::SHA384:
+            oss << "SHA384(" << arguments[0]->ToString() << ")";
+            break;
+        case ExprOperator::SHA512:
+            oss << "SHA512(" << arguments[0]->ToString() << ")";
+            break;
+
         case ExprOperator::Count:
             oss << "COUNT(" << (arguments.empty() ? "*" : arguments[0]->ToString()) << ")";
             break;
@@ -158,6 +353,10 @@ std::string FilterClause::ToString() const {
     return "FILTER " + expr->ToString();
 }
 
+std::string BindClause::ToString() const {
+    return "BIND(" + expr->ToString() + " AS " + alias.ToString() + ")";
+}
+
 std::string OptionalPattern::ToString() const {
     return "OPTIONAL { " + pattern->ToString() + " }";
 }
@@ -173,6 +372,46 @@ std::string UnionPattern::ToString() const {
     return oss.str();
 }
 
+std::string ValuesClause::ToString() const {
+    std::ostringstream oss;
+    oss << "VALUES (";
+    for (size_t i = 0; i < variables.size(); ++i) {
+        if (i > 0) oss << " ";
+        oss << variables[i].ToString();
+    }
+    oss << ") {\n";
+    for (const auto& row : rows) {
+        oss << "  (";
+        for (size_t i = 0; i < row.size(); ++i) {
+            if (i > 0) oss << " ";
+            oss << sparql::ToString(row[i]);
+        }
+        oss << ")\n";
+    }
+    oss << "}";
+    return oss.str();
+}
+
+std::string MinusPattern::ToString() const {
+    return "MINUS { " + pattern->ToString() + " }";
+}
+
+std::string ExistsPattern::ToString() const {
+    std::ostringstream oss;
+    if (is_negated) {
+        oss << "FILTER NOT EXISTS { ";
+    } else {
+        oss << "FILTER EXISTS { ";
+    }
+    oss << pattern->ToString();
+    oss << " }";
+    return oss.str();
+}
+
+std::string SubqueryPattern::ToString() const {
+    return "{ " + query.ToString() + " }";
+}
+
 std::string QueryPattern::ToString() const {
     std::ostringstream oss;
 
@@ -184,12 +423,32 @@ std::string QueryPattern::ToString() const {
         oss << "  " << filter.ToString() << "\n";
     }
 
+    for (const auto& bind : binds) {
+        oss << "  " << bind.ToString() << "\n";
+    }
+
     for (const auto& optional : optionals) {
         oss << "  " << optional.ToString() << "\n";
     }
 
     for (const auto& union_pat : unions) {
         oss << "  " << union_pat.ToString() << "\n";
+    }
+
+    for (const auto& values_clause : values) {
+        oss << "  " << values_clause.ToString() << "\n";
+    }
+
+    for (const auto& minus_pat : minus_patterns) {
+        oss << "  " << minus_pat.ToString() << "\n";
+    }
+
+    for (const auto& exists_pat : exists_patterns) {
+        oss << "  " << exists_pat.ToString() << "\n";
+    }
+
+    for (const auto& subquery : subqueries) {
+        oss << "  " << subquery.ToString() << "\n";
     }
 
     return oss.str();
@@ -222,6 +481,12 @@ std::string AggregateExpression::ToString() const {
         oss << expr->ToString();
     }
     oss << " AS " << alias.ToString() << ")";
+    return oss.str();
+}
+
+std::string ProjectionExpression::ToString() const {
+    std::ostringstream oss;
+    oss << "(" << expr->ToString() << " AS " << alias.ToString() << ")";
     return oss.str();
 }
 
@@ -261,6 +526,8 @@ std::string SelectClause::ToString() const {
                 oss << var->ToString();
             } else if (auto* agg = std::get_if<AggregateExpression>(&items[i])) {
                 oss << agg->ToString();
+            } else if (auto* proj = std::get_if<ProjectionExpression>(&items[i])) {
+                oss << proj->ToString();
             }
         }
     }
@@ -298,6 +565,54 @@ std::string SelectQuery::ToString() const {
     }
 
     return oss.str();
+}
+
+std::string AskQuery::ToString() const {
+    std::ostringstream oss;
+    oss << "ASK\n";
+    oss << "WHERE {\n";
+    oss << where.ToString();
+    oss << "}\n";
+    return oss.str();
+}
+
+std::string ConstructTemplate::ToString() const {
+    std::ostringstream oss;
+    for (const auto& triple : triples) {
+        oss << "  " << triple.ToString() << "\n";
+    }
+    return oss.str();
+}
+
+std::string ConstructQuery::ToString() const {
+    std::ostringstream oss;
+    oss << "CONSTRUCT {\n";
+    oss << construct_template.ToString();
+    oss << "}\n";
+    oss << "WHERE {\n";
+    oss << where.ToString();
+    oss << "}\n";
+    return oss.str();
+}
+
+std::string DescribeQuery::ToString() const {
+    std::ostringstream oss;
+    oss << "DESCRIBE ";
+    for (size_t i = 0; i < resources.size(); ++i) {
+        if (i > 0) oss << " ";
+        oss << sparql::ToString(resources[i]);
+    }
+    oss << "\n";
+    if (where.has_value()) {
+        oss << "WHERE {\n";
+        oss << where->ToString();
+        oss << "}\n";
+    }
+    return oss.str();
+}
+
+std::string Query::ToString() const {
+    return std::visit([](const auto& q) { return q.ToString(); }, query_body);
 }
 
 } // namespace sparql

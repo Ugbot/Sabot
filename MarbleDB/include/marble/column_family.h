@@ -154,15 +154,53 @@ public:
     /**
      * @brief Number of column families
      */
-    size_t size() const { return families_.size(); }
+    size_t size() const;
 
 private:
-    std::unordered_map<std::string, std::unique_ptr<ColumnFamilyHandle>> families_;
-    std::unordered_map<uint32_t, ColumnFamilyHandle*> id_to_handle_;
-    ColumnFamilyHandle* default_cf_ = nullptr;
-    uint32_t next_id_ = 0;
-    
-    std::mutex mutex_;
+    // Lock-free copy-on-write using atomic pointer
+    // Column families are metadata (rare writes, frequent reads)
+    struct ColumnFamilyData {
+        std::unordered_map<std::string, ColumnFamilyHandle*> families;  // Raw pointers (owned elsewhere)
+        std::unordered_map<uint32_t, ColumnFamilyHandle*> id_to_handle;
+        ColumnFamilyHandle* default_cf = nullptr;
+        std::vector<std::unique_ptr<ColumnFamilyHandle>> owned_handles;  // Actual ownership
+
+        ColumnFamilyData() = default;
+
+        // Deep copy for COW
+        ColumnFamilyData(const ColumnFamilyData& other) {
+            default_cf = other.default_cf;
+            // Copy ownership
+            for (const auto& handle_ptr : other.owned_handles) {
+                auto new_handle = std::make_unique<ColumnFamilyHandle>(*handle_ptr);
+                ColumnFamilyHandle* raw = new_handle.get();
+                families[new_handle->name()] = raw;
+                id_to_handle[new_handle->id()] = raw;
+                if (new_handle->name() == "default") {
+                    default_cf = raw;
+                }
+                owned_handles.push_back(std::move(new_handle));
+            }
+        }
+    };
+
+    // Atomic pointer for lock-free reads/writes
+    std::atomic<ColumnFamilyData*> data_{nullptr};
+
+    // Atomic ID generator
+    std::atomic<uint32_t> next_id_{0};
+
+    // Helper: Load current state (lock-free)
+    ColumnFamilyData* load_data() const {
+        return data_.load(std::memory_order_acquire);
+    }
+
+    // Helper: CAS update
+    bool cas_update(ColumnFamilyData* expected, ColumnFamilyData* desired) {
+        return data_.compare_exchange_strong(expected, desired,
+                                             std::memory_order_acq_rel,
+                                             std::memory_order_acquire);
+    }
 };
 
 /**

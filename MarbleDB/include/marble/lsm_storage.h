@@ -208,12 +208,12 @@ public:
 private:
     // Core components
     LSMTreeConfig config_;
-    std::unique_ptr<MemTableFactory> memtable_factory_;
+    std::unique_ptr<SimpleMemTableFactory> memtable_factory_;
     std::unique_ptr<SSTableManager> sstable_manager_;
 
-    // MemTables
-    std::unique_ptr<MemTable> active_memtable_;
-    std::vector<std::unique_ptr<MemTable>> immutable_memtables_;
+    // MemTables (using Simple interface for uint64_t keys)
+    std::unique_ptr<SimpleMemTable> active_memtable_;
+    std::vector<std::unique_ptr<SimpleMemTable>> immutable_memtables_;
 
     // SSTables organized by level
     std::vector<std::vector<std::unique_ptr<SSTable>>> sstables_;
@@ -238,10 +238,10 @@ private:
     Status CreateDirectories();
     Status RecoverFromDisk();
     Status SwitchMemTable();
-    Status FlushMemTable(std::unique_ptr<MemTable> memtable);
+    Status FlushMemTable(std::unique_ptr<SimpleMemTable> memtable);
     Status ScheduleCompaction(const CompactionTask& task);
     Status PerformCompaction(const CompactionTask& task);
-    Status PerformMinorCompaction(const std::vector<std::unique_ptr<MemTable>>& memtables);
+    Status PerformMinorCompaction(const std::vector<std::unique_ptr<SimpleMemTable>>& memtables);
     Status PerformMajorCompaction(uint64_t level, const std::vector<std::string>& input_files);
     Status MergeSSTables(const std::vector<std::unique_ptr<SSTable>>& inputs,
                         std::unique_ptr<SSTable>* output);

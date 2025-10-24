@@ -837,6 +837,27 @@ public:
         return Status::OK();
     }
 
+    // Scanning with specific column family
+    Status NewIterator(const std::string& table_name, const ReadOptions& options, const KeyRange& range, std::unique_ptr<Iterator>* iterator) override {
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // Find the specified column family
+        auto it = column_families_.find(table_name);
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Column family '" + table_name + "' does not exist");
+        }
+
+        auto* cf_info = it->second.get();
+
+        // Create range iterator with indexes for optimization
+        auto range_iterator = std::make_unique<RangeIterator>(
+            cf_info->data, range, cf_info->schema,
+            cf_info->skipping_index, cf_info->bloom_filter);
+
+        *iterator = std::move(range_iterator);
+        return Status::OK();
+    }
+
     // Maintenance operations
     Status Flush() override {
         return Status::NotImplemented("Flush not implemented");

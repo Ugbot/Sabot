@@ -146,7 +146,7 @@ public:
                                 global_metrics_collector->incrementCounter("marble.mvcc.conflicts");
                             }
 
-                            return Status::Conflict("Write conflict on key: " + key_str);
+                            return Status::WriteConflict("Write conflict on key: " + key_str);
                         }
                     }
                 }
