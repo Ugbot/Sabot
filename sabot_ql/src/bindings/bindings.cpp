@@ -62,5 +62,20 @@ arrow::Result<std::shared_ptr<Vocabulary>> CreateVocabularyMarbleDB(
     return ::sabot_ql::CreateVocabularyMarbleDB(db_path, db);
 }
 
+// Convert Query to SelectQuery
+arrow::Result<sparql::SelectQuery> QueryToSelectQuery(const sparql::Query& query) {
+    if (std::holds_alternative<sparql::SelectQuery>(query.query_body)) {
+        return std::get<sparql::SelectQuery>(query.query_body);
+    } else if (std::holds_alternative<sparql::AskQuery>(query.query_body)) {
+        return arrow::Status::Invalid("Query is ASK type, not SELECT");
+    } else if (std::holds_alternative<sparql::ConstructQuery>(query.query_body)) {
+        return arrow::Status::Invalid("Query is CONSTRUCT type, not SELECT");
+    } else if (std::holds_alternative<sparql::DescribeQuery>(query.query_body)) {
+        return arrow::Status::Invalid("Query is DESCRIBE type, not SELECT");
+    } else {
+        return arrow::Status::Invalid("Unknown query type");
+    }
+}
+
 } // namespace bindings
 } // namespace sabot_ql

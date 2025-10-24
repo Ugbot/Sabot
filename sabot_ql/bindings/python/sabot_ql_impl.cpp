@@ -9,6 +9,9 @@
             "/Users/bengamble/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/include/python3.11/pythread.h",
             "/Users/bengamble/Sabot/MarbleDB/include/marble/db.h",
             "/Users/bengamble/Sabot/sabot_ql/include/sabot_ql/bindings.h",
+            "/Users/bengamble/Sabot/sabot_ql/include/sabot_ql/sparql/ast.h",
+            "/Users/bengamble/Sabot/sabot_ql/include/sabot_ql/sparql/parser.h",
+            "/Users/bengamble/Sabot/sabot_ql/include/sabot_ql/sparql/query_engine.h",
             "/Users/bengamble/Sabot/sabot_ql/include/sabot_ql/storage/triple_store.h",
             "/Users/bengamble/Sabot/sabot_ql/include/sabot_ql/storage/vocabulary.h",
             "/Users/bengamble/Sabot/sabot_ql/include/sabot_ql/types/value_id.h",
@@ -1437,6 +1440,9 @@ static CYTHON_INLINE float __PYX_NAN() {
 #include "sabot_ql/storage/triple_store.h"
 #include "sabot_ql/storage/vocabulary.h"
 #include "sabot_ql/types/value_id.h"
+#include "sabot_ql/sparql/ast.h"
+#include "sabot_ql/sparql/parser.h"
+#include "sabot_ql/sparql/query_engine.h"
 #include "sabot_ql/bindings.h"
 #ifdef _OPENMP
 #include <omp.h>
@@ -3380,6 +3386,7 @@ struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper {
   std::shared_ptr<sabot_ql::TripleStore>  c_triple_store;
   std::shared_ptr<sabot_ql::Vocabulary>  c_vocab;
   std::shared_ptr<marble::MarbleDB>  c_db;
+  std::shared_ptr<sabot_ql::sparql::QueryEngine>  c_query_engine;
   PyObject *db_path;
 };
 
@@ -5042,6 +5049,13 @@ static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *nam
   #define __PYX_STD_MOVE_IF_SUPPORTED(x) x
 #endif
 
+/* PyUnicode_Unicode.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyUnicode_Unicode(PyObject *obj);
+
+/* JoinPyUnicode.proto */
+static PyObject* __Pyx_PyUnicode_Join(PyObject** values, Py_ssize_t value_count, Py_ssize_t result_ulength,
+                                      Py_UCS4 max_char);
+
 /* RejectKeywords.proto */
 static void __Pyx_RejectKeywords(const char* function_name, PyObject *kwds);
 
@@ -5120,14 +5134,12 @@ static PyTypeObject *__Pyx_ImportType_3_1_5(PyObject* module, const char *module
 /* GetVTable.proto */
 static void* __Pyx_GetVtable(PyTypeObject *type);
 
-/* ListPack.proto */
-static PyObject *__Pyx_PyList_Pack(Py_ssize_t n, ...);
-
 /* Import.proto */
 static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
 
-/* ImportFrom.proto */
-static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name);
+/* ImportDottedModule.proto */
+static PyObject *__Pyx_ImportDottedModule(PyObject *name, PyObject *parts_tuple);
+static PyObject *__Pyx_ImportDottedModule_WalkParts(PyObject *module, PyObject *name, PyObject *parts_tuple);
 
 /* FetchSharedCythonModule.proto */
 static PyObject *__Pyx_FetchSharedCythonABIModule(void);
@@ -5426,6 +5438,9 @@ static unsigned long __Pyx_get_runtime_version(void);
 /* CheckBinaryVersion.proto */
 static int __Pyx_check_binary_version(unsigned long ct_version, unsigned long rt_version, int allow_newer);
 
+/* FunctionImport.proto */
+static int __Pyx_ImportFunction_3_1_5(PyObject *module, const char *funcname, void (**f)(void), const char *sig);
+
 /* MultiPhaseInitModuleState.proto */
 #if CYTHON_PEP489_MULTI_PHASE_INIT && CYTHON_USE_MODULE_STATE
 static PyObject *__Pyx_State_FindModule(void*);
@@ -5670,31 +5685,37 @@ static PyObject *__pyx_builtin_NotImplementedError;
 static PyObject *__pyx_builtin_TypeError;
 static PyObject *__pyx_builtin_MemoryError;
 /* #### Code section: string_decls ### */
-static const char __pyx_k_[] = "";
+static const char __pyx_k_[] = " ";
 static const char __pyx_k_A[] = "\200A\360\006\000\t\017\320\016!\240\021\240!";
 static const char __pyx_k_Q[] = "\200\001\330\004\n\210+\220Q";
 static const char __pyx_k_Qa[] = "\320\000!\240\030\250\021\360\024\000\005\014\320\013\035\230Q\230a";
-static const char __pyx_k__2[] = ".";
+static const char __pyx_k__2[] = " .";
 static const char __pyx_k__3[] = "?";
 static const char __pyx_k_gc[] = "gc";
 static const char __pyx_k_pa[] = "pa";
+static const char __pyx_k_add[] = "add";
 static const char __pyx_k_pop[] = "pop";
 static const char __pyx_k_str[] = "str";
+static const char __pyx_k_None[] = "None";
 static const char __pyx_k_func[] = "__func__";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_self[] = "self";
 static const char __pyx_k_size[] = "size";
+static const char __pyx_k_spec[] = "__spec__";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_close[] = "close";
-static const char __pyx_k_sabot[] = "sabot";
+static const char __pyx_k_query[] = "query";
+static const char __pyx_k_A_b_Jl[] = "\200A\360\026\000\t\027\220b\230\004\230J\240l\260!\360\010\000\t\017\320\016!\240\021\330\014\r";
 static const char __pyx_k_enable[] = "enable";
 static const char __pyx_k_module[] = "__module__";
 static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_return[] = "return";
-static const char __pyx_k_cyarrow[] = "cyarrow";
+static const char __pyx_k_c_query[] = "c_query";
+static const char __pyx_k_c_table[] = "c_table";
 static const char __pyx_k_db_path[] = "db_path";
 static const char __pyx_k_disable[] = "disable";
+static const char __pyx_k_pyarrow[] = "pyarrow";
 static const char __pyx_k_subject[] = "subject";
 static const char __pyx_k_add_note[] = "add_note";
 static const char __pyx_k_getstate[] = "__getstate__";
@@ -5705,19 +5726,23 @@ static const char __pyx_k_TypeError[] = "TypeError";
 static const char __pyx_k_isenabled[] = "isenabled";
 static const char __pyx_k_predicate[] = "predicate";
 static const char __pyx_k_pyx_state[] = "__pyx_state";
+static const char __pyx_k_query_ast[] = "query_ast";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
 static const char __pyx_k_object_val[] = "object_val";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
-static const char __pyx_k_A_O6_HF_E_q[] = "\200A\360\006\000\t\r\210O\2306\240\021\330\010\014\210H\220F\230!\330\010\014\210E\220\026\220q";
 static const char __pyx_k_MemoryError[] = "MemoryError";
-static const char __pyx_k_object_term[] = "object_term";
+static const char __pyx_k_exec_result[] = "exec_result";
+static const char __pyx_k_triple_line[] = "triple_line";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
+static const char __pyx_k_initializing[] = "_initializing";
 static const char __pyx_k_is_coroutine[] = "_is_coroutine";
+static const char __pyx_k_parse_result[] = "parse_result";
+static const char __pyx_k_select_query[] = "select_query";
+static const char __pyx_k_sparql_query[] = "sparql_query";
 static const char __pyx_k_stringsource[] = "<stringsource>";
-static const char __pyx_k_subject_term[] = "subject_term";
-static const char __pyx_k_insert_triple[] = "insert_triple";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
-static const char __pyx_k_predicate_term[] = "predicate_term";
+static const char __pyx_k_select_result[] = "select_result";
+static const char __pyx_k_A_O6_O6_HF_E_q[] = "\200A\360\006\000\t\r\210O\2306\240\021\330\010\014\210O\2306\240\021\330\010\014\210H\220F\230!\330\010\014\210E\220\026\220q";
 static const char __pyx_k_sabot_ql_native[] = "sabot_ql_native";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_sabot_ql_impl_pyx[] = "sabot_ql_impl.pyx";
@@ -5726,24 +5751,26 @@ static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_NotImplementedError[] = "NotImplementedError";
 static const char __pyx_k_create_triple_store[] = "create_triple_store";
+static const char __pyx_k_TripleStoreWrapper_add[] = "TripleStoreWrapper.add";
 static const char __pyx_k_TripleStoreWrapper_size[] = "TripleStoreWrapper.size";
 static const char __pyx_k_TripleStoreWrapper_close[] = "TripleStoreWrapper.close";
+static const char __pyx_k_TripleStoreWrapper_query[] = "TripleStoreWrapper.query";
 static const char __pyx_k_size_method_needs_C_binding[] = "size() method needs C++ binding";
 static const char __pyx_k_SabotQL_Python_Bindings_Impleme[] = "\nSabotQL Python Bindings - Implementation\n\nExposes SabotQL's RDF triple store with MarbleDB persistence to Python.\n";
-static const char __pyx_k_A_KwgQa_HA_L_L_k_ha_l_l_j_q_81_q[] = "\200A\360\026\000\t\025\220K\230w\240g\250Q\250a\330\010\024\220H\230A\330\010\024\220L\240\001\330\010\024\220L\240\001\360\006\000\t\027\220k\240\031\250'\260\021\260!\330\010\026\220h\230a\330\010\026\220l\240!\330\010\026\220l\240!\360\006\000\t\024\220;\230j\250\007\250q\260\001\330\010\023\2208\2301\330\010\023\220<\230q\330\010\023\220<\230q\360\016\000\t\017\320\016!\240\021\330\014\r";
+static const char __pyx_k_A6_gQa_aq_A_a_32DAQ_A_8t_bP____A[] = "\200A\3606\000\t#\240,\250g\260Q\260a\360\006\000\t,\250;\260a\260q\330\010\024\220A\220\\\240\027\250\001\330\010\037\230|\250;\260a\360\006\000\t3\3202D\300A\300Q\330\010\024\220A\220]\240'\250\021\330\010(\250\r\260[\300\001\360\006\000\t8\260t\270?\310$\310b\320P^\320^_\320_`\330\010\024\220A\220[\240\007\240q\330\010*\250+\260[\300\001\360\006\000\t\020\320\017!\240\021\240!";
 static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.";
 static const char __pyx_k_TripleStoreWrapper___reduce_cyth[] = "TripleStoreWrapper.__reduce_cython__";
 static const char __pyx_k_TripleStoreWrapper___setstate_cy[] = "TripleStoreWrapper.__setstate_cython__";
-static const char __pyx_k_TripleStoreWrapper_insert_triple[] = "TripleStoreWrapper.insert_triple";
-static const char __pyx_k_insert_triple_requires_additiona[] = "insert_triple() requires additional C++ bindings for Vocabulary::AddTerm(). Use insert_triples_batch() with Arrow data instead.";
-static const char __pyx_k_self_c_db_self_c_triple_store_se[] = "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling";
+static const char __pyx_k_add_requires_N_Triples_parser_bi[] = "add() requires N-Triples parser binding. Use add_batch() or load triples via the NTriplesParser for now.";
+static const char __pyx_k_self_c_db_self_c_query_engine_se[] = "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling";
 /* #### Code section: decls ### */
 static int __pyx_pf_15sabot_ql_native_18TripleStoreWrapper___init__(struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self, PyObject *__pyx_v_db_path); /* proto */
-static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_2insert_triple(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self, PyObject *__pyx_v_subject, PyObject *__pyx_v_predicate, PyObject *__pyx_v_object_val); /* proto */
-static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_4size(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_6close(struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_8__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_10__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_2add(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self, PyObject *__pyx_v_subject, PyObject *__pyx_v_predicate, PyObject *__pyx_v_object_val); /* proto */
+static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_4query(struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self, PyObject *__pyx_v_sparql_query); /* proto */
+static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_6size(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_8close(struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_10__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_12__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_pf_15sabot_ql_native_create_triple_store(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_db_path); /* proto */
 static PyObject *__pyx_tp_new_15sabot_ql_native_TripleStoreWrapper(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 /* #### Code section: late_includes ### */
@@ -5895,8 +5922,8 @@ typedef struct {
   PyObject *__pyx_type_15sabot_ql_native_TripleStoreWrapper;
   PyTypeObject *__pyx_ptype_15sabot_ql_native_TripleStoreWrapper;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
-  PyObject *__pyx_codeobj_tab[6];
-  PyObject *__pyx_string_tab[61];
+  PyObject *__pyx_codeobj_tab[7];
+  PyObject *__pyx_string_tab[71];
 /* #### Code section: module_state_contents ### */
 /* CommonTypesMetaclass.module_state_decls */
 PyTypeObject *__pyx_CommonTypesMetaclassType;
@@ -5934,67 +5961,77 @@ static __pyx_mstatetype __pyx_mstate_global_static =
 static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_static;
 #endif
 /* #### Code section: constant_name_defines ### */
-#define __pyx_kp_b_ __pyx_string_tab[0]
+#define __pyx_kp_u_ __pyx_string_tab[0]
 #define __pyx_n_u_MemoryError __pyx_string_tab[1]
-#define __pyx_n_u_NotImplementedError __pyx_string_tab[2]
-#define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[3]
-#define __pyx_n_u_RuntimeError __pyx_string_tab[4]
-#define __pyx_n_u_TripleStoreWrapper __pyx_string_tab[5]
-#define __pyx_n_u_TripleStoreWrapper___reduce_cyth __pyx_string_tab[6]
-#define __pyx_n_u_TripleStoreWrapper___setstate_cy __pyx_string_tab[7]
-#define __pyx_n_u_TripleStoreWrapper_close __pyx_string_tab[8]
-#define __pyx_n_u_TripleStoreWrapper_insert_triple __pyx_string_tab[9]
-#define __pyx_n_u_TripleStoreWrapper_size __pyx_string_tab[10]
-#define __pyx_n_u_TypeError __pyx_string_tab[11]
-#define __pyx_kp_u__2 __pyx_string_tab[12]
-#define __pyx_kp_u__3 __pyx_string_tab[13]
-#define __pyx_kp_u_add_note __pyx_string_tab[14]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[15]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[16]
-#define __pyx_n_u_close __pyx_string_tab[17]
-#define __pyx_n_u_create_triple_store __pyx_string_tab[18]
-#define __pyx_n_u_cyarrow __pyx_string_tab[19]
-#define __pyx_n_u_db_path __pyx_string_tab[20]
-#define __pyx_kp_u_disable __pyx_string_tab[21]
-#define __pyx_kp_u_enable __pyx_string_tab[22]
-#define __pyx_n_u_func __pyx_string_tab[23]
-#define __pyx_kp_u_gc __pyx_string_tab[24]
-#define __pyx_n_u_getstate __pyx_string_tab[25]
-#define __pyx_n_u_insert_triple __pyx_string_tab[26]
-#define __pyx_kp_u_insert_triple_requires_additiona __pyx_string_tab[27]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[28]
-#define __pyx_kp_u_isenabled __pyx_string_tab[29]
-#define __pyx_n_u_main __pyx_string_tab[30]
-#define __pyx_n_u_module __pyx_string_tab[31]
-#define __pyx_n_u_name __pyx_string_tab[32]
-#define __pyx_n_u_object_term __pyx_string_tab[33]
-#define __pyx_n_u_object_val __pyx_string_tab[34]
-#define __pyx_n_u_pa __pyx_string_tab[35]
-#define __pyx_n_u_pop __pyx_string_tab[36]
-#define __pyx_n_u_predicate __pyx_string_tab[37]
-#define __pyx_n_u_predicate_term __pyx_string_tab[38]
-#define __pyx_n_u_pyx_state __pyx_string_tab[39]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[40]
-#define __pyx_n_u_qualname __pyx_string_tab[41]
-#define __pyx_n_u_reduce __pyx_string_tab[42]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[43]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[44]
-#define __pyx_n_u_return __pyx_string_tab[45]
-#define __pyx_n_u_sabot __pyx_string_tab[46]
-#define __pyx_kp_u_sabot_ql_impl_pyx __pyx_string_tab[47]
-#define __pyx_n_u_sabot_ql_native __pyx_string_tab[48]
-#define __pyx_n_u_self __pyx_string_tab[49]
-#define __pyx_kp_u_self_c_db_self_c_triple_store_se __pyx_string_tab[50]
-#define __pyx_n_u_set_name __pyx_string_tab[51]
-#define __pyx_n_u_setstate __pyx_string_tab[52]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[53]
-#define __pyx_n_u_size __pyx_string_tab[54]
-#define __pyx_kp_u_size_method_needs_C_binding __pyx_string_tab[55]
-#define __pyx_n_u_str __pyx_string_tab[56]
-#define __pyx_kp_u_stringsource __pyx_string_tab[57]
-#define __pyx_n_u_subject __pyx_string_tab[58]
-#define __pyx_n_u_subject_term __pyx_string_tab[59]
-#define __pyx_n_u_test __pyx_string_tab[60]
+#define __pyx_kp_u_None __pyx_string_tab[2]
+#define __pyx_n_u_NotImplementedError __pyx_string_tab[3]
+#define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[4]
+#define __pyx_n_u_RuntimeError __pyx_string_tab[5]
+#define __pyx_n_u_TripleStoreWrapper __pyx_string_tab[6]
+#define __pyx_n_u_TripleStoreWrapper___reduce_cyth __pyx_string_tab[7]
+#define __pyx_n_u_TripleStoreWrapper___setstate_cy __pyx_string_tab[8]
+#define __pyx_n_u_TripleStoreWrapper_add __pyx_string_tab[9]
+#define __pyx_n_u_TripleStoreWrapper_close __pyx_string_tab[10]
+#define __pyx_n_u_TripleStoreWrapper_query __pyx_string_tab[11]
+#define __pyx_n_u_TripleStoreWrapper_size __pyx_string_tab[12]
+#define __pyx_n_u_TypeError __pyx_string_tab[13]
+#define __pyx_kp_u__2 __pyx_string_tab[14]
+#define __pyx_kp_u__3 __pyx_string_tab[15]
+#define __pyx_n_u_add __pyx_string_tab[16]
+#define __pyx_kp_u_add_note __pyx_string_tab[17]
+#define __pyx_kp_u_add_requires_N_Triples_parser_bi __pyx_string_tab[18]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[19]
+#define __pyx_n_u_c_query __pyx_string_tab[20]
+#define __pyx_n_u_c_table __pyx_string_tab[21]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[22]
+#define __pyx_n_u_close __pyx_string_tab[23]
+#define __pyx_n_u_create_triple_store __pyx_string_tab[24]
+#define __pyx_n_u_db_path __pyx_string_tab[25]
+#define __pyx_kp_u_disable __pyx_string_tab[26]
+#define __pyx_kp_u_enable __pyx_string_tab[27]
+#define __pyx_n_u_exec_result __pyx_string_tab[28]
+#define __pyx_n_u_func __pyx_string_tab[29]
+#define __pyx_kp_u_gc __pyx_string_tab[30]
+#define __pyx_n_u_getstate __pyx_string_tab[31]
+#define __pyx_n_u_initializing __pyx_string_tab[32]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[33]
+#define __pyx_kp_u_isenabled __pyx_string_tab[34]
+#define __pyx_n_u_main __pyx_string_tab[35]
+#define __pyx_n_u_module __pyx_string_tab[36]
+#define __pyx_n_u_name __pyx_string_tab[37]
+#define __pyx_n_u_object_val __pyx_string_tab[38]
+#define __pyx_n_u_pa __pyx_string_tab[39]
+#define __pyx_n_u_parse_result __pyx_string_tab[40]
+#define __pyx_n_u_pop __pyx_string_tab[41]
+#define __pyx_n_u_predicate __pyx_string_tab[42]
+#define __pyx_n_u_pyarrow __pyx_string_tab[43]
+#define __pyx_n_u_pyx_state __pyx_string_tab[44]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[45]
+#define __pyx_n_u_qualname __pyx_string_tab[46]
+#define __pyx_n_u_query __pyx_string_tab[47]
+#define __pyx_n_u_query_ast __pyx_string_tab[48]
+#define __pyx_n_u_reduce __pyx_string_tab[49]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[50]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[51]
+#define __pyx_n_u_return __pyx_string_tab[52]
+#define __pyx_kp_u_sabot_ql_impl_pyx __pyx_string_tab[53]
+#define __pyx_n_u_sabot_ql_native __pyx_string_tab[54]
+#define __pyx_n_u_select_query __pyx_string_tab[55]
+#define __pyx_n_u_select_result __pyx_string_tab[56]
+#define __pyx_n_u_self __pyx_string_tab[57]
+#define __pyx_kp_u_self_c_db_self_c_query_engine_se __pyx_string_tab[58]
+#define __pyx_n_u_set_name __pyx_string_tab[59]
+#define __pyx_n_u_setstate __pyx_string_tab[60]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[61]
+#define __pyx_n_u_size __pyx_string_tab[62]
+#define __pyx_kp_u_size_method_needs_C_binding __pyx_string_tab[63]
+#define __pyx_n_u_sparql_query __pyx_string_tab[64]
+#define __pyx_n_u_spec __pyx_string_tab[65]
+#define __pyx_n_u_str __pyx_string_tab[66]
+#define __pyx_kp_u_stringsource __pyx_string_tab[67]
+#define __pyx_n_u_subject __pyx_string_tab[68]
+#define __pyx_n_u_test __pyx_string_tab[69]
+#define __pyx_n_u_triple_line __pyx_string_tab[70]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -6125,8 +6162,8 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_ptype_7pyarrow_3lib_StopToken);
   Py_CLEAR(clear_module_state->__pyx_ptype_15sabot_ql_native_TripleStoreWrapper);
   Py_CLEAR(clear_module_state->__pyx_type_15sabot_ql_native_TripleStoreWrapper);
-  for (int i=0; i<6; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<61; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<7; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<71; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   return 0;
 }
 #endif
@@ -6257,8 +6294,8 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_ptype_7pyarrow_3lib_StopToken);
   Py_VISIT(traverse_module_state->__pyx_ptype_15sabot_ql_native_TripleStoreWrapper);
   Py_VISIT(traverse_module_state->__pyx_type_15sabot_ql_native_TripleStoreWrapper);
-  for (int i=0; i<6; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<61; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<7; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<71; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   return 0;
 }
 #endif
@@ -9140,7 +9177,7 @@ static CYTHON_INLINE PyObject *__pyx_f_15sabot_ql_native_check_status(arrow::Sta
   return __pyx_r;
 }
 
-/* "sabot_ql_impl.pyx":36
+/* "sabot_ql_impl.pyx":38
  *     cdef object db_path
  * 
  *     def __init__(self, str db_path):             # <<<<<<<<<<<<<<
@@ -9174,32 +9211,32 @@ static int __pyx_pw_15sabot_ql_native_18TripleStoreWrapper_1__init__(PyObject *_
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_db_path,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 36, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 38, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 36, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 38, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < (0)) __PYX_ERR(0, 36, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < (0)) __PYX_ERR(0, 38, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, i); __PYX_ERR(0, 36, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, i); __PYX_ERR(0, 38, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 36, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 38, __pyx_L3_error)
     }
     __pyx_v_db_path = ((PyObject*)values[0]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 36, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 38, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9210,7 +9247,7 @@ static int __pyx_pw_15sabot_ql_native_18TripleStoreWrapper_1__init__(PyObject *_
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_db_path), (&PyUnicode_Type), 1, "db_path", 1))) __PYX_ERR(0, 36, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_db_path), (&PyUnicode_Type), 1, "db_path", 1))) __PYX_ERR(0, 38, __pyx_L1_error)
   __pyx_r = __pyx_pf_15sabot_ql_native_18TripleStoreWrapper___init__(((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_v_self), __pyx_v_db_path);
 
   /* function exit code */
@@ -9247,7 +9284,7 @@ static int __pyx_pf_15sabot_ql_native_18TripleStoreWrapper___init__(struct __pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "sabot_ql_impl.pyx":43
+  /* "sabot_ql_impl.pyx":45
  *             db_path: Path to MarbleDB database directory
  *         """
  *         self.db_path = db_path             # <<<<<<<<<<<<<<
@@ -9260,7 +9297,7 @@ static int __pyx_pf_15sabot_ql_native_18TripleStoreWrapper___init__(struct __pyx
   __Pyx_DECREF(__pyx_v_self->db_path);
   __pyx_v_self->db_path = __pyx_v_db_path;
 
-  /* "sabot_ql_impl.pyx":44
+  /* "sabot_ql_impl.pyx":46
  *         """
  *         self.db_path = db_path
  *         cdef cpp_string c_db_path = db_path.encode('utf-8')             # <<<<<<<<<<<<<<
@@ -9269,15 +9306,15 @@ static int __pyx_pf_15sabot_ql_native_18TripleStoreWrapper___init__(struct __pyx
 */
   if (unlikely(__pyx_v_db_path == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
-    __PYX_ERR(0, 44, __pyx_L1_error)
+    __PYX_ERR(0, 46, __pyx_L1_error)
   }
-  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_db_path); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_db_path); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_2 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c_db_path = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_2);
 
-  /* "sabot_ql_impl.pyx":47
+  /* "sabot_ql_impl.pyx":49
  * 
  *         # Open MarbleDB
  *         cdef CResult[shared_ptr[MarbleDB]] db_result = OpenMarbleDB(c_db_path, True)             # <<<<<<<<<<<<<<
@@ -9286,18 +9323,18 @@ static int __pyx_pf_15sabot_ql_native_18TripleStoreWrapper___init__(struct __pyx
 */
   __pyx_v_db_result = sabot_ql::bindings::OpenMarbleDB(__pyx_v_c_db_path, 1);
 
-  /* "sabot_ql_impl.pyx":48
+  /* "sabot_ql_impl.pyx":50
  *         # Open MarbleDB
  *         cdef CResult[shared_ptr[MarbleDB]] db_result = OpenMarbleDB(c_db_path, True)
  *         check_status(db_result.status())             # <<<<<<<<<<<<<<
  *         self.c_db = db_result.ValueOrDie()
  * 
 */
-  __pyx_t_1 = __pyx_f_15sabot_ql_native_check_status(__pyx_v_db_result.status()); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_15sabot_ql_native_check_status(__pyx_v_db_result.status()); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot_ql_impl.pyx":49
+  /* "sabot_ql_impl.pyx":51
  *         cdef CResult[shared_ptr[MarbleDB]] db_result = OpenMarbleDB(c_db_path, True)
  *         check_status(db_result.status())
  *         self.c_db = db_result.ValueOrDie()             # <<<<<<<<<<<<<<
@@ -9308,11 +9345,11 @@ static int __pyx_pf_15sabot_ql_native_18TripleStoreWrapper___init__(struct __pyx
     __pyx_t_3 = __pyx_v_db_result.ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 49, __pyx_L1_error)
+    __PYX_ERR(0, 51, __pyx_L1_error)
   }
   __pyx_v_self->c_db = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_3);
 
-  /* "sabot_ql_impl.pyx":52
+  /* "sabot_ql_impl.pyx":54
  * 
  *         # Create vocabulary
  *         cdef CResult[shared_ptr[Vocabulary]] vocab_result = CreateVocabularyMarbleDB(             # <<<<<<<<<<<<<<
@@ -9321,18 +9358,18 @@ static int __pyx_pf_15sabot_ql_native_18TripleStoreWrapper___init__(struct __pyx
 */
   __pyx_v_vocab_result = sabot_ql::bindings::CreateVocabularyMarbleDB(__pyx_v_c_db_path, __pyx_v_self->c_db);
 
-  /* "sabot_ql_impl.pyx":54
+  /* "sabot_ql_impl.pyx":56
  *         cdef CResult[shared_ptr[Vocabulary]] vocab_result = CreateVocabularyMarbleDB(
  *             c_db_path, self.c_db)
  *         check_status(vocab_result.status())             # <<<<<<<<<<<<<<
  *         self.c_vocab = vocab_result.ValueOrDie()
  * 
 */
-  __pyx_t_1 = __pyx_f_15sabot_ql_native_check_status(__pyx_v_vocab_result.status()); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_15sabot_ql_native_check_status(__pyx_v_vocab_result.status()); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot_ql_impl.pyx":55
+  /* "sabot_ql_impl.pyx":57
  *             c_db_path, self.c_db)
  *         check_status(vocab_result.status())
  *         self.c_vocab = vocab_result.ValueOrDie()             # <<<<<<<<<<<<<<
@@ -9343,11 +9380,11 @@ static int __pyx_pf_15sabot_ql_native_18TripleStoreWrapper___init__(struct __pyx
     __pyx_t_4 = __pyx_v_vocab_result.ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 55, __pyx_L1_error)
+    __PYX_ERR(0, 57, __pyx_L1_error)
   }
   __pyx_v_self->c_vocab = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_4);
 
-  /* "sabot_ql_impl.pyx":58
+  /* "sabot_ql_impl.pyx":60
  * 
  *         # Create triple store
  *         cdef CResult[shared_ptr[TripleStore]] store_result = CreateTripleStoreMarbleDB(             # <<<<<<<<<<<<<<
@@ -9356,33 +9393,42 @@ static int __pyx_pf_15sabot_ql_native_18TripleStoreWrapper___init__(struct __pyx
 */
   __pyx_v_store_result = sabot_ql::bindings::CreateTripleStoreMarbleDB(__pyx_v_c_db_path, __pyx_v_self->c_db);
 
-  /* "sabot_ql_impl.pyx":60
+  /* "sabot_ql_impl.pyx":62
  *         cdef CResult[shared_ptr[TripleStore]] store_result = CreateTripleStoreMarbleDB(
  *             c_db_path, self.c_db)
  *         check_status(store_result.status())             # <<<<<<<<<<<<<<
  *         self.c_triple_store = store_result.ValueOrDie()
  * 
 */
-  __pyx_t_1 = __pyx_f_15sabot_ql_native_check_status(__pyx_v_store_result.status()); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_15sabot_ql_native_check_status(__pyx_v_store_result.status()); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 62, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot_ql_impl.pyx":61
+  /* "sabot_ql_impl.pyx":63
  *             c_db_path, self.c_db)
  *         check_status(store_result.status())
  *         self.c_triple_store = store_result.ValueOrDie()             # <<<<<<<<<<<<<<
  * 
- *     def insert_triple(self, str subject, str predicate, str object_val):
+ *         # Create query engine
 */
   try {
     __pyx_t_5 = __pyx_v_store_result.ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 61, __pyx_L1_error)
+    __PYX_ERR(0, 63, __pyx_L1_error)
   }
   __pyx_v_self->c_triple_store = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_5);
 
-  /* "sabot_ql_impl.pyx":36
+  /* "sabot_ql_impl.pyx":66
+ * 
+ *         # Create query engine
+ *         self.c_query_engine = shared_ptr[QueryEngine](             # <<<<<<<<<<<<<<
+ *             new QueryEngine(self.c_triple_store, self.c_vocab))
+ * 
+*/
+  __pyx_v_self->c_query_engine = std::shared_ptr<sabot_ql::sparql::QueryEngine> (new sabot_ql::sparql::QueryEngine(__pyx_v_self->c_triple_store, __pyx_v_self->c_vocab));
+
+  /* "sabot_ql_impl.pyx":38
  *     cdef object db_path
  * 
  *     def __init__(self, str db_path):             # <<<<<<<<<<<<<<
@@ -9402,25 +9448,25 @@ static int __pyx_pf_15sabot_ql_native_18TripleStoreWrapper___init__(struct __pyx
   return __pyx_r;
 }
 
-/* "sabot_ql_impl.pyx":63
- *         self.c_triple_store = store_result.ValueOrDie()
+/* "sabot_ql_impl.pyx":69
+ *             new QueryEngine(self.c_triple_store, self.c_vocab))
  * 
- *     def insert_triple(self, str subject, str predicate, str object_val):             # <<<<<<<<<<<<<<
+ *     def add(self, str subject, str predicate, str object_val):             # <<<<<<<<<<<<<<
  *         """
- *         Insert a single RDF triple.
+ *         Add a single RDF triple.
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_3insert_triple(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_3add(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_15sabot_ql_native_18TripleStoreWrapper_2insert_triple, "\n        Insert a single RDF triple.\n\n        Args:\n            subject: Subject IRI\n            predicate: Predicate IRI\n            object_val: Object IRI or literal\n        ");
-static PyMethodDef __pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_3insert_triple = {"insert_triple", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_3insert_triple, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_2insert_triple};
-static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_3insert_triple(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_15sabot_ql_native_18TripleStoreWrapper_2add, "\n        Add a single RDF triple.\n\n        Args:\n            subject: Subject IRI (e.g., '<http://example.org/Alice>')\n            predicate: Predicate IRI (e.g., '<http://xmlns.com/foaf/0.1/name>')\n            object_val: Object IRI or literal (e.g., '\"Alice\"' or '<http://example.org/Bob>')\n        ");
+static PyMethodDef __pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_3add = {"add", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_3add, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_2add};
+static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_3add(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -9440,7 +9486,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("insert_triple (wrapper)", 0);
+  __Pyx_RefNannySetupContext("add (wrapper)", 0);
   #if !CYTHON_METH_FASTCALL
   #if CYTHON_ASSUME_SAFE_SIZE
   __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
@@ -9452,38 +9498,38 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_subject,&__pyx_mstate_global->__pyx_n_u_predicate,&__pyx_mstate_global->__pyx_n_u_object_val,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 63, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 69, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 63, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 69, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 63, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 69, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 63, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 69, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "insert_triple", 0) < (0)) __PYX_ERR(0, 63, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "add", 0) < (0)) __PYX_ERR(0, 69, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("insert_triple", 1, 3, 3, i); __PYX_ERR(0, 63, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("add", 1, 3, 3, i); __PYX_ERR(0, 69, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 3)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 63, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 69, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 63, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 69, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 63, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 69, __pyx_L3_error)
     }
     __pyx_v_subject = ((PyObject*)values[0]);
     __pyx_v_predicate = ((PyObject*)values[1]);
@@ -9491,21 +9537,21 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("insert_triple", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 63, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("add", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 69, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
     Py_XDECREF(values[__pyx_temp]);
   }
-  __Pyx_AddTraceback("sabot_ql_native.TripleStoreWrapper.insert_triple", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("sabot_ql_native.TripleStoreWrapper.add", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_subject), (&PyUnicode_Type), 1, "subject", 1))) __PYX_ERR(0, 63, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_predicate), (&PyUnicode_Type), 1, "predicate", 1))) __PYX_ERR(0, 63, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_object_val), (&PyUnicode_Type), 1, "object_val", 1))) __PYX_ERR(0, 63, __pyx_L1_error)
-  __pyx_r = __pyx_pf_15sabot_ql_native_18TripleStoreWrapper_2insert_triple(((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_v_self), __pyx_v_subject, __pyx_v_predicate, __pyx_v_object_val);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_subject), (&PyUnicode_Type), 1, "subject", 1))) __PYX_ERR(0, 69, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_predicate), (&PyUnicode_Type), 1, "predicate", 1))) __PYX_ERR(0, 69, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_object_val), (&PyUnicode_Type), 1, "object_val", 1))) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_r = __pyx_pf_15sabot_ql_native_18TripleStoreWrapper_2add(((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_v_self), __pyx_v_subject, __pyx_v_predicate, __pyx_v_object_val);
 
   /* function exit code */
   goto __pyx_L0;
@@ -9524,222 +9570,392 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_2insert_triple(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self, PyObject *__pyx_v_subject, PyObject *__pyx_v_predicate, PyObject *__pyx_v_object_val) {
-  struct sabot_ql::Term __pyx_v_subject_term;
-  struct sabot_ql::Term __pyx_v_predicate_term;
-  struct sabot_ql::Term __pyx_v_object_term;
+static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_2add(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self, PyObject *__pyx_v_subject, PyObject *__pyx_v_predicate, PyObject *__pyx_v_object_val) {
+  CYTHON_UNUSED PyObject *__pyx_v_triple_line = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
-  std::string __pyx_t_2;
+  PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  size_t __pyx_t_5;
+  PyObject *__pyx_t_4[6];
+  PyObject *__pyx_t_5 = NULL;
+  size_t __pyx_t_6;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("insert_triple", 0);
-
-  /* "sabot_ql_impl.pyx":74
- *         # Convert strings to Terms and get ValueIds
- *         cdef Term subject_term
- *         subject_term.lexical = subject.encode('utf-8')             # <<<<<<<<<<<<<<
- *         subject_term.kind = IRI
- *         subject_term.language = b""
-*/
-  if (unlikely(__pyx_v_subject == Py_None)) {
-    PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
-    __PYX_ERR(0, 74, __pyx_L1_error)
-  }
-  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_subject); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 74, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 74, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_subject_term.lexical = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_2);
-
-  /* "sabot_ql_impl.pyx":75
- *         cdef Term subject_term
- *         subject_term.lexical = subject.encode('utf-8')
- *         subject_term.kind = IRI             # <<<<<<<<<<<<<<
- *         subject_term.language = b""
- *         subject_term.datatype = b""
-*/
-  __pyx_v_subject_term.kind = sabot_ql::TermKind::IRI;
-
-  /* "sabot_ql_impl.pyx":76
- *         subject_term.lexical = subject.encode('utf-8')
- *         subject_term.kind = IRI
- *         subject_term.language = b""             # <<<<<<<<<<<<<<
- *         subject_term.datatype = b""
- * 
-*/
-  __pyx_t_2 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_mstate_global->__pyx_kp_b_); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 76, __pyx_L1_error)
-  __pyx_v_subject_term.language = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_2);
-
-  /* "sabot_ql_impl.pyx":77
- *         subject_term.kind = IRI
- *         subject_term.language = b""
- *         subject_term.datatype = b""             # <<<<<<<<<<<<<<
- * 
- *         cdef Term predicate_term
-*/
-  __pyx_t_2 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_mstate_global->__pyx_kp_b_); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 77, __pyx_L1_error)
-  __pyx_v_subject_term.datatype = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_2);
+  __Pyx_RefNannySetupContext("add", 0);
 
   /* "sabot_ql_impl.pyx":80
+ *         # For now, use the RDF parser to handle N-Triples syntax
+ *         # This ensures proper parsing of IRIs, literals, etc.
+ *         triple_line = f"{subject} {predicate} {object_val} ."             # <<<<<<<<<<<<<<
  * 
- *         cdef Term predicate_term
- *         predicate_term.lexical = predicate.encode('utf-8')             # <<<<<<<<<<<<<<
- *         predicate_term.kind = IRI
- *         predicate_term.language = b""
+ *         # We'll need to expose a method to add N-Triples strings to the store
 */
-  if (unlikely(__pyx_v_predicate == Py_None)) {
-    PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
-    __PYX_ERR(0, 80, __pyx_L1_error)
-  }
-  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_predicate); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyUnicode_Unicode(__pyx_v_subject); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyUnicode_Unicode(__pyx_v_predicate); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyUnicode_Unicode(__pyx_v_object_val); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4[0] = __pyx_t_1;
+  __pyx_t_4[1] = __pyx_mstate_global->__pyx_kp_u_;
+  __pyx_t_4[2] = __pyx_t_2;
+  __pyx_t_4[3] = __pyx_mstate_global->__pyx_kp_u_;
+  __pyx_t_4[4] = __pyx_t_3;
+  __pyx_t_4[5] = __pyx_mstate_global->__pyx_kp_u__2;
+  __pyx_t_5 = __Pyx_PyUnicode_Join(__pyx_t_4, 6, __Pyx_PyUnicode_GET_LENGTH(__pyx_t_1) + 1 * 2 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2) + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3) + 2, 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3));
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_predicate_term.lexical = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_triple_line = ((PyObject*)__pyx_t_5);
+  __pyx_t_5 = 0;
 
-  /* "sabot_ql_impl.pyx":81
- *         cdef Term predicate_term
- *         predicate_term.lexical = predicate.encode('utf-8')
- *         predicate_term.kind = IRI             # <<<<<<<<<<<<<<
- *         predicate_term.language = b""
- *         predicate_term.datatype = b""
-*/
-  __pyx_v_predicate_term.kind = sabot_ql::TermKind::IRI;
-
-  /* "sabot_ql_impl.pyx":82
- *         predicate_term.lexical = predicate.encode('utf-8')
- *         predicate_term.kind = IRI
- *         predicate_term.language = b""             # <<<<<<<<<<<<<<
- *         predicate_term.datatype = b""
- * 
-*/
-  __pyx_t_2 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_mstate_global->__pyx_kp_b_); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 82, __pyx_L1_error)
-  __pyx_v_predicate_term.language = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_2);
-
-  /* "sabot_ql_impl.pyx":83
- *         predicate_term.kind = IRI
- *         predicate_term.language = b""
- *         predicate_term.datatype = b""             # <<<<<<<<<<<<<<
- * 
- *         cdef Term object_term
-*/
-  __pyx_t_2 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_mstate_global->__pyx_kp_b_); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L1_error)
-  __pyx_v_predicate_term.datatype = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_2);
-
-  /* "sabot_ql_impl.pyx":86
- * 
- *         cdef Term object_term
- *         object_term.lexical = object_val.encode('utf-8')             # <<<<<<<<<<<<<<
- *         object_term.kind = IRI
- *         object_term.language = b""
-*/
-  if (unlikely(__pyx_v_object_val == Py_None)) {
-    PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
-    __PYX_ERR(0, 86, __pyx_L1_error)
-  }
-  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_object_val); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 86, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 86, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_object_term.lexical = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_2);
-
-  /* "sabot_ql_impl.pyx":87
- *         cdef Term object_term
- *         object_term.lexical = object_val.encode('utf-8')
- *         object_term.kind = IRI             # <<<<<<<<<<<<<<
- *         object_term.language = b""
- *         object_term.datatype = b""
-*/
-  __pyx_v_object_term.kind = sabot_ql::TermKind::IRI;
-
-  /* "sabot_ql_impl.pyx":88
- *         object_term.lexical = object_val.encode('utf-8')
- *         object_term.kind = IRI
- *         object_term.language = b""             # <<<<<<<<<<<<<<
- *         object_term.datatype = b""
- * 
-*/
-  __pyx_t_2 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_mstate_global->__pyx_kp_b_); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 88, __pyx_L1_error)
-  __pyx_v_object_term.language = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_2);
-
-  /* "sabot_ql_impl.pyx":89
- *         object_term.kind = IRI
- *         object_term.language = b""
- *         object_term.datatype = b""             # <<<<<<<<<<<<<<
- * 
- *         # Add terms to vocabulary and get IDs
-*/
-  __pyx_t_2 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_mstate_global->__pyx_kp_b_); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 89, __pyx_L1_error)
-  __pyx_v_object_term.datatype = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_2);
-
-  /* "sabot_ql_impl.pyx":96
- * 
- *         # For now, raise NotImplementedError since we need to expose more C++ methods
+  /* "sabot_ql_impl.pyx":84
+ *         # We'll need to expose a method to add N-Triples strings to the store
+ *         # For now, raise NotImplementedError with helpful message
  *         raise NotImplementedError(             # <<<<<<<<<<<<<<
- *             "insert_triple() requires additional C++ bindings for Vocabulary::AddTerm(). "
- *             "Use insert_triples_batch() with Arrow data instead."
+ *             "add() requires N-Triples parser binding. "
+ *             "Use add_batch() or load triples via the NTriplesParser for now."
 */
   __pyx_t_3 = NULL;
   __Pyx_INCREF(__pyx_builtin_NotImplementedError);
-  __pyx_t_4 = __pyx_builtin_NotImplementedError; 
-  __pyx_t_5 = 1;
+  __pyx_t_2 = __pyx_builtin_NotImplementedError; 
+  __pyx_t_6 = 1;
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_mstate_global->__pyx_kp_u_insert_triple_requires_additiona};
-    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_mstate_global->__pyx_kp_u_add_requires_N_Triples_parser_bi};
+    __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 96, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 84, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
   }
-  __Pyx_Raise(__pyx_t_1, 0, 0, 0);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __PYX_ERR(0, 96, __pyx_L1_error)
+  __Pyx_Raise(__pyx_t_5, 0, 0, 0);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __PYX_ERR(0, 84, __pyx_L1_error)
 
-  /* "sabot_ql_impl.pyx":63
- *         self.c_triple_store = store_result.ValueOrDie()
+  /* "sabot_ql_impl.pyx":69
+ *             new QueryEngine(self.c_triple_store, self.c_vocab))
  * 
- *     def insert_triple(self, str subject, str predicate, str object_val):             # <<<<<<<<<<<<<<
+ *     def add(self, str subject, str predicate, str object_val):             # <<<<<<<<<<<<<<
  *         """
- *         Insert a single RDF triple.
+ *         Add a single RDF triple.
 */
 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("sabot_ql_native.TripleStoreWrapper.insert_triple", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_AddTraceback("sabot_ql_native.TripleStoreWrapper.add", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
+  __Pyx_XDECREF(__pyx_v_triple_line);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "sabot_ql_impl.pyx":101
+/* "sabot_ql_impl.pyx":89
  *         )
  * 
- *     def size(self):             # <<<<<<<<<<<<<<
- *         """Get approximate number of triples in store."""
- *         # Would call triple_store->Size() if exposed
+ *     def query(self, str sparql_query):             # <<<<<<<<<<<<<<
+ *         """
+ *         Execute a SPARQL query with full W3C 1.1 support including property paths.
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_5size(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_5query(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_15sabot_ql_native_18TripleStoreWrapper_4size, "Get approximate number of triples in store.");
-static PyMethodDef __pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_5size = {"size", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_5size, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_4size};
-static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_5size(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_15sabot_ql_native_18TripleStoreWrapper_4query, "\n        Execute a SPARQL query with full W3C 1.1 support including property paths.\n\n        Args:\n            sparql_query: SPARQL query string (SELECT, ASK, CONSTRUCT, DESCRIBE)\n\n        Returns:\n            Arrow Table with query results\n\n        Examples:\n            # Simple pattern\n            result = store.query('''\n                SELECT ?s ?p ?o\n                WHERE { ?s ?p ?o }\n                LIMIT 10\n            ''')\n\n            # Property path (works!)\n            result = store.query('''\n                PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n                SELECT ?person ?friend\n                WHERE {\n                    ?person foaf:knows/foaf:name ?friend .\n                }\n            ''')\n        ");
+static PyMethodDef __pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_5query = {"query", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_5query, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_4query};
+static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_5query(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  PyObject *__pyx_v_sparql_query = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("query (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_sparql_query,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 89, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 89, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "query", 0) < (0)) __PYX_ERR(0, 89, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("query", 1, 1, 1, i); __PYX_ERR(0, 89, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 89, __pyx_L3_error)
+    }
+    __pyx_v_sparql_query = ((PyObject*)values[0]);
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("query", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 89, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("sabot_ql_native.TripleStoreWrapper.query", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_sparql_query), (&PyUnicode_Type), 1, "sparql_query", 1))) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_r = __pyx_pf_15sabot_ql_native_18TripleStoreWrapper_4query(((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_v_self), __pyx_v_sparql_query);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  goto __pyx_L7_cleaned_up;
+  __pyx_L0:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __pyx_L7_cleaned_up:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_4query(struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self, PyObject *__pyx_v_sparql_query) {
+  std::string __pyx_v_c_query;
+  arrow::Result<sabot_ql::sparql::Query>  __pyx_v_parse_result;
+  sabot_ql::sparql::Query __pyx_v_query_ast;
+  arrow::Result<sabot_ql::sparql::SelectQuery>  __pyx_v_select_result;
+  sabot_ql::sparql::SelectQuery __pyx_v_select_query;
+  arrow::Result<std::shared_ptr< arrow::Table> >  __pyx_v_exec_result;
+  std::shared_ptr< arrow::Table>  __pyx_v_c_table;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  std::string __pyx_t_2;
+  sabot_ql::sparql::Query __pyx_t_3;
+  sabot_ql::sparql::SelectQuery __pyx_t_4;
+  std::shared_ptr< arrow::Table>  __pyx_t_5;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("query", 0);
+
+  /* "sabot_ql_impl.pyx":116
+ *             ''')
+ *         """
+ *         cdef cpp_string c_query = sparql_query.encode('utf-8')             # <<<<<<<<<<<<<<
+ * 
+ *         # Parse SPARQL query
+*/
+  if (unlikely(__pyx_v_sparql_query == Py_None)) {
+    PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
+    __PYX_ERR(0, 116, __pyx_L1_error)
+  }
+  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_sparql_query); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 116, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_c_query = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_2);
+
+  /* "sabot_ql_impl.pyx":119
+ * 
+ *         # Parse SPARQL query
+ *         cdef CResult[Query] parse_result = ParseSPARQL(c_query)             # <<<<<<<<<<<<<<
+ *         check_status(parse_result.status())
+ *         cdef Query query_ast = parse_result.ValueOrDie()
+*/
+  __pyx_v_parse_result = sabot_ql::sparql::ParseSPARQL(__pyx_v_c_query);
+
+  /* "sabot_ql_impl.pyx":120
+ *         # Parse SPARQL query
+ *         cdef CResult[Query] parse_result = ParseSPARQL(c_query)
+ *         check_status(parse_result.status())             # <<<<<<<<<<<<<<
+ *         cdef Query query_ast = parse_result.ValueOrDie()
+ * 
+*/
+  __pyx_t_1 = __pyx_f_15sabot_ql_native_check_status(__pyx_v_parse_result.status()); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "sabot_ql_impl.pyx":121
+ *         cdef CResult[Query] parse_result = ParseSPARQL(c_query)
+ *         check_status(parse_result.status())
+ *         cdef Query query_ast = parse_result.ValueOrDie()             # <<<<<<<<<<<<<<
+ * 
+ *         # Convert to SelectQuery (currently only SELECT supported)
+*/
+  try {
+    __pyx_t_3 = __pyx_v_parse_result.ValueOrDie();
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 121, __pyx_L1_error)
+  }
+  __pyx_v_query_ast = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_3);
+
+  /* "sabot_ql_impl.pyx":124
+ * 
+ *         # Convert to SelectQuery (currently only SELECT supported)
+ *         cdef CResult[SelectQuery] select_result = QueryToSelectQuery(query_ast)             # <<<<<<<<<<<<<<
+ *         check_status(select_result.status())
+ *         cdef SelectQuery select_query = select_result.ValueOrDie()
+*/
+  __pyx_v_select_result = sabot_ql::bindings::QueryToSelectQuery(__pyx_v_query_ast);
+
+  /* "sabot_ql_impl.pyx":125
+ *         # Convert to SelectQuery (currently only SELECT supported)
+ *         cdef CResult[SelectQuery] select_result = QueryToSelectQuery(query_ast)
+ *         check_status(select_result.status())             # <<<<<<<<<<<<<<
+ *         cdef SelectQuery select_query = select_result.ValueOrDie()
+ * 
+*/
+  __pyx_t_1 = __pyx_f_15sabot_ql_native_check_status(__pyx_v_select_result.status()); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "sabot_ql_impl.pyx":126
+ *         cdef CResult[SelectQuery] select_result = QueryToSelectQuery(query_ast)
+ *         check_status(select_result.status())
+ *         cdef SelectQuery select_query = select_result.ValueOrDie()             # <<<<<<<<<<<<<<
+ * 
+ *         # Execute query
+*/
+  try {
+    __pyx_t_4 = __pyx_v_select_result.ValueOrDie();
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 126, __pyx_L1_error)
+  }
+  __pyx_v_select_query = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_4);
+
+  /* "sabot_ql_impl.pyx":129
+ * 
+ *         # Execute query
+ *         cdef CResult[shared_ptr[CTable]] exec_result = self.c_query_engine.get().ExecuteSelect(select_query)             # <<<<<<<<<<<<<<
+ *         check_status(exec_result.status())
+ *         cdef shared_ptr[CTable] c_table = exec_result.ValueOrDie()
+*/
+  __pyx_v_exec_result = __pyx_v_self->c_query_engine.get()->ExecuteSelect(__pyx_v_select_query);
+
+  /* "sabot_ql_impl.pyx":130
+ *         # Execute query
+ *         cdef CResult[shared_ptr[CTable]] exec_result = self.c_query_engine.get().ExecuteSelect(select_query)
+ *         check_status(exec_result.status())             # <<<<<<<<<<<<<<
+ *         cdef shared_ptr[CTable] c_table = exec_result.ValueOrDie()
+ * 
+*/
+  __pyx_t_1 = __pyx_f_15sabot_ql_native_check_status(__pyx_v_exec_result.status()); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "sabot_ql_impl.pyx":131
+ *         cdef CResult[shared_ptr[CTable]] exec_result = self.c_query_engine.get().ExecuteSelect(select_query)
+ *         check_status(exec_result.status())
+ *         cdef shared_ptr[CTable] c_table = exec_result.ValueOrDie()             # <<<<<<<<<<<<<<
+ * 
+ *         # Convert to Python Arrow Table using pyarrow's Cython wrapper - Sabot standard
+*/
+  try {
+    __pyx_t_5 = __pyx_v_exec_result.ValueOrDie();
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 131, __pyx_L1_error)
+  }
+  __pyx_v_c_table = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_5);
+
+  /* "sabot_ql_impl.pyx":134
+ * 
+ *         # Convert to Python Arrow Table using pyarrow's Cython wrapper - Sabot standard
+ *         return pyarrow_wrap_table(c_table)             # <<<<<<<<<<<<<<
+ * 
+ *     def size(self):
+*/
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_f_7pyarrow_3lib_pyarrow_wrap_table(__pyx_v_c_table); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "sabot_ql_impl.pyx":89
+ *         )
+ * 
+ *     def query(self, str sparql_query):             # <<<<<<<<<<<<<<
+ *         """
+ *         Execute a SPARQL query with full W3C 1.1 support including property paths.
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("sabot_ql_native.TripleStoreWrapper.query", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "sabot_ql_impl.pyx":136
+ *         return pyarrow_wrap_table(c_table)
+ * 
+ *     def size(self):             # <<<<<<<<<<<<<<
+ *         """Get approximate number of triples in store."""
+ *         # Would call triple_store->TotalTriples() if exposed
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_7size(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_15sabot_ql_native_18TripleStoreWrapper_6size, "Get approximate number of triples in store.");
+static PyMethodDef __pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_7size = {"size", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_7size, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_6size};
+static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_7size(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -9765,14 +9981,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("size", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_15sabot_ql_native_18TripleStoreWrapper_4size(((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_v_self));
+  __pyx_r = __pyx_pf_15sabot_ql_native_18TripleStoreWrapper_6size(((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_4size(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self) {
+static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_6size(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9784,9 +10000,9 @@ static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_4size(CYTHON_UN
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("size", 0);
 
-  /* "sabot_ql_impl.pyx":104
+  /* "sabot_ql_impl.pyx":139
  *         """Get approximate number of triples in store."""
- *         # Would call triple_store->Size() if exposed
+ *         # Would call triple_store->TotalTriples() if exposed
  *         raise NotImplementedError("size() method needs C++ binding")             # <<<<<<<<<<<<<<
  * 
  *     def close(self):
@@ -9800,19 +10016,19 @@ static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_4size(CYTHON_UN
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_4, (2-__pyx_t_4) | (__pyx_t_4*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 104, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_Raise(__pyx_t_1, 0, 0, 0);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __PYX_ERR(0, 104, __pyx_L1_error)
+  __PYX_ERR(0, 139, __pyx_L1_error)
 
-  /* "sabot_ql_impl.pyx":101
- *         )
+  /* "sabot_ql_impl.pyx":136
+ *         return pyarrow_wrap_table(c_table)
  * 
  *     def size(self):             # <<<<<<<<<<<<<<
  *         """Get approximate number of triples in store."""
- *         # Would call triple_store->Size() if exposed
+ *         # Would call triple_store->TotalTriples() if exposed
 */
 
   /* function exit code */
@@ -9827,7 +10043,7 @@ static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_4size(CYTHON_UN
   return __pyx_r;
 }
 
-/* "sabot_ql_impl.pyx":106
+/* "sabot_ql_impl.pyx":141
  *         raise NotImplementedError("size() method needs C++ binding")
  * 
  *     def close(self):             # <<<<<<<<<<<<<<
@@ -9836,16 +10052,16 @@ static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_4size(CYTHON_UN
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_7close(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_9close(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_15sabot_ql_native_18TripleStoreWrapper_6close, "Close the triple store and flush to disk.");
-static PyMethodDef __pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_7close = {"close", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_7close, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_6close};
-static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_7close(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_15sabot_ql_native_18TripleStoreWrapper_8close, "Close the triple store and flush to disk.");
+static PyMethodDef __pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_9close = {"close", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_9close, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_8close};
+static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_9close(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -9871,29 +10087,38 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("close", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_15sabot_ql_native_18TripleStoreWrapper_6close(((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_v_self));
+  __pyx_r = __pyx_pf_15sabot_ql_native_18TripleStoreWrapper_8close(((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_6close(struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self) {
+static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_8close(struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("close", 0);
 
-  /* "sabot_ql_impl.pyx":109
+  /* "sabot_ql_impl.pyx":144
  *         """Close the triple store and flush to disk."""
  *         # Reset shared_ptrs
+ *         self.c_query_engine.reset()             # <<<<<<<<<<<<<<
+ *         self.c_triple_store.reset()
+ *         self.c_vocab.reset()
+*/
+  __pyx_v_self->c_query_engine.reset();
+
+  /* "sabot_ql_impl.pyx":145
+ *         # Reset shared_ptrs
+ *         self.c_query_engine.reset()
  *         self.c_triple_store.reset()             # <<<<<<<<<<<<<<
  *         self.c_vocab.reset()
  *         self.c_db.reset()
 */
   __pyx_v_self->c_triple_store.reset();
 
-  /* "sabot_ql_impl.pyx":110
- *         # Reset shared_ptrs
+  /* "sabot_ql_impl.pyx":146
+ *         self.c_query_engine.reset()
  *         self.c_triple_store.reset()
  *         self.c_vocab.reset()             # <<<<<<<<<<<<<<
  *         self.c_db.reset()
@@ -9901,7 +10126,7 @@ static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_6close(struct _
 */
   __pyx_v_self->c_vocab.reset();
 
-  /* "sabot_ql_impl.pyx":111
+  /* "sabot_ql_impl.pyx":147
  *         self.c_triple_store.reset()
  *         self.c_vocab.reset()
  *         self.c_db.reset()             # <<<<<<<<<<<<<<
@@ -9910,7 +10135,7 @@ static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_6close(struct _
 */
   __pyx_v_self->c_db.reset();
 
-  /* "sabot_ql_impl.pyx":106
+  /* "sabot_ql_impl.pyx":141
  *         raise NotImplementedError("size() method needs C++ binding")
  * 
  *     def close(self):             # <<<<<<<<<<<<<<
@@ -9927,20 +10152,20 @@ static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_6close(struct _
 
 /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_9__reduce_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_11__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_9__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_9__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_9__reduce_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_11__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_11__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_11__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -9966,14 +10191,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("__reduce_cython__", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_15sabot_ql_native_18TripleStoreWrapper_8__reduce_cython__(((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_v_self));
+  __pyx_r = __pyx_pf_15sabot_ql_native_18TripleStoreWrapper_10__reduce_cython__(((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_8__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self) {
+static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_10__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -9983,16 +10208,16 @@ static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_8__reduce_cytho
 
   /* "(tree fragment)":2
  * def __reduce_cython__(self):
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"             # <<<<<<<<<<<<<<
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"             # <<<<<<<<<<<<<<
  * def __setstate_cython__(self, __pyx_state):
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
 */
-  __Pyx_Raise(__pyx_builtin_TypeError, __pyx_mstate_global->__pyx_kp_u_self_c_db_self_c_triple_store_se, 0, 0);
+  __Pyx_Raise(__pyx_builtin_TypeError, __pyx_mstate_global->__pyx_kp_u_self_c_db_self_c_query_engine_se, 0, 0);
   __PYX_ERR(1, 2, __pyx_L1_error)
 
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):
 */
 
@@ -10007,21 +10232,21 @@ static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_8__reduce_cytho
 
 /* "(tree fragment)":3
  * def __reduce_cython__(self):
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_11__setstate_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_13__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_11__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_11__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_11__setstate_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_13__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_13__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_13__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -10087,7 +10312,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_15sabot_ql_native_18TripleStoreWrapper_10__setstate_cython__(((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_v_self), __pyx_v___pyx_state);
+  __pyx_r = __pyx_pf_15sabot_ql_native_18TripleStoreWrapper_12__setstate_cython__(((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_v_self), __pyx_v___pyx_state);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -10097,7 +10322,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_10__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_12__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -10106,18 +10331,18 @@ static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_10__setstate_cy
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
 
   /* "(tree fragment)":4
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"             # <<<<<<<<<<<<<<
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"             # <<<<<<<<<<<<<<
 */
-  __Pyx_Raise(__pyx_builtin_TypeError, __pyx_mstate_global->__pyx_kp_u_self_c_db_self_c_triple_store_se, 0, 0);
+  __Pyx_Raise(__pyx_builtin_TypeError, __pyx_mstate_global->__pyx_kp_u_self_c_db_self_c_query_engine_se, 0, 0);
   __PYX_ERR(1, 4, __pyx_L1_error)
 
   /* "(tree fragment)":3
  * def __reduce_cython__(self):
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
 */
 
   /* function exit code */
@@ -10129,7 +10354,7 @@ static PyObject *__pyx_pf_15sabot_ql_native_18TripleStoreWrapper_10__setstate_cy
   return __pyx_r;
 }
 
-/* "sabot_ql_impl.pyx":114
+/* "sabot_ql_impl.pyx":150
  * 
  * 
  * def create_triple_store(db_path: str) -> TripleStoreWrapper:             # <<<<<<<<<<<<<<
@@ -10177,32 +10402,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_db_path,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 114, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 150, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 114, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 150, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "create_triple_store", 0) < (0)) __PYX_ERR(0, 114, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "create_triple_store", 0) < (0)) __PYX_ERR(0, 150, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_triple_store", 1, 1, 1, i); __PYX_ERR(0, 114, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_triple_store", 1, 1, 1, i); __PYX_ERR(0, 150, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 114, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 150, __pyx_L3_error)
     }
     __pyx_v_db_path = ((PyObject*)values[0]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_triple_store", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 114, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_triple_store", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 150, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10213,7 +10438,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_db_path), (&PyUnicode_Type), 0, "db_path", 2))) __PYX_ERR(0, 114, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_db_path), (&PyUnicode_Type), 0, "db_path", 2))) __PYX_ERR(0, 150, __pyx_L1_error)
   __pyx_r = __pyx_pf_15sabot_ql_native_create_triple_store(__pyx_self, __pyx_v_db_path);
 
   /* function exit code */
@@ -10245,7 +10470,7 @@ static struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_pf_15sabot_q
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_triple_store", 0);
 
-  /* "sabot_ql_impl.pyx":124
+  /* "sabot_ql_impl.pyx":160
  *         TripleStoreWrapper instance
  *     """
  *     return TripleStoreWrapper(db_path)             # <<<<<<<<<<<<<<
@@ -10260,14 +10485,14 @@ static struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *__pyx_pf_15sabot_q
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_4, (2-__pyx_t_4) | (__pyx_t_4*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 160, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __pyx_r = ((struct __pyx_obj_15sabot_ql_native_TripleStoreWrapper *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot_ql_impl.pyx":114
+  /* "sabot_ql_impl.pyx":150
  * 
  * 
  * def create_triple_store(db_path: str) -> TripleStoreWrapper:             # <<<<<<<<<<<<<<
@@ -10307,6 +10532,7 @@ static PyObject *__pyx_tp_new_15sabot_ql_native_TripleStoreWrapper(PyTypeObject 
   __Pyx_default_placement_construct(&(p->c_triple_store));
   __Pyx_default_placement_construct(&(p->c_vocab));
   __Pyx_default_placement_construct(&(p->c_db));
+  __Pyx_default_placement_construct(&(p->c_query_engine));
   p->db_path = Py_None; Py_INCREF(Py_None);
   return o;
 }
@@ -10324,6 +10550,7 @@ static void __pyx_tp_dealloc_15sabot_ql_native_TripleStoreWrapper(PyObject *o) {
   __Pyx_call_destructor(p->c_triple_store);
   __Pyx_call_destructor(p->c_vocab);
   __Pyx_call_destructor(p->c_db);
+  __Pyx_call_destructor(p->c_query_engine);
   Py_CLEAR(p->db_path);
   #if CYTHON_USE_TYPE_SLOTS
   (*Py_TYPE(o)->tp_free)(o);
@@ -10358,17 +10585,18 @@ static int __pyx_tp_clear_15sabot_ql_native_TripleStoreWrapper(PyObject *o) {
 }
 
 static PyMethodDef __pyx_methods_15sabot_ql_native_TripleStoreWrapper[] = {
-  {"insert_triple", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_3insert_triple, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_2insert_triple},
-  {"size", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_5size, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_4size},
-  {"close", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_7close, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_6close},
-  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_9__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_11__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"add", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_3add, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_2add},
+  {"query", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_5query, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_4query},
+  {"size", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_7size, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_6size},
+  {"close", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_9close, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_15sabot_ql_native_18TripleStoreWrapper_8close},
+  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_11__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_15sabot_ql_native_18TripleStoreWrapper_13__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 #if CYTHON_USE_TYPE_SPECS
 static PyType_Slot __pyx_type_15sabot_ql_native_TripleStoreWrapper_slots[] = {
   {Py_tp_dealloc, (void *)__pyx_tp_dealloc_15sabot_ql_native_TripleStoreWrapper},
-  {Py_tp_doc, (void *)PyDoc_STR("\n    Python wrapper for SabotQL triple store with MarbleDB persistence.\n    ")},
+  {Py_tp_doc, (void *)PyDoc_STR("\n    Python wrapper for SabotQL triple store with MarbleDB persistence.\n    Provides full W3C SPARQL 1.1 query support including property paths.\n    ")},
   {Py_tp_traverse, (void *)__pyx_tp_traverse_15sabot_ql_native_TripleStoreWrapper},
   {Py_tp_clear, (void *)__pyx_tp_clear_15sabot_ql_native_TripleStoreWrapper},
   {Py_tp_methods, (void *)__pyx_methods_15sabot_ql_native_TripleStoreWrapper},
@@ -10411,7 +10639,7 @@ static PyTypeObject __pyx_type_15sabot_ql_native_TripleStoreWrapper = {
   0, /*tp_setattro*/
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
-  PyDoc_STR("\n    Python wrapper for SabotQL triple store with MarbleDB persistence.\n    "), /*tp_doc*/
+  PyDoc_STR("\n    Python wrapper for SabotQL triple store with MarbleDB persistence.\n    Provides full W3C SPARQL 1.1 query support including property paths.\n    "), /*tp_doc*/
   __pyx_tp_traverse_15sabot_ql_native_TripleStoreWrapper, /*tp_traverse*/
   __pyx_tp_clear_15sabot_ql_native_TripleStoreWrapper, /*tp_clear*/
   0, /*tp_richcompare*/
@@ -11658,10 +11886,23 @@ static int __Pyx_modinit_variable_import_code(__pyx_mstatetype *__pyx_mstate) {
 static int __Pyx_modinit_function_import_code(__pyx_mstatetype *__pyx_mstate) {
   __Pyx_RefNannyDeclarations
   CYTHON_UNUSED_VAR(__pyx_mstate);
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_import_code", 0);
   /*--- Function import code ---*/
+  __pyx_t_1 = PyImport_ImportModule("pyarrow.lib"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (__Pyx_ImportFunction_3_1_5(__pyx_t_1, "pyarrow_wrap_table", (void (**)(void))&__pyx_f_7pyarrow_3lib_pyarrow_wrap_table, "PyObject *(std::shared_ptr< arrow::Table>  const &)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ImportFunction_3_1_5(__pyx_t_1, "pyarrow_unwrap_table", (void (**)(void))&__pyx_f_7pyarrow_3lib_pyarrow_unwrap_table, "std::shared_ptr< arrow::Table>  (PyObject *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_RefNannyFinishContext();
+  return -1;
 }
 
 #if CYTHON_PEP489_MULTI_PHASE_INIT
@@ -11944,111 +12185,117 @@ __Pyx_RefNannySetupContext("PyInit_sabot_ql_native", 0);
   if (unlikely((__Pyx_modinit_type_init_code(__pyx_mstate) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
   if (unlikely((__Pyx_modinit_type_import_code(__pyx_mstate) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
   (void)__Pyx_modinit_variable_import_code(__pyx_mstate);
-  (void)__Pyx_modinit_function_import_code(__pyx_mstate);
+  if (unlikely((__Pyx_modinit_function_import_code(__pyx_mstate) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
   /*--- Execution code ---*/
 
-  /* "sabot_ql_impl.pyx":16
+  /* "sabot_ql_impl.pyx":19
  * 
- * # Import cyarrow for Sabot compatibility
- * from sabot import cyarrow as pa             # <<<<<<<<<<<<<<
+ * # Import Python Arrow for type compatibility
+ * import pyarrow as pa             # <<<<<<<<<<<<<<
  * 
- * # Import C++ declarations
+ * # Helper function to check Arrow status
 */
-  __pyx_t_2 = __Pyx_PyList_Pack(1, __pyx_mstate_global->__pyx_n_u_cyarrow); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_pyarrow, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot, __pyx_t_2, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 16, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pa, __pyx_t_2) < (0)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_cyarrow); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pa, __pyx_t_2) < (0)) __PYX_ERR(0, 16, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot_ql_impl.pyx":63
- *         self.c_triple_store = store_result.ValueOrDie()
+  /* "sabot_ql_impl.pyx":69
+ *             new QueryEngine(self.c_triple_store, self.c_vocab))
  * 
- *     def insert_triple(self, str subject, str predicate, str object_val):             # <<<<<<<<<<<<<<
+ *     def add(self, str subject, str predicate, str object_val):             # <<<<<<<<<<<<<<
  *         """
- *         Insert a single RDF triple.
+ *         Add a single RDF triple.
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_3insert_triple, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper_insert_triple, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 63, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_15sabot_ql_native_TripleStoreWrapper, __pyx_mstate_global->__pyx_n_u_insert_triple, __pyx_t_3) < (0)) __PYX_ERR(0, 63, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_3add, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper_add, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_15sabot_ql_native_TripleStoreWrapper, __pyx_mstate_global->__pyx_n_u_add, __pyx_t_2) < (0)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot_ql_impl.pyx":101
+  /* "sabot_ql_impl.pyx":89
  *         )
+ * 
+ *     def query(self, str sparql_query):             # <<<<<<<<<<<<<<
+ *         """
+ *         Execute a SPARQL query with full W3C 1.1 support including property paths.
+*/
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_5query, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper_query, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_15sabot_ql_native_TripleStoreWrapper, __pyx_mstate_global->__pyx_n_u_query, __pyx_t_2) < (0)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "sabot_ql_impl.pyx":136
+ *         return pyarrow_wrap_table(c_table)
  * 
  *     def size(self):             # <<<<<<<<<<<<<<
  *         """Get approximate number of triples in store."""
- *         # Would call triple_store->Size() if exposed
+ *         # Would call triple_store->TotalTriples() if exposed
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_5size, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper_size, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 101, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_15sabot_ql_native_TripleStoreWrapper, __pyx_mstate_global->__pyx_n_u_size, __pyx_t_3) < (0)) __PYX_ERR(0, 101, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_7size, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper_size, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_15sabot_ql_native_TripleStoreWrapper, __pyx_mstate_global->__pyx_n_u_size, __pyx_t_2) < (0)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot_ql_impl.pyx":106
+  /* "sabot_ql_impl.pyx":141
  *         raise NotImplementedError("size() method needs C++ binding")
  * 
  *     def close(self):             # <<<<<<<<<<<<<<
  *         """Close the triple store and flush to disk."""
  *         # Reset shared_ptrs
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_7close, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper_close, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 106, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_15sabot_ql_native_TripleStoreWrapper, __pyx_mstate_global->__pyx_n_u_close, __pyx_t_3) < (0)) __PYX_ERR(0, 106, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_9close, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper_close, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_15sabot_ql_native_TripleStoreWrapper, __pyx_mstate_global->__pyx_n_u_close, __pyx_t_2) < (0)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_9__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper___reduce_cyth, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_3) < (0)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_11__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper___reduce_cyth, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_2) < (0)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":3
  * def __reduce_cython__(self):
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
- *     raise TypeError, "self.c_db,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self.c_db,self.c_query_engine,self.c_triple_store,self.c_vocab cannot be converted to a Python object for pickling"
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_11__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper___setstate_cy, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 3, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_3) < (0)) __PYX_ERR(1, 3, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_18TripleStoreWrapper_13__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper___setstate_cy, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 3, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_2) < (0)) __PYX_ERR(1, 3, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot_ql_impl.pyx":114
+  /* "sabot_ql_impl.pyx":150
  * 
  * 
  * def create_triple_store(db_path: str) -> TripleStoreWrapper:             # <<<<<<<<<<<<<<
  *     """
  *     Create or open SabotQL triple store.
 */
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 114, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_db_path, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 114, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper) < (0)) __PYX_ERR(0, 114, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_1create_triple_store, 0, __pyx_mstate_global->__pyx_n_u_create_triple_store, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_2, __pyx_t_3);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_triple_store, __pyx_t_2) < (0)) __PYX_ERR(0, 114, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_db_path, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 150, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_TripleStoreWrapper) < (0)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_15sabot_ql_native_1create_triple_store, 0, __pyx_mstate_global->__pyx_n_u_create_triple_store, NULL, __pyx_mstate_global->__pyx_n_u_sabot_ql_native, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_3, __pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_triple_store, __pyx_t_3) < (0)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "sabot_ql_impl.pyx":1
  * # cython: language_level=3, boundscheck=False, wraparound=False             # <<<<<<<<<<<<<<
  * """
  * SabotQL Python Bindings - Implementation
 */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_test, __pyx_t_2) < (0)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_test, __pyx_t_3) < (0)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /*--- Wrapped vars code ---*/
 
@@ -12109,67 +12356,77 @@ typedef struct {
 } __Pyx_StringTabEntry;
 static const char * const __pyx_string_tab_encodings[] = { 0 };
 static const __Pyx_StringTabEntry __pyx_string_tab[] = {
-  {__pyx_k_, sizeof(__pyx_k_), 0, 0, 0}, /* PyObject cname: __pyx_kp_b_ */
+  {__pyx_k_, sizeof(__pyx_k_), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_ */
   {__pyx_k_MemoryError, sizeof(__pyx_k_MemoryError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MemoryError */
+  {__pyx_k_None, sizeof(__pyx_k_None), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_None */
   {__pyx_k_NotImplementedError, sizeof(__pyx_k_NotImplementedError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_NotImplementedError */
   {__pyx_k_Note_that_Cython_is_deliberately, sizeof(__pyx_k_Note_that_Cython_is_deliberately), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Note_that_Cython_is_deliberately */
   {__pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_RuntimeError */
   {__pyx_k_TripleStoreWrapper, sizeof(__pyx_k_TripleStoreWrapper), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TripleStoreWrapper */
   {__pyx_k_TripleStoreWrapper___reduce_cyth, sizeof(__pyx_k_TripleStoreWrapper___reduce_cyth), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TripleStoreWrapper___reduce_cyth */
   {__pyx_k_TripleStoreWrapper___setstate_cy, sizeof(__pyx_k_TripleStoreWrapper___setstate_cy), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TripleStoreWrapper___setstate_cy */
+  {__pyx_k_TripleStoreWrapper_add, sizeof(__pyx_k_TripleStoreWrapper_add), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TripleStoreWrapper_add */
   {__pyx_k_TripleStoreWrapper_close, sizeof(__pyx_k_TripleStoreWrapper_close), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TripleStoreWrapper_close */
-  {__pyx_k_TripleStoreWrapper_insert_triple, sizeof(__pyx_k_TripleStoreWrapper_insert_triple), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TripleStoreWrapper_insert_triple */
+  {__pyx_k_TripleStoreWrapper_query, sizeof(__pyx_k_TripleStoreWrapper_query), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TripleStoreWrapper_query */
   {__pyx_k_TripleStoreWrapper_size, sizeof(__pyx_k_TripleStoreWrapper_size), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TripleStoreWrapper_size */
   {__pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TypeError */
   {__pyx_k__2, sizeof(__pyx_k__2), 0, 1, 0}, /* PyObject cname: __pyx_kp_u__2 */
   {__pyx_k__3, sizeof(__pyx_k__3), 0, 1, 0}, /* PyObject cname: __pyx_kp_u__3 */
+  {__pyx_k_add, sizeof(__pyx_k_add), 0, 1, 1}, /* PyObject cname: __pyx_n_u_add */
   {__pyx_k_add_note, sizeof(__pyx_k_add_note), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_add_note */
+  {__pyx_k_add_requires_N_Triples_parser_bi, sizeof(__pyx_k_add_requires_N_Triples_parser_bi), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_add_requires_N_Triples_parser_bi */
   {__pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 1, 1}, /* PyObject cname: __pyx_n_u_asyncio_coroutines */
+  {__pyx_k_c_query, sizeof(__pyx_k_c_query), 0, 1, 1}, /* PyObject cname: __pyx_n_u_c_query */
+  {__pyx_k_c_table, sizeof(__pyx_k_c_table), 0, 1, 1}, /* PyObject cname: __pyx_n_u_c_table */
   {__pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cline_in_traceback */
   {__pyx_k_close, sizeof(__pyx_k_close), 0, 1, 1}, /* PyObject cname: __pyx_n_u_close */
   {__pyx_k_create_triple_store, sizeof(__pyx_k_create_triple_store), 0, 1, 1}, /* PyObject cname: __pyx_n_u_create_triple_store */
-  {__pyx_k_cyarrow, sizeof(__pyx_k_cyarrow), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cyarrow */
   {__pyx_k_db_path, sizeof(__pyx_k_db_path), 0, 1, 1}, /* PyObject cname: __pyx_n_u_db_path */
   {__pyx_k_disable, sizeof(__pyx_k_disable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_disable */
   {__pyx_k_enable, sizeof(__pyx_k_enable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_enable */
+  {__pyx_k_exec_result, sizeof(__pyx_k_exec_result), 0, 1, 1}, /* PyObject cname: __pyx_n_u_exec_result */
   {__pyx_k_func, sizeof(__pyx_k_func), 0, 1, 1}, /* PyObject cname: __pyx_n_u_func */
   {__pyx_k_gc, sizeof(__pyx_k_gc), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_gc */
   {__pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_getstate */
-  {__pyx_k_insert_triple, sizeof(__pyx_k_insert_triple), 0, 1, 1}, /* PyObject cname: __pyx_n_u_insert_triple */
-  {__pyx_k_insert_triple_requires_additiona, sizeof(__pyx_k_insert_triple_requires_additiona), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_insert_triple_requires_additiona */
+  {__pyx_k_initializing, sizeof(__pyx_k_initializing), 0, 1, 1}, /* PyObject cname: __pyx_n_u_initializing */
   {__pyx_k_is_coroutine, sizeof(__pyx_k_is_coroutine), 0, 1, 1}, /* PyObject cname: __pyx_n_u_is_coroutine */
   {__pyx_k_isenabled, sizeof(__pyx_k_isenabled), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_isenabled */
   {__pyx_k_main, sizeof(__pyx_k_main), 0, 1, 1}, /* PyObject cname: __pyx_n_u_main */
   {__pyx_k_module, sizeof(__pyx_k_module), 0, 1, 1}, /* PyObject cname: __pyx_n_u_module */
   {__pyx_k_name, sizeof(__pyx_k_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_name */
-  {__pyx_k_object_term, sizeof(__pyx_k_object_term), 0, 1, 1}, /* PyObject cname: __pyx_n_u_object_term */
   {__pyx_k_object_val, sizeof(__pyx_k_object_val), 0, 1, 1}, /* PyObject cname: __pyx_n_u_object_val */
   {__pyx_k_pa, sizeof(__pyx_k_pa), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pa */
+  {__pyx_k_parse_result, sizeof(__pyx_k_parse_result), 0, 1, 1}, /* PyObject cname: __pyx_n_u_parse_result */
   {__pyx_k_pop, sizeof(__pyx_k_pop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pop */
   {__pyx_k_predicate, sizeof(__pyx_k_predicate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_predicate */
-  {__pyx_k_predicate_term, sizeof(__pyx_k_predicate_term), 0, 1, 1}, /* PyObject cname: __pyx_n_u_predicate_term */
+  {__pyx_k_pyarrow, sizeof(__pyx_k_pyarrow), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyarrow */
   {__pyx_k_pyx_state, sizeof(__pyx_k_pyx_state), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_state */
   {__pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_vtable */
   {__pyx_k_qualname, sizeof(__pyx_k_qualname), 0, 1, 1}, /* PyObject cname: __pyx_n_u_qualname */
+  {__pyx_k_query, sizeof(__pyx_k_query), 0, 1, 1}, /* PyObject cname: __pyx_n_u_query */
+  {__pyx_k_query_ast, sizeof(__pyx_k_query_ast), 0, 1, 1}, /* PyObject cname: __pyx_n_u_query_ast */
   {__pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 1, 1}, /* PyObject cname: __pyx_n_u_reduce */
   {__pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_reduce_cython */
   {__pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 1, 1}, /* PyObject cname: __pyx_n_u_reduce_ex */
   {__pyx_k_return, sizeof(__pyx_k_return), 0, 1, 1}, /* PyObject cname: __pyx_n_u_return */
-  {__pyx_k_sabot, sizeof(__pyx_k_sabot), 0, 1, 1}, /* PyObject cname: __pyx_n_u_sabot */
   {__pyx_k_sabot_ql_impl_pyx, sizeof(__pyx_k_sabot_ql_impl_pyx), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_sabot_ql_impl_pyx */
   {__pyx_k_sabot_ql_native, sizeof(__pyx_k_sabot_ql_native), 0, 1, 1}, /* PyObject cname: __pyx_n_u_sabot_ql_native */
+  {__pyx_k_select_query, sizeof(__pyx_k_select_query), 0, 1, 1}, /* PyObject cname: __pyx_n_u_select_query */
+  {__pyx_k_select_result, sizeof(__pyx_k_select_result), 0, 1, 1}, /* PyObject cname: __pyx_n_u_select_result */
   {__pyx_k_self, sizeof(__pyx_k_self), 0, 1, 1}, /* PyObject cname: __pyx_n_u_self */
-  {__pyx_k_self_c_db_self_c_triple_store_se, sizeof(__pyx_k_self_c_db_self_c_triple_store_se), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_self_c_db_self_c_triple_store_se */
+  {__pyx_k_self_c_db_self_c_query_engine_se, sizeof(__pyx_k_self_c_db_self_c_query_engine_se), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_self_c_db_self_c_query_engine_se */
   {__pyx_k_set_name, sizeof(__pyx_k_set_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_set_name */
   {__pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate */
   {__pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate_cython */
   {__pyx_k_size, sizeof(__pyx_k_size), 0, 1, 1}, /* PyObject cname: __pyx_n_u_size */
   {__pyx_k_size_method_needs_C_binding, sizeof(__pyx_k_size_method_needs_C_binding), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_size_method_needs_C_binding */
+  {__pyx_k_sparql_query, sizeof(__pyx_k_sparql_query), 0, 1, 1}, /* PyObject cname: __pyx_n_u_sparql_query */
+  {__pyx_k_spec, sizeof(__pyx_k_spec), 0, 1, 1}, /* PyObject cname: __pyx_n_u_spec */
   {__pyx_k_str, sizeof(__pyx_k_str), 0, 1, 1}, /* PyObject cname: __pyx_n_u_str */
   {__pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_stringsource */
   {__pyx_k_subject, sizeof(__pyx_k_subject), 0, 1, 1}, /* PyObject cname: __pyx_n_u_subject */
-  {__pyx_k_subject_term, sizeof(__pyx_k_subject_term), 0, 1, 1}, /* PyObject cname: __pyx_n_u_subject_term */
   {__pyx_k_test, sizeof(__pyx_k_test), 0, 1, 1}, /* PyObject cname: __pyx_n_u_test */
+  {__pyx_k_triple_line, sizeof(__pyx_k_triple_line), 0, 1, 1}, /* PyObject cname: __pyx_n_u_triple_line */
   {0, 0, 0, 0, 0}
 };
 /* InitStrings.proto */
@@ -12180,7 +12437,7 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, c
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 24, __pyx_L1_error)
-  __pyx_builtin_NotImplementedError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_NotImplementedError); if (!__pyx_builtin_NotImplementedError) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_builtin_NotImplementedError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_NotImplementedError); if (!__pyx_builtin_NotImplementedError) __PYX_ERR(0, 84, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(1, 34, __pyx_L1_error)
   return 0;
@@ -12213,9 +12470,9 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
             unsigned int argcount : 3;
             unsigned int num_posonly_args : 1;
             unsigned int num_kwonly_args : 1;
-            unsigned int nlocals : 3;
+            unsigned int nlocals : 4;
             unsigned int flags : 10;
-            unsigned int first_line : 7;
+            unsigned int first_line : 8;
             unsigned int line_table_length : 12;
         } __Pyx_PyCode_New_function_description;
 /* NewCodeObj.proto */
@@ -12233,34 +12490,39 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 63, 123};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_subject, __pyx_mstate->__pyx_n_u_predicate, __pyx_mstate->__pyx_n_u_object_val, __pyx_mstate->__pyx_n_u_subject_term, __pyx_mstate->__pyx_n_u_predicate_term, __pyx_mstate->__pyx_n_u_object_term};
-    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot_ql_impl_pyx, __pyx_mstate->__pyx_n_u_insert_triple, __pyx_k_A_KwgQa_HA_L_L_k_ha_l_l_j_q_81_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 69, 30};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_subject, __pyx_mstate->__pyx_n_u_predicate, __pyx_mstate->__pyx_n_u_object_val, __pyx_mstate->__pyx_n_u_triple_line};
+    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot_ql_impl_pyx, __pyx_mstate->__pyx_n_u_add, __pyx_k_A_b_Jl, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 101, 14};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot_ql_impl_pyx, __pyx_mstate->__pyx_n_u_size, __pyx_k_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 9, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 89, 132};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_sparql_query, __pyx_mstate->__pyx_n_u_c_query, __pyx_mstate->__pyx_n_u_parse_result, __pyx_mstate->__pyx_n_u_query_ast, __pyx_mstate->__pyx_n_u_select_result, __pyx_mstate->__pyx_n_u_select_query, __pyx_mstate->__pyx_n_u_exec_result, __pyx_mstate->__pyx_n_u_c_table};
+    __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot_ql_impl_pyx, __pyx_mstate->__pyx_n_u_query, __pyx_k_A6_gQa_aq_A_a_32DAQ_A_8t_bP____A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 106, 31};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 136, 14};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot_ql_impl_pyx, __pyx_mstate->__pyx_n_u_close, __pyx_k_A_O6_HF_E_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot_ql_impl_pyx, __pyx_mstate->__pyx_n_u_size, __pyx_k_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
+  }
+  {
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 141, 40};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
+    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot_ql_impl_pyx, __pyx_mstate->__pyx_n_u_close, __pyx_k_A_O6_O6_HF_E_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 3, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 114, 19};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 150, 19};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_db_path};
-    __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot_ql_impl_pyx, __pyx_mstate->__pyx_n_u_create_triple_store, __pyx_k_Qa, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot_ql_impl_pyx, __pyx_mstate->__pyx_n_u_create_triple_store, __pyx_k_Qa, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;
@@ -13712,6 +13974,91 @@ static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *nam
     return 0;
 }
 
+/* PyUnicode_Unicode */
+static CYTHON_INLINE PyObject* __Pyx_PyUnicode_Unicode(PyObject *obj) {
+    if (unlikely(obj == Py_None))
+        obj = __pyx_mstate_global->__pyx_kp_u_None;
+    return __Pyx_NewRef(obj);
+}
+
+/* JoinPyUnicode */
+static PyObject* __Pyx_PyUnicode_Join(PyObject** values, Py_ssize_t value_count, Py_ssize_t result_ulength,
+                                      Py_UCS4 max_char) {
+#if CYTHON_USE_UNICODE_INTERNALS && CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    PyObject *result_uval;
+    int result_ukind, kind_shift;
+    Py_ssize_t i, char_pos;
+    void *result_udata;
+    if (max_char > 1114111) max_char = 1114111;
+    result_uval = PyUnicode_New(result_ulength, max_char);
+    if (unlikely(!result_uval)) return NULL;
+    result_ukind = (max_char <= 255) ? PyUnicode_1BYTE_KIND : (max_char <= 65535) ? PyUnicode_2BYTE_KIND : PyUnicode_4BYTE_KIND;
+    kind_shift = (result_ukind == PyUnicode_4BYTE_KIND) ? 2 : result_ukind - 1;
+    result_udata = PyUnicode_DATA(result_uval);
+    assert(kind_shift == 2 || kind_shift == 1 || kind_shift == 0);
+    if (unlikely((PY_SSIZE_T_MAX >> kind_shift) - result_ulength < 0))
+        goto overflow;
+    char_pos = 0;
+    for (i=0; i < value_count; i++) {
+        int ukind;
+        Py_ssize_t ulength;
+        void *udata;
+        PyObject *uval = values[i];
+        #if !CYTHON_COMPILING_IN_LIMITED_API
+        if (__Pyx_PyUnicode_READY(uval) == (-1))
+            goto bad;
+        #endif
+        ulength = __Pyx_PyUnicode_GET_LENGTH(uval);
+        #if !CYTHON_ASSUME_SAFE_SIZE
+        if (unlikely(ulength < 0)) goto bad;
+        #endif
+        if (unlikely(!ulength))
+            continue;
+        if (unlikely((PY_SSIZE_T_MAX >> kind_shift) - ulength < char_pos))
+            goto overflow;
+        ukind = __Pyx_PyUnicode_KIND(uval);
+        udata = __Pyx_PyUnicode_DATA(uval);
+        if (ukind == result_ukind) {
+            memcpy((char *)result_udata + (char_pos << kind_shift), udata, (size_t) (ulength << kind_shift));
+        } else {
+            #if PY_VERSION_HEX >= 0x030d0000
+            if (unlikely(PyUnicode_CopyCharacters(result_uval, char_pos, uval, 0, ulength) < 0)) goto bad;
+            #elif CYTHON_COMPILING_IN_CPYTHON || defined(_PyUnicode_FastCopyCharacters)
+            _PyUnicode_FastCopyCharacters(result_uval, char_pos, uval, 0, ulength);
+            #else
+            Py_ssize_t j;
+            for (j=0; j < ulength; j++) {
+                Py_UCS4 uchar = __Pyx_PyUnicode_READ(ukind, udata, j);
+                __Pyx_PyUnicode_WRITE(result_ukind, result_udata, char_pos+j, uchar);
+            }
+            #endif
+        }
+        char_pos += ulength;
+    }
+    return result_uval;
+overflow:
+    PyErr_SetString(PyExc_OverflowError, "join() result is too long for a Python string");
+bad:
+    Py_DECREF(result_uval);
+    return NULL;
+#else
+    Py_ssize_t i;
+    PyObject *result = NULL;
+    PyObject *value_tuple = PyTuple_New(value_count);
+    if (unlikely(!value_tuple)) return NULL;
+    CYTHON_UNUSED_VAR(max_char);
+    CYTHON_UNUSED_VAR(result_ulength);
+    for (i=0; i<value_count; i++) {
+        if (__Pyx_PyTuple_SET_ITEM(value_tuple, i, values[i]) != (0)) goto bad;
+        Py_INCREF(values[i]);
+    }
+    result = PyUnicode_Join(__pyx_mstate_global->__pyx_empty_unicode, value_tuple);
+bad:
+    Py_DECREF(value_tuple);
+    return result;
+#endif
+}
+
 /* RejectKeywords */
 static void __Pyx_RejectKeywords(const char* function_name, PyObject *kwds) {
     PyObject *key = NULL;
@@ -14436,25 +14783,6 @@ bad:
     return NULL;
 }
 
-/* ListPack */
-static PyObject *__Pyx_PyList_Pack(Py_ssize_t n, ...) {
-    va_list va;
-    PyObject *l = PyList_New(n);
-    va_start(va, n);
-    if (unlikely(!l)) goto end;
-    for (Py_ssize_t i=0; i<n; ++i) {
-        PyObject *arg = va_arg(va, PyObject*);
-        Py_INCREF(arg);
-        if (__Pyx_PyList_SET_ITEM(l, i, arg) != (0)) {
-            Py_CLEAR(l);
-            goto end;
-        }
-    }
-    end:
-    va_end(va);
-    return l;
-}
-
 /* Import */
 static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level) {
     PyObject *module = 0;
@@ -14486,43 +14814,118 @@ bad:
     return module;
 }
 
-/* ImportFrom */
-static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name) {
-    PyObject* value = __Pyx_PyObject_GetAttrStr(module, name);
-    if (unlikely(!value) && PyErr_ExceptionMatches(PyExc_AttributeError)) {
-        const char* module_name_str = 0;
-        PyObject* module_name = 0;
-        PyObject* module_dot = 0;
-        PyObject* full_name = 0;
+/* ImportDottedModule */
+static PyObject *__Pyx__ImportDottedModule_Error(PyObject *name, PyObject *parts_tuple, Py_ssize_t count) {
+    PyObject *partial_name = NULL, *slice = NULL, *sep = NULL;
+    Py_ssize_t size;
+    if (unlikely(PyErr_Occurred())) {
         PyErr_Clear();
-        module_name_str = PyModule_GetName(module);
-        if (unlikely(!module_name_str)) { goto modbad; }
-        module_name = PyUnicode_FromString(module_name_str);
-        if (unlikely(!module_name)) { goto modbad; }
-        module_dot = PyUnicode_Concat(module_name, __pyx_mstate_global->__pyx_kp_u__2);
-        if (unlikely(!module_dot)) { goto modbad; }
-        full_name = PyUnicode_Concat(module_dot, name);
-        if (unlikely(!full_name)) { goto modbad; }
-        #if (CYTHON_COMPILING_IN_PYPY && PYPY_VERSION_NUM  < 0x07030400) ||\
-                CYTHON_COMPILING_IN_GRAAL
-        {
-            PyObject *modules = PyImport_GetModuleDict();
-            if (unlikely(!modules))
-                goto modbad;
-            value = PyObject_GetItem(modules, full_name);
+    }
+#if CYTHON_ASSUME_SAFE_SIZE
+    size = PyTuple_GET_SIZE(parts_tuple);
+#else
+    size = PyTuple_Size(parts_tuple);
+    if (size < 0) goto bad;
+#endif
+    if (likely(size == count)) {
+        partial_name = name;
+    } else {
+        slice = PySequence_GetSlice(parts_tuple, 0, count);
+        if (unlikely(!slice))
+            goto bad;
+        sep = PyUnicode_FromStringAndSize(".", 1);
+        if (unlikely(!sep))
+            goto bad;
+        partial_name = PyUnicode_Join(sep, slice);
+    }
+    PyErr_Format(
+        PyExc_ModuleNotFoundError,
+        "No module named '%U'", partial_name);
+bad:
+    Py_XDECREF(sep);
+    Py_XDECREF(slice);
+    Py_XDECREF(partial_name);
+    return NULL;
+}
+static PyObject *__Pyx__ImportDottedModule_Lookup(PyObject *name) {
+    PyObject *imported_module;
+#if (CYTHON_COMPILING_IN_PYPY && PYPY_VERSION_NUM  < 0x07030400) ||\
+        CYTHON_COMPILING_IN_GRAAL
+    PyObject *modules = PyImport_GetModuleDict();
+    if (unlikely(!modules))
+        return NULL;
+    imported_module = __Pyx_PyDict_GetItemStr(modules, name);
+    Py_XINCREF(imported_module);
+#else
+    imported_module = PyImport_GetModule(name);
+#endif
+    return imported_module;
+}
+static PyObject *__Pyx_ImportDottedModule_WalkParts(PyObject *module, PyObject *name, PyObject *parts_tuple) {
+    Py_ssize_t i, nparts;
+#if CYTHON_ASSUME_SAFE_SIZE
+    nparts = PyTuple_GET_SIZE(parts_tuple);
+#else
+    nparts = PyTuple_Size(parts_tuple);
+    if (nparts < 0) return NULL;
+#endif
+    for (i=1; i < nparts && module; i++) {
+        PyObject *part, *submodule;
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+        part = PyTuple_GET_ITEM(parts_tuple, i);
+#else
+        part = __Pyx_PySequence_ITEM(parts_tuple, i);
+        if (!part) return NULL;
+#endif
+        submodule = __Pyx_PyObject_GetAttrStrNoError(module, part);
+#if !(CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS)
+        Py_DECREF(part);
+#endif
+        Py_DECREF(module);
+        module = submodule;
+    }
+    if (unlikely(!module)) {
+        return __Pyx__ImportDottedModule_Error(name, parts_tuple, i);
+    }
+    return module;
+}
+static PyObject *__Pyx__ImportDottedModule(PyObject *name, PyObject *parts_tuple) {
+    PyObject *imported_module;
+    PyObject *module = __Pyx_Import(name, NULL, 0);
+    if (!parts_tuple || unlikely(!module))
+        return module;
+    imported_module = __Pyx__ImportDottedModule_Lookup(name);
+    if (likely(imported_module)) {
+        Py_DECREF(module);
+        return imported_module;
+    }
+    PyErr_Clear();
+    return __Pyx_ImportDottedModule_WalkParts(module, name, parts_tuple);
+}
+static PyObject *__Pyx_ImportDottedModule(PyObject *name, PyObject *parts_tuple) {
+#if CYTHON_COMPILING_IN_CPYTHON
+    PyObject *module = __Pyx__ImportDottedModule_Lookup(name);
+    if (likely(module)) {
+        PyObject *spec = __Pyx_PyObject_GetAttrStrNoError(module, __pyx_mstate_global->__pyx_n_u_spec);
+        if (likely(spec)) {
+            PyObject *unsafe = __Pyx_PyObject_GetAttrStrNoError(spec, __pyx_mstate_global->__pyx_n_u_initializing);
+            if (likely(!unsafe || !__Pyx_PyObject_IsTrue(unsafe))) {
+                Py_DECREF(spec);
+                spec = NULL;
+            }
+            Py_XDECREF(unsafe);
         }
-        #else
-        value = PyImport_GetModule(full_name);
-        #endif
-      modbad:
-        Py_XDECREF(full_name);
-        Py_XDECREF(module_dot);
-        Py_XDECREF(module_name);
+        if (likely(!spec)) {
+            PyErr_Clear();
+            return module;
+        }
+        Py_DECREF(spec);
+        Py_DECREF(module);
+    } else if (PyErr_Occurred()) {
+        PyErr_Clear();
     }
-    if (unlikely(!value)) {
-        PyErr_Format(PyExc_ImportError, "cannot import name %S", name);
-    }
-    return value;
+#endif
+    return __Pyx__ImportDottedModule(name, parts_tuple);
 }
 
 /* FetchSharedCythonModule */
@@ -16966,6 +17369,51 @@ static int __Pyx_check_binary_version(unsigned long ct_version, unsigned long rt
         return PyErr_WarnEx(NULL, message, 1);
     }
 }
+
+/* FunctionImport */
+#ifndef __PYX_HAVE_RT_ImportFunction_3_1_5
+#define __PYX_HAVE_RT_ImportFunction_3_1_5
+static int __Pyx_ImportFunction_3_1_5(PyObject *module, const char *funcname, void (**f)(void), const char *sig) {
+    PyObject *d = 0;
+    PyObject *cobj = 0;
+    union {
+        void (*fp)(void);
+        void *p;
+    } tmp;
+    d = PyObject_GetAttrString(module, "__pyx_capi__");
+    if (!d)
+        goto bad;
+#if (defined(Py_LIMITED_API) && Py_LIMITED_API >= 0x030d0000) || (!defined(Py_LIMITED_API) && PY_VERSION_HEX >= 0x030d0000)
+    PyDict_GetItemStringRef(d, funcname, &cobj);
+#else
+    cobj = PyDict_GetItemString(d, funcname);
+    Py_XINCREF(cobj);
+#endif
+    if (!cobj) {
+        PyErr_Format(PyExc_ImportError,
+            "%.200s does not export expected C function %.200s",
+                PyModule_GetName(module), funcname);
+        goto bad;
+    }
+    if (!PyCapsule_IsValid(cobj, sig)) {
+        PyErr_Format(PyExc_TypeError,
+            "C function %.200s.%.200s has wrong signature (expected %.500s, got %.500s)",
+             PyModule_GetName(module), funcname, sig, PyCapsule_GetName(cobj));
+        goto bad;
+    }
+    tmp.p = PyCapsule_GetPointer(cobj, sig);
+    *f = tmp.fp;
+    if (!(*f))
+        goto bad;
+    Py_DECREF(d);
+    Py_DECREF(cobj);
+    return 0;
+bad:
+    Py_XDECREF(d);
+    Py_XDECREF(cobj);
+    return -1;
+}
+#endif
 
 /* NewCodeObj */
 #if CYTHON_COMPILING_IN_LIMITED_API

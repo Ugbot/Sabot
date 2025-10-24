@@ -9,16 +9,17 @@ from libcpp.vector cimport vector
 from libcpp cimport bool as cpp_bool
 from libc.stdint cimport uint64_t, int64_t
 
-# Arrow C++ declarations
-from pyarrow.lib cimport (
-    CStatus,
-    CTable,
-    CRecordBatch,
-    CSchema,
-    shared_ptr as arrow_shared_ptr
-)
+# C++ std::string for Arrow
+cdef extern from "<string>" namespace "std":
+    cdef cppclass string:
+        const char* c_str()
 
-# Define CResult template since pyarrow might not expose it fully
+# Import pyarrow's Cython bindings - Sabot standard pattern
+cimport pyarrow.lib as ca
+from pyarrow.lib cimport CStatus, pyarrow_wrap_table, pyarrow_unwrap_table
+from pyarrow.includes.libarrow cimport CTable, CRecordBatch, CSchema
+
+# Define CResult template
 cdef extern from "arrow/result.h" namespace "arrow" nogil:
     cdef cppclass CResult "arrow::Result"[T]:
         CResult()
@@ -67,6 +68,27 @@ cdef extern from "sabot_ql/types/value_id.h" namespace "sabot_ql":
         ValueId fromBits(uint64_t bits)
         uint64_t getBits() const
 
+# SPARQL AST declarations
+cdef extern from "sabot_ql/sparql/ast.h" namespace "sabot_ql::sparql":
+    cdef cppclass Query:
+        pass
+
+    cdef cppclass SelectQuery:
+        pass
+
+    cdef cppclass AskQuery:
+        pass
+
+# SPARQL Parser declarations
+cdef extern from "sabot_ql/sparql/parser.h" namespace "sabot_ql::sparql":
+    CResult[Query] ParseSPARQL(const cpp_string& query_text)
+
+# SPARQL Query Engine declarations
+cdef extern from "sabot_ql/sparql/query_engine.h" namespace "sabot_ql::sparql":
+    cdef cppclass QueryEngine:
+        QueryEngine(shared_ptr[TripleStore] store, shared_ptr[Vocabulary] vocab)
+        CResult[shared_ptr[CTable]] ExecuteSelect(const SelectQuery& query)
+
 # Bindings factory functions
 cdef extern from "sabot_ql/bindings.h" namespace "sabot_ql::bindings":
     CResult[shared_ptr[MarbleDB]] OpenMarbleDB(const cpp_string& db_path, cpp_bool create_if_missing)
@@ -78,3 +100,6 @@ cdef extern from "sabot_ql/bindings.h" namespace "sabot_ql::bindings":
     CResult[shared_ptr[Vocabulary]] CreateVocabularyMarbleDB(
         const cpp_string& db_path,
         shared_ptr[MarbleDB] db)
+
+    # Helper to convert Query to SelectQuery (safe downcast)
+    CResult[SelectQuery] QueryToSelectQuery(const Query& query)

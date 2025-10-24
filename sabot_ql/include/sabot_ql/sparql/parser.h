@@ -155,9 +155,8 @@ private:
     std::optional<TokenType> LookupKeyword(const std::string& text) const;
 };
 
-// Forward declarations for property path parsing helpers
+// Forward declaration for property path parsing
 struct PathToken;
-arrow::Result<std::vector<PathToken>> TokenizePropertyPathTokens(SPARQLParser& parser);
 
 // SPARQL query parser (recursive descent)
 class SPARQLParser {

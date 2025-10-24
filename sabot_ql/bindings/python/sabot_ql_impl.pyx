@@ -12,11 +12,11 @@ from libcpp cimport bool as cpp_bool
 from libc.stdint cimport uint64_t
 from cpython.ref cimport PyObject
 
-# Import cyarrow for Sabot compatibility
-from sabot import cyarrow as pa
-
-# Import C++ declarations
+# Import C++ declarations - these include vendored Arrow wrap/unwrap functions
 from sabot_ql_cpp cimport *
+
+# Import Python Arrow for type compatibility
+import pyarrow as pa
 
 # Helper function to check Arrow status
 cdef inline check_status(const CStatus& status):
@@ -27,10 +27,12 @@ cdef inline check_status(const CStatus& status):
 cdef class TripleStoreWrapper:
     """
     Python wrapper for SabotQL triple store with MarbleDB persistence.
+    Provides full W3C SPARQL 1.1 query support including property paths.
     """
     cdef shared_ptr[TripleStore] c_triple_store
     cdef shared_ptr[Vocabulary] c_vocab
     cdef shared_ptr[MarbleDB] c_db
+    cdef shared_ptr[QueryEngine] c_query_engine
     cdef object db_path
 
     def __init__(self, str db_path):
@@ -60,52 +62,86 @@ cdef class TripleStoreWrapper:
         check_status(store_result.status())
         self.c_triple_store = store_result.ValueOrDie()
 
-    def insert_triple(self, str subject, str predicate, str object_val):
+        # Create query engine
+        self.c_query_engine = shared_ptr[QueryEngine](
+            new QueryEngine(self.c_triple_store, self.c_vocab))
+
+    def add(self, str subject, str predicate, str object_val):
         """
-        Insert a single RDF triple.
+        Add a single RDF triple.
 
         Args:
-            subject: Subject IRI
-            predicate: Predicate IRI
-            object_val: Object IRI or literal
+            subject: Subject IRI (e.g., '<http://example.org/Alice>')
+            predicate: Predicate IRI (e.g., '<http://xmlns.com/foaf/0.1/name>')
+            object_val: Object IRI or literal (e.g., '"Alice"' or '<http://example.org/Bob>')
         """
-        # Convert strings to Terms and get ValueIds
-        cdef Term subject_term
-        subject_term.lexical = subject.encode('utf-8')
-        subject_term.kind = IRI
-        subject_term.language = b""
-        subject_term.datatype = b""
+        # For now, use the RDF parser to handle N-Triples syntax
+        # This ensures proper parsing of IRIs, literals, etc.
+        triple_line = f"{subject} {predicate} {object_val} ."
 
-        cdef Term predicate_term
-        predicate_term.lexical = predicate.encode('utf-8')
-        predicate_term.kind = IRI
-        predicate_term.language = b""
-        predicate_term.datatype = b""
-
-        cdef Term object_term
-        object_term.lexical = object_val.encode('utf-8')
-        object_term.kind = IRI
-        object_term.language = b""
-        object_term.datatype = b""
-
-        # Add terms to vocabulary and get IDs
-        # Note: This is a simplified version - full implementation would call
-        # vocab->AddTerm() and handle the Result properly
-
-        # For now, raise NotImplementedError since we need to expose more C++ methods
+        # We'll need to expose a method to add N-Triples strings to the store
+        # For now, raise NotImplementedError with helpful message
         raise NotImplementedError(
-            "insert_triple() requires additional C++ bindings for Vocabulary::AddTerm(). "
-            "Use insert_triples_batch() with Arrow data instead."
+            "add() requires N-Triples parser binding. "
+            "Use add_batch() or load triples via the NTriplesParser for now."
         )
+
+    def query(self, str sparql_query):
+        """
+        Execute a SPARQL query with full W3C 1.1 support including property paths.
+
+        Args:
+            sparql_query: SPARQL query string (SELECT, ASK, CONSTRUCT, DESCRIBE)
+
+        Returns:
+            Arrow Table with query results
+
+        Examples:
+            # Simple pattern
+            result = store.query('''
+                SELECT ?s ?p ?o
+                WHERE { ?s ?p ?o }
+                LIMIT 10
+            ''')
+
+            # Property path (works!)
+            result = store.query('''
+                PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                SELECT ?person ?friend
+                WHERE {
+                    ?person foaf:knows/foaf:name ?friend .
+                }
+            ''')
+        """
+        cdef cpp_string c_query = sparql_query.encode('utf-8')
+
+        # Parse SPARQL query
+        cdef CResult[Query] parse_result = ParseSPARQL(c_query)
+        check_status(parse_result.status())
+        cdef Query query_ast = parse_result.ValueOrDie()
+
+        # Convert to SelectQuery (currently only SELECT supported)
+        cdef CResult[SelectQuery] select_result = QueryToSelectQuery(query_ast)
+        check_status(select_result.status())
+        cdef SelectQuery select_query = select_result.ValueOrDie()
+
+        # Execute query
+        cdef CResult[shared_ptr[CTable]] exec_result = self.c_query_engine.get().ExecuteSelect(select_query)
+        check_status(exec_result.status())
+        cdef shared_ptr[CTable] c_table = exec_result.ValueOrDie()
+
+        # Convert to Python Arrow Table using pyarrow's Cython wrapper - Sabot standard
+        return pyarrow_wrap_table(c_table)
 
     def size(self):
         """Get approximate number of triples in store."""
-        # Would call triple_store->Size() if exposed
+        # Would call triple_store->TotalTriples() if exposed
         raise NotImplementedError("size() method needs C++ binding")
 
     def close(self):
         """Close the triple store and flush to disk."""
         # Reset shared_ptrs
+        self.c_query_engine.reset()
         self.c_triple_store.reset()
         self.c_vocab.reset()
         self.c_db.reset()

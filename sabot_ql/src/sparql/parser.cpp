@@ -2347,10 +2347,11 @@ struct PathToken {
     }
 };
 
-// Static helper to tokenize property path - needs parser context
+// Friend function to tokenize property path - needs parser context
 // This is in the .cpp to keep PathToken internal
-static arrow::Result<std::vector<PathToken>> TokenizePropertyPathTokens(SPARQLParser& parser) {
+arrow::Result<std::vector<PathToken>> TokenizePropertyPathTokens(SPARQLParser& parser) {
     std::vector<PathToken> path_tokens;
+    bool expecting_operand = true;  // Start by expecting an operand
 
     while (!parser.IsAtEnd()) {
         const Token& token = parser.CurrentToken();
@@ -2369,8 +2370,13 @@ static arrow::Result<std::vector<PathToken>> TokenizePropertyPathTokens(SPARQLPa
         // Operands: IRI, variable, prefixed name
         if (token.type == TokenType::IRI_REF || token.type == TokenType::VARIABLE ||
             token.type == TokenType::PREFIX_LABEL) {
+            // If we're not expecting an operand, this must be the object of the triple pattern
+            if (!expecting_operand && !path_tokens.empty()) {
+                break;  // Stop here, let this token be parsed as the object
+            }
             ARROW_ASSIGN_OR_RAISE(auto term, parser.ParseRDFTerm());
             path_tokens.emplace_back(term);
+            expecting_operand = false;  // After operand, expect operator or quantifier
             continue;
         }
 
@@ -2378,11 +2384,13 @@ static arrow::Result<std::vector<PathToken>> TokenizePropertyPathTokens(SPARQLPa
         if (token.type == TokenType::DIVIDE) {
             path_tokens.emplace_back(PathToken::BINARY_OP, "/", 3);  // Sequence: precedence 3
             parser.Advance();
+            expecting_operand = true;  // After operator, expect operand
             continue;
         }
         if (token.type == TokenType::PIPE) {
             path_tokens.emplace_back(PathToken::BINARY_OP, "|", 2);  // Alternative: precedence 2
             parser.Advance();
+            expecting_operand = true;  // After operator, expect operand
             continue;
         }
 
@@ -2390,11 +2398,13 @@ static arrow::Result<std::vector<PathToken>> TokenizePropertyPathTokens(SPARQLPa
         if (token.type == TokenType::CARET) {
             path_tokens.emplace_back(PathToken::UNARY_PREFIX, "^", 4);  // Inverse: precedence 4
             parser.Advance();
+            expecting_operand = true;  // After prefix operator, expect operand
             continue;
         }
         if (token.type == TokenType::NOT) {
             path_tokens.emplace_back(PathToken::UNARY_PREFIX, "!", 4);  // Negation: precedence 4
             parser.Advance();
+            expecting_operand = true;  // After prefix operator, expect operand
             continue;
         }
 
@@ -2463,11 +2473,13 @@ static arrow::Result<std::vector<PathToken>> TokenizePropertyPathTokens(SPARQLPa
         if (token.type == TokenType::LPAREN) {
             path_tokens.emplace_back(PathToken::LPAREN, "(", 0);
             parser.Advance();
+            expecting_operand = true;  // After '(', expect operand
             continue;
         }
         if (token.type == TokenType::RPAREN) {
             path_tokens.emplace_back(PathToken::RPAREN, ")", 0);
             parser.Advance();
+            expecting_operand = false;  // After ')', expect operator or quantifier
             continue;
         }
 

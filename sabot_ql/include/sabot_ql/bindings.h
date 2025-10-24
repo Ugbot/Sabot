@@ -6,6 +6,7 @@ SabotQL Python Bindings Interface
 
 #include "sabot_ql/storage/triple_store.h"
 #include "sabot_ql/storage/vocabulary.h"
+#include "sabot_ql/sparql/ast.h"
 #include "marble/db.h"
 #include <arrow/result.h>
 #include <arrow/status.h>
@@ -51,6 +52,16 @@ arrow::Result<std::shared_ptr<Vocabulary>> CreateVocabularyMarbleDB(
 arrow::Result<std::shared_ptr<marble::MarbleDB>> OpenMarbleDB(
     const std::string& db_path,
     bool create_if_missing = true);
+
+/**
+ * @brief Convert generic Query AST to SelectQuery
+ *
+ * Safely downcasts a Query to SelectQuery. Returns error if query is not SELECT type.
+ *
+ * @param query Generic query AST
+ * @return Result containing SelectQuery or error status
+ */
+arrow::Result<sparql::SelectQuery> QueryToSelectQuery(const sparql::Query& query);
 
 } // namespace bindings
 } // namespace sabot_ql
