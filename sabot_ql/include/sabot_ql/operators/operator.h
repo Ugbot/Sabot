@@ -7,6 +7,7 @@
 #include <unordered_set>
 #include <arrow/api.h>
 #include <arrow/result.h>
+#include <sabot_ql/operators/operator_metadata.h>
 
 namespace sabot_ql {
 
@@ -82,6 +83,15 @@ public:
     // Get the estimated cardinality (number of output rows)
     // Used by query optimizer for cost estimation
     virtual size_t EstimateCardinality() const = 0;
+
+    // Get output ordering (if known)
+    // Returns empty ordering if operator provides no ordering guarantees.
+    // Used for query optimization - if data is already sorted,
+    // we can skip redundant sort operations.
+    virtual OrderingProperty GetOutputOrdering() const {
+        // Default: no ordering guarantees
+        return OrderingProperty{};
+    }
 
 protected:
     OperatorStats stats_;

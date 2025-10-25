@@ -538,6 +538,7 @@ def load_arrow_to_store(store, table):
         clean_data = clean_rdf_data(raw_data)
 
         # Load into store
+        from sabot.rdf import RDFStore
         store = RDFStore()
         count = load_arrow_to_store(store, clean_data)
     """
@@ -552,7 +553,20 @@ def load_arrow_to_store(store, table):
         dtype = table.column('datatype')[i].as_py() or ''
         lang = table.column('lang')[i].as_py() or ''
 
-        triples.append((s, p, o, is_lit, dtype, lang))
+        # Strip angle brackets from IRIs (N-Triples format)
+        if s.startswith('<') and s.endswith('>'):
+            s = s[1:-1]
+        if p.startswith('<') and p.endswith('>'):
+            p = p[1:-1]
+        if not is_lit and o.startswith('<') and o.endswith('>'):
+            o = o[1:-1]
+        elif is_lit and o.startswith('"'):
+            # Strip quotes from literals
+            if o.endswith('"'):
+                o = o[1:-1]
+
+        # Note: add_many expects (s, p, o, is_lit, lang, dtype) with lang before dtype
+        triples.append((s, p, o, is_lit, lang, dtype))
 
     # Batch load
     store.add_many(triples)

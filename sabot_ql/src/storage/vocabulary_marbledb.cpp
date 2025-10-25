@@ -50,6 +50,9 @@ public:
         // Load existing vocabulary size from MarbleDB
         LoadVocabularySize();
 
+        // Load all terms into hash map for O(1) lookups
+        LoadVocabularyMap();
+
         return arrow::Status::OK();
     }
 
@@ -85,6 +88,14 @@ public:
 
         // Update cache
         UpdateCache(term, new_id);
+
+        // Update full vocabulary map
+        {
+            std::unique_lock<std::shared_mutex> lock(cache_mutex_);
+            if (vocab_map_loaded_) {
+                full_vocab_map_[term] = new_id;
+            }
+        }
 
         return new_id;
     }
@@ -310,11 +321,88 @@ private:
         }
     }
 
+    // Load all vocabulary terms into hash map for O(1) lookups
+    void LoadVocabularyMap() {
+        std::unique_lock<std::shared_mutex> lock(cache_mutex_);
+
+        // Check if already loaded
+        if (vocab_map_loaded_) {
+            return;
+        }
+
+        // Scan all vocabulary entries
+        marble::ReadOptions read_opts;
+        marble::KeyRange full_range(
+            std::make_shared<marble::Int64Key>(1),
+            true,
+            std::make_shared<marble::Int64Key>(next_id_.load()),
+            false);
+
+        std::unique_ptr<marble::Iterator> iter;
+        auto status = db_->NewIterator(read_opts, full_range, &iter);
+        if (!status.ok()) {
+            // Failed to load - leave map empty
+            return;
+        }
+
+        size_t loaded_count = 0;
+        while (iter->Valid()) {
+            auto record = iter->value();
+            auto batch_result = record->ToRecordBatch();
+            if (!batch_result.ok()) {
+                iter->Next();
+                continue;
+            }
+
+            auto batch = *batch_result;
+            if (batch->num_rows() > 0) {
+                auto id_array = std::static_pointer_cast<arrow::Int64Array>(
+                    batch->column(0));
+                auto lex_array = std::static_pointer_cast<arrow::StringArray>(
+                    batch->column(1));
+                auto kind_array = std::static_pointer_cast<arrow::UInt8Array>(
+                    batch->column(2));
+                auto lang_array = std::static_pointer_cast<arrow::StringArray>(
+                    batch->column(3));
+                auto dtype_array = std::static_pointer_cast<arrow::StringArray>(
+                    batch->column(4));
+
+                for (int64_t row = 0; row < batch->num_rows(); ++row) {
+                    Term term(
+                        std::string(lex_array->GetView(row)),
+                        static_cast<TermKind>(kind_array->Value(row)),
+                        std::string(lang_array->GetView(row)),
+                        std::string(dtype_array->GetView(row))
+                    );
+                    ValueId id = ValueId::fromBits(id_array->Value(row));
+                    full_vocab_map_[term] = id;
+                    loaded_count++;
+                }
+            }
+
+            iter->Next();
+        }
+
+        vocab_map_loaded_ = true;
+        // Note: In production, you might log this: "Loaded {loaded_count} terms into vocabulary map"
+    }
+
     // Find term in MarbleDB by lexical form
     arrow::Result<std::optional<ValueId>> FindTermInDB(const Term& term) const {
-        // For now, scan to find matching term
-        // TODO: Add secondary index on lexical+kind for faster lookups
+        // Check full vocabulary hash map first (O(1) lookup)
+        {
+            std::shared_lock<std::shared_mutex> lock(cache_mutex_);
+            if (vocab_map_loaded_) {
+                auto it = full_vocab_map_.find(term);
+                if (it != full_vocab_map_.end()) {
+                    return it->second;
+                }
+                // Not in map means not in DB (map is complete)
+                return std::nullopt;
+            }
+        }
 
+        // Fallback: scan to find matching term (only if map not loaded)
         marble::ReadOptions read_opts;
         marble::KeyRange full_range(
             std::make_shared<marble::Int64Key>(1),
@@ -503,6 +591,11 @@ private:
     mutable std::shared_mutex cache_mutex_;
     std::unordered_map<Term, ValueId> term_to_id_cache_;
     std::unordered_map<ValueId, Term> id_to_term_cache_;
+
+    // Full vocabulary hash map for O(1) lookups (loaded at startup)
+    // Protectedby the same cache_mutex as the LRU cache
+    std::unordered_map<Term, ValueId> full_vocab_map_;
+    bool vocab_map_loaded_ = false;
 };
 
 // Factory function

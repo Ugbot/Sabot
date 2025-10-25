@@ -1,10 +1,12 @@
 #include <sabot_ql/execution/scan_operator.h>
 #include <sabot_ql/storage/triple_store.h>
 #include <sabot_ql/operators/metadata.h>
+#include <sabot_ql/util/logging.h>
 #include <arrow/api.h>
 #include <sstream>
 #include <chrono>
 #include <iostream>
+#include <algorithm>
 
 namespace sabot_ql {
 
@@ -78,9 +80,9 @@ arrow::Result<std::shared_ptr<arrow::Schema>> ScanOperator::GetOutputSchema() co
 }
 
 arrow::Result<std::shared_ptr<arrow::RecordBatch>> ScanOperator::GetNextBatch() {
-    std::cout << "[SCAN] GetNextBatch: Starting (executed=" << executed_ << ")\n" << std::flush;
+    SABOT_LOG_SCAN("GetNextBatch: Starting (executed=" << executed_ << ")");
     if (executed_) {
-        std::cout << "[SCAN] Already executed, returning nullptr\n" << std::flush;
+        SABOT_LOG_SCAN("Already executed, returning nullptr");
         // Already returned all results
         return nullptr;
     }
@@ -88,9 +90,9 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> ScanOperator::GetNextBatch() 
     auto start_time = std::chrono::high_resolution_clock::now();
 
     // Execute scan
-    std::cout << "[SCAN] Calling store_->ScanPattern()\n" << std::flush;
+    SABOT_LOG_SCAN("Calling store_->ScanPattern()");
     ARROW_ASSIGN_OR_RAISE(auto result_table, store_->ScanPattern(pattern_));
-    std::cout << "[SCAN] ScanPattern returned table with " << result_table->num_rows() << " rows, " << result_table->num_columns() << " cols\n" << std::flush;
+    SABOT_LOG_SCAN("ScanPattern returned table with " << result_table->num_rows() << " rows, " << result_table->num_columns() << " cols");
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
@@ -104,17 +106,17 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> ScanOperator::GetNextBatch() 
 
     // Convert table to single batch
     if (result_table->num_rows() == 0) {
-        std::cout << "[SCAN] Empty result, creating empty batch\n" << std::flush;
+        SABOT_LOG_SCAN("Empty result, creating empty batch");
         // Empty result
         ARROW_ASSIGN_OR_RAISE(auto schema, GetOutputSchema());
-        std::cout << "[SCAN] Output schema has " << schema->num_fields() << " fields\n" << std::flush;
+        SABOT_LOG_SCAN("Output schema has " << schema->num_fields() << " fields");
         std::vector<std::shared_ptr<arrow::Array>> empty_arrays;
         for (int i = 0; i < schema->num_fields(); ++i) {
-            std::cout << "[SCAN]   Creating empty array for field " << i << ": " << schema->field(i)->name() << "\n" << std::flush;
+            SABOT_LOG_SCAN("  Creating empty array for field " << i << ": " << schema->field(i)->name());
             ARROW_ASSIGN_OR_RAISE(auto empty_array, arrow::MakeArrayOfNull(schema->field(i)->type(), 0));
             empty_arrays.push_back(empty_array);
         }
-        std::cout << "[SCAN] Creating empty batch with " << empty_arrays.size() << " arrays\n" << std::flush;
+        SABOT_LOG_SCAN("Creating empty batch with " << empty_arrays.size() << " arrays");
         return arrow::RecordBatch::Make(schema, 0, empty_arrays);
     }
 
@@ -178,6 +180,50 @@ size_t ScanOperator::EstimateCardinality() const {
         return result.ValueOrDie();
     }
     return 0;
+}
+
+OrderingProperty ScanOperator::GetOutputOrdering() const {
+    // Determine which index the store will use for this pattern
+    IndexType index = store_->SelectIndex(pattern_);
+
+    OrderingProperty ordering;
+
+    // Index scans return naturally sorted data based on the index type
+    // We only include unbound (output) columns in the ordering
+
+    std::vector<std::string> output_cols;
+    if (!pattern_.subject.has_value()) output_cols.push_back("subject");
+    if (!pattern_.predicate.has_value()) output_cols.push_back("predicate");
+    if (!pattern_.object.has_value()) output_cols.push_back("object");
+
+    if (output_cols.empty()) {
+        // All bound - no output columns, no ordering
+        return ordering;
+    }
+
+    // Define index orderings (full triple order)
+    std::vector<std::string> index_order;
+    switch (index) {
+        case IndexType::SPO:
+            index_order = {"subject", "predicate", "object"};
+            break;
+        case IndexType::POS:
+            index_order = {"predicate", "object", "subject"};
+            break;
+        case IndexType::OSP:
+            index_order = {"object", "subject", "predicate"};
+            break;
+    }
+
+    // Build ordering from index order, keeping only output columns
+    for (const auto& col : index_order) {
+        if (std::find(output_cols.begin(), output_cols.end(), col) != output_cols.end()) {
+            ordering.columns.push_back(col);
+            ordering.directions.push_back(SortDirection::Ascending);
+        }
+    }
+
+    return ordering;
 }
 
 } // namespace sabot_ql

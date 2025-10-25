@@ -414,7 +414,12 @@ private:
         ARROW_RETURN_NOT_OK(col2_builder.Finish(&col2_array));
         ARROW_RETURN_NOT_OK(col3_builder.Finish(&col3_array));
 
-        auto schema = GetIndexSchema(index);
+        // Use generic col1/col2/col3 schema to match MarbleDB column families
+        auto schema = arrow::schema({
+            arrow::field("col1", arrow::int64()),
+            arrow::field("col2", arrow::int64()),
+            arrow::field("col3", arrow::int64())
+        });
 
         return arrow::RecordBatch::Make(
             schema, triples.size(),

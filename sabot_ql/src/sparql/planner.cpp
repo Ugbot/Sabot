@@ -4,6 +4,7 @@
 #include <sabot_ql/operators/join.h>
 #include <sabot_ql/operators/aggregate.h>
 #include <sabot_ql/operators/sort.h>
+#include <sabot_ql/operators/radix_sort.h>
 #include <sabot_ql/operators/union.h>
 #include <sabot_ql/operators/bind.h>
 // Layer 2 operators (new generic implementations)
@@ -11,6 +12,7 @@
 #include <sabot_ql/execution/zipper_join.h>
 #include <sabot_ql/execution/filter_operator.h>
 #include <sabot_ql/operators/rename.h>
+#include <sabot_ql/util/logging.h>
 #include <sstream>
 #include <algorithm>
 #include <iostream>
@@ -80,62 +82,62 @@ std::vector<std::string> GetVariables(const BasicGraphPattern& bgp) {
 
 // QueryPlanner implementation
 arrow::Result<PhysicalPlan> QueryPlanner::PlanSelectQuery(const SelectQuery& query) {
-    std::cout << "[PLANNER] PlanSelectQuery: Starting\n" << std::flush;
+    SABOT_LOG_PLANNER("PlanSelectQuery: Starting");
     PhysicalPlan plan;
     PlanningContext ctx(store_, vocab_);
-    std::cout << "[PLANNER] Context created\n" << std::flush;
+    SABOT_LOG_PLANNER("Context created");
 
     // 1. Plan WHERE clause (basic graph pattern)
     if (!query.where.bgp.has_value()) {
         return arrow::Status::Invalid("SELECT query must have WHERE clause with basic graph pattern");
     }
-    std::cout << "[PLANNER] About to plan BGP with " << query.where.bgp->triples.size() << " triples\n" << std::flush;
+    SABOT_LOG_PLANNER("About to plan BGP with " << query.where.bgp->triples.size() << " triples");
 
     ARROW_ASSIGN_OR_RAISE(
         plan.root_operator,
         PlanBasicGraphPattern(*query.where.bgp, ctx)
     );
-    std::cout << "[PLANNER] BGP planned successfully\n" << std::flush;
+    SABOT_LOG_PLANNER("BGP planned successfully");
 
     // 2. Plan FILTER clauses
-    std::cout << "[PLANNER] Planning " << query.where.filters.size() << " filters\n" << std::flush;
+    SABOT_LOG_PLANNER("Planning " << query.where.filters.size() << " filters");
     for (const auto& filter : query.where.filters) {
         ARROW_ASSIGN_OR_RAISE(
             plan.root_operator,
             PlanFilter(plan.root_operator, filter, ctx)
         );
     }
-    std::cout << "[PLANNER] Filters planned\n" << std::flush;
+    SABOT_LOG_PLANNER("Filters planned");
 
     // 3. Plan BIND clauses
-    std::cout << "[PLANNER] Planning " << query.where.binds.size() << " binds\n" << std::flush;
+    SABOT_LOG_PLANNER("Planning " << query.where.binds.size() << " binds");
     for (const auto& bind : query.where.binds) {
         ARROW_ASSIGN_OR_RAISE(
             plan.root_operator,
             PlanBind(plan.root_operator, bind, ctx)
         );
     }
-    std::cout << "[PLANNER] Binds planned\n" << std::flush;
+    SABOT_LOG_PLANNER("Binds planned");
 
     // 5. Plan OPTIONAL clauses
-    std::cout << "[PLANNER] Planning " << query.where.optionals.size() << " optionals\n" << std::flush;
+    SABOT_LOG_PLANNER("Planning " << query.where.optionals.size() << " optionals");
     for (const auto& optional : query.where.optionals) {
         ARROW_ASSIGN_OR_RAISE(
             plan.root_operator,
             PlanOptional(plan.root_operator, optional, ctx)
         );
     }
-    std::cout << "[PLANNER] Optionals planned\n" << std::flush;
+    SABOT_LOG_PLANNER("Optionals planned");
 
     // 6. Plan UNION clauses
-    std::cout << "[PLANNER] Planning " << query.where.unions.size() << " unions\n" << std::flush;
+    SABOT_LOG_PLANNER("Planning " << query.where.unions.size() << " unions");
     for (const auto& union_pat : query.where.unions) {
         ARROW_ASSIGN_OR_RAISE(
             plan.root_operator,
             PlanUnion(union_pat, ctx)
         );
     }
-    std::cout << "[PLANNER] Unions planned\n" << std::flush;
+    SABOT_LOG_PLANNER("Unions planned");
 
     // 7. Plan GROUP BY and aggregates
     if (query.HasAggregates()) {
@@ -170,111 +172,111 @@ arrow::Result<PhysicalPlan> QueryPlanner::PlanSelectQuery(const SelectQuery& que
     }
 
     // 6. Plan ORDER BY
-    std::cout << "[PLANNER] Planning ORDER BY (" << query.order_by.size() << " clauses)\n" << std::flush;
+    SABOT_LOG_PLANNER("Planning ORDER BY (" << query.order_by.size() << " clauses)");
     if (!query.order_by.empty()) {
         ARROW_ASSIGN_OR_RAISE(
             plan.root_operator,
             PlanOrderBy(plan.root_operator, query.order_by, ctx)
         );
     }
-    std::cout << "[PLANNER] ORDER BY planned\n" << std::flush;
+    SABOT_LOG_PLANNER("ORDER BY planned");
 
     // 7. Plan projection (SELECT clause) - only if not aggregating
-    std::cout << "[PLANNER] Planning projection (HasAgg=" << query.HasAggregates()
+    SABOT_LOG_PLANNER("Planning projection (HasAgg=" << query.HasAggregates()
               << ", HasGroup=" << query.HasGroupBy()
-              << ", IsSelectAll=" << query.select.IsSelectAll() << ")\n" << std::flush;
+              << ", IsSelectAll=" << query.select.IsSelectAll() << ")");
     if (!query.HasAggregates() && !query.HasGroupBy() && !query.select.IsSelectAll()) {
-        std::cout << "[PLANNER] Projection needed for " << query.select.items.size() << " items\n" << std::flush;
+        SABOT_LOG_PLANNER("Projection needed for " << query.select.items.size() << " items");
         std::vector<std::string> select_cols;
         std::unordered_map<std::string, std::string> renamings;  // col_name → var_name
 
         for (const auto& item : query.select.items) {
             if (auto* var = std::get_if<Variable>(&item)) {
-                std::cout << "[PLANNER]   Processing variable: " << var->name << "\n" << std::flush;
+                SABOT_LOG_PLANNER("  Processing variable: " << var->name);
                 // Use var_to_column mapping to get actual column name
                 auto it = ctx.var_to_column.find(var->name);
                 if (it != ctx.var_to_column.end()) {
-                    std::cout << "[PLANNER]     Found mapping: " << var->name << " -> " << it->second << "\n" << std::flush;
+                    SABOT_LOG_PLANNER("    Found mapping: " << var->name << " -> " << it->second);
                     select_cols.push_back(it->second);
                     // Map: internal column name (subject) → SPARQL variable (s)
                     renamings[it->second] = var->name;
                 } else {
-                    std::cout << "[PLANNER]     No mapping, using variable name directly\n" << std::flush;
+                    SABOT_LOG_PLANNER("    No mapping, using variable name directly");
                     // Fallback: use variable name directly
                     select_cols.push_back(planning::VariableToColumnName(*var));
                 }
             }
         }
 
-        std::cout << "[PLANNER] Creating ProjectOperator with " << select_cols.size() << " columns\n" << std::flush;
+        SABOT_LOG_PLANNER("Creating ProjectOperator with " << select_cols.size() << " columns");
         // ProjectOperator: Select which columns
         plan.root_operator = std::make_shared<ProjectOperator>(
             plan.root_operator,
             select_cols
         );
-        std::cout << "[PLANNER] ProjectOperator created\n" << std::flush;
+        SABOT_LOG_PLANNER("ProjectOperator created");
 
         // RenameOperator: Rename to SPARQL variable names
         // This gives us "s", "o" instead of "subject", "object"
         if (!renamings.empty()) {
-            std::cout << "[PLANNER] Creating RenameOperator with " << renamings.size() << " renamings\n" << std::flush;
+            SABOT_LOG_PLANNER("Creating RenameOperator with " << renamings.size() << " renamings");
             plan.root_operator = std::make_shared<RenameOperator>(
                 plan.root_operator,
                 renamings
             );
-            std::cout << "[PLANNER] RenameOperator created\n" << std::flush;
+            SABOT_LOG_PLANNER("RenameOperator created");
         }
     }
-    std::cout << "[PLANNER] Projection complete\n" << std::flush;
+    SABOT_LOG_PLANNER("Projection complete");
 
     // 8. Plan DISTINCT (only if not already handled by GROUP BY)
-    std::cout << "[PLANNER] Planning DISTINCT\n" << std::flush;
+    SABOT_LOG_PLANNER("Planning DISTINCT");
     if (query.select.distinct && !query.HasGroupBy()) {
         plan.root_operator = std::make_shared<DistinctOperator>(plan.root_operator);
     }
-    std::cout << "[PLANNER] DISTINCT planned\n" << std::flush;
+    SABOT_LOG_PLANNER("DISTINCT planned");
 
     // 9. Plan LIMIT
-    std::cout << "[PLANNER] Planning LIMIT\n" << std::flush;
+    SABOT_LOG_PLANNER("Planning LIMIT");
     if (query.limit.has_value()) {
         plan.root_operator = std::make_shared<LimitOperator>(
             plan.root_operator,
             *query.limit
         );
     }
-    std::cout << "[PLANNER] LIMIT planned\n" << std::flush;
+    SABOT_LOG_PLANNER("LIMIT planned");
 
     // 9. Estimate cost
-    std::cout << "[PLANNER] Estimating cardinality\n" << std::flush;
+    SABOT_LOG_PLANNER("Estimating cardinality");
     plan.estimated_cost = plan.root_operator->EstimateCardinality();
-    std::cout << "[PLANNER] Estimated cost: " << plan.estimated_cost << "\n" << std::flush;
+    SABOT_LOG_PLANNER("Estimated cost: " << plan.estimated_cost);
 
-    std::cout << "[PLANNER] PlanSelectQuery complete!\n" << std::flush;
+    SABOT_LOG_PLANNER("PlanSelectQuery complete!");
     return plan;
 }
 
 arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanTriplePattern(
     const TriplePattern& pattern,
     PlanningContext& ctx) {
-    std::cout << "[PLANNER] PlanTriplePattern: Starting\n" << std::flush;
+    SABOT_LOG_PLANNER("PlanTriplePattern: Starting");
 
     // Convert SPARQL triple pattern to storage triple pattern
     sabot_ql::TriplePattern storage_pattern;
-    std::cout << "[PLANNER] Created storage pattern\n" << std::flush;
+    SABOT_LOG_PLANNER("Created storage pattern");
 
     // Convert subject
-    std::cout << "[PLANNER] Converting subject\n" << std::flush;
+    SABOT_LOG_PLANNER("Converting subject");
     ARROW_ASSIGN_OR_RAISE(auto subject_vid, TermToValueId(pattern.subject, ctx));
     storage_pattern.subject = subject_vid.has_value() ?
         std::optional<uint64_t>(subject_vid->getBits()) : std::nullopt;
     if (storage_pattern.subject.has_value()) {
-        std::cout << "[PLANNER] Subject bound to ID: " << storage_pattern.subject.value() << "\n" << std::flush;
+        SABOT_LOG_PLANNER("Subject bound to ID: " << storage_pattern.subject.value());
     } else {
-        std::cout << "[PLANNER] Subject unbound (variable)\n" << std::flush;
+        SABOT_LOG_PLANNER("Subject unbound (variable)");
     }
 
     // Convert predicate
-    std::cout << "[PLANNER] Converting predicate\n" << std::flush;
+    SABOT_LOG_PLANNER("Converting predicate");
 
     // Check if it's a property path (not yet supported)
     if (pattern.IsPredicatePropertyPath()) {
@@ -292,20 +294,20 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanTriplePattern(
     storage_pattern.predicate = predicate_vid.has_value() ?
         std::optional<uint64_t>(predicate_vid->getBits()) : std::nullopt;
     if (storage_pattern.predicate.has_value()) {
-        std::cout << "[PLANNER] Predicate bound to ID: " << storage_pattern.predicate.value() << "\n" << std::flush;
+        SABOT_LOG_PLANNER("Predicate bound to ID: " << storage_pattern.predicate.value());
     } else {
-        std::cout << "[PLANNER] Predicate unbound (variable)\n" << std::flush;
+        SABOT_LOG_PLANNER("Predicate unbound (variable)");
     }
 
     // Convert object
-    std::cout << "[PLANNER] Converting object\n" << std::flush;
+    SABOT_LOG_PLANNER("Converting object");
     ARROW_ASSIGN_OR_RAISE(auto object_vid, TermToValueId(pattern.object, ctx));
     storage_pattern.object = object_vid.has_value() ?
         std::optional<uint64_t>(object_vid->getBits()) : std::nullopt;
     if (storage_pattern.object.has_value()) {
-        std::cout << "[PLANNER] Object bound to ID: " << storage_pattern.object.value() << "\n" << std::flush;
+        SABOT_LOG_PLANNER("Object bound to ID: " << storage_pattern.object.value());
     } else {
-        std::cout << "[PLANNER] Object unbound (variable)\n" << std::flush;
+        SABOT_LOG_PLANNER("Object unbound (variable)");
     }
 
     // Build variable bindings for this scan (column_name → SPARQL variable)
@@ -337,26 +339,26 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanTriplePattern(
 arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanBasicGraphPattern(
     const BasicGraphPattern& bgp,
     PlanningContext& ctx) {
-    std::cout << "[PLANNER] PlanBasicGraphPattern: Starting\n" << std::flush;
+    SABOT_LOG_PLANNER("PlanBasicGraphPattern: Starting");
 
     if (bgp.triples.empty()) {
         return arrow::Status::Invalid("Empty basic graph pattern");
     }
-    std::cout << "[PLANNER] BGP has " << bgp.triples.size() << " triples\n" << std::flush;
+    SABOT_LOG_PLANNER("BGP has " << bgp.triples.size() << " triples");
 
     // Use optimizer to reorder triple patterns
-    std::cout << "[PLANNER] Creating optimizer\n" << std::flush;
+    SABOT_LOG_PLANNER("Creating optimizer");
     QueryOptimizer optimizer(store_);
-    std::cout << "[PLANNER] Optimizing BGP\n" << std::flush;
+    SABOT_LOG_PLANNER("Optimizing BGP");
     auto optimized_triples = optimizer.OptimizeBasicGraphPattern(bgp);
-    std::cout << "[PLANNER] BGP optimized, planning first triple\n" << std::flush;
+    SABOT_LOG_PLANNER("BGP optimized, planning first triple");
 
     // Plan first triple pattern
     ARROW_ASSIGN_OR_RAISE(
         auto current_op,
         PlanTriplePattern(optimized_triples[0], ctx)
     );
-    std::cout << "[PLANNER] First triple planned\n" << std::flush;
+    SABOT_LOG_PLANNER("First triple planned");
 
     // Join remaining triple patterns using ZipperJoin (merge join)
     for (size_t i = 1; i < optimized_triples.size(); ++i) {
@@ -397,9 +399,72 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanBasicGraphPattern(
             sort_keys.emplace_back(col, SortDirection::Ascending);
         }
 
-        // Add SortOperator before joining
-        current_op = std::make_shared<SortOperator>(current_op, sort_keys);
-        right_op = std::make_shared<SortOperator>(right_op, sort_keys);
+        // SMART SORT SELECTION:
+        // 1. Check if already sorted (from index scan)
+        // 2. If not, prefer radix sort (O(n)) for int64 columns
+        // 3. Fall back to comparison sort (O(n log n))
+
+        // Check if left input is already sorted
+        auto left_ordering = current_op->GetOutputOrdering();
+        if (!left_ordering.matches(join_columns)) {
+            SABOT_LOG_PLANNER("Left input not sorted, adding sort operator");
+
+            // Check if we can use radix sort (all int64 columns)
+            auto left_schema_result = current_op->GetOutputSchema();
+            bool use_radix = false;
+            if (left_schema_result.ok()) {
+                auto left_schema = *left_schema_result;
+                use_radix = true;
+                for (const auto& col : join_columns) {
+                    auto field = left_schema->GetFieldByName(col);
+                    if (!field || field->type()->id() != arrow::Type::INT64) {
+                        use_radix = false;
+                        break;
+                    }
+                }
+            }
+
+            if (use_radix) {
+                SABOT_LOG_PLANNER("Using radix sort (O(n)) for left input");
+                current_op = std::make_shared<RadixSortOperator>(current_op, sort_keys);
+            } else {
+                SABOT_LOG_PLANNER("Using comparison sort (O(n log n)) for left input");
+                current_op = std::make_shared<SortOperator>(current_op, sort_keys);
+            }
+        } else {
+            SABOT_LOG_PLANNER("Left input already sorted, skipping sort");
+        }
+
+        // Check if right input is already sorted
+        auto right_ordering = right_op->GetOutputOrdering();
+        if (!right_ordering.matches(join_columns)) {
+            SABOT_LOG_PLANNER("Right input not sorted, adding sort operator");
+
+            // Check if we can use radix sort (all int64 columns)
+            auto right_schema_result = right_op->GetOutputSchema();
+            bool use_radix = false;
+            if (right_schema_result.ok()) {
+                auto right_schema = *right_schema_result;
+                use_radix = true;
+                for (const auto& col : join_columns) {
+                    auto field = right_schema->GetFieldByName(col);
+                    if (!field || field->type()->id() != arrow::Type::INT64) {
+                        use_radix = false;
+                        break;
+                    }
+                }
+            }
+
+            if (use_radix) {
+                SABOT_LOG_PLANNER("Using radix sort (O(n)) for right input");
+                right_op = std::make_shared<RadixSortOperator>(right_op, sort_keys);
+            } else {
+                SABOT_LOG_PLANNER("Using comparison sort (O(n log n)) for right input");
+                right_op = std::make_shared<SortOperator>(right_op, sort_keys);
+            }
+        } else {
+            SABOT_LOG_PLANNER("Right input already sorted, skipping sort");
+        }
 
         // Create zipper join operator (Layer 2 - O(n+m) merge join)
         current_op = std::make_shared<ZipperJoinOperator>(
@@ -886,25 +951,10 @@ std::vector<TriplePattern> QueryOptimizer::OptimizeBasicGraphPattern(
         return bgp.triples;
     }
 
-    // Use SelectJoinOrder to get optimal ordering
-    auto order = SelectJoinOrder(bgp.triples, nullptr);
-
-    // Reorder patterns according to optimal order
-    std::vector<TriplePattern> optimized;
-    optimized.reserve(bgp.triples.size());
-
-    for (size_t idx : order) {
-        if (idx < bgp.triples.size()) {
-            optimized.push_back(bgp.triples[idx]);
-        }
-    }
-
-    // If optimization failed to include all patterns, fall back to original order
-    if (optimized.size() != bgp.triples.size()) {
-        return bgp.triples;
-    }
-
-    return optimized;
+    // TODO: Implement proper join order optimization with cardinality estimation
+    // For now, just return patterns in original order
+    // The sort elimination optimization will still make JOINs fast
+    return bgp.triples;
 }
 
 arrow::Result<size_t> QueryOptimizer::EstimateCardinality(

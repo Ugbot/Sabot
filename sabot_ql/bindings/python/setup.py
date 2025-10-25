@@ -3,10 +3,17 @@
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 import pyarrow as pa
+import numpy as np
 
-# Arrow include directories
-arrow_include = pa.get_include()
-arrow_lib = pa.get_library_dirs()[0]
+# Arrow include directories (use vendored arrow)
+arrow_include_vendored = "../../../vendor/arrow/cpp/build/install/include"
+arrow_lib = "../../../vendor/arrow/cpp/build/install/lib"
+
+# PyArrow Python headers (for pyarrow_wrap_table, etc.)
+arrow_include_pyarrow = pa.get_include()
+
+# NumPy include directory
+numpy_include = np.get_include()
 
 # SabotQL include directories
 sabot_ql_include = "../../include"
@@ -17,7 +24,9 @@ extensions = [
         "sabot_ql.bindings.python.sabot_ql",
         ["sabot_ql.pyx"],
         include_dirs=[
-            arrow_include,
+            arrow_include_vendored,
+            arrow_include_pyarrow,
+            numpy_include,
             sabot_ql_include,
             marble_include,
         ],

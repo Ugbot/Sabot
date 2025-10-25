@@ -1,29 +1,13 @@
 #pragma once
 
 #include <sabot_ql/operators/operator.h>
+#include <sabot_ql/operators/operator_metadata.h>
 #include <vector>
 #include <string>
 
 namespace sabot_ql {
 
-// Sort direction for ORDER BY
-enum class SortDirection {
-    Ascending,
-    Descending
-};
-
-// Sort key: column name and direction
-struct SortKey {
-    std::string column_name;
-    SortDirection direction;
-
-    SortKey(std::string col, SortDirection dir)
-        : column_name(std::move(col)), direction(dir) {}
-
-    std::string ToString() const {
-        return column_name + (direction == SortDirection::Ascending ? " ASC" : " DESC");
-    }
-};
+// Note: SortDirection and SortKey are now defined in operator_metadata.h
 
 // Sort operator: sorts input by one or more columns
 // Uses Arrow compute SortIndices kernel for vectorized sorting

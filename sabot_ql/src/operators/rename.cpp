@@ -1,4 +1,5 @@
 #include <sabot_ql/operators/rename.h>
+#include <sabot_ql/util/logging.h>
 #include <arrow/api.h>
 #include <sstream>
 #include <iostream>
@@ -56,27 +57,27 @@ arrow::Result<std::shared_ptr<arrow::Schema>> RenameOperator::BuildOutputSchema(
 }
 
 arrow::Result<std::shared_ptr<arrow::RecordBatch>> RenameOperator::GetNextBatch() {
-    std::cout << "[RENAME] GetNextBatch: Starting\n" << std::flush;
+    SABOT_LOG_RENAME("GetNextBatch: Starting");
     // Get input batch
-    std::cout << "[RENAME] Calling input_->GetNextBatch()\n" << std::flush;
+    SABOT_LOG_RENAME("Calling input_->GetNextBatch()");
     ARROW_ASSIGN_OR_RAISE(auto input_batch, input_->GetNextBatch());
-    std::cout << "[RENAME] input_->GetNextBatch() returned\n" << std::flush;
+    SABOT_LOG_RENAME("input_->GetNextBatch() returned");
 
     if (!input_batch) {
-        std::cout << "[RENAME] input_batch is null, returning nullptr\n" << std::flush;
+        SABOT_LOG_RENAME("input_batch is null, returning nullptr");
         // End of stream
         return nullptr;
     }
-    std::cout << "[RENAME] input_batch has " << input_batch->num_rows() << " rows, " << input_batch->num_columns() << " cols\n" << std::flush;
+    SABOT_LOG_RENAME("input_batch has " << input_batch->num_rows() << " rows, " << input_batch->num_columns() << " cols");
 
     // Get output schema (with renamed columns)
-    std::cout << "[RENAME] Calling GetOutputSchema()\n" << std::flush;
+    SABOT_LOG_RENAME("Calling GetOutputSchema()");
     ARROW_ASSIGN_OR_RAISE(auto output_schema, GetOutputSchema());
-    std::cout << "[RENAME] GetOutputSchema() returned\n" << std::flush;
+    SABOT_LOG_RENAME("GetOutputSchema() returned");
 
     // Zero-copy: just wrap same columns with new schema
     // No data is copied, only schema metadata changes
-    std::cout << "[RENAME] Creating renamed batch\n" << std::flush;
+    SABOT_LOG_RENAME("Creating renamed batch");
     return arrow::RecordBatch::Make(
         output_schema,
         input_batch->num_rows(),

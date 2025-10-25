@@ -12,8 +12,22 @@ from libcpp cimport bool as cpp_bool
 from libc.stdint cimport uint64_t
 from cpython.ref cimport PyObject
 
-# Import C++ declarations - these include vendored Arrow wrap/unwrap functions
-from sabot_ql_cpp cimport *
+# Import C++ declarations from sabot_ql (includes all types)
+from sabot_ql_cpp cimport (
+    # C++ types
+    TripleStore, Vocabulary, MarbleDB, QueryEngine,
+    Query, SelectQuery,
+    # Arrow types (re-exported from pyarrow.lib in .pxd)
+    CStatus, CResult, CTable, CRecordBatch,
+    # Binding functions
+    OpenMarbleDB, CreateTripleStoreMarbleDB, CreateVocabularyMarbleDB,
+    ParseSPARQL, QueryToSelectQuery,
+    # PyArrow conversion functions
+    pyarrow_wrap_table, pyarrow_unwrap_table
+)
+
+# Import additional pyarrow functions
+from pyarrow.lib cimport pyarrow_unwrap_batch
 
 # Import Python Arrow for type compatibility
 import pyarrow as pa
@@ -83,8 +97,59 @@ cdef class TripleStoreWrapper:
         # For now, raise NotImplementedError with helpful message
         raise NotImplementedError(
             "add() requires N-Triples parser binding. "
-            "Use add_batch() or load triples via the NTriplesParser for now."
+            "Use load_data() or load triples via the NTriplesParser for now."
         )
+
+    def load_data(self, object triples_table, object terms_table):
+        """
+        Load triples and vocabulary from Arrow tables.
+
+        Args:
+            triples_table: Arrow Table with [s, p, o] int64 columns
+                           (subject, predicate, object as ValueId integers)
+            terms_table: Arrow Table with columns:
+                         - id (int64): ValueId
+                         - lex (string): Lexical form
+                         - kind (uint8): 0=IRI, 1=Literal, 2=BlankNode
+                         - lang (string): Language tag (for literals)
+                         - datatype (string): Datatype IRI (for literals)
+
+        Example:
+            >>> triples = pa.table({
+            ...     's': pa.array([1, 2], type=pa.int64()),
+            ...     'p': pa.array([3, 3], type=pa.int64()),
+            ...     'o': pa.array([4, 5], type=pa.int64())
+            ... })
+            >>> terms = pa.table({
+            ...     'id': pa.array([1, 2, 3, 4, 5], type=pa.int64()),
+            ...     'lex': pa.array(['Alice', 'Bob', 'name', 'Alice', 'Bob']),
+            ...     'kind': pa.array([0, 0, 0, 1, 1], type=pa.uint8()),
+            ...     'lang': pa.array(['', '', '', '', ''], type=pa.string()),
+            ...     'datatype': pa.array(['', '', '', '', ''], type=pa.string())
+            ... })
+            >>> store.load_data(triples, terms)
+        """
+        # Cython variable declarations
+        cdef shared_ptr[CRecordBatch] triples_batch
+        cdef CStatus insert_status
+
+        # Convert Python Arrow Table to single RecordBatch
+        if triples_table.num_rows > 0:
+            # Combine all chunks into single batch in Python
+            triples_batch_py = triples_table.combine_chunks().to_batches()[0]
+            triples_batch = pyarrow_unwrap_batch(triples_batch_py)
+
+            # Insert triples into store
+            insert_status = self.c_triple_store.get().InsertArrowBatch(triples_batch)
+            check_status(insert_status)
+
+        # TODO: Load terms into vocabulary
+        # For now, the vocabulary is built automatically when inserting triples
+        # In a future version, we can expose Vocabulary.AddTerms() to pre-populate
+
+    def count(self):
+        """Get total number of triples in store."""
+        return self.c_triple_store.get().TotalTriples()
 
     def query(self, str sparql_query):
         """
@@ -132,11 +197,6 @@ cdef class TripleStoreWrapper:
 
         # Convert to Python Arrow Table using pyarrow's Cython wrapper - Sabot standard
         return pyarrow_wrap_table(c_table)
-
-    def size(self):
-        """Get approximate number of triples in store."""
-        # Would call triple_store->TotalTriples() if exposed
-        raise NotImplementedError("size() method needs C++ binding")
 
     def close(self):
         """Close the triple store and flush to disk."""

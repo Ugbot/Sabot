@@ -26,6 +26,7 @@ from sabot import cyarrow as pa
 from sabot.cyarrow import compute as pc
 from typing import List, Dict, Any, Optional, Set
 import logging
+import warnings
 
 from .sparql_ast import (
     SPARQLQuery, SelectClause, WhereClause, BasicGraphPattern,
@@ -108,6 +109,22 @@ class SPARQLTranslator:
             6. Project selected variables
             7. Apply LIMIT/OFFSET
         """
+        # ⚠️  DEPRECATION WARNING - This Python implementation is slow
+        warnings.warn(
+            "\n"
+            "⚠️  PERFORMANCE WARNING: Using Python SPARQL implementation\n"
+            "   This implementation has O(n²) scaling due to nested loop joins.\n"
+            "   Performance: ~1-5 triples/ms (226s for 4-pattern query on 130K triples)\n"
+            "\n"
+            "   ✅ SOLUTION: Use C++ backend for 30-50x speedup:\n"
+            "      from sabot.rdf import RDFStore\n"
+            "      store = RDFStore(backend='cpp')  # Fast C++ W3C SPARQL 1.1 engine\n"
+            "\n"
+            "   Python SPARQL will be removed in a future version.\n",
+            DeprecationWarning,
+            stacklevel=3
+        )
+
         logger.info(f"Executing SPARQL query: {query}")
 
         # Step 1: Get Basic Graph Pattern

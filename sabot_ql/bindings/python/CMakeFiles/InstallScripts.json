@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/bengamble/Sabot/sabot_ql/bindings/python/cmake_install.cmake",
+		"/Users/bengamble/Sabot/sabot_ql/bindings/python/tests/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

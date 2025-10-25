@@ -6,6 +6,15 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Debug logging option (disabled by default for production)
+option(SABOT_ENABLE_DEBUG_LOGGING "Enable debug logging" ON)
+if(SABOT_ENABLE_DEBUG_LOGGING)
+    add_definitions(-DSABOT_ENABLE_DEBUG_LOGGING)
+    message(STATUS "Debug logging ENABLED (can be controlled at runtime with SABOT_DEBUG=1)")
+else()
+    message(STATUS "Debug logging DISABLED (zero overhead)")
+endif()
+
 # Find dependencies
 find_package(Arrow REQUIRED PATHS ${CMAKE_SOURCE_DIR}/../vendor/arrow/cpp/build/install NO_DEFAULT_PATH)
 find_package(ArrowFlight REQUIRED PATHS ${CMAKE_SOURCE_DIR}/../vendor/arrow/cpp/build/install NO_DEFAULT_PATH)
@@ -47,6 +56,7 @@ set(SABOT_QL_SOURCES
     # Generic utility operators
     src/operators/rename.cpp
     src/operators/metadata.cpp
+    src/operators/operator_metadata.cpp
 
     # SPARQL operators
     src/operators/bind.cpp
@@ -55,6 +65,7 @@ set(SABOT_QL_SOURCES
     src/operators/join.cpp
     src/operators/aggregate.cpp
     src/operators/sort.cpp
+    src/operators/radix_sort.cpp
     src/operators/union.cpp
 
     # Execution engine

@@ -1,7 +1,7 @@
 # Sabot Project Map
 
 **Version:** 0.1.0
-**Last Updated:** October 20, 2025
+**Last Updated:** October 25, 2025
 **Status:** Production Ready (Core Components)
 
 ## Quick Summary
@@ -13,12 +13,14 @@
 - ✅ Stream API with Arrow operations
 - ✅ Distributed execution (2-4 agents tested)
 - ✅ SQL via DuckDB integration
-- ✅ Graph queries (Cypher) with Arrow storage - 23,798 q/s parsing, 3-37M matches/sec
+- ✅ Graph queries (Cypher) with Arrow storage
+- ⚠️ RDF/SPARQL (95% feature complete, critical performance issue - see below)
 - ✅ 70+ Cython modules built
 
 **What's Being Improved**:
 - ⏳ SQL string operations (using Arrow compute kernels)
 - ⏳ Full Avro/Protobuf decoders (infrastructure ready)
+- ❌ SPARQL query execution (O(n²) scaling - blocking production use)
 
 ## Repository Structure
 
@@ -220,6 +222,60 @@ Sabot/
 - ✅ Agent distribution
 
 **Status**: Infrastructure complete, integration in progress
+
+### RDF/SPARQL ⚠️ CRITICAL PERFORMANCE ISSUE
+
+**Implementation** (`sabot/rdf.py`, `sabot/_cython/graph/`):
+- ✅ RDF triple storage with 3-index strategy (SPO, POS, OSP)
+- ✅ SPARQL 1.1 parser (95% feature complete)
+- ✅ User-friendly Python API
+- ✅ Arrow-native storage
+- ✅ PREFIX management
+- ❌ **Query execution has O(n²) scaling bug**
+
+**Performance Measurements**:
+- **Loading**: 147,775 triples/sec ✅ (fast and efficient)
+- **Small datasets (<1K triples)**: 40K+ triples/sec ✅
+- **Medium datasets (10K triples)**: 2,863 triples/sec ⚠️
+- **Large datasets (130K triples)**: **5,044 triples/sec** ❌ (25s for 2-pattern query)
+- **Complex queries** (4-pattern join): **575 triples/sec** ❌ (226s for 130K triples)
+
+**Scaling Analysis**:
+```
+Dataset Size → Query Time (2-pattern join)
+  100 triples →     2ms ✅
+  1K triples  →    51ms ✅
+  10K triples →  3,493ms ⚠️
+  130K triples → 25,762ms ❌ (O(n²) scaling confirmed)
+```
+
+**Root Cause**: Likely nested loop joins in C++ query executor instead of hash joins
+- Expected: O(n) or O(n log n) with proper join algorithms
+- Actual: O(n²) behavior observed
+- Impact: **Blocks production use for datasets >10K triples**
+
+**Feature Completeness**: 95%
+- ✅ SELECT, WHERE, PREFIX, FILTER, LIMIT, OFFSET, DISTINCT
+- ✅ Multi-pattern joins
+- ✅ Aggregates (COUNT, SUM, AVG, MIN, MAX)
+- ✅ ORDER BY, GROUP BY
+- ❌ OPTIONAL (not implemented)
+- ❌ UNION (not implemented)
+- ❌ Blank nodes (not implemented)
+
+**Usability**:
+- ✅ Demos and tutorials (<1K triples)
+- ⚠️ Development (1-10K triples, slow but workable)
+- ❌ Production (>10K triples, unusably slow)
+
+**Documentation**:
+- ✅ API docs: `docs/features/rdf_sparql.md`
+- ✅ Examples: `examples/RDF_EXAMPLES.md`
+- ✅ Performance analysis: `docs/features/graph/SPARQL_PERFORMANCE_ANALYSIS.md`
+
+**Priority**: High - blocking issue for production RDF/SPARQL use
+**Estimated Fix**: 1-3 days of C++ profiling and optimization
+**Files to investigate**: `sabot_ql/src/sparql/query_engine.cpp`, `sabot_ql/src/sparql/planner.cpp`
 
 ## Vendored Dependencies
 

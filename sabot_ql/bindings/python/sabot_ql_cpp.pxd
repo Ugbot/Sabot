@@ -36,7 +36,8 @@ cdef extern from "marble/db.h" namespace "marble":
 # SabotQL declarations
 cdef extern from "sabot_ql/storage/triple_store.h" namespace "sabot_ql":
     cdef cppclass TripleStore:
-        pass
+        CStatus InsertArrowBatch(shared_ptr[CRecordBatch] batch) nogil
+        size_t TotalTriples() nogil
 
     cdef struct Triple:
         uint64_t subject

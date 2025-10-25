@@ -1,0 +1,51 @@
+{
+  "timestamp": "2025-10-25 09:15:21",
+  "results": [
+    {
+      "query": "Q2_Property_Access",
+      "dataset": "FOAF",
+      "triple_count": 130000,
+      "load_time_ms": 879.72,
+      "parse_time_ms": {
+        "min": 24805.24,
+        "max": 27411.6,
+        "mean": 25761.65
+      },
+      "exec_time_ms": {
+        "min": 0,
+        "max": 0,
+        "mean": 0.0
+      },
+      "total_time_ms": {
+        "min": 24805.24,
+        "max": 27411.6,
+        "mean": 25761.65
+      },
+      "result_rows": 10000,
+      "num_runs": 3
+    },
+    {
+      "query": "Q4_Relationships",
+      "dataset": "FOAF",
+      "triple_count": 130000,
+      "load_time_ms": 879.72,
+      "parse_time_ms": {
+        "min": 223363.45,
+        "max": 229602.46,
+        "mean": 225953.02
+      },
+      "exec_time_ms": {
+        "min": 0,
+        "max": 0,
+        "mean": 0.0
+      },
+      "total_time_ms": {
+        "min": 223363.45,
+        "max": 229602.46,
+        "mean": 225953.02
+      },
+      "result_rows": 10000,
+      "num_runs": 3
+    }
+  ]
+}

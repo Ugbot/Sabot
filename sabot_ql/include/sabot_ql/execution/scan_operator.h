@@ -58,6 +58,16 @@ public:
     size_t EstimateCardinality() const override;
 
     /**
+     * @brief Get output ordering based on index used
+     *
+     * Index scans return naturally sorted data:
+     * - SPO index → sorted by (subject, predicate, object)
+     * - POS index → sorted by (predicate, object, subject)
+     * - OSP index → sorted by (object, subject, predicate)
+     */
+    OrderingProperty GetOutputOrdering() const override;
+
+    /**
      * @brief Get the triple pattern being scanned
      */
     const TriplePattern& GetPattern() const { return pattern_; }

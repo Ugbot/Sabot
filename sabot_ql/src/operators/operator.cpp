@@ -1,5 +1,6 @@
 #include <sabot_ql/operators/operator.h>
 #include <sabot_ql/storage/triple_store.h>
+#include <sabot_ql/util/logging.h>
 #include <arrow/compute/api.h>
 #include <sstream>
 #include <chrono>
@@ -19,33 +20,33 @@ std::string OperatorStats::ToString() const {
 }
 
 arrow::Result<std::shared_ptr<arrow::Table>> Operator::GetAllResults() {
-    std::cout << "[OPERATOR] GetAllResults: Starting on " << ToString() << "\n" << std::flush;
+    SABOT_LOG_OPERATOR("GetAllResults: Starting on " << ToString());
     std::vector<std::shared_ptr<arrow::RecordBatch>> batches;
 
-    std::cout << "[OPERATOR] Calling HasNextBatch()\n" << std::flush;
+    SABOT_LOG_OPERATOR("Calling HasNextBatch()");
     while (HasNextBatch()) {
-        std::cout << "[OPERATOR] HasNextBatch() returned true, calling GetNextBatch()\n" << std::flush;
+        SABOT_LOG_OPERATOR("HasNextBatch() returned true, calling GetNextBatch()");
         ARROW_ASSIGN_OR_RAISE(auto batch, GetNextBatch());
-        std::cout << "[OPERATOR] GetNextBatch() returned\n" << std::flush;
+        SABOT_LOG_OPERATOR("GetNextBatch() returned");
         if (batch) {
-            std::cout << "[OPERATOR] Batch has " << batch->num_rows() << " rows\n" << std::flush;
+            SABOT_LOG_OPERATOR("Batch has " << batch->num_rows() << " rows");
             batches.push_back(batch);
         }
-        std::cout << "[OPERATOR] Calling HasNextBatch() again\n" << std::flush;
+        SABOT_LOG_OPERATOR("Calling HasNextBatch() again");
     }
-    std::cout << "[OPERATOR] HasNextBatch() returned false\n" << std::flush;
+    SABOT_LOG_OPERATOR("HasNextBatch() returned false");
 
     if (batches.empty()) {
-        std::cout << "[OPERATOR] No batches, creating empty table\n" << std::flush;
+        SABOT_LOG_OPERATOR("No batches, creating empty table");
         // Return empty table with correct schema
-        std::cout << "[OPERATOR] Calling GetOutputSchema()\n" << std::flush;
+        SABOT_LOG_OPERATOR("Calling GetOutputSchema()");
         ARROW_ASSIGN_OR_RAISE(auto schema, GetOutputSchema());
-        std::cout << "[OPERATOR] GetOutputSchema() returned\n" << std::flush;
+        SABOT_LOG_OPERATOR("GetOutputSchema() returned");
         std::vector<std::shared_ptr<arrow::Array>> empty_arrays;
         return arrow::Table::Make(schema, empty_arrays);
     }
 
-    std::cout << "[OPERATOR] Creating table from " << batches.size() << " batches\n" << std::flush;
+    SABOT_LOG_OPERATOR("Creating table from " << batches.size() << " batches");
     return arrow::Table::FromRecordBatches(batches);
 }
 
@@ -282,33 +283,33 @@ arrow::Result<std::shared_ptr<arrow::Schema>> ProjectOperator::GetOutputSchema()
 }
 
 arrow::Result<std::shared_ptr<arrow::RecordBatch>> ProjectOperator::GetNextBatch() {
-    std::cout << "[PROJECT] GetNextBatch: Starting\n" << std::flush;
-    std::cout << "[PROJECT] Calling input_->GetNextBatch()\n" << std::flush;
+    SABOT_LOG_PROJECT("GetNextBatch: Starting");
+    SABOT_LOG_PROJECT("Calling input_->GetNextBatch()");
     ARROW_ASSIGN_OR_RAISE(auto batch, input_->GetNextBatch());
-    std::cout << "[PROJECT] input_->GetNextBatch() returned\n" << std::flush;
+    SABOT_LOG_PROJECT("input_->GetNextBatch() returned");
     if (!batch) {
-        std::cout << "[PROJECT] batch is null, returning nullptr\n" << std::flush;
+        SABOT_LOG_PROJECT("batch is null, returning nullptr");
         return nullptr;
     }
-    std::cout << "[PROJECT] batch has " << batch->num_rows() << " rows, " << batch->num_columns() << " cols\n" << std::flush;
+    SABOT_LOG_PROJECT("batch has " << batch->num_rows() << " rows, " << batch->num_columns() << " cols");
 
     // Select columns
-    std::cout << "[PROJECT] Selecting " << column_indices_.size() << " columns\n" << std::flush;
+    SABOT_LOG_PROJECT("Selecting " << column_indices_.size() << " columns");
     std::vector<std::shared_ptr<arrow::Array>> columns;
     for (int idx : column_indices_) {
-        std::cout << "[PROJECT]   Selecting column " << idx << "\n" << std::flush;
+        SABOT_LOG_PROJECT("  Selecting column " << idx);
         columns.push_back(batch->column(idx));
     }
-    std::cout << "[PROJECT] Columns selected\n" << std::flush;
+    SABOT_LOG_PROJECT("Columns selected");
 
-    std::cout << "[PROJECT] Calling GetOutputSchema()\n" << std::flush;
+    SABOT_LOG_PROJECT("Calling GetOutputSchema()");
     ARROW_ASSIGN_OR_RAISE(auto output_schema, GetOutputSchema());
-    std::cout << "[PROJECT] GetOutputSchema() returned\n" << std::flush;
+    SABOT_LOG_PROJECT("GetOutputSchema() returned");
 
     stats_.rows_processed += batch->num_rows();
     stats_.batches_processed++;
 
-    std::cout << "[PROJECT] Creating output batch\n" << std::flush;
+    SABOT_LOG_PROJECT("Creating output batch");
     return arrow::RecordBatch::Make(output_schema, batch->num_rows(), columns);
 }
 
