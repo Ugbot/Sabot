@@ -24,3 +24,4 @@
 - no short cuts, no simplifications
 - we are buidling sabot. any thrid party system is there purely for reference. dont suggest we use them instead.
 - sabot is arrow first where ever it can be. Arrow everywhere means all operators can interop, and all thigns can be shuffled and streamed. by usign one vendored arrow we can then imporve it if eeds be.
+- after an improvement, run a benchmark. if we get a positive result commit it to git
