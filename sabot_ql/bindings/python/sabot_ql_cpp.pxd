@@ -49,7 +49,7 @@ cdef extern from "sabot_ql/storage/triple_store.h" namespace "sabot_ql":
 
 cdef extern from "sabot_ql/storage/vocabulary.h" namespace "sabot_ql":
     cdef cppclass Vocabulary:
-        pass
+        CResult[ValueId] AddTerm(const Term& term) nogil
 
     # TermKind enum
     ctypedef enum TermKind:
@@ -62,6 +62,11 @@ cdef extern from "sabot_ql/storage/vocabulary.h" namespace "sabot_ql":
         TermKind kind
         cpp_string language
         cpp_string datatype
+
+    # Term factory functions (static methods)
+    Term TermIRI "sabot_ql::Term::IRI"(const cpp_string& iri)
+    Term TermLiteral "sabot_ql::Term::Literal"(const cpp_string& value, const cpp_string& lang, const cpp_string& datatype)
+    Term TermBlankNode "sabot_ql::Term::BlankNode"(const cpp_string& id)
 
 cdef extern from "sabot_ql/types/value_id.h" namespace "sabot_ql":
     cdef cppclass ValueId:

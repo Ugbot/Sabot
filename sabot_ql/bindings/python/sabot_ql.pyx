@@ -17,6 +17,8 @@ from sabot_ql_cpp cimport (
     # C++ types
     TripleStore, Vocabulary, MarbleDB, QueryEngine,
     Query, SelectQuery,
+    Term, ValueId,
+    TermIRI, TermLiteral, TermBlankNode,
     # Arrow types (re-exported from pyarrow.lib in .pxd)
     CStatus, CResult, CTable, CRecordBatch,
     # Binding functions
@@ -132,20 +134,63 @@ cdef class TripleStoreWrapper:
         # Cython variable declarations
         cdef shared_ptr[CRecordBatch] triples_batch
         cdef CStatus insert_status
+        cdef Term term
+        cdef CResult[ValueId] add_result
+        cdef ValueId new_id
 
-        # Convert Python Arrow Table to single RecordBatch
+        # Build mapping from Python IDs to C++ IDs
+        id_map = {}  # Python dict: old_id -> new_id
+
+        # Load terms into vocabulary and build ID mapping
+        if terms_table.num_rows > 0:
+            for i in range(terms_table.num_rows):
+                old_id = terms_table.column('id')[i].as_py()
+                lex = terms_table.column('lex')[i].as_py()
+                kind = terms_table.column('kind')[i].as_py()
+                lang = terms_table.column('lang')[i].as_py() or ''
+                dtype = terms_table.column('datatype')[i].as_py() or ''
+
+                # Create C++ Term using factory functions based on kind
+                # kind: 0=IRI, 1=Literal, 2=BlankNode
+                if kind == 0:
+                    term = TermIRI(lex.encode('utf-8'))
+                elif kind == 1:
+                    term = TermLiteral(lex.encode('utf-8'),
+                                      lang.encode('utf-8'),
+                                      dtype.encode('utf-8'))
+                elif kind == 2:
+                    term = TermBlankNode(lex.encode('utf-8'))
+                else:
+                    raise ValueError(f"Invalid term kind: {kind}")
+
+                # Add term to vocabulary and get new ID
+                add_result = self.c_vocab.get().AddTerm(term)
+                check_status(add_result.status())
+                new_id = add_result.ValueOrDie()
+
+                # Map old Python ID to new C++ ID
+                id_map[old_id] = new_id.getBits()
+
+        # Translate triples using ID mapping
         if triples_table.num_rows > 0:
-            # Combine all chunks into single batch in Python
-            triples_batch_py = triples_table.combine_chunks().to_batches()[0]
+            # Extract triples and remap IDs
+            s_col = triples_table.column('s') if 's' in triples_table.column_names else triples_table.column('subject')
+            p_col = triples_table.column('p') if 'p' in triples_table.column_names else triples_table.column('predicate')
+            o_col = triples_table.column('o') if 'o' in triples_table.column_names else triples_table.column('object')
+
+            # Remap IDs
+            s_remapped = pa.array([id_map.get(s.as_py(), s.as_py()) for s in s_col], type=pa.int64())
+            p_remapped = pa.array([id_map.get(p.as_py(), p.as_py()) for p in p_col], type=pa.int64())
+            o_remapped = pa.array([id_map.get(o.as_py(), o.as_py()) for o in o_col], type=pa.int64())
+
+            # Create new table with remapped IDs
+            remapped_table = pa.table({'s': s_remapped, 'p': p_remapped, 'o': o_remapped})
+            triples_batch_py = remapped_table.to_batches()[0]
             triples_batch = pyarrow_unwrap_batch(triples_batch_py)
 
             # Insert triples into store
             insert_status = self.c_triple_store.get().InsertArrowBatch(triples_batch)
             check_status(insert_status)
-
-        # TODO: Load terms into vocabulary
-        # For now, the vocabulary is built automatically when inserting triples
-        # In a future version, we can expose Vocabulary.AddTerms() to pre-populate
 
     def count(self):
         """Get total number of triples in store."""

@@ -694,7 +694,13 @@ arrow::Result<std::optional<ValueId>> QueryPlanner::TermToValueId(
 
     if (auto* iri = std::get_if<IRI>(&term)) {
         Term storage_term = Term::IRI(iri->iri);
+        SABOT_LOG_PLANNER("Looking up IRI in vocabulary: '" << iri->iri << "'");
         ARROW_ASSIGN_OR_RAISE(auto maybe_id, ctx.vocab->GetValueId(storage_term));
+        if (maybe_id.has_value()) {
+            SABOT_LOG_PLANNER("  ✓ Found in vocabulary (ID: " << maybe_id->getBits() << ")");
+        } else {
+            SABOT_LOG_PLANNER("  ✗ NOT found in vocabulary");
+        }
         return maybe_id;
     }
 

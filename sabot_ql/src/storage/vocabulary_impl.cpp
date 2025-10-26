@@ -5,6 +5,7 @@
 #include <marble/db.h>
 #include <shared_mutex>
 #include <regex>
+#include <iostream>
 
 namespace sabot_ql {
 
@@ -101,6 +102,13 @@ public:
         // Update caches
         term_to_id_cache_.Put(term, new_id);
         id_to_term_cache_.Put(new_id, term);
+
+        #ifdef SABOT_ENABLE_DEBUG_LOGGING
+        if (term.kind == TermKind::IRI) {
+            std::cerr << "[VOCAB] Added IRI to vocabulary: '" << term.lexical
+                      << "' (ID: " << new_id.getBits() << ")" << std::endl;
+        }
+        #endif
 
         return new_id;
     }
