@@ -590,6 +590,7 @@ public:
         uint32_t id;
         std::shared_ptr<SkippingIndex> skipping_index;
         std::shared_ptr<BloomFilter> bloom_filter;
+        // TODO: Add LSMTree integration once LSMTree::Create() is implemented
 
         ColumnFamilyInfo(std::string n, std::shared_ptr<arrow::Schema> s, uint32_t i)
             : name(std::move(n)), schema(std::move(s)), id(i) {}
@@ -673,15 +674,38 @@ public:
             return Status::InvalidArgument("Batch schema does not match column family schema for '" + table_name + "'");
         }
 
-        // Store batch in memory (for now - in production this would go to LSM tree)
+        // Store batch in memory
         cf_info->data.push_back(batch);
 
-        // Rebuild indexes after data insertion
-        auto status = cf_info->BuildIndexes();
-        if (!status.ok()) {
-            // Remove the batch if indexing failed
-            cf_info->data.pop_back();
-            return status;
+        // Incrementally update indexes (O(m) where m = batch size, not O(n) where n = total data)
+        // Initialize indexes on first insert
+        if (cf_info->data.size() == 1) {
+            cf_info->skipping_index = std::make_shared<InMemorySkippingIndex>();
+            cf_info->bloom_filter = std::make_shared<BloomFilter>(1000000, 0.01);  // Preallocate for 1M keys
+        }
+
+        // Update skipping index with new batch only
+        if (cf_info->skipping_index) {
+            auto single_batch_table_result = arrow::Table::FromRecordBatches(cf_info->schema, {batch});
+            if (single_batch_table_result.ok()) {
+                std::shared_ptr<arrow::Table> single_batch_table = single_batch_table_result.ValueOrDie();
+                // Add block stats for this batch (incremental, not full rebuild)
+                cf_info->skipping_index->BuildFromTable(single_batch_table, 8192);
+            }
+        }
+
+        // Update bloom filter with new batch only (incremental)
+        if (cf_info->bloom_filter && batch->num_columns() >= 3) {
+            auto subject_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(0));
+            auto predicate_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(1));
+            auto object_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(2));
+
+            for (int64_t i = 0; i < batch->num_rows(); ++i) {
+                std::string key_str = std::to_string(subject_col->Value(i)) + "," +
+                                    std::to_string(predicate_col->Value(i)) + "," +
+                                    std::to_string(object_col->Value(i));
+                cf_info->bloom_filter->Add(key_str);
+            }
         }
 
         return Status::OK();
