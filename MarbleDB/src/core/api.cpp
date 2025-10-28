@@ -13,6 +13,7 @@
 #include "marble/skipping_index.h"
 #include "marble/status.h"
 #include "marble/ttl.h"
+#include "marble/lsm_storage.h"
 #include <nlohmann/json.hpp>
 #include <arrow/api.h>
 #include <arrow/ipc/api.h>
@@ -657,17 +658,32 @@ private:
 // Simple MarbleDB implementation for API
 class SimpleMarbleDB : public MarbleDB {
 public:
-    SimpleMarbleDB(const std::string& path) : path_(path) {}
+    SimpleMarbleDB(const std::string& path) : path_(path) {
+        // Initialize LSM tree for persistent storage
+        lsm_tree_ = std::make_unique<StandardLSMTree>();
+
+        LSMTreeConfig config;
+        config.data_directory = path + "/lsm";
+        config.memtable_max_size_bytes = 64 * 1024 * 1024;  // 64MB
+        config.l0_compaction_trigger = 4;
+        config.compaction_threads = 2;
+        config.flush_threads = 1;
+
+        auto status = lsm_tree_->Init(config);
+        if (!status.ok()) {
+            throw std::runtime_error("Failed to initialize LSM tree: " + status.ToString());
+        }
+    }
 
     // Column Family management
     struct ColumnFamilyInfo {
         std::string name;
         std::shared_ptr<arrow::Schema> schema;
-        std::vector<std::shared_ptr<arrow::RecordBatch>> data;  // In-memory storage for now
+        std::vector<std::shared_ptr<arrow::RecordBatch>> data;  // Legacy in-memory storage (deprecated)
         uint32_t id;
+        uint64_t next_batch_id = 0;  // Sequential batch ID for LSM storage
         std::shared_ptr<SkippingIndex> skipping_index;
         std::shared_ptr<BloomFilter> bloom_filter;
-        // TODO: Add LSMTree integration once LSMTree::Create() is implemented
 
         ColumnFamilyInfo(std::string n, std::shared_ptr<arrow::Schema> s, uint32_t i)
             : name(std::move(n)), schema(std::move(s)), id(i) {}
@@ -707,6 +723,30 @@ public:
     std::unordered_map<uint32_t, ColumnFamilyInfo*> id_to_cf_;
     uint32_t next_cf_id_ = 1;
     mutable std::mutex cf_mutex_;
+
+    // LSM tree for persistent storage
+    std::unique_ptr<StandardLSMTree> lsm_tree_;
+
+    // Key encoding helpers
+    // Batch keys: bit 63 = 0, format: [0][table_id: 16 bits][batch_id: 47 bits]
+    // Row keys:   bit 63 = 1, format: [1][table_id: 16 bits][row_hash: 47 bits]
+    static uint64_t EncodeBatchKey(uint32_t table_id, uint64_t batch_id) {
+        return ((uint64_t)table_id << 48) | (batch_id & 0x0000FFFFFFFFFFFF);
+    }
+
+    static void DecodeBatchKey(uint64_t key, uint32_t* table_id, uint64_t* batch_id) {
+        *table_id = (key >> 48) & 0xFFFF;
+        *batch_id = key & 0x0000FFFFFFFFFFFF;
+    }
+
+    static uint64_t EncodeRowKey(uint32_t table_id, uint64_t row_hash) {
+        return (1ULL << 63) | ((uint64_t)table_id << 48) | (row_hash & 0x0000FFFFFFFFFFFF);
+    }
+
+    static void DecodeRowKey(uint64_t key, uint32_t* table_id, uint64_t* row_hash) {
+        *table_id = (key >> 48) & 0xFFFF;
+        *row_hash = key & 0x0000FFFFFFFFFFFF;
+    }
 
     // Basic operations
     Status Put(const WriteOptions& options, std::shared_ptr<Record> record) override {
@@ -751,12 +791,31 @@ public:
             return Status::InvalidArgument("Batch schema does not match column family schema for '" + table_name + "'");
         }
 
-        // Store batch in memory
+        // Assign sequential batch ID
+        uint64_t batch_id = cf_info->next_batch_id++;
+
+        // Serialize RecordBatch using Arrow IPC
+        std::string serialized_batch;
+        auto serialize_status = SerializeArrowBatch(batch, &serialized_batch);
+        if (!serialize_status.ok()) {
+            return serialize_status;
+        }
+
+        // Encode key for LSM tree storage
+        uint64_t batch_key = EncodeBatchKey(cf_info->id, batch_id);
+
+        // Write to LSM tree for persistence
+        auto put_status = lsm_tree_->Put(batch_key, serialized_batch);
+        if (!put_status.ok()) {
+            return put_status;
+        }
+
+        // Also keep in memory for backward compatibility (deprecated - will be removed)
         cf_info->data.push_back(batch);
 
         // Incrementally update indexes (O(m) where m = batch size, not O(n) where n = total data)
         // Initialize indexes on first insert
-        if (cf_info->data.size() == 1) {
+        if (cf_info->next_batch_id == 1) {
             cf_info->skipping_index = std::make_shared<InMemorySkippingIndex>();
             cf_info->bloom_filter = std::make_shared<BloomFilter>(1000000, 0.01);  // Preallocate for 1M keys
         }
@@ -804,9 +863,35 @@ public:
 
         auto* cf_info = it->second.get();
 
-        // Combine all batches into a single table
-        if (cf_info->data.empty()) {
-            // Return empty table with correct schema
+        // Read all batches from LSM tree
+        std::vector<std::shared_ptr<arrow::RecordBatch>> record_batches;
+
+        // Compute key range for this table's batches (bit 63 = 0 for batch keys)
+        uint64_t start_key = EncodeBatchKey(cf_info->id, 0);
+        uint64_t end_key = EncodeBatchKey(cf_info->id, 0x0000FFFFFFFFFFFF);
+
+        // Scan LSM tree for all batches
+        std::vector<std::pair<uint64_t, std::string>> lsm_results;
+        auto scan_status = lsm_tree_->Scan(start_key, end_key, &lsm_results);
+        if (!scan_status.ok()) {
+            return scan_status;
+        }
+
+        // Deserialize each batch
+        for (const auto& [key, serialized_batch] : lsm_results) {
+            std::shared_ptr<arrow::RecordBatch> batch;
+            auto deserialize_status = DeserializeArrowBatch(
+                serialized_batch.data(),
+                serialized_batch.size(),
+                &batch);
+            if (!deserialize_status.ok()) {
+                return deserialize_status;
+            }
+            record_batches.push_back(batch);
+        }
+
+        // Handle empty case
+        if (record_batches.empty()) {
             std::vector<std::shared_ptr<arrow::ChunkedArray>> empty_columns;
             for (int i = 0; i < cf_info->schema->num_fields(); ++i) {
                 auto field = cf_info->schema->field(i);
@@ -820,7 +905,7 @@ public:
 
         // Concatenate all record batches
         ARROW_ASSIGN_OR_RAISE(auto combined_table,
-                             arrow::Table::FromRecordBatches(cf_info->schema, cf_info->data));
+                             arrow::Table::FromRecordBatches(cf_info->schema, record_batches));
 
         // Create query result
         return TableQueryResult::Create(combined_table, result);

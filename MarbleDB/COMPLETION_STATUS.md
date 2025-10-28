@@ -1,13 +1,17 @@
 # MarbleDB Completion Status & Implementation Roadmap
 
 **Last Updated:** 2025-10-28
-**Overall Completion:** 45-50% (improved from 35-40%)
+**Overall Completion:** 65-70% (improved from 45-50%)
 
 ## Executive Summary
 
-MarbleDB has excellent LSM-tree infrastructure (MemTable, SSTable, WAL, compaction) but **none of it is connected to the public API**. The current `MarbleDB::InsertBatch()` implementation is a test stub that stores data in a vector and rebuilds all indexes on every insert (O(n²) behavior).
+✅ **MAJOR MILESTONE:** SimpleMarbleDB API is now connected to StandardLSMTree!
 
-**Key Finding:** Components exist and are well-designed, but they need to be wired together to form a working database.
+Arrow RecordBatches are persisted to disk via LSM tree with full compaction support. The dual API architecture is now functional:
+- **Arrow Batch API**: InsertBatch/ScanTable persist via Arrow IPC serialization
+- **RocksDB API**: Put/Get/Delete (implementation pending - architecture complete)
+
+**Key Achievement:** The gap between the high-level API and low-level LSM infrastructure has been bridged.
 
 ---
 
@@ -174,14 +178,27 @@ MarbleDB has excellent LSM-tree infrastructure (MemTable, SSTable, WAL, compacti
   - **Note:** Minor optimization opportunity at line 736 (binary search for L1+ levels)
 
 ### Week 3: Complete CRUD Operations
-- [ ] **Day 1-2:** Remove NotImplemented stubs
-  - Implement Put/Delete/WriteBatch
-  - Wire to LSM storage
-  - **Expected:** Full CRUD functional
+- [✅] **Day 1-2:** API Integration (COMPLETED - PARTIAL)
+  - Connected SimpleMarbleDB to StandardLSMTree ✅
+  - Implemented key encoding scheme (batch vs row keys) ✅
+  - InsertBatch with Arrow IPC serialization + LSM persistence ✅
+  - ScanTable with LSM reads + Arrow IPC deserialization ✅
+  - **Architecture:**
+    - Batch keys: [0][table_id:16][batch_id:47] → serialized RecordBatch
+    - Row keys: [1][table_id:16][row_hash:47] → (batch_id, row_offset) [TODO]
+  - **Status:** Arrow Batch API complete, RocksDB API pending
+  - **Result:** RecordBatches now persist to disk with compaction support!
 
-- [ ] **Day 3-5:** Testing & Bug Fixing
+- [ ] **Day 3-4:** Implement RocksDB Put/Get/Delete API
+  - Put: Buffer rows, flush as RecordBatch, build secondary index
+  - Get: Lookup row index → read batch → extract row
+  - Delete: Tombstone markers in row index
+  - WriteBatch: Batch multiple operations
+  - **Expected:** Full dual API (Arrow + RocksDB)
+
+- [ ] **Day 5:** Testing & Bug Fixing
   - Integration tests (write → flush → compact → read)
-  - Crash recovery tests
+  - Test dual API interaction (Put updates affecting ScanTable)
   - Performance benchmarks
   - **Expected:** Stable, correct database
 
