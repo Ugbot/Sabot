@@ -41,6 +41,7 @@ set(SABOT_QL_SOURCES
     src/storage/vocabulary_impl.cpp
     src/storage/triple_store_marbledb.cpp
     src/storage/vocabulary_marbledb.cpp
+    src/storage/bulk_loader.cpp
 
     # Bindings
     src/bindings/bindings.cpp

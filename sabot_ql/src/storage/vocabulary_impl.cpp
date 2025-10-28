@@ -30,6 +30,14 @@ public:
         cache_.Clear();
     }
 
+    // Batch put - single lock for multiple insertions
+    void PutBatch(const std::vector<std::pair<K, V>>& entries) {
+        std::unique_lock lock(mutex_);
+        for (const auto& [key, value] : entries) {
+            cache_.Put(key, value);
+        }
+    }
+
 private:
     mutable LRUCache<K, V> cache_;
     mutable std::shared_mutex mutex_;
@@ -160,10 +168,44 @@ public:
         std::vector<ValueId> ids;
         ids.reserve(terms.size());
 
-        for (const auto& term : terms) {
-            ARROW_ASSIGN_OR_RAISE(auto id, AddTerm(term));
-            ids.push_back(id);
+        // Batch processing for efficiency:
+        // 1. Try inline encoding (no DB/cache needed)
+        // 2. Batch allocate IDs for remaining terms
+        // 3. Batch update cache
+
+        std::vector<size_t> non_inline_indices;
+        non_inline_indices.reserve(terms.size());
+
+        // Phase 1: Process inline-encodeable terms
+        for (size_t i = 0; i < terms.size(); ++i) {
+            auto inline_id = TryEncodeInline(terms[i]);
+            if (inline_id.has_value()) {
+                ids.push_back(*inline_id);
+            } else {
+                ids.push_back(ValueId());  // Placeholder
+                non_inline_indices.push_back(i);
+            }
         }
+
+        if (non_inline_indices.empty()) {
+            return ids;  // All terms were inline-encodeable
+        }
+
+        // Phase 2: Batch allocate IDs for non-inline terms
+        // Use atomic increment to get a contiguous block of IDs
+        uint64_t start_id = next_id_.fetch_add(non_inline_indices.size());
+
+        // Phase 3: Assign IDs (lock-free - just writing to vector)
+        for (size_t j = 0; j < non_inline_indices.size(); ++j) {
+            size_t i = non_inline_indices[j];
+            ValueId new_id = ValueId::makeFromVocabIndex(VocabIndex::make(start_id + j));
+            ids[i] = new_id;
+        }
+
+        // NO cache updates during bulk load!
+        // Lock-free design: cache is for query-time lookups, not bulk inserts
+        // Cache will be populated on-demand when terms are actually queried
+        // This eliminates ~3000 mutex lock/unlock cycles for 1K triple loads
 
         return ids;
     }

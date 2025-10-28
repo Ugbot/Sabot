@@ -95,9 +95,78 @@ public:
     arrow::Status InsertArrowBatch(
         const std::shared_ptr<arrow::RecordBatch>& batch) override {
 
-        // Convert Arrow batch to vector of triples
-        ARROW_ASSIGN_OR_RAISE(auto triples, Triple::FromArrowBatch(batch));
-        return InsertTriples(triples);
+        // FAST PATH: Use Arrow compute kernels to create index batches directly
+        // No conversion to/from vector<Triple> - pure columnar operations!
+
+        // Extract columns (support both naming conventions)
+        auto s_array = batch->GetColumnByName("s");
+        if (!s_array) s_array = batch->GetColumnByName("subject");
+
+        auto p_array = batch->GetColumnByName("p");
+        if (!p_array) p_array = batch->GetColumnByName("predicate");
+
+        auto o_array = batch->GetColumnByName("o");
+        if (!o_array) o_array = batch->GetColumnByName("object");
+
+        if (!s_array || !p_array || !o_array) {
+            return arrow::Status::Invalid("Batch missing s/p/o columns");
+        }
+
+        // Create index batches using Arrow kernels (just reorder columns - zero copy!)
+        // SPO: subject, predicate, object
+        auto spo_schema = arrow::schema({
+            arrow::field("s", arrow::int64()),
+            arrow::field("p", arrow::int64()),
+            arrow::field("o", arrow::int64())
+        });
+        auto spo_batch = arrow::RecordBatch::Make(
+            spo_schema,
+            batch->num_rows(),
+            {s_array, p_array, o_array}
+        );
+
+        // POS: predicate, object, subject
+        auto pos_schema = arrow::schema({
+            arrow::field("p", arrow::int64()),
+            arrow::field("o", arrow::int64()),
+            arrow::field("s", arrow::int64())
+        });
+        auto pos_batch = arrow::RecordBatch::Make(
+            pos_schema,
+            batch->num_rows(),
+            {p_array, o_array, s_array}
+        );
+
+        // OSP: object, subject, predicate
+        auto osp_schema = arrow::schema({
+            arrow::field("o", arrow::int64()),
+            arrow::field("s", arrow::int64()),
+            arrow::field("p", arrow::int64())
+        });
+        auto osp_batch = arrow::RecordBatch::Make(
+            osp_schema,
+            batch->num_rows(),
+            {o_array, s_array, p_array}
+        );
+
+        // Insert into each index (3x parallel writes possible with proper MarbleDB API)
+        auto status = db_->InsertBatch("SPO", spo_batch);
+        if (!status.ok()) {
+            return arrow::Status::IOError("Failed to insert SPO batch: " + status.ToString());
+        }
+
+        status = db_->InsertBatch("POS", pos_batch);
+        if (!status.ok()) {
+            return arrow::Status::IOError("Failed to insert POS batch: " + status.ToString());
+        }
+
+        status = db_->InsertBatch("OSP", osp_batch);
+        if (!status.ok()) {
+            return arrow::Status::IOError("Failed to insert OSP batch: " + status.ToString());
+        }
+
+        total_triples_ += batch->num_rows();
+        return arrow::Status::OK();
     }
 
     arrow::Result<std::shared_ptr<arrow::Table>> ScanPattern(

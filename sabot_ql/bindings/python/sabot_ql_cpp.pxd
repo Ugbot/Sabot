@@ -68,6 +68,13 @@ cdef extern from "sabot_ql/storage/vocabulary.h" namespace "sabot_ql":
     Term TermLiteral "sabot_ql::Term::Literal"(const cpp_string& value, const cpp_string& lang, const cpp_string& datatype)
     Term TermBlankNode "sabot_ql::Term::BlankNode"(const cpp_string& id)
 
+cdef extern from "sabot_ql/storage/bulk_loader.h" namespace "sabot_ql":
+    CStatus BulkLoadFromArrow(
+        shared_ptr[Vocabulary] vocab,
+        shared_ptr[TripleStore] triple_store,
+        shared_ptr[CTable] terms_table,
+        shared_ptr[CTable] triples_table) nogil
+
 cdef extern from "sabot_ql/types/value_id.h" namespace "sabot_ql":
     cdef cppclass ValueId:
         @staticmethod
