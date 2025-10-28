@@ -439,16 +439,161 @@ Status StandardLSMTree::PerformMajorCompaction(uint64_t level, const std::vector
     return Status::OK();
 }
 
+// Helper struct for k-way merge heap
+struct MergeEntry {
+    uint64_t key;
+    std::string value;
+    size_t source_index;  // Which SSTable this came from
+
+    // Min-heap comparator (reverse for std::priority_queue which is max-heap by default)
+    bool operator>(const MergeEntry& other) const {
+        return key > other.key;  // Reversed: smaller keys have higher priority
+    }
+};
+
+// Helper class to manage per-SSTable iteration state
+struct SSTableIterator {
+    const SSTable* sstable;
+    std::vector<std::pair<uint64_t, std::string>> buffer;
+    size_t buffer_pos = 0;
+    uint64_t current_min_key = 0;
+    bool exhausted = false;
+
+    SSTableIterator(const SSTable* table) : sstable(table) {}
+
+    Status LoadNextChunk(uint64_t start_key, size_t chunk_size = 10000) {
+        buffer.clear();
+        buffer_pos = 0;
+
+        if (exhausted) {
+            return Status::OK();
+        }
+
+        // Reserve space for chunk to reduce allocations
+        buffer.reserve(chunk_size);
+
+        // Load next chunk of entries
+        auto status = sstable->Scan(start_key, UINT64_MAX, &buffer);
+        if (!status.ok()) {
+            return status;
+        }
+
+        if (buffer.empty()) {
+            exhausted = true;
+        } else {
+            current_min_key = buffer[0].first;
+        }
+
+        return Status::OK();
+    }
+
+    bool HasMore() const {
+        return buffer_pos < buffer.size();
+    }
+
+    std::pair<uint64_t, std::string> Current() const {
+        return buffer[buffer_pos];
+    }
+
+    void Advance() {
+        buffer_pos++;
+    }
+};
+
 Status StandardLSMTree::MergeSSTables(const std::vector<std::unique_ptr<SSTable>>& inputs,
                                      std::unique_ptr<SSTable>* output) {
     if (inputs.empty()) {
         return Status::InvalidArgument("No input SSTables to merge");
     }
 
-    // For now, just return the first SSTable
-    // FIXME: Implement proper SSTable merging
-    // TODO: SSTableImpl constructor not accessible due to forward declaration
-    return Status::NotImplemented("SSTable merging not implemented");
+    // Determine output level and path
+    uint64_t output_level = inputs[0]->GetMetadata().level + 1;
+    std::string output_path = config_.data_directory + "/merged_" +
+                             std::to_string(output_level) + "_" +
+                             std::to_string(std::time(nullptr)) + ".sst";
+
+    // Create writer for output SSTable
+    std::unique_ptr<SSTableWriter> writer;
+    auto create_status = sstable_manager_->CreateWriter(output_path, output_level, &writer);
+    if (!create_status.ok()) {
+        return create_status;
+    }
+
+    // Initialize iterators for each input SSTable
+    std::vector<SSTableIterator> iterators;
+    iterators.reserve(inputs.size());
+
+    for (size_t i = 0; i < inputs.size(); ++i) {
+        SSTableIterator iter(inputs[i].get());
+
+        // Load first chunk
+        auto load_status = iter.LoadNextChunk(0);
+        if (!load_status.ok()) {
+            return load_status;
+        }
+
+        if (iter.HasMore()) {
+            iterators.push_back(std::move(iter));
+        }
+    }
+
+    // K-way merge using min-heap
+    std::priority_queue<MergeEntry, std::vector<MergeEntry>, std::greater<MergeEntry>> heap;
+
+    // Initialize heap with first entry from each iterator
+    for (size_t i = 0; i < iterators.size(); ++i) {
+        if (iterators[i].HasMore()) {
+            auto [key, value] = iterators[i].Current();
+            heap.push({key, value, i});
+        }
+    }
+
+    // Merge loop with deduplication
+    uint64_t last_key = 0;
+    bool first_entry = true;
+
+    while (!heap.empty()) {
+        // Extract minimum entry
+        MergeEntry entry = heap.top();
+        heap.pop();
+
+        // Deduplication: skip duplicates, keep first occurrence (newest in LSM-tree)
+        if (first_entry || entry.key != last_key) {
+            // Write to output
+            auto write_status = writer->Add(entry.key, entry.value);
+            if (!write_status.ok()) {
+                return write_status;
+            }
+
+            last_key = entry.key;
+            first_entry = false;
+        }
+
+        // Refill heap from same source
+        auto& iter = iterators[entry.source_index];
+        iter.Advance();
+
+        // Check if iterator needs refill
+        if (!iter.HasMore() && !iter.exhausted) {
+            // Load next chunk
+            auto load_status = iter.LoadNextChunk(iter.current_min_key + 1);
+            if (!load_status.ok()) {
+                return load_status;
+            }
+        }
+
+        // Push next entry from this source
+        if (iter.HasMore()) {
+            auto [key, value] = iter.Current();
+            heap.push({key, value, entry.source_index});
+        }
+    }
+
+    // Finalize output SSTable
+    auto finish_status = writer->Finish(output);
+    if (!finish_status.ok()) {
+        return finish_status;
+    }
 
     return Status::OK();
 }

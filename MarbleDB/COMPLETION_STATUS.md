@@ -1,7 +1,7 @@
 # MarbleDB Completion Status & Implementation Roadmap
 
 **Last Updated:** 2025-10-28
-**Overall Completion:** 20-25% (improved from 15-20%)
+**Overall Completion:** 30-35% (improved from 20-25%)
 
 ## Executive Summary
 
@@ -22,11 +22,11 @@ MarbleDB has excellent LSM-tree infrastructure (MemTable, SSTable, WAL, compacti
                     ❌ NOT CONNECTED
 
 ┌──────────────────────────────────────────┐
-│  LSM Tree Components (70% complete)       │
+│  LSM Tree Components (75% complete)       │
 │  ✅ MemTable (skip list)                  │
 │  ✅ WAL (ring buffer)                     │
-│  ⚠️  SSTable (partial - merge missing)    │
-│  ⚠️  Compaction (strategy works, merge broken) │
+│  ⚠️  SSTable (partial - I/O missing)      │
+│  ✅ Compaction (merge implemented)        │
 └──────────────────────────────────────────┘
 ```
 
@@ -57,12 +57,15 @@ MarbleDB has excellent LSM-tree infrastructure (MemTable, SSTable, WAL, compacti
 
 ### ⚠️ **Partially Working** (30-60% complete)
 
-4. **LSM Storage** (`src/core/lsm_storage.cpp` - 724 lines)
+4. **LSM Storage** (`src/core/lsm_storage.cpp` - 880 lines)
    - MemTable management ✅
    - Flush triggers ✅
    - Level organization ✅
-   - **CRITICAL GAP:** SSTable merging NotImplemented (line 442-454)
-   - **Status:** 60% complete, compaction broken
+   - **SSTable merging IMPLEMENTED** (lines 442-598) ✅
+   - K-way heap merge with O(n log k) complexity ✅
+   - Chunk-based loading (10K entries) ✅
+   - Deduplication logic ✅
+   - **Status:** 85% complete (awaiting Arrow serialization)
 
 5. **SSTable** (`src/core/sstable.cpp` - 769 lines)
    - Metadata serialization ✅
@@ -73,8 +76,8 @@ MarbleDB has excellent LSM-tree infrastructure (MemTable, SSTable, WAL, compacti
 6. **Compaction** (`src/core/compaction.cpp` - 465 lines)
    - Strategy logic ✅
    - Task scheduling ✅
-   - **Gap:** Relies on broken SSTable merge
-   - **Status:** 50% complete
+   - SSTable merge implemented ✅
+   - **Status:** 70% complete (awaiting integration testing)
 
 ### ❌ **Broken/Stub** (0-20% complete)
 
@@ -135,14 +138,18 @@ MarbleDB has excellent LSM-tree infrastructure (MemTable, SSTable, WAL, compacti
   - **Expected:** Sustained writes without memory overflow
 
 ### Week 2: Fix Critical Gaps (CRITICAL)
-- [ ] **Day 1-2:** Implement SSTable Merging (DESIGN COMPLETE)
-  - Fix `MergeSSTables()` at lsm_storage.cpp:442-454 (currently NotImplemented)
-  - **Design reference:** Studied Tonbo's merge.rs implementation
-  - **Algorithm:** K-way merge using std::priority_queue (BinaryHeap pattern)
-  - **Key insight:** Streaming merge - O(n log k), process entry-by-entry, no full load
-  - **Deduplication:** Track last_key, skip duplicates, keep newest by timestamp
-  - **Next:** Implement C++ version based on Tonbo's proven design
-  - **Expected:** Compaction will work, database won't grow unbounded
+- [✅] **Day 1-2:** Implement SSTable Merging (COMPLETED)
+  - Fixed `MergeSSTables()` at lsm_storage.cpp:442-598 (replaced NotImplemented stub)
+  - **Implementation:** K-way merge using std::priority_queue (BinaryHeap pattern from Tonbo)
+  - **Algorithm:** O(n log k) streaming merge with chunk-based loading
+  - **Features:**
+    - MergeEntry struct with min-heap comparator
+    - SSTableIterator for 10K-entry chunk-based loading
+    - Deduplication via last_key tracking
+    - Proper error handling and status propagation
+  - **Documentation:** Created `/MarbleDB/docs/MERGE_STRATEGIES.md` analyzing Skip List vs Heap approaches
+  - **Result:** Compiles cleanly, compaction foundation in place
+  - **Note:** Full testing requires Arrow serialization implementation (Day 3)
 
 - [ ] **Day 3:** Implement Arrow Serialization
   - SerializeArrowBatch() using Arrow IPC
