@@ -1,4 +1,6 @@
 #include "marble/lsm_storage.h"
+#include "marble/wal.h"
+#include "marble/record.h"
 #include <filesystem>
 #include <algorithm>
 #include <chrono>
@@ -23,6 +25,15 @@ Status StandardLSMTree::Init(const LSMTreeConfig& config) {
     // Initialize components
     memtable_factory_ = CreateSimpleMemTableFactory();
     sstable_manager_ = CreateSSTableManager();
+    wal_manager_ = std::make_unique<WalManagerImpl>();
+
+    // Initialize WAL
+    WalOptions wal_options;
+    wal_options.wal_path = config_.wal_directory;
+    wal_options.max_file_size = 64 * 1024 * 1024;  // 64MB
+    wal_options.sync_mode = WalOptions::SyncMode::kAsync;  // Fast but less durable for now
+    status = wal_manager_->Open(wal_options);
+    if (!status.ok()) return status;
 
     // Create initial memtable
     active_memtable_ = memtable_factory_->CreateMemTable();
@@ -90,6 +101,17 @@ Status StandardLSMTree::Put(uint64_t key, const std::string& value) {
         if (!status.ok()) return status;
     }
 
+    // Write to WAL first (for crash recovery)
+    if (wal_manager_) {
+        auto key_obj = std::make_shared<Int64Key>(key);
+        // For WAL, we store the raw value as a simple record
+        auto value_obj = std::make_shared<SimpleRecord>(key_obj, nullptr, 0);  // Simplified for now
+        WalEntry entry(wal_manager_->GetCurrentSequence() + 1, 0, WalEntryType::kPut,
+                      key_obj, value_obj, 0);
+        auto wal_status = wal_manager_->WriteEntry(entry);
+        if (!wal_status.ok()) return wal_status;
+    }
+
     // Write to active memtable
     auto status = active_memtable_->Put(key, value);
     if (!status.ok()) return status;
@@ -105,6 +127,15 @@ Status StandardLSMTree::Delete(uint64_t key) {
     if (active_memtable_->ShouldFlush(config_.memtable_max_size_bytes)) {
         auto status = SwitchMemTable();
         if (!status.ok()) return status;
+    }
+
+    // Write to WAL first (for crash recovery)
+    if (wal_manager_) {
+        auto key_obj = std::make_shared<Int64Key>(key);
+        WalEntry entry(wal_manager_->GetCurrentSequence() + 1, 0, WalEntryType::kDelete,
+                      key_obj, nullptr, 0);
+        auto wal_status = wal_manager_->WriteEntry(entry);
+        if (!wal_status.ok()) return wal_status;
     }
 
     // Write delete tombstone to active memtable
@@ -258,6 +289,27 @@ Status StandardLSMTree::CreateDirectories() {
 }
 
 Status StandardLSMTree::RecoverFromDisk() {
+    // First, replay WAL to recover uncommitted changes
+    if (wal_manager_) {
+        auto wal_status = wal_manager_->Recover([this](const WalEntry& entry) {
+            // Replay the entry to memtable
+            if (entry.entry_type == WalEntryType::kPut) {
+                if (entry.key && entry.value) {
+                    // For now, simplified recovery - just log
+                    // TODO: Implement proper WAL entry replay
+                }
+            } else if (entry.entry_type == WalEntryType::kDelete) {
+                if (entry.key) {
+                    // TODO: Implement delete replay
+                }
+            }
+            return Status::OK();
+        });
+        if (!wal_status.ok()) {
+            return wal_status;
+        }
+    }
+
     // List all SSTable files
     std::vector<std::string> sstable_files;
     auto status = sstable_manager_->ListSSTables(config_.data_directory, &sstable_files);

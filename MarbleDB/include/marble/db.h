@@ -287,22 +287,57 @@ public:
      */
     virtual std::string GetSystemInfo() const = 0;
 
+    // Transaction support (MVCC with snapshot isolation)
+    virtual Status BeginTransaction(const TransactionOptions& options,
+                                  DBTransaction** txn) = 0;
+    virtual Status BeginTransaction(DBTransaction** txn) = 0;  // Default options
+
     // Disable copying
     MarbleDB(const MarbleDB&) = delete;
     MarbleDB& operator=(const MarbleDB&) = delete;
 };
 
-// Transaction support (future extension)
+// Forward declarations for MVCC
+class MVCCManager;
+class Snapshot;
+
+// Transaction options
+struct TransactionOptions {
+    bool read_only = false;         // Read-only transaction
+    bool snapshot = true;           // Use snapshot isolation
+    uint64_t lock_timeout_ms = 5000; // Lock timeout in milliseconds
+    size_t max_write_buffer_size = 64 * 1024 * 1024; // 64MB max buffer
+
+    TransactionOptions() = default;
+};
+
+// Transaction support with MVCC
 class DBTransaction {
 public:
     virtual ~DBTransaction() = default;
 
-    virtual Status Put(std::shared_ptr<Record> record) = 0;
-    virtual Status Get(const Key& key, std::shared_ptr<Record>* record) = 0;
-    virtual Status Delete(const Key& key) = 0;
+    // Read operations (snapshot isolation)
+    virtual Status Get(const ReadOptions& options, const Key& key,
+                      std::shared_ptr<Record>* record) = 0;
 
+    // Write operations (buffered until commit)
+    virtual Status Put(const WriteOptions& options, std::shared_ptr<Record> record) = 0;
+    virtual Status Delete(const WriteOptions& options, const Key& key) = 0;
+
+    // Batch operations within transaction
+    virtual Status Put(const WriteOptions& options, ColumnFamilyHandle* cf,
+                      std::shared_ptr<Record> record) = 0;
+    virtual Status Delete(const WriteOptions& options, ColumnFamilyHandle* cf,
+                         const Key& key) = 0;
+
+    // Transaction control
     virtual Status Commit() = 0;
     virtual Status Rollback() = 0;
+
+    // Transaction metadata
+    virtual uint64_t GetTxnId() const = 0;
+    virtual Snapshot GetSnapshot() const = 0;
+    virtual bool IsReadOnly() const = 0;
 };
 
 // Batch write support

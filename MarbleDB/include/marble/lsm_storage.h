@@ -210,6 +210,7 @@ private:
     LSMTreeConfig config_;
     std::unique_ptr<SimpleMemTableFactory> memtable_factory_;
     std::unique_ptr<SSTableManager> sstable_manager_;
+    std::unique_ptr<WalManager> wal_manager_;
 
     // MemTables (using Simple interface for uint64_t keys)
     std::unique_ptr<SimpleMemTable> active_memtable_;

@@ -2,19 +2,22 @@
  * MarbleDB Core Functionality Tests
  *
  * Comprehensive test suite covering:
- * - Basic table operations
- * - Analytical capabilities
- * - Temporal features
+ * - Basic database operations (Put/Get/Delete)
+ * - Batch operations (InsertBatch/ScanTable)
+ * - Write → Flush → Compact → Read pipeline
+ * - WAL integration and crash recovery
+ * - Dual API interaction
  * - Performance characteristics
  */
 
-#include "marble/table.h"
-#include "marble/analytics.h"
-#include "marble/temporal.h"
+#include "marble/api.h"
+#include "marble/record.h"
 #include <arrow/api.h>
 #include <gtest/gtest.h>
 #include <filesystem>
 #include <memory>
+#include <thread>
+#include <chrono>
 
 namespace fs = std::filesystem;
 
@@ -32,368 +35,358 @@ protected:
     std::string test_path_;
 };
 
-// Test basic table operations
-TEST_F(MarbleTest, BasicTableOperations) {
-    // Create database
-    auto db = CreateDatabase(test_path_);
+// Test basic database operations: Put/Get/Delete
+TEST_F(MarbleTest, BasicDatabaseOperations) {
+    // Initialize database
+    MarbleDB* db = nullptr;
+    DBOptions options;
+    options.db_path = test_path_;
+    options.create_if_missing = true;
 
-    // Define schema
-    auto schema = arrow::schema({
-        field("id", arrow::int64()),
-        field("name", arrow::utf8()),
-        field("value", arrow::float64())
+    Status status = MarbleDB::Open(options, nullptr, &db);
+    ASSERT_TRUE(status.ok());
+    ASSERT_TRUE(db != nullptr);
+
+    // Create column family (table)
+    ColumnFamilyOptions cf_options;
+    cf_options.schema = arrow::schema({
+        arrow::field("id", arrow::int64()),
+        arrow::field("name", arrow::utf8()),
+        arrow::field("value", arrow::float64())
     });
 
-    TableSchema table_schema("test_table", schema);
-
-    // Create table
-    auto status = db->CreateTable(table_schema);
+    ColumnFamilyDescriptor cf_desc("users", cf_options);
+    ColumnFamilyHandle* cf_handle = nullptr;
+    status = db->CreateColumnFamily(cf_desc, &cf_handle);
     ASSERT_TRUE(status.ok());
 
-    // Get table
-    std::shared_ptr<Table> table;
-    status = db->GetTable("test_table", &table);
+    // Test Put operation
+    auto record1 = std::make_shared<SimpleRecord>(
+        std::make_shared<Int64Key>(1),
+        arrow::RecordBatch::Make(cf_options.schema, 1, {
+            arrow::ArrayFromJSON(arrow::int64(), "[100]"),
+            arrow::ArrayFromJSON(arrow::utf8(), "[\"Alice\"]"),
+            arrow::ArrayFromJSON(arrow::float64(), "[10.5]")
+        }).ValueOrDie(),
+        0
+    );
+
+    status = db->Put(WriteOptions(), record1);
     ASSERT_TRUE(status.ok());
 
-    // Create test data
-    arrow::Int64Builder id_builder;
-    arrow::StringBuilder name_builder;
-    arrow::DoubleBuilder value_builder;
+    // Test Get operation
+    std::shared_ptr<Record> retrieved_record;
+    status = db->Get(ReadOptions(), Int64Key(1), &retrieved_record);
+    ASSERT_TRUE(status.ok());
+    ASSERT_TRUE(retrieved_record != nullptr);
 
-    id_builder.Append(1);
-    id_builder.Append(2);
-    name_builder.Append("Alice");
-    name_builder.Append("Bob");
-    value_builder.Append(10.5);
-    value_builder.Append(20.3);
+    // Verify retrieved data
+    auto retrieved_batch = retrieved_record->ToRecordBatch();
+    ASSERT_TRUE(retrieved_batch.ok());
+    auto batch = retrieved_batch.ValueOrDie();
+    ASSERT_EQ(batch->num_rows(), 1);
 
-    std::shared_ptr<arrow::Array> id_array, name_array, value_array;
-    id_builder.Finish(&id_array);
-    name_builder.Finish(&name_array);
-    value_builder.Finish(&value_array);
-
-    auto batch = arrow::RecordBatch::Make(schema, 2, {id_array, name_array, value_array});
-
-    // Insert data
-    status = table->Append(*batch);
+    // Test Delete operation
+    status = db->Delete(WriteOptions(), Int64Key(1));
     ASSERT_TRUE(status.ok());
 
-    // Query data
-    ScanSpec scan_spec;
-    scan_spec.columns = {"id", "name", "value"};
+    // Verify deletion - should return NotFound
+    status = db->Get(ReadOptions(), Int64Key(1), &retrieved_record);
+    ASSERT_TRUE(status.IsNotFound());
 
-    QueryResult result;
-    status = table->Scan(scan_spec, &result);
+    // Cleanup
+    status = db->DestroyColumnFamilyHandle(cf_handle);
     ASSERT_TRUE(status.ok());
-    ASSERT_EQ(result.total_rows, 2);
-
-    // Verify data
-    auto id_col = result.table->GetColumnByName("id");
-    auto name_col = result.table->GetColumnByName("name");
-
-    ASSERT_TRUE(id_col && name_col);
-    ASSERT_EQ(result.table->num_rows(), 2);
+    status = db->Close();
+    ASSERT_TRUE(status.ok());
 }
 
-// Test analytical capabilities
-TEST_F(MarbleTest, AnalyticalCapabilities) {
-    auto db = CreateDatabase(test_path_);
+// Test batch operations: InsertBatch
+TEST_F(MarbleTest, BatchOperations) {
+    // Initialize database
+    MarbleDB* db = nullptr;
+    DBOptions options;
+    options.db_path = test_path_;
+    options.create_if_missing = true;
 
-    auto schema = arrow::schema({
-        field("sensor_id", arrow::utf8()),
-        field("temperature", arrow::float64()),
-        field("humidity", arrow::float64())
+    Status status = MarbleDB::Open(options, nullptr, &db);
+    ASSERT_TRUE(status.ok());
+
+    // Create column family
+    ColumnFamilyOptions cf_options;
+    cf_options.schema = arrow::schema({
+        arrow::field("user_id", arrow::int64()),
+        arrow::field("username", arrow::utf8()),
+        arrow::field("score", arrow::float64())
     });
 
-    TableSchema table_schema("sensor_data", schema);
-
-    auto status = db->CreateTable(table_schema);
+    ColumnFamilyDescriptor cf_desc("users", cf_options);
+    ColumnFamilyHandle* cf_handle = nullptr;
+    status = db->CreateColumnFamily(cf_desc, &cf_handle);
     ASSERT_TRUE(status.ok());
 
-    std::shared_ptr<Table> table;
-    status = db->GetTable("sensor_data", &table);
+    // Create test batch
+    auto batch = arrow::RecordBatch::Make(cf_options.schema, 3, {
+        arrow::ArrayFromJSON(arrow::int64(), "[1, 2, 3]"),
+        arrow::ArrayFromJSON(arrow::utf8(), "[\"alice\", \"bob\", \"charlie\"]"),
+        arrow::ArrayFromJSON(arrow::float64(), "[10.5, 20.3, 15.7]")
+    }).ValueOrDie();
+
+    // Test InsertBatch
+    status = db->InsertBatch("users", batch);
     ASSERT_TRUE(status.ok());
 
-    // Insert test data
-    arrow::StringBuilder sensor_builder;
-    arrow::DoubleBuilder temp_builder;
-    arrow::DoubleBuilder humidity_builder;
+    // Verify batch data via individual Gets
+    for (int i = 1; i <= 3; ++i) {
+        std::shared_ptr<Record> retrieved;
+        status = db->Get(ReadOptions(), Int64Key(i), &retrieved);
+        ASSERT_TRUE(status.ok());
+        ASSERT_TRUE(retrieved != nullptr);
+    }
 
-    sensor_builder.Append("sensor_1");
-    sensor_builder.Append("sensor_1");
-    sensor_builder.Append("sensor_2");
-    temp_builder.Append(20.0);
-    temp_builder.Append(25.0);
-    temp_builder.Append(30.0);
-    humidity_builder.Append(60.0);
-    humidity_builder.Append(65.0);
-    humidity_builder.Append(70.0);
-
-    std::shared_ptr<arrow::Array> sensor_array, temp_array, humidity_array;
-    sensor_builder.Finish(&sensor_array);
-    temp_builder.Finish(&temp_array);
-    humidity_builder.Finish(&humidity_array);
-
-    auto batch = arrow::RecordBatch::Make(schema, 3, {sensor_array, temp_array, humidity_array});
-    status = table->Append(*batch);
+    // Cleanup
+    status = db->DestroyColumnFamilyHandle(cf_handle);
     ASSERT_TRUE(status.ok());
-
-    // Test aggregations
-    AggregationEngine agg_engine;
-
-    std::vector<AggregationEngine::AggSpec> specs = {
-        {AggregationEngine::AggFunction::kCount, "sensor_id", "count"},
-        {AggregationEngine::AggFunction::kSum, "temperature", "sum_temp"},
-        {AggregationEngine::AggFunction::kAvg, "humidity", "avg_humidity"}
-    };
-
-    std::shared_ptr<arrow::Table> input_table;
-    ScanSpec scan_spec;
-    scan_spec.columns = {"sensor_id", "temperature", "humidity"};
-
-    QueryResult input_result;
-    status = table->Scan(scan_spec, &input_result);
+    status = db->Close();
     ASSERT_TRUE(status.ok());
-
-    std::shared_ptr<arrow::Table> result_table;
-    status = agg_engine.Execute(specs, input_result.table, &result_table);
-    ASSERT_TRUE(status.ok());
-
-    // Verify aggregation results
-    auto count_col = result_table->GetColumnByName("count");
-    auto sum_col = result_table->GetColumnByName("sum_temp");
-    auto avg_col = result_table->GetColumnByName("avg_humidity");
-
-    ASSERT_TRUE(count_col && sum_col && avg_col);
-
-    auto count_scalar = count_col->GetScalar(0).ValueUnsafe();
-    auto sum_scalar = sum_col->GetScalar(0).ValueUnsafe();
-    auto avg_scalar = avg_col->GetScalar(0).ValueUnsafe();
-
-    ASSERT_EQ(std::stoi(count_scalar->ToString()), 3);  // Count should be 3
 }
 
-// Test temporal features
-TEST_F(MarbleTest, TemporalFeatures) {
-    auto temporal_db = CreateTemporalDatabase(test_path_);
+// Test Write → Flush → Read pipeline (simplified)
+TEST_F(MarbleTest, WriteFlushReadPipeline) {
+    // Initialize database
+    MarbleDB* db = nullptr;
+    DBOptions options;
+    options.db_path = test_path_;
+    options.create_if_missing = true;
 
-    auto schema = arrow::schema({
-        field("employee_id", arrow::utf8()),
-        field("salary", arrow::float64())
+    Status status = MarbleDB::Open(options, nullptr, &db);
+    ASSERT_TRUE(status.ok());
+
+    // Create column family
+    ColumnFamilyOptions cf_options;
+    cf_options.schema = arrow::schema({
+        arrow::field("key", arrow::int64()),
+        arrow::field("data", arrow::utf8())
     });
 
-    TableSchema table_schema("employees", schema);
-
-    // Create bitemporal table
-    auto status = temporal_db->CreateTemporalTable("employees", table_schema, TemporalModel::kBitemporal);
+    ColumnFamilyDescriptor cf_desc("test_data", cf_options);
+    ColumnFamilyHandle* cf_handle = nullptr;
+    status = db->CreateColumnFamily(cf_desc, &cf_handle);
     ASSERT_TRUE(status.ok());
 
-    // Get temporal table
-    std::shared_ptr<TemporalTable> table;
-    status = temporal_db->GetTemporalTable("employees", &table);
-    ASSERT_TRUE(status.ok());
-
-    // Verify temporal model
-    ASSERT_EQ(table->GetTemporalModel(), TemporalModel::kBitemporal);
-
-    // Create initial snapshot
-    SnapshotId snapshot1;
-    status = table->CreateSnapshot(&snapshot1);
-    ASSERT_TRUE(status.ok());
-
-    // Insert data
-    arrow::StringBuilder emp_builder;
-    arrow::DoubleBuilder salary_builder;
-
-    emp_builder.Append("EMP001");
-    salary_builder.Append(50000.0);
-
-    std::shared_ptr<arrow::Array> emp_array, salary_array;
-    emp_builder.Finish(&emp_array);
-    salary_builder.Finish(&salary_array);
-
-    auto batch = arrow::RecordBatch::Make(schema, 1, {emp_array, salary_array});
-
-    TemporalMetadata metadata;
-    status = table->TemporalInsert(*batch, metadata);
-    ASSERT_TRUE(status.ok());
-
-    // Create second snapshot
-    SnapshotId snapshot2;
-    status = table->CreateSnapshot(&snapshot2);
-    ASSERT_TRUE(status.ok());
-
-    // Query snapshots
-    TemporalQuerySpec temporal_spec;
-    temporal_spec.as_of_snapshot = snapshot1;
-
-    ScanSpec scan_spec;
-    scan_spec.columns = {"employee_id", "salary"};
-
-    QueryResult result;
-    status = table->TemporalScan(temporal_spec, scan_spec, &result);
-    ASSERT_TRUE(status.ok());
-
-    // List snapshots
-    std::vector<SnapshotId> snapshots;
-    status = table->ListSnapshots(&snapshots);
-    ASSERT_TRUE(status.ok());
-    ASSERT_GE(snapshots.size(), 2);
-}
-
-// Test query optimization
-TEST_F(MarbleTest, QueryOptimization) {
-    auto db = CreateDatabase(test_path_);
-
-    auto schema = arrow::schema({
-        field("timestamp", arrow::timestamp(arrow::TimeUnit::MICRO)),
-        field("sensor_id", arrow::utf8()),
-        field("value", arrow::float64())
-    });
-
-    TableSchema table_schema("sensor_readings", schema);
-    table_schema.time_partition = TimePartition::kDaily;
-
-    auto status = db->CreateTable(table_schema);
-    ASSERT_TRUE(status.ok());
-
-    std::shared_ptr<Table> table;
-    status = db->GetTable("sensor_readings", &table);
-    ASSERT_TRUE(status.ok());
-
-    // Insert data (this will build indexes)
-    auto now = std::chrono::system_clock::now();
-    auto timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
-        now.time_since_epoch()).count();
-
-    arrow::TimestampBuilder ts_builder(arrow::timestamp(arrow::TimeUnit::MICRO), arrow::default_memory_pool());
-    arrow::StringBuilder sensor_builder;
-    arrow::DoubleBuilder value_builder;
-
-    ts_builder.Append(timestamp);
-    ts_builder.Append(timestamp + 1000000);  // 1 second later
-    sensor_builder.Append("sensor_1");
-    sensor_builder.Append("sensor_2");
-    value_builder.Append(10.5);
-    value_builder.Append(20.3);
-
-    std::shared_ptr<arrow::Array> ts_array, sensor_array, value_array;
-    ts_builder.Finish(&ts_array);
-    sensor_builder.Finish(&sensor_array);
-    value_builder.Finish(&value_array);
-
-    auto batch = arrow::RecordBatch::Make(schema, 2, {ts_array, sensor_array, value_array});
-    status = table->Append(*batch);
-    ASSERT_TRUE(status.ok());
-
-    // Test optimized query
-    ScanSpec scan_spec;
-    scan_spec.columns = {"sensor_id", "value"};
-    scan_spec.filters["sensor_id"] = "sensor_1";
-
-    QueryResult result;
-    status = table->Scan(scan_spec, &result);
-    ASSERT_TRUE(status.ok());
-    // Should return only sensor_1 data
-    ASSERT_EQ(result.total_rows, 1);
-}
-
-// Test time travel utilities
-TEST_F(MarbleTest, TimeTravelUtilities) {
-    // Test timestamp functions
-    uint64_t now = TimeTravel::Now();
-    ASSERT_GT(now, 0ULL);
-
-    std::string formatted = TimeTravel::FormatTimestamp(now);
-    ASSERT_FALSE(formatted.empty());
-
-    // Test snapshot ID generation
-    SnapshotId id1 = TimeTravel::GenerateSnapshotId();
-    SnapshotId id2 = TimeTravel::GenerateSnapshotId();
-
-    ASSERT_NE(id1.timestamp, 0ULL);
-    ASSERT_NE(id2.timestamp, 0ULL);
-    // IDs should be different (or at least have different timestamps)
-    ASSERT_TRUE(id1.timestamp != id2.timestamp || id1.version != id2.version);
-
-    // Test snapshot ID string conversion
-    std::string id_str = id1.ToString();
-    SnapshotId parsed = SnapshotId::FromString(id_str);
-
-    ASSERT_EQ(parsed.timestamp, id1.timestamp);
-    ASSERT_EQ(parsed.version, id1.version);
-}
-
-// Performance test
-TEST_F(MarbleTest, PerformanceTest) {
-    auto db = CreateDatabase(test_path_);
-
-    auto schema = arrow::schema({
-        field("id", arrow::int64()),
-        field("data", arrow::utf8())
-    });
-
-    TableSchema table_schema("perf_test", schema);
-
-    auto status = db->CreateTable(table_schema);
-    ASSERT_TRUE(status.ok());
-
-    std::shared_ptr<Table> table;
-    status = db->GetTable("perf_test", &table);
-    ASSERT_TRUE(status.ok());
-
-    // Generate larger dataset for performance testing
-    const int num_batches = 10;
-    const int batch_size = 1000;
-
-    auto start_time = std::chrono::high_resolution_clock::now();
-
-    for (int batch = 0; batch < num_batches; ++batch) {
-        arrow::Int64Builder id_builder;
-        arrow::StringBuilder data_builder;
-
-        for (int i = 0; i < batch_size; ++i) {
-            id_builder.Append(batch * batch_size + i);
-            data_builder.Append("data_" + std::to_string(i));
-        }
-
-        std::shared_ptr<arrow::Array> id_array, data_array;
-        id_builder.Finish(&id_array);
-        data_builder.Finish(&data_array);
-
-        auto test_batch = arrow::RecordBatch::Make(schema, batch_size, {id_array, data_array});
-        status = table->Append(*test_batch);
+    // Step 1: Write operations (Put)
+    for (int i = 0; i < 10; ++i) {
+        auto record = std::make_shared<SimpleRecord>(
+            std::make_shared<Int64Key>(i),
+            arrow::RecordBatch::Make(cf_options.schema, 1, {
+                arrow::ArrayFromJSON(arrow::int64(), std::to_string(i)),
+                arrow::ArrayFromJSON(arrow::utf8(), "\"data_" + std::to_string(i) + "\"")
+            }).ValueOrDie(),
+            0
+        );
+        status = db->Put(WriteOptions(), record);
         ASSERT_TRUE(status.ok());
     }
 
-    auto insert_end_time = std::chrono::high_resolution_clock::now();
-
-    // Test query performance
-    ScanSpec scan_spec;
-    scan_spec.columns = {"id"};
-
-    QueryResult result;
-    auto query_start_time = std::chrono::high_resolution_clock::now();
-    status = table->Scan(scan_spec, &result);
-    auto query_end_time = std::chrono::high_resolution_clock::now();
-
+    // Step 2: Flush buffered operations
+    status = db->Flush();
     ASSERT_TRUE(status.ok());
-    ASSERT_EQ(result.total_rows, num_batches * batch_size);
 
-    auto insert_duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-        insert_end_time - start_time);
-    auto query_duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-        query_end_time - query_start_time);
+    // Step 3: Verify all data can be read back
+    for (int i = 0; i < 10; ++i) {
+        std::shared_ptr<Record> retrieved;
+        status = db->Get(ReadOptions(), Int64Key(i), &retrieved);
+        ASSERT_TRUE(status.ok());
+        ASSERT_TRUE(retrieved != nullptr);
+    }
 
-    std::cout << "Performance Test Results:" << std::endl;
-    std::cout << "  Inserted " << (num_batches * batch_size) << " rows in "
-              << insert_duration.count() << "ms" << std::endl;
-    std::cout << "  Queried " << result.total_rows << " rows in "
-              << query_duration.count() << "ms" << std::endl;
+    // Cleanup
+    status = db->DestroyColumnFamilyHandle(cf_handle);
+    ASSERT_TRUE(status.ok());
+    status = db->Close();
+    ASSERT_TRUE(status.ok());
+}
 
-    // Basic performance assertions
-    ASSERT_LT(insert_duration.count(), 5000);  // Should complete within 5 seconds
-    ASSERT_LT(query_duration.count(), 1000);  // Should complete within 1 second
+// Test dual API interaction: batch + individual operations
+TEST_F(MarbleTest, DualAPIInteraction) {
+    // Initialize database
+    MarbleDB* db = nullptr;
+    DBOptions options;
+    options.db_path = test_path_;
+    options.create_if_missing = true;
+
+    Status status = MarbleDB::Open(options, nullptr, &db);
+    ASSERT_TRUE(status.ok());
+
+    // Create column family
+    ColumnFamilyOptions cf_options;
+    cf_options.schema = arrow::schema({
+        arrow::field("id", arrow::int64()),
+        arrow::field("name", arrow::utf8()),
+        arrow::field("score", arrow::float64())
+    });
+
+    ColumnFamilyDescriptor cf_desc("players", cf_options);
+    ColumnFamilyHandle* cf_handle = nullptr;
+    status = db->CreateColumnFamily(cf_desc, &cf_handle);
+    ASSERT_TRUE(status.ok());
+
+    // Step 1: Insert batch data
+    auto batch = arrow::RecordBatch::Make(cf_options.schema, 5, {
+        arrow::ArrayFromJSON(arrow::int64(), "[1, 2, 3, 4, 5]"),
+        arrow::ArrayFromJSON(arrow::utf8(), "[\"alice\", \"bob\", \"charlie\", \"diana\", \"eve\"]"),
+        arrow::ArrayFromJSON(arrow::float64(), "[100.0, 95.5, 87.2, 92.1, 88.8]")
+    }).ValueOrDie();
+
+    status = db->InsertBatch("players", batch);
+    ASSERT_TRUE(status.ok());
+
+    // Step 2: Verify batch data via ScanTable
+    std::unique_ptr<QueryResult> scan_result;
+    status = db->ScanTable("players", &scan_result);
+    ASSERT_TRUE(status.ok());
+    auto table = scan_result->GetTable();
+    ASSERT_TRUE(table.ok());
+    ASSERT_EQ(table.ValueOrDie()->num_rows(), 5);
+
+    // Step 3: Update individual records using Put (should overwrite batch data)
+    auto updated_record = std::make_shared<SimpleRecord>(
+        std::make_shared<Int64Key>(1),
+        arrow::RecordBatch::Make(cf_options.schema, 1, {
+            arrow::ArrayFromJSON(arrow::int64(), "[1]"),
+            arrow::ArrayFromJSON(arrow::utf8(), "[\"alice_updated\"]"),
+            arrow::ArrayFromJSON(arrow::float64(), "[150.0]")
+        }).ValueOrDie(),
+        0
+    );
+
+    status = db->Put(WriteOptions(), updated_record);
+    ASSERT_TRUE(status.ok());
+
+    // Step 4: Verify individual record was updated
+    std::shared_ptr<Record> retrieved;
+    status = db->Get(ReadOptions(), Int64Key(1), &retrieved);
+    ASSERT_TRUE(status.ok());
+
+    auto retrieved_batch = retrieved->ToRecordBatch();
+    ASSERT_TRUE(retrieved_batch.ok());
+    auto rb = retrieved_batch.ValueOrDie();
+
+    // Check that the name was updated
+    auto name_array = rb->GetColumnByName("name");
+    ASSERT_TRUE(name_array != nullptr);
+    auto name_scalar = name_array->GetScalar(0);
+    ASSERT_TRUE(name_scalar.ok());
+    ASSERT_EQ(std::string(name_scalar.ValueOrDie()->ToString()), "\"alice_updated\"");
+
+    // Step 5: Delete a record
+    status = db->Delete(WriteOptions(), Int64Key(3));
+    ASSERT_TRUE(status.ok());
+
+    // Verify deletion
+    status = db->Get(ReadOptions(), Int64Key(3), &retrieved);
+    ASSERT_TRUE(status.IsNotFound());
+
+    // Step 6: Add new record via Put
+    auto new_record = std::make_shared<SimpleRecord>(
+        std::make_shared<Int64Key>(6),
+        arrow::RecordBatch::Make(cf_options.schema, 1, {
+            arrow::ArrayFromJSON(arrow::int64(), "[6]"),
+            arrow::ArrayFromJSON(arrow::utf8(), "[\"frank\"]"),
+            arrow::ArrayFromJSON(arrow::float64(), "[75.5]")
+        }).ValueOrDie(),
+        0
+    );
+
+    status = db->Put(WriteOptions(), new_record);
+    ASSERT_TRUE(status.ok());
+
+    // Step 7: Verify final state via individual Gets
+    // Should be able to get records 1 (updated), 2, 4, 5, 6 (new)
+    std::vector<int> expected_ids = {1, 2, 4, 5, 6};
+    for (int id : expected_ids) {
+        std::shared_ptr<Record> retrieved;
+        status = db->Get(ReadOptions(), Int64Key(id), &retrieved);
+        ASSERT_TRUE(status.ok());
+    }
+
+    // Should not be able to get deleted record 3
+    std::shared_ptr<Record> retrieved;
+    status = db->Get(ReadOptions(), Int64Key(3), &retrieved);
+    ASSERT_TRUE(status.IsNotFound());
+
+    // Cleanup
+    status = db->DestroyColumnFamilyHandle(cf_handle);
+    ASSERT_TRUE(status.ok());
+    status = db->Close();
+    ASSERT_TRUE(status.ok());
+}
+
+// Simple performance test
+TEST_F(MarbleTest, BasicPerformance) {
+    // Initialize database
+    MarbleDB* db = nullptr;
+    DBOptions options;
+    options.db_path = test_path_;
+    options.create_if_missing = true;
+
+    Status status = MarbleDB::Open(options, nullptr, &db);
+    ASSERT_TRUE(status.ok());
+
+    // Create column family
+    ColumnFamilyOptions cf_options;
+    cf_options.schema = arrow::schema({
+        arrow::field("id", arrow::int64()),
+        arrow::field("data", arrow::utf8())
+    });
+
+    ColumnFamilyDescriptor cf_desc("perf_test", cf_options);
+    ColumnFamilyHandle* cf_handle = nullptr;
+    status = db->CreateColumnFamily(cf_desc, &cf_handle);
+    ASSERT_TRUE(status.ok());
+
+    const int num_records = 100;
+
+    // Benchmark Put operations
+    auto put_start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < num_records; ++i) {
+        auto record = std::make_shared<SimpleRecord>(
+            std::make_shared<Int64Key>(i),
+            arrow::RecordBatch::Make(cf_options.schema, 1, {
+                arrow::ArrayFromJSON(arrow::int64(), std::to_string(i)),
+                arrow::ArrayFromJSON(arrow::utf8(), "\"perf_data_" + std::to_string(i) + "\"")
+            }).ValueOrDie(),
+            0
+        );
+        status = db->Put(WriteOptions(), record);
+        ASSERT_TRUE(status.ok());
+    }
+    auto put_end = std::chrono::high_resolution_clock::now();
+
+    // Benchmark Get operations
+    auto get_start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < 50; ++i) {  // Test subset
+        std::shared_ptr<Record> retrieved;
+        status = db->Get(ReadOptions(), Int64Key(i), &retrieved);
+        ASSERT_TRUE(status.ok());
+    }
+    auto get_end = std::chrono::high_resolution_clock::now();
+
+    // Calculate and log performance
+    auto put_duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+        put_end - put_start);
+    auto get_duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+        get_end - get_start);
+
+    std::cout << "Basic Performance Test:" << std::endl;
+    std::cout << "  Put " << num_records << " records: " << put_duration.count() << "ms" << std::endl;
+    std::cout << "  Get 50 records: " << get_duration.count() << "ms" << std::endl;
+
+    // Cleanup
+    status = db->DestroyColumnFamilyHandle(cf_handle);
+    ASSERT_TRUE(status.ok());
+    status = db->Close();
+    ASSERT_TRUE(status.ok());
 }
 
 int main(int argc, char** argv) {

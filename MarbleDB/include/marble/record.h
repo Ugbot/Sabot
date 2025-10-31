@@ -298,6 +298,12 @@ public:
 
     // Get a zero-copy reference to this record
     virtual std::unique_ptr<RecordRef> AsRecordRef() const = 0;
+
+    // MVCC versioning support
+    virtual void SetMVCCInfo(uint64_t begin_ts, uint64_t commit_ts) = 0;
+    virtual uint64_t GetBeginTimestamp() const = 0;
+    virtual uint64_t GetCommitTimestamp() const = 0;
+    virtual bool IsVisible(uint64_t snapshot_ts) const = 0;
 };
 
 /**

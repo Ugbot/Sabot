@@ -16,13 +16,44 @@ class TaskScheduler;
 
 // WAL entry types for handling large records that span multiple log entries
 enum class WalEntryType {
+    kPut,       // Put operation
+    kDelete,    // Delete operation
+    kMerge,     // Merge operation
     kFull,      // Complete record in single entry
     kFirst,     // First part of multi-part record
     kMiddle,    // Middle part of multi-part record
     kLast,      // Last part of multi-part record
-    kDelete,    // Deletion marker
     kCommit,    // Transaction commit marker
     kAbort      // Transaction abort marker
+};
+
+// WAL entry structure for simple operations
+struct WalEntry {
+    uint64_t sequence_number = 0;
+    uint64_t transaction_id = 0;
+    WalEntryType entry_type = WalEntryType::kFull;
+    std::shared_ptr<Key> key;
+    std::shared_ptr<Record> value;  // nullptr for deletes
+    uint64_t timestamp = 0;
+    uint64_t batch_id = 0;  // For batch operations
+
+    // For multi-part entries
+    size_t part_index = 0;
+    size_t total_parts = 1;
+
+    // Checksum for data integrity
+    uint32_t checksum = 0;
+
+    WalEntry() = default;
+    WalEntry(uint64_t seq, uint64_t ts, WalEntryType type,
+             std::shared_ptr<Key> k, std::shared_ptr<Record> v, uint64_t bid = 0)
+        : sequence_number(seq), timestamp(ts), entry_type(type),
+          key(std::move(k)), value(std::move(v)), batch_id(bid) {}
+    WalEntry(uint64_t seq, uint64_t txn_id, WalEntryType type,
+             std::shared_ptr<Key> k, std::shared_ptr<Record> v,
+             uint64_t ts = 0)
+        : sequence_number(seq), transaction_id(txn_id), entry_type(type),
+          key(std::move(k)), value(std::move(v)), timestamp(ts) {}
 };
 
 // WAL configuration options
@@ -54,28 +85,6 @@ struct WalOptions {
 
     // Checksum verification
     bool enable_checksum = true;
-};
-
-// WAL entry containing the actual log data
-struct WalEntry {
-    uint64_t sequence_number = 0;
-    uint64_t transaction_id = 0;
-    WalEntryType entry_type = WalEntryType::kFull;
-    std::shared_ptr<Key> key;
-    std::shared_ptr<Record> value;  // nullptr for deletes
-    uint64_t timestamp = 0;
-
-    // For multi-part entries
-    size_t part_index = 0;
-    size_t total_parts = 1;
-
-    // Checksum for data integrity
-    uint32_t checksum = 0;
-
-    WalEntry() = default;
-    WalEntry(uint64_t seq, uint64_t txn_id, WalEntryType type,
-             std::shared_ptr<Key> k, std::shared_ptr<Record> v,
-             uint64_t ts = 0);
 };
 
 // WAL file interface for managing individual WAL files

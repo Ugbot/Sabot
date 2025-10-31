@@ -17,9 +17,19 @@ namespace marble {
  */
 class MVCCManager {
 public:
-    MVCCManager() : oracle_(), next_txn_id_(1) {
+    MVCCManager()
+        : oracle_()
+        , next_txn_id_(1)
+        , lsm_tree_(nullptr)
+        , wal_manager_(nullptr) {
         // Initialize timestamp oracle
         oracle_.Set(Timestamp(1000));  // Start at 1000 to leave room for reserved timestamps
+    }
+
+    // Initialize with database components
+    void Initialize(LSMTree* lsm_tree, WalManager* wal_manager) {
+        lsm_tree_ = lsm_tree;
+        wal_manager_ = wal_manager;
     }
 
     /**
@@ -152,11 +162,45 @@ public:
                 }
             }
 
-            // No conflicts - commit all writes
+            // No conflicts - commit all writes to database
             for (const auto& entry : ctx.write_buffer.entries()) {
                 const auto& key_str = entry.first;
                 const auto& record = entry.second;
 
+                // Set MVCC timestamps on the record
+                if (record) {
+                    record->SetMVCCInfo(ctx.start_time.value(), commit_ts.value());
+                }
+
+                // Write to WAL for durability
+                if (wal_manager_) {
+                    // Create WAL entry for this write
+                    WalEntry wal_entry;
+                    wal_entry.sequence_number = commit_ts.value();
+                    wal_entry.timestamp = commit_ts.value();
+                    wal_entry.entry_type = record ? WalEntryType::kPut : WalEntryType::kDelete;
+
+                    // TODO: Set key and value in WAL entry
+                    // wal_entry.key = ...;
+                    // wal_entry.value = record;
+
+                    // wal_manager_->WriteEntry(wal_entry);
+                }
+
+                // Write to LSM tree for persistence
+                if (lsm_tree_ && record) {
+                    // For now, convert key string to uint64_t (simplified)
+                    // In a full implementation, this would handle proper Key types
+                    try {
+                        uint64_t key_uint = std::stoull(key_str);
+                        std::string value_str = "MVCC_RECORD";  // Placeholder
+                        lsm_tree_->Put(key_uint, value_str);
+                    } catch (const std::exception&) {
+                        // Skip invalid keys for now
+                    }
+                }
+
+                // Store version in memory for MVCC
                 VersionInfo version;
                 version.commit_ts = commit_ts;
                 version.record = record;
@@ -226,7 +270,7 @@ public:
      * @param record Output record
      * @return Status OK if found, NotFound if no visible version
      */
-    Status GetForSnapshot(const Key& key, const Snapshot& snapshot, std::shared_ptr<Record>* record) {
+    Status GetForSnapshot(const Key& key, uint64_t snapshot_ts, std::shared_ptr<Record>* record) {
         std::lock_guard<std::mutex> lock(mutex_);
 
         std::string key_str = key.ToString();
@@ -240,7 +284,8 @@ public:
 
         // Find first version visible to snapshot (versions sorted newest first)
         for (const auto& version : versions) {
-            if (snapshot.IsVisible(version.commit_ts)) {
+            // Version is visible if it was committed before or at the snapshot timestamp
+            if (version.commit_ts <= snapshot_ts) {
                 if (version.record == nullptr) {
                     // Tombstone - key was deleted
                     return Status::NotFound("Key deleted: " + key_str);
@@ -397,6 +442,10 @@ private:
 
     TimestampOracle oracle_;
     std::atomic<uint64_t> next_txn_id_;
+
+    // Database components
+    LSMTree* lsm_tree_;
+    WalManager* wal_manager_;
 
     // Active transactions: txn_id -> snapshot_ts
     std::unordered_map<uint64_t, Timestamp> active_transactions_;

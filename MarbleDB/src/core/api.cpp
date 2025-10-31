@@ -14,6 +14,8 @@
 #include "marble/status.h"
 #include "marble/ttl.h"
 #include "marble/lsm_storage.h"
+#include "marble/mvcc.h"
+#include "marble/wal.h"
 #include <nlohmann/json.hpp>
 #include <arrow/api.h>
 #include <arrow/ipc/api.h>
@@ -360,7 +362,8 @@ private:
 class SimpleRecord : public Record {
 public:
     SimpleRecord(std::shared_ptr<Key> key, std::shared_ptr<arrow::RecordBatch> batch, int64_t row_index)
-        : key_(std::move(key)), batch_(std::move(batch)), row_index_(row_index) {}
+        : key_(std::move(key)), batch_(std::move(batch)), row_index_(row_index),
+          begin_ts_(0), commit_ts_(0) {}
 
     std::shared_ptr<Key> GetKey() const override {
         return key_;
@@ -379,10 +382,32 @@ public:
         return std::make_unique<SimpleRecordRef>(key_, batch_, row_index_);
     }
 
+    // MVCC versioning support
+    void SetMVCCInfo(uint64_t begin_ts, uint64_t commit_ts) override {
+        begin_ts_ = begin_ts;
+        commit_ts_ = commit_ts;
+    }
+
+    uint64_t GetBeginTimestamp() const override {
+        return begin_ts_;
+    }
+
+    uint64_t GetCommitTimestamp() const override {
+        return commit_ts_;
+    }
+
+    bool IsVisible(uint64_t snapshot_ts) const override {
+        // Record is visible if it was committed before the snapshot timestamp
+        // and began before or at the snapshot timestamp
+        return commit_ts_ > 0 && commit_ts_ <= snapshot_ts && begin_ts_ <= snapshot_ts;
+    }
+
 private:
     std::shared_ptr<Key> key_;
     std::shared_ptr<arrow::RecordBatch> batch_;
     int64_t row_index_;
+    uint64_t begin_ts_;  // Transaction begin timestamp
+    uint64_t commit_ts_; // Transaction commit timestamp
 };
 
 // Range Iterator implementation with bloom filters and sparse indexes
@@ -673,6 +698,32 @@ public:
         if (!status.ok()) {
             throw std::runtime_error("Failed to initialize LSM tree: " + status.ToString());
         }
+
+        // Initialize WAL manager
+        wal_manager_ = std::make_unique<WalManagerImpl>();
+        WalOptions wal_options;
+        wal_options.wal_path = path + "/wal";
+        wal_options.max_file_size = 64 * 1024 * 1024; // 64MB
+        wal_options.sync_mode = WalOptions::SyncMode::kAsync;
+
+        status = wal_manager_->Open(wal_options);
+        if (!status.ok()) {
+            throw std::runtime_error("Failed to initialize WAL manager: " + status.ToString());
+        }
+
+        // Initialize MVCC manager
+        initializeMVCC();
+        mvcc_manager_ = global_mvcc_manager;
+
+        // Connect MVCC manager to database components
+        if (mvcc_manager_) {
+            mvcc_manager_->Initialize(lsm_tree_.get(), wal_manager_.get());
+        }
+    }
+
+    ~SimpleMarbleDB() {
+        // Cleanup MVCC on shutdown
+        shutdownMVCC();
     }
 
     // Column Family management
@@ -685,8 +736,75 @@ public:
         std::shared_ptr<SkippingIndex> skipping_index;
         std::shared_ptr<BloomFilter> bloom_filter;
 
+        // Secondary index: maps row keys to (batch_id, row_offset) pairs
+        // This enables individual row lookups via Get/Put/Delete operations
+        struct RowLocation {
+            uint64_t batch_id;
+            uint32_t row_offset;
+            RowLocation() : batch_id(0), row_offset(0) {}
+            RowLocation(uint64_t b, uint32_t r) : batch_id(b), row_offset(r) {}
+        };
+        std::unordered_map<uint64_t, RowLocation> row_index;  // key_hash -> (batch_id, row_offset)
+
+        // Buffering for Put operations (flush when full)
+        std::vector<std::shared_ptr<Record>> put_buffer;
+        static constexpr size_t PUT_BATCH_SIZE = 1024;  // Flush every 1024 records
+
         ColumnFamilyInfo(std::string n, std::shared_ptr<arrow::Schema> s, uint32_t i)
             : name(std::move(n)), schema(std::move(s)), id(i) {}
+
+        // Flush buffered records to LSM tree and update secondary index
+        Status FlushPutBuffer(SimpleMarbleDB* db) {
+            if (put_buffer.empty()) return Status::OK();
+
+            // Convert buffered records to RecordBatch
+            std::vector<std::shared_ptr<arrow::RecordBatch>> batches;
+            for (const auto& record : put_buffer) {
+                auto batch_result = record->ToRecordBatch();
+                if (!batch_result.ok()) {
+                    return Status::InternalError("Failed to convert record to batch: " +
+                                               batch_result.status().ToString());
+                }
+                batches.push_back(batch_result.ValueOrDie());
+            }
+
+            // Combine into single batch
+            auto combined_result = arrow::Table::FromRecordBatches(schema, batches);
+            if (!combined_result.ok()) {
+                return Status::InternalError("Failed to combine batches: " +
+                                           combined_result.status().ToString());
+            }
+
+            auto table = combined_result.ValueOrDie();
+            auto batch = arrow::compute::ToRecordBatch(table);
+            if (!batch.ok()) {
+                return Status::InternalError("Failed to create record batch: " +
+                                           batch.status().ToString());
+            }
+
+            // Assign batch ID and store in LSM
+            uint64_t batch_id = next_batch_id++;
+            std::string serialized_batch;
+            auto serialize_status = db->SerializeArrowBatch(batch.ValueOrDie(), &serialized_batch);
+            if (!serialize_status.ok()) return serialize_status;
+
+            uint64_t batch_key = db->EncodeBatchKey(id, batch_id);
+            auto put_status = db->lsm_tree_->Put(batch_key, serialized_batch);
+            if (!put_status.ok()) return put_status;
+
+            // Update secondary index for each record
+            for (size_t i = 0; i < put_buffer.size(); ++i) {
+                const auto& record = put_buffer[i];
+                auto key = record->GetKey();
+                // Use the key's built-in hash function
+                size_t key_hash = key->Hash();
+                row_index[key_hash] = RowLocation{batch_id, static_cast<uint32_t>(i)};
+            }
+
+            // Clear buffer
+            put_buffer.clear();
+            return Status::OK();
+        }
 
         // Build indexes from current data
         Status BuildIndexes() {
@@ -750,15 +868,113 @@ public:
 
     // Basic operations
     Status Put(const WriteOptions& options, std::shared_ptr<Record> record) override {
-        return Status::NotImplemented("Put not implemented");
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // For now, assume default column family (table_name = "default")
+        // TODO: Add column family parameter support
+        auto it = column_families_.find("default");
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Default column family does not exist. Create it first.");
+        }
+
+        auto* cf_info = it->second.get();
+
+        // Validate record schema matches column family
+        auto record_schema = record->GetArrowSchema();
+        if (!record_schema->Equals(cf_info->schema)) {
+            return Status::InvalidArgument("Record schema does not match column family schema");
+        }
+
+        // Add to buffer
+        cf_info->put_buffer.push_back(record);
+
+        // Flush if buffer is full
+        if (cf_info->put_buffer.size() >= cf_info->PUT_BATCH_SIZE) {
+            return cf_info->FlushPutBuffer(this);
+        }
+
+        return Status::OK();
     }
 
     Status Get(const ReadOptions& options, const Key& key, std::shared_ptr<Record>* record) override {
-        return Status::NotImplemented("Get not implemented");
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // For now, assume default column family
+        auto it = column_families_.find("default");
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Default column family does not exist");
+        }
+
+        auto* cf_info = it->second.get();
+
+        // Look up key in secondary index
+        size_t key_hash = key.Hash();
+        auto index_it = cf_info->row_index.find(key_hash);
+        if (index_it == cf_info->row_index.end()) {
+            return Status::NotFound("Key not found");
+        }
+
+        const auto& location = index_it->second;
+
+        // Read the batch from LSM tree
+        uint64_t batch_key = EncodeBatchKey(cf_info->id, location.batch_id);
+        std::string serialized_batch;
+        auto get_status = lsm_tree_->Get(batch_key, &serialized_batch);
+        if (!get_status.ok()) {
+            return get_status;
+        }
+
+        // Deserialize the batch
+        std::shared_ptr<arrow::RecordBatch> batch;
+        auto deserialize_status = DeserializeArrowBatch(serialized_batch, cf_info->schema, &batch);
+        if (!deserialize_status.ok()) {
+            return deserialize_status;
+        }
+
+        // Extract the specific row
+        if (location.row_offset >= static_cast<uint32_t>(batch->num_rows())) {
+            return Status::InternalError("Invalid row offset in secondary index");
+        }
+
+        // Create a Record from the row
+        // Use SimpleRecord which wraps a RecordBatch row
+        *record = std::make_shared<SimpleRecord>(std::make_shared<Int64Key>(key_hash), batch, location.row_offset);
+
+        return Status::OK();
     }
 
     Status Delete(const WriteOptions& options, const Key& key) override {
-        return Status::NotImplemented("Delete not implemented");
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // For now, assume default column family
+        auto it = column_families_.find("default");
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Default column family does not exist");
+        }
+
+        auto* cf_info = it->second.get();
+
+        // Look up key in secondary index
+        size_t key_hash = key.Hash();
+        auto index_it = cf_info->row_index.find(key_hash);
+        if (index_it == cf_info->row_index.end()) {
+            return Status::NotFound("Key not found");
+        }
+
+        // For now, implement delete as a tombstone
+        // TODO: Implement proper deletion with compaction
+        // Remove from secondary index (tombstone)
+        cf_info->row_index.erase(index_it);
+
+        // Write tombstone to LSM tree
+        uint64_t row_key = EncodeRowKey(cf_info->id, key_hash);
+        std::string tombstone_value = "__TOMBSTONE__";
+        auto put_status = lsm_tree_->Put(row_key, tombstone_value);
+        if (!put_status.ok()) {
+            return put_status;
+        }
+
+        return Status::OK();
     }
     
     // Merge operations
@@ -910,7 +1126,58 @@ public:
         // Create query result
         return TableQueryResult::Create(combined_table, result);
     }
-    
+
+    /**
+     * @brief Create Arrow-optimized query builder
+     */
+    std::unique_ptr<QueryBuilder> Query(const std::string& table_name) {
+        return std::unique_ptr<QueryBuilder>(new QueryBuilder(this, table_name));
+    }
+
+    /**
+     * @brief Helper for QueryExecutor to read batches from LSM
+     * Used by QueryBuilder::Execute()
+     */
+    Status ReadBatchesFromLSM(
+        const std::string& table_name,
+        uint64_t start_key,
+        uint64_t end_key,
+        std::vector<std::shared_ptr<arrow::RecordBatch>>* batches
+    ) {
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        auto it = column_families_.find(table_name);
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Table not found: " + table_name);
+        }
+
+        auto* cf_info = it->second.get();
+
+        // Encode key range for this table's batches
+        uint64_t lsm_start = EncodeBatchKey(cf_info->id, start_key);
+        uint64_t lsm_end = EncodeBatchKey(cf_info->id, end_key);
+
+        // Scan LSM tree
+        std::vector<std::pair<uint64_t, std::string>> lsm_results;
+        auto scan_status = lsm_tree_->Scan(lsm_start, lsm_end, &lsm_results);
+        if (!scan_status.ok()) return scan_status;
+
+        // Deserialize batches
+        for (const auto& [key, serialized] : lsm_results) {
+            std::shared_ptr<arrow::RecordBatch> batch;
+            auto status = DeserializeArrowBatch(
+                serialized.data(),
+                serialized.size(),
+                &batch
+            );
+            if (!status.ok()) return status;
+
+            batches->push_back(batch);
+        }
+
+        return Status::OK();
+    }
+
     // Column Family operations
     Status CreateColumnFamily(const ColumnFamilyDescriptor& descriptor, ColumnFamilyHandle** handle) override {
         std::lock_guard<std::mutex> lock(cf_mutex_);
@@ -1046,7 +1313,18 @@ public:
 
     // Maintenance operations
     Status Flush() override {
-        return Status::NotImplemented("Flush not implemented");
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // Flush all column families' put buffers
+        for (const auto& cf_pair : column_families_) {
+            auto* cf_info = cf_pair.second.get();
+            auto status = cf_info->FlushPutBuffer(this);
+            if (!status.ok()) {
+                return status;
+            }
+        }
+
+        return Status::OK();
     }
 
     Status CompactRange(const KeyRange& range) override {
@@ -1120,8 +1398,27 @@ public:
         return "SimpleMarbleDB v1.0 - In-memory implementation for testing";
     }
 
+    // Transaction support (MVCC with snapshot isolation)
+    Status BeginTransaction(const TransactionOptions& options,
+                          DBTransaction** txn) override {
+        if (!mvcc_manager_) {
+            return Status::NotImplemented("MVCC not initialized");
+        }
+
+        return CreateMVCCTransaction(mvcc_manager_, lsm_tree_.get(),
+                                   wal_manager_.get(), options, txn);
+    }
+
+    Status BeginTransaction(DBTransaction** txn) override {
+        TransactionOptions default_options;
+        return BeginTransaction(default_options, txn);
+    }
+
 private:
     std::string path_;
+    std::unique_ptr<StandardLSMTree> lsm_tree_;
+    std::unique_ptr<WalManagerImpl> wal_manager_;
+    MVCCManager* mvcc_manager_;
 };
 
 } // anonymous namespace

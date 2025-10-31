@@ -167,7 +167,8 @@ file(GLOB_RECURSE MARBLE_SOURCES
 
 # Remove files that should not be included
 list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/flight_service.cpp")
-list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/async.cpp")
+# async.cpp is now enabled
+# list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/async.cpp")
 
 # Remove Raft sources if not enabled
 if(NOT MARBLE_ENABLE_RAFT)
@@ -212,6 +213,7 @@ set(MARBLE_SOURCES
     src/core/execution_engine.cpp
     src/core/block_optimizations.cpp
     src/core/hot_key_cache.cpp
+    src/query/query.cpp
 )
 
 # Add Raft sources if enabled

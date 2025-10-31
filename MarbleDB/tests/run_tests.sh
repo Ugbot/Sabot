@@ -103,7 +103,10 @@ run_unit_tests() {
     local failed_tests=0
 
     # Run each unit test
+    run_test_with_timeout "Status Tests" "./test_status" || ((failed_tests++))
     run_test_with_timeout "Record System Tests" "./test_record_system" || ((failed_tests++))
+    run_test_with_timeout "Record Operations Tests" "./test_record_operations" || ((failed_tests++))
+    run_test_with_timeout "LSM Storage Tests" "./test_lsm_storage" || ((failed_tests++))
     run_test_with_timeout "Pushdown Tests" "./test_pushdown" || ((failed_tests++))
 
     cd ..
@@ -126,6 +129,11 @@ run_integration_tests() {
 
     # Run each integration test
     run_test_with_timeout "Query Execution Tests" "./test_query_execution" || ((failed_tests++))
+    run_test_with_timeout "MarbleDB Core Tests" "./test_marble_core" || ((failed_tests++))
+    run_test_with_timeout "Arctic Bitemporal Tests" "./test_arctic_bitemporal" || ((failed_tests++))
+    run_test_with_timeout "MVCC Comprehensive Tests" "./test_mvcc_comprehensive" || ((failed_tests++))
+    run_test_with_timeout "Database Tests" "./db_test" || ((failed_tests++))
+    run_test_with_timeout "Compaction Tests" "./db_compaction_test" || ((failed_tests++))
 
     cd ..
 
@@ -133,6 +141,26 @@ run_integration_tests() {
         print_status "All integration tests passed!"
     else
         print_error "$failed_tests integration test(s) failed"
+        return 1
+    fi
+}
+
+run_stress_tests() {
+    print_header "Running Stress Tests"
+
+    cd "$BUILD_DIR"
+
+    local failed_tests=0
+
+    # Run stress tests (these may take longer)
+    run_test_with_timeout "Database Stress Tests" "./db_stress_test" 300 || ((failed_tests++))
+
+    cd ..
+
+    if [[ $failed_tests -eq 0 ]]; then
+        print_status "All stress tests passed!"
+    else
+        print_error "$failed_tests stress test(s) failed"
         return 1
     fi
 }
@@ -158,27 +186,21 @@ run_performance_tests() {
     fi
 }
 
-# Run legacy tests
-run_legacy_tests() {
-    print_header "Running Legacy Tests"
+# Run benchmarks (if available)
+run_benchmarks() {
+    print_header "Running Performance Benchmarks"
 
     cd "$BUILD_DIR"
 
-    local failed_tests=0
-
-    # Run legacy tests
-    run_test_with_timeout "Status Tests" "./test_status" || ((failed_tests++))
-    run_test_with_timeout "Marble Core Tests" "./test_marble_core" || ((failed_tests++))
-    run_test_with_timeout "Arctic Bitemporal Tests" "./test_arctic_bitemporal" || ((failed_tests++))
+    if [[ -f "db_performance_benchmark" ]]; then
+        print_status "Running database performance benchmarks..."
+        ./db_performance_benchmark --benchmark_min_time=0.1 --benchmark_counters_tabular=true
+        print_status "Benchmarks completed"
+    else
+        print_warning "Performance benchmarks not available (benchmark library not found)"
+    fi
 
     cd ..
-
-    if [[ $failed_tests -eq 0 ]]; then
-        print_status "All legacy tests passed!"
-    else
-        print_error "$failed_tests legacy test(s) failed"
-        return 1
-    fi
 }
 
 # Run all tests
@@ -191,9 +213,11 @@ run_all_tests() {
     echo
     run_integration_tests || ((total_failed++))
     echo
+    run_stress_tests || ((total_failed++))
+    echo
     run_performance_tests || ((total_failed++))
     echo
-    run_legacy_tests || ((total_failed++))
+    run_benchmarks  # Benchmarks don't fail, just informative
 
     echo
     if [[ $total_failed -eq 0 ]]; then
@@ -274,9 +298,10 @@ show_usage() {
     echo "  build         Build all tests"
     echo "  unit          Run unit tests only"
     echo "  integration   Run integration tests only"
+    echo "  stress        Run stress tests only"
     echo "  performance   Run performance tests only"
-    echo "  legacy        Run legacy tests only"
-    echo "  all           Run all tests (default)"
+    echo "  benchmark     Run performance benchmarks only"
+    echo "  all           Run all tests and benchmarks (default)"
     echo "  ctest         Run tests using CTest"
     echo "  coverage      Generate code coverage report"
     echo "  clean         Clean build directory"
@@ -285,7 +310,8 @@ show_usage() {
     echo "Examples:"
     echo "  $0 build          # Build tests"
     echo "  $0 unit           # Run unit tests"
-    echo "  $0 all            # Run all tests"
+    echo "  $0 benchmark      # Run performance benchmarks"
+    echo "  $0 all            # Run all tests and benchmarks"
     echo "  $0 ctest          # Run with CTest"
     echo "  $0 coverage       # Generate coverage report"
     echo
@@ -310,13 +336,17 @@ main() {
             check_build
             run_integration_tests
             ;;
+        "stress")
+            check_build
+            run_stress_tests
+            ;;
         "performance")
             check_build
             run_performance_tests
             ;;
-        "legacy")
+        "benchmark")
             check_build
-            run_legacy_tests
+            run_benchmarks
             ;;
         "all")
             check_build

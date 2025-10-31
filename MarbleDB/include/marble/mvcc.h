@@ -12,6 +12,7 @@ Provides snapshot isolation for ACID transactions without blocking readers.
 #include <marble/record_ref.h>
 #include <marble/lsm_tree.h>  // For MemTable (full definition needed)
 #include <marble/wal.h>        // For WAL (full definition needed)
+#include <marble/api.h>        // For QueryResult, ColumnPredicate, TransactionOptions, DBTransaction
 #include <memory>
 #include <atomic>
 #include <unordered_map>
@@ -93,20 +94,22 @@ private:
 
 /**
  * @brief Transaction write buffer
- * 
+ *
  * Stores uncommitted writes in transaction-local buffer.
  * Provides read-your-writes semantics.
  */
 class WriteBuffer {
 public:
-    void Put(std::shared_ptr<Key> key, std::shared_ptr<Record> record) {
+    void Put(std::shared_ptr<Record> record) {
+        if (!record) return;
+        const auto& key = record->GetKey();
         buffer_[key->ToString()] = record;
     }
-    
+
     void Delete(std::shared_ptr<Key> key) {
         buffer_[key->ToString()] = nullptr;  // Tombstone
     }
-    
+
     /**
      * @brief Get from buffer (returns true if found)
      */
@@ -115,18 +118,18 @@ public:
         if (it == buffer_.end()) {
             return false;  // Not in buffer
         }
-        
+
         *record = it->second;  // May be nullptr (tombstone)
         return true;
     }
-    
+
     /**
      * @brief Get all buffered writes for commit
      */
     const std::unordered_map<std::string, std::shared_ptr<Record>>& entries() const {
         return buffer_;
     }
-    
+
     size_t size() const { return buffer_.size(); }
     bool empty() const { return buffer_.empty(); }
 
@@ -238,67 +241,27 @@ public:
      * @param wal Write-ahead log
      * @return Status OK if committed, Conflict if conflicts detected
      */
+    // This method is deprecated - use the MVCCManager version instead
     Status CommitTransaction(
         const WriteBuffer& buffer,
         const Snapshot& snapshot,
         MemTable* memtable,
         WalManager* wal) {
+        // Forward to MVCCManager implementation
+        MVCCManager::TransactionContext ctx;
+        ctx.snapshot = snapshot;
+        ctx.write_buffer = buffer;
+        ctx.read_only = false;
+        ctx.start_time = snapshot.timestamp();
 
-        if (buffer.empty()) {
-            return Status::OK();  // Nothing to commit
-        }
-
-        // Get commit timestamp
-        Timestamp commit_ts = oracle_->Next();
-
-        // Collect keys being written
-        std::vector<std::shared_ptr<Key>> keys;
-        for (const auto& entry : buffer.entries()) {
-            // Parse key from string
-            // TODO: Proper key deserialization
-        }
-
-        // Check for write conflicts
-        auto conflict_key = ConflictDetector::DetectConflicts(
-            keys, snapshot.timestamp(), commit_ts, memtable
-        );
-
-        if (conflict_key) {
-            return Status::WriteConflict("Write conflict on key: " + conflict_key->ToString());
-        }
-
-        // Write batch to WAL
-        if (wal) {
-            for (const auto& entry : buffer.entries()) {
-                WalEntry wal_entry;
-                wal_entry.sequence_number = commit_ts.value();
-                // TODO: Populate wal_entry from buffer
-
-                auto status = wal->WriteEntry(wal_entry);
-                if (!status.ok()) {
-                    return status;
-                }
-            }
-
-            if (wal->Sync().ok()) {
-                // WAL synced
-            }
-        }
-
-        // Apply writes to memtable
-        for (const auto& entry : buffer.entries()) {
-            // TODO: Apply with commit_ts
-        }
-
-        return Status::OK();
+        // TODO: Pass LSM tree and WAL references to MVCCManager
+        return Status::NotImplemented("Use MVCCManager::CommitTransaction instead");
     }
 
 private:
     TimestampOracle* oracle_;
 };
 
-// Forward declaration
-class MVCCManager;
 struct TableCapabilities;
 
 // Global MVCC manager instance

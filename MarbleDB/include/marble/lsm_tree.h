@@ -261,9 +261,17 @@ public:
     // Read operations
     virtual Status Get(const Key& key, std::shared_ptr<Record>* record) const = 0;
 
+    // MVCC-aware read operations
+    virtual Status GetForSnapshot(const Key& key, uint64_t snapshot_ts,
+                                  std::shared_ptr<Record>* record) const = 0;
+
     // Range operations
     virtual Status Scan(const Key& start, const Key& end,
                        std::vector<std::shared_ptr<Record>>* records) const = 0;
+
+    // MVCC-aware range operations
+    virtual Status ScanForSnapshot(const Key& start, const Key& end, uint64_t snapshot_ts,
+                                   std::vector<std::shared_ptr<Record>>* records) const = 0;
 
     // Flush current memtable to disk
     virtual Status Flush() = 0;

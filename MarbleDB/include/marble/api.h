@@ -21,8 +21,98 @@ namespace marble {
 
 class MarbleDB;
 class Query;
-class QueryResult;
-struct QueryOptions;
+class QueryResult {
+public:
+    virtual ~QueryResult() = default;
+
+    // Get the result as a table
+    virtual arrow::Result<std::shared_ptr<arrow::Table>> GetTable() = 0;
+
+    // Check if there are more results
+    virtual bool HasNext() const = 0;
+
+    // Get next batch
+    virtual Status Next(std::shared_ptr<arrow::RecordBatch>* batch) = 0;
+
+    // Get schema
+    virtual std::shared_ptr<arrow::Schema> schema() const = 0;
+
+    // Get total row count
+    virtual int64_t num_rows() const = 0;
+};
+struct QueryOptions {
+    bool optimize = true;
+    size_t batch_size = 1000;
+    std::string query_plan;
+};
+
+// Forward declarations for WAL and predicates
+class WalManager;
+struct ColumnPredicate {
+    std::string column_name;
+    enum class PredicateType {
+        kEqual,
+        kGreaterThan,
+        kLessThan,
+        kGreaterThanOrEqual,
+        kLessThanOrEqual,
+        kNotEqual,
+        kLike,
+        kIn
+    } predicate_type;
+    std::shared_ptr<arrow::Scalar> value;
+};
+
+class TableQueryResult : public QueryResult {
+public:
+    explicit TableQueryResult(std::shared_ptr<arrow::Table> table)
+        : table_(std::move(table)), current_batch_(0) {}
+
+    static Status Create(std::shared_ptr<arrow::Table> table,
+                        std::unique_ptr<QueryResult>* result) {
+        *result = std::make_unique<TableQueryResult>(std::move(table));
+        return Status::OK();
+    }
+
+    arrow::Result<std::shared_ptr<arrow::Table>> GetTable() override {
+        return table_;
+    }
+
+    bool HasNext() const override {
+        return current_batch_ < static_cast<size_t>(table_->num_columns() > 0 ? 1 : 0);
+    }
+
+    Status Next(std::shared_ptr<arrow::RecordBatch>* batch) override {
+        if (!HasNext()) {
+            return Status::OK(); // End of results
+        }
+
+        // Convert table to record batch
+        ARROW_ASSIGN_OR_RAISE(auto batches, table_->ToRecordBatches());
+        if (batches.empty()) {
+            return Status::InternalError("No batches from table");
+        }
+
+        if (current_batch_ < batches.size()) {
+            *batch = batches[current_batch_++];
+            return Status::OK();
+        }
+
+        return Status::OK(); // End of results
+    }
+
+    std::shared_ptr<arrow::Schema> schema() const override {
+        return table_->schema();
+    }
+
+    int64_t num_rows() const override {
+        return table_->num_rows();
+    }
+
+private:
+    std::shared_ptr<arrow::Table> table_;
+    mutable size_t current_batch_;
+};
 
 //==============================================================================
 // Database Management API

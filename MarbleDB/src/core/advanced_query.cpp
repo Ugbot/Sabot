@@ -704,6 +704,42 @@ public:
         return Status::OK();
     }
 
+    // Missing pure virtual method implementations
+    Status ExecuteWindowFunction(const std::string& table_name,
+                               const std::vector<std::string>& select_columns,
+                               const WindowSpec& window_spec,
+                               WindowFunction window_func,
+                               const std::string& window_func_column,
+                               std::unique_ptr<QueryResult>* result) override {
+        return Status::NotImplemented("Window functions not implemented");
+    }
+
+    Status ExecuteTimeAggregation(const std::string& table_name,
+                                const TimeSeriesSpec& time_spec,
+                                std::unique_ptr<QueryResult>* result) override {
+        return Status::NotImplemented("Time aggregation not implemented");
+    }
+
+    Status ExecuteJoin(const std::string& left_table,
+                     const std::string& right_table,
+                     const std::vector<JoinCondition>& join_conditions,
+                     JoinType join_type,
+                     const std::vector<std::string>& select_columns,
+                     std::unique_ptr<QueryResult>* result) override {
+        return Status::NotImplemented("Join operations not implemented");
+    }
+
+    Status ExecuteSubquery(const std::string& outer_query,
+                         const std::string& subquery,
+                         std::unique_ptr<QueryResult>* result) override {
+        return Status::NotImplemented("Subqueries not implemented");
+    }
+
+    Status ExecuteWithSymbols(const std::string& query_with_symbols,
+                            std::unique_ptr<QueryResult>* result) override {
+        return Status::NotImplemented("Symbol execution not implemented");
+    }
+
 private:
     Database* database_;
     std::unique_ptr<TimeSeriesAnalytics> time_series_analytics_;
