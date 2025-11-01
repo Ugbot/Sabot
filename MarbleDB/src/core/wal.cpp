@@ -15,8 +15,13 @@
 
 namespace marble {
 
+// Factory function to create WAL manager
+std::unique_ptr<WalManager> CreateWalManager() {
+    return std::make_unique<WalManagerImpl>();
+}
+
 // WalEntry implementation
-WalEntry::WalEntry(uint64_t seq, uint64_t txn_id, WalEntryType type,
+WalEntry::WalEntry(uint64_t seq, WalEntryType type, uint64_t txn_id,
                    std::shared_ptr<Key> k, std::shared_ptr<Record> v,
                    uint64_t ts)
     : sequence_number(seq), transaction_id(txn_id), entry_type(type),

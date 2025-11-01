@@ -182,37 +182,6 @@ Status CreateSSTable(const std::string& filename,
                     const DBOptions& options,
                     std::unique_ptr<LSMSSTable>* table);
 
-// Simple Bloom Filter implementation for ClickHouse-style indexing
-class BloomFilter {
-public:
-    BloomFilter(size_t bits_per_key, size_t num_keys);
-    ~BloomFilter();
-
-    // Add a key to the filter
-    void Add(const Key& key);
-
-    // Check if a key might be in the filter
-    bool MayContain(const Key& key) const;
-
-    // Get the size of the filter in bytes
-    size_t Size() const { return bits_.size() / 8; }
-
-    // Serialize the filter
-    Status Serialize(std::string* data) const;
-
-    // Deserialize the filter
-    static Status Deserialize(const std::string& data, std::unique_ptr<BloomFilter>* filter);
-
-private:
-    std::vector<uint8_t> bits_;
-    size_t num_hashes_;
-
-    // Hash functions for Bloom filter
-    uint64_t Hash1(const std::string& key) const;
-    uint64_t Hash2(const std::string& key) const;
-    size_t NthHash(uint64_t hash1, uint64_t hash2, size_t n) const;
-};
-
 // LSM Tree configuration
 struct LSMTreeOptions {
     // MemTable options
@@ -239,62 +208,6 @@ struct LSMTreeOptions {
     bool enable_wal = true;
 };
 
-// LSM Tree main interface
-class LSMTree {
-public:
-    virtual ~LSMTree() = default;
-
-    // Create a new LSM tree
-    static Status Create(const LSMTreeOptions& options,
-                        std::shared_ptr<Schema> schema,
-                        std::unique_ptr<LSMTree>* tree);
-
-    // Open an existing LSM tree
-    static Status Open(const LSMTreeOptions& options,
-                      std::shared_ptr<Schema> schema,
-                      std::unique_ptr<LSMTree>* tree);
-
-    // Write operations
-    virtual Status Put(std::shared_ptr<Key> key, std::shared_ptr<Record> record) = 0;
-    virtual Status Delete(std::shared_ptr<Key> key) = 0;
-
-    // Read operations
-    virtual Status Get(const Key& key, std::shared_ptr<Record>* record) const = 0;
-
-    // MVCC-aware read operations
-    virtual Status GetForSnapshot(const Key& key, uint64_t snapshot_ts,
-                                  std::shared_ptr<Record>* record) const = 0;
-
-    // Range operations
-    virtual Status Scan(const Key& start, const Key& end,
-                       std::vector<std::shared_ptr<Record>>* records) const = 0;
-
-    // MVCC-aware range operations
-    virtual Status ScanForSnapshot(const Key& start, const Key& end, uint64_t snapshot_ts,
-                                   std::vector<std::shared_ptr<Record>>* records) const = 0;
-
-    // Flush current memtable to disk
-    virtual Status Flush() = 0;
-
-    // Force compaction
-    virtual Status Compact() = 0;
-
-    // Get statistics
-    virtual Status GetStats(std::string* stats) const = 0;
-
-    // Close the LSM tree
-    virtual Status Close() = 0;
-
-    // Iterator for full table scan
-    virtual std::unique_ptr<MemTable::Iterator> NewIterator() = 0;
-
-    // Get compaction manager
-    virtual CompactionManager* GetCompactionManager() = 0;
-
-    // Disable copying
-    LSMTree(const LSMTree&) = delete;
-    LSMTree& operator=(const LSMTree&) = delete;
-};
 
 // Compaction manager interface
 class CompactionManager {

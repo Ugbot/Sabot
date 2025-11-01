@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <arrow/api.h>
+#include <arrow/table.h>
 #include <marble/status.h>
 
 namespace marble {
@@ -87,16 +89,12 @@ public:
             return Status::OK(); // End of results
         }
 
-        // Convert table to record batch
-        ARROW_ASSIGN_OR_RAISE(auto batches, table_->ToRecordBatches());
-        if (batches.empty()) {
-            return Status::InternalError("No batches from table");
+        // Convert table to record batch using TableBatchReader
+        if (!batch_reader_) {
+            batch_reader_ = std::make_unique<arrow::TableBatchReader>(*table_);
         }
 
-        if (current_batch_ < batches.size()) {
-            *batch = batches[current_batch_++];
-            return Status::OK();
-        }
+        return batch_reader_->ReadNext(batch);
 
         return Status::OK(); // End of results
     }
@@ -112,6 +110,7 @@ public:
 private:
     std::shared_ptr<arrow::Table> table_;
     mutable size_t current_batch_;
+    std::unique_ptr<arrow::TableBatchReader> batch_reader_;
 };
 
 //==============================================================================
@@ -436,5 +435,13 @@ Status GetVersion(std::string* version);
  * @return Status indicating success or failure
  */
 Status GetBuildInfo(std::string* build_info);
+
+// Arrow serialization utilities
+Status SerializeArrowBatch(const std::shared_ptr<arrow::RecordBatch>& batch,
+                          std::string* serialized_data);
+Status DeserializeArrowBatch(const void* data, size_t size,
+                           std::shared_ptr<arrow::RecordBatch>* batch);
+Status DeserializeArrowBatch(const std::string& data,
+                           std::shared_ptr<arrow::RecordBatch>* batch);
 
 } // namespace marble

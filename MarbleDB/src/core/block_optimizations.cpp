@@ -15,7 +15,9 @@ void BlockBloomFilterManager::AddKeyToBlock(size_t block_id, const Key& key) {
     auto it = block_blooms_.find(block_id);
     if (it == block_blooms_.end()) {
         // Create new bloom filter for this block
-        auto bloom = std::make_shared<BloomFilter>(bits_per_key_, block_size_);
+        // Estimate expected items based on bits per key
+        size_t expected_items = bits_per_key_ > 0 ? (block_size_ * 8) / bits_per_key_ : 1000;
+        auto bloom = std::make_shared<BloomFilter>(expected_items, 0.01);
         block_blooms_[block_id] = bloom;
         it = block_blooms_.find(block_id);
     }

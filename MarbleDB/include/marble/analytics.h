@@ -27,6 +27,9 @@ limitations under the License.
 
 namespace marble {
 
+// Forward declarations
+class QueryResult;
+
 /**
  * @brief Zone map for a column - stores min/max/null statistics
  */

@@ -63,6 +63,8 @@ set(BASIC_TESTS
     unit/test_record_operations.cpp
     unit/test_lsm_storage.cpp
     unit/test_pushdown.cpp
+    unit/test_framework_validation.cpp
+    unit/test_infrastructure_only.cpp
     integration/test_mvcc_comprehensive.cpp
     integration/db_test.cc
     integration/db_compaction_test.cc

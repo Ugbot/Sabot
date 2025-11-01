@@ -113,6 +113,9 @@ public:
      */
     arrow::Result<std::shared_ptr<arrow::Table>> ExecuteToTable();
 
+    // Public constructor for derived classes
+    QueryBuilder(MarbleDB* db, const std::string& table_name);
+
     // Getters for QueryExecutor
     const std::string& table_name() const { return table_name_; }
     uint64_t start_key() const { return start_key_; }
@@ -124,8 +127,6 @@ public:
 
 private:
     friend class MarbleDB;
-
-    QueryBuilder(MarbleDB* db, const std::string& table_name);
 
     MarbleDB* db_;
     std::string table_name_;

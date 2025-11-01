@@ -167,8 +167,6 @@ file(GLOB_RECURSE MARBLE_SOURCES
 
 # Remove files that should not be included
 list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/flight_service.cpp")
-# async.cpp is now enabled
-# list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/async.cpp")
 
 # Remove Raft sources if not enabled
 if(NOT MARBLE_ENABLE_RAFT)
@@ -180,6 +178,9 @@ endif()
 
 # Remove arrow_flight_transport.cpp (requires Arrow Flight module not available)
 list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/raft/arrow_flight_transport.cpp")
+
+# Remove async.cpp (has compilation issues and is not needed for basic functionality)
+list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/async.cpp")
 
 # Explicitly list source files to ensure they're included
 set(MARBLE_SOURCES

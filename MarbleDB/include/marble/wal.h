@@ -13,6 +13,10 @@ namespace marble {
 
 // Forward declarations
 class TaskScheduler;
+class WalManagerImpl;
+
+// Factory function to create WAL manager
+std::unique_ptr<WalManager> CreateWalManager();
 
 // WAL entry types for handling large records that span multiple log entries
 enum class WalEntryType {
@@ -49,7 +53,7 @@ struct WalEntry {
              std::shared_ptr<Key> k, std::shared_ptr<Record> v, uint64_t bid = 0)
         : sequence_number(seq), timestamp(ts), entry_type(type),
           key(std::move(k)), value(std::move(v)), batch_id(bid) {}
-    WalEntry(uint64_t seq, uint64_t txn_id, WalEntryType type,
+    WalEntry(uint64_t seq, WalEntryType type, uint64_t txn_id,
              std::shared_ptr<Key> k, std::shared_ptr<Record> v,
              uint64_t ts = 0)
         : sequence_number(seq), transaction_id(txn_id), entry_type(type),

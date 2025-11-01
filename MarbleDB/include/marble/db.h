@@ -15,6 +15,8 @@ namespace marble {
 // Forward declarations
 class Stream;
 class ColumnFamilyHandle;
+struct TransactionOptions;
+class DBTransaction;
 
 // Database configuration options
 struct DBOptions {

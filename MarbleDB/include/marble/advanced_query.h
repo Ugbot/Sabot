@@ -11,6 +11,9 @@
 
 namespace marble {
 
+// Forward declarations
+class QueryResult;
+
 // Forward declarations and basic types for query planning
 enum class JoinType {
     kInner,

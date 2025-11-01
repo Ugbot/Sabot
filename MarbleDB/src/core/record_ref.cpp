@@ -214,5 +214,50 @@ std::vector<std::string> ArrowRecordRef::field_names() const {
     return names;
 }
 
+//==============================================================================
+// SimpleRecord Implementation
+//==============================================================================
+
+SimpleRecord::SimpleRecord(std::shared_ptr<Key> key, std::shared_ptr<arrow::RecordBatch> batch, int64_t row_index)
+    : key_(std::move(key)), batch_(std::move(batch)), row_index_(row_index),
+      begin_ts_(0), commit_ts_(0) {}
+
+std::shared_ptr<Key> SimpleRecord::GetKey() const {
+    return key_;
+}
+
+arrow::Result<std::shared_ptr<arrow::RecordBatch>> SimpleRecord::ToRecordBatch() const {
+    // Extract single row as RecordBatch
+    return batch_->Slice(row_index_, 1);
+}
+
+std::shared_ptr<arrow::Schema> SimpleRecord::GetArrowSchema() const {
+    return batch_->schema();
+}
+
+std::unique_ptr<RecordRef> SimpleRecord::AsRecordRef() const {
+    return std::make_unique<SimpleRecordRef>(key_, batch_, row_index_);
+}
+
+// MVCC versioning support
+void SimpleRecord::SetMVCCInfo(uint64_t begin_ts, uint64_t commit_ts) {
+    begin_ts_ = begin_ts;
+    commit_ts_ = commit_ts;
+}
+
+uint64_t SimpleRecord::GetBeginTimestamp() const {
+    return begin_ts_;
+}
+
+uint64_t SimpleRecord::GetCommitTimestamp() const {
+    return commit_ts_;
+}
+
+bool SimpleRecord::IsVisible(uint64_t snapshot_ts) const {
+    // Simple visibility check: record is visible if its commit timestamp
+    // is less than or equal to the snapshot timestamp
+    return commit_ts_ <= snapshot_ts;
+}
+
 } // namespace marble
 

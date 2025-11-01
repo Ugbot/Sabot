@@ -247,15 +247,9 @@ public:
         const Snapshot& snapshot,
         MemTable* memtable,
         WalManager* wal) {
-        // Forward to MVCCManager implementation
-        MVCCManager::TransactionContext ctx;
-        ctx.snapshot = snapshot;
-        ctx.write_buffer = buffer;
-        ctx.read_only = false;
-        ctx.start_time = snapshot.timestamp();
-
-        // TODO: Pass LSM tree and WAL references to MVCCManager
-        return Status::NotImplemented("Use MVCCManager::CommitTransaction instead");
+        // TODO: Implement proper MVCC transaction commit
+        // This requires integration with the MVCCManager
+        return Status::NotImplemented("MVCC transaction commit not yet implemented");
     }
 
 private:
@@ -266,6 +260,13 @@ struct TableCapabilities;
 
 // Global MVCC manager instance
 extern std::unique_ptr<MVCCManager> global_mvcc_manager;
+
+// Transaction creation function
+Status CreateMVCCTransaction(MVCCManager* mvcc_manager,
+                           LSMTree* lsm_tree,
+                           WalManager* wal_manager,
+                           const TransactionOptions& options,
+                           DBTransaction** txn);
 
 // Initialization functions
 void initializeMVCC();

@@ -616,4 +616,34 @@ public:
     virtual void Prev() = 0;
 };
 
+//==============================================================================
+// Simple Record Implementation
+//==============================================================================
+
+/**
+ * @brief Simple concrete Record implementation that wraps a RecordBatch row
+ */
+class SimpleRecord : public Record {
+public:
+    SimpleRecord(std::shared_ptr<Key> key, std::shared_ptr<arrow::RecordBatch> batch, int64_t row_index);
+
+    std::shared_ptr<Key> GetKey() const override;
+    arrow::Result<std::shared_ptr<arrow::RecordBatch>> ToRecordBatch() const override;
+    std::shared_ptr<arrow::Schema> GetArrowSchema() const override;
+    std::unique_ptr<RecordRef> AsRecordRef() const override;
+
+    // MVCC versioning support
+    void SetMVCCInfo(uint64_t begin_ts, uint64_t commit_ts) override;
+    uint64_t GetBeginTimestamp() const override;
+    uint64_t GetCommitTimestamp() const override;
+    bool IsVisible(uint64_t snapshot_ts) const override;
+
+private:
+    std::shared_ptr<Key> key_;
+    std::shared_ptr<arrow::RecordBatch> batch_;
+    int64_t row_index_;
+    uint64_t begin_ts_;
+    uint64_t commit_ts_;
+};
+
 } // namespace marble

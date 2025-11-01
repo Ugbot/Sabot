@@ -16,6 +16,7 @@
 #include "marble/lsm_storage.h"
 #include "marble/mvcc.h"
 #include "marble/wal.h"
+#include "marble/version.h"
 #include <nlohmann/json.hpp>
 #include <arrow/api.h>
 #include <arrow/ipc/api.h>
@@ -30,655 +31,6 @@ namespace marble {
 //==============================================================================
 // Internal Helper Functions
 //==============================================================================
-
-namespace {
-
-// Convert JSON string to Arrow Schema
-Status JsonToArrowSchema(const std::string& schema_json, std::shared_ptr<arrow::Schema>* schema) {
-    try {
-        auto json = nlohmann::json::parse(schema_json);
-        std::vector<std::shared_ptr<arrow::Field>> fields;
-
-        for (const auto& field_json : json["fields"]) {
-            std::string name = field_json["name"];
-            std::string type_str = field_json["type"];
-            bool nullable = field_json.value("nullable", false);
-
-            std::shared_ptr<arrow::DataType> arrow_type;
-            if (type_str == "int64") arrow_type = arrow::int64();
-            else if (type_str == "int32") arrow_type = arrow::int32();
-            else if (type_str == "float64") arrow_type = arrow::float64();
-            else if (type_str == "float32") arrow_type = arrow::float32();
-            else if (type_str == "string" || type_str == "utf8") arrow_type = arrow::utf8();
-            else if (type_str == "bool" || type_str == "boolean") arrow_type = arrow::boolean();
-            else if (type_str == "timestamp") arrow_type = arrow::timestamp(arrow::TimeUnit::MICRO);
-            else return Status::InvalidArgument("Unsupported type: " + type_str);
-
-            fields.push_back(arrow::field(name, arrow_type, nullable));
-        }
-
-        *schema = arrow::schema(fields);
-        return Status::OK();
-    } catch (const std::exception& e) {
-        return Status::InvalidArgument("Invalid JSON schema: " + std::string(e.what()));
-    }
-}
-
-// Convert Arrow Schema to JSON string
-Status ArrowSchemaToJson(const std::shared_ptr<arrow::Schema>& schema, std::string* schema_json) {
-    try {
-        nlohmann::json json_schema;
-        json_schema["fields"] = nlohmann::json::array();
-
-        for (int i = 0; i < schema->num_fields(); ++i) {
-            const auto& field = schema->field(i);
-            nlohmann::json field_json;
-            field_json["name"] = field->name();
-            field_json["nullable"] = field->nullable();
-
-            // Convert Arrow type to string
-            auto type = field->type();
-            if (type->Equals(arrow::int64())) field_json["type"] = "int64";
-            else if (type->Equals(arrow::int32())) field_json["type"] = "int32";
-            else if (type->Equals(arrow::float64())) field_json["type"] = "float64";
-            else if (type->Equals(arrow::float32())) field_json["type"] = "float32";
-            else if (type->Equals(arrow::utf8())) field_json["type"] = "string";
-            else if (type->Equals(arrow::boolean())) field_json["type"] = "boolean";
-            else if (type->id() == arrow::Type::TIMESTAMP) field_json["type"] = "timestamp";
-            else field_json["type"] = "unknown";
-
-            json_schema["fields"].push_back(field_json);
-        }
-
-        *schema_json = json_schema.dump(2);
-        return Status::OK();
-    } catch (const std::exception& e) {
-        return Status::InternalError("Failed to convert schema to JSON: " + std::string(e.what()));
-    }
-}
-
-// Convert JSON record to Arrow RecordBatch
-Status JsonToArrowRecord(const std::string& record_json, const std::shared_ptr<arrow::Schema>& schema,
-                        std::shared_ptr<arrow::RecordBatch>* batch) {
-    try {
-        auto json = nlohmann::json::parse(record_json);
-        std::vector<std::shared_ptr<arrow::Array>> arrays;
-
-        for (int i = 0; i < schema->num_fields(); ++i) {
-            const auto& field = schema->field(i);
-            std::string field_name = field->name();
-
-            if (json.contains(field_name)) {
-                // Create array with single value
-                auto value = json[field_name];
-                // This is simplified - in practice would need proper type conversion
-                // For now, assume string values
-                arrow::StringBuilder builder;
-                builder.Append(value.dump());
-                std::shared_ptr<arrow::Array> array;
-                builder.Finish(&array);
-                arrays.push_back(array);
-            } else {
-                // Null value
-                auto array = arrow::MakeArrayOfNull(field->type(), 1).ValueOrDie();
-                arrays.push_back(array);
-            }
-        }
-
-        *batch = arrow::RecordBatch::Make(schema, 1, arrays);
-        return Status::OK();
-    } catch (const std::exception& e) {
-        return Status::InvalidArgument("Invalid JSON record: " + std::string(e.what()));
-    }
-}
-
-// Convert Arrow RecordBatch to JSON string
-Status ArrowRecordBatchToJson(const std::shared_ptr<arrow::RecordBatch>& batch, std::string* json_str) {
-    try {
-        nlohmann::json json_array = nlohmann::json::array();
-
-        for (int64_t row = 0; row < batch->num_rows(); ++row) {
-            nlohmann::json json_record;
-
-            for (int col = 0; col < batch->num_columns(); ++col) {
-                const auto& column = batch->column(col);
-                const auto& field = batch->schema()->field(col);
-                std::string field_name = field->name();
-
-                if (column->IsValid(row)) {
-                    // Extract value based on type
-                    auto type_id = column->type()->id();
-                    if (type_id == arrow::Type::INT64) {
-                        auto int_array = std::static_pointer_cast<arrow::Int64Array>(column);
-                        json_record[field_name] = int_array->Value(row);
-                    } else if (type_id == arrow::Type::STRING || type_id == arrow::Type::LARGE_STRING) {
-                        auto str_array = std::static_pointer_cast<arrow::StringArray>(column);
-                        json_record[field_name] = str_array->GetString(row);
-                    } else if (type_id == arrow::Type::DOUBLE) {
-                        auto double_array = std::static_pointer_cast<arrow::DoubleArray>(column);
-                        json_record[field_name] = double_array->Value(row);
-                    } else if (type_id == arrow::Type::BOOL) {
-                        auto bool_array = std::static_pointer_cast<arrow::BooleanArray>(column);
-                        json_record[field_name] = bool_array->Value(row);
-                    } else {
-                        json_record[field_name] = "unsupported_type";
-                    }
-                } else {
-                    json_record[field_name] = nullptr;
-                }
-            }
-
-            json_array.push_back(json_record);
-        }
-
-        *json_str = json_array.dump(2);
-        return Status::OK();
-    } catch (const std::exception& e) {
-        return Status::InternalError("Failed to convert RecordBatch to JSON: " + std::string(e.what()));
-    }
-}
-
-// Serialize Arrow RecordBatch to bytes - simplified implementation
-Status SerializeArrowBatch(const std::shared_ptr<arrow::RecordBatch>& batch,
-                          std::string* serialized_data) {
-    if (!batch) {
-        return Status::InvalidArgument("Null RecordBatch provided");
-    }
-    if (!serialized_data) {
-        return Status::InvalidArgument("Null output string provided");
-    }
-
-    // Create output stream backed by string
-    auto output_stream = arrow::io::BufferOutputStream::Create();
-    if (!output_stream.ok()) {
-        return Status::IOError("Failed to create output stream: " + output_stream.status().ToString());
-    }
-
-    // Create IPC writer with default options
-    auto writer_result = arrow::ipc::MakeStreamWriter(
-        output_stream.ValueOrDie(),
-        batch->schema());
-    if (!writer_result.ok()) {
-        return Status::IOError("Failed to create IPC writer: " + writer_result.status().ToString());
-    }
-
-    auto writer = writer_result.ValueOrDie();
-
-    // Write the batch
-    auto write_status = writer->WriteRecordBatch(*batch);
-    if (!write_status.ok()) {
-        return Status::IOError("Failed to write RecordBatch: " + write_status.ToString());
-    }
-
-    // Close writer to flush data
-    auto close_status = writer->Close();
-    if (!close_status.ok()) {
-        return Status::IOError("Failed to close writer: " + close_status.ToString());
-    }
-
-    // Get the buffer
-    auto finish_result = output_stream.ValueOrDie()->Finish();
-    if (!finish_result.ok()) {
-        return Status::IOError("Failed to finish stream: " + finish_result.status().ToString());
-    }
-
-    auto buffer = finish_result.ValueOrDie();
-
-    // Copy to output string
-    serialized_data->assign(reinterpret_cast<const char*>(buffer->data()), buffer->size());
-
-    return Status::OK();
-}
-
-// Deserialize Arrow RecordBatch from bytes - simplified implementation
-Status DeserializeArrowBatch(const void* data, size_t size,
-                           std::shared_ptr<arrow::RecordBatch>* batch) {
-    if (!data) {
-        return Status::InvalidArgument("Null data provided");
-    }
-    if (size == 0) {
-        return Status::InvalidArgument("Zero-size data provided");
-    }
-    if (!batch) {
-        return Status::InvalidArgument("Null output batch pointer provided");
-    }
-
-    // Create input stream from buffer
-    auto buffer = arrow::Buffer::Wrap(reinterpret_cast<const uint8_t*>(data), size);
-    auto input_stream = std::make_shared<arrow::io::BufferReader>(buffer);
-
-    // Create IPC reader
-    auto reader_result = arrow::ipc::RecordBatchStreamReader::Open(input_stream);
-    if (!reader_result.ok()) {
-        return Status::IOError("Failed to create IPC reader: " + reader_result.status().ToString());
-    }
-
-    auto reader = reader_result.ValueOrDie();
-
-    // Read the next batch (should be the only one in stream format)
-    auto read_result = reader->Next();
-    if (!read_result.ok()) {
-        return Status::IOError("Failed to read RecordBatch: " + read_result.status().ToString());
-    }
-
-    *batch = read_result.ValueOrDie();
-
-    if (!*batch) {
-        return Status::IOError("No RecordBatch found in stream");
-    }
-
-    return Status::OK();
-}
-
-// Concrete Key implementation for triple keys
-class TripleKey : public Key {
-public:
-    TripleKey(int64_t subject, int64_t predicate, int64_t object)
-        : subject_(subject), predicate_(predicate), object_(object) {}
-
-    int Compare(const Key& other) const override {
-        const TripleKey* other_key = dynamic_cast<const TripleKey*>(&other);
-        if (!other_key) return -1;
-
-        if (subject_ != other_key->subject_) return subject_ < other_key->subject_ ? -1 : 1;
-        if (predicate_ != other_key->predicate_) return predicate_ < other_key->predicate_ ? -1 : 1;
-        if (object_ != other_key->object_) return object_ < other_key->object_ ? -1 : 1;
-        return 0;
-    }
-
-    arrow::Result<std::shared_ptr<arrow::Scalar>> ToArrowScalar() const override {
-        return arrow::MakeScalar(subject_); // Just return subject for now
-    }
-
-    std::shared_ptr<Key> Clone() const override {
-        return std::make_shared<TripleKey>(subject_, predicate_, object_);
-    }
-
-    // Additional required methods from Key interface
-    bool Equals(const Key& other) const {
-        return Compare(other) == 0;
-    }
-
-    std::string ToString() const override {
-        return std::to_string(subject_) + "," + std::to_string(predicate_) + "," + std::to_string(object_);
-    }
-
-    size_t Hash() const override {
-        size_t h = std::hash<int64_t>()(subject_);
-        h = h * 31 + std::hash<int64_t>()(predicate_);
-        h = h * 31 + std::hash<int64_t>()(object_);
-        return h;
-    }
-
-    int64_t subject() const { return subject_; }
-    int64_t predicate() const { return predicate_; }
-    int64_t object() const { return object_; }
-
-private:
-    int64_t subject_;
-    int64_t predicate_;
-    int64_t object_;
-};
-
-// Concrete RecordRef implementation
-class SimpleRecordRef : public RecordRef {
-public:
-    SimpleRecordRef(std::shared_ptr<Key> key, std::shared_ptr<arrow::RecordBatch> batch, int64_t row_index)
-        : key_(std::move(key)), batch_(std::move(batch)), row_index_(row_index) {}
-
-    std::shared_ptr<Key> key() const override {
-        return key_;
-    }
-
-    arrow::Result<std::shared_ptr<arrow::Scalar>> GetField(const std::string& field_name) const override {
-        auto column = batch_->GetColumnByName(field_name);
-        if (!column) {
-            return arrow::Status::KeyError("Field not found: ", field_name);
-        }
-        return column->GetScalar(row_index_);
-    }
-
-    arrow::Result<std::vector<std::shared_ptr<arrow::Scalar>>> GetFields() const override {
-        std::vector<std::shared_ptr<arrow::Scalar>> fields;
-        for (int i = 0; i < batch_->num_columns(); ++i) {
-            auto column = batch_->column(i);
-            ARROW_ASSIGN_OR_RAISE(auto scalar, column->GetScalar(row_index_));
-            fields.push_back(scalar);
-        }
-        return fields;
-    }
-
-    size_t Size() const override {
-        return batch_->num_columns();
-    }
-
-private:
-    std::shared_ptr<Key> key_;
-    std::shared_ptr<arrow::RecordBatch> batch_;
-    int64_t row_index_;
-};
-
-// Concrete Record implementation
-class SimpleRecord : public Record {
-public:
-    SimpleRecord(std::shared_ptr<Key> key, std::shared_ptr<arrow::RecordBatch> batch, int64_t row_index)
-        : key_(std::move(key)), batch_(std::move(batch)), row_index_(row_index),
-          begin_ts_(0), commit_ts_(0) {}
-
-    std::shared_ptr<Key> GetKey() const override {
-        return key_;
-    }
-
-    arrow::Result<std::shared_ptr<arrow::RecordBatch>> ToRecordBatch() const override {
-        // Extract single row as RecordBatch
-        return batch_->Slice(row_index_, 1);
-    }
-
-    std::shared_ptr<arrow::Schema> GetArrowSchema() const override {
-        return batch_->schema();
-    }
-
-    std::unique_ptr<RecordRef> AsRecordRef() const override {
-        return std::make_unique<SimpleRecordRef>(key_, batch_, row_index_);
-    }
-
-    // MVCC versioning support
-    void SetMVCCInfo(uint64_t begin_ts, uint64_t commit_ts) override {
-        begin_ts_ = begin_ts;
-        commit_ts_ = commit_ts;
-    }
-
-    uint64_t GetBeginTimestamp() const override {
-        return begin_ts_;
-    }
-
-    uint64_t GetCommitTimestamp() const override {
-        return commit_ts_;
-    }
-
-    bool IsVisible(uint64_t snapshot_ts) const override {
-        // Record is visible if it was committed before the snapshot timestamp
-        // and began before or at the snapshot timestamp
-        return commit_ts_ > 0 && commit_ts_ <= snapshot_ts && begin_ts_ <= snapshot_ts;
-    }
-
-private:
-    std::shared_ptr<Key> key_;
-    std::shared_ptr<arrow::RecordBatch> batch_;
-    int64_t row_index_;
-    uint64_t begin_ts_;  // Transaction begin timestamp
-    uint64_t commit_ts_; // Transaction commit timestamp
-};
-
-// Range Iterator implementation with bloom filters and sparse indexes
-class RangeIterator : public Iterator {
-public:
-    RangeIterator(const std::vector<std::shared_ptr<arrow::RecordBatch>>& data,
-                  const KeyRange& range,
-                  std::shared_ptr<arrow::Schema> schema,
-                  std::shared_ptr<SkippingIndex> skipping_index = nullptr,
-                  std::shared_ptr<BloomFilter> bloom_filter = nullptr)
-        : data_(data), range_(range), schema_(schema),
-          skipping_index_(skipping_index), bloom_filter_(bloom_filter),
-          current_batch_(0), current_row_(0) {
-        // Find first valid position
-        SeekToStart();
-    }
-
-    bool Valid() const override {
-        return current_batch_ < data_.size() &&
-               current_row_ < static_cast<int64_t>(data_[current_batch_]->num_rows());
-    }
-
-    void Next() override {
-        if (!Valid()) return;
-
-        current_row_++;
-        if (current_row_ >= static_cast<int64_t>(data_[current_batch_]->num_rows())) {
-            current_batch_++;
-            current_row_ = 0;
-        }
-
-        // Skip records that don't match the range
-        while (Valid() && !InRange()) {
-            Next();
-        }
-    }
-
-    std::shared_ptr<Key> key() const override {
-        if (!Valid()) return nullptr;
-
-        auto batch = data_[current_batch_];
-        auto subject_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(0));
-        auto predicate_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(1));
-        auto object_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(2));
-
-        return std::make_shared<TripleKey>(
-            subject_col->Value(current_row_),
-            predicate_col->Value(current_row_),
-            object_col->Value(current_row_)
-        );
-    }
-
-    std::shared_ptr<Record> value() const override {
-        if (!Valid()) return nullptr;
-        return std::make_shared<SimpleRecord>(key(), data_[current_batch_], current_row_);
-    }
-
-    std::unique_ptr<RecordRef> value_ref() const override {
-        if (!Valid()) return nullptr;
-        return std::make_unique<SimpleRecordRef>(key(), data_[current_batch_], current_row_);
-    }
-
-    marble::Status status() const override {
-        return marble::Status::OK();
-    }
-
-    // Additional Iterator methods
-    void Seek(const Key& target) override {
-        const TripleKey* target_key = dynamic_cast<const TripleKey*>(&target);
-        if (!target_key) return;
-
-        // Find the first record >= target
-        for (size_t batch_idx = 0; batch_idx < data_.size(); ++batch_idx) {
-            const auto& batch = data_[batch_idx];
-            auto subject_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(0));
-            auto predicate_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(1));
-            auto object_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(2));
-
-            for (int64_t row_idx = 0; row_idx < static_cast<int64_t>(batch->num_rows()); ++row_idx) {
-                TripleKey current_key(subject_col->Value(row_idx),
-                                    predicate_col->Value(row_idx),
-                                    object_col->Value(row_idx));
-
-                if (current_key.Compare(*target_key) >= 0) {
-                    current_batch_ = batch_idx;
-                    current_row_ = row_idx;
-                    return;
-                }
-            }
-        }
-
-        // If not found, go to end
-        current_batch_ = data_.size();
-        current_row_ = 0;
-    }
-
-    void SeekForPrev(const Key& target) override {
-        const TripleKey* target_key = dynamic_cast<const TripleKey*>(&target);
-        if (!target_key) return;
-
-        // Find the last record <= target
-        size_t found_batch = data_.size();
-        int64_t found_row = -1;
-
-        for (size_t batch_idx = 0; batch_idx < data_.size(); ++batch_idx) {
-            const auto& batch = data_[batch_idx];
-            auto subject_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(0));
-            auto predicate_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(1));
-            auto object_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(2));
-
-            for (int64_t row_idx = 0; row_idx < static_cast<int64_t>(batch->num_rows()); ++row_idx) {
-                TripleKey current_key(subject_col->Value(row_idx),
-                                    predicate_col->Value(row_idx),
-                                    object_col->Value(row_idx));
-
-                if (current_key.Compare(*target_key) <= 0) {
-                    found_batch = batch_idx;
-                    found_row = row_idx;
-                } else if (found_row >= 0) {
-                    // We've passed the target, stop
-                    break;
-                }
-            }
-        }
-
-        if (found_row >= 0) {
-            current_batch_ = found_batch;
-            current_row_ = found_row;
-        } else {
-            // Not found, go to beginning
-            current_batch_ = 0;
-            current_row_ = 0;
-        }
-    }
-
-    void SeekToLast() override {
-        if (data_.empty()) return;
-        current_batch_ = data_.size() - 1;
-        current_row_ = data_[current_batch_]->num_rows() - 1;
-    }
-
-    void Prev() override {
-        if (!Valid()) return;
-
-        if (current_row_ > 0) {
-            current_row_--;
-        } else if (current_batch_ > 0) {
-            current_batch_--;
-            current_row_ = data_[current_batch_]->num_rows() - 1;
-        } else {
-            // At beginning, make invalid
-            current_batch_ = data_.size();
-            current_row_ = 0;
-        }
-
-        // Skip records that don't match the range
-        while (Valid() && !InRange()) {
-            Prev();
-        }
-    }
-
-private:
-    void SeekToStart() {
-        current_batch_ = 0;
-        current_row_ = 0;
-
-        // Skip records that don't match the range
-        while (Valid() && !InRange()) {
-            Next();
-        }
-    }
-
-    // Check if current position can be skipped using bloom filter
-    bool CanSkipWithBloomFilter() const {
-        if (!bloom_filter_ || !Valid()) return false;
-
-        auto current_key = key();
-        if (!current_key) return false;
-
-        std::string key_str = current_key->ToString();
-        return !bloom_filter_->MightContain(key_str);
-    }
-
-    // Get candidate batches using skipping index
-    std::vector<size_t> GetCandidateBatches() const {
-        if (!skipping_index_) {
-            // No skipping index, return all batches
-            std::vector<size_t> all_batches;
-            for (size_t i = 0; i < data_.size(); ++i) {
-                all_batches.push_back(i);
-            }
-            return all_batches;
-        }
-
-        // Use skipping index to find relevant batches
-        std::vector<int64_t> candidate_blocks;
-        if (range_.start()) {
-            const TripleKey* start_key = dynamic_cast<const TripleKey*>(range_.start().get());
-            if (start_key) {
-                // For subject-based queries, use subject column
-                auto subject_value = arrow::MakeScalar(start_key->subject());
-                skipping_index_->GetCandidateBlocks("subject", ">=",
-                                                   subject_value, &candidate_blocks);
-            }
-        }
-
-        // Convert block IDs to batch indices (simplified mapping)
-        std::vector<size_t> candidate_batches;
-        for (int64_t block_id : candidate_blocks) {
-            size_t batch_idx = block_id / 10; // Assume 10 blocks per batch (simplified)
-            if (batch_idx < data_.size()) {
-                candidate_batches.push_back(batch_idx);
-            }
-        }
-
-        // If no candidates found, fall back to all batches
-        if (candidate_batches.empty()) {
-            for (size_t i = 0; i < data_.size(); ++i) {
-                candidate_batches.push_back(i);
-            }
-        }
-
-        return candidate_batches;
-    }
-
-    bool InRange() const {
-        if (!Valid()) return false;
-
-        auto current_key = key();
-        if (!current_key) return false;
-
-        const TripleKey* triple_key = dynamic_cast<const TripleKey*>(current_key.get());
-        if (!triple_key) return false;
-
-        // Check start bound
-        if (range_.start()) {
-            const TripleKey* start_key = dynamic_cast<const TripleKey*>(range_.start().get());
-            if (start_key) {
-                int cmp = triple_key->Compare(*start_key);
-                if (range_.start_inclusive()) {
-                    if (cmp < 0) return false;
-                } else {
-                    if (cmp <= 0) return false;
-                }
-            }
-        }
-
-        // Check end bound
-        if (range_.end()) {
-            const TripleKey* end_key = dynamic_cast<const TripleKey*>(range_.end().get());
-            if (end_key) {
-                int cmp = triple_key->Compare(*end_key);
-                if (range_.end_inclusive()) {
-                    if (cmp > 0) return false;
-                } else {
-                    if (cmp >= 0) return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    const std::vector<std::shared_ptr<arrow::RecordBatch>>& data_;
-    KeyRange range_;
-    std::shared_ptr<arrow::Schema> schema_;
-    std::shared_ptr<SkippingIndex> skipping_index_;
-    std::shared_ptr<BloomFilter> bloom_filter_;
-    size_t current_batch_;
-    int64_t current_row_;
-};
 
 // Simple MarbleDB implementation for API
 class SimpleMarbleDB : public MarbleDB {
@@ -700,7 +52,7 @@ public:
         }
 
         // Initialize WAL manager
-        wal_manager_ = std::make_unique<WalManagerImpl>();
+        wal_manager_ = CreateWalManager(nullptr);
         WalOptions wal_options;
         wal_options.wal_path = path + "/wal";
         wal_options.max_file_size = 64 * 1024 * 1024; // 64MB
@@ -713,12 +65,9 @@ public:
 
         // Initialize MVCC manager
         initializeMVCC();
-        mvcc_manager_ = global_mvcc_manager;
+        mvcc_manager_ = global_mvcc_manager.get();
 
-        // Connect MVCC manager to database components
-        if (mvcc_manager_) {
-            mvcc_manager_->Initialize(lsm_tree_.get(), wal_manager_.get());
-        }
+        // MVCC manager is initialized in its constructor
     }
 
     ~SimpleMarbleDB() {
@@ -776,16 +125,17 @@ public:
             }
 
             auto table = combined_result.ValueOrDie();
-            auto batch = arrow::compute::ToRecordBatch(table);
-            if (!batch.ok()) {
+            auto batch_result = table->CombineChunksToBatch();
+            if (!batch_result.ok()) {
                 return Status::InternalError("Failed to create record batch: " +
-                                           batch.status().ToString());
+                                           batch_result.status().ToString());
             }
+            auto batch = batch_result.ValueOrDie();
 
             // Assign batch ID and store in LSM
             uint64_t batch_id = next_batch_id++;
             std::string serialized_batch;
-            auto serialize_status = db->SerializeArrowBatch(batch.ValueOrDie(), &serialized_batch);
+            auto serialize_status = SerializeArrowBatch(batch, &serialized_batch);
             if (!serialize_status.ok()) return serialize_status;
 
             uint64_t batch_key = db->EncodeBatchKey(id, batch_id);
@@ -1131,7 +481,7 @@ public:
      * @brief Create Arrow-optimized query builder
      */
     std::unique_ptr<QueryBuilder> Query(const std::string& table_name) {
-        return std::unique_ptr<QueryBuilder>(new QueryBuilder(this, table_name));
+        return std::make_unique<QueryBuilder>(this, table_name);
     }
 
     /**
@@ -1242,7 +592,7 @@ public:
         return Status::NotImplemented("CF Put not implemented");
     }
     
-    Status Get(const ReadOptions& options, ColumnFamilyHandle* cf, const Key& key, std::shared_ptr<Record>* record) override {
+    Status Get(const ReadOptions& options, ColumnFamilyHandle* cf, const Key& key, std::shared_ptr<Record>* record) override {                                                                                                                        
         return Status::NotImplemented("CF Get not implemented");
     }
     
@@ -1251,11 +601,11 @@ public:
     }
     
     // Multi-Get
-    Status MultiGet(const ReadOptions& options, const std::vector<Key>& keys, std::vector<std::shared_ptr<Record>>* records) override {
+    Status MultiGet(const ReadOptions& options, const std::vector<Key>& keys, std::vector<std::shared_ptr<Record>>* records) override {                                                                                                               
         return Status::NotImplemented("MultiGet not implemented");
     }
     
-    Status MultiGet(const ReadOptions& options, ColumnFamilyHandle* cf, const std::vector<Key>& keys, std::vector<std::shared_ptr<Record>>* records) override {
+    Status MultiGet(const ReadOptions& options, ColumnFamilyHandle* cf, const std::vector<Key>& keys, std::vector<std::shared_ptr<Record>>* records) override {                                                                                       
         return Status::NotImplemented("CF MultiGet not implemented");
     }
     
@@ -1264,7 +614,7 @@ public:
         return Status::NotImplemented("DeleteRange not implemented");
     }
     
-    Status DeleteRange(const WriteOptions& options, ColumnFamilyHandle* cf, const Key& begin_key, const Key& end_key) override {
+    Status DeleteRange(const WriteOptions& options, ColumnFamilyHandle* cf, const Key& begin_key, const Key& end_key) override {                                                                                                                      
         return Status::NotImplemented("CF DeleteRange not implemented");
     }
 
@@ -1291,7 +641,7 @@ public:
     }
 
     // Scanning with specific column family
-    Status NewIterator(const std::string& table_name, const ReadOptions& options, const KeyRange& range, std::unique_ptr<Iterator>* iterator) override {
+    Status NewIterator(const std::string& table_name, const ReadOptions& options, const KeyRange& range, std::unique_ptr<Iterator>* iterator) override {                                                                                              
         std::lock_guard<std::mutex> lock(cf_mutex_);
 
         // Find the specified column family
@@ -1416,10 +766,609 @@ public:
 
 private:
     std::string path_;
-    std::unique_ptr<StandardLSMTree> lsm_tree_;
-    std::unique_ptr<WalManagerImpl> wal_manager_;
+    std::unique_ptr<WalManager> wal_manager_;
     MVCCManager* mvcc_manager_;
 };
+
+namespace {
+
+// Convert JSON string to Arrow Schema
+Status JsonToArrowSchema(const std::string& schema_json, std::shared_ptr<arrow::Schema>* schema) {
+    try {
+        auto json = nlohmann::json::parse(schema_json);
+        std::vector<std::shared_ptr<arrow::Field>> fields;
+
+        for (const auto& field_json : json["fields"]) {
+            std::string name = field_json["name"];
+            std::string type_str = field_json["type"];
+            bool nullable = field_json.value("nullable", false);
+
+            std::shared_ptr<arrow::DataType> arrow_type;
+            if (type_str == "int64") arrow_type = arrow::int64();
+            else if (type_str == "int32") arrow_type = arrow::int32();
+            else if (type_str == "float64") arrow_type = arrow::float64();
+            else if (type_str == "float32") arrow_type = arrow::float32();
+            else if (type_str == "string" || type_str == "utf8") arrow_type = arrow::utf8();
+            else if (type_str == "bool" || type_str == "boolean") arrow_type = arrow::boolean();
+            else if (type_str == "timestamp") arrow_type = arrow::timestamp(arrow::TimeUnit::MICRO);
+            else return Status::InvalidArgument("Unsupported type: " + type_str);
+
+            fields.push_back(arrow::field(name, arrow_type, nullable));
+        }
+
+        *schema = arrow::schema(fields);
+        return Status::OK();
+    } catch (const std::exception& e) {
+        return Status::InvalidArgument("Invalid JSON schema: " + std::string(e.what()));
+    }
+}
+
+// Convert Arrow Schema to JSON string
+Status ArrowSchemaToJson(const std::shared_ptr<arrow::Schema>& schema, std::string* schema_json) {
+    try {
+        nlohmann::json json_schema;
+        json_schema["fields"] = nlohmann::json::array();
+
+        for (int i = 0; i < schema->num_fields(); ++i) {
+            const auto& field = schema->field(i);
+            nlohmann::json field_json;
+            field_json["name"] = field->name();
+            field_json["nullable"] = field->nullable();
+
+            // Convert Arrow type to string
+            auto type = field->type();
+            if (type->Equals(arrow::int64())) field_json["type"] = "int64";
+            else if (type->Equals(arrow::int32())) field_json["type"] = "int32";
+            else if (type->Equals(arrow::float64())) field_json["type"] = "float64";
+            else if (type->Equals(arrow::float32())) field_json["type"] = "float32";
+            else if (type->Equals(arrow::utf8())) field_json["type"] = "string";
+            else if (type->Equals(arrow::boolean())) field_json["type"] = "boolean";
+            else if (type->id() == arrow::Type::TIMESTAMP) field_json["type"] = "timestamp";
+            else field_json["type"] = "unknown";
+
+            json_schema["fields"].push_back(field_json);
+        }
+
+        *schema_json = json_schema.dump(2);
+        return Status::OK();
+    } catch (const std::exception& e) {
+        return Status::InternalError("Failed to convert schema to JSON: " + std::string(e.what()));
+    }
+}
+
+// Convert JSON record to Arrow RecordBatch
+Status JsonToArrowRecord(const std::string& record_json, const std::shared_ptr<arrow::Schema>& schema,
+                        std::shared_ptr<arrow::RecordBatch>* batch) {
+    try {
+        auto json = nlohmann::json::parse(record_json);
+        std::vector<std::shared_ptr<arrow::Array>> arrays;
+
+        for (int i = 0; i < schema->num_fields(); ++i) {
+            const auto& field = schema->field(i);
+            std::string field_name = field->name();
+
+            if (json.contains(field_name)) {
+                // Create array with single value
+                auto value = json[field_name];
+                // This is simplified - in practice would need proper type conversion
+                // For now, assume string values
+                arrow::StringBuilder builder;
+                builder.Append(value.dump());
+                std::shared_ptr<arrow::Array> array;
+                builder.Finish(&array);
+                arrays.push_back(array);
+            } else {
+                // Null value
+                auto array = arrow::MakeArrayOfNull(field->type(), 1).ValueOrDie();
+                arrays.push_back(array);
+            }
+        }
+
+        *batch = arrow::RecordBatch::Make(schema, 1, arrays);
+        return Status::OK();
+    } catch (const std::exception& e) {
+        return Status::InvalidArgument("Invalid JSON record: " + std::string(e.what()));
+    }
+}
+
+// Convert Arrow RecordBatch to JSON string
+Status ArrowRecordBatchToJson(const std::shared_ptr<arrow::RecordBatch>& batch, std::string* json_str) {
+    try {
+        nlohmann::json json_array = nlohmann::json::array();
+
+        for (int64_t row = 0; row < batch->num_rows(); ++row) {
+            nlohmann::json json_record;
+
+            for (int col = 0; col < batch->num_columns(); ++col) {
+                const auto& column = batch->column(col);
+                const auto& field = batch->schema()->field(col);
+                std::string field_name = field->name();
+
+                if (column->IsValid(row)) {
+                    // Extract value based on type
+                    auto type_id = column->type()->id();
+                    if (type_id == arrow::Type::INT64) {
+                        auto int_array = std::static_pointer_cast<arrow::Int64Array>(column);
+                        json_record[field_name] = int_array->Value(row);
+                    } else if (type_id == arrow::Type::STRING || type_id == arrow::Type::LARGE_STRING) {
+                        auto str_array = std::static_pointer_cast<arrow::StringArray>(column);
+                        json_record[field_name] = str_array->GetString(row);
+                    } else if (type_id == arrow::Type::DOUBLE) {
+                        auto double_array = std::static_pointer_cast<arrow::DoubleArray>(column);
+                        json_record[field_name] = double_array->Value(row);
+                    } else if (type_id == arrow::Type::BOOL) {
+                        auto bool_array = std::static_pointer_cast<arrow::BooleanArray>(column);
+                        json_record[field_name] = bool_array->Value(row);
+                    } else {
+                        json_record[field_name] = "unsupported_type";
+                    }
+                } else {
+                    json_record[field_name] = nullptr;
+                }
+            }
+
+            json_array.push_back(json_record);
+        }
+
+        *json_str = json_array.dump(2);
+        return Status::OK();
+    } catch (const std::exception& e) {
+        return Status::InternalError("Failed to convert RecordBatch to JSON: " + std::string(e.what()));
+    }
+}
+
+// Serialize Arrow RecordBatch to bytes - simplified implementation
+Status SerializeArrowBatch(const std::shared_ptr<arrow::RecordBatch>& batch,
+                          std::string* serialized_data) {
+    if (!batch) {
+        return Status::InvalidArgument("Null RecordBatch provided");
+    }
+    if (!serialized_data) {
+        return Status::InvalidArgument("Null output string provided");
+    }
+
+    // Create output stream backed by string
+    auto output_stream = arrow::io::BufferOutputStream::Create();
+    if (!output_stream.ok()) {
+        return Status::IOError("Failed to create output stream: " + output_stream.status().ToString());
+    }
+
+    // Create IPC writer with default options
+    auto writer_result = arrow::ipc::MakeStreamWriter(
+        output_stream.ValueOrDie(),
+        batch->schema());
+    if (!writer_result.ok()) {
+        return Status::IOError("Failed to create IPC writer: " + writer_result.status().ToString());
+    }
+
+    auto writer = writer_result.ValueOrDie();
+
+    // Write the batch
+    auto write_status = writer->WriteRecordBatch(*batch);
+    if (!write_status.ok()) {
+        return Status::IOError("Failed to write RecordBatch: " + write_status.ToString());
+    }
+
+    // Close writer to flush data
+    auto close_status = writer->Close();
+    if (!close_status.ok()) {
+        return Status::IOError("Failed to close writer: " + close_status.ToString());
+    }
+
+    // Get the buffer
+    auto finish_result = output_stream.ValueOrDie()->Finish();
+    if (!finish_result.ok()) {
+        return Status::IOError("Failed to finish stream: " + finish_result.status().ToString());
+    }
+
+    auto buffer = finish_result.ValueOrDie();
+
+    // Copy to output string
+    serialized_data->assign(reinterpret_cast<const char*>(buffer->data()), buffer->size());
+
+    return Status::OK();
+}
+
+// Deserialize Arrow RecordBatch from bytes - simplified implementation
+Status DeserializeArrowBatch(const void* data, size_t size,
+                           std::shared_ptr<arrow::RecordBatch>* batch) {
+    if (!data) {
+        return Status::InvalidArgument("Null data provided");
+    }
+    if (size == 0) {
+        return Status::InvalidArgument("Zero-size data provided");
+    }
+    if (!batch) {
+        return Status::InvalidArgument("Null output batch pointer provided");
+    }
+
+    // Create input stream from buffer
+    auto buffer = arrow::Buffer::Wrap(reinterpret_cast<const uint8_t*>(data), size);
+    auto input_stream = std::make_shared<arrow::io::BufferReader>(buffer);
+
+    // Create IPC reader
+    auto reader_result = arrow::ipc::RecordBatchStreamReader::Open(input_stream);
+    if (!reader_result.ok()) {
+        return Status::IOError("Failed to create IPC reader: " + reader_result.status().ToString());
+    }
+
+    auto reader = reader_result.ValueOrDie();
+
+    // Read the next batch (should be the only one in stream format)
+    auto read_result = reader->Next();
+    if (!read_result.ok()) {
+        return Status::IOError("Failed to read RecordBatch: " + read_result.status().ToString());
+    }
+
+    *batch = read_result.ValueOrDie();
+
+    if (!*batch) {
+        return Status::IOError("No RecordBatch found in stream");
+    }
+
+    return Status::OK();
+}
+
+// Concrete Key implementation for triple keys
+class TripleKey : public Key {
+public:
+    TripleKey(int64_t subject, int64_t predicate, int64_t object)
+        : subject_(subject), predicate_(predicate), object_(object) {}
+
+    int Compare(const Key& other) const override {
+        const TripleKey* other_key = dynamic_cast<const TripleKey*>(&other);
+        if (!other_key) return -1;
+
+        if (subject_ != other_key->subject_) return subject_ < other_key->subject_ ? -1 : 1;
+        if (predicate_ != other_key->predicate_) return predicate_ < other_key->predicate_ ? -1 : 1;
+        if (object_ != other_key->object_) return object_ < other_key->object_ ? -1 : 1;
+        return 0;
+    }
+
+    arrow::Result<std::shared_ptr<arrow::Scalar>> ToArrowScalar() const override {
+        return arrow::MakeScalar(subject_); // Just return subject for now
+    }
+
+    std::shared_ptr<Key> Clone() const override {
+        return std::make_shared<TripleKey>(subject_, predicate_, object_);
+    }
+
+    // Additional required methods from Key interface
+    bool Equals(const Key& other) const {
+        return Compare(other) == 0;
+    }
+
+    std::string ToString() const override {
+        return std::to_string(subject_) + "," + std::to_string(predicate_) + "," + std::to_string(object_);
+    }
+
+    size_t Hash() const override {
+        size_t h = std::hash<int64_t>()(subject_);
+        h = h * 31 + std::hash<int64_t>()(predicate_);
+        h = h * 31 + std::hash<int64_t>()(object_);
+        return h;
+    }
+
+    int64_t subject() const { return subject_; }
+    int64_t predicate() const { return predicate_; }
+    int64_t object() const { return object_; }
+
+private:
+    int64_t subject_;
+    int64_t predicate_;
+    int64_t object_;
+};
+
+// Concrete RecordRef implementation
+class SimpleRecordRef : public RecordRef {
+public:
+    SimpleRecordRef(std::shared_ptr<Key> key, std::shared_ptr<arrow::RecordBatch> batch, int64_t row_index)
+        : key_(std::move(key)), batch_(std::move(batch)), row_index_(row_index) {}
+
+    std::shared_ptr<Key> key() const override {
+        return key_;
+    }
+
+    arrow::Result<std::shared_ptr<arrow::Scalar>> GetField(const std::string& field_name) const override {
+        auto column = batch_->GetColumnByName(field_name);
+        if (!column) {
+            return arrow::Status::KeyError("Field not found: ", field_name);
+        }
+        return column->GetScalar(row_index_);
+    }
+
+    arrow::Result<std::vector<std::shared_ptr<arrow::Scalar>>> GetFields() const override {
+        std::vector<std::shared_ptr<arrow::Scalar>> fields;
+        for (int i = 0; i < batch_->num_columns(); ++i) {
+            auto column = batch_->column(i);
+            ARROW_ASSIGN_OR_RAISE(auto scalar, column->GetScalar(row_index_));
+            fields.push_back(scalar);
+        }
+        return fields;
+    }
+
+    size_t Size() const override {
+        return batch_->num_columns();
+    }
+
+private:
+    std::shared_ptr<Key> key_;
+    std::shared_ptr<arrow::RecordBatch> batch_;
+    int64_t row_index_;
+};
+
+// Concrete Record implementation
+
+// Range Iterator implementation with bloom filters and sparse indexes
+class RangeIterator : public Iterator {
+public:
+    RangeIterator(const std::vector<std::shared_ptr<arrow::RecordBatch>>& data,
+                  const KeyRange& range,
+                  std::shared_ptr<arrow::Schema> schema,
+                  std::shared_ptr<SkippingIndex> skipping_index = nullptr,
+                  std::shared_ptr<BloomFilter> bloom_filter = nullptr)
+        : data_(data), range_(range), schema_(schema),
+          skipping_index_(skipping_index), bloom_filter_(bloom_filter),
+          current_batch_(0), current_row_(0) {
+        // Find first valid position
+        SeekToStart();
+    }
+
+    bool Valid() const override {
+        return current_batch_ < data_.size() &&
+               current_row_ < static_cast<int64_t>(data_[current_batch_]->num_rows());
+    }
+
+    void Next() override {
+        if (!Valid()) return;
+
+        current_row_++;
+        if (current_row_ >= static_cast<int64_t>(data_[current_batch_]->num_rows())) {
+            current_batch_++;
+            current_row_ = 0;
+        }
+
+        // Skip records that don't match the range
+        while (Valid() && !InRange()) {
+            Next();
+        }
+    }
+
+    std::shared_ptr<Key> key() const override {
+        if (!Valid()) return nullptr;
+
+        auto batch = data_[current_batch_];
+        auto subject_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(0));
+        auto predicate_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(1));
+        auto object_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(2));
+
+        return std::make_shared<TripleKey>(
+            subject_col->Value(current_row_),
+            predicate_col->Value(current_row_),
+            object_col->Value(current_row_)
+        );
+    }
+
+    std::shared_ptr<Record> value() const override {
+        if (!Valid()) return nullptr;
+        return std::make_shared<SimpleRecord>(key(), data_[current_batch_], current_row_);
+    }
+
+    std::unique_ptr<RecordRef> value_ref() const override {
+        if (!Valid()) return nullptr;
+        return std::make_unique<SimpleRecordRef>(key(), data_[current_batch_], current_row_);
+    }
+
+    marble::Status status() const override {
+        return marble::Status::OK();
+    }
+
+    // Additional Iterator methods
+    void Seek(const Key& target) override {
+        const TripleKey* target_key = dynamic_cast<const TripleKey*>(&target);
+        if (!target_key) return;
+
+        // Find the first record >= target
+        for (size_t batch_idx = 0; batch_idx < data_.size(); ++batch_idx) {
+            const auto& batch = data_[batch_idx];
+            auto subject_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(0));
+            auto predicate_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(1));
+            auto object_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(2));
+
+            for (int64_t row_idx = 0; row_idx < static_cast<int64_t>(batch->num_rows()); ++row_idx) {
+                TripleKey current_key(subject_col->Value(row_idx),
+                                    predicate_col->Value(row_idx),
+                                    object_col->Value(row_idx));
+
+                if (current_key.Compare(*target_key) >= 0) {
+                    current_batch_ = batch_idx;
+                    current_row_ = row_idx;
+                    return;
+                }
+            }
+        }
+
+        // If not found, go to end
+        current_batch_ = data_.size();
+        current_row_ = 0;
+    }
+
+    void SeekForPrev(const Key& target) override {
+        const TripleKey* target_key = dynamic_cast<const TripleKey*>(&target);
+        if (!target_key) return;
+
+        // Find the last record <= target
+        size_t found_batch = data_.size();
+        int64_t found_row = -1;
+
+        for (size_t batch_idx = 0; batch_idx < data_.size(); ++batch_idx) {
+            const auto& batch = data_[batch_idx];
+            auto subject_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(0));
+            auto predicate_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(1));
+            auto object_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(2));
+
+            for (int64_t row_idx = 0; row_idx < static_cast<int64_t>(batch->num_rows()); ++row_idx) {
+                TripleKey current_key(subject_col->Value(row_idx),
+                                    predicate_col->Value(row_idx),
+                                    object_col->Value(row_idx));
+
+                if (current_key.Compare(*target_key) <= 0) {
+                    found_batch = batch_idx;
+                    found_row = row_idx;
+                } else if (found_row >= 0) {
+                    // We've passed the target, stop
+                    break;
+                }
+            }
+        }
+
+        if (found_row >= 0) {
+            current_batch_ = found_batch;
+            current_row_ = found_row;
+        } else {
+            // Not found, go to beginning
+            current_batch_ = 0;
+            current_row_ = 0;
+        }
+    }
+
+    void SeekToLast() override {
+        if (data_.empty()) return;
+        current_batch_ = data_.size() - 1;
+        current_row_ = data_[current_batch_]->num_rows() - 1;
+    }
+
+    void Prev() override {
+        if (!Valid()) return;
+
+        if (current_row_ > 0) {
+            current_row_--;
+        } else if (current_batch_ > 0) {
+            current_batch_--;
+            current_row_ = data_[current_batch_]->num_rows() - 1;
+        } else {
+            // At beginning, make invalid
+            current_batch_ = data_.size();
+            current_row_ = 0;
+        }
+
+        // Skip records that don't match the range
+        while (Valid() && !InRange()) {
+            Prev();
+        }
+    }
+
+private:
+    void SeekToStart() {
+        current_batch_ = 0;
+        current_row_ = 0;
+
+        // Skip records that don't match the range
+        while (Valid() && !InRange()) {
+            Next();
+        }
+    }
+
+    // Check if current position can be skipped using bloom filter
+    bool CanSkipWithBloomFilter() const {
+        if (!bloom_filter_ || !Valid()) return false;
+
+        auto current_key = key();
+        if (!current_key) return false;
+
+        std::string key_str = current_key->ToString();
+        return !bloom_filter_->MightContain(key_str);
+    }
+
+    // Get candidate batches using skipping index
+    std::vector<size_t> GetCandidateBatches() const {
+        if (!skipping_index_) {
+            // No skipping index, return all batches
+            std::vector<size_t> all_batches;
+            for (size_t i = 0; i < data_.size(); ++i) {
+                all_batches.push_back(i);
+            }
+            return all_batches;
+        }
+
+        // Use skipping index to find relevant batches
+        std::vector<int64_t> candidate_blocks;
+        if (range_.start()) {
+            const TripleKey* start_key = dynamic_cast<const TripleKey*>(range_.start().get());
+            if (start_key) {
+                // For subject-based queries, use subject column
+                auto subject_value = arrow::MakeScalar(start_key->subject());
+                skipping_index_->GetCandidateBlocks("subject", ">=",
+                                                   subject_value, &candidate_blocks);
+            }
+        }
+
+        // Convert block IDs to batch indices (simplified mapping)
+        std::vector<size_t> candidate_batches;
+        for (int64_t block_id : candidate_blocks) {
+            size_t batch_idx = block_id / 10; // Assume 10 blocks per batch (simplified)
+            if (batch_idx < data_.size()) {
+                candidate_batches.push_back(batch_idx);
+            }
+        }
+
+        // If no candidates found, fall back to all batches
+        if (candidate_batches.empty()) {
+            for (size_t i = 0; i < data_.size(); ++i) {
+                candidate_batches.push_back(i);
+            }
+        }
+
+        return candidate_batches;
+    }
+
+    bool InRange() const {
+        if (!Valid()) return false;
+
+        auto current_key = key();
+        if (!current_key) return false;
+
+        const TripleKey* triple_key = dynamic_cast<const TripleKey*>(current_key.get());
+        if (!triple_key) return false;
+
+        // Check start bound
+        if (range_.start()) {
+            const TripleKey* start_key = dynamic_cast<const TripleKey*>(range_.start().get());
+            if (start_key) {
+                int cmp = triple_key->Compare(*start_key);
+                if (range_.start_inclusive()) {
+                    if (cmp < 0) return false;
+                } else {
+                    if (cmp <= 0) return false;
+                }
+            }
+        }
+
+        // Check end bound
+        if (range_.end()) {
+            const TripleKey* end_key = dynamic_cast<const TripleKey*>(range_.end().get());
+            if (end_key) {
+                int cmp = triple_key->Compare(*end_key);
+                if (range_.end_inclusive()) {
+                    if (cmp > 0) return false;
+                } else {
+                    if (cmp >= 0) return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    const std::vector<std::shared_ptr<arrow::RecordBatch>>& data_;
+    KeyRange range_;
+    std::shared_ptr<arrow::Schema> schema_;
+    std::shared_ptr<SkippingIndex> skipping_index_;
+    std::shared_ptr<BloomFilter> bloom_filter_;
+    size_t current_batch_;
+    int64_t current_row_;
+};
+
 
 } // anonymous namespace
 

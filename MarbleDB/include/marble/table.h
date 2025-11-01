@@ -23,6 +23,7 @@ limitations under the License.
 #include <arrow/api.h>
 #include <marble/status.h>
 #include <marble/query.h>
+#include <marble/api.h>
 
 namespace marble {
 
