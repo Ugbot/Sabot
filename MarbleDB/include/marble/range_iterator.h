@@ -23,16 +23,17 @@ namespace marble {
  * - Range filtering (start/end bounds)
  * - Bidirectional iteration
  * - Skipping index for pruning batches
- * - Future: Bloom filters for existence checks (P0.3)
+ * - Bloom filters for existence checks
  */
 class RangeIterator : public Iterator {
 public:
     RangeIterator(const std::vector<std::shared_ptr<arrow::RecordBatch>>& data,
                   const KeyRange& range,
                   std::shared_ptr<arrow::Schema> schema,
-                  std::shared_ptr<SkippingIndex> skipping_index = nullptr)
+                  std::shared_ptr<SkippingIndex> skipping_index = nullptr,
+                  std::shared_ptr<BloomFilter> bloom_filter = nullptr)
         : data_(data), range_(range), schema_(schema),
-          skipping_index_(skipping_index),
+          skipping_index_(skipping_index), bloom_filter_(bloom_filter),
           current_batch_(0), current_row_(0) {
         // Find first valid position
         SeekToStart();
@@ -208,7 +209,7 @@ public:
     }
 
     std::unique_ptr<Iterator> Clone() const {
-        RangeIterator* clone_raw = new RangeIterator(data_, range_, schema_, skipping_index_);
+        RangeIterator* clone_raw = new RangeIterator(data_, range_, schema_, skipping_index_, bloom_filter_);
         clone_raw->current_batch_ = current_batch_;
         clone_raw->current_row_ = current_row_;
         return std::unique_ptr<Iterator>(clone_raw);
@@ -239,8 +240,30 @@ private:
         }
     }
 
-    // TODO: Re-add bloom filter check in P0.3
-    // bool CanSkipWithBloomFilter() const { ... }
+    /**
+     * @brief Check if current key might exist using bloom filter
+     *
+     * Returns true if key might exist (continue checking),
+     * Returns false if key definitely doesn't exist (can skip)
+     */
+    bool CanSkipWithBloomFilter() const {
+        if (!bloom_filter_ || !Valid()) return false;
+
+        auto current_key = key();
+        if (!current_key) return false;
+
+        const TripleKey* triple_key = dynamic_cast<const TripleKey*>(current_key.get());
+        if (!triple_key) return false;
+
+        // Create key string for bloom filter lookup
+        std::string key_str = std::to_string(triple_key->subject()) + "," +
+                            std::to_string(triple_key->predicate()) + "," +
+                            std::to_string(triple_key->object());
+
+        // If bloom filter says "might contain", we can't skip (continue checking)
+        // If bloom filter says "definitely not", we can skip
+        return !bloom_filter_->MightContain(key_str);
+    }
 
     bool InRange() const {
         if (!Valid()) return false;
@@ -284,7 +307,7 @@ private:
     KeyRange range_;
     std::shared_ptr<arrow::Schema> schema_;
     std::shared_ptr<SkippingIndex> skipping_index_;
-    // TODO: Re-add in P0.3: std::shared_ptr<BloomFilter> bloom_filter_;
+    std::shared_ptr<BloomFilter> bloom_filter_;
     size_t current_batch_;
     int64_t current_row_;
 };

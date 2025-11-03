@@ -386,7 +386,8 @@ public:
         // Initialize indexes on first insert
         if (cf_info->next_batch_id == 1) {
             cf_info->skipping_index = std::make_shared<InMemorySkippingIndex>();
-            cf_info->bloom_filter = std::make_shared<BloomFilter>(1000000, 0.01);  // Preallocate for 1M keys
+            // Start with 100K capacity, will auto-grow to 200K, 400K, 800K, etc. as needed
+            cf_info->bloom_filter = std::make_shared<BloomFilter>(100000, 0.01);
         }
 
         // Update skipping index with new batch only
@@ -651,7 +652,7 @@ public:
         // Create range iterator with indexes for optimization
         auto range_iterator = std::make_unique<RangeIterator>(
             cf_info->data, range, cf_info->schema,
-            cf_info->skipping_index);  // bloom_filter temporarily removed (TODO: P0.3)
+            cf_info->skipping_index, cf_info->bloom_filter);
 
         *iterator = std::move(range_iterator);
         return Status::OK();
@@ -672,7 +673,7 @@ public:
         // Create range iterator with indexes for optimization
         auto range_iterator = std::make_unique<RangeIterator>(
             cf_info->data, range, cf_info->schema,
-            cf_info->skipping_index);  // bloom_filter temporarily removed (TODO: P0.3)
+            cf_info->skipping_index, cf_info->bloom_filter);
 
         *iterator = std::move(range_iterator);
         return Status::OK();

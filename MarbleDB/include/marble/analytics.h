@@ -90,6 +90,21 @@ public:
      */
     static std::unique_ptr<BloomFilter> Deserialize(const std::vector<uint8_t>& data);
 
+    /**
+     * @brief Get the number of items added to the filter
+     */
+    size_t ItemsAdded() const;
+
+    /**
+     * @brief Get the capacity (expected items) of the filter
+     */
+    size_t Capacity() const;
+
+    /**
+     * @brief Get the load factor (items_added / capacity)
+     */
+    double LoadFactor() const;
+
 private:
     class Impl;
     std::unique_ptr<Impl> impl_;

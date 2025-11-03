@@ -40,29 +40,55 @@ bool ZoneMap::CanPrune(const std::string& predicate_op,
 class BloomFilter::Impl {
 public:
     Impl(size_t expected_items, double false_positive_rate)
-        : expected_items_(expected_items), false_positive_rate_(false_positive_rate) {
+        : expected_items_(expected_items), false_positive_rate_(false_positive_rate),
+          capacity_(expected_items) {
         // Calculate optimal size and hash functions
-        size_t m = CalculateOptimalSize(expected_items, false_positive_rate);
-        size_t k = CalculateOptimalHashes(expected_items, m);
+        // m = optimal number of bits = -n * ln(p) / (ln(2))^2
+        double m_real = -static_cast<double>(expected_items) * std::log(false_positive_rate) /
+                        std::pow(std::log(2.0), 2.0);
+        size_t m = static_cast<size_t>(std::ceil(m_real));
 
-        bits_.resize((m + 63) / 64, 0);  // Round up to 64-bit words
+        // k = optimal number of hash functions = (m/n) * ln(2)
+        double k_real = (static_cast<double>(m) / static_cast<double>(expected_items)) * std::log(2.0);
+        size_t k = static_cast<size_t>(std::round(k_real));
+
+        // Ensure at least 1 hash function and at least 64 bits
+        if (k < 1) k = 1;
+        if (m < 64) m = 64;
+
         num_hashes_ = k;
+        size_t num_words = (m + 63) / 64;  // Round up to 64-bit words
+        bits_.resize(num_words, 0);
+
+        // For aggressive growth strategy, always track keys from the start
+        tracking_keys_ = true;
+        key_buffer_ = std::make_unique<std::vector<std::string>>();
+        key_buffer_->reserve(expected_items);
     }
 
     void Add(const std::string& item) {
-        auto hashes = HashItem(item);
-        for (size_t hash : hashes) {
-            size_t bit_index = hash % (bits_.size() * 64);
+        // Always save the key for potential rehash (aggressive strategy)
+        key_buffer_->push_back(item);
+
+        // Check if we need to grow (at 85% capacity)
+        if (LoadFactor() > 0.85) {
+            Grow();
+        }
+
+        // Add to bit array
+        auto bit_indices = HashItem(item);
+        for (size_t bit_index : bit_indices) {
             size_t word_index = bit_index / 64;
             size_t bit_offset = bit_index % 64;
             bits_[word_index] |= (1ULL << bit_offset);
         }
+
+        items_added_++;
     }
 
     bool MightContain(const std::string& item) const {
-        auto hashes = HashItem(item);
-        for (size_t hash : hashes) {
-            size_t bit_index = hash % (bits_.size() * 64);
+        auto bit_indices = HashItem(item);  // Now returns bit indices directly
+        for (size_t bit_index : bit_indices) {
             size_t word_index = bit_index / 64;
             size_t bit_offset = bit_index % 64;
             if ((bits_[word_index] & (1ULL << bit_offset)) == 0) {
@@ -114,23 +140,85 @@ public:
         return impl;
     }
 
+    // Dynamic resizing support methods
+    size_t ItemsAdded() const { return items_added_; }
+    size_t Capacity() const { return capacity_; }
+    double LoadFactor() const {
+        if (capacity_ == 0) return 0.0;
+        return static_cast<double>(items_added_) / static_cast<double>(capacity_);
+    }
+
+    void StartKeyTracking() {
+        if (!tracking_keys_) {
+            tracking_keys_ = true;
+            key_buffer_ = std::make_unique<std::vector<std::string>>();
+            key_buffer_->reserve(static_cast<size_t>(capacity_ * 0.3));  // Reserve for 30% more
+            std::cerr << "BloomFilter: Started key tracking at load factor " << LoadFactor() << "\n";
+        }
+    }
+
+    void Grow() {
+        if (!key_buffer_ || key_buffer_->empty()) {
+            std::cerr << "BloomFilter: Cannot grow - no keys tracked\n";
+            return;
+        }
+
+        size_t old_capacity = capacity_;
+        size_t new_capacity = capacity_ * 2;
+
+        std::cerr << "BloomFilter: Growing from " << old_capacity << " to " << new_capacity
+                  << " capacity (load factor: " << LoadFactor() << ", " << items_added_ << " items)\n";
+
+        // Create new filter with 2x capacity
+        auto new_impl = std::make_unique<Impl>(new_capacity, false_positive_rate_);
+
+        // Rehash all tracked keys
+        for (const auto& key : *key_buffer_) {
+            new_impl->AddInternal(key);
+        }
+
+        // Swap internal state
+        bits_ = std::move(new_impl->bits_);
+        capacity_ = new_capacity;
+        expected_items_ = new_capacity;
+        num_hashes_ = new_impl->num_hashes_;
+        items_added_ = key_buffer_->size();
+
+        // DON'T clear key buffer - we need ALL keys for future growths
+        // This is the memory cost of the aggressive rehashing strategy
+        std::cerr << "BloomFilter: Growth complete, new load factor: " << LoadFactor()
+                  << " (buffer size: " << (key_buffer_->size() * 50 / 1024 / 1024) << " MB)\n";
+    }
+
+    // Internal add without growth checks (used during Grow())
+    void AddInternal(const std::string& item) {
+        auto bit_indices = HashItem(item);
+        for (size_t bit_index : bit_indices) {
+            size_t word_index = bit_index / 64;
+            size_t bit_offset = bit_index % 64;
+            bits_[word_index] |= (1ULL << bit_offset);
+        }
+        items_added_++;
+    }
+
 private:
-    size_t CalculateOptimalSize(size_t n, double p) {
-        return std::ceil(-n * std::log(p) / std::pow(std::log(2), 2));
-    }
-
-    size_t CalculateOptimalHashes(size_t n, size_t m) {
-        return std::round(std::log(2) * m / n);
-    }
-
     std::vector<size_t> HashItem(const std::string& item) const {
-        // Simple hash functions - in production, use better hash functions
+        // Use double hashing approach inspired by RocksDB
+        // Generate k hash values from two base hashes: h1 and h2
+        // hash_i = h1 + i * h2 (mod m) - Kirsch-Mitzenmacher optimization
         std::vector<size_t> hashes;
-        size_t h1 = std::hash<std::string>{}(item);
-        size_t h2 = std::hash<std::string>{}(item + "salt");
 
+        // Generate two independent hash values
+        std::hash<std::string> hasher;
+        size_t h1 = hasher(item);
+
+        // For h2, use golden ratio multiplier (like RocksDB) to generate independent hash
+        // 0x9e3779b9 is the 32-bit golden ratio: 2^32 / φ where φ = (1+√5)/2
+        size_t h2 = h1 * 0x9e3779b9;
+
+        size_t num_bits = bits_.size() * 64;
         for (size_t i = 0; i < num_hashes_; ++i) {
-            hashes.push_back(h1 + i * h2);
+            hashes.push_back((h1 + i * h2) % num_bits);
         }
 
         return hashes;
@@ -140,6 +228,12 @@ private:
     double false_positive_rate_;
     std::vector<uint64_t> bits_;
     size_t num_hashes_;
+
+    // Dynamic resizing support
+    size_t items_added_ = 0;
+    size_t capacity_;  // Same as expected_items_, stored for quick access
+    std::unique_ptr<std::vector<std::string>> key_buffer_;  // Only allocated when needed
+    bool tracking_keys_ = false;
 };
 
 BloomFilter::BloomFilter(size_t expected_items, double false_positive_rate)
@@ -172,6 +266,18 @@ std::unique_ptr<BloomFilter> BloomFilter::Deserialize(const std::vector<uint8_t>
     auto filter = std::make_unique<BloomFilter>(0, 0.0);  // Dummy values
     filter->impl_ = std::move(impl);
     return filter;
+}
+
+size_t BloomFilter::ItemsAdded() const {
+    return impl_->ItemsAdded();
+}
+
+size_t BloomFilter::Capacity() const {
+    return impl_->Capacity();
+}
+
+double BloomFilter::LoadFactor() const {
+    return impl_->LoadFactor();
 }
 
 // ColumnIndex implementation
