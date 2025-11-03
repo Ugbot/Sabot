@@ -1,6 +1,7 @@
 #include "marble/mvcc.h"
 #include "marble/table_capabilities.h"
 #include "marble/column_family.h"
+#include "marble/lsm_storage.h"
 #include <algorithm>
 #include <chrono>
 
@@ -15,9 +16,9 @@ namespace marble {
  * - Conflict detection
  * - Garbage collection of old versions
  */
-class MVCCManager {
+class MVCCManagerImpl {
 public:
-    MVCCManager()
+    MVCCManagerImpl()
         : oracle_()
         , next_txn_id_(1)
         , lsm_tree_(nullptr)
@@ -270,7 +271,7 @@ public:
      * @param record Output record
      * @return Status OK if found, NotFound if no visible version
      */
-    Status GetForSnapshot(const Key& key, uint64_t snapshot_ts, std::shared_ptr<Record>* record) {
+    Status GetForSnapshot(const Key& key, Timestamp snapshot_ts, std::shared_ptr<Record>* record) {
         std::lock_guard<std::mutex> lock(mutex_);
 
         std::string key_str = key.ToString();
@@ -460,15 +461,23 @@ private:
     MVCCStats stats_;
 };
 
-// Global MVCC manager instance
-std::unique_ptr<MVCCManager> global_mvcc_manager;
+// Define the global MVCC manager implementation
+static std::unique_ptr<MVCCManagerImpl> global_mvcc_manager_impl;
 
+// NOTE: global_mvcc_manager is declared extern in mvcc.h but we can't define it
+// because MVCCManager is only forward-declared (incomplete type).
+// This is a design flaw that needs refactoring.
+// For now, api.cpp doesn't use it (line 72 sets mvcc_manager_ = nullptr)
+
+// Initialization functions - to be called by the application
 void initializeMVCC() {
-    global_mvcc_manager = std::make_unique<MVCCManager>();
+    if (!global_mvcc_manager_impl) {
+        global_mvcc_manager_impl = std::make_unique<MVCCManagerImpl>();
+    }
 }
 
 void shutdownMVCC() {
-    global_mvcc_manager.reset();
+    global_mvcc_manager_impl.reset();
 }
 
 // Helper function to convert TableCapabilities::MVCCSettings to MVCC configuration

@@ -12,6 +12,7 @@
 #include <marble/status.h>
 #include <marble/memtable.h>
 #include <marble/sstable.h>
+#include <marble/wal.h>
 
 namespace marble {
 

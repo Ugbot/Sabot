@@ -15,19 +15,20 @@ public:
     DefaultTimestampProvider() : current_timestamp_(1) {}  // Start at 1, 0 is invalid
 
     Timestamp GetReadTimestamp() const override {
-        return current_timestamp_.load(std::memory_order_acquire);
+        return Timestamp(current_timestamp_.load(std::memory_order_acquire));
     }
 
     Timestamp GetWriteTimestamp() override {
-        return current_timestamp_.fetch_add(1, std::memory_order_acq_rel) + 1;
+        uint64_t ts = current_timestamp_.fetch_add(1, std::memory_order_acq_rel);
+        return Timestamp(ts + 1);
     }
 
     Timestamp CreateSnapshotTimestamp() override {
-        return current_timestamp_.load(std::memory_order_acquire);
+        return Timestamp(current_timestamp_.load(std::memory_order_acquire));
     }
 
 private:
-    std::atomic<Timestamp> current_timestamp_;
+    std::atomic<uint64_t> current_timestamp_;
 };
 
 // Version implementation
@@ -82,7 +83,7 @@ public:
 
     Status GetStats(std::string* stats) const override {
         std::stringstream ss;
-        ss << "Version{timestamp=" << timestamp_
+        ss << "Version{timestamp=" << timestamp_.value()
            << ", ref_count=" << reference_count_.load();
 
         for (int level = 0; level < 7; ++level) {
@@ -110,7 +111,7 @@ public:
     VersionSetImpl() : current_timestamp_(std::make_unique<DefaultTimestampProvider>()) {
         // Create initial empty version
         std::array<std::vector<std::shared_ptr<SSTable>>, 7> empty_levels{};
-        current_version_ = std::make_shared<VersionImpl>(0, empty_levels);
+        current_version_ = std::make_shared<VersionImpl>(Timestamp(0), empty_levels);
     }
 
     std::shared_ptr<Version> Current() const override {
@@ -172,7 +173,7 @@ public:
 
     std::shared_ptr<Version> CreateSnapshot(Timestamp timestamp) override {
         std::unique_lock<std::mutex> lock(mutex_);
-        if (timestamp == 0) {
+        if (timestamp == Timestamp(0)) {
             timestamp = current_timestamp_->CreateSnapshotTimestamp();
         }
         return std::make_shared<VersionImpl>(timestamp,
@@ -221,7 +222,7 @@ public:
         std::unique_lock<std::mutex> lock(mutex_);
 
         std::stringstream ss;
-        ss << "VersionSet{current_ts=" << CurrentTimestamp()
+        ss << "VersionSet{current_ts=" << CurrentTimestamp().value()
            << ", history_size=" << version_history_.size()
            << ", current_version_refs=" << current_version_->GetReferenceCount()
            << "}";
@@ -247,23 +248,32 @@ public:
     MVCCManagerImpl(std::unique_ptr<TransactionTimestampProvider> timestamp_provider)
         : MVCCManager(std::move(timestamp_provider)), next_transaction_id_(1) {}
 
-    Status BeginTransaction(TransactionId* transaction_id) override {
+    TransactionContext BeginTransaction(bool read_only) override {
         std::unique_lock<std::mutex> lock(txn_mutex_);
 
-        *transaction_id = next_transaction_id_++;
-        active_transactions_[*transaction_id] = TransactionInfo{
-            *transaction_id,
-            timestamp_provider_->GetReadTimestamp(),
+        TransactionId txn_id = next_transaction_id_++;
+        Timestamp read_ts = timestamp_provider_->GetReadTimestamp();
+
+        active_transactions_[txn_id] = TransactionInfo{
+            txn_id,
+            read_ts,
             std::chrono::steady_clock::now()
         };
 
-        return Status::OK();
+        TransactionContext context;
+        context.txn_id = txn_id;
+        context.snapshot = Snapshot(read_ts);
+        context.write_buffer = nullptr;  // Will be set by caller
+        context.read_only = read_only;
+        context.start_time = read_ts;
+
+        return context;
     }
 
-    Status CommitTransaction(TransactionId transaction_id) override {
+    Status CommitTransaction(const TransactionContext& context) override {
         std::unique_lock<std::mutex> lock(txn_mutex_);
 
-        auto it = active_transactions_.find(transaction_id);
+        auto it = active_transactions_.find(context.txn_id);
         if (it == active_transactions_.end()) {
             return Status::InvalidArgument("Transaction not found or already committed");
         }
@@ -275,16 +285,16 @@ public:
         return Status::OK();
     }
 
-    Status RollbackTransaction(TransactionId transaction_id) override {
+    Status RollbackTransaction(const TransactionContext& context) override {
         std::unique_lock<std::mutex> lock(txn_mutex_);
 
-        auto it = active_transactions_.find(transaction_id);
+        auto it = active_transactions_.find(context.txn_id);
         if (it == active_transactions_.end()) {
             return Status::InvalidArgument("Transaction not found");
         }
 
         // Discard all writes from this transaction
-        transaction_writes_.erase(transaction_id);
+        transaction_writes_.erase(context.txn_id);
         active_transactions_.erase(it);
         return Status::OK();
     }
@@ -330,6 +340,16 @@ public:
         // For now, return empty list
 
         return Status::OK();
+    }
+
+    Status GetForSnapshot(const Key& key, Timestamp snapshot_ts,
+                        std::shared_ptr<Record>* record) override {
+        std::unique_lock<std::mutex> lock(rw_mutex_);
+
+        // Get record visible at snapshot timestamp
+        // In a real implementation, this would query the version manager
+        // For now, return NotFound
+        return Status::NotFound("Record not found (GetForSnapshot not fully implemented)");
     }
 
     Status AddWriteOperation(TransactionId transaction_id,
@@ -507,7 +527,7 @@ public:
 
         std::stringstream ss;
         ss << "VersionGC{scheduled=" << (gc_scheduled_ ? "true" : "false")
-           << ", retention_ts=" << retention_timestamp_
+           << ", retention_ts=" << retention_timestamp_.value()
            << "}";
 
         *stats = ss.str();

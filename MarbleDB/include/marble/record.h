@@ -646,4 +646,47 @@ private:
     uint64_t commit_ts_;
 };
 
+/**
+ * @brief Concrete RecordRef implementation for Arrow RecordBatch rows
+ *
+ * Provides direct access to a row within an Arrow RecordBatch without copying.
+ * Implements the RecordRef interface for efficient field access.
+ */
+class SimpleRecordRef : public RecordRef {
+public:
+    SimpleRecordRef(std::shared_ptr<Key> key, std::shared_ptr<arrow::RecordBatch> batch, int64_t row_index)
+        : key_(std::move(key)), batch_(std::move(batch)), row_index_(row_index) {}
+
+    std::shared_ptr<Key> key() const override {
+        return key_;
+    }
+
+    arrow::Result<std::shared_ptr<arrow::Scalar>> GetField(const std::string& field_name) const override {
+        auto column = batch_->GetColumnByName(field_name);
+        if (!column) {
+            return arrow::Status::KeyError("Field not found: ", field_name);
+        }
+        return column->GetScalar(row_index_);
+    }
+
+    arrow::Result<std::vector<std::shared_ptr<arrow::Scalar>>> GetFields() const override {
+        std::vector<std::shared_ptr<arrow::Scalar>> fields;
+        for (int i = 0; i < batch_->num_columns(); ++i) {
+            auto column = batch_->column(i);
+            ARROW_ASSIGN_OR_RAISE(auto scalar, column->GetScalar(row_index_));
+            fields.push_back(scalar);
+        }
+        return fields;
+    }
+
+    size_t Size() const override {
+        return batch_->num_columns();
+    }
+
+private:
+    std::shared_ptr<Key> key_;
+    std::shared_ptr<arrow::RecordBatch> batch_;
+    int64_t row_index_;
+};
+
 } // namespace marble

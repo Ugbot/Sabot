@@ -15,8 +15,7 @@ namespace marble {
 class TaskScheduler;
 class WalManagerImpl;
 
-// Factory function to create WAL manager
-std::unique_ptr<WalManager> CreateWalManager();
+// Factory function to create WAL manager (declared after WalManager class)
 
 // WAL entry types for handling large records that span multiple log entries
 enum class WalEntryType {
@@ -51,8 +50,8 @@ struct WalEntry {
     WalEntry() = default;
     WalEntry(uint64_t seq, uint64_t ts, WalEntryType type,
              std::shared_ptr<Key> k, std::shared_ptr<Record> v, uint64_t bid = 0)
-        : sequence_number(seq), timestamp(ts), entry_type(type),
-          key(std::move(k)), value(std::move(v)), batch_id(bid) {}
+        : sequence_number(seq), entry_type(type), key(std::move(k)),
+          value(std::move(v)), timestamp(ts), batch_id(bid) {}
     WalEntry(uint64_t seq, WalEntryType type, uint64_t txn_id,
              std::shared_ptr<Key> k, std::shared_ptr<Record> v,
              uint64_t ts = 0)
@@ -289,7 +288,8 @@ private:
 std::unique_ptr<WalManager> CreateMMRingBufferWalManager(TaskScheduler* scheduler = nullptr);
 
 // Factory functions
-std::unique_ptr<WalManager> CreateWalManager(TaskScheduler* scheduler = nullptr);
+std::unique_ptr<WalManager> CreateWalManager();
+std::unique_ptr<WalManager> CreateWalManager(TaskScheduler* scheduler);
 std::unique_ptr<WalFile> CreateWalFile(const std::string& path, uint64_t file_id);
 
 // Utility functions

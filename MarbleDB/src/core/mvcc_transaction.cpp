@@ -7,6 +7,7 @@
 #include "marble/db.h"
 #include "marble/mvcc.h"
 #include "marble/lsm_storage.h"
+#include "marble/version.h"
 #include "marble/status.h"
 #include <memory>
 #include <mutex>
@@ -89,7 +90,7 @@ public:
             return Status::InvalidArgument("Transaction already committed");
         }
 
-        write_buffer_.Delete(std::make_shared<Key>(key));
+        write_buffer_.Delete(key.Clone());
         return Status::OK();
     }
 
@@ -124,7 +125,7 @@ public:
         MVCCManager::TransactionContext ctx;
         ctx.txn_id = txn_id_;
         ctx.snapshot = snapshot_;
-        ctx.write_buffer = write_buffer_;
+        ctx.write_buffer = &write_buffer_;
         ctx.read_only = read_only_;
         ctx.start_time = start_time_;
 
@@ -147,7 +148,7 @@ public:
         MVCCManager::TransactionContext ctx;
         ctx.txn_id = txn_id_;
         ctx.snapshot = snapshot_;
-        ctx.write_buffer = write_buffer_;
+        ctx.write_buffer = &write_buffer_;
         ctx.read_only = read_only_;
         ctx.start_time = start_time_;
 
@@ -182,6 +183,7 @@ private:
     Snapshot snapshot_;
     WriteBuffer write_buffer_;
     bool read_only_;
+    Timestamp start_time_;
     bool committed_;
     bool rolled_back_;
 };

@@ -18,11 +18,37 @@ target_link_libraries(simple_p1_test PRIVATE marble)
 add_executable(performance_optimizations_bench performance_optimizations_bench.cpp)
 target_link_libraries(performance_optimizations_bench PRIVATE marble)
 
+# Comprehensive test harness for benchmarking
+add_executable(marble_bench_harness marble_bench_harness.cpp)
+target_link_libraries(marble_bench_harness PRIVATE marble)
+
+# Simple working benchmark (avoids Arrow batch API issues)
+add_executable(marble_bench_simple marble_bench_simple.cpp)
+target_link_libraries(marble_bench_simple PRIVATE marble)
+
+# New vendor-pattern benchmarks (RocksDB/Tonbo style)
+# Common infrastructure library
+add_library(marble_bench_common STATIC common.cpp)
+target_link_libraries(marble_bench_common PUBLIC marble)
+target_include_directories(marble_bench_common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Batch write benchmark
+add_executable(batch_write_bench batch_write_bench.cpp)
+target_link_libraries(batch_write_bench PRIVATE marble_bench_common marble)
+
 # Install benchmarks
 install(TARGETS
     marble_bench
     p1_optimization_bench
     simple_p1_test
     performance_optimizations_bench
+    marble_bench_harness
+    marble_bench_simple
+    batch_write_bench
     RUNTIME DESTINATION bin/benchmarks
+)
+
+# Install config example
+install(FILES bench_config_example.json
+    DESTINATION share/marbledb/benchmarks
 )

@@ -25,21 +25,17 @@ bool ColumnStatistics::CanSatisfyPredicate(const ColumnPredicate& predicate) con
 
     // For now, implement basic range checks
     // This could be extended with more sophisticated predicate evaluation
-    switch (predicate.type) {
-        case PredicateType::kLessThan: {
+    switch (predicate.predicate_type) {
+        case ColumnPredicate::PredicateType::kLessThan: {
             // If max_value >= predicate.value, some rows might satisfy
             // For now, be conservative and allow the scan
             return true;
         }
-        case PredicateType::kGreaterThan: {
+        case ColumnPredicate::PredicateType::kGreaterThan: {
             // For now, be conservative and allow the scan
             return true;
         }
-        case PredicateType::kEqual: {
-            // For now, be conservative and allow the scan
-            return true;
-        }
-        case PredicateType::kBetween: {
+        case ColumnPredicate::PredicateType::kEqual: {
             // For now, be conservative and allow the scan
             return true;
         }
@@ -63,23 +59,23 @@ ArrowPredicateEvaluator::ArrowPredicateEvaluator(const std::vector<ColumnPredica
         compiled.column_name = pred.column_name;
         compiled.value = pred.value;
 
-        switch (pred.type) {
-            case PredicateType::kEqual:
+        switch (pred.predicate_type) {
+            case ColumnPredicate::PredicateType::kEqual:
                 compiled.op = arrow::compute::CompareOperator::EQUAL;
                 break;
-            case PredicateType::kNotEqual:
+            case ColumnPredicate::PredicateType::kNotEqual:
                 compiled.op = arrow::compute::CompareOperator::NOT_EQUAL;
                 break;
-            case PredicateType::kLessThan:
+            case ColumnPredicate::PredicateType::kLessThan:
                 compiled.op = arrow::compute::CompareOperator::LESS;
                 break;
-            case PredicateType::kLessThanOrEqual:
+            case ColumnPredicate::PredicateType::kLessThanOrEqual:
                 compiled.op = arrow::compute::CompareOperator::LESS_EQUAL;
                 break;
-            case PredicateType::kGreaterThan:
+            case ColumnPredicate::PredicateType::kGreaterThan:
                 compiled.op = arrow::compute::CompareOperator::GREATER;
                 break;
-            case PredicateType::kGreaterThanOrEqual:
+            case ColumnPredicate::PredicateType::kGreaterThanOrEqual:
                 compiled.op = arrow::compute::CompareOperator::GREATER_EQUAL;
                 break;
             default:

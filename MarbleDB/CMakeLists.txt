@@ -12,7 +12,7 @@ option(MARBLE_BUILD_BENCHMARKS "Build MarbleDB benchmarks" OFF)
 option(MARBLE_BUILD_SERVER "Build MarbleDB server binary" ON)
 option(MARBLE_BUILD_SHARED "Build shared library" OFF)
 option(MARBLE_BUILD_STATIC "Build static library" ON)
-option(MARBLE_ENABLE_RAFT "Enable Raft consensus support" ON)
+option(MARBLE_ENABLE_RAFT "Enable Raft consensus support" OFF)  # Disabled - not needed for Arrow Batch API
 option(MARBLE_USE_ASAN "Enable AddressSanitizer" OFF)
 option(MARBLE_USE_TSAN "Enable ThreadSanitizer" OFF)
 option(MARBLE_USE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
@@ -182,11 +182,27 @@ list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/raft/arrow_flig
 # Remove async.cpp (has compilation issues and is not needed for basic functionality)
 list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/async.cpp")
 
+# Remove query.cpp files (incomplete implementations with compilation errors)
+list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/query.cpp")
+list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/query/query.cpp")
+
+# Re-enabled mvcc_transaction.cpp - contains CreateMVCCTransaction needed for benchmarks
+# list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/mvcc_transaction.cpp")
+
+# Re-enabled record_ref.cpp - fixed SimpleRecordRef error (now uses ArrowRecordRef)
+# list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/record_ref.cpp")
+
+# Remove schema.cpp (has conflicting SimpleRecord definition - demo/test file)
+list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/schema.cpp")
+
+# Remove transaction.cpp (has redefinition and abstract class issues)
+list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/transaction.cpp")
+
 # Explicitly list source files to ensure they're included
 set(MARBLE_SOURCES
     ${MARBLE_SOURCES}
     src/util/status.cpp
-    src/core/schema.cpp
+    # src/core/schema.cpp  # Excluded - has conflicting SimpleRecord definition
     src/core/metrics.cpp
     src/core/advanced_features.cpp
     src/core/task_scheduler.cpp
@@ -199,14 +215,14 @@ set(MARBLE_SOURCES
     src/core/compaction.cpp
     src/core/wal.cpp
     src/core/version.cpp
-    src/core/transaction.cpp
-    src/core/query.cpp
+    # src/core/transaction.cpp  # Excluded - redefinition and abstract class issues
     src/core/table.cpp
     src/core/analytics.cpp
     src/core/skipping_index.cpp
     src/core/typed_record.cpp
     src/core/sstable_arrow.cpp
     src/core/api.cpp
+    src/core/arrow_serialization.cpp
     src/core/c_api.cpp
     src/core/temporal.cpp
     src/core/temporal_reconstruction.cpp
@@ -214,7 +230,6 @@ set(MARBLE_SOURCES
     src/core/execution_engine.cpp
     src/core/block_optimizations.cpp
     src/core/hot_key_cache.cpp
-    src/query/query.cpp
 )
 
 # Add Raft sources if enabled

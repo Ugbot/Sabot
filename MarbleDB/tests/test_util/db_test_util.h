@@ -17,7 +17,14 @@ class MarbleDB;
 class DBOptions;
 class WriteOptions;
 class ReadOptions;
+class Status;
 }
+
+// Bring types into scope for convenience
+using marble::Status;
+using marble::DBOptions;
+using marble::WriteOptions;
+using marble::ReadOptions;
 
 // Database test base class - similar to RocksDB's DBTestBase
 class DBTestBase : public MarbleDBTest {

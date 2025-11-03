@@ -15,25 +15,7 @@
 
 namespace marble {
 
-// Factory function to create WAL manager
-std::unique_ptr<WalManager> CreateWalManager() {
-    return std::make_unique<WalManagerImpl>();
-}
-
-// WalEntry implementation
-WalEntry::WalEntry(uint64_t seq, WalEntryType type, uint64_t txn_id,
-                   std::shared_ptr<Key> k, std::shared_ptr<Record> v,
-                   uint64_t ts)
-    : sequence_number(seq), transaction_id(txn_id), entry_type(type),
-      key(std::move(k)), value(std::move(v)), timestamp(ts) {
-
-    if (timestamp == 0) {
-        timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch()).count();
-    }
-
-    checksum = ComputeChecksum(*this);
-}
+// Factory function to create WAL manager - moved to end of file after WalManagerImpl definition
 
 // WAL file implementation
 class WalFileImpl : public WalFile {
@@ -1274,6 +1256,10 @@ Status MMRingBufferWalManager::RecoverFromFile(std::function<Status(const WalEnt
 // Factory functions
 std::unique_ptr<WalManager> CreateMMRingBufferWalManager(TaskScheduler* scheduler) {
     return std::make_unique<MMRingBufferWalManager>(scheduler);
+}
+
+std::unique_ptr<WalManager> CreateWalManager() {
+    return std::make_unique<WalManagerImpl>();
 }
 
 std::unique_ptr<WalManager> CreateWalManager(TaskScheduler* scheduler) {

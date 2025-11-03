@@ -236,6 +236,57 @@ std::shared_ptr<arrow::Schema> SimpleRecord::GetArrowSchema() const {
 }
 
 std::unique_ptr<RecordRef> SimpleRecord::AsRecordRef() const {
+    // Inline implementation of RecordRef for SimpleRecord
+    // This wraps the SimpleRecord's key, batch, and row_index
+    class SimpleRecordRef : public RecordRef {
+    private:
+        std::shared_ptr<Key> key_;
+        std::shared_ptr<arrow::RecordBatch> batch_;
+        int64_t row_index_;
+
+    public:
+        SimpleRecordRef(std::shared_ptr<Key> key,
+                       std::shared_ptr<arrow::RecordBatch> batch,
+                       int64_t row_index)
+            : key_(std::move(key)), batch_(std::move(batch)), row_index_(row_index) {}
+
+        std::shared_ptr<Key> key() const override {
+            return key_;
+        }
+
+        arrow::Result<std::shared_ptr<arrow::Scalar>> GetField(const std::string& field_name) const override {
+            auto schema = batch_->schema();
+            int idx = schema->GetFieldIndex(field_name);
+            if (idx < 0) {
+                return arrow::Status::KeyError("Field not found: " + field_name);
+            }
+            return batch_->column(idx)->GetScalar(row_index_);
+        }
+
+        arrow::Result<std::vector<std::shared_ptr<arrow::Scalar>>> GetFields() const override {
+            std::vector<std::shared_ptr<arrow::Scalar>> scalars;
+            scalars.reserve(batch_->num_columns());
+            for (int i = 0; i < batch_->num_columns(); ++i) {
+                auto scalar_result = batch_->column(i)->GetScalar(row_index_);
+                if (!scalar_result.ok()) {
+                    return scalar_result.status();
+                }
+                scalars.push_back(*scalar_result);
+            }
+            return scalars;
+        }
+
+        size_t Size() const override {
+            // Estimate total size as sum of column data for this row
+            size_t total = 0;
+            for (int i = 0; i < batch_->num_columns(); ++i) {
+                // Rough estimate: 64 bytes per field (covers most types)
+                total += 64;
+            }
+            return total;
+        }
+    };
+
     return std::make_unique<SimpleRecordRef>(key_, batch_, row_index_);
 }
 

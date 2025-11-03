@@ -331,7 +331,7 @@ NegativeCache::NegativeCache(size_t max_entries)
     : max_entries_(max_entries) {
     // Create bloom filter for negative lookups
     // Use 8 bits per key for ~3% false positive rate
-    negative_bloom_ = std::make_unique<BloomFilter>(8, max_entries);
+    // negative_bloom_ = std::make_unique<BloomFilter>(8, max_entries); // TODO: Re-enable
 }
 
 void NegativeCache::RecordMiss(const Key& key) {
@@ -340,7 +340,7 @@ void NegativeCache::RecordMiss(const Key& key) {
     std::string key_str = key.ToString();
     
     // Add to bloom filter
-    negative_bloom_->Add(key);
+    // negative_bloom_->Add(key); // TODO: Re-enable
     
     // Add to recent misses set
     recent_misses_.insert(key_str);
@@ -357,9 +357,12 @@ bool NegativeCache::DefinitelyNotExists(const Key& key) const {
     total_checks_++;
     
     // Quick check: bloom filter
+    // TODO: Re-enable bloom filter
+    /*
     if (!negative_bloom_->MayContain(key)) {
         return false;  // Might exist (not in negative cache)
     }
+    */
     
     // Detailed check: recent misses set
     std::lock_guard<std::mutex> lock(mutex_);
@@ -387,7 +390,7 @@ void NegativeCache::Clear() {
     recent_misses_.clear();
     
     // Recreate bloom filter
-    negative_bloom_ = std::make_unique<BloomFilter>(8, max_entries_);
+    // negative_bloom_ = std::make_unique<BloomFilter>(8, max_entries_); // TODO: Re-enable
 }
 
 NegativeCache::Stats NegativeCache::GetStats() const {

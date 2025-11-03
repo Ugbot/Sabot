@@ -1,0 +1,97 @@
+{
+  "_comment": "MarbleDB Benchmark Harness Configuration Example",
+  "_usage": "marble_bench_harness --config bench_config_example.json",
+
+  "database": {
+    "db_path": "/tmp/marble_bench",
+    "clean_on_start": true,
+    "enable_wal": true,
+    "memtable_size_mb": 64
+  },
+
+  "benchmarks": {
+    "_comment": "Which benchmark categories to run: 'crud', 'batch', 'analytics', or 'all'",
+    "to_run": ["all"],
+
+    "_alternatively": "To run specific benchmarks",
+    "to_run_alt": ["crud", "batch"]
+  },
+
+  "dataset_sizes": {
+    "_comment": "Predefined dataset sizes for benchmarks",
+    "tiny": 100,
+    "small": 1000,
+    "medium": 10000,
+    "large": 100000,
+    "xlarge": 1000000,
+
+    "_default": "Which size to use by default",
+    "default": "medium"
+  },
+
+  "batch_operations": {
+    "_comment": "Batch sizes to test for InsertBatch operations",
+    "batch_sizes": [100, 1000, 10000],
+
+    "_note": "Will test each batch size with multiple batches",
+    "example": "batch_size=1000 means InsertBatch() with 1000 rows per call"
+  },
+
+  "concurrency": {
+    "_comment": "Number of threads for concurrent benchmarks",
+    "num_threads": 1,
+
+    "_note": "Multi-threading not fully implemented yet",
+    "future": "Will support 1, 2, 4, 8 threads"
+  },
+
+  "output": {
+    "_comment": "Output format options",
+    "formats": ["console", "json"],
+    "_formats_options": "'console' for human-readable, 'json' for machine-readable",
+
+    "json_output_file": "benchmark_results.json",
+    "_file_note": "If empty, JSON prints to stdout",
+
+    "verbose": false,
+    "_verbose_note": "Show detailed operation-by-operation output"
+  },
+
+  "randomization": {
+    "_comment": "Data generation settings",
+    "randomize_data": true,
+    "_randomize_note": "Use random values (no hardcoded test data)",
+
+    "random_seed": 0,
+    "_seed_note": "0 = use random_device, non-zero = reproducible results"
+  },
+
+  "performance_targets": {
+    "_comment": "Expected performance targets for comparison",
+    "_note": "Results show % of target achieved",
+
+    "put_ops_sec": 400000,
+    "get_ops_sec": 700000,
+    "batch_rows_sec": 1000000,
+    "scan_rows_sec": 5000000,
+
+    "_targets_note": "Based on BENCHMARK_RESULTS.md measurements"
+  },
+
+  "examples": {
+    "_example_1": "Quick test with small dataset",
+    "command_1": "./marble_bench_harness --benchmark all --size small --output console",
+
+    "_example_2": "Batch benchmarks only, medium dataset, JSON output",
+    "command_2": "./marble_bench_harness --benchmark batch --size medium --output json --json-file results.json",
+
+    "_example_3": "Large dataset, specific batch size",
+    "command_3": "./marble_bench_harness --size large --batch-size 10000 --output both",
+
+    "_example_4": "Using config file",
+    "command_4": "./marble_bench_harness --config bench_config_example.json",
+
+    "_example_5": "Config file with CLI overrides",
+    "command_5": "./marble_bench_harness --config bench_config_example.json --size large --output json"
+  }
+}

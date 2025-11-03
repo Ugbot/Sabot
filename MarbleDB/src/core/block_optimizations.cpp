@@ -17,13 +17,13 @@ void BlockBloomFilterManager::AddKeyToBlock(size_t block_id, const Key& key) {
         // Create new bloom filter for this block
         // Estimate expected items based on bits per key
         size_t expected_items = bits_per_key_ > 0 ? (block_size_ * 8) / bits_per_key_ : 1000;
-        auto bloom = std::make_shared<BloomFilter>(expected_items, 0.01);
-        block_blooms_[block_id] = bloom;
+        // auto bloom = std::make_shared<BloomFilter>(expected_items, 0.01); // TODO: Re-enable
+        // block_blooms_[block_id] = bloom; // TODO: Re-enable
         it = block_blooms_.find(block_id);
     }
 
     // Add key to block's bloom filter
-    it->second->Add(key);
+    // it->second->Add(key); // TODO: Re-enable
 }
 
 bool BlockBloomFilterManager::BlockMayContainKey(size_t block_id, const Key& key) const {
@@ -32,13 +32,15 @@ bool BlockBloomFilterManager::BlockMayContainKey(size_t block_id, const Key& key
         return true;  // Conservative: assume block might contain key
     }
 
-    return it->second->MayContain(key);
+    // return it->second->MayContain(key); // TODO: Re-enable
+    return true; // Conservative: assume block might contain key
 }
 
 std::shared_ptr<BloomFilter> BlockBloomFilterManager::GetBlockBloomFilter(size_t block_id) const {
     auto it = block_blooms_.find(block_id);
     if (it != block_blooms_.end()) {
-        return it->second;
+        // return it->second; // TODO: Re-enable
+        return nullptr; // TODO: Re-enable
     }
     return nullptr;
 }
@@ -83,6 +85,8 @@ Status OptimizedSSTableReader::GetOptimized(
 
     for (size_t block_id = 0; block_id < num_blocks; ++block_id) {
         // Check block bloom filter first
+        // TODO: Re-enable bloom filter
+        /*
         if (block_id < block_blooms.size()) {
             Int64Key key_obj(key);
             if (!block_blooms[block_id]->MayContain(key_obj)) {
@@ -91,6 +95,7 @@ Status OptimizedSSTableReader::GetOptimized(
                 continue;
             }
         }
+        */
 
         // Block might contain key - do binary search within block
         stats_.blocks_scanned++;
@@ -164,15 +169,18 @@ std::vector<std::shared_ptr<BloomFilter>> BlockBloomFilterBuilder::BuildFromEntr
         size_t block_key_count = block_end - block_start;
 
         // Create bloom filter for this block
-        auto bloom = std::make_shared<BloomFilter>(bits_per_key_, block_key_count);
+        // auto bloom = std::make_shared<BloomFilter>(bits_per_key_, block_key_count); // TODO: Re-enable
 
         // Add all keys in this block to the bloom filter
+        // TODO: Re-enable bloom filter
+        /*
         for (size_t i = block_start; i < block_end; ++i) {
             Int64Key key_obj(sorted_entries[i].first);
             bloom->Add(key_obj);
         }
 
         block_blooms.push_back(bloom);
+        */
     }
 
     return block_blooms;

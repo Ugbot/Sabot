@@ -25,7 +25,7 @@ Status StandardLSMTree::Init(const LSMTreeConfig& config) {
     // Initialize components
     memtable_factory_ = CreateSimpleMemTableFactory();
     sstable_manager_ = CreateSSTableManager();
-    wal_manager_ = std::make_unique<WalManagerImpl>();
+    wal_manager_ = CreateWalManager();
 
     // Initialize WAL
     WalOptions wal_options;

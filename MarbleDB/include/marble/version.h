@@ -7,6 +7,7 @@
 #include <functional>
 #include <marble/status.h>
 #include <marble/record.h>
+#include <marble/mvcc.h>
 
 namespace marble {
 
@@ -14,8 +15,7 @@ namespace marble {
 class TaskScheduler;
 class SSTable;
 
-// Timestamp for versioning - monotonically increasing
-using Timestamp = uint64_t;
+// Timestamp for versioning - defined in mvcc.h
 
 // Transaction ID for tracking transactions
 using TransactionId = uint64_t;
@@ -25,7 +25,7 @@ struct VersionSnapshot {
     Timestamp timestamp;
     std::string name;  // Optional snapshot name
 
-    VersionSnapshot(Timestamp ts = 0, const std::string& n = "")
+    VersionSnapshot(Timestamp ts = Timestamp(0), const std::string& n = "")
         : timestamp(ts), name(n) {}
 };
 
@@ -62,7 +62,7 @@ struct VersionEdit {
     VersionEditType type;
     int level = -1;  // LSM level (0-6)
     std::shared_ptr<SSTable> sstable;  // For add/delete operations
-    Timestamp new_timestamp = 0;  // For timestamp updates
+    Timestamp new_timestamp = Timestamp(0);  // For timestamp updates
     std::string compaction_range;  // For compaction tracking
 
     VersionEdit(VersionEditType t) : type(t) {}
@@ -116,7 +116,7 @@ public:
                             std::shared_ptr<Version>* new_version) = 0;
 
     // Create a snapshot at current timestamp
-    virtual std::shared_ptr<Version> CreateSnapshot(Timestamp timestamp = 0) = 0;
+    virtual std::shared_ptr<Version> CreateSnapshot(Timestamp timestamp = Timestamp(0)) = 0;
 
     // Get version at specific timestamp (for time travel queries)
     virtual std::shared_ptr<Version> GetVersionAt(Timestamp timestamp) const = 0;
@@ -152,17 +152,26 @@ public:
 // MVCC Manager coordinates multi-version concurrency control
 class MVCCManager {
 public:
+    // Transaction context for commit/rollback operations
+    struct TransactionContext {
+        TransactionId txn_id;
+        Snapshot snapshot;
+        const WriteBuffer* write_buffer;  // Pointer to transaction's write buffer
+        bool read_only;
+        Timestamp start_time;
+    };
+
     explicit MVCCManager(std::unique_ptr<TransactionTimestampProvider> timestamp_provider);
     virtual ~MVCCManager() = default;
 
     // Begin a new transaction with snapshot isolation
-    virtual Status BeginTransaction(TransactionId* transaction_id) = 0;
+    virtual TransactionContext BeginTransaction(bool read_only) = 0;
 
     // Commit a transaction
-    virtual Status CommitTransaction(TransactionId transaction_id) = 0;
+    virtual Status CommitTransaction(const TransactionContext& context) = 0;
 
     // Rollback a transaction
-    virtual Status RollbackTransaction(TransactionId transaction_id) = 0;
+    virtual Status RollbackTransaction(const TransactionContext& context) = 0;
 
     // Check for write-write conflicts
     virtual Status CheckWriteConflict(const VersionedKey& key,
@@ -175,6 +184,10 @@ public:
     virtual Status GetVisibleRecords(TransactionId transaction_id,
                                    const Key& key,
                                    std::vector<VersionedRecord>* records) const = 0;
+
+    // Get record for snapshot (used by MVCC transactions)
+    virtual Status GetForSnapshot(const Key& key, Timestamp snapshot_ts,
+                                std::shared_ptr<Record>* record) = 0;
 
     // Add a write operation to a transaction
     virtual Status AddWriteOperation(TransactionId transaction_id,

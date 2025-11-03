@@ -1,6 +1,7 @@
 #include "marble/sstable.h"
 #include "marble/file_system.h"
 #include "marble/lsm_tree.h"
+#include "marble/analytics.h"  // For BloomFilter
 #include <sstream>
 #include <iomanip>
 #include <cstring>

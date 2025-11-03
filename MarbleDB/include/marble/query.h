@@ -3,15 +3,19 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <functional>
 #include <arrow/api.h>
 #include <arrow/compute/api.h>
 #include "marble/status.h"
+#include "marble/api.h"
 
 namespace marble {
 
 // Forward declarations
 class MarbleDB;
 class QueryExecutor;
+class Record;
+struct ColumnPredicate;
 
 /**
  * @brief Predicate for filtering Arrow data
@@ -136,6 +140,70 @@ private:
     std::vector<Predicate> predicates_;
     size_t limit_ = SIZE_MAX;
     bool reverse_ = false;
+};
+
+/**
+ * @brief Evaluates predicates for filtering records
+ */
+class PredicateEvaluator {
+public:
+    explicit PredicateEvaluator(const std::vector<ColumnPredicate>& predicates);
+    bool Evaluate(const std::shared_ptr<Record>& record) const;
+    std::vector<ColumnPredicate> GetKeyRangePredicates() const;
+    std::vector<ColumnPredicate> GetRecordPredicates() const;
+
+private:
+    std::vector<ColumnPredicate> predicates_;
+    std::vector<ColumnPredicate> key_range_predicates_;
+    std::vector<ColumnPredicate> record_predicates_;
+};
+
+/**
+ * @brief Projects columns from records to Arrow arrays
+ */
+class ColumnProjector {
+public:
+    explicit ColumnProjector(const std::vector<std::string>& columns);
+    Status ProjectToArrow(const std::vector<std::shared_ptr<Record>>& records,
+                         std::vector<std::shared_ptr<arrow::Array>>* arrays) const;
+    std::shared_ptr<arrow::Schema> GetProjectedSchema() const;
+    bool IsFullProjection() const;
+
+private:
+    std::vector<std::string> projected_columns_;
+    bool full_projection_;
+};
+
+/**
+ * @brief Streaming query result for large datasets
+ */
+class StreamingQueryResult {
+public:
+    StreamingQueryResult(std::shared_ptr<arrow::Schema> schema, MarbleDB* db,
+                        const std::vector<ColumnPredicate>& predicates,
+                        const QueryOptions& options);
+    ~StreamingQueryResult();
+
+    bool HasNext() const;
+    Status Next(std::shared_ptr<arrow::RecordBatch>* batch);
+    Status NextAsync(std::function<void(Status, std::shared_ptr<arrow::RecordBatch>)> callback);
+    std::shared_ptr<arrow::Schema> schema() const;
+    int64_t num_rows() const;
+    int64_t num_batches() const;
+    Status RecordsToArrowBatch(const std::vector<std::shared_ptr<Record>>& records,
+                              std::shared_ptr<arrow::RecordBatch>* batch);
+
+private:
+    std::shared_ptr<arrow::Schema> schema_;
+    MarbleDB* db_;
+    std::vector<ColumnPredicate> predicates_;
+    QueryOptions options_;
+    std::unique_ptr<class Iterator> iterator_;
+    std::unique_ptr<PredicateEvaluator> predicate_evaluator_;
+    std::unique_ptr<ColumnProjector> column_projector_;
+    int64_t current_batch_;
+    int64_t total_rows_;
+    bool finished_;
 };
 
 } // namespace marble

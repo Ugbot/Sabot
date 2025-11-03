@@ -340,7 +340,7 @@ public:
     Stats GetStats() const;
     
 private:
-    std::unique_ptr<BloomFilter> negative_bloom_;
+    // std::unique_ptr<BloomFilter> negative_bloom_; // TODO: Re-enable
     std::unordered_set<std::string> recent_misses_;
     size_t max_entries_;
     mutable std::mutex mutex_;

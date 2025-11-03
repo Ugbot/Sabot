@@ -19,6 +19,7 @@
 #include "marble/version.h"
 #include "marble/range_iterator.h"
 #include "marble/arrow_serialization.h"
+#include "marble/simple_marble_db.h"
 #include <nlohmann/json.hpp>
 #include <arrow/api.h>
 #include <arrow/ipc/api.h>
@@ -33,7 +34,7 @@ namespace marble {
 //==============================================================================
 // Internal Helper Functions
 //==============================================================================
-namespace {
+
 // Simple MarbleDB implementation for API
 class SimpleMarbleDB : public MarbleDB {
 public:
@@ -86,7 +87,7 @@ public:
         uint32_t id;
         uint64_t next_batch_id = 0;  // Sequential batch ID for LSM storage
         std::shared_ptr<SkippingIndex> skipping_index;
-        std::shared_ptr<BloomFilter> bloom_filter;
+        // std::shared_ptr<BloomFilter> bloom_filter; // TODO: Re-enable bloom filter
 
         // Secondary index: maps row keys to (batch_id, row_offset) pairs
         // This enables individual row lookups via Get/Put/Delete operations
@@ -172,6 +173,8 @@ public:
             if (!status.ok()) return status;
 
             // Build bloom filter for key lookups
+            // TODO: Re-enable bloom filter
+            /*
             bloom_filter = std::make_shared<BloomFilter>(data.size() * 10, 0.01); // Estimate 10 keys per batch
             for (const auto& batch : data) {
                 auto subject_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(0));
@@ -185,6 +188,7 @@ public:
                     bloom_filter->Add(key_str);
                 }
             }
+            */
 
             return Status::OK();
         }
@@ -386,7 +390,7 @@ public:
         // Initialize indexes on first insert
         if (cf_info->next_batch_id == 1) {
             cf_info->skipping_index = std::make_shared<InMemorySkippingIndex>();
-            cf_info->bloom_filter = std::make_shared<BloomFilter>(1000000, 0.01);  // Preallocate for 1M keys
+            // cf_info->bloom_filter = std::make_shared<BloomFilter>(1000000, 0.01);  // Preallocate for 1M keys // TODO: Re-enable
         }
 
         // Update skipping index with new batch only
@@ -400,6 +404,8 @@ public:
         }
 
         // Update bloom filter with new batch only (incremental)
+        // TODO: Re-enable bloom filter
+        /*
         if (cf_info->bloom_filter && batch->num_columns() >= 3) {
             auto subject_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(0));
             auto predicate_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(1));
@@ -412,18 +418,21 @@ public:
                 cf_info->bloom_filter->Add(key_str);
             }
         }
+        */
 
         return Status::OK();
     }
 
     // Table operations
     Status CreateTable(const TableSchema& schema) override {
-        // Create column family with provided schema
+        // Create column family options with the provided schema
         ColumnFamilyOptions options;
         options.schema = schema.arrow_schema;
 
+        // Create column family descriptor
         ColumnFamilyDescriptor descriptor(schema.table_name, options);
 
+        // Create the column family (table)
         ColumnFamilyHandle* handle = nullptr;
         auto status = CreateColumnFamily(descriptor, &handle);
 
@@ -648,12 +657,24 @@ public:
         auto it = column_families_.begin();
         auto* cf_info = it->second.get();
 
-        // Create range iterator with indexes for optimization
-        auto range_iterator = std::make_unique<RangeIterator>(
-            cf_info->data, range, cf_info->schema,
-            cf_info->skipping_index);  // bloom_filter temporarily removed (TODO: P0.3)
+        // Read all batches from LSM tree for this column family
+        std::vector<std::shared_ptr<arrow::RecordBatch>> batches;
+        uint64_t start_key = EncodeBatchKey(cf_info->id, 0);
+        uint64_t end_key = EncodeBatchKey(cf_info->id, 0x0000FFFFFFFFFFFF);
 
-        *iterator = std::move(range_iterator);
+        std::vector<std::pair<uint64_t, std::string>> lsm_results;
+        auto scan_status = lsm_tree_->Scan(start_key, end_key, &lsm_results);
+        if (!scan_status.ok()) return scan_status;
+
+        for (const auto& [key, serialized] : lsm_results) {
+            std::shared_ptr<arrow::RecordBatch> batch;
+            auto status = DeserializeArrowBatch(serialized.data(), serialized.size(), &batch);
+            if (!status.ok()) return status;
+            batches.push_back(batch);
+        }
+
+        // Create range iterator (without bloom filter for now)
+        *iterator = std::unique_ptr<Iterator>(new RangeIterator(batches, range, cf_info->schema, nullptr));
         return Status::OK();
     }
 
@@ -669,12 +690,24 @@ public:
 
         auto* cf_info = it->second.get();
 
-        // Create range iterator with indexes for optimization
-        auto range_iterator = std::make_unique<RangeIterator>(
-            cf_info->data, range, cf_info->schema,
-            cf_info->skipping_index);  // bloom_filter temporarily removed (TODO: P0.3)
+        // Read all batches from LSM tree for this column family
+        std::vector<std::shared_ptr<arrow::RecordBatch>> batches;
+        uint64_t start_key = EncodeBatchKey(cf_info->id, 0);
+        uint64_t end_key = EncodeBatchKey(cf_info->id, 0x0000FFFFFFFFFFFF);
 
-        *iterator = std::move(range_iterator);
+        std::vector<std::pair<uint64_t, std::string>> lsm_results;
+        auto scan_status = lsm_tree_->Scan(start_key, end_key, &lsm_results);
+        if (!scan_status.ok()) return scan_status;
+
+        for (const auto& [key, serialized] : lsm_results) {
+            std::shared_ptr<arrow::RecordBatch> batch;
+            auto status = DeserializeArrowBatch(serialized.data(), serialized.size(), &batch);
+            if (!status.ok()) return status;
+            batches.push_back(batch);
+        }
+
+        // Create range iterator (without bloom filter for now)
+        *iterator = std::unique_ptr<Iterator>(new RangeIterator(batches, range, cf_info->schema, nullptr));
         return Status::OK();
     }
 
@@ -786,6 +819,8 @@ private:
     std::unique_ptr<WalManager> wal_manager_;
     MVCCManager* mvcc_manager_;
 };
+
+namespace {
 
 // Convert JSON string to Arrow Schema
 Status JsonToArrowSchema(const std::string& schema_json, std::shared_ptr<arrow::Schema>* schema) {

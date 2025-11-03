@@ -82,6 +82,7 @@ if(WITH_ALL_TESTS)
         integration/test_query_execution.cpp
         integration/test_marble_core.cpp
         integration/test_arctic_bitemporal.cpp
+        integration/test_arrow_batch_lsm.cpp
         # Add more tests here as they are created
     )
 endif()
@@ -209,6 +210,7 @@ add_test(NAME PushdownTest COMMAND test_pushdown)
 add_test(NAME QueryExecutionTest COMMAND test_query_execution)
 add_test(NAME MarbleCoreTest COMMAND test_marble_core)
 add_test(NAME ArcticBitemporalTest COMMAND test_arctic_bitemporal)
+add_test(NAME ArrowBatchLSMTest COMMAND test_arrow_batch_lsm)
 add_test(NAME PushdownPerformanceTest COMMAND test_pushdown_performance)
 
 # Set test properties
@@ -221,6 +223,7 @@ set_tests_properties(
     QueryExecutionTest
     MarbleCoreTest
     ArcticBitemporalTest
+    ArrowBatchLSMTest
     PushdownPerformanceTest
     PROPERTIES
     ENVIRONMENT "ARROW_DEFAULT_MEMORY_POOL=system"
@@ -235,6 +238,7 @@ set_property(TEST PushdownTest PROPERTY LABELS "unit")
 set_property(TEST QueryExecutionTest PROPERTY LABELS "integration")
 set_property(TEST MarbleCoreTest PROPERTY LABELS "integration")
 set_property(TEST ArcticBitemporalTest PROPERTY LABELS "integration")
+set_property(TEST ArrowBatchLSMTest PROPERTY LABELS "integration")
 set_property(TEST PushdownPerformanceTest PROPERTY LABELS "performance")
 
 #==============================================================================
