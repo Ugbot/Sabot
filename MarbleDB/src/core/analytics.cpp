@@ -60,18 +60,39 @@ public:
         size_t num_words = (m + 63) / 64;  // Round up to 64-bit words
         bits_.resize(num_words, 0);
 
-        // For aggressive growth strategy, always track keys from the start
-        tracking_keys_ = true;
-        key_buffer_ = std::make_unique<std::vector<std::string>>();
-        key_buffer_->reserve(expected_items);
+        // For large filters (>100K items), disable key tracking to prevent memory exhaustion
+        // This keeps the filter fixed-size but avoids the 47+ MB key buffer overhead
+        if (expected_items > 100000) {
+            tracking_keys_ = false;  // No growth, fixed-size filter
+            key_buffer_.reset();      // Don't allocate key buffer
+            max_tracked_keys_ = 0;
+            std::cerr << "BloomFilter: Large filter (" << expected_items
+                      << " items), using fixed-size mode (no growth)\n";
+        } else {
+            // For small filters, enable growth with memory limit
+            max_tracked_keys_ = 1000000;
+            tracking_keys_ = true;
+            key_buffer_ = std::make_unique<std::vector<std::string>>();
+            key_buffer_->reserve(std::min(expected_items, max_tracked_keys_));
+        }
     }
 
     void Add(const std::string& item) {
-        // Always save the key for potential rehash (aggressive strategy)
-        key_buffer_->push_back(item);
+        // Save key for potential rehash, but stop tracking at memory limit
+        if (tracking_keys_ && key_buffer_->size() < max_tracked_keys_) {
+            key_buffer_->push_back(item);
+        } else if (tracking_keys_ && key_buffer_->size() >= max_tracked_keys_) {
+            // Hit memory limit - stop tracking and disable future growth
+            std::cerr << "BloomFilter: Memory limit reached (" << max_tracked_keys_
+                      << " keys, ~" << (max_tracked_keys_ * 50 / 1024 / 1024) << " MB). "
+                      << "Disabling growth, accepting higher FPR.\n";
+            key_buffer_->clear();
+            key_buffer_.reset();
+            tracking_keys_ = false;
+        }
 
-        // Check if we need to grow (at 85% capacity)
-        if (LoadFactor() > 0.85) {
+        // Check if we need to grow (at 85% capacity) - only if still tracking
+        if (tracking_keys_ && LoadFactor() > 0.85) {
             Grow();
         }
 
@@ -186,8 +207,9 @@ public:
 
         // DON'T clear key buffer - we need ALL keys for future growths
         // This is the memory cost of the aggressive rehashing strategy
+        size_t buffer_mb = key_buffer_->size() * 50 / 1024 / 1024;
         std::cerr << "BloomFilter: Growth complete, new load factor: " << LoadFactor()
-                  << " (buffer size: " << (key_buffer_->size() * 50 / 1024 / 1024) << " MB)\n";
+                  << ", buffer: " << key_buffer_->size() << " keys (~" << buffer_mb << " MB)\n";
     }
 
     // Internal add without growth checks (used during Grow())
@@ -232,6 +254,7 @@ private:
     // Dynamic resizing support
     size_t items_added_ = 0;
     size_t capacity_;  // Same as expected_items_, stored for quick access
+    size_t max_tracked_keys_;  // Memory limit: stop tracking after this many keys
     std::unique_ptr<std::vector<std::string>> key_buffer_;  // Only allocated when needed
     bool tracking_keys_ = false;
 };

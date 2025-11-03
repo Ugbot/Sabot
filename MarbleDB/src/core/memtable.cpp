@@ -412,6 +412,28 @@ private:
     uint64_t commit_ts_ = UINT64_MAX; // Uncommitted by default
 };
 
+// Simple bloom filter for SSTable-level membership testing
+class BloomFilter {
+public:
+    BloomFilter(size_t bits_per_key, size_t num_keys);
+    ~BloomFilter();
+
+    void Add(const Key& key);
+    bool MayContain(const Key& key) const;
+    Status Serialize(std::string* data) const;
+    static Status Deserialize(const std::string& data, std::unique_ptr<BloomFilter>* filter);
+
+private:
+    uint64_t Hash1(const std::string& key) const;
+    uint64_t Hash2(const std::string& key) const;
+    size_t NthHash(uint64_t hash1, uint64_t hash2, size_t n) const;
+
+    std::vector<uint8_t> bits_;
+    size_t num_hashes_;
+
+    friend class ArrowSSTable;
+};
+
 // Iterator for ArrowSSTable with predicate filtering
 class ArrowSSTableIterator : public MemTable::Iterator {
 public:
@@ -618,9 +640,8 @@ public:
     }
 
     bool KeyMayMatch(const Key& key) const override {
-        // TODO: Check bloom filter when implemented
-        // Conservative: assume all keys may match
-        return true;
+        // Delegate to the concrete implementation
+        return static_cast<const ArrowSSTable*>(this)->KeyMayMatch(key);
     }
 
     Status GetBloomFilter(std::string* bloom_filter) const override {
@@ -693,12 +714,10 @@ public:
         //     sparse_index_.reserve(num_rows / index_granularity + 1);
         // }
 
-        // TODO: Re-enable bloom filter
-        /*
+        // Initialize SSTable-level bloom filter
         if (has_bloom_filter) {
-            // bloom_filter_ = std::make_unique<BloomFilter>(options.bloom_filter_bits_per_key, num_rows);
+            bloom_filter_ = std::make_unique<BloomFilter>(options.bloom_filter_bits_per_key, num_rows);
         }
-        */
 
         // Process each block
         for (size_t block_idx = 0; block_idx < num_blocks; ++block_idx) {
@@ -708,17 +727,14 @@ public:
             LSMSSTable::BlockStats block_stat;
             block_stat.first_row_index = start_row;
             block_stat.row_count = end_row - start_row;
-            
+
             // Create per-block bloom filter if enabled
-            // TODO: Re-enable bloom filter
-            /*
             if (options.enable_block_bloom_filters) {
                 block_stat.block_bloom = std::make_shared<BloomFilter>(
                     options.bloom_filter_bits_per_key,
                     block_stat.row_count
                 );
             }
-            */
 
             // Get min/max keys for this block
             if (start_row < end_row) {
@@ -740,9 +756,7 @@ public:
                 */
 
                 // Add to bloom filters
-                // if (bloom_filter_) { // TODO: Re-enable
-                    // TODO: Re-enable bloom filter
-                    /*
+                if (bloom_filter_) {
                     for (size_t row = start_row; row < end_row; ++row) {
                         BenchKey key(static_cast<int64_t>(row));
                         bloom_filter_->Add(key);
@@ -752,8 +766,7 @@ public:
                             block_stat.block_bloom->Add(key);
                         }
                     }
-                    */
-                // }  // Removed - this was closing commented-out code
+                }
             }
 
             // TODO: Store block stats properly
@@ -799,16 +812,13 @@ public:
             if (block_idx >= block_stats_.size()) {
                 return Status::NotFound("Key out of range");
             }
-            
+
             // Check block bloom filter first (fast miss detection)
-            // TODO: Re-enable bloom filter
-            /*
             const auto& block_stat = block_stats_[block_idx];
             if (block_stat.block_bloom && !block_stat.block_bloom->MayContain(key)) {
                 // Definitely not in this block!
                 return Status::NotFound("Key not found (bloom filter)");
             }
-            */
 
             // Find the sparse index entry that covers this key
             // Each entry covers [entry.key, entry.key + granularity)
@@ -852,14 +862,11 @@ public:
 
     bool KeyMayMatch(const Key& key) const override {
         // Check bloom filter first if available
-        // TODO: Re-enable bloom filter
-        /*
         if (has_bloom_filter_ && bloom_filter_) {
             if (!bloom_filter_->MayContain(key)) {
                 return false;
             }
         }
-        */
 
         // Check if key is within the range of this SSTable
         if (smallest_key_ && largest_key_) {
@@ -871,12 +878,9 @@ public:
     }
 
     Status GetBloomFilter(std::string* bloom_filter) const override {
-        // TODO: Re-enable bloom filter
-        /*
         if (bloom_filter_ && has_bloom_filter_) {
             return bloom_filter_->Serialize(bloom_filter);
         }
-        */
         *bloom_filter = "";
         return Status::NotFound("No bloom filter available");
     }
@@ -966,7 +970,7 @@ private:
     std::string filename_;
     Metadata metadata_;
     std::shared_ptr<arrow::RecordBatch> batch_;
-    // std::unique_ptr<BloomFilter> bloom_filter_; // TODO: Re-enable
+    std::unique_ptr<BloomFilter> bloom_filter_;
 
     // Indexing data stored in the SSTable itself
     size_t block_size_ = 1024;
@@ -979,8 +983,7 @@ private:
     std::shared_ptr<Key> largest_key_;
 };
 
-// BloomFilter implementation - TODO: Re-enable
-/*
+// BloomFilter implementation
 BloomFilter::BloomFilter(size_t bits_per_key, size_t num_keys)
     : num_hashes_(static_cast<size_t>(bits_per_key * 0.69)) {  // ln(2) approximation
     size_t bits = num_keys * bits_per_key;
@@ -1067,7 +1070,6 @@ uint64_t BloomFilter::Hash2(const std::string& key) const {
 size_t BloomFilter::NthHash(uint64_t hash1, uint64_t hash2, size_t n) const {
     return hash1 + n * hash2;
 }
-*/
 
 // Factory functions
 std::unique_ptr<MemTable> CreateSkipListMemTable(std::shared_ptr<Schema> schema) {

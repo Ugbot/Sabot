@@ -64,8 +64,7 @@ Status TemporalReconstructor::ReconstructAsOf(
     return MergeRecordBatches(active_versions, result);
 }
 
-// TODO: Implement proper valid time temporal reconstruction
-// Currently simplified, real implementation needs temporal algebra
+// Reconstruct data valid during a specific time range
 Status TemporalReconstructor::ReconstructValidTime(
     uint64_t valid_start,
     uint64_t valid_end,
@@ -73,7 +72,6 @@ Status TemporalReconstructor::ReconstructValidTime(
     const std::vector<TemporalMetadata>& metadata_list,
     std::shared_ptr<arrow::RecordBatch>* result) {
 
-    // Implement proper valid time temporal reconstruction
     if (version_batches.empty() || metadata_list.empty()) {
         *result = nullptr;
         return Status::OK();
@@ -108,15 +106,13 @@ Status TemporalReconstructor::ReconstructValidTime(
     return MergeRecordBatches(valid_versions, result);
 }
 
-// TODO: Implement proper bitemporal reconstruction
-// ArcticDB-style full bitemporal queries are complex and need careful implementation
+// Reconstruct data using both system time (AS OF) and valid time dimensions
 Status TemporalReconstructor::ReconstructBitemporal(
     const TemporalQuerySpec& spec,
     const std::vector<arrow::RecordBatch>& version_batches,
     const std::vector<TemporalMetadata>& metadata_list,
     std::shared_ptr<arrow::RecordBatch>* result) {
 
-    // Implement proper bitemporal reconstruction
     if (version_batches.empty() || metadata_list.empty()) {
         *result = nullptr;
         return Status::OK();
@@ -201,14 +197,12 @@ Status TemporalReconstructor::ReconstructHistory(
     return Status::OK();
 }
 
-// FIXME: BuildVersionChains is a complete placeholder
-// Real implementation needs proper version lineage tracking and conflict detection
+// Build version chains by grouping versions by primary key and sorting by system time
 Status TemporalReconstructor::BuildVersionChains(
     const std::vector<arrow::RecordBatch>& version_batches,
     const std::vector<TemporalMetadata>& metadata_list,
     std::unordered_map<std::string, VersionChain>* chains) {
 
-    // Implement proper version chain building
     chains->clear();
 
     if (version_batches.size() != metadata_list.size()) {
@@ -360,23 +354,70 @@ Status TemporalReconstructor::ApplyValidTimeFilter(
     return Status::OK();
 }
 
-// FIXME: ReconstructFromChains is a complete placeholder
-// Real implementation needs proper temporal reconstruction algorithms
+// Reconstruct data from version chains based on temporal query spec
 Status TemporalReconstructor::ReconstructFromChains(
     const std::unordered_map<std::string, VersionChain>& chains,
     const std::vector<arrow::RecordBatch>& version_batches,
     const TemporalQuerySpec& spec,
     std::shared_ptr<arrow::RecordBatch>* result) {
 
-    // FIXME: This is a placeholder - just return the first batch
-    if (version_batches.empty()) {
-        return Status::InvalidArgument("No version batches provided");
+    if (version_batches.empty() || chains.empty()) {
+        *result = nullptr;
+        return Status::OK();
     }
 
-    // FIXME: Simplified for MVP - proper error handling needed
-    *result = arrow::RecordBatch::Make(
-        version_batches[0].schema(), version_batches[0].num_rows(), version_batches[0].columns());
-    return Status::OK();
+    // Collect active versions based on temporal query spec
+    std::vector<std::shared_ptr<arrow::RecordBatch>> active_versions;
+
+    for (const auto& [key, chain] : chains) {
+        // Skip deleted records unless explicitly requested
+        if (chain.is_deleted && !spec.include_deleted) {
+            continue;
+        }
+
+        // Find active version based on spec
+        std::shared_ptr<arrow::RecordBatch> active_version;
+
+        // If AS OF snapshot is specified, find version active at that snapshot
+        if (spec.as_of_snapshot.timestamp != UINT64_MAX) {
+            auto status = FindActiveVersion(chain, spec.as_of_snapshot, version_batches, &active_version);
+            if (!status.ok()) continue;
+        }
+        // Otherwise, use the most recent version (first in chain, sorted descending)
+        else if (!chain.version_indices.empty()) {
+            size_t version_index = chain.version_indices[0];
+            if (version_index < version_batches.size()) {
+                active_version = arrow::RecordBatch::Make(
+                    version_batches[version_index].schema(),
+                    version_batches[version_index].num_rows(),
+                    version_batches[version_index].columns());
+            }
+        }
+
+        // Apply valid time filtering if specified
+        if (active_version &&
+            (spec.valid_time_start != 0 || spec.valid_time_end != UINT64_MAX)) {
+            // Check if this version's valid time overlaps with query range
+            bool overlaps = (chain.valid_from <= spec.valid_time_end) &&
+                           (chain.valid_to >= spec.valid_time_start);
+            if (!overlaps) {
+                continue;  // Skip this version
+            }
+        }
+
+        // Add to active versions if not deleted or if we include deleted
+        if (active_version && (!chain.is_deleted || spec.include_deleted)) {
+            active_versions.push_back(active_version);
+        }
+    }
+
+    // Merge all active versions into final result
+    if (active_versions.empty()) {
+        *result = nullptr;
+        return Status::OK();
+    }
+
+    return MergeRecordBatches(active_versions, result);
 }
 
 Status TemporalReconstructor::ExtractPrimaryKey(
@@ -414,20 +455,17 @@ Status TemporalReconstructor::ExtractPrimaryKey(
     return Status::OK();
 }
 
-// FIXME: MergeRecordBatches is a complete placeholder
-// Real implementation needs proper RecordBatch concatenation
+// Merge multiple RecordBatches into a single batch using Arrow concatenation
 Status TemporalReconstructor::MergeRecordBatches(
     const std::vector<std::shared_ptr<arrow::RecordBatch>>& batches,
     std::shared_ptr<arrow::RecordBatch>* result) {
 
     if (batches.empty()) {
-        // FIXME: Simplified for MVP - proper error handling needed
         auto empty_result = arrow::RecordBatch::MakeEmpty(arrow::schema({}));
         *result = empty_result.ValueUnsafe();
         return Status::OK();
     }
 
-    // Implement proper batch merging using Arrow's ConcatenateTables
     if (batches.size() == 1) {
         *result = batches[0];
         return Status::OK();
@@ -624,8 +662,7 @@ TemporalQuerySpec ArcticQueryBuilder::Build() const {
 Status ArcticQueryBuilder::Execute(const std::shared_ptr<TemporalTable>& table,
                                   std::unique_ptr<QueryResult>* result) {
     if (history_key_.has_value()) {
-        // History query
-        // FIXME: GetVersionHistory not implemented in TemporalTable interface
+        // History query - requires additional TemporalTable interface support
         return Status::NotImplemented("Version history queries not yet implemented");
     } else {
         // Standard temporal query

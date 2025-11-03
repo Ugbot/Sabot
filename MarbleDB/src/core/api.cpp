@@ -345,6 +345,40 @@ public:
 
     // Arrow batch operations
     Status InsertBatch(const std::string& table_name, const std::shared_ptr<arrow::RecordBatch>& batch) override {
+        // Chunk large batches to prevent memory exhaustion
+        // Use zero-copy slicing for efficient processing
+        const int64_t CHUNK_SIZE = 5000;  // Process 5K rows at a time
+
+        if (batch->num_rows() <= CHUNK_SIZE) {
+            // Small batch, process directly
+            return InsertBatchInternal(table_name, batch);
+        }
+
+        // Large batch, chunk and process
+        for (int64_t offset = 0; offset < batch->num_rows(); offset += CHUNK_SIZE) {
+            int64_t length = std::min(CHUNK_SIZE, batch->num_rows() - offset);
+
+            // Safety check
+            if (offset + length > batch->num_rows()) {
+                return Status::InvalidArgument("Slice bounds exceed batch size");
+            }
+
+            auto chunk = batch->Slice(offset, length);  // Zero-copy slice
+            if (!chunk) {
+                return Status::InvalidArgument("Failed to slice batch");
+            }
+
+            auto status = InsertBatchInternal(table_name, chunk);
+            if (!status.ok()) {
+                return status;
+            }
+        }
+
+        return Status::OK();
+    }
+
+private:
+    Status InsertBatchInternal(const std::string& table_name, const std::shared_ptr<arrow::RecordBatch>& batch) {
         std::lock_guard<std::mutex> lock(cf_mutex_);
 
         // Find column family
@@ -380,7 +414,11 @@ public:
         }
 
         // Also keep in memory for backward compatibility (deprecated - will be removed)
+        // Limit to last 100 batches to avoid memory exhaustion
         cf_info->data.push_back(batch);
+        if (cf_info->data.size() > 100) {
+            cf_info->data.erase(cf_info->data.begin());  // Remove oldest batch
+        }
 
         // Incrementally update indexes (O(m) where m = batch size, not O(n) where n = total data)
         // Initialize indexes on first insert
@@ -417,6 +455,7 @@ public:
         return Status::OK();
     }
 
+public:
     // Table operations
     Status CreateTable(const TableSchema& schema) override {
         // Create column family with provided schema
