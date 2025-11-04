@@ -210,6 +210,7 @@ set(MARBLE_SOURCES
     src/core/memtable.cpp
     src/core/memtable_new.cpp
     src/core/sstable.cpp
+    src/core/arrow_sstable_reader.cpp
     src/core/lsm_storage.cpp
     src/core/mmap_sstable_writer.cpp
     src/core/disruptor.cpp

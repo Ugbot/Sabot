@@ -381,7 +381,7 @@ Status StandardLSMTree::FlushMemTable(std::unique_ptr<SimpleMemTable> memtable) 
         std::cerr << "LSM: Using memory-mapped flush (zone_size=" << config_.flush_zone_size_mb << " MB)\n";
         size_t zone_size = config_.flush_zone_size_mb * 1024 * 1024;
         writer = CreateMmapSSTableWriter(filepath, 0, std::make_shared<LocalFileSystem>(),
-                                        zone_size, config_.use_async_msync);
+                                        sstable_manager_.get(), zone_size, config_.use_async_msync);
     } else {
         // Fallback to standard writer
         std::cerr << "LSM: Using standard flush\n";
