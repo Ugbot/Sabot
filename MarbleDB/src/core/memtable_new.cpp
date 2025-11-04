@@ -1,10 +1,24 @@
 #include "marble/memtable.h"
+#include "marble/node_pool.h"
 #include <random>
 #include <cmath>
 #include <cstring>
 #include <algorithm>
+#include <iostream>
 
 namespace marble {
+
+// Global shared node pool - allocated once for entire database
+// This enables zero-allocation writes across all memtables
+static std::shared_ptr<ObjectPool<SkipListSimpleMemTable::SkipNode>> GetGlobalNodePool() {
+    static auto pool = std::make_shared<ObjectPool<SkipListSimpleMemTable::SkipNode>>(1000000);
+    static bool initialized = false;
+    if (!initialized) {
+        std::cerr << "MarbleDB: Initialized global node pool with 1,000,000 nodes\n";
+        initialized = true;
+    }
+    return pool;
+}
 
 // SkipListMemTable implementation
 SkipListSimpleMemTable::SkipNode::SkipNode(uint64_t k, const SimpleMemTableEntry& e, int level)
@@ -13,11 +27,35 @@ SkipListSimpleMemTable::SkipNode::SkipNode(uint64_t k, const SimpleMemTableEntry
 SkipListSimpleMemTable::SkipListSimpleMemTable()
     : max_level_(1), entry_count_(0), memory_usage_(0),
       min_key_(UINT64_MAX), max_key_(0) {
+    // Use global shared node pool
+    node_pool_ = GetGlobalNodePool();
+
     // Create header node with maximum possible level
     header_ = std::make_unique<SkipNode>(0, SimpleMemTableEntry(), kMaxLevel);
+    allocated_nodes_.reserve(100000);  // Reserve space for 100K node tracking
 }
 
-SkipListSimpleMemTable::~SkipListSimpleMemTable() = default;
+SkipListSimpleMemTable::SkipListSimpleMemTable(std::shared_ptr<ObjectPool<SkipNode>> node_pool)
+    : node_pool_(node_pool), max_level_(1), entry_count_(0), memory_usage_(0),
+      min_key_(UINT64_MAX), max_key_(0) {
+    // Create header node with maximum possible level
+    header_ = std::make_unique<SkipNode>(0, SimpleMemTableEntry(), kMaxLevel);
+    allocated_nodes_.reserve(100000);  // Reserve space for 100K node tracking
+}
+
+SkipListSimpleMemTable::~SkipListSimpleMemTable() {
+    // Return all allocated nodes to the pool
+    if (node_pool_ && !allocated_nodes_.empty()) {
+        std::cerr << "SkipListSimpleMemTable: Returning " << allocated_nodes_.size() << " nodes to pool\n";
+        for (SkipNode* node : allocated_nodes_) {
+            if (node) {
+                node->Reset();
+            }
+        }
+        node_pool_->ReleaseBatch(allocated_nodes_);
+        allocated_nodes_.clear();
+    }
+}
 
 int SkipListSimpleMemTable::GetRandomLevel() const {
     int level = 0;
@@ -83,7 +121,19 @@ Status SkipListSimpleMemTable::Put(uint64_t key, const std::string& value) {
         header_->forward.resize(level + 1, nullptr);
     }
 
-    auto new_node = std::make_unique<SkipNode>(key, entry, level);
+    // Acquire node from pool (zero-allocation design)
+    SkipNode* new_node = node_pool_->Acquire();
+    if (!new_node) {
+        // Pool exhausted - memtable is full, trigger flush
+        std::cerr << "SkipListSimpleMemTable: Node pool exhausted, memtable full\n";
+        return Status::ResourceExhausted("MemTable full - node pool exhausted");
+    }
+
+    // Initialize the node
+    new_node->Init(key, entry, level);
+
+    // Track allocated node for cleanup
+    allocated_nodes_.push_back(new_node);
 
     // Update key range
     min_key_ = std::min(min_key_, key);
@@ -103,19 +153,14 @@ Status SkipListSimpleMemTable::Put(uint64_t key, const std::string& value) {
     // Insert the new node
     for (int i = 0; i <= level; ++i) {
         new_node->forward[i] = update[i]->forward[i];
-        update[i]->forward[i] = new_node.get();
+        update[i]->forward[i] = new_node;
     }
 
     // Update statistics
     entry_count_++;
     memory_usage_ += sizeof(SkipNode) + value.size() +
-                    (level + 1) * sizeof(std::unique_ptr<SkipNode>) +
+                    (level + 1) * sizeof(SkipNode*) +
                     sizeof(SimpleMemTableEntry);
-
-    // Store the node (transfer ownership)
-    // FIXME: We need to properly manage node ownership in the skip list
-    // For now, we'll leak the node to avoid complex ownership issues
-    new_node.release();
 
     return Status::OK();
 }
@@ -278,6 +323,19 @@ std::unique_ptr<SimpleMemTable> SkipListSimpleMemTable::CreateSnapshot() const {
 void SkipListSimpleMemTable::Clear() {
     std::lock_guard<std::mutex> lock(mutex_);
 
+    // Return all allocated nodes to the pool (zero-allocation design)
+    if (node_pool_ && !allocated_nodes_.empty()) {
+        std::cerr << "SkipListSimpleMemTable::Clear: Returning " << allocated_nodes_.size()
+                  << " nodes to pool\n";
+        for (SkipNode* node : allocated_nodes_) {
+            if (node) {
+                node->Reset();
+            }
+        }
+        node_pool_->ReleaseBatch(allocated_nodes_);
+        allocated_nodes_.clear();
+    }
+
     // Reset header
     header_ = std::make_unique<SkipNode>(0, SimpleMemTableEntry(), kMaxLevel);
     max_level_ = 1;
@@ -285,9 +343,6 @@ void SkipListSimpleMemTable::Clear() {
     memory_usage_ = 0;
     min_key_ = UINT64_MAX;
     max_key_ = 0;
-
-    // FIXME: We need to properly clean up all the SkipNode objects
-    // For now, we're leaking memory to avoid complex ownership issues
 }
 
 void SkipListSimpleMemTable::GetStats(uint64_t* min_key, uint64_t* max_key,

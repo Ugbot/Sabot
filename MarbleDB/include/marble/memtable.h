@@ -134,9 +134,38 @@ public:
  * - Lock-free reads (TODO: refactor to use disruptor pattern)
  * - Atomic writes with proper synchronization
  */
+// Forward declarations
+template<typename T> class ObjectPool;
+
 class SkipListSimpleMemTable : public SimpleMemTable {
 public:
+    // Skip list node structure
+    struct SkipNode {
+        uint64_t key;
+        SimpleMemTableEntry entry;
+        std::vector<SkipNode*> forward;
+
+        SkipNode() : key(0), entry(), forward() {}
+        SkipNode(uint64_t k, const SimpleMemTableEntry& e, int level);
+
+        // Initialize node (called when acquired from pool)
+        void Init(uint64_t k, const SimpleMemTableEntry& e, int level) {
+            key = k;
+            entry = e;
+            forward.clear();
+            forward.resize(level + 1, nullptr);
+        }
+
+        // Reset node (called before returning to pool)
+        void Reset() {
+            key = 0;
+            entry = SimpleMemTableEntry();
+            forward.clear();
+        }
+    };
+
     SkipListSimpleMemTable();
+    explicit SkipListSimpleMemTable(std::shared_ptr<ObjectPool<SkipNode>> node_pool);
     ~SkipListSimpleMemTable() override;
 
     Status Put(uint64_t key, const std::string& value) override;
@@ -155,20 +184,13 @@ public:
                  size_t* entry_count, size_t* memory_usage) const override;
 
 private:
-    // Skip list node structure
-    struct SkipNode {
-        uint64_t key;
-        SimpleMemTableEntry entry;
-        std::vector<SkipNode*> forward;
-
-        SkipNode(uint64_t k, const SimpleMemTableEntry& e, int level);
-    };
-
     // Skip list implementation
     int GetRandomLevel() const;
     SkipNode* Find(uint64_t key) const;
 
     std::unique_ptr<SkipNode> header_;
+    std::shared_ptr<ObjectPool<SkipNode>> node_pool_;  // Shared node pool for zero-allocation
+    std::vector<SkipNode*> allocated_nodes_;           // Track nodes to release on clear
     int max_level_;
     size_t entry_count_;
     size_t memory_usage_;
@@ -178,6 +200,7 @@ private:
 
     static constexpr int kMaxLevel = 32;
     static constexpr double kProbability = 0.25;
+    static constexpr size_t kDefaultPoolSize = 1000000;  // 1M nodes pre-allocated
 };
 
 /**

@@ -189,7 +189,7 @@ list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/query/query.cpp
 # Re-enabled mvcc_transaction.cpp - contains CreateMVCCTransaction needed for benchmarks
 # list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/mvcc_transaction.cpp")
 
-# Re-enabled record_ref.cpp - fixed SimpleRecordRef error (now uses ArrowRecordRef)
+# Re-enabled record_ref.cpp - needed by lsm_storage.cpp for SimpleRecord
 # list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/record_ref.cpp")
 
 # Remove schema.cpp (has conflicting SimpleRecord definition - demo/test file)
@@ -211,6 +211,7 @@ set(MARBLE_SOURCES
     src/core/memtable_new.cpp
     src/core/sstable.cpp
     src/core/lsm_storage.cpp
+    src/core/mmap_sstable_writer.cpp
     src/core/disruptor.cpp
     src/core/compaction.cpp
     src/core/wal.cpp
