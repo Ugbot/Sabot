@@ -1,7 +1,9 @@
 #include "marble/sstable.h"
+#include "marble/arrow_sstable_reader.h"
 #include "marble/file_system.h"
 #include "marble/lsm_tree.h"
 #include "marble/analytics.h"  // For BloomFilter
+#include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <cstring>
@@ -476,9 +478,77 @@ SSTableReaderImpl::~SSTableReaderImpl() = default;
 
 Status SSTableReaderImpl::Open(const std::string& filepath,
                               std::unique_ptr<SSTable>* sstable) {
-    // Read metadata from file
+    std::cerr << "SSTableReaderImpl::Open() START - filepath=" << filepath << "\n";
+    std::cerr << std::flush;
+
+    // First, try to detect Arrow format by checking footer magic
+    // Read last 8 bytes to check for "ARROWSST" magic
     std::unique_ptr<FileHandle> file_handle;
+
+    std::cerr << "SSTableReaderImpl::Open() - Opening file...\n";
+    std::cerr << std::flush;
+
     auto status = fs_->OpenFile(filepath, FileOpenFlags::kRead, &file_handle);
+    if (!status.ok()) {
+        std::cerr << "SSTableReaderImpl::Open() - Failed to open file\n";
+        return status;
+    }
+    std::cerr << "SSTableReaderImpl::Open() - File opened successfully\n";
+
+    size_t file_size;
+    std::cerr << "SSTableReaderImpl::Open() - Getting file size...\n";
+    std::cerr << std::flush;
+
+    auto size_status = file_handle->GetSize(&file_size);
+
+    std::cerr << "SSTableReaderImpl::Open() - GetSize() returned\n";
+    if (!size_status.ok()) {
+        std::cerr << "SSTableReaderImpl::Open() - GetSize() failed\n";
+        return size_status;
+    }
+    std::cerr << "SSTableReaderImpl::Open() - file_size=" << file_size << " bytes\n";
+
+    if (file_size >= 24) {  // Need at least 24 bytes for Arrow footer
+        uint64_t magic;
+        std::cerr << "SSTableReaderImpl::Open() - Seeking to footer...\n";
+        std::cerr << std::flush;
+
+        auto seek_status = file_handle->Seek(file_size - 8);
+
+        std::cerr << "SSTableReaderImpl::Open() - Seek() returned\n";
+        if (seek_status.ok()) {
+            std::cerr << "SSTableReaderImpl::Open() - Reading magic number...\n";
+            std::cerr << std::flush;
+
+            status = file_handle->Read(&magic, sizeof(uint64_t), nullptr);
+
+            std::cerr << "SSTableReaderImpl::Open() - Read() returned\n";
+            std::cerr << "SSTableReaderImpl::Open() - magic=0x" << std::hex << magic << std::dec << "\n";
+
+            if (status.ok() && magic == 0x4152524F57535354) {  // "ARROWSST"
+                // Arrow format detected - use ArrowSSTableReader
+                std::cerr << "SSTableReaderImpl: Detected Arrow format for " << filepath << "\n";
+                auto arrow_sstable = OpenArrowSSTable(filepath, fs_);
+                if (arrow_sstable) {
+                    *sstable = std::move(arrow_sstable);
+                    return Status::OK();
+                }
+                return Status::IOError("Failed to open Arrow SSTable");
+            } else {
+                std::cerr << "SSTableReaderImpl::Open() - Not Arrow format (magic mismatch)\n";
+            }
+        } else {
+            std::cerr << "SSTableReaderImpl::Open() - Seek() failed\n";
+        }
+    } else {
+        std::cerr << "SSTableReaderImpl::Open() - File too small for Arrow format\n";
+    }
+
+    // Not Arrow format - try old format
+    std::cerr << "SSTableReaderImpl: Using old format reader for " << filepath << "\n";
+
+    // Reset file handle for old format reading
+    status = fs_->OpenFile(filepath, FileOpenFlags::kRead, &file_handle);
     if (!status.ok()) return status;
 
     // Seek to metadata offset in header (28 bytes into header)
@@ -494,9 +564,6 @@ Status SSTableReaderImpl::Open(const std::string& filepath,
     // For now, assume metadata is less than 1MB
     std::string metadata_buffer;
     metadata_buffer.resize(1024 * 1024); // 1MB buffer
-    size_t file_size;
-    auto size_status = file_handle->GetSize(&file_size);
-    if (!size_status.ok()) return size_status;
     uint64_t bytes_to_read = file_size - metadata_offset;
     if (bytes_to_read > metadata_buffer.size()) {
         return Status::InvalidArgument("Metadata too large");

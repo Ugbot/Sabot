@@ -57,7 +57,9 @@ public:
     Status Read(void* buffer, size_t nr_bytes, size_t* bytes_read) override {
         try {
             file_.read(static_cast<char*>(buffer), nr_bytes);
-            *bytes_read = file_.gcount();
+            if (bytes_read) {
+                *bytes_read = file_.gcount();
+            }
             if (file_.bad()) {
                 return Status::IOError("Read error");
             }

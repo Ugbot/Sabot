@@ -200,9 +200,15 @@ Status MmapSSTableWriter::Finish(std::unique_ptr<SSTable>* sstable) {
 
     // Step 5: Try to reopen SSTable for reading
     std::cerr << "MmapSSTableWriter: Attempting to reopen SSTable for reading\n";
+    std::cerr << "MmapSSTableWriter: filepath=" << filepath_ << "\n";
 
     if (sstable_mgr_) {
+        std::cerr << "MmapSSTableWriter: SSTableManager exists, calling OpenSSTable()...\n";
+        std::cerr << std::flush;  // Force flush before potentially crashing call
+
         status = sstable_mgr_->OpenSSTable(filepath_, sstable);
+
+        std::cerr << "MmapSSTableWriter: OpenSSTable() returned\n";
         if (!status.ok()) {
             std::cerr << "MmapSSTableWriter: WARNING - Failed to reopen SSTable: "
                       << status.message() << "\n";
