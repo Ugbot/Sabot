@@ -71,6 +71,25 @@ public:
         mvcc_manager_ = nullptr;  // global_mvcc_manager.get();
 
         // MVCC manager is initialized in its constructor
+
+        // ★★★ CREATE DEFAULT COLUMN FAMILY ★★★
+        // Create a default column family with a generic schema so that Get() without
+        // a column family handle will work
+        auto default_schema = arrow::schema({
+            arrow::field("key", arrow::uint64()),
+            arrow::field("value", arrow::binary())
+        });
+
+        ColumnFamilyOptions default_options;
+        default_options.schema = default_schema;
+        ColumnFamilyDescriptor default_descriptor("default", default_options);
+        ColumnFamilyHandle* default_handle = nullptr;
+
+        // Create the default column family (ignore errors - it might already exist)
+        auto create_status = CreateColumnFamily(default_descriptor, &default_handle);
+        if (create_status.ok() && default_handle) {
+            delete default_handle;  // We don't need the handle
+        }
     }
 
     ~SimpleMarbleDB() {
@@ -98,6 +117,32 @@ public:
         };
         std::unordered_map<uint64_t, RowLocation> row_index;  // key_hash -> (batch_id, row_offset)
 
+        // ★★★ BATCH CACHE - Avoid repeated deserialization ★★★
+        struct BatchCacheEntry {
+            std::shared_ptr<arrow::RecordBatch> batch;
+            uint64_t last_access_time;  // For LRU eviction
+
+            BatchCacheEntry() : last_access_time(0) {}
+            BatchCacheEntry(std::shared_ptr<arrow::RecordBatch> b, uint64_t t)
+                : batch(std::move(b)), last_access_time(t) {}
+        };
+        std::unordered_map<uint64_t, BatchCacheEntry> batch_cache;  // batch_id -> cached batch
+        size_t batch_cache_max_size = 100;  // Cache last 100 batches (~100MB)
+        uint64_t cache_access_counter = 0;  // Monotonic counter for LRU
+
+        // ★★★ HOT KEY CACHE - Avoid secondary index lookups for hot keys ★★★
+        struct HotKeyCacheEntry {
+            RowLocation location;           // (batch_id, row_offset)
+            uint64_t last_access_time;      // For LRU eviction
+
+            HotKeyCacheEntry() : last_access_time(0) {}
+            HotKeyCacheEntry(const RowLocation& loc, uint64_t t)
+                : location(loc), last_access_time(t) {}
+        };
+        std::unordered_map<uint64_t, HotKeyCacheEntry> hot_key_cache;  // key_hash -> location
+        size_t hot_key_cache_max_size = 100;  // Cache last 100 hot keys (~10KB)
+        uint64_t hot_key_access_counter = 0;  // Monotonic counter for LRU
+
         // Buffering for Put operations (flush when full)
         std::vector<std::shared_ptr<Record>> put_buffer;
         static constexpr size_t PUT_BATCH_SIZE = 1024;  // Flush every 1024 records
@@ -120,20 +165,14 @@ public:
                 batches.push_back(batch_result.ValueOrDie());
             }
 
-            // Combine into single batch
-            auto combined_result = arrow::Table::FromRecordBatches(schema, batches);
+            // Combine into single batch using ConcatenateRecordBatches
+            // This properly preserves buffer lifetimes for binary data
+            auto combined_result = arrow::ConcatenateRecordBatches(batches);
             if (!combined_result.ok()) {
-                return Status::InternalError("Failed to combine batches: " +
+                return Status::InternalError("Failed to concatenate batches: " +
                                            combined_result.status().ToString());
             }
-
-            auto table = combined_result.ValueOrDie();
-            auto batch_result = table->CombineChunksToBatch();
-            if (!batch_result.ok()) {
-                return Status::InternalError("Failed to create record batch: " +
-                                           batch_result.status().ToString());
-            }
-            auto batch = batch_result.ValueOrDie();
+            auto batch = combined_result.ValueOrDie();
 
             // Assign batch ID and store in LSM
             uint64_t batch_id = next_batch_id++;
@@ -157,6 +196,111 @@ public:
             // Clear buffer
             put_buffer.clear();
             return Status::OK();
+        }
+
+        // ★★★ GET BATCH WITH CACHING ★★★
+        // Checks batch cache before deserializing from LSM
+        Status GetBatch(SimpleMarbleDB* db, uint64_t batch_id, std::shared_ptr<arrow::RecordBatch>* batch) {
+            // Check cache first
+            cache_access_counter++;
+            auto cache_it = batch_cache.find(batch_id);
+            if (cache_it != batch_cache.end()) {
+                // Cache hit! Update access time and return
+                cache_it->second.last_access_time = cache_access_counter;
+                *batch = cache_it->second.batch;
+                return Status::OK();
+            }
+
+            // Cache miss - read from LSM and deserialize
+            uint64_t batch_key = db->EncodeBatchKey(id, batch_id);
+            std::string serialized_batch;
+            auto get_status = db->lsm_tree_->Get(batch_key, &serialized_batch);
+            if (!get_status.ok()) {
+                return get_status;
+            }
+
+            // Deserialize the batch
+            std::shared_ptr<arrow::RecordBatch> deserialized_batch;
+            auto deserialize_status = DeserializeArrowBatch(serialized_batch, &deserialized_batch);
+            if (!deserialize_status.ok()) {
+                return deserialize_status;
+            }
+
+            // Add to cache (with eviction if needed)
+            if (batch_cache.size() >= batch_cache_max_size) {
+                EvictOldestBatch();
+            }
+            batch_cache[batch_id] = BatchCacheEntry(deserialized_batch, cache_access_counter);
+
+            *batch = deserialized_batch;
+            return Status::OK();
+        }
+
+        // ★★★ LRU EVICTION ★★★
+        // Evicts the least recently used batch from cache
+        void EvictOldestBatch() {
+            if (batch_cache.empty()) return;
+
+            // Find entry with smallest last_access_time
+            uint64_t oldest_batch_id = 0;
+            uint64_t oldest_access_time = UINT64_MAX;
+
+            for (const auto& entry : batch_cache) {
+                if (entry.second.last_access_time < oldest_access_time) {
+                    oldest_access_time = entry.second.last_access_time;
+                    oldest_batch_id = entry.first;
+                }
+            }
+
+            // Evict it
+            batch_cache.erase(oldest_batch_id);
+        }
+
+        // ★★★ HOT KEY CACHE OPERATIONS ★★★
+        // Check if key is in hot key cache (avoids secondary index lookup)
+        bool GetHotKey(uint64_t key_hash, RowLocation* location) {
+            hot_key_access_counter++;
+            auto cache_it = hot_key_cache.find(key_hash);
+            if (cache_it != hot_key_cache.end()) {
+                // Cache hit! Update access time and return location
+                cache_it->second.last_access_time = hot_key_access_counter;
+                *location = cache_it->second.location;
+                return true;
+            }
+            return false;
+        }
+
+        // Add key to hot key cache (after secondary index lookup)
+        void PutHotKey(uint64_t key_hash, const RowLocation& location) {
+            // Add to cache (with eviction if needed)
+            if (hot_key_cache.size() >= hot_key_cache_max_size) {
+                EvictOldestHotKey();
+            }
+            hot_key_cache[key_hash] = HotKeyCacheEntry(location, hot_key_access_counter);
+        }
+
+        // Evict the least recently used hot key from cache
+        void EvictOldestHotKey() {
+            if (hot_key_cache.empty()) return;
+
+            // Find entry with smallest last_access_time
+            uint64_t oldest_key_hash = 0;
+            uint64_t oldest_access_time = UINT64_MAX;
+
+            for (const auto& entry : hot_key_cache) {
+                if (entry.second.last_access_time < oldest_access_time) {
+                    oldest_access_time = entry.second.last_access_time;
+                    oldest_key_hash = entry.first;
+                }
+            }
+
+            // Evict it
+            hot_key_cache.erase(oldest_key_hash);
+        }
+
+        // Invalidate hot key cache entry (on update/delete)
+        void InvalidateHotKey(uint64_t key_hash) {
+            hot_key_cache.erase(key_hash);
         }
 
         // Build indexes from current data
@@ -419,28 +563,28 @@ public:
 
         auto* cf_info = it->second.get();
 
-        // Look up key in secondary index
+        // ★★★ CHECK HOT KEY CACHE FIRST - Avoid secondary index lookup ★★★
         size_t key_hash = key.Hash();
-        auto index_it = cf_info->row_index.find(key_hash);
-        if (index_it == cf_info->row_index.end()) {
-            return Status::NotFound("Key not found");
+        ColumnFamilyInfo::RowLocation location;
+
+        if (!cf_info->GetHotKey(key_hash, &location)) {
+            // Hot key cache miss - fall back to secondary index
+            auto index_it = cf_info->row_index.find(key_hash);
+            if (index_it == cf_info->row_index.end()) {
+                return Status::NotFound("Key not found");
+            }
+
+            location = index_it->second;
+
+            // Add to hot key cache for future accesses
+            cf_info->PutHotKey(key_hash, location);
         }
 
-        const auto& location = index_it->second;
-
-        // Read the batch from LSM tree
-        uint64_t batch_key = EncodeBatchKey(cf_info->id, location.batch_id);
-        std::string serialized_batch;
-        auto get_status = lsm_tree_->Get(batch_key, &serialized_batch);
+        // ★★★ USE BATCH CACHE - Avoid repeated deserialization ★★★
+        std::shared_ptr<arrow::RecordBatch> batch;
+        auto get_status = cf_info->GetBatch(this, location.batch_id, &batch);
         if (!get_status.ok()) {
             return get_status;
-        }
-
-        // Deserialize the batch
-        std::shared_ptr<arrow::RecordBatch> batch;
-        auto deserialize_status = DeserializeArrowBatch(serialized_batch, &batch);
-        if (!deserialize_status.ok()) {
-            return deserialize_status;
         }
 
         // Extract the specific row
@@ -477,6 +621,9 @@ public:
         // TODO: Implement proper deletion with compaction
         // Remove from secondary index (tombstone)
         cf_info->row_index.erase(index_it);
+
+        // Invalidate hot key cache
+        cf_info->InvalidateHotKey(key_hash);
 
         // Write tombstone to LSM tree
         uint64_t row_key = EncodeRowKey(cf_info->id, key_hash);
@@ -570,6 +717,62 @@ private:
         auto put_status = lsm_tree_->Put(batch_key, serialized_batch);
         if (!put_status.ok()) {
             return put_status;
+        }
+
+        // ★★★ BUILD ROW_INDEX FOR POINT LOOKUPS ★★★
+        // Extract keys from first column and build row_index mapping
+        // This enables Get() to work with data inserted via InsertBatch()
+        if (batch->num_columns() > 0 && batch->num_rows() > 0) {
+            auto key_column = batch->column(0);  // Assume first column is the primary key
+
+            for (int64_t i = 0; i < batch->num_rows(); ++i) {
+                size_t key_hash = 0;
+                bool key_extracted = false;
+
+                // Extract key based on column type
+                switch (key_column->type()->id()) {
+                    case arrow::Type::INT64: {
+                        auto arr = std::static_pointer_cast<arrow::Int64Array>(key_column);
+                        if (!arr->IsNull(i)) {
+                            key_hash = std::hash<int64_t>{}(arr->Value(i));
+                            key_extracted = true;
+                        }
+                        break;
+                    }
+                    case arrow::Type::UINT64: {
+                        auto arr = std::static_pointer_cast<arrow::UInt64Array>(key_column);
+                        if (!arr->IsNull(i)) {
+                            key_hash = std::hash<uint64_t>{}(arr->Value(i));
+                            key_extracted = true;
+                        }
+                        break;
+                    }
+                    case arrow::Type::INT32: {
+                        auto arr = std::static_pointer_cast<arrow::Int32Array>(key_column);
+                        if (!arr->IsNull(i)) {
+                            key_hash = std::hash<int32_t>{}(arr->Value(i));
+                            key_extracted = true;
+                        }
+                        break;
+                    }
+                    case arrow::Type::STRING: {
+                        auto arr = std::static_pointer_cast<arrow::StringArray>(key_column);
+                        if (!arr->IsNull(i)) {
+                            key_hash = std::hash<std::string>{}(arr->GetString(i));
+                            key_extracted = true;
+                        }
+                        break;
+                    }
+                    default:
+                        // Unsupported key type, skip this row
+                        continue;
+                }
+
+                // Add to row_index if we successfully extracted a key
+                if (key_extracted) {
+                    cf_info->row_index[key_hash] = ColumnFamilyInfo::RowLocation{batch_id, static_cast<uint32_t>(i)};
+                }
+            }
         }
 
         // Incrementally update indexes (O(m) where m = batch size, not O(n) where n = total data)

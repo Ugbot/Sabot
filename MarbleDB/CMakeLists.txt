@@ -213,6 +213,7 @@ set(MARBLE_SOURCES
     src/core/arrow_sstable_reader.cpp
     src/core/lsm_storage.cpp
     src/core/mmap_sstable_writer.cpp
+    src/core/rocksdb_adapter.cpp
     src/core/disruptor.cpp
     src/core/compaction.cpp
     src/core/wal.cpp

@@ -68,8 +68,18 @@ Status DeserializeArrowBatch(const void* data, size_t size,
     }
 
     // Create input stream from buffer
-    auto buffer = arrow::Buffer::Wrap(reinterpret_cast<const uint8_t*>(data), size);
-    auto input_stream = std::make_shared<arrow::io::BufferReader>(buffer);
+    // IMPORTANT: Copy the data to ensure buffer lifetime extends beyond input data
+    // Wrap() creates a zero-copy view which becomes invalid when input goes out of scope
+    auto buffer_result = arrow::AllocateBuffer(size);
+    if (!buffer_result.ok()) {
+        return Status::IOError("Failed to allocate buffer: " + buffer_result.status().ToString());
+    }
+    auto buffer = std::move(buffer_result).ValueOrDie();
+    std::memcpy(buffer->mutable_data(), data, size);
+
+    // BufferReader needs a shared_ptr, convert from unique_ptr
+    std::shared_ptr<arrow::Buffer> shared_buffer = std::move(buffer);
+    auto input_stream = std::make_shared<arrow::io::BufferReader>(shared_buffer);
 
     // Create IPC reader
     auto reader_result = arrow::ipc::RecordBatchStreamReader::Open(input_stream);
