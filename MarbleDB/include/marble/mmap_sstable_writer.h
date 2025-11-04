@@ -23,6 +23,8 @@ limitations under the License.
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <arrow/api.h>
+#include <arrow/ipc/api.h>
 
 namespace marble {
 
@@ -55,12 +57,14 @@ public:
      * @param filepath Path to SSTable file
      * @param level LSM tree level (0 for flush from memtable)
      * @param fs File system abstraction
+     * @param sstable_mgr SSTable manager for reopening file after flush
      * @param zone_size Initial zone size in bytes (default: 8 MiB)
      * @param use_async_msync Use MS_ASYNC for non-blocking sync (default: true)
      */
     MmapSSTableWriter(const std::string& filepath,
                       uint64_t level,
                       std::shared_ptr<FileSystem> fs,
+                      SSTableManager* sstable_mgr,
                       size_t zone_size = 8 * 1024 * 1024,
                       bool use_async_msync = true);
 
@@ -129,6 +133,7 @@ private:
     std::string filepath_;
     uint64_t level_;
     std::shared_ptr<FileSystem> fs_;
+    SSTableManager* sstable_mgr_;  // Non-owning pointer, used only during Finish()
     std::unique_ptr<FileHandle> file_handle_;
     int fd_;  // File descriptor for mmap
 
@@ -148,10 +153,25 @@ private:
 
     // Index building
     static constexpr size_t kSparseIndexInterval = 4096;  // Index every 4K entries
-    std::vector<std::pair<uint64_t, size_t>> sparse_index_;  // key -> offset
+    std::vector<std::pair<uint64_t, size_t>> sparse_index_;  // key -> batch file offset
+
+    // Arrow RecordBatch buffering
+    static constexpr size_t kRecordBatchSize = 4096;  // Batch size for Arrow writes
+    std::shared_ptr<arrow::Schema> arrow_schema_;
+    std::vector<uint64_t> batch_keys_;
+    std::vector<std::string> batch_values_;
+    std::vector<std::shared_ptr<arrow::RecordBatch>> record_batches_;
+
+    // Data offset tracking
+    size_t data_section_start_;  // Start of Arrow IPC data
+    size_t data_section_end_;    // End of Arrow IPC data (start of index)
 
     // State
     bool finished_;
+
+    // Helper methods for Arrow RecordBatch handling
+    Status FlushBatchBuffer();
+    Status CreateRecordBatchFromBuffer(std::shared_ptr<arrow::RecordBatch>* batch);
 };
 
 /**
@@ -164,6 +184,7 @@ std::unique_ptr<SSTableWriter> CreateMmapSSTableWriter(
     const std::string& filepath,
     uint64_t level,
     std::shared_ptr<FileSystem> fs,
+    SSTableManager* sstable_mgr,
     size_t zone_size = 8 * 1024 * 1024,
     bool use_async_msync = true);
 

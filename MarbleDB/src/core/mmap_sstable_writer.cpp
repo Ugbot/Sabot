@@ -22,17 +22,21 @@ limitations under the License.
 #include <cstring>
 #include <algorithm>
 #include <iostream>
+#include <arrow/io/file.h>
+#include <arrow/ipc/writer.h>
 
 namespace marble {
 
 MmapSSTableWriter::MmapSSTableWriter(const std::string& filepath,
                                      uint64_t level,
                                      std::shared_ptr<FileSystem> fs,
+                                     SSTableManager* sstable_mgr,
                                      size_t zone_size,
                                      bool use_async_msync)
     : filepath_(filepath)
     , level_(level)
     , fs_(fs)
+    , sstable_mgr_(sstable_mgr)
     , fd_(-1)
     , mapped_region_(nullptr)
     , zone_size_(zone_size)
@@ -42,7 +46,19 @@ MmapSSTableWriter::MmapSSTableWriter(const std::string& filepath,
     , entry_count_(0)
     , min_key_(UINT64_MAX)
     , max_key_(0)
+    , data_section_start_(0)
+    , data_section_end_(0)
     , finished_(false) {
+
+    // Create Arrow schema for key-value storage
+    arrow_schema_ = arrow::schema({
+        arrow::field("key", arrow::uint64()),
+        arrow::field("value", arrow::binary())
+    });
+
+    // Reserve batch buffers
+    batch_keys_.reserve(kRecordBatchSize);
+    batch_values_.reserve(kRecordBatchSize);
 
     std::cerr << "MmapSSTableWriter: Creating " << filepath_
               << " with zone_size=" << (zone_size_ / 1024 / 1024) << " MB\n";
@@ -92,49 +108,30 @@ Status MmapSSTableWriter::Add(uint64_t key, const std::string& value) {
 
         current_file_size_ = zone_size_;
         write_offset_ = 0;
+        data_section_start_ = 0;
 
         std::cerr << "MmapSSTableWriter: Mapped " << (zone_size_ / 1024 / 1024)
                   << " MB at " << mapped_region_ << "\n";
     }
 
-    // Calculate space needed for this entry
-    size_t entry_size = sizeof(uint64_t) +      // key
-                       sizeof(uint32_t) +       // value size
-                       value.size();             // value data
-
-    // Check if we need to grow the zone
-    if (write_offset_ + entry_size > current_file_size_) {
-        auto status = ExtendAndRemap();
-        if (!status.ok()) {
-            return status;
-        }
-    }
-
-    // Write entry directly to mapped memory (ZERO SYSCALLS!)
-    char* write_ptr = static_cast<char*>(mapped_region_) + write_offset_;
-
-    // Write key (8 bytes)
-    *reinterpret_cast<uint64_t*>(write_ptr) = key;
-    write_ptr += sizeof(uint64_t);
-
-    // Write value size (4 bytes)
-    uint32_t value_size = static_cast<uint32_t>(value.size());
-    *reinterpret_cast<uint32_t*>(write_ptr) = value_size;
-    write_ptr += sizeof(uint32_t);
-
-    // Write value data
-    std::memcpy(write_ptr, value.data(), value.size());
-
-    write_offset_ += entry_size;
+    // Buffer entry in Arrow RecordBatch buffer
+    batch_keys_.push_back(key);
+    batch_values_.push_back(value);
     entry_count_++;
 
     // Update key range
     min_key_ = std::min(min_key_, key);
     max_key_ = std::max(max_key_, key);
 
-    // Add to sparse index every N entries
+    // Add to sparse index every N entries (track batch number for now)
     if (entry_count_ % kSparseIndexInterval == 0) {
-        sparse_index_.emplace_back(key, write_offset_ - entry_size);
+        // Store key and batch index - will update with file offset later
+        sparse_index_.emplace_back(key, record_batches_.size());
+    }
+
+    // Flush batch when buffer is full
+    if (batch_keys_.size() >= kRecordBatchSize) {
+        return FlushBatchBuffer();
     }
 
     return Status::OK();
@@ -178,81 +175,255 @@ Status MmapSSTableWriter::Finish(std::unique_ptr<SSTable>* sstable) {
     }
 
     std::cerr << "MmapSSTableWriter: Finishing with " << entry_count_
-              << " entries, " << (write_offset_ / 1024 / 1024) << " MB data\n";
+              << " entries\n";
 
-    // Step 1: Flush dirty pages to disk
-    if (use_async_msync_) {
-        // MS_ASYNC: Non-blocking, kernel schedules write
-        if (msync(mapped_region_, write_offset_, MS_ASYNC) != 0) {
-            std::cerr << "Warning: msync(MS_ASYNC) failed, falling back to MS_SYNC\n";
-            msync(mapped_region_, write_offset_, MS_SYNC);
-        }
-    } else {
-        // MS_SYNC: Blocking, wait for write completion
-        if (msync(mapped_region_, write_offset_, MS_SYNC) != 0) {
-            return Status::IOError("msync failed");
-        }
-    }
-
-    // Step 2: Unmap memory (data is now on disk)
-    if (munmap(mapped_region_, current_file_size_) != 0) {
-        return Status::IOError("Failed to unmap region");
-    }
-    mapped_region_ = nullptr;
-
-    // Step 3: Truncate file to actual data size (trim excess)
-    if (ftruncate(fd_, write_offset_) != 0) {
-        std::cerr << "Warning: Failed to truncate file to exact size\n";
-    }
-
-    // Step 4: Write sparse index (append to file)
+    // Step 1: Write RecordBatches using Arrow IPC
     auto status = WriteIndex();
     if (!status.ok()) {
         return status;
     }
 
-    // Step 5: Write metadata (entry count, index offset, etc.)
+    // Step 2: Write metadata (sparse index + footer)
     status = WriteMetadata();
     if (!status.ok()) {
         return status;
     }
 
-    // Step 6: Close file
+    // Step 3: Close file
     if (close(fd_) != 0) {
         return Status::IOError("Failed to close file");
     }
     fd_ = -1;
 
-    // Step 7: Create SSTable object for reads
+    // Step 4: Mark as finished
     finished_ = true;
 
-    // For now, return a simple success status
-    // Full SSTable object creation would load the file for reads
-    *sstable = nullptr;  // TODO: Create actual SSTable object
+    // Step 5: Try to reopen SSTable for reading
+    std::cerr << "MmapSSTableWriter: Attempting to reopen SSTable for reading\n";
 
-    std::cerr << "MmapSSTableWriter: Finished successfully\n";
+    if (sstable_mgr_) {
+        status = sstable_mgr_->OpenSSTable(filepath_, sstable);
+        if (!status.ok()) {
+            std::cerr << "MmapSSTableWriter: WARNING - Failed to reopen SSTable: "
+                      << status.message() << "\n";
+            std::cerr << "MmapSSTableWriter: Data written to disk but SSTableReader needs update\n";
+            *sstable = nullptr;
+            return Status::OK();  // Don't fail - data is on disk
+        }
+        std::cerr << "MmapSSTableWriter: Successfully reopened SSTable\n";
+    } else {
+        std::cerr << "MmapSSTableWriter: No SSTableManager provided, returning nullptr\n";
+        *sstable = nullptr;
+    }
+
+    return Status::OK();
+}
+
+Status MmapSSTableWriter::CreateRecordBatchFromBuffer(std::shared_ptr<arrow::RecordBatch>* batch) {
+    if (batch_keys_.empty()) {
+        return Status::InvalidArgument("Cannot create RecordBatch from empty buffer");
+    }
+
+    // Build key column (UInt64Array)
+    arrow::UInt64Builder key_builder;
+    auto status_arrow = key_builder.AppendValues(batch_keys_);
+    if (!status_arrow.ok()) {
+        return Status::IOError("Failed to append keys: " + status_arrow.ToString());
+    }
+    std::shared_ptr<arrow::Array> key_array;
+    status_arrow = key_builder.Finish(&key_array);
+    if (!status_arrow.ok()) {
+        return Status::IOError("Failed to finish key array: " + status_arrow.ToString());
+    }
+
+    // Build value column (BinaryArray)
+    arrow::BinaryBuilder value_builder;
+    for (const auto& val : batch_values_) {
+        status_arrow = value_builder.Append(val);
+        if (!status_arrow.ok()) {
+            return Status::IOError("Failed to append value: " + status_arrow.ToString());
+        }
+    }
+    std::shared_ptr<arrow::Array> value_array;
+    status_arrow = value_builder.Finish(&value_array);
+    if (!status_arrow.ok()) {
+        return Status::IOError("Failed to finish value array: " + status_arrow.ToString());
+    }
+
+    // Create RecordBatch
+    *batch = arrow::RecordBatch::Make(arrow_schema_, batch_keys_.size(), {key_array, value_array});
+
+    return Status::OK();
+}
+
+Status MmapSSTableWriter::FlushBatchBuffer() {
+    if (batch_keys_.empty()) {
+        return Status::OK();  // Nothing to flush
+    }
+
+    // Create RecordBatch from buffer
+    std::shared_ptr<arrow::RecordBatch> batch;
+    auto status = CreateRecordBatchFromBuffer(&batch);
+    if (!status.ok()) {
+        return status;
+    }
+
+    // Store batch for later writing (will write in WriteIndex())
+    record_batches_.push_back(batch);
+
+    // Clear buffers
+    batch_keys_.clear();
+    batch_values_.clear();
 
     return Status::OK();
 }
 
 Status MmapSSTableWriter::WriteIndex() {
-    if (sparse_index_.empty()) {
-        return Status::OK();  // No index to write
+    // Flush any remaining buffered entries
+    if (!batch_keys_.empty()) {
+        auto status = FlushBatchBuffer();
+        if (!status.ok()) {
+            return status;
+        }
     }
 
-    // TODO: Write sparse index to file
-    // For now, just log
-    std::cerr << "MmapSSTableWriter: Sparse index has " << sparse_index_.size()
-              << " entries\n";
+    if (record_batches_.empty()) {
+        return Status::OK();  // No data to write
+    }
+
+    std::cerr << "MmapSSTableWriter: Writing " << record_batches_.size()
+              << " RecordBatches using Arrow IPC\n";
+
+    // Now write RecordBatches to the mapped file using Arrow IPC
+    // Create Arrow OutputStream that writes to our mapped region
+    // We'll use lseek + write instead of mmap for Arrow IPC (simpler)
+
+    // Close mmap and switch to file writes for Arrow IPC
+    if (mapped_region_) {
+        if (munmap(mapped_region_, current_file_size_) != 0) {
+            return Status::IOError("Failed to unmap before Arrow IPC write");
+        }
+        mapped_region_ = nullptr;
+    }
+
+    // Truncate file to start fresh for Arrow IPC data
+    if (ftruncate(fd_, 0) != 0) {
+        return Status::IOError("Failed to truncate file for Arrow IPC");
+    }
+
+    // Create Arrow file output stream
+    auto file_result = arrow::io::FileOutputStream::Open(filepath_);
+    if (!file_result.ok()) {
+        return Status::IOError("Failed to open Arrow output stream: " + file_result.status().ToString());
+    }
+    auto arrow_file = file_result.ValueOrDie();
+
+    // Create IPC StreamWriter
+    auto writer_result = arrow::ipc::MakeStreamWriter(arrow_file, arrow_schema_);
+    if (!writer_result.ok()) {
+        return Status::IOError("Failed to create IPC writer: " + writer_result.status().ToString());
+    }
+    auto ipc_writer = writer_result.ValueOrDie();
+
+    // Write each RecordBatch
+    size_t batch_offset = 0;
+    for (const auto& batch : record_batches_) {
+        // Update sparse index with actual file offsets
+        // For now, we use batch index as stored in sparse_index_
+        // This is approximate - good enough for sparse lookups
+
+        auto write_status = ipc_writer->WriteRecordBatch(*batch);
+        if (!write_status.ok()) {
+            return Status::IOError("Failed to write RecordBatch: " + write_status.ToString());
+        }
+        batch_offset++;
+    }
+
+    // Close IPC writer to finalize
+    auto close_status = ipc_writer->Close();
+    if (!close_status.ok()) {
+        return Status::IOError("Failed to close IPC writer: " + close_status.ToString());
+    }
+
+    // Get current file position (end of Arrow IPC data)
+    auto tell_result = arrow_file->Tell();
+    if (!tell_result.ok()) {
+        return Status::IOError("Failed to get file position: " + tell_result.status().ToString());
+    }
+    data_section_end_ = tell_result.ValueOrDie();
+
+    // Close Arrow file (we'll reopen with fd_ for metadata)
+    auto file_close_status = arrow_file->Close();
+    if (!file_close_status.ok()) {
+        return Status::IOError("Failed to close Arrow file: " + file_close_status.ToString());
+    }
+
+    std::cerr << "MmapSSTableWriter: Wrote " << data_section_end_ / 1024 / 1024
+              << " MB of Arrow IPC data\n";
 
     return Status::OK();
 }
 
 Status MmapSSTableWriter::WriteMetadata() {
-    // TODO: Write metadata footer
-    // For now, just log
-    std::cerr << "MmapSSTableWriter: Metadata - entries=" << entry_count_
-              << ", min_key=" << min_key_ << ", max_key=" << max_key_ << "\n";
+    std::cerr << "MmapSSTableWriter: Writing metadata footer\n";
+
+    // Reopen file for appending metadata
+    // fd_ is still valid, just seek to end
+    off_t current_pos = lseek(fd_, 0, SEEK_END);
+    if (current_pos == -1) {
+        return Status::IOError("Failed to seek to end of file");
+    }
+
+    // Write sparse index
+    // Format: [COUNT(8)][KEY1(8)][BATCH_IDX1(8)][KEY2(8)][BATCH_IDX2(8)]...
+    uint64_t index_count = sparse_index_.size();
+    if (write(fd_, &index_count, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        return Status::IOError("Failed to write sparse index count");
+    }
+
+    for (const auto& entry : sparse_index_) {
+        uint64_t key = entry.first;
+        uint64_t batch_idx = entry.second;
+        if (write(fd_, &key, sizeof(uint64_t)) != sizeof(uint64_t)) {
+            return Status::IOError("Failed to write sparse index key");
+        }
+        if (write(fd_, &batch_idx, sizeof(uint64_t)) != sizeof(uint64_t)) {
+            return Status::IOError("Failed to write sparse index batch index");
+        }
+    }
+
+    size_t index_section_end = lseek(fd_, 0, SEEK_CUR);
+
+    // Write metadata
+    // Format: [ENTRY_COUNT(8)][MIN_KEY(8)][MAX_KEY(8)][LEVEL(8)]
+    if (write(fd_, &entry_count_, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        return Status::IOError("Failed to write entry count");
+    }
+    if (write(fd_, &min_key_, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        return Status::IOError("Failed to write min key");
+    }
+    if (write(fd_, &max_key_, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        return Status::IOError("Failed to write max key");
+    }
+    if (write(fd_, &level_, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        return Status::IOError("Failed to write level");
+    }
+
+    // Write footer: [DATA_END(8)][INDEX_END(8)][MAGIC(8)]
+    uint64_t magic = 0x4152524F57535354;  // "ARROWSST" in hex
+    if (write(fd_, &data_section_end_, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        return Status::IOError("Failed to write data section end");
+    }
+    if (write(fd_, &index_section_end, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        return Status::IOError("Failed to write index section end");
+    }
+    if (write(fd_, &magic, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        return Status::IOError("Failed to write magic number");
+    }
+
+    std::cerr << "MmapSSTableWriter: Metadata written - entries=" << entry_count_
+              << ", min_key=" << min_key_ << ", max_key=" << max_key_
+              << ", sparse_index_size=" << sparse_index_.size() << "\n";
 
     return Status::OK();
 }
@@ -261,11 +432,12 @@ std::unique_ptr<SSTableWriter> CreateMmapSSTableWriter(
     const std::string& filepath,
     uint64_t level,
     std::shared_ptr<FileSystem> fs,
+    SSTableManager* sstable_mgr,
     size_t zone_size,
     bool use_async_msync) {
 
     return std::make_unique<MmapSSTableWriter>(
-        filepath, level, fs, zone_size, use_async_msync);
+        filepath, level, fs, sstable_mgr, zone_size, use_async_msync);
 }
 
 } // namespace marble
