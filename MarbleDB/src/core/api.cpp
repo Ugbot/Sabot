@@ -82,7 +82,7 @@ public:
     struct ColumnFamilyInfo {
         std::string name;
         std::shared_ptr<arrow::Schema> schema;
-        std::vector<std::shared_ptr<arrow::RecordBatch>> data;  // Legacy in-memory storage (deprecated)
+        // Note: data is now stored in LSM tree, not in memory
         uint32_t id;
         uint64_t next_batch_id = 0;  // Sequential batch ID for LSM storage
         std::shared_ptr<SkippingIndex> skipping_index;
@@ -160,34 +160,193 @@ public:
         }
 
         // Build indexes from current data
-        Status BuildIndexes() {
-            if (data.empty()) return Status::OK();
+        // BuildIndexes() removed - indexes are now built incrementally during InsertBatch()
+    };
 
-            // Build skipping index
-            skipping_index = std::make_shared<InMemorySkippingIndex>();
-            auto table = arrow::Table::FromRecordBatches(schema, data);
-            if (!table.ok()) return Status::InternalError("Failed to create table for indexing");
+    // LSM-backed iterator that reads batches from LSM tree
+    class LSMBatchIterator : public Iterator {
+    public:
+        LSMBatchIterator(StandardLSMTree* lsm, uint32_t table_id, std::shared_ptr<arrow::Schema> schema)
+            : lsm_(lsm)
+            , schema_(schema)
+            , current_batch_idx_(0)
+            , current_row_idx_(0)
+            , valid_(false) {
 
-            auto status = skipping_index->BuildFromTable(*table, 8192); // 8192 rows per block
-            if (!status.ok()) return status;
+            // Scan all batches for this table from LSM
+            uint64_t start_key = EncodeBatchKey(table_id, 0);
+            uint64_t end_key = EncodeBatchKey(table_id + 1, 0);  // Next table's range
 
-            // Build bloom filter for key lookups
-            bloom_filter = std::make_shared<BloomFilter>(data.size() * 10, 0.01); // Estimate 10 keys per batch
-            for (const auto& batch : data) {
-                auto subject_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(0));
-                auto predicate_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(1));
-                auto object_col = std::static_pointer_cast<arrow::Int64Array>(batch->column(2));
+            std::vector<std::pair<uint64_t, std::string>> scan_results;
+            auto status = lsm_->Scan(start_key, end_key, &scan_results);
 
-                for (int64_t i = 0; i < batch->num_rows(); ++i) {
-                    std::string key_str = std::to_string(subject_col->Value(i)) + "," +
-                                        std::to_string(predicate_col->Value(i)) + "," +
-                                        std::to_string(object_col->Value(i));
-                    bloom_filter->Add(key_str);
+            if (status.ok()) {
+                // Deserialize all batches
+                for (const auto& [batch_key, serialized_batch] : scan_results) {
+                    std::shared_ptr<arrow::RecordBatch> batch;
+                    auto deser_status = DeserializeArrowBatch(serialized_batch, &batch);
+                    if (deser_status.ok() && batch && batch->num_rows() > 0) {
+                        batches_.push_back(batch);
+                    }
+                }
+
+                // Position at first row if we have data
+                if (!batches_.empty() && batches_[0]->num_rows() > 0) {
+                    valid_ = true;
+                    current_batch_idx_ = 0;
+                    current_row_idx_ = 0;
+                }
+            }
+        }
+
+        bool Valid() const override {
+            return valid_;
+        }
+
+        void Next() override {
+            if (!valid_) return;
+
+            current_row_idx_++;
+
+            // Move to next batch if needed
+            while (current_batch_idx_ < batches_.size()) {
+                if (current_row_idx_ < batches_[current_batch_idx_]->num_rows()) {
+                    return;  // Still valid
+                }
+                // Move to next batch
+                current_batch_idx_++;
+                current_row_idx_ = 0;
+            }
+
+            // No more data
+            valid_ = false;
+        }
+
+        std::shared_ptr<Key> key() const override {
+            if (!valid_) return nullptr;
+
+            // Extract key from current row
+            // Assume first column is the key (or use row index as key)
+            uint64_t key_value = current_batch_idx_ * 10000 + current_row_idx_;
+            return std::make_shared<Int64Key>(key_value);
+        }
+
+        std::shared_ptr<Record> value() const override {
+            if (!valid_) return nullptr;
+
+            auto batch = batches_[current_batch_idx_];
+            auto key_ptr = key();
+            return std::make_shared<SimpleRecord>(key_ptr, batch, current_row_idx_);
+        }
+
+        std::unique_ptr<RecordRef> value_ref() const override {
+            if (!valid_) return nullptr;
+
+            // Use the record's AsRecordRef() method
+            auto record = value();
+            if (!record) return nullptr;
+            return record->AsRecordRef();
+        }
+
+        marble::Status status() const override {
+            return Status::OK();
+        }
+
+        void Seek(const Key& target) override {
+            // Simple linear search for now
+            // TODO: Binary search within batches
+            SeekToFirst();
+            while (valid_) {
+                auto current_key = key();
+                if (current_key->Compare(target) >= 0) {
+                    return;
+                }
+                Next();
+            }
+        }
+
+        void SeekForPrev(const Key& target) override {
+            // Find last key <= target
+            SeekToFirst();
+            std::shared_ptr<Key> last_valid_key = nullptr;
+            size_t last_batch = 0, last_row = 0;
+
+            while (valid_) {
+                auto current_key = key();
+                if (current_key->Compare(target) <= 0) {
+                    last_valid_key = current_key;
+                    last_batch = current_batch_idx_;
+                    last_row = current_row_idx_;
+                }
+                Next();
+            }
+
+            if (last_valid_key) {
+                current_batch_idx_ = last_batch;
+                current_row_idx_ = last_row;
+                valid_ = true;
+            } else {
+                valid_ = false;
+            }
+        }
+
+        void SeekToFirst() {
+            if (!batches_.empty() && batches_[0]->num_rows() > 0) {
+                valid_ = true;
+                current_batch_idx_ = 0;
+                current_row_idx_ = 0;
+            } else {
+                valid_ = false;
+            }
+        }
+
+        void SeekToLast() override {
+            if (batches_.empty()) {
+                valid_ = false;
+                return;
+            }
+
+            // Find last non-empty batch
+            for (int i = batches_.size() - 1; i >= 0; i--) {
+                if (batches_[i]->num_rows() > 0) {
+                    current_batch_idx_ = i;
+                    current_row_idx_ = batches_[i]->num_rows() - 1;
+                    valid_ = true;
+                    return;
                 }
             }
 
-            return Status::OK();
+            valid_ = false;
         }
+
+        void Prev() override {
+            if (!valid_) return;
+
+            if (current_row_idx_ > 0) {
+                current_row_idx_--;
+                return;
+            }
+
+            // Move to previous batch
+            while (current_batch_idx_ > 0) {
+                current_batch_idx_--;
+                if (batches_[current_batch_idx_]->num_rows() > 0) {
+                    current_row_idx_ = batches_[current_batch_idx_]->num_rows() - 1;
+                    return;
+                }
+            }
+
+            // No more data
+            valid_ = false;
+        }
+
+    private:
+        StandardLSMTree* lsm_;
+        std::shared_ptr<arrow::Schema> schema_;
+        std::vector<std::shared_ptr<arrow::RecordBatch>> batches_;
+        size_t current_batch_idx_;
+        size_t current_row_idx_;
+        bool valid_;
     };
 
     std::unordered_map<std::string, std::unique_ptr<ColumnFamilyInfo>> column_families_;
@@ -411,13 +570,6 @@ private:
         auto put_status = lsm_tree_->Put(batch_key, serialized_batch);
         if (!put_status.ok()) {
             return put_status;
-        }
-
-        // Also keep in memory for backward compatibility (deprecated - will be removed)
-        // Limit to last 100 batches to avoid memory exhaustion
-        cf_info->data.push_back(batch);
-        if (cf_info->data.size() > 100) {
-            cf_info->data.erase(cf_info->data.begin());  // Remove oldest batch
         }
 
         // Incrementally update indexes (O(m) where m = batch size, not O(n) where n = total data)
@@ -688,12 +840,11 @@ public:
         auto it = column_families_.begin();
         auto* cf_info = it->second.get();
 
-        // Create range iterator with indexes for optimization
-        auto range_iterator = std::make_unique<RangeIterator>(
-            cf_info->data, range, cf_info->schema,
-            cf_info->skipping_index, cf_info->bloom_filter);
+        // Create LSM-backed iterator
+        auto lsm_iterator = std::make_unique<LSMBatchIterator>(
+            lsm_tree_.get(), cf_info->id, cf_info->schema);
 
-        *iterator = std::move(range_iterator);
+        *iterator = std::move(lsm_iterator);
         return Status::OK();
     }
 
@@ -709,12 +860,11 @@ public:
 
         auto* cf_info = it->second.get();
 
-        // Create range iterator with indexes for optimization
-        auto range_iterator = std::make_unique<RangeIterator>(
-            cf_info->data, range, cf_info->schema,
-            cf_info->skipping_index, cf_info->bloom_filter);
+        // Create LSM-backed iterator
+        auto lsm_iterator = std::make_unique<LSMBatchIterator>(
+            lsm_tree_.get(), cf_info->id, cf_info->schema);
 
-        *iterator = std::move(range_iterator);
+        *iterator = std::move(lsm_iterator);
         return Status::OK();
     }
 
