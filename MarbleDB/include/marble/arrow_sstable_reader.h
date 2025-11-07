@@ -110,7 +110,7 @@ private:
     std::shared_ptr<HotKeyCache> hot_key_cache_;
 
     // Negative cache (recent misses)
-    std::shared_ptr<NegativeCache> negative_cache_;
+    std::shared_ptr<HotKeyNegativeCache> negative_cache_;
 
     // Statistics
     mutable Stats stats_;

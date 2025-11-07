@@ -36,6 +36,21 @@ target_include_directories(marble_bench_common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR
 add_executable(batch_write_bench batch_write_bench.cpp)
 target_link_libraries(batch_write_bench PRIVATE marble_bench_common marble)
 
+# RocksDB baseline benchmark (simpler, working version)
+add_executable(rocksdb_baseline rocksdb_baseline.cpp)
+target_include_directories(rocksdb_baseline PRIVATE
+    ${CMAKE_SOURCE_DIR}/../vendor/rocksdb/include
+)
+target_link_libraries(rocksdb_baseline PRIVATE
+    ${CMAKE_SOURCE_DIR}/../vendor/rocksdb/build/librocksdb.a
+    z  # zlib (required by RocksDB)
+    bz2  # bzip2 (required by RocksDB)
+)
+
+# MarbleDB baseline benchmark (comparable to RocksDB)
+add_executable(marbledb_baseline marbledb_baseline.cpp)
+target_link_libraries(marbledb_baseline PRIVATE marble)
+
 # Install benchmarks
 install(TARGETS
     marble_bench
@@ -45,6 +60,8 @@ install(TARGETS
     marble_bench_harness
     marble_bench_simple
     batch_write_bench
+    rocksdb_baseline
+    marbledb_baseline
     RUNTIME DESTINATION bin/benchmarks
 )
 

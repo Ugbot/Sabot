@@ -65,7 +65,11 @@ set(BASIC_TESTS
     unit/test_pushdown.cpp
     unit/test_framework_validation.cpp
     unit/test_infrastructure_only.cpp
+    unit/test_optimization_strategies.cpp
+    unit/test_index_persistence.cpp
+    unit/test_index_persistence_e2e.cpp
     integration/test_mvcc_comprehensive.cpp
+    integration/test_optimization_integration.cpp
     integration/db_test.cc
     integration/db_compaction_test.cc
     integration/crash_recovery_test.cc
@@ -74,6 +78,7 @@ set(BASIC_TESTS
     stress/io_stress_test.cc
     fuzz/db_fuzz_test.cc
     performance/microbench_test.cc
+    performance/test_optimization_performance.cpp
 )
 
 # All tests (when WITH_ALL_TESTS is enabled)
@@ -207,11 +212,14 @@ add_test(NAME RecordSystemTest COMMAND test_record_system)
 add_test(NAME RecordOperationsTest COMMAND test_record_operations)
 add_test(NAME LSMStorageTest COMMAND test_lsm_storage)
 add_test(NAME PushdownTest COMMAND test_pushdown)
+add_test(NAME OptimizationStrategiesTest COMMAND test_optimization_strategies)
+add_test(NAME OptimizationIntegrationTest COMMAND test_optimization_integration)
 add_test(NAME QueryExecutionTest COMMAND test_query_execution)
 add_test(NAME MarbleCoreTest COMMAND test_marble_core)
 add_test(NAME ArcticBitemporalTest COMMAND test_arctic_bitemporal)
 add_test(NAME ArrowBatchLSMTest COMMAND test_arrow_batch_lsm)
 add_test(NAME PushdownPerformanceTest COMMAND test_pushdown_performance)
+add_test(NAME OptimizationPerformanceTest COMMAND test_optimization_performance)
 
 # Set test properties
 set_tests_properties(
@@ -220,11 +228,14 @@ set_tests_properties(
     RecordOperationsTest
     LSMStorageTest
     PushdownTest
+    OptimizationStrategiesTest
+    OptimizationIntegrationTest
     QueryExecutionTest
     MarbleCoreTest
     ArcticBitemporalTest
     ArrowBatchLSMTest
     PushdownPerformanceTest
+    OptimizationPerformanceTest
     PROPERTIES
     ENVIRONMENT "ARROW_DEFAULT_MEMORY_POOL=system"
 )
@@ -235,11 +246,14 @@ set_property(TEST RecordSystemTest PROPERTY LABELS "unit")
 set_property(TEST RecordOperationsTest PROPERTY LABELS "unit")
 set_property(TEST LSMStorageTest PROPERTY LABELS "unit")
 set_property(TEST PushdownTest PROPERTY LABELS "unit")
+set_property(TEST OptimizationStrategiesTest PROPERTY LABELS "unit")
 set_property(TEST QueryExecutionTest PROPERTY LABELS "integration")
 set_property(TEST MarbleCoreTest PROPERTY LABELS "integration")
 set_property(TEST ArcticBitemporalTest PROPERTY LABELS "integration")
 set_property(TEST ArrowBatchLSMTest PROPERTY LABELS "integration")
+set_property(TEST OptimizationIntegrationTest PROPERTY LABELS "integration")
 set_property(TEST PushdownPerformanceTest PROPERTY LABELS "performance")
+set_property(TEST OptimizationPerformanceTest PROPERTY LABELS "performance")
 
 #==============================================================================
 # Test Coverage and Reporting

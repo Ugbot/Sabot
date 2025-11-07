@@ -81,7 +81,7 @@ struct EnhancedSSTableMetadata {
 class OptimizedSSTableReader {
 public:
     explicit OptimizedSSTableReader(
-        std::shared_ptr<NegativeCache> negative_cache = nullptr);
+        std::shared_ptr<HotKeyNegativeCache> negative_cache = nullptr);
 
     /**
      * @brief Read with block bloom filter optimization
@@ -114,7 +114,7 @@ public:
     Stats GetStats() const { return stats_; }
 
 private:
-    std::shared_ptr<NegativeCache> negative_cache_;
+    std::shared_ptr<HotKeyNegativeCache> negative_cache_;
     mutable Stats stats_;
 
     /**

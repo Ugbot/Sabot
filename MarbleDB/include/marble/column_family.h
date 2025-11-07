@@ -12,6 +12,7 @@ each with its own schema, compaction settings, and merge operators.
 #include <marble/record.h>
 #include <marble/merge_operator.h>
 #include <marble/table_capabilities.h>
+#include <marble/optimization_strategy.h>
 #include <arrow/api.h>
 #include <memory>
 #include <string>
@@ -23,10 +24,60 @@ namespace marble {
 // Forward declarations
 class LSMSSTable;
 class MemTable;
+class OptimizationPipeline;
+
+/**
+ * @brief Optimization configuration for a column family
+ *
+ * Controls pluggable optimization strategies (bloom filters, caches, etc.)
+ * for this table. Can be auto-configured from schema or manually specified.
+ */
+struct OptimizationConfig {
+    // Enable pluggable optimization system (default: false for backward compatibility)
+    bool enable_pluggable_optimizations = false;
+
+    // Auto-configure from schema (default: true)
+    bool auto_configure = true;
+
+    // Workload hints for auto-configuration
+    WorkloadHints workload_hints;
+
+    // Optimization pipeline (created by factory or manually)
+    std::unique_ptr<OptimizationPipeline> pipeline;
+
+    // Legacy bloom filter settings (used when pluggable optimizations disabled)
+    bool legacy_bloom_filter_enabled = true;
+
+    OptimizationConfig() = default;
+
+    // Copy constructor - copies config but not pipeline (pipeline must be recreated)
+    OptimizationConfig(const OptimizationConfig& other)
+        : enable_pluggable_optimizations(other.enable_pluggable_optimizations),
+          auto_configure(other.auto_configure),
+          workload_hints(other.workload_hints),
+          pipeline(nullptr),  // Pipeline not copied, must be recreated
+          legacy_bloom_filter_enabled(other.legacy_bloom_filter_enabled) {}
+
+    // Copy assignment - copies config but not pipeline
+    OptimizationConfig& operator=(const OptimizationConfig& other) {
+        if (this != &other) {
+            enable_pluggable_optimizations = other.enable_pluggable_optimizations;
+            auto_configure = other.auto_configure;
+            workload_hints = other.workload_hints;
+            pipeline = nullptr;  // Pipeline not copied, must be recreated
+            legacy_bloom_filter_enabled = other.legacy_bloom_filter_enabled;
+        }
+        return *this;
+    }
+
+    // Move semantics
+    OptimizationConfig(OptimizationConfig&& other) = default;
+    OptimizationConfig& operator=(OptimizationConfig&& other) = default;
+};
 
 /**
  * @brief Column Family options
- * 
+ *
  * Each CF can have its own compaction settings, merge operator, etc.
  */
 struct ColumnFamilyOptions {
@@ -60,7 +111,16 @@ struct ColumnFamilyOptions {
     // Feature capabilities (MVCC, temporal, search, TTL, etc.)
     TableCapabilities capabilities;
 
+    // Optimization configuration (pluggable strategies)
+    OptimizationConfig optimization_config;
+
     ColumnFamilyOptions() = default;
+
+    // Copy/move semantics - OptimizationConfig handles its own copying
+    ColumnFamilyOptions(const ColumnFamilyOptions&) = default;
+    ColumnFamilyOptions& operator=(const ColumnFamilyOptions&) = default;
+    ColumnFamilyOptions(ColumnFamilyOptions&&) = default;
+    ColumnFamilyOptions& operator=(ColumnFamilyOptions&&) = default;
 };
 
 /**

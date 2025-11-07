@@ -293,13 +293,13 @@ private:
 
 /**
  * @brief Negative cache for fast "key doesn't exist" checks
- * 
+ *
  * Remembers recently failed lookups to avoid redundant work.
  * Inspired by Aerospike's negative response caching.
  */
-class NegativeCache {
+class HotKeyNegativeCache {
 public:
-    explicit NegativeCache(size_t max_entries = 10000);
+    explicit HotKeyNegativeCache(size_t max_entries = 10000);
     
     /**
      * @brief Record a failed lookup
@@ -356,7 +356,7 @@ std::unique_ptr<HotKeyCache> CreateHotKeyCache(
 std::unique_ptr<HotKeyCacheManager> CreateHotKeyCacheManager(
     size_t global_memory_budget_mb = 256);
 
-std::unique_ptr<NegativeCache> CreateNegativeCache(
+std::unique_ptr<HotKeyNegativeCache> CreateHotKeyNegativeCache(
     size_t max_entries = 10000);
 
 } // namespace marble

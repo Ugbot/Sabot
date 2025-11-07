@@ -153,6 +153,7 @@ endif()
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/simdjson/include)
 
 # Add NuRaft includes if enabled
 if(MARBLE_ENABLE_RAFT AND NURAFT_FOUND)
@@ -233,6 +234,12 @@ set(MARBLE_SOURCES
     src/core/execution_engine.cpp
     src/core/block_optimizations.cpp
     src/core/hot_key_cache.cpp
+    src/core/optimization_strategy.cpp
+    src/core/optimization_factory.cpp
+    src/core/bloom_filter_strategy.cpp
+    src/core/cache_strategy.cpp
+    src/core/index_persistence.cpp
+    vendor/simdjson/singleheader/simdjson.cpp
 )
 
 # Add Raft sources if enabled

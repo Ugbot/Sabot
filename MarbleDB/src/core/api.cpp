@@ -19,6 +19,10 @@
 #include "marble/version.h"
 #include "marble/range_iterator.h"
 #include "marble/arrow_serialization.h"
+#include "marble/optimization_factory.h"
+#include "marble/optimization_strategy.h"
+#include "marble/table_capabilities.h"
+#include "marble/index_persistence.h"
 #include <nlohmann/json.hpp>
 #include <arrow/api.h>
 #include <arrow/ipc/api.h>
@@ -63,6 +67,13 @@ public:
         status = wal_manager_->Open(wal_options);
         if (!status.ok()) {
             throw std::runtime_error("Failed to initialize WAL manager: " + status.ToString());
+        }
+
+        // Initialize index persistence manager
+        index_persistence_manager_ = std::make_unique<IndexPersistenceManager>(path);
+        status = index_persistence_manager_->Initialize();
+        if (!status.ok()) {
+            throw std::runtime_error("Failed to initialize index persistence manager: " + status.ToString());
         }
 
         // Initialize MVCC manager
@@ -147,8 +158,17 @@ public:
         std::vector<std::shared_ptr<Record>> put_buffer;
         static constexpr size_t PUT_BATCH_SIZE = 1024;  // Flush every 1024 records
 
+        // ★★★ OPTIMIZATION PIPELINE - Pluggable optimization strategies ★★★
+        std::unique_ptr<OptimizationPipeline> optimization_pipeline;
+
         ColumnFamilyInfo(std::string n, std::shared_ptr<arrow::Schema> s, uint32_t i)
-            : name(std::move(n)), schema(std::move(s)), id(i) {}
+            : name(std::move(n)), schema(std::move(s)), id(i) {
+            // Auto-configure optimizations based on schema
+            TableCapabilities caps;  // Use default capabilities
+            WorkloadHints hints;
+            // Let factory auto-detect from schema
+            optimization_pipeline = OptimizationFactory::CreateForSchema(s, caps, hints);
+        }
 
         // Flush buffered records to LSM tree and update secondary index
         Status FlushPutBuffer(SimpleMarbleDB* db) {
@@ -193,8 +213,148 @@ public:
                 row_index[key_hash] = RowLocation{batch_id, static_cast<uint32_t>(i)};
             }
 
+            // ★★★ OPTIMIZATION PIPELINE - Notify of flush (serialize bloom filters, etc.) ★★★
+            if (optimization_pipeline) {
+                FlushContext flush_ctx{batch, static_cast<size_t>(batch->num_rows())};
+
+                auto opt_status = optimization_pipeline->OnFlush(&flush_ctx);
+                if (!opt_status.ok()) {
+                    // Log warning but don't fail the flush
+                    std::cerr << "Optimization OnFlush failed: " << opt_status.ToString() << std::endl;
+                }
+
+                // Store bloom filter metadata if requested
+                if (flush_ctx.include_bloom_filter && !flush_ctx.metadata.empty()) {
+                    // TODO: Store bloom filter metadata in LSM tree metadata
+                }
+            }
+
+            // ★★★ PERSIST INDEXES TO DISK ★★★
+            auto save_indexes_status = SaveIndexes(db, batch_id);
+            if (!save_indexes_status.ok()) {
+                std::cerr << "Failed to save indexes: " << save_indexes_status.ToString() << std::endl;
+            }
+
             // Clear buffer
             put_buffer.clear();
+            return Status::OK();
+        }
+
+        // ★★★ SAVE INDEXES TO DISK ★★★
+        Status SaveIndexes(SimpleMarbleDB* db, uint64_t batch_id) {
+            if (!db->index_persistence_manager_) {
+                return Status::OK();  // No persistence manager configured
+            }
+
+            // Save bloom filter if available
+            if (bloom_filter) {
+                std::vector<uint8_t> serialized = bloom_filter->Serialize();
+                auto save_status = db->index_persistence_manager_->SaveBloomFilter(
+                    id, batch_id, serialized);
+                if (!save_status.ok()) {
+                    std::cerr << "Failed to save bloom filter: " << save_status.ToString() << std::endl;
+                }
+            }
+
+            return Status::OK();
+        }
+
+        // ★★★ LOAD INDEXES FROM DISK ★★★
+        Status LoadIndexes(SimpleMarbleDB* db) {
+            if (!db->index_persistence_manager_) {
+                return Status::OK();  // No persistence manager configured
+            }
+
+            // Load all bloom filters for this column family
+            std::unordered_map<uint64_t, std::vector<uint8_t>> bloom_filters;
+            auto load_status = db->index_persistence_manager_->LoadAllBloomFilters(id, &bloom_filters);
+            if (!load_status.ok()) {
+                if (load_status.IsNotFound()) {
+                    // No persisted bloom filters - this is OK for new databases
+                    return Status::OK();
+                }
+                return load_status;
+            }
+
+            // Deserialize bloom filters into optimization_pipeline
+            if (!bloom_filters.empty() && optimization_pipeline) {
+                // Get the BloomFilter strategy from the pipeline
+                auto* bloom_strategy = optimization_pipeline->GetStrategy("BloomFilter");
+                if (bloom_strategy) {
+                    // Use the most recent bloom filter (highest batch_id)
+                    // In future, we could merge multiple filters
+                    uint64_t max_batch_id = 0;
+                    const std::vector<uint8_t>* most_recent_filter = nullptr;
+
+                    for (const auto& [batch_id, filter_data] : bloom_filters) {
+                        if (batch_id > max_batch_id) {
+                            max_batch_id = batch_id;
+                            most_recent_filter = &filter_data;
+                        }
+                    }
+
+                    if (most_recent_filter) {
+                        auto deserialize_status = bloom_strategy->Deserialize(*most_recent_filter);
+                        if (!deserialize_status.ok()) {
+                            std::cerr << "Warning: Failed to deserialize bloom filter for CF " << id
+                                     << ": " << deserialize_status.ToString() << std::endl;
+                        } else {
+                            std::cerr << "Loaded bloom filter (batch " << max_batch_id
+                                     << ") for CF " << id << std::endl;
+                        }
+                    }
+                } else {
+                    std::cerr << "Warning: Found persisted bloom filters for CF " << id
+                             << " but no BloomFilter strategy in pipeline" << std::endl;
+                }
+            }
+
+            // ★★★ LOAD SKIPPING INDEXES FROM DISK ★★★
+            std::unordered_map<uint64_t, std::vector<uint8_t>> skipping_indexes;
+            auto skip_load_status = db->index_persistence_manager_->LoadAllSkippingIndexes(id, &skipping_indexes);
+            if (!skip_load_status.ok()) {
+                if (skip_load_status.IsNotFound()) {
+                    // No persisted skipping indexes - this is OK for new databases
+                    // Don't need to log anything here
+                } else {
+                    // Log warning but continue (non-fatal)
+                    std::cerr << "Warning: Failed to load skipping indexes for CF " << id
+                             << ": " << skip_load_status.ToString() << std::endl;
+                }
+            }
+
+            // Deserialize skipping indexes into optimization_pipeline
+            if (!skipping_indexes.empty() && optimization_pipeline) {
+                // Get the SkippingIndex strategy from the pipeline
+                auto* skip_strategy = optimization_pipeline->GetStrategy("SkippingIndex");
+                if (skip_strategy) {
+                    // Use the most recent skipping index (highest batch_id)
+                    uint64_t max_batch_id = 0;
+                    const std::vector<uint8_t>* most_recent_index = nullptr;
+
+                    for (const auto& [batch_id, index_data] : skipping_indexes) {
+                        if (batch_id > max_batch_id) {
+                            max_batch_id = batch_id;
+                            most_recent_index = &index_data;
+                        }
+                    }
+
+                    if (most_recent_index) {
+                        auto deserialize_status = skip_strategy->Deserialize(*most_recent_index);
+                        if (!deserialize_status.ok()) {
+                            std::cerr << "Warning: Failed to deserialize skipping index for CF " << id
+                                     << ": " << deserialize_status.ToString() << std::endl;
+                        } else {
+                            std::cerr << "Loaded skipping index (batch " << max_batch_id
+                                     << ") for CF " << id << std::endl;
+                        }
+                    }
+                } else {
+                    std::cerr << "Warning: Found persisted skipping indexes for CF " << id
+                             << " but no SkippingIndex strategy in pipeline" << std::endl;
+                }
+            }
+
             return Status::OK();
         }
 
@@ -541,6 +701,22 @@ public:
             return Status::InvalidArgument("Record schema does not match column family schema");
         }
 
+        // ★★★ OPTIMIZATION PIPELINE - Notify of write (add to bloom filter, etc.) ★★★
+        if (cf_info->optimization_pipeline) {
+            auto key = record->GetKey();
+            auto batch_result = record->ToRecordBatch();
+            if (batch_result.ok()) {
+                auto record_batch = batch_result.ValueOrDie();
+                WriteContext write_ctx{*key, record_batch, 0};  // row_offset = 0 for single record
+
+                auto opt_status = cf_info->optimization_pipeline->OnWrite(&write_ctx);
+                if (!opt_status.ok()) {
+                    // Log warning but don't fail the write
+                    std::cerr << "Optimization OnWrite failed: " << opt_status.ToString() << std::endl;
+                }
+            }
+        }
+
         // Add to buffer
         cf_info->put_buffer.push_back(record);
 
@@ -562,6 +738,20 @@ public:
         }
 
         auto* cf_info = it->second.get();
+
+        // ★★★ OPTIMIZATION PIPELINE - Check if we can skip this read ★★★
+        if (cf_info->optimization_pipeline) {
+            ReadContext read_ctx{key};
+            read_ctx.is_point_lookup = true;
+            read_ctx.is_range_scan = false;
+
+            auto opt_status = cf_info->optimization_pipeline->OnRead(&read_ctx);
+
+            // If bloom filter says key definitely doesn't exist, short-circuit
+            if (read_ctx.definitely_not_found) {
+                return Status::NotFound("Key not found (bloom filter)");
+            }
+        }
 
         // ★★★ CHECK HOT KEY CACHE FIRST - Avoid secondary index lookup ★★★
         size_t key_hash = key.Hash();
@@ -964,6 +1154,22 @@ public:
         column_families_[descriptor.name] = std::move(cf_info);
         id_to_cf_[cf_id] = cf_ptr;
 
+        // Register column family with index persistence manager
+        if (index_persistence_manager_) {
+            auto register_status = index_persistence_manager_->RegisterColumnFamily(cf_id, descriptor.name);
+            if (!register_status.ok()) {
+                std::cerr << "Failed to register column family with index persistence: "
+                         << register_status.ToString() << std::endl;
+            }
+
+            // Load any persisted indexes for this column family
+            auto load_status = cf_ptr->LoadIndexes(this);
+            if (!load_status.ok()) {
+                std::cerr << "Failed to load persisted indexes: "
+                         << load_status.ToString() << std::endl;
+            }
+        }
+
         // Create handle (we'll create a simple handle implementation)
         *handle = new ColumnFamilyHandle(descriptor.name, cf_id);
 
@@ -1178,6 +1384,7 @@ private:
     std::string path_;
     std::unique_ptr<WalManager> wal_manager_;
     MVCCManager* mvcc_manager_;
+    std::unique_ptr<IndexPersistenceManager> index_persistence_manager_;
 };
 
 // Convert JSON string to Arrow Schema

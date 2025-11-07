@@ -55,7 +55,7 @@ void BlockBloomFilterManager::Finalize() {
 //==============================================================================
 
 OptimizedSSTableReader::OptimizedSSTableReader(
-    std::shared_ptr<NegativeCache> negative_cache)
+    std::shared_ptr<HotKeyNegativeCache> negative_cache)
     : negative_cache_(negative_cache) {}
 
 Status OptimizedSSTableReader::GetOptimized(

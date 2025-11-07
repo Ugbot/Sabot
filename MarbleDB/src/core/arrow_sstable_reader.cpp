@@ -45,9 +45,9 @@ ArrowSSTableReader::ArrowSSTableReader(const std::string& filepath,
     std::cerr << "ArrowSSTableReader: HotKeyCache created\n";
 
     // Create negative cache
-    std::cerr << "ArrowSSTableReader: Creating NegativeCache...\n";
-    negative_cache_ = CreateNegativeCache(10000);
-    std::cerr << "ArrowSSTableReader: NegativeCache created\n";
+    std::cerr << "ArrowSSTableReader: Creating HotKeyNegativeCache...\n";
+    negative_cache_ = CreateHotKeyNegativeCache(10000);
+    std::cerr << "ArrowSSTableReader: HotKeyNegativeCache created\n";
 
     std::cerr << "ArrowSSTableReader: Constructor COMPLETE for " << filepath_ << "\n";
 }

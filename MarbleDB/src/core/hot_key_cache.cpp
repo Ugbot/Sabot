@@ -326,15 +326,15 @@ void HotKeyCacheManager::RebalanceMemory() {
     // For now, equal distribution
 }
 
-// NegativeCache implementation
-NegativeCache::NegativeCache(size_t max_entries)
+// HotKeyNegativeCache implementation
+HotKeyNegativeCache::HotKeyNegativeCache(size_t max_entries)
     : max_entries_(max_entries) {
     // Create bloom filter for negative lookups
     // Use 8 bits per key for ~3% false positive rate
     // negative_bloom_ = std::make_unique<BloomFilter>(8, max_entries); // TODO: Re-enable
 }
 
-void NegativeCache::RecordMiss(const Key& key) {
+void HotKeyNegativeCache::RecordMiss(const Key& key) {
     std::lock_guard<std::mutex> lock(mutex_);
     
     std::string key_str = key.ToString();
@@ -353,7 +353,7 @@ void NegativeCache::RecordMiss(const Key& key) {
     }
 }
 
-bool NegativeCache::DefinitelyNotExists(const Key& key) const {
+bool HotKeyNegativeCache::DefinitelyNotExists(const Key& key) const {
     total_checks_++;
     
     // Quick check: bloom filter
@@ -376,7 +376,7 @@ bool NegativeCache::DefinitelyNotExists(const Key& key) const {
     return false;  // Bloom filter false positive
 }
 
-void NegativeCache::Invalidate(const Key& key) {
+void HotKeyNegativeCache::Invalidate(const Key& key) {
     std::lock_guard<std::mutex> lock(mutex_);
     std::string key_str = key.ToString();
     recent_misses_.erase(key_str);
@@ -385,15 +385,15 @@ void NegativeCache::Invalidate(const Key& key) {
     // Bloom filter will have false positives until recreated
 }
 
-void NegativeCache::Clear() {
+void HotKeyNegativeCache::Clear() {
     std::lock_guard<std::mutex> lock(mutex_);
     recent_misses_.clear();
-    
+
     // Recreate bloom filter
     // negative_bloom_ = std::make_unique<BloomFilter>(8, max_entries_); // TODO: Re-enable
 }
 
-NegativeCache::Stats NegativeCache::GetStats() const {
+HotKeyNegativeCache::Stats HotKeyNegativeCache::GetStats() const {
     Stats stats;
     stats.total_checks = total_checks_.load();
     stats.negative_hits = negative_hits_.load();
@@ -409,8 +409,8 @@ std::unique_ptr<HotKeyCacheManager> CreateHotKeyCacheManager(size_t global_memor
     return std::make_unique<HotKeyCacheManager>(global_memory_budget_mb);
 }
 
-std::unique_ptr<NegativeCache> CreateNegativeCache(size_t max_entries) {
-    return std::make_unique<NegativeCache>(max_entries);
+std::unique_ptr<HotKeyNegativeCache> CreateHotKeyNegativeCache(size_t max_entries) {
+    return std::make_unique<HotKeyNegativeCache>(max_entries);
 }
 
 } // namespace marble
