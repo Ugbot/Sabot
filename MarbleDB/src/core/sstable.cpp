@@ -21,7 +21,9 @@ Status SSTableMetadata::SerializeToString(std::string* output) const {
     size_t filename_size = filename.size();
     size_t bloom_filter_size = bloom_filter.size();
     size_t total_size = sizeof(uint32_t) + filename_size + // filename
-                       sizeof(uint64_t) * 6 +             // numeric fields
+                       sizeof(uint64_t) * 6 +             // original numeric fields
+                       sizeof(uint64_t) * 2 +             // data_min_key, data_max_key
+                       sizeof(uint8_t) +                  // has_data_range
                        sizeof(uint32_t) + bloom_filter_size; // bloom filter
 
     output->resize(total_size);
@@ -40,6 +42,11 @@ Status SSTableMetadata::SerializeToString(std::string* output) const {
     *reinterpret_cast<uint64_t*>(ptr) = record_count; ptr += sizeof(uint64_t);
     *reinterpret_cast<uint64_t*>(ptr) = created_timestamp; ptr += sizeof(uint64_t);
     *reinterpret_cast<uint64_t*>(ptr) = level; ptr += sizeof(uint64_t);
+
+    // Write data column value ranges (new fields)
+    *reinterpret_cast<uint64_t*>(ptr) = data_min_key; ptr += sizeof(uint64_t);
+    *reinterpret_cast<uint64_t*>(ptr) = data_max_key; ptr += sizeof(uint64_t);
+    *reinterpret_cast<uint8_t*>(ptr) = has_data_range ? 1 : 0; ptr += sizeof(uint8_t);
 
     // Write bloom filter
     *reinterpret_cast<uint32_t*>(ptr) = bloom_filter_size;
@@ -75,6 +82,19 @@ Status SSTableMetadata::DeserializeFromString(const std::string& input, SSTableM
     metadata->record_count = *reinterpret_cast<const uint64_t*>(ptr); ptr += sizeof(uint64_t);
     metadata->created_timestamp = *reinterpret_cast<const uint64_t*>(ptr); ptr += sizeof(uint64_t);
     metadata->level = *reinterpret_cast<const uint64_t*>(ptr); ptr += sizeof(uint64_t);
+
+    // Read data column value ranges (new fields - optional for backward compatibility)
+    if (ptr + sizeof(uint64_t) * 2 + sizeof(uint8_t) <= input.data() + input.size() - sizeof(uint32_t)) {
+        // We have enough bytes for the new fields + bloom filter header
+        metadata->data_min_key = *reinterpret_cast<const uint64_t*>(ptr); ptr += sizeof(uint64_t);
+        metadata->data_max_key = *reinterpret_cast<const uint64_t*>(ptr); ptr += sizeof(uint64_t);
+        metadata->has_data_range = (*reinterpret_cast<const uint8_t*>(ptr) != 0); ptr += sizeof(uint8_t);
+    } else {
+        // Old format SSTable - set defaults
+        metadata->data_min_key = 0;
+        metadata->data_max_key = 0;
+        metadata->has_data_range = false;
+    }
 
     // Read bloom filter
     if (ptr + sizeof(uint32_t) > input.data() + input.size()) {

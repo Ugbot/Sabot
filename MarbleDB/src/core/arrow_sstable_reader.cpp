@@ -599,6 +599,24 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
         return nullptr;
     }
 
+    // Read data column value ranges (for predicate pushdown)
+    // These fields are optional - older SSTables won't have them
+    uint64_t data_min_key = 0;
+    uint64_t data_max_key = 0;
+    bool has_data_range = false;
+
+    bytes_read = read(fd, &data_min_key, sizeof(uint64_t));
+    if (bytes_read == sizeof(uint64_t)) {
+        bytes_read = read(fd, &data_max_key, sizeof(uint64_t));
+        if (bytes_read == sizeof(uint64_t)) {
+            uint8_t has_data_range_byte = 0;
+            bytes_read = read(fd, &has_data_range_byte, sizeof(uint8_t));
+            if (bytes_read == sizeof(uint8_t)) {
+                has_data_range = (has_data_range_byte != 0);
+            }
+        }
+    }
+
     close(fd);
 
     std::cerr << "OpenArrowSSTable: Metadata - entries=" << entry_count
@@ -622,6 +640,11 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
     metadata.max_key = max_key;
     metadata.record_count = entry_count;
     metadata.level = level;
+
+    // Data column value ranges (for predicate pushdown)
+    metadata.data_min_key = data_min_key;
+    metadata.data_max_key = data_max_key;
+    metadata.has_data_range = has_data_range;
 
     std::cerr << "OpenArrowSSTable: Creating ArrowSSTableReader...\n";
     try {

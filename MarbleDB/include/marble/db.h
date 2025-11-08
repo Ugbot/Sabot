@@ -2,6 +2,8 @@
 
 #include <memory>
 #include <string>
+#include <vector>
+#include <arrow/api.h>
 #include <marble/status.h>
 #include <marble/record.h>
 #include <marble/table.h>
@@ -17,6 +19,18 @@ class Stream;
 class ColumnFamilyHandle;
 struct TransactionOptions;
 class DBTransaction;
+class SSTable;
+
+// Forward declaration for arrow_api friend
+namespace arrow_api {
+    class MarbleRecordBatchReader;
+
+    ::arrow::Result<std::shared_ptr<::arrow::RecordBatchReader>> OpenTable(
+        std::shared_ptr<MarbleDB> db,
+        const std::string& table_name,
+        const std::vector<std::string>& projection,
+        const std::vector<ColumnPredicate>& predicates);
+}
 
 // Database configuration options
 struct DBOptions {
@@ -90,6 +104,12 @@ struct ReadOptions {
 
 // Main MarbleDB class
 class MarbleDB {
+    // Friend declarations for Arrow integration
+    friend ::arrow::Result<std::shared_ptr<::arrow::RecordBatchReader>>
+        arrow_api::OpenTable(std::shared_ptr<MarbleDB>, const std::string&,
+                            const std::vector<std::string>&, const std::vector<ColumnPredicate>&);
+    friend class arrow_api::MarbleRecordBatchReader;
+
 public:
     MarbleDB() = default;
     virtual ~MarbleDB() = default;
@@ -293,6 +313,57 @@ public:
     virtual Status BeginTransaction(const TransactionOptions& options,
                                   DBTransaction** txn) = 0;
     virtual Status BeginTransaction(DBTransaction** txn) = 0;  // Default options
+
+protected:
+    /**
+     * @brief Create Arrow RecordBatchReader for a table (internal use by arrow_api)
+     *
+     * This method is used internally by arrow_api::OpenTable() factory function.
+     * It creates a fully initialized RecordBatchReader with access to LSM internals.
+     * This keeps the LSM structure hidden from the public API while enabling
+     * efficient Arrow integration.
+     *
+     * @param table_name Name of the table
+     * @param projection Column names to read (empty = all columns)
+     * @param predicates Predicates for pushdown
+     * @param reader Output RecordBatchReader
+     * @return Status OK on success
+     */
+    virtual Status CreateRecordBatchReader(
+        const std::string& table_name,
+        const std::vector<std::string>& projection,
+        const std::vector<ColumnPredicate>& predicates,
+        std::shared_ptr<::arrow::RecordBatchReader>* reader) = 0;
+
+    /**
+     * @brief Get SSTables for a table (internal use - protected, not public API)
+     *
+     * Returns SSTables organized by LSM level. This is a protected method
+     * used internally by CreateRecordBatchReader() to access LSM structure.
+     * NOT part of the public API - use arrow_api::OpenTable() instead.
+     *
+     * @param table_name Name of the table
+     * @param sstables Output vector of SSTables per level (index 0 = L0, 1 = L1, etc.)
+     * @return Status OK on success
+     */
+    virtual Status GetSSTablesInternal(
+        const std::string& table_name,
+        std::vector<std::vector<std::shared_ptr<SSTable>>>* sstables) = 0;
+
+    /**
+     * @brief Get table schema (internal use - protected, not public API)
+     *
+     * Returns the Arrow schema for a table. This is a protected method
+     * used internally by CreateRecordBatchReader() to determine table columns.
+     * NOT part of the public API - use arrow_api::OpenTable() instead.
+     *
+     * @param table_name Name of the table
+     * @param schema Output Arrow schema
+     * @return Status OK on success, InvalidArgument if table doesn't exist
+     */
+    virtual Status GetTableSchemaInternal(
+        const std::string& table_name,
+        std::shared_ptr<::arrow::Schema>* schema) = 0;
 
     // Disable copying
     MarbleDB(const MarbleDB&) = delete;

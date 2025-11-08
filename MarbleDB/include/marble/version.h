@@ -210,6 +210,11 @@ std::unique_ptr<MVCCManager> CreateMVCCManager(
     std::unique_ptr<TransactionTimestampProvider> timestamp_provider);
 std::unique_ptr<TransactionTimestampProvider> CreateDefaultTimestampProvider();
 
+// Create a Version snapshot from LSM tree levels
+std::shared_ptr<Version> CreateVersion(
+    Timestamp timestamp,
+    const std::array<std::vector<std::shared_ptr<SSTable>>, 7>& levels);
+
 // Snapshot management
 class SnapshotManager {
 public:

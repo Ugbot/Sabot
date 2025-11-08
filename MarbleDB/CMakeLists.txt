@@ -167,6 +167,7 @@ file(GLOB_RECURSE MARBLE_SOURCES
 )
 
 # Remove files that should not be included
+list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 list(REMOVE_ITEM MARBLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/flight_service.cpp")
 
 # Remove Raft sources if not enabled
@@ -239,6 +240,8 @@ set(MARBLE_SOURCES
     src/core/bloom_filter_strategy.cpp
     src/core/cache_strategy.cpp
     src/core/index_persistence.cpp
+    src/arrow/reader.cpp
+    src/arrow/lsm_iterator.cpp
     vendor/simdjson/singleheader/simdjson.cpp
 )
 

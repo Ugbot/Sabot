@@ -64,7 +64,7 @@ public:
   Status Flush();
 
   // Test utilities
-  void ResetDB() override;
+  void ResetDB();
   void DestroyAndReopen(const DBOptions& options = DBOptions{});
   void Reopen(const DBOptions& options = DBOptions{});
 

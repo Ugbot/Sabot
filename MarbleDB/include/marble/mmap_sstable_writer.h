@@ -148,8 +148,13 @@ private:
 
     // Statistics
     size_t entry_count_;
-    uint64_t min_key_;
-    uint64_t max_key_;
+    uint64_t min_key_;      // LSM storage key range (EncodeBatchKey)
+    uint64_t max_key_;      // LSM storage key range (EncodeBatchKey)
+
+    // Data column value ranges (for RecordBatch predicate pushdown)
+    uint64_t data_min_key_ = UINT64_MAX;  // Min value from first data column
+    uint64_t data_max_key_ = 0;           // Max value from first data column
+    bool has_data_range_ = false;         // True if data ranges are valid
 
     // Index building
     static constexpr size_t kSparseIndexInterval = 4096;  // Index every 4K entries

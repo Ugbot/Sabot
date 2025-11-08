@@ -23,7 +23,10 @@ limitations under the License.
 #include <algorithm>
 #include <iostream>
 #include <arrow/io/file.h>
+#include <arrow/io/memory.h>
 #include <arrow/ipc/writer.h>
+#include <arrow/ipc/reader.h>
+#include <arrow/compute/api.h>
 
 namespace marble {
 
@@ -274,6 +277,77 @@ Status MmapSSTableWriter::FlushBatchBuffer() {
         return status;
     }
 
+    // Compute data column min/max from serialized RecordBatches in column 1
+    // Column 0 is LSM storage keys, Column 1 is serialized Arrow RecordBatches with user data
+    // This is done once per batch (every 4096 entries) rather than on every Add() call
+    if (batch->num_columns() >= 2 && batch->num_rows() > 0) {
+        auto value_column = batch->column(1);  // BinaryArray with serialized RecordBatches
+
+        if (value_column->type()->id() == ::arrow::Type::BINARY) {
+            auto binary_array = std::static_pointer_cast<::arrow::BinaryArray>(value_column);
+
+            // Iterate over each serialized RecordBatch
+            for (int64_t i = 0; i < binary_array->length(); ++i) {
+                if (binary_array->IsNull(i)) continue;
+
+                // Get the serialized RecordBatch data
+                auto view = binary_array->GetView(i);
+                auto buffer = std::make_shared<::arrow::Buffer>(
+                    reinterpret_cast<const uint8_t*>(view.data()), view.size());
+
+                // Deserialize the RecordBatch using Arrow IPC
+                auto buffer_reader = std::make_shared<::arrow::io::BufferReader>(buffer);
+                auto stream_reader_result = ::arrow::ipc::RecordBatchStreamReader::Open(buffer_reader);
+
+                if (!stream_reader_result.ok()) {
+                    continue;  // Skip this batch if deserialization fails
+                }
+
+                auto stream_reader = stream_reader_result.ValueOrDie();
+                std::shared_ptr<::arrow::RecordBatch> inner_batch;
+                auto read_status = stream_reader->ReadNext(&inner_batch);
+
+                if (!read_status.ok() || !inner_batch) {
+                    continue;  // Skip if cannot read batch
+                }
+
+                // Extract min/max from first data column of inner RecordBatch
+                if (inner_batch->num_columns() > 0 && inner_batch->num_rows() > 0) {
+                    auto data_column = inner_batch->column(0);
+
+                    // Only handle uint64 type (can be extended for other types)
+                    if (data_column->type()->id() == ::arrow::Type::UINT64) {
+                        auto uint_array = std::static_pointer_cast<::arrow::UInt64Array>(data_column);
+
+                        // Compute min/max by scanning the array
+                        uint64_t batch_min = UINT64_MAX;
+                        uint64_t batch_max = 0;
+
+                        for (int64_t j = 0; j < uint_array->length(); ++j) {
+                            if (!uint_array->IsNull(j)) {
+                                uint64_t value = uint_array->Value(j);
+                                if (value < batch_min) batch_min = value;
+                                if (value > batch_max) batch_max = value;
+                            }
+                        }
+
+                        // Update global min/max for this SSTable
+                        if (batch_min != UINT64_MAX) {
+                            if (!has_data_range_) {
+                                data_min_key_ = batch_min;
+                                data_max_key_ = batch_max;
+                                has_data_range_ = true;
+                            } else {
+                                if (batch_min < data_min_key_) data_min_key_ = batch_min;
+                                if (batch_max > data_max_key_) data_max_key_ = batch_max;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Store batch for later writing (will write in WriteIndex())
     record_batches_.push_back(batch);
 
@@ -402,6 +476,7 @@ Status MmapSSTableWriter::WriteMetadata() {
 
     // Write metadata
     // Format: [ENTRY_COUNT(8)][MIN_KEY(8)][MAX_KEY(8)][LEVEL(8)]
+    //         [DATA_MIN_KEY(8)][DATA_MAX_KEY(8)][HAS_DATA_RANGE(1)]
     if (write(fd_, &entry_count_, sizeof(uint64_t)) != sizeof(uint64_t)) {
         return Status::IOError("Failed to write entry count");
     }
@@ -413,6 +488,18 @@ Status MmapSSTableWriter::WriteMetadata() {
     }
     if (write(fd_, &level_, sizeof(uint64_t)) != sizeof(uint64_t)) {
         return Status::IOError("Failed to write level");
+    }
+
+    // Write data column value ranges (for predicate pushdown)
+    if (write(fd_, &data_min_key_, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        return Status::IOError("Failed to write data min key");
+    }
+    if (write(fd_, &data_max_key_, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        return Status::IOError("Failed to write data max key");
+    }
+    uint8_t has_data_range_byte = has_data_range_ ? 1 : 0;
+    if (write(fd_, &has_data_range_byte, sizeof(uint8_t)) != sizeof(uint8_t)) {
+        return Status::IOError("Failed to write has data range flag");
     }
 
     // Write footer: [DATA_END(8)][INDEX_END(8)][MAGIC(8)]
@@ -429,6 +516,8 @@ Status MmapSSTableWriter::WriteMetadata() {
 
     std::cerr << "MmapSSTableWriter: Metadata written - entries=" << entry_count_
               << ", min_key=" << min_key_ << ", max_key=" << max_key_
+              << ", data_min_key=" << data_min_key_ << ", data_max_key=" << data_max_key_
+              << ", has_data_range=" << has_data_range_
               << ", sparse_index_size=" << sparse_index_.size() << "\n";
 
     return Status::OK();

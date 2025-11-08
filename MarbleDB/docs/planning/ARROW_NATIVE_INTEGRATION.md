@@ -50,6 +50,77 @@ MarbleDB should be the **ideal storage backend for Sabot**, supporting:
 - LSM merge logic not exposed as Arrow-native iterator
 - Custom query engine instead of leveraging Arrow compute libraries
 
+### Known Implementation Issues
+
+**Status**: Critical bugs discovered during testing that must be resolved before Arrow integration can proceed.
+
+#### 1. Column Projection Error Handling
+
+**Severity**: High
+**Component**: `ArrowRecordBatchIterator` / SSTable reader
+**Test Failure**: `ArrowFactoryPatternTest.InvalidColumnProjectionReturnsError`
+**Description**: Column projection does not validate requested columns against schema. Requesting non-existent columns returns OK status instead of error.
+**Impact**:
+- Silent failures when projecting invalid columns
+- Missing validation in projection path
+- API contract violated (should return error for invalid columns)
+
+**Blocker for**: Stage 1 (Foundation) - Column projection must work reliably with proper error handling
+
+#### 2. Predicate Pushdown Logic Bugs
+
+**Severity**: Critical
+**Component**: Bloom filter / Zone map integration
+**Test Failures**: 6/8 tests in `ArrowPredicatePushdownTest` suite failing:
+- `EqualityPredicateSSTablePruning`
+- `GreaterThanPredicateSSTablePruning`
+- `LessThanPredicateSSTablePruning`
+- `GreaterThanOrEqualPredicate`
+- `LessThanOrEqualPredicate`
+- `PredicateOutsideAllRangesSkipsAll`
+
+**Description**: Predicate pushdown logic has correctness bugs preventing proper SSTable pruning.
+**Impact**:
+- Incorrect filtering may return wrong results
+- Performance optimizations (bloom filters, zone maps) not working correctly
+- Query results may be incomplete or incorrect
+
+**Blocker for**: Stage 3 (Expression Conversion) - Cannot push predicates to storage until logic is verified correct
+
+#### 3. LSM Merge Memory Safety Issues
+
+**Severity**: Critical
+**Component**: LSM merge iterator (`test_arrow_lsm_merge`)
+**Test Failure**: Segmentation fault (exit code 139) during `ArrowLSMMergeTest.DeduplicationNewerValuesOverride`
+**Description**: Memory safety issues in LSM merge iterator causing crashes during multi-level scans.
+**Impact**:
+- Process crashes during read operations
+- Data corruption risk
+- Blocks all multi-level LSM operations
+- Prevents testing of Arrow integration on top of LSM layer
+
+**Blocker for**: Stage 2 (LSM Merge Iterator) - Cannot implement K-way merge until base merge operations are memory-safe
+
+#### Next Steps for Issue Resolution
+
+**Priority 1 (Blocking)**: LSM merge segfault
+1. Run under AddressSanitizer/Valgrind to identify memory issue
+2. Review iterator lifecycle and shared_ptr usage
+3. Fix memory safety bug
+4. Add comprehensive memory safety tests
+
+**Priority 2 (Blocking)**: Predicate pushdown correctness
+1. Debug failing predicate tests one by one
+2. Review bloom filter and zone map logic
+3. Add detailed logging to predicate evaluation
+4. Fix logic bugs and verify all tests pass
+
+**Priority 3 (Important)**: Column projection validation
+1. Add schema validation in projection path
+2. Return proper error status for invalid columns
+3. Update test expectations
+4. Add additional edge case tests
+
 ### Success Criteria
 
 **Primary: Sabot Integration**
@@ -786,6 +857,79 @@ private:
 
 }}  // namespace marble::arrow
 ```
+
+### 17.1.1 API Encapsulation Design
+
+**Design Decision**: Use factory method pattern instead of exposing internal LSM structure
+
+**Problem**: Arrow RecordBatchReader needs access to SSTables from the LSM tree, but exposing `GetSSTables()` as a public API method violates encapsulation principles.
+
+**Bad Approach** (exposing internals):
+```cpp
+// ❌ BAD: Exposes internal LSM structure as public API
+class MarbleDB {
+public:
+    virtual Status GetSSTables(
+        const std::string& table_name,
+        std::vector<std::vector<std::shared_ptr<SSTable>>>* sstables) = 0;
+};
+
+// User code now knows about LSM levels, SSTables, etc.
+std::vector<std::vector<SSTable>> sstables;
+db->GetSSTables("orders", &sstables);  // Leaks LSM implementation details!
+```
+
+**Good Approach** (factory method):
+```cpp
+// ✅ GOOD: Factory method hides LSM internals, returns Arrow interface
+namespace marble {
+namespace arrow_api {
+
+::arrow::Result<std::shared_ptr<::arrow::RecordBatchReader>> OpenTable(
+    std::shared_ptr<MarbleDB> db,
+    const std::string& table_name,
+    const std::vector<std::string>& projection = {},
+    const std::vector<ColumnPredicate>& predicates = {});
+
+}}  // namespace marble::arrow_api
+
+// User code gets clean Arrow interface, no knowledge of LSM internals
+auto reader = marble::arrow_api::OpenTable(db, "orders", {"customer_id", "amount"});
+```
+
+**Implementation Strategy**:
+1. MarbleDB has **internal** method `CreateRecordBatchReader()`
+2. This method has access to LSM tree and SSTables
+3. Factory function `OpenTable()` calls the internal method
+4. Returns fully initialized `MarbleRecordBatchReader`
+5. LSM structure remains hidden from public API
+
+**Rationale**:
+- **Encapsulation**: LSM tree structure is an implementation detail
+- **Arrow-First**: Users work with Arrow interfaces, not storage internals
+- **Consistency**: Follows the factory pattern established in this design (see `Open()` methods above)
+- **Flexibility**: Can change LSM implementation without breaking public API
+- **Sabot Integration**: Sabot code only sees Arrow interfaces, not storage details
+
+**Internal Implementation**:
+```cpp
+// Internal helper in MarbleDB (not exposed publicly)
+class MarbleDB {
+protected:
+    virtual Status CreateRecordBatchReader(
+        const std::string& table_name,
+        const std::vector<std::string>& projection,
+        const std::vector<ColumnPredicate>& predicates,
+        std::shared_ptr<::arrow::RecordBatchReader>* reader) = 0;
+
+    // Internal access to SSTables (used by CreateRecordBatchReader)
+    virtual Status GetSSTablesInternal(
+        const std::string& table_name,
+        std::vector<std::vector<std::shared_ptr<SSTable>>>* sstables) = 0;
+};
+```
+
+This design ensures that **Arrow is the public interface**, while LSM details remain internal.
 
 ### 17.2 Dataset Interface
 
@@ -1866,7 +2010,12 @@ SELECT ?movie (COUNT(?person) as ?fans) WHERE {
 3. Deduplication logic (same key across levels)
 4. Integration with bloom filters (skip SSTables)
 5. Integration with zone maps (skip batches)
-6. Tests: insert, update, scan, verify latest version returned
+6. **API Design**: Implement factory method pattern (see Section 17.1.1)
+   - Add `CreateRecordBatchReader()` internal method to MarbleDB
+   - Update `arrow_api::OpenTable()` to use factory method
+   - Do NOT expose `GetSSTables()` as public API
+   - Keep LSM structure internal
+7. Tests: insert, update, scan, verify latest version returned
 
 **Deliverables**:
 - `MarbleDB/include/marble/arrow/lsm_iterator.h`
@@ -2442,6 +2591,18 @@ SELECT ?movie (COUNT(?person) as ?fans) WHERE {
    - Arrow IPC supports compression
    - Which codec? (LZ4, ZSTD, Snappy)
    - **Recommendation**: ZSTD (best ratio, good speed)
+
+6. **LSM Internal API Exposure**:
+   - Expose `GetSSTables()` as public API?
+   - Or use factory method `CreateRecordBatchReader()`?
+   - **Decision**: Factory method
+   - **Rationale**:
+     - Keeps LSM structure internal (encapsulation)
+     - Provides cleaner Arrow-native API
+     - Follows established factory patterns in this design
+     - Sabot code only sees Arrow interfaces, not storage internals
+     - Can change LSM implementation without breaking public API
+   - **Implementation**: See Section 17.1.1 for details
 
 ### 17.2 Ecosystem Integration
 

@@ -23,6 +23,8 @@
 #include "marble/optimization_strategy.h"
 #include "marble/table_capabilities.h"
 #include "marble/index_persistence.h"
+#include "marble/arrow/reader.h"
+#include "marble/arrow/lsm_iterator.h"
 #include <nlohmann/json.hpp>
 #include <arrow/api.h>
 #include <arrow/ipc/api.h>
@@ -1277,6 +1279,116 @@ public:
         return Status::OK();
     }
 
+    // Arrow integration (protected method called by arrow_api factory)
+    Status CreateRecordBatchReader(
+        const std::string& table_name,
+        const std::vector<std::string>& projection,
+        const std::vector<ColumnPredicate>& predicates,
+        std::shared_ptr<::arrow::RecordBatchReader>* reader) override {
+
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // Find the column family (table)
+        auto it = column_families_.find(table_name);
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Table '" + table_name + "' does not exist");
+        }
+
+        auto* cf_info = it->second.get();
+
+        // Get schema from table
+        auto schema = cf_info->schema;
+        if (!schema) {
+            return Status::InvalidArgument("Table '" + table_name + "' has no schema");
+        }
+
+        // Create fully initialized MarbleRecordBatchReader
+        // NOTE: We can't use shared_from_this() since SimpleMarbleDB doesn't inherit from enable_shared_from_this
+        // The reader takes a raw pointer wrapped in shared_ptr with custom deleter (no-op)
+        auto marble_reader = std::make_shared<marble::arrow_api::MarbleRecordBatchReader>(
+            std::shared_ptr<MarbleDB>(this, [](MarbleDB*){}),  // Non-owning shared_ptr
+            table_name, projection, predicates);
+
+        *reader = marble_reader;
+        return Status::OK();
+    }
+
+    // Get SSTables (internal protected method for Arrow integration)
+    Status GetSSTablesInternal(
+        const std::string& table_name,
+        std::vector<std::vector<std::shared_ptr<SSTable>>>* sstables) override {
+
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // Find the column family
+        auto it = column_families_.find(table_name);
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Table '" + table_name + "' does not exist");
+        }
+
+        // Get SSTables from LSM tree
+        if (lsm_tree_) {
+            std::shared_ptr<Version> version;
+            auto status = lsm_tree_->GetCurrentVersion(&version);
+            if (!status.ok()) {
+                return status;
+            }
+
+            // Get table info for key range filtering
+            auto* cf_info = it->second.get();
+            uint32_t table_id = cf_info->id;
+
+            // Calculate key range for this table
+            // Keys are encoded as: [table_id: 16 bits][batch_id: 48 bits]
+            uint64_t min_key = EncodeBatchKey(table_id, 0);
+            uint64_t max_key = EncodeBatchKey(table_id + 1, 0) - 1;
+
+            // Convert Version's SSTable levels to output format with filtering
+            const auto& all_levels = version->GetAllLevels();
+            sstables->resize(all_levels.size());
+
+            for (size_t level = 0; level < all_levels.size(); ++level) {
+                for (const auto& sstable : all_levels[level]) {
+                    const auto& meta = sstable->GetMetadata();
+
+                    // Only include SSTable if key range overlaps with table's range
+                    if (meta.max_key >= min_key && meta.min_key <= max_key) {
+                        (*sstables)[level].push_back(sstable);
+                    }
+                }
+            }
+
+            return Status::OK();
+        }
+
+        // No LSM tree - return empty
+        sstables->clear();
+        return Status::OK();
+    }
+
+    // Get table schema (internal protected method for Arrow integration)
+    Status GetTableSchemaInternal(
+        const std::string& table_name,
+        std::shared_ptr<::arrow::Schema>* schema) override {
+
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // Find the column family (table)
+        auto it = column_families_.find(table_name);
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Table '" + table_name + "' does not exist");
+        }
+
+        // Get schema from column family info
+        auto* cf_info = it->second.get();
+        if (!cf_info || !cf_info->schema) {
+            return Status::InvalidArgument("Table '" + table_name + "' has no schema");
+        }
+
+        *schema = cf_info->schema;
+        return Status::OK();
+    }
+
     // Maintenance operations
     Status Flush() override {
         std::lock_guard<std::mutex> lock(cf_mutex_);
@@ -1288,6 +1400,18 @@ public:
             if (!status.ok()) {
                 return status;
             }
+        }
+
+        // Flush LSM tree to create SSTables from memtable
+        auto lsm_status = lsm_tree_->Flush();
+        if (!lsm_status.ok()) {
+            return lsm_status;
+        }
+
+        // Wait for background flush to complete (flush is asynchronous)
+        auto wait_status = lsm_tree_->WaitForBackgroundTasks();
+        if (!wait_status.ok()) {
+            return wait_status;
         }
 
         return Status::OK();

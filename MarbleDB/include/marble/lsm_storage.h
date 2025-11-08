@@ -16,6 +16,9 @@
 
 namespace marble {
 
+// Forward declaration
+class Version;
+
 /**
  * @brief LSM Tree configuration parameters
  */
@@ -89,6 +92,10 @@ struct LSMTreeStats {
     size_t ongoing_compactions = 0;
     size_t completed_compactions = 0;
     uint64_t total_compaction_bytes = 0;
+
+    // Flush stats
+    size_t ongoing_flushes = 0;
+    size_t completed_flushes = 0;
 
     // Performance stats
     uint64_t total_writes = 0;
@@ -188,6 +195,17 @@ public:
      * @brief Wait for all background operations to complete
      */
     virtual Status WaitForBackgroundTasks() = 0;
+
+    /**
+     * @brief Get current version for Arrow integration (internal use)
+     *
+     * Returns the current version which contains all SSTable levels.
+     * Used internally by CreateRecordBatchReader() for Arrow integration.
+     *
+     * @param version Output pointer to current version
+     * @return Status OK on success
+     */
+    virtual Status GetCurrentVersion(std::shared_ptr<Version>* version) = 0;
 };
 
 /**
@@ -211,6 +229,7 @@ public:
     LSMTreeStats GetStats() const override;
     const LSMTreeConfig& GetConfig() const override;
     Status WaitForBackgroundTasks() override;
+    Status GetCurrentVersion(std::shared_ptr<Version>* version) override;
 
 private:
     // Core components
@@ -225,7 +244,10 @@ private:
     std::vector<std::unique_ptr<SimpleMemTable>> immutable_memtables_;
 
     // SSTables organized by level
-    std::vector<std::vector<std::unique_ptr<SSTable>>> sstables_;
+    // NOTE: Changed from unique_ptr to shared_ptr to support Version snapshots
+    // This allows Arrow RecordBatchReaders to maintain references to SSTables
+    // while reading, preventing premature deletion during compaction
+    std::vector<std::vector<std::shared_ptr<SSTable>>> sstables_;
 
     // Background task management
     std::vector<std::thread> compaction_threads_;
@@ -252,8 +274,8 @@ private:
     Status PerformCompaction(const CompactionTask& task);
     Status PerformMinorCompaction(const std::vector<std::unique_ptr<SimpleMemTable>>& memtables);
     Status PerformMajorCompaction(uint64_t level, const std::vector<std::string>& input_files);
-    Status MergeSSTables(const std::vector<std::unique_ptr<SSTable>>& inputs,
-                        std::unique_ptr<SSTable>* output);
+    Status MergeSSTables(const std::vector<std::shared_ptr<SSTable>>& inputs,
+                        std::shared_ptr<SSTable>* output);
     bool NeedsCompaction(uint64_t level) const;
     std::vector<std::string> SelectCompactionFiles(uint64_t level) const;
 
@@ -280,14 +302,14 @@ public:
     /**
      * @brief Determine if a level needs compaction
      */
-    virtual bool NeedsCompaction(const std::vector<std::unique_ptr<SSTable>>& level_files,
+    virtual bool NeedsCompaction(const std::vector<std::shared_ptr<SSTable>>& level_files,
                                 const LSMTreeConfig& config) const = 0;
 
     /**
      * @brief Select files for compaction
      */
     virtual std::vector<size_t> SelectFilesForCompaction(
-        const std::vector<std::unique_ptr<SSTable>>& level_files,
+        const std::vector<std::shared_ptr<SSTable>>& level_files,
         const LSMTreeConfig& config) const = 0;
 };
 
@@ -296,11 +318,11 @@ public:
  */
 class LeveledCompactionStrategy : public CompactionStrategy {
 public:
-    bool NeedsCompaction(const std::vector<std::unique_ptr<SSTable>>& level_files,
+    bool NeedsCompaction(const std::vector<std::shared_ptr<SSTable>>& level_files,
                         const LSMTreeConfig& config) const override;
 
     std::vector<size_t> SelectFilesForCompaction(
-        const std::vector<std::unique_ptr<SSTable>>& level_files,
+        const std::vector<std::shared_ptr<SSTable>>& level_files,
         const LSMTreeConfig& config) const override;
 };
 
@@ -309,11 +331,11 @@ public:
  */
 class SizeTieredCompactionStrategy : public CompactionStrategy {
 public:
-    bool NeedsCompaction(const std::vector<std::unique_ptr<SSTable>>& level_files,
+    bool NeedsCompaction(const std::vector<std::shared_ptr<SSTable>>& level_files,
                         const LSMTreeConfig& config) const override;
 
     std::vector<size_t> SelectFilesForCompaction(
-        const std::vector<std::unique_ptr<SSTable>>& level_files,
+        const std::vector<std::shared_ptr<SSTable>>& level_files,
         const LSMTreeConfig& config) const override;
 };
 

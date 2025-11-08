@@ -16,12 +16,19 @@ namespace marble {
 struct SSTableMetadata {
     std::string filename;
     uint64_t file_size = 0;
-    uint64_t min_key = 0;
-    uint64_t max_key = 0;
+    uint64_t min_key = 0;  // LSM storage key range (EncodeBatchKey for RecordBatch API)
+    uint64_t max_key = 0;  // LSM storage key range (EncodeBatchKey for RecordBatch API)
     uint64_t record_count = 0;
     uint64_t created_timestamp = 0;
     uint64_t level = 0;  // LSM level (0 = L0, 1 = L1, etc.)
     std::string bloom_filter;  // Serialized bloom filter data
+
+    // Data column value ranges (for RecordBatch predicate pushdown)
+    // These track min/max values from the first data column, enabling
+    // SSTable-level zone map pruning for RecordBatch queries
+    uint64_t data_min_key = 0;   // Min value from first data column
+    uint64_t data_max_key = 0;   // Max value from first data column
+    bool has_data_range = false; // True if data_min_key/data_max_key are valid
 
     // Serialization
     Status SerializeToString(std::string* output) const;

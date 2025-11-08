@@ -573,4 +573,10 @@ std::unique_ptr<VersionGarbageCollector> CreateVersionGarbageCollector(
     return std::make_unique<VersionGarbageCollectorImpl>(version_set, scheduler);
 }
 
+std::shared_ptr<Version> CreateVersion(
+    Timestamp timestamp,
+    const std::array<std::vector<std::shared_ptr<SSTable>>, 7>& levels) {
+    return std::make_shared<VersionImpl>(timestamp, levels);
+}
+
 } // namespace marble

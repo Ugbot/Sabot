@@ -3,6 +3,7 @@
 #include "marble/record.h"
 #include "marble/mmap_sstable_writer.h"
 #include "marble/file_system.h"
+#include "marble/version.h"
 #include <filesystem>
 #include <algorithm>
 #include <chrono>
@@ -270,16 +271,55 @@ const LSMTreeConfig& StandardLSMTree::GetConfig() const {
 }
 
 Status StandardLSMTree::WaitForBackgroundTasks() {
-    // Wait for compaction queue to be empty
+    // Wait for both flush and compaction queues to be empty
     while (true) {
+        bool all_done = false;
         {
-            std::lock_guard<std::mutex> lock(compaction_mutex_);
-            if (compaction_queue_.empty() && stats_.ongoing_compactions == 0) {
-                break;
+            std::lock_guard<std::mutex> lock(mutex_);
+            std::lock_guard<std::mutex> comp_lock(compaction_mutex_);
+            std::lock_guard<std::mutex> stats_lock(stats_mutex_);
+
+            // Check both immutable memtables (flush queue) and compaction queue
+            if (immutable_memtables_.empty() &&
+                compaction_queue_.empty() &&
+                stats_.ongoing_compactions == 0 &&
+                stats_.ongoing_flushes == 0) {
+                all_done = true;
             }
         }
+
+        if (all_done) {
+            break;
+        }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
+    return Status::OK();
+}
+
+Status StandardLSMTree::GetCurrentVersion(std::shared_ptr<Version>* version) {
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    // Convert vector<vector<shared_ptr<SSTable>>> to array<vector<shared_ptr<SSTable>>, 7>
+    std::array<std::vector<std::shared_ptr<SSTable>>, 7> levels;
+
+    // Copy SSTable levels from sstables_ to fixed-size array
+    // Version expects exactly 7 levels (L0-L6)
+    for (size_t i = 0; i < std::min(sstables_.size(), size_t(7)); ++i) {
+        levels[i] = sstables_[i];  // Shared_ptr copy is safe - increments reference count
+    }
+
+    // Get current timestamp for this version snapshot
+    Timestamp current_ts = Timestamp(
+        std::chrono::system_clock::now().time_since_epoch().count()
+    );
+
+    // Create Version snapshot using factory function
+    // This creates a VersionImpl which holds shared_ptr references to all SSTables
+    // The SSTables will remain valid until the Version is released, even if
+    // compaction removes them from sstables_
+    *version = CreateVersion(current_ts, levels);
+
     return Status::OK();
 }
 
@@ -323,16 +363,17 @@ Status StandardLSMTree::RecoverFromDisk() {
     for (const auto& filename : sstable_files) {
         std::string filepath = config_.data_directory + "/" + filename;
 
-        std::unique_ptr<SSTable> sstable;
-        status = sstable_manager_->OpenSSTable(filepath, &sstable);
+        std::unique_ptr<SSTable> sstable_unique;
+        status = sstable_manager_->OpenSSTable(filepath, &sstable_unique);
         if (!status.ok()) {
             // Log error but continue
             continue;
         }
 
-        uint64_t level = sstable->GetMetadata().level;
+        uint64_t level = sstable_unique->GetMetadata().level;
         if (level < sstables_.size()) {
-            sstables_[level].push_back(std::move(sstable));
+            // Convert unique_ptr to shared_ptr (transfer ownership)
+            sstables_[level].push_back(std::shared_ptr<SSTable>(std::move(sstable_unique)));
         }
     }
 
@@ -363,7 +404,6 @@ Status StandardLSMTree::FlushMemTable(std::unique_ptr<SimpleMemTable> memtable) 
     if (!status.ok()) return status;
 
     if (entries.empty()) {
-        std::cerr << "LSM: Skipping empty memtable flush\n";
         return Status::OK();
     }
 
@@ -371,20 +411,16 @@ Status StandardLSMTree::FlushMemTable(std::unique_ptr<SimpleMemTable> memtable) 
     std::string filename = "sstable_" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + ".sst";
     std::string filepath = config_.data_directory + "/" + filename;
 
-    std::cerr << "LSM: Flushing memtable with " << entries.size() << " entries to " << filepath << "\n";
-
     // Create SSTable writer (use mmap if enabled)
     std::unique_ptr<SSTableWriter> writer;
 
     if (config_.enable_mmap_flush) {
         // Use memory-mapped writer for 5-10× performance
-        std::cerr << "LSM: Using memory-mapped flush (zone_size=" << config_.flush_zone_size_mb << " MB)\n";
         size_t zone_size = config_.flush_zone_size_mb * 1024 * 1024;
         writer = CreateMmapSSTableWriter(filepath, 0, std::make_shared<LocalFileSystem>(),
                                         sstable_manager_.get(), zone_size, config_.use_async_msync);
     } else {
         // Fallback to standard writer
-        std::cerr << "LSM: Using standard flush\n";
         status = sstable_manager_->CreateWriter(filepath, 0, &writer);
         if (!status.ok()) return status;
     }
@@ -395,7 +431,6 @@ Status StandardLSMTree::FlushMemTable(std::unique_ptr<SimpleMemTable> memtable) 
         if (entry.op == SimpleMemTableEntry::kPut) {
             status = writer->Add(entry.key, entry.value);
             if (!status.ok()) {
-                std::cerr << "LSM: Failed to write entry " << entries_written << ": " << status.ToString() << "\n";
                 return status;
             }
             entries_written++;
@@ -403,13 +438,10 @@ Status StandardLSMTree::FlushMemTable(std::unique_ptr<SimpleMemTable> memtable) 
         // Skip delete entries for now (they become tombstones in SSTable)
     }
 
-    std::cerr << "LSM: Wrote " << entries_written << " entries, finishing SSTable...\n";
-
     // Finish SSTable
-    std::unique_ptr<SSTable> sstable;
-    status = writer->Finish(&sstable);
+    std::unique_ptr<SSTable> sstable_unique;
+    status = writer->Finish(&sstable_unique);
     if (!status.ok()) {
-        std::cerr << "LSM: Failed to finish SSTable: " << status.ToString() << "\n";
         return status;
     }
 
@@ -420,13 +452,10 @@ Status StandardLSMTree::FlushMemTable(std::unique_ptr<SimpleMemTable> memtable) 
             sstables_.resize(1);
         }
 
-        // For now, add nullptr since mmap writer returns nullptr
-        // TODO: Create proper SSTable object for reads
-        if (sstable) {
-            sstables_[0].push_back(std::move(sstable));
+        // Convert unique_ptr to shared_ptr (transfer ownership)
+        if (sstable_unique) {
+            sstables_[0].push_back(std::shared_ptr<SSTable>(std::move(sstable_unique)));
         }
-
-        std::cerr << "LSM: Flush complete, L0 now has " << sstables_[0].size() << " SSTables\n";
 
         // Check if L0 needs compaction
         if (NeedsCompaction(0)) {
@@ -482,16 +511,17 @@ Status StandardLSMTree::PerformMajorCompaction(uint64_t level, const std::vector
     }
 
     // Open SSTables
-    std::vector<std::unique_ptr<SSTable>> input_sstables;
+    std::vector<std::shared_ptr<SSTable>> input_sstables;
     for (const auto& filepath : files_to_compact) {
-        std::unique_ptr<SSTable> sstable;
-        auto status = sstable_manager_->OpenSSTable(filepath, &sstable);
+        std::unique_ptr<SSTable> sstable_unique;
+        auto status = sstable_manager_->OpenSSTable(filepath, &sstable_unique);
         if (!status.ok()) continue; // Skip corrupted files
-        input_sstables.push_back(std::move(sstable));
+        // Convert unique_ptr to shared_ptr
+        input_sstables.push_back(std::shared_ptr<SSTable>(std::move(sstable_unique)));
     }
 
     // Merge SSTables
-    std::unique_ptr<SSTable> output_sstable;
+    std::shared_ptr<SSTable> output_sstable;
     auto status = MergeSSTables(input_sstables, &output_sstable);
     if (!status.ok()) return status;
 
@@ -507,14 +537,14 @@ Status StandardLSMTree::PerformMajorCompaction(uint64_t level, const std::vector
         auto& current_level = sstables_[level];
         for (const auto& filepath : files_to_compact) {
             auto it = std::remove_if(current_level.begin(), current_level.end(),
-                                   [&](const std::unique_ptr<SSTable>& sstable) {
+                                   [&](const std::shared_ptr<SSTable>& sstable) {
                                        return sstable->GetFilePath() == filepath;
                                    });
             current_level.erase(it, current_level.end());
         }
 
-        // Add new SSTable to target level
-        sstables_[target_level].push_back(std::move(output_sstable));
+        // Add new SSTable to target level (no need for std::move with shared_ptr)
+        sstables_[target_level].push_back(output_sstable);
 
         // Delete old files
         for (const auto& filepath : files_to_compact) {
@@ -586,8 +616,8 @@ struct SSTableIterator {
     }
 };
 
-Status StandardLSMTree::MergeSSTables(const std::vector<std::unique_ptr<SSTable>>& inputs,
-                                     std::unique_ptr<SSTable>* output) {
+Status StandardLSMTree::MergeSSTables(const std::vector<std::shared_ptr<SSTable>>& inputs,
+                                     std::shared_ptr<SSTable>* output) {
     if (inputs.empty()) {
         return Status::InvalidArgument("No input SSTables to merge");
     }
@@ -676,10 +706,14 @@ Status StandardLSMTree::MergeSSTables(const std::vector<std::unique_ptr<SSTable>
     }
 
     // Finalize output SSTable
-    auto finish_status = writer->Finish(output);
+    std::unique_ptr<SSTable> output_unique;
+    auto finish_status = writer->Finish(&output_unique);
     if (!finish_status.ok()) {
         return finish_status;
     }
+
+    // Convert unique_ptr to shared_ptr
+    *output = std::shared_ptr<SSTable>(std::move(output_unique));
 
     return Status::OK();
 }
@@ -779,8 +813,23 @@ void StandardLSMTree::FlushWorker() {
             }
         }
 
+        // Increment ongoing flush counter before work starts
+        {
+            std::lock_guard<std::mutex> stats_lock(stats_mutex_);
+            stats_.ongoing_flushes++;
+        }
+
         // Flush memtable to SSTable
-        FlushMemTable(std::move(memtable_to_flush));
+        auto status = FlushMemTable(std::move(memtable_to_flush));
+
+        // Decrement ongoing flush counter after work completes
+        {
+            std::lock_guard<std::mutex> stats_lock(stats_mutex_);
+            stats_.ongoing_flushes--;
+            if (status.ok()) {
+                stats_.completed_flushes++;
+            }
+        }
     }
 }
 
@@ -896,13 +945,13 @@ std::unique_ptr<CompactionStrategy> CreateSizeTieredCompactionStrategy() {
 }
 
 // CompactionStrategy implementations
-bool LeveledCompactionStrategy::NeedsCompaction(const std::vector<std::unique_ptr<SSTable>>& level_files,
+bool LeveledCompactionStrategy::NeedsCompaction(const std::vector<std::shared_ptr<SSTable>>& level_files,
                                                const LSMTreeConfig& config) const {
     return level_files.size() >= config.l0_compaction_trigger;
 }
 
 std::vector<size_t> LeveledCompactionStrategy::SelectFilesForCompaction(
-    const std::vector<std::unique_ptr<SSTable>>& level_files,
+    const std::vector<std::shared_ptr<SSTable>>& level_files,
     const LSMTreeConfig& config) const {
     // Select all files for compaction
     std::vector<size_t> indices;
@@ -912,7 +961,7 @@ std::vector<size_t> LeveledCompactionStrategy::SelectFilesForCompaction(
     return indices;
 }
 
-bool SizeTieredCompactionStrategy::NeedsCompaction(const std::vector<std::unique_ptr<SSTable>>& level_files,
+bool SizeTieredCompactionStrategy::NeedsCompaction(const std::vector<std::shared_ptr<SSTable>>& level_files,
                                                   const LSMTreeConfig& config) const {
     if (level_files.size() < 2) {
         return false;
@@ -933,7 +982,7 @@ bool SizeTieredCompactionStrategy::NeedsCompaction(const std::vector<std::unique
 }
 
 std::vector<size_t> SizeTieredCompactionStrategy::SelectFilesForCompaction(
-    const std::vector<std::unique_ptr<SSTable>>& level_files,
+    const std::vector<std::shared_ptr<SSTable>>& level_files,
     const LSMTreeConfig& config) const {
     // Select files with similar sizes
     if (level_files.empty()) return {};
