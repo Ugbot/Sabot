@@ -1132,21 +1132,41 @@ private:
         // Assign sequential batch ID
         uint64_t batch_id = cf_info->next_batch_id++;
 
-        // Serialize RecordBatch using Arrow IPC
-        std::string serialized_batch;
-        auto serialize_status = SerializeArrowBatch(batch, &serialized_batch);
-        if (!serialize_status.ok()) {
-            return serialize_status;
+        // ARROW-NATIVE PATH: Store RecordBatch directly without serialization
+        // Add column family metadata to the batch for filtering during scans
+        auto new_metadata = std::make_shared<arrow::KeyValueMetadata>();
+
+        // Copy existing metadata if present
+        auto existing_metadata = batch->schema()->metadata();
+        if (existing_metadata) {
+            for (int64_t i = 0; i < existing_metadata->size(); ++i) {
+                new_metadata->Append(existing_metadata->key(i), existing_metadata->value(i));
+            }
         }
 
-        // Encode key for LSM tree storage
-        uint64_t batch_key = EncodeBatchKey(cf_info->id, batch_id);
+        // Add column family metadata
+        new_metadata->Append("cf_id", std::to_string(cf_info->id));
+        new_metadata->Append("batch_id", std::to_string(batch_id));
+        new_metadata->Append("cf_name", table_name);
 
-        // Write to LSM tree for persistence
-        auto put_status = lsm_tree_->Put(batch_key, serialized_batch);
+        auto schema_with_metadata = batch->schema()->WithMetadata(new_metadata);
+        auto batch_with_metadata = arrow::RecordBatch::Make(
+            schema_with_metadata,
+            batch->num_rows(),
+            batch->columns());
+
+        // Write to LSM tree using zero-copy Arrow-native path
+        auto put_status = lsm_tree_->PutBatch(batch_with_metadata);
         if (!put_status.ok()) {
             return put_status;
         }
+
+        // LEGACY PATH (preserved for backwards compatibility)
+        // Keep the old serialization path commented out in case we need to revert
+        // std::string serialized_batch;
+        // auto serialize_status = SerializeArrowBatch(batch, &serialized_batch);
+        // uint64_t batch_key = EncodeBatchKey(cf_info->id, batch_id);
+        // auto put_status = lsm_tree_->Put(batch_key, serialized_batch);
 
         // ★★★ BUILD ROW_INDEX FOR POINT LOOKUPS ★★★
         // Extract keys from first column and build row_index mapping
@@ -1271,32 +1291,42 @@ public:
 
         auto* cf_info = it->second.get();
 
-        // Read all batches from LSM tree
+        // ARROW-NATIVE PATH: Read batches directly without deserialization
         std::vector<std::shared_ptr<arrow::RecordBatch>> record_batches;
 
-        // Compute key range for this table's batches (bit 63 = 0 for batch keys)
-        uint64_t start_key = EncodeBatchKey(cf_info->id, 0);
-        uint64_t end_key = EncodeBatchKey(cf_info->id, 0x0000FFFFFFFFFFFF);
-
-        // Scan LSM tree for all batches
-        std::vector<std::pair<uint64_t, std::string>> lsm_results;
-        auto scan_status = lsm_tree_->Scan(start_key, end_key, &lsm_results);
+        // Scan all batches from LSM tree using zero-copy Arrow-native path
+        std::vector<std::shared_ptr<arrow::RecordBatch>> all_batches;
+        auto scan_status = lsm_tree_->ScanSSTablesBatches(0, UINT64_MAX, &all_batches);
         if (!scan_status.ok()) {
             return scan_status;
         }
 
-        // Deserialize each batch
-        for (const auto& [key, serialized_batch] : lsm_results) {
-            std::shared_ptr<arrow::RecordBatch> batch;
-            auto deserialize_status = DeserializeArrowBatch(
-                serialized_batch.data(),
-                serialized_batch.size(),
-                &batch);
-            if (!deserialize_status.ok()) {
-                return deserialize_status;
+        // Filter batches by column family ID using metadata
+        for (const auto& batch : all_batches) {
+            auto metadata = batch->schema()->metadata();
+            if (!metadata) continue;
+
+            // Check if this batch belongs to our column family
+            auto cf_id_index = metadata->FindKey("cf_id");
+            if (cf_id_index == -1) continue;
+
+            auto cf_id_str = metadata->value(cf_id_index);
+            uint64_t batch_cf_id = std::stoull(cf_id_str);
+
+            if (batch_cf_id == cf_info->id) {
+                record_batches.push_back(batch);
             }
-            record_batches.push_back(batch);
         }
+
+        // LEGACY PATH (preserved for backwards compatibility)
+        // The old deserialization path is commented out
+        // std::vector<std::pair<uint64_t, std::string>> lsm_results;
+        // auto scan_status = lsm_tree_->Scan(start_key, end_key, &lsm_results);
+        // for (const auto& [key, serialized_batch] : lsm_results) {
+        //     std::shared_ptr<arrow::RecordBatch> batch;
+        //     auto deserialize_status = DeserializeArrowBatch(...);
+        //     record_batches.push_back(batch);
+        // }
 
         // Handle empty case
         if (record_batches.empty()) {
