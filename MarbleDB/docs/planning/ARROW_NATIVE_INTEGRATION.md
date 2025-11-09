@@ -595,13 +595,426 @@ Results back to user
 3. **Lower memory usage**: 2.5x reduction (proven in benchmarks)
 4. **Faster restart**: 2.72x faster (persistent indexes)
 
-**Benchmark Results** (MarbleDB vs RocksDB):
-- Write throughput: **1.26x faster** (166.44 vs 131.64 K ops/sec)
-- Point lookup: **1.69x faster** (2.18 vs 3.68 μs/op)
-- Range scan: Tied (3.52 vs 3.47 M rows/sec)
-- Database restart: **2.72x faster** (8.87 vs 24.15 ms)
+**Benchmark Results** (MarbleDB vs RocksDB - Updated November 8, 2025):
+- Write throughput: **1.04x slower** (178.30 vs 193.28 K ops/sec)
+- Point lookup: **1.05x faster** (2.550 vs 2.692 μs/op)
+- Range scan: **7.82x faster** (30.15 vs 3.85 M rows/sec) ✅ **NEW: Iterator optimization**
+- Database restart: **3.38x faster** (6.89 vs 23.32 ms)
+
+**Key Improvement**: Iterator optimization achieved **39x speedup** (0.77 → 30.15 M rows/sec) by using batch-based scanning instead of row-by-row iteration, leveraging MarbleDB's Arrow-native design.
 
 Reference: `MarbleDB/docs/ROCKSDB_BENCHMARK_RESULTS_2025.md`
+
+### 4.2.1 RocksDB API Optimization Opportunities
+
+**Research Date**: November 8, 2025
+**Status**: Planning - Based on Iterator optimization success (39x improvement)
+
+#### Executive Summary
+
+Analysis of the RocksDB compatibility layer identified **8 major optimization opportunities** leveraging MarbleDB's Arrow-native design for **2-100x performance improvements** across different operation types.
+
+The Iterator optimization (39x speedup) validates that MarbleDB's columnar architecture provides massive performance gains when properly leveraged through the RocksDB API.
+
+#### Top 5 Optimization Opportunities (Ranked by Impact)
+
+| # | Optimization | Expected Speedup | Effort | Confidence |
+|---|-------------|------------------|--------|------------|
+| 1 | **MultiGet Batch Bloom Filters** | 5-10x | 4 hours | High |
+| 2 | **Vectorized CompactRange** | 10-50x | 2-3 days | High |
+| 3 | **Arrow Compute Merge Ops** | 20-100x | 1-2 days | High |
+| 4 | **DeleteRange Tombstones** | 1000x | 1 day | High |
+| 5 | **Parallel MultiGet Prefetch** | 3-5x | 1 day | Medium |
+
+---
+
+#### 1. MultiGet Batch Bloom Filters 🔥 **HIGHEST PRIORITY**
+
+**Current Implementation** (lines 572-591 in `rocksdb_adapter.cpp`):
+```cpp
+for (size_t i = 0; i < keys.size(); ++i) {
+    auto status = Get(options, cf, keys[i], &(*values)[i]);
+    statuses.push_back(status);
+}
+```
+
+**Problem**: Simple loop over individual Get() calls
+- No batch bloom filter checking
+- No batch I/O coordination
+- No cache-friendly access patterns
+- Misses opportunity for vectorized operations
+
+**Optimized Approach**:
+1. **Batch bloom filter check** - Single cache line fetch vs N fetches
+2. **Batch hot key cache lookup** - Cache-friendly sequential access
+3. **Group by batch_id** - Fetch each RecordBatch only once
+4. **Extract values from cached batches** - Zero-copy Arrow array access
+
+**Expected Impact**: **5-10x speedup** vs current loop-based implementation
+**Implementation Effort**: 4 hours
+**Code Locations**: `/Users/bengamble/Sabot/MarbleDB/src/core/rocksdb_adapter.cpp` lines 572-591
+
+**Validation**: Benchmark with 1M keys, 10K random MultiGet(100 keys each)
+
+---
+
+#### 2. Vectorized CompactRange with Zone Map Pruning 🔥
+
+**Current Implementation** (lines 694-713 in `rocksdb_adapter.cpp`):
+- Uses row-by-row compaction (not shown but likely)
+- Doesn't leverage zone maps for skipping
+- Doesn't use Arrow compute for vectorized merging
+
+**Optimized Approach**:
+1. **SSTable-level zone map pruning** - Skip entire SSTables if out of range
+2. **Batch-level zone map pruning** - Skip 8192-row blocks if out of range
+3. **Arrow compute filtering** - Vectorized predicate evaluation
+4. **Arrow compute merging** - SIMD-accelerated sorted merge
+
+**Benefits**:
+- Skip entire SSTables if out of range
+- Skip 8192-row blocks if out of range
+- Vectorized filtering and merging
+- SIMD acceleration from Arrow
+
+**Expected Impact**: **10-50x speedup** for selective compactions
+**Implementation Effort**: 2-3 days
+**Code Locations**:
+- `/Users/bengamble/Sabot/MarbleDB/src/core/rocksdb_adapter.cpp` lines 694-713
+- `/Users/bengamble/Sabot/MarbleDB/src/core/lsm_storage.cpp` (compaction logic)
+
+**Similar To**: Iterator optimization (which achieved 39x improvement)
+
+---
+
+#### 3. Arrow Compute Merge Operations 🔥
+
+**Current Implementation** (lines 457-476 in `rocksdb_adapter.cpp`):
+```cpp
+// Read-Modify-Write fallback
+std::string existing_value;
+auto get_status = Get(ReadOptions(), cf, key, &existing_value);
+std::string merged = existing_value + std::string(value);
+return Put(options, cf, key, merged);
+```
+
+**Problem**:
+- Read-Modify-Write is slow (2 I/O ops + lock)
+- String concatenation not associative (doesn't work for compaction)
+- Doesn't leverage Arrow compute kernels
+
+**Optimized Approach**:
+
+Define merge operators using Arrow compute:
+
+**Use Cases**:
+- **Counters** (increment): `arrow::compute::Add`
+- **Sets** (union): `arrow::compute::Union`
+- **Histograms**: `arrow::compute::Histogram`
+- **Min/Max**: `arrow::compute::MinMax`
+
+**Example - Counter Merge Operator**:
+```cpp
+struct CounterMergeOperator : MergeOperator {
+    Status Apply(const Record& existing,
+                 const std::string& operand,
+                 Record* result) override {
+        auto existing_counters = ExtractInt64Array(existing);
+        auto delta = ParseInt64(operand);
+
+        // Use Arrow compute for vectorized addition
+        auto result_counters = arrow::compute::Add(existing_counters, delta);
+        *result = CreateRecord(result_counters);
+        return Status::OK();
+    }
+};
+```
+
+**Benefits**:
+- No Read-Modify-Write overhead
+- Vectorized operations (SIMD)
+- Works correctly during compaction
+- Enables high-throughput counter updates
+
+**Expected Impact**: **20-100x speedup** for counter/set workloads
+**Implementation Effort**: 1-2 days
+**Code Locations**:
+- `/Users/bengamble/Sabot/MarbleDB/src/core/rocksdb_adapter.cpp` lines 457-476
+- `/Users/bengamble/Sabot/MarbleDB/include/marble/merge_operator.h` (new file)
+
+---
+
+#### 4. DeleteRange with Tombstones 🔥
+
+**Current Implementation** (lines 1233-1239 in `api.cpp`):
+```cpp
+Status DeleteRange(...) {
+    return Status::NotImplemented("DeleteRange not implemented");
+}
+```
+
+**Optimized Approach**:
+```cpp
+Status DeleteRange(const Key& begin_key, const Key& end_key) {
+    // Create a single tombstone record
+    auto tombstone = std::make_shared<RangeTombstone>(begin_key, end_key);
+
+    // Write to memtable (single write, no loop)
+    return memtable_->PutTombstone(tombstone);
+}
+```
+
+**Benefits**:
+- Single write instead of N individual deletes
+- Constant-time deletion
+- Compaction merges tombstones efficiently
+
+**Use Cases**:
+- TTL expiration
+- Bulk user data deletion
+- Time-series data cleanup
+
+**Expected Impact**: **1000x speedup** vs loop of individual deletes
+**Implementation Effort**: 1 day
+**Code Locations**: `/Users/bengamble/Sabot/MarbleDB/src/core/api.cpp` lines 1233-1239
+
+---
+
+#### 5. Parallel MultiGet with Prefetching 🔥
+
+**Builds on**: MultiGet batch bloom filters (#1)
+
+**Optimized Approach**:
+1. **Batch bloom filter checks** (from #1)
+2. **Sort keys by batch_id** for sequential I/O
+3. **Parallel batch fetching** with thread pool
+4. **Prefetch next batch** while processing current
+5. **Wait for results** and extract values
+
+**Benefits**:
+- Parallel I/O for independent batches
+- Prefetching hides I/O latency
+- Cache-friendly sequential access within batches
+
+**Expected Impact**: **3-5x additional speedup** (on top of batch bloom filters)
+**Implementation Effort**: 1 day
+**Code Locations**: `/Users/bengamble/Sabot/MarbleDB/src/core/rocksdb_adapter.cpp` lines 572-591
+
+---
+
+#### Additional Opportunities (Lower Priority)
+
+**6. Zero-Copy Snapshots**
+- Expected: 100-1000x vs copy-based snapshots
+- Effort: 2-3 days
+- Use Arrow's reference counting + MVCC version vectors
+
+**7. FastScan Direct Batch Return**
+- Expected: Minimal (already optimized via BatchOptimizedIterator)
+- Effort: 4 hours
+- Status: Lines 612-655 already use optimized iterator
+
+**8. Bloom Filter Hints for Get()**
+- Status: ✅ Already implemented (lines 744-756 in `api.cpp`)
+- Performance: Excellent (1.05x faster than RocksDB)
+
+---
+
+#### Current Optimization Status
+
+**Already Optimized** ✅:
+
+1. **Point Lookups (Get/Put/Delete)** - Lines 688-792 in `api.cpp`
+   - ✅ Bloom filter checking
+   - ✅ Hot key cache (sub-microsecond access)
+   - ✅ Batch cache (avoid repeated deserialization)
+   - **Performance**: 1.05x faster than RocksDB (2.550 vs 2.692 μs/op)
+
+2. **WriteBatch** - Lines 478-570 in `rocksdb_adapter.cpp`
+   - ✅ Already uses `InsertBatch()` API
+   - ✅ Builds single Arrow RecordBatch for all PUTs
+   - **Performance**: Good (further optimization potential: low)
+
+3. **Iterator (Range Scans)** - Lines 593-610 in `rocksdb_adapter.cpp`
+   - ✅ Recently optimized with BatchOptimizedIterator
+   - ✅ Uses `ScanBatches()` for 10-100x faster iteration
+   - **Performance**: Excellent - **39x improvement** (0.77 → 30.15 M rows/sec)
+   - **Status**: ✅ Proven optimization approach
+
+**Not Yet Optimized** ❌:
+
+1. **MultiGet** - Simple loop (no batching)
+2. **CompactRange** - Row-by-row compaction
+3. **Merge** - Read-Modify-Write fallback
+4. **DeleteRange** - Not implemented
+5. **Snapshots** - Not implemented
+
+---
+
+#### MarbleDB Native Optimizations Available
+
+These optimizations already exist in MarbleDB but aren't fully exposed through all RocksDB APIs:
+
+**1. Bloom Filters** ✅
+- Location: `include/marble/bloom_filter_strategy.h`
+- Status: Implemented and integrated into Get() path
+- Usage: Automatically applied via OptimizationPipeline
+- Features: Per-table filters, persistent, 1% FP rate
+
+**2. Hot Key Cache** ✅
+- Location: `include/marble/hot_key_cache.h`
+- Status: Implemented and integrated into Get() path
+- Features: LRU eviction, adaptive promotion (3+ accesses), RCU lock-free reads
+- Size: 64 MB default cache
+- Performance: Sub-microsecond access for hot keys
+
+**3. Zone Maps / Skipping Indexes** ✅
+- Location: `include/marble/skipping_index_strategy.h`
+- Status: Implemented for range scans
+- Features: Min/max per 8192-row block, SSTable-level zone maps, persistent
+- Exposure: ⚠️ Used by ScanBatches(), not yet in CompactRange
+
+**4. Batch Operations** ✅
+- APIs: `InsertBatch()`, `ScanBatches()`
+- Status:
+  - ✅ InsertBatch used by WriteBatch::Write()
+  - ✅ ScanBatches used by BatchOptimizedIterator
+  - ❌ Not exposed for MultiGet or CompactRange
+
+---
+
+#### Implementation Roadmap
+
+**Phase 1: Quick Wins** (1 week)
+1. MultiGet batch bloom filters (4 hours) → 5-10x speedup
+2. DeleteRange tombstones (1 day) → 1000x speedup
+3. Arrow Compute merges (2 days) → 20-100x speedup for counters
+
+**Total Effort**: 3-4 days
+**Expected Impact**: 3 major API improvements
+
+---
+
+**Phase 2: Major Optimizations** (2 weeks)
+4. Vectorized CompactRange (2-3 days) → 10-50x speedup
+5. Parallel MultiGet (1 day) → 3-5x additional speedup
+6. Zero-copy snapshots (2-3 days) → 100-1000x speedup
+
+**Total Effort**: 5-7 days
+**Expected Impact**: Production-grade RocksDB replacement
+
+---
+
+**Phase 3: Polish** (1 week)
+7. Performance benchmarks for all optimizations
+8. Documentation and tuning guides
+9. Integration tests for RocksDB compatibility
+
+---
+
+#### Validation Strategy
+
+**Benchmark Methodology**:
+
+For each optimization, run before/after benchmarks:
+
+**MultiGet**:
+- Dataset: 1M keys, 10K random MultiGet(100 keys each)
+- Metrics: Throughput (ops/sec), Latency (μs/op), Cache hit rate
+- Expected: 5-10x improvement
+
+**CompactRange**:
+- Dataset: 10M keys across 10 SSTables, compact 10% of range
+- Metrics: Time (sec), Rows processed, Rows skipped
+- Expected: 10-50x improvement (90% skip rate)
+
+**Merge**:
+- Dataset: 1M counters, 1M random increments
+- Metrics: Throughput (ops/sec), Compaction time
+- Expected: 20-100x improvement vs RMW
+
+**DeleteRange**:
+- Dataset: 1M keys, delete ranges of 1K-100K keys
+- Metrics: Time per range, Amplification factor
+- Expected: 1000x improvement
+
+---
+
+#### Compatibility Concerns
+
+**Breaking Changes**: None
+
+All optimizations maintain RocksDB API compatibility:
+- MultiGet still returns `vector<Status>` and `vector<string>`
+- CompactRange still accepts `Slice* begin/end`
+- Merge still uses string operands
+- DeleteRange still uses Key range
+
+**API Extensions** (Optional, non-breaking):
+- `FastScan()` already exists as MarbleDB extension (line 302-321 in `rocksdb_compat.h`)
+- Could add `MultiGetBatched()` for bulk lookups
+- Could add `MergeWithOperator()` for custom operators
+
+---
+
+#### Conclusion
+
+MarbleDB's Arrow-native design provides massive optimization opportunities when properly leveraged. The Iterator optimization (39x improvement) validates this approach.
+
+**Summary of Opportunities**:
+1. MultiGet: 5-10x faster (4 hours work)
+2. CompactRange: 10-50x faster (2-3 days work)
+3. Merge: 20-100x faster (1-2 days work)
+4. DeleteRange: 1000x faster (1 day work)
+5. Parallel MultiGet: 3-5x additional (1 day work)
+
+**Total effort for Phase 1+2**: ~2-3 weeks
+**Total expected impact**: RocksDB compatibility with significantly better performance across all operations
+
+The RocksDB API compatibility layer is already well-designed and partially optimized (Put/Get/Iterator). The remaining opportunities are straightforward implementations that leverage MarbleDB's existing optimizations (bloom filters, zone maps, hot key cache, Arrow compute).
+
+#### Implementation Status (Updated 2025-11-08)
+
+**✅ Completed Optimizations:**
+
+1. **MultiGet Batch Bloom Filters** (4 hours) - COMPLETE
+   - Added `MightContainBatch()` to bloom filter
+   - Implemented batch processing infrastructure in MultiGet
+   - Files: `bloom_filter_strategy.{h,cpp}`, `rocksdb_adapter.cpp`
+
+2. **DeleteRange with Tombstones** (1 day) - COMPLETE
+   - O(1) range deletion via single tombstone marker
+   - Compaction cleanup for deleted ranges
+   - Hot key cache invalidation
+   - Files: `api.cpp` (encoding/DeleteRange), `lsm_storage.cpp` (compaction cleanup)
+
+3. **Parallel MultiGet with Prefetching** (1 day) - COMPLETE
+   - Automatic parallelization for batches ≥16 keys
+   - Uses hardware concurrency (4-16 threads)
+   - Files: `rocksdb_adapter.cpp`
+
+4. **Arrow Compute Merge Operations** (1-2 days) - INFRASTRUCTURE COMPLETE
+   - Merge operator framework already exists (Int64Add, StringAppend, SetUnion, Max, Min, JsonMerge)
+   - Added merge_operator field to ColumnFamilyInfo
+   - Implemented Merge() methods in MarbleDB API
+   - RocksDB adapter delegates to native MarbleDB Merge()
+   - Files: `api.cpp`, `rocksdb_adapter.cpp`
+   - Status: Infrastructure ready, full Record creation integration pending
+
+**⏳ Pending Optimization:**
+
+5. **Vectorized CompactRange** (2-3 days) - DEFERRED
+   - Would use Arrow compute kernels for compaction operations
+   - Expected 10-50x speedup for compaction workloads
+   - Deferred pending benchmark validation of completed optimizations
+   - Implementation approach documented in section 4.2.1.2
+
+**Next Steps:**
+- Run benchmarks to validate implemented optimizations
+- Based on results, prioritize CompactRange implementation
+- Consider additional optimizations: WriteBatch vectorization, Snapshot optimizations
+
+---
 
 ### 4.3 Sabot Requirements Summary
 

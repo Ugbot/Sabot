@@ -27,7 +27,7 @@ namespace marble {
 // Implement proper AS OF temporal reconstruction
 Status TemporalReconstructor::ReconstructAsOf(
     const SnapshotId& snapshot,
-    const std::vector<arrow::RecordBatch>& version_batches,
+    const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
     const std::vector<TemporalMetadata>& metadata_list,
     std::shared_ptr<arrow::RecordBatch>* result) {
 
@@ -68,7 +68,7 @@ Status TemporalReconstructor::ReconstructAsOf(
 Status TemporalReconstructor::ReconstructValidTime(
     uint64_t valid_start,
     uint64_t valid_end,
-    const std::vector<arrow::RecordBatch>& version_batches,
+    const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
     const std::vector<TemporalMetadata>& metadata_list,
     std::shared_ptr<arrow::RecordBatch>* result) {
 
@@ -90,9 +90,9 @@ Status TemporalReconstructor::ReconstructValidTime(
         if (overlaps) {
             // Create a copy of this version batch
             auto version_copy = arrow::RecordBatch::Make(
-                version_batches[i].schema(),
-                version_batches[i].num_rows(),
-                version_batches[i].columns());
+                version_batches[i]->schema(),
+                version_batches[i]->num_rows(),
+                version_batches[i]->columns());
             valid_versions.push_back(version_copy);
         }
     }
@@ -109,7 +109,7 @@ Status TemporalReconstructor::ReconstructValidTime(
 // Reconstruct data using both system time (AS OF) and valid time dimensions
 Status TemporalReconstructor::ReconstructBitemporal(
     const TemporalQuerySpec& spec,
-    const std::vector<arrow::RecordBatch>& version_batches,
+    const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
     const std::vector<TemporalMetadata>& metadata_list,
     std::shared_ptr<arrow::RecordBatch>* result) {
 
@@ -147,7 +147,7 @@ Status TemporalReconstructor::ReconstructBitemporal(
 
 Status TemporalReconstructor::ReconstructHistory(
     const std::string& primary_key,
-    const std::vector<arrow::RecordBatch>& version_batches,
+    const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
     const std::vector<TemporalMetadata>& metadata_list,
     std::vector<std::shared_ptr<arrow::RecordBatch>>* history) {
 
@@ -187,9 +187,9 @@ Status TemporalReconstructor::ReconstructHistory(
 
         // Create a copy of this version
         auto version_copy = arrow::RecordBatch::Make(
-            version_batches[version_index].schema(),
-            version_batches[version_index].num_rows(),
-            version_batches[version_index].columns());
+            version_batches[version_index]->schema(),
+            version_batches[version_index]->num_rows(),
+            version_batches[version_index]->columns());
 
         history->push_back(version_copy);
     }
@@ -199,7 +199,7 @@ Status TemporalReconstructor::ReconstructHistory(
 
 // Build version chains by grouping versions by primary key and sorting by system time
 Status TemporalReconstructor::BuildVersionChains(
-    const std::vector<arrow::RecordBatch>& version_batches,
+    const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
     const std::vector<TemporalMetadata>& metadata_list,
     std::unordered_map<std::string, VersionChain>* chains) {
 
@@ -357,7 +357,7 @@ Status TemporalReconstructor::ApplyValidTimeFilter(
 // Reconstruct data from version chains based on temporal query spec
 Status TemporalReconstructor::ReconstructFromChains(
     const std::unordered_map<std::string, VersionChain>& chains,
-    const std::vector<arrow::RecordBatch>& version_batches,
+    const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
     const TemporalQuerySpec& spec,
     std::shared_ptr<arrow::RecordBatch>* result) {
 
@@ -388,9 +388,9 @@ Status TemporalReconstructor::ReconstructFromChains(
             size_t version_index = chain.version_indices[0];
             if (version_index < version_batches.size()) {
                 active_version = arrow::RecordBatch::Make(
-                    version_batches[version_index].schema(),
-                    version_batches[version_index].num_rows(),
-                    version_batches[version_index].columns());
+                    version_batches[version_index]->schema(),
+                    version_batches[version_index]->num_rows(),
+                    version_batches[version_index]->columns());
             }
         }
 
@@ -421,13 +421,13 @@ Status TemporalReconstructor::ReconstructFromChains(
 }
 
 Status TemporalReconstructor::ExtractPrimaryKey(
-    const arrow::RecordBatch& batch,
+    const std::shared_ptr<arrow::RecordBatch>& batch,
     size_t row_index,
     const std::string& key_column,
     std::string* primary_key) {
 
     // Extract primary key from the specified column
-    if (row_index >= batch.num_rows()) {
+    if (row_index >= batch->num_rows()) {
         return Status::InvalidArgument("Row index out of bounds");
     }
 
@@ -436,14 +436,14 @@ Status TemporalReconstructor::ExtractPrimaryKey(
 
     int column_index = 0;
     if (!actual_key_column.empty()) {
-        column_index = batch.schema()->GetFieldIndex(actual_key_column);
+        column_index = batch->schema()->GetFieldIndex(actual_key_column);
         if (column_index == -1) {
             return Status::InvalidArgument("Key column not found: " + actual_key_column);
         }
     }
 
     // Get the value from the specified row and column
-    auto column = batch.column(column_index);
+    auto column = batch->column(column_index);
     auto scalar_result = column->GetScalar(row_index);
 
     if (!scalar_result.ok()) {
@@ -499,19 +499,19 @@ Status TemporalReconstructor::MergeRecordBatches(
 }
 
 Status TemporalReconstructor::SortByPrimaryKey(
-    const arrow::RecordBatch& batch,
+    const std::shared_ptr<arrow::RecordBatch>& batch,
     const std::string& key_column,
     std::shared_ptr<arrow::RecordBatch>* result) {
 
-    if (batch.num_rows() == 0) {
-        *result = arrow::RecordBatch::Make(batch.schema(), 0, batch.columns());
+    if (batch->num_rows() == 0) {
+        *result = arrow::RecordBatch::Make(batch->schema(), 0, batch->columns());
         return Status::OK();
     }
 
     // Determine which column to sort by
     int sort_column_index = 0;
     if (!key_column.empty()) {
-        sort_column_index = batch.schema()->GetFieldIndex(key_column);
+        sort_column_index = batch->schema()->GetFieldIndex(key_column);
         if (sort_column_index == -1) {
             return Status::InvalidArgument("Key column not found: " + key_column);
         }
@@ -519,7 +519,7 @@ Status TemporalReconstructor::SortByPrimaryKey(
 
     // Convert RecordBatch to Table for sorting
     // Create a shared_ptr from the batch using Make (since RecordBatch is abstract)
-    auto batch_copy = arrow::RecordBatch::Make(batch.schema(), batch.num_rows(), batch.columns());
+    auto batch_copy = arrow::RecordBatch::Make(batch->schema(), batch->num_rows(), batch->columns());
     auto table_result = arrow::Table::FromRecordBatches({batch_copy});
     if (!table_result.ok()) {
         return Status::FromArrowStatus(table_result.status());
@@ -540,8 +540,8 @@ Status TemporalReconstructor::SortByPrimaryKey(
 
     // Apply the sort indices to reorder the batch
     std::vector<std::shared_ptr<arrow::Array>> sorted_columns;
-    for (int i = 0; i < batch.num_columns(); ++i) {
-        auto take_result = arrow::compute::Take(batch.column(i), sort_indices);
+    for (int i = 0; i < batch->num_columns(); ++i) {
+        auto take_result = arrow::compute::Take(batch->column(i), sort_indices);
         if (!take_result.ok()) {
             return Status::FromArrowStatus(take_result.status());
         }
@@ -549,7 +549,7 @@ Status TemporalReconstructor::SortByPrimaryKey(
     }
 
     // Create sorted RecordBatch
-    *result = arrow::RecordBatch::Make(batch.schema(), batch.num_rows(), sorted_columns);
+    *result = arrow::RecordBatch::Make(batch->schema(), batch->num_rows(), sorted_columns);
     return Status::OK();
 }
 
@@ -559,7 +559,7 @@ Status TemporalReconstructor::SortByPrimaryKey(
 Status TemporalReconstructor::FindActiveVersion(
     const VersionChain& chain,
     const SnapshotId& snapshot,
-    const std::vector<arrow::RecordBatch>& version_batches,
+    const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
     std::shared_ptr<arrow::RecordBatch>* result) {
 
     // Find the version that was active at the snapshot time
@@ -581,9 +581,9 @@ Status TemporalReconstructor::FindActiveVersion(
         if (metadata.system_time <= snapshot.timestamp) {
             // This is the active version at the snapshot time
             *result = arrow::RecordBatch::Make(
-                version_batches[version_index].schema(),
-                version_batches[version_index].num_rows(),
-                version_batches[version_index].columns());
+                version_batches[version_index]->schema(),
+                version_batches[version_index]->num_rows(),
+                version_batches[version_index]->columns());
             return Status::OK();
         }
     }

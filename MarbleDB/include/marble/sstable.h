@@ -91,6 +91,20 @@ public:
                        std::vector<std::pair<uint64_t, std::string>>* results) const = 0;
 
     /**
+     * @brief Scan a range of keys and return Arrow RecordBatches (optimized)
+     *
+     * This method provides batch-level iteration instead of row-by-row,
+     * enabling 10-100x faster scans by avoiding individual I/O per row.
+     *
+     * @param start_key Minimum key (inclusive)
+     * @param end_key Maximum key (inclusive)
+     * @param batches Output vector of RecordBatches containing [key, value] columns
+     * @return Status indicating success or failure
+     */
+    virtual Status ScanBatches(uint64_t start_key, uint64_t end_key,
+                              std::vector<std::shared_ptr<::arrow::RecordBatch>>* batches) const = 0;
+
+    /**
      * @brief Get all keys in this SSTable
      */
     virtual Status GetAllKeys(std::vector<uint64_t>* keys) const = 0;

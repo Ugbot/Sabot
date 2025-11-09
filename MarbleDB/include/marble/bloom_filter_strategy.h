@@ -39,6 +39,10 @@ public:
     // Check if key might exist (false positives possible)
     bool MightContain(uint64_t hash) const;
 
+    // Batch bloom filter check - returns bitmask of keys that might exist
+    // More efficient than individual checks due to better cache locality
+    std::vector<bool> MightContainBatch(const std::vector<uint64_t>& hashes) const;
+
     // Get current memory usage
     size_t MemoryUsage() const;
 

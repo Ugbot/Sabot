@@ -224,6 +224,8 @@ public:
     bool Contains(uint64_t key) const override;
     Status Scan(uint64_t start_key, uint64_t end_key,
                std::vector<std::pair<uint64_t, std::string>>* results) override;
+    Status ScanSSTablesBatches(uint64_t start_key, uint64_t end_key,
+                              std::vector<std::shared_ptr<arrow::RecordBatch>>* batches) const;
     Status Flush() override;
     Status Compact(uint64_t level) override;
     LSMTreeStats GetStats() const override;

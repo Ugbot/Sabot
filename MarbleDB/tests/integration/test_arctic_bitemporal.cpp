@@ -6,6 +6,7 @@
 #include "marble/temporal.h"
 #include <gtest/gtest.h>
 #include <arrow/api.h>
+#include <arrow/testing/gtest_util.h>
 #include <memory>
 
 using namespace marble;
@@ -33,7 +34,7 @@ protected:
         auto salaries_v1 = ArrayFromJSON(int64(), R"([50000, 55000, 60000])");
         auto depts_v1 = ArrayFromJSON(utf8(), R"(["Engineering", "Sales", "Marketing"])");
 
-        version_batches_.push_back(*RecordBatch::Make(schema_, 3,
+        version_batches_.push_back(RecordBatch::Make(schema_, 3,
                                                      {ids_v1, names_v1, salaries_v1, depts_v1}));
 
         // Version 1 metadata (hired Jan 2024, valid until further notice)
@@ -47,7 +48,7 @@ protected:
 
         // Create version 2 data (salary increases in Mar 2024)
         auto salaries_v2 = ArrayFromJSON(int64(), R"([55000, 60500, 66000])");  // +10% raises
-        version_batches_.push_back(*RecordBatch::Make(schema_, 3,
+        version_batches_.push_back(RecordBatch::Make(schema_, 3,
                                                      {ids_v1, names_v1, salaries_v2, depts_v1}));
 
         // Version 2 metadata
@@ -61,7 +62,7 @@ protected:
 
         // Create version 3 data (Bob moves to Engineering in Jun 2024)
         auto depts_v3 = ArrayFromJSON(utf8(), R"(["Engineering", "Engineering", "Marketing"])");
-        version_batches_.push_back(*RecordBatch::Make(schema_, 3,
+        version_batches_.push_back(RecordBatch::Make(schema_, 3,
                                                      {ids_v1, names_v1, salaries_v2, depts_v3}));
 
         // Version 3 metadata
@@ -75,7 +76,7 @@ protected:
     }
 
     std::shared_ptr<Schema> schema_;
-    std::vector<RecordBatch> version_batches_;
+    std::vector<std::shared_ptr<RecordBatch>> version_batches_;
     std::vector<TemporalMetadata> metadata_;
 };
 
@@ -84,17 +85,17 @@ TEST_F(ArcticBitemporalTest, AsOfQuery) {
 
     // Test AS OF Jan 2024 (should see original salaries)
     SnapshotId jan_snapshot(1704067200000000ULL, 1);
-    RecordBatch result;
+    std::shared_ptr<RecordBatch> result;
 
     auto status = reconstructor->ReconstructAsOf(jan_snapshot,
                                                 version_batches_,
                                                 metadata_,
                                                 &result);
     ASSERT_TRUE(status.ok());
-    ASSERT_EQ(result.num_rows(), 3);
+    ASSERT_EQ(result->num_rows(), 3);
 
     // Check salaries are original values
-    auto salary_col = result.GetColumnByName("salary");
+    auto salary_col = result->GetColumnByName("salary");
     auto salary_0 = salary_col->GetScalar(0);
     auto salary_1 = salary_col->GetScalar(1);
     auto salary_2 = salary_col->GetScalar(2);
@@ -115,16 +116,16 @@ TEST_F(ArcticBitemporalTest, ValidTimeQuery) {
     uint64_t feb_start = 1706745600000000ULL;  // Feb 1, 2024
     uint64_t feb_end = 1709251199999999ULL;    // Feb 28, 2024
 
-    RecordBatch result;
+    std::shared_ptr<RecordBatch> result;
     auto status = reconstructor->ReconstructValidTime(feb_start, feb_end,
                                                      version_batches_,
                                                      metadata_,
                                                      &result);
     ASSERT_TRUE(status.ok());
-    ASSERT_EQ(result.num_rows(), 3);
+    ASSERT_EQ(result->num_rows(), 3);
 
     // Check salaries are original values (valid during Feb)
-    auto salary_col = result.GetColumnByName("salary");
+    auto salary_col = result->GetColumnByName("salary");
     auto salary_0 = salary_col->GetScalar(0);
     ASSERT_TRUE(salary_0.ok());
     ASSERT_EQ(std::static_pointer_cast<Int64Scalar>(salary_0.ValueUnsafe())->value, 50000);
@@ -139,16 +140,16 @@ TEST_F(ArcticBitemporalTest, FullBitemporalQuery) {
     spec.valid_time_start = 1711929600000000ULL;  // Apr 1, 2024
     spec.valid_time_end = 1714521599999999ULL;    // Apr 30, 2024
 
-    RecordBatch result;
+    std::shared_ptr<RecordBatch> result;
     auto status = reconstructor->ReconstructBitemporal(spec,
                                                       version_batches_,
                                                       metadata_,
                                                       &result);
     ASSERT_TRUE(status.ok());
-    ASSERT_EQ(result.num_rows(), 3);
+    ASSERT_EQ(result->num_rows(), 3);
 
     // Should see March salaries (AS OF Mar) which were valid in April
-    auto salary_col = result.GetColumnByName("salary");
+    auto salary_col = result->GetColumnByName("salary");
     auto salary_0 = salary_col->GetScalar(0);
     ASSERT_TRUE(salary_0.ok());
     ASSERT_EQ(std::static_pointer_cast<Int64Scalar>(salary_0.ValueUnsafe())->value, 55000);
@@ -218,13 +219,13 @@ TEST_F(ArcticBitemporalTest, ArcticOperations) {
     ASSERT_TRUE(status.ok());
 
     // Test AppendWithValidity
-    auto test_data = *RecordBatch::Make(
+    auto test_data = RecordBatch::Make(
         arrow::schema({field("id", utf8()), field("value", int64())}),
         1, {ArrayFromJSON(utf8(), R"(["TEST001"])"),
              ArrayFromJSON(int64(), R"([42])")}
     );
 
-    status = ArcticOperations::AppendWithValidity(table, test_data,
+    status = ArcticOperations::AppendWithValidity(table, *test_data,
                                                  1704067200000000ULL, UINT64_MAX);
     ASSERT_TRUE(status.ok());
 

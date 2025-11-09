@@ -15,6 +15,7 @@ limitations under the License.
 **************************************************************************/
 
 #include "marble/arrow_sstable_reader.h"
+#include "marble/logging.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <iostream>
@@ -24,6 +25,9 @@ limitations under the License.
 
 namespace marble {
 
+// Define log tag for this component
+MARBLE_LOG_TAG(ArrowReader);
+
 ArrowSSTableReader::ArrowSSTableReader(const std::string& filepath,
                                        const SSTableMetadata& metadata,
                                        std::shared_ptr<FileSystem> fs)
@@ -31,25 +35,25 @@ ArrowSSTableReader::ArrowSSTableReader(const std::string& filepath,
     , metadata_(metadata)
     , fs_(fs) {
 
-    std::cerr << "ArrowSSTableReader: Constructor START\n";
-    std::cerr << "ArrowSSTableReader:   filepath=" << filepath << "\n";
-    std::cerr << "ArrowSSTableReader:   entries=" << metadata.record_count << "\n";
-    std::cerr << "ArrowSSTableReader:   key_range=[" << metadata.min_key << "," << metadata.max_key << "]\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Constructor START";
+    MARBLE_LOG_DEBUG(ArrowReader) << "  filepath=" << filepath;
+    MARBLE_LOG_DEBUG(ArrowReader) << "  entries=" << metadata.record_count;
+    MARBLE_LOG_DEBUG(ArrowReader) << "  key_range=[" << metadata.min_key << "," << metadata.max_key << "]";
 
     // Create hot key cache for this SSTable
-    std::cerr << "ArrowSSTableReader: Creating HotKeyCache...\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Creating HotKeyCache...";
     HotKeyCacheConfig cache_config;
     cache_config.max_entries = 10000;
     cache_config.promotion_threshold = 3;
     hot_key_cache_ = CreateHotKeyCache(cache_config);
-    std::cerr << "ArrowSSTableReader: HotKeyCache created\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "HotKeyCache created";
 
     // Create negative cache
-    std::cerr << "ArrowSSTableReader: Creating HotKeyNegativeCache...\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Creating HotKeyNegativeCache...";
     negative_cache_ = CreateHotKeyNegativeCache(10000);
-    std::cerr << "ArrowSSTableReader: HotKeyNegativeCache created\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "HotKeyNegativeCache created";
 
-    std::cerr << "ArrowSSTableReader: Constructor COMPLETE for " << filepath_ << "\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Constructor COMPLETE for " << filepath_;
 }
 
 ArrowSSTableReader::~ArrowSSTableReader() = default;
@@ -87,7 +91,8 @@ bool ArrowSSTableReader::ContainsKey(uint64_t key) const {
 }
 
 Status ArrowSSTableReader::Get(uint64_t key, std::string* value) const {
-    std::cerr << "ArrowSSTableReader::Get called for key=" << key << "\n";
+    // Debug logging disabled for benchmarking
+    // std::cerr << "ArrowSSTableReader::Get called for key=" << key << "\n";
     // Fast path 1: Hot key cache (O(1), ~100ns)
     size_t cached_batch_idx, cached_row_idx;
     auto status = GetFromHotCache(key, value, &cached_batch_idx, &cached_row_idx);
@@ -316,6 +321,57 @@ Status ArrowSSTableReader::Scan(uint64_t start_key, uint64_t end_key,
     return Status::OK();
 }
 
+Status ArrowSSTableReader::ScanBatches(uint64_t start_key, uint64_t end_key,
+                                        std::vector<std::shared_ptr<arrow::RecordBatch>>* batches) const {
+    batches->clear();
+
+    // Fast path 1: Metadata range pruning (SSTable-level zone map)
+    if (end_key < metadata_.min_key || start_key > metadata_.max_key) {
+        return Status::OK();  // No overlap
+    }
+
+    // Load batches from Arrow IPC file (one-time deserialization)
+    if (!batches_loaded_) {
+        const_cast<ArrowSSTableReader*>(this)->LoadArrowBatches();
+    }
+
+    // Find starting batch via sparse index (binary search)
+    size_t start_batch = 0;
+    if (!sparse_index_.empty() && !sparse_index_loaded_) {
+        const_cast<ArrowSSTableReader*>(this)->LoadSparseIndex();
+    }
+
+    if (!sparse_index_.empty()) {
+        auto it = std::lower_bound(sparse_index_.begin(), sparse_index_.end(), start_key,
+            [](const auto& entry, uint64_t k) { return entry.first < k; });
+        if (it != sparse_index_.begin()) --it;
+        start_batch = it->second;
+    }
+
+    // Scan batches in range and collect RecordBatches
+    // Key optimization: Return batches directly instead of extracting rows
+    for (size_t batch_idx = start_batch; batch_idx < batches_.size(); ++batch_idx) {
+        auto batch = batches_[batch_idx];
+        auto key_array = std::static_pointer_cast<arrow::UInt64Array>(batch->column(0));
+
+        // Check if this batch overlaps with scan range
+        if (key_array->length() == 0) continue;
+
+        uint64_t batch_min = key_array->Value(0);
+        uint64_t batch_max = key_array->Value(key_array->length() - 1);
+
+        // Fast path 2: Batch-level zone map pruning
+        if (batch_max < start_key) continue;  // Batch is before range
+        if (batch_min > end_key) break;       // Batch is after range, done
+
+        // Batch overlaps with range - add it
+        // Note: May contain keys outside range, caller must filter if needed
+        batches->push_back(batch);
+    }
+
+    return Status::OK();
+}
+
 Status ArrowSSTableReader::GetAllKeys(std::vector<uint64_t>* keys) const {
     if (!batches_loaded_) {
         const_cast<ArrowSSTableReader*>(this)->LoadArrowBatches();
@@ -393,8 +449,8 @@ Status ArrowSSTableReader::LoadFooter() {
         return status;
     }
 
-    std::cerr << "ArrowSSTableReader: Footer loaded - data_end=" << data_section_end_
-              << ", index_end=" << index_section_end_ << "\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Footer loaded - data_end=" << data_section_end_
+                                   << ", index_end=" << index_section_end_;
 
     return Status::OK();
 }
@@ -446,8 +502,8 @@ Status ArrowSSTableReader::LoadSparseIndex() {
     close(fd);
     sparse_index_loaded_ = true;
 
-    std::cerr << "ArrowSSTableReader: Loaded sparse index with " << sparse_index_.size()
-              << " entries\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Loaded sparse index with " << sparse_index_.size()
+                                   << " entries";
 
     return Status::OK();
 }
@@ -464,7 +520,7 @@ Status ArrowSSTableReader::LoadArrowBatches() {
         return Status::OK();
     }
 
-    std::cerr << "ArrowSSTableReader: Loading Arrow IPC batches from " << filepath_ << "\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Loading Arrow IPC batches from " << filepath_;
 
     // Open file with Arrow FileInputStream
     auto file_result = arrow::io::ReadableFile::Open(filepath_);
@@ -495,7 +551,7 @@ Status ArrowSSTableReader::LoadArrowBatches() {
 
     batches_loaded_ = true;
 
-    std::cerr << "ArrowSSTableReader: Loaded " << batches_.size() << " RecordBatches\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Loaded " << batches_.size() << " RecordBatches";
 
     return Status::OK();
 }
@@ -505,7 +561,7 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
     const std::string& filepath,
     std::shared_ptr<FileSystem> fs) {
 
-    std::cerr << "OpenArrowSSTable: Opening " << filepath << "\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Opening " << filepath;
 
     if (!fs) {
         fs = FileSystem::CreateLocal();
@@ -514,29 +570,29 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
     // Read footer to get metadata
     int fd = open(filepath.c_str(), O_RDONLY);
     if (fd < 0) {
-        std::cerr << "OpenArrowSSTable: Failed to open file\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "Failed to open file";
         return nullptr;
     }
 
     // Read last 24 bytes for footer
     off_t file_size = lseek(fd, 0, SEEK_END);
-    std::cerr << "OpenArrowSSTable: file_size=" << file_size << " bytes\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "file_size=" << file_size << " bytes";
 
     if (file_size < 24) {
-        std::cerr << "OpenArrowSSTable: ERROR - file too small (need 24 bytes minimum)\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - file too small (need 24 bytes minimum)";
         close(fd);
         return nullptr;
     }
 
     uint8_t footer[24];
     if (lseek(fd, file_size - 24, SEEK_SET) == -1) {
-        std::cerr << "OpenArrowSSTable: ERROR - failed to seek to footer\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - failed to seek to footer";
         close(fd);
         return nullptr;
     }
 
     if (read(fd, footer, 24) != 24) {
-        std::cerr << "OpenArrowSSTable: ERROR - failed to read footer\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - failed to read footer";
         close(fd);
         return nullptr;
     }
@@ -545,22 +601,22 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
     uint64_t index_end = *reinterpret_cast<uint64_t*>(&footer[8]);
     uint64_t magic = *reinterpret_cast<uint64_t*>(&footer[16]);
 
-    std::cerr << "OpenArrowSSTable: Footer - data_end=" << data_end
-              << ", index_end=" << index_end
-              << ", magic=0x" << std::hex << magic << std::dec << "\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Footer - data_end=" << data_end
+                                   << ", index_end=" << index_end
+                                   << ", magic=0x" << std::hex << magic << std::dec;
 
     if (magic != 0x4152524F57535354) {  // "ARROWSST"
-        std::cerr << "OpenArrowSSTable: ERROR - invalid magic number (expected 0x4152524F57535354)\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - invalid magic number (expected 0x4152524F57535354)";
         close(fd);
         return nullptr;  // Not Arrow format
     }
 
-    std::cerr << "OpenArrowSSTable: Magic number verified - this is Arrow format\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Magic number verified - this is Arrow format";
 
     // Read metadata section (between index_end and footer)
-    std::cerr << "OpenArrowSSTable: Seeking to metadata at offset " << index_end << "\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Seeking to metadata at offset " << index_end;
     if (lseek(fd, index_end, SEEK_SET) == -1) {
-        std::cerr << "OpenArrowSSTable: ERROR - failed to seek to metadata section\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - failed to seek to metadata section";
         close(fd);
         return nullptr;
     }
@@ -568,33 +624,33 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
     SSTableMetadata metadata;
     uint64_t entry_count, min_key, max_key, level;
 
-    std::cerr << "OpenArrowSSTable: Reading metadata fields...\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Reading metadata fields...";
     ssize_t bytes_read;
 
     bytes_read = read(fd, &entry_count, sizeof(uint64_t));
     if (bytes_read != sizeof(uint64_t)) {
-        std::cerr << "OpenArrowSSTable: ERROR - failed to read entry_count (got " << bytes_read << " bytes)\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - failed to read entry_count (got " << bytes_read << " bytes)";
         close(fd);
         return nullptr;
     }
 
     bytes_read = read(fd, &min_key, sizeof(uint64_t));
     if (bytes_read != sizeof(uint64_t)) {
-        std::cerr << "OpenArrowSSTable: ERROR - failed to read min_key (got " << bytes_read << " bytes)\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - failed to read min_key (got " << bytes_read << " bytes)";
         close(fd);
         return nullptr;
     }
 
     bytes_read = read(fd, &max_key, sizeof(uint64_t));
     if (bytes_read != sizeof(uint64_t)) {
-        std::cerr << "OpenArrowSSTable: ERROR - failed to read max_key (got " << bytes_read << " bytes)\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - failed to read max_key (got " << bytes_read << " bytes)";
         close(fd);
         return nullptr;
     }
 
     bytes_read = read(fd, &level, sizeof(uint64_t));
     if (bytes_read != sizeof(uint64_t)) {
-        std::cerr << "OpenArrowSSTable: ERROR - failed to read level (got " << bytes_read << " bytes)\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - failed to read level (got " << bytes_read << " bytes)";
         close(fd);
         return nullptr;
     }
@@ -619,18 +675,18 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
 
     close(fd);
 
-    std::cerr << "OpenArrowSSTable: Metadata - entries=" << entry_count
-              << ", min_key=" << min_key
-              << ", max_key=" << max_key
-              << ", level=" << level << "\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Metadata - entries=" << entry_count
+                                   << ", min_key=" << min_key
+                                   << ", max_key=" << max_key
+                                   << ", level=" << level;
 
     // Sanity checks
     if (entry_count == 0) {
-        std::cerr << "OpenArrowSSTable: ERROR - zero entries in metadata\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - zero entries in metadata";
         return nullptr;
     }
     if (min_key > max_key) {
-        std::cerr << "OpenArrowSSTable: ERROR - invalid key range (min > max)\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - invalid key range (min > max)";
         return nullptr;
     }
 
@@ -646,16 +702,16 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
     metadata.data_max_key = data_max_key;
     metadata.has_data_range = has_data_range;
 
-    std::cerr << "OpenArrowSSTable: Creating ArrowSSTableReader...\n";
+    MARBLE_LOG_DEBUG(ArrowReader) << "Creating ArrowSSTableReader...";
     try {
         auto reader = std::make_unique<ArrowSSTableReader>(filepath, metadata, fs);
-        std::cerr << "OpenArrowSSTable: Successfully created reader\n";
+        MARBLE_LOG_DEBUG(ArrowReader) << "Successfully created reader";
         return reader;
     } catch (const std::exception& e) {
-        std::cerr << "OpenArrowSSTable: EXCEPTION during construction: " << e.what() << "\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "EXCEPTION during construction: " << e.what();
         return nullptr;
     } catch (...) {
-        std::cerr << "OpenArrowSSTable: UNKNOWN EXCEPTION during construction\n";
+        MARBLE_LOG_ERROR(ArrowReader) << "UNKNOWN EXCEPTION during construction";
         return nullptr;
     }
 }

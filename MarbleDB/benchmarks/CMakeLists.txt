@@ -51,6 +51,17 @@ target_link_libraries(rocksdb_baseline PRIVATE
 add_executable(marbledb_baseline marbledb_baseline.cpp)
 target_link_libraries(marbledb_baseline PRIVATE marble)
 
+# RocksDB API optimizations benchmark
+add_executable(rocksdb_api_optimizations_bench rocksdb_api_optimizations_bench.cpp)
+target_include_directories(rocksdb_api_optimizations_bench PRIVATE
+    ${PROJECT_SOURCE_DIR}/include
+    ${ROCKSDB_INCLUDE_DIR}
+)
+target_link_libraries(rocksdb_api_optimizations_bench PRIVATE
+    marble
+    ${ROCKSDB_LIBRARIES}
+)
+
 # Install benchmarks
 install(TARGETS
     marble_bench

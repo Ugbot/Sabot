@@ -177,6 +177,8 @@ public:
                    std::vector<std::string>* values) const override;
     Status Scan(uint64_t start_key, uint64_t end_key,
                std::vector<std::pair<uint64_t, std::string>>* results) const override;
+    Status ScanBatches(uint64_t start_key, uint64_t end_key,
+                      std::vector<std::shared_ptr<::arrow::RecordBatch>>* batches) const override;
     Status GetAllKeys(std::vector<uint64_t>* keys) const override;
     std::string GetFilePath() const override;
     uint64_t GetFileSize() const override;
@@ -498,56 +500,37 @@ SSTableReaderImpl::~SSTableReaderImpl() = default;
 
 Status SSTableReaderImpl::Open(const std::string& filepath,
                               std::unique_ptr<SSTable>* sstable) {
-    std::cerr << "SSTableReaderImpl::Open() START - filepath=" << filepath << "\n";
-    std::cerr << std::flush;
 
     // First, try to detect Arrow format by checking footer magic
     // Read last 8 bytes to check for "ARROWSST" magic
     std::unique_ptr<FileHandle> file_handle;
 
-    std::cerr << "SSTableReaderImpl::Open() - Opening file...\n";
-    std::cerr << std::flush;
 
     auto status = fs_->OpenFile(filepath, FileOpenFlags::kRead, &file_handle);
     if (!status.ok()) {
-        std::cerr << "SSTableReaderImpl::Open() - Failed to open file\n";
         return status;
     }
-    std::cerr << "SSTableReaderImpl::Open() - File opened successfully\n";
 
     size_t file_size;
-    std::cerr << "SSTableReaderImpl::Open() - Getting file size...\n";
-    std::cerr << std::flush;
 
     auto size_status = file_handle->GetSize(&file_size);
 
-    std::cerr << "SSTableReaderImpl::Open() - GetSize() returned\n";
     if (!size_status.ok()) {
-        std::cerr << "SSTableReaderImpl::Open() - GetSize() failed\n";
         return size_status;
     }
-    std::cerr << "SSTableReaderImpl::Open() - file_size=" << file_size << " bytes\n";
 
     if (file_size >= 24) {  // Need at least 24 bytes for Arrow footer
         uint64_t magic;
-        std::cerr << "SSTableReaderImpl::Open() - Seeking to footer...\n";
-        std::cerr << std::flush;
 
         auto seek_status = file_handle->Seek(file_size - 8);
 
-        std::cerr << "SSTableReaderImpl::Open() - Seek() returned\n";
         if (seek_status.ok()) {
-            std::cerr << "SSTableReaderImpl::Open() - Reading magic number...\n";
-            std::cerr << std::flush;
 
             status = file_handle->Read(&magic, sizeof(uint64_t), nullptr);
 
-            std::cerr << "SSTableReaderImpl::Open() - Read() returned\n";
-            std::cerr << "SSTableReaderImpl::Open() - magic=0x" << std::hex << magic << std::dec << "\n";
 
             if (status.ok() && magic == 0x4152524F57535354) {  // "ARROWSST"
                 // Arrow format detected - use ArrowSSTableReader
-                std::cerr << "SSTableReaderImpl: Detected Arrow format for " << filepath << "\n";
                 auto arrow_sstable = OpenArrowSSTable(filepath, fs_);
                 if (arrow_sstable) {
                     *sstable = std::move(arrow_sstable);
@@ -555,17 +538,13 @@ Status SSTableReaderImpl::Open(const std::string& filepath,
                 }
                 return Status::IOError("Failed to open Arrow SSTable");
             } else {
-                std::cerr << "SSTableReaderImpl::Open() - Not Arrow format (magic mismatch)\n";
             }
         } else {
-            std::cerr << "SSTableReaderImpl::Open() - Seek() failed\n";
         }
     } else {
-        std::cerr << "SSTableReaderImpl::Open() - File too small for Arrow format\n";
     }
 
     // Not Arrow format - try old format
-    std::cerr << "SSTableReaderImpl: Using old format reader for " << filepath << "\n";
 
     // Reset file handle for old format reading
     status = fs_->OpenFile(filepath, FileOpenFlags::kRead, &file_handle);
@@ -688,6 +667,58 @@ Status SSTableImpl::Scan(uint64_t start_key, uint64_t end_key,
 
         results->emplace_back(it->key, value);
     }
+
+    return Status::OK();
+}
+
+Status SSTableImpl::ScanBatches(uint64_t start_key, uint64_t end_key,
+                                 std::vector<std::shared_ptr<::arrow::RecordBatch>>* batches) const {
+    // SSTableImpl uses old format (not Arrow-based)
+    // Fall back to row-by-row scan and convert to RecordBatch
+    // Note: This is not optimized - ArrowSSTableReader should be used for performance
+
+    std::vector<std::pair<uint64_t, std::string>> results;
+    auto status = Scan(start_key, end_key, &results);
+    if (!status.ok()) return status;
+
+    if (results.empty()) {
+        batches->clear();
+        return Status::OK();
+    }
+
+    // Convert results to Arrow RecordBatch
+    ::arrow::UInt64Builder key_builder;
+    ::arrow::BinaryBuilder value_builder;
+
+    for (const auto& [key, value] : results) {
+        auto append_status = key_builder.Append(key);
+        if (!append_status.ok()) {
+            return Status::InvalidArgument("Failed to build key array");
+        }
+        append_status = value_builder.Append(value);
+        if (!append_status.ok()) {
+            return Status::InvalidArgument("Failed to build value array");
+        }
+    }
+
+    std::shared_ptr<::arrow::Array> key_array, value_array;
+    auto arrow_status = key_builder.Finish(&key_array);
+    if (!arrow_status.ok()) {
+        return Status::InvalidArgument("Failed to finish key array");
+    }
+    arrow_status = value_builder.Finish(&value_array);
+    if (!arrow_status.ok()) {
+        return Status::InvalidArgument("Failed to finish value array");
+    }
+
+    auto schema = ::arrow::schema({
+        ::arrow::field("key", ::arrow::uint64()),
+        ::arrow::field("value", ::arrow::binary())
+    });
+
+    auto batch = ::arrow::RecordBatch::Make(schema, results.size(), {key_array, value_array});
+    batches->clear();
+    batches->push_back(batch);
 
     return Status::OK();
 }

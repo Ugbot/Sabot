@@ -16,6 +16,32 @@ option(MARBLE_ENABLE_RAFT "Enable Raft consensus support" OFF)  # Disabled - not
 option(MARBLE_USE_ASAN "Enable AddressSanitizer" OFF)
 option(MARBLE_USE_TSAN "Enable ThreadSanitizer" OFF)
 option(MARBLE_USE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
+option(MARBLE_ENABLE_DEBUG_LOGGING "Enable debug logging output (zero overhead when OFF)" OFF)
+
+# Build type optimization
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type (Debug, Release, RelWithDebInfo, MinSizeRel)" FORCE)
+    message(STATUS "CMAKE_BUILD_TYPE not set, defaulting to Release")
+endif()
+
+# Optimization flags for Release builds
+if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+        add_compile_options(-O3 -march=native)
+        message(STATUS "MarbleDB optimization: -O3 -march=native")
+    elseif(MSVC)
+        add_compile_options(/O2)
+        message(STATUS "MarbleDB optimization: /O2")
+    endif()
+endif()
+
+# Debug logging configuration
+if(MARBLE_ENABLE_DEBUG_LOGGING)
+    add_compile_definitions(MARBLE_ENABLE_DEBUG_LOGGING)
+    message(STATUS "MarbleDB debug logging: ENABLED")
+else()
+    message(STATUS "MarbleDB debug logging: DISABLED (zero overhead)")
+endif()
 
 # Dependencies
 find_package(Boost REQUIRED COMPONENTS filesystem system coroutine)

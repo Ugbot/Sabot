@@ -63,7 +63,6 @@ MmapSSTableWriter::MmapSSTableWriter(const std::string& filepath,
     batch_keys_.reserve(kRecordBatchSize);
     batch_values_.reserve(kRecordBatchSize);
 
-    std::cerr << "MmapSSTableWriter: Creating " << filepath_
               << " with zone_size=" << (zone_size_ / 1024 / 1024) << " MB\n";
 }
 
@@ -113,7 +112,6 @@ Status MmapSSTableWriter::Add(uint64_t key, const std::string& value) {
         write_offset_ = 0;
         data_section_start_ = 0;
 
-        std::cerr << "MmapSSTableWriter: Mapped " << (zone_size_ / 1024 / 1024)
                   << " MB at " << mapped_region_ << "\n";
     }
 
@@ -141,7 +139,6 @@ Status MmapSSTableWriter::Add(uint64_t key, const std::string& value) {
 }
 
 Status MmapSSTableWriter::ExtendAndRemap() {
-    std::cerr << "MmapSSTableWriter: Extending zone from "
               << (current_file_size_ / 1024 / 1024) << " MB to "
               << ((current_file_size_ + zone_size_) / 1024 / 1024) << " MB\n";
 
@@ -177,7 +174,6 @@ Status MmapSSTableWriter::Finish(std::unique_ptr<SSTable>* sstable) {
         return Status::InvalidArgument("Cannot finish empty SSTable");
     }
 
-    std::cerr << "MmapSSTableWriter: Finishing with " << entry_count_
               << " entries\n";
 
     // Step 1: Write RecordBatches using Arrow IPC
@@ -202,26 +198,17 @@ Status MmapSSTableWriter::Finish(std::unique_ptr<SSTable>* sstable) {
     finished_ = true;
 
     // Step 5: Try to reopen SSTable for reading
-    std::cerr << "MmapSSTableWriter: Attempting to reopen SSTable for reading\n";
-    std::cerr << "MmapSSTableWriter: filepath=" << filepath_ << "\n";
 
     if (sstable_mgr_) {
-        std::cerr << "MmapSSTableWriter: SSTableManager exists, calling OpenSSTable()...\n";
-        std::cerr << std::flush;  // Force flush before potentially crashing call
 
         status = sstable_mgr_->OpenSSTable(filepath_, sstable);
 
-        std::cerr << "MmapSSTableWriter: OpenSSTable() returned\n";
         if (!status.ok()) {
-            std::cerr << "MmapSSTableWriter: WARNING - Failed to reopen SSTable: "
                       << status.message() << "\n";
-            std::cerr << "MmapSSTableWriter: Data written to disk but SSTableReader needs update\n";
             *sstable = nullptr;
             return Status::OK();  // Don't fail - data is on disk
         }
-        std::cerr << "MmapSSTableWriter: Successfully reopened SSTable\n";
     } else {
-        std::cerr << "MmapSSTableWriter: No SSTableManager provided, returning nullptr\n";
         *sstable = nullptr;
     }
 
@@ -371,7 +358,6 @@ Status MmapSSTableWriter::WriteIndex() {
         return Status::OK();  // No data to write
     }
 
-    std::cerr << "MmapSSTableWriter: Writing " << record_batches_.size()
               << " RecordBatches using Arrow IPC\n";
 
     // Now write RecordBatches to the mapped file using Arrow IPC
@@ -438,14 +424,12 @@ Status MmapSSTableWriter::WriteIndex() {
         return Status::IOError("Failed to close Arrow file: " + file_close_status.ToString());
     }
 
-    std::cerr << "MmapSSTableWriter: Wrote " << data_section_end_ / 1024 / 1024
               << " MB of Arrow IPC data\n";
 
     return Status::OK();
 }
 
 Status MmapSSTableWriter::WriteMetadata() {
-    std::cerr << "MmapSSTableWriter: Writing metadata footer\n";
 
     // Reopen file for appending metadata
     // fd_ is still valid, just seek to end
@@ -514,7 +498,6 @@ Status MmapSSTableWriter::WriteMetadata() {
         return Status::IOError("Failed to write magic number");
     }
 
-    std::cerr << "MmapSSTableWriter: Metadata written - entries=" << entry_count_
               << ", min_key=" << min_key_ << ", max_key=" << max_key_
               << ", data_min_key=" << data_min_key_ << ", data_max_key=" << data_max_key_
               << ", has_data_range=" << has_data_range_

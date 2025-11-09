@@ -61,7 +61,7 @@ public:
      * the state of data as it existed at a specific snapshot.
      */
     Status ReconstructAsOf(const SnapshotId& snapshot,
-                          const std::vector<arrow::RecordBatch>& version_batches,
+                          const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
                           const std::vector<TemporalMetadata>& metadata_list,
                           std::shared_ptr<arrow::RecordBatch>* result);
 
@@ -73,7 +73,7 @@ public:
      */
     Status ReconstructValidTime(uint64_t valid_start,
                                uint64_t valid_end,
-                               const std::vector<arrow::RecordBatch>& version_batches,
+                               const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
                                const std::vector<TemporalMetadata>& metadata_list,
                                std::shared_ptr<arrow::RecordBatch>* result);
 
@@ -84,7 +84,7 @@ public:
      * for complete temporal queries.
      */
     Status ReconstructBitemporal(const TemporalQuerySpec& spec,
-                                const std::vector<arrow::RecordBatch>& version_batches,
+                                const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
                                 const std::vector<TemporalMetadata>& metadata_list,
                                 std::shared_ptr<arrow::RecordBatch>* result);
 
@@ -94,15 +94,15 @@ public:
      * Shows all versions of a single record over time.
      */
     Status ReconstructHistory(const std::string& primary_key,
-                             const std::vector<arrow::RecordBatch>& version_batches,
+                             const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
                              const std::vector<TemporalMetadata>& metadata_list,
                              std::vector<std::shared_ptr<arrow::RecordBatch>>* history);
 
-private:
+protected:  // Changed from private to allow test access
     /**
      * @brief Group versions by primary key to create version chains
      */
-    Status BuildVersionChains(const std::vector<arrow::RecordBatch>& version_batches,
+    Status BuildVersionChains(const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
                              const std::vector<TemporalMetadata>& metadata_list,
                              std::unordered_map<std::string, VersionChain>* chains);
 
@@ -119,7 +119,7 @@ private:
      */
     Status FindActiveVersion(const VersionChain& chain,
                             const SnapshotId& snapshot,
-                            const std::vector<arrow::RecordBatch>& version_batches,
+                            const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
                             std::shared_ptr<arrow::RecordBatch>* result);
 
     /**
@@ -134,14 +134,14 @@ private:
      * @brief Reconstruct a single record batch from version chains
      */
     Status ReconstructFromChains(const std::unordered_map<std::string, VersionChain>& chains,
-                                const std::vector<arrow::RecordBatch>& version_batches,
+                                const std::vector<std::shared_ptr<arrow::RecordBatch>>& version_batches,
                                 const TemporalQuerySpec& spec,
                                 std::shared_ptr<arrow::RecordBatch>* result);
 
     /**
      * @brief Extract primary key from a record batch row
      */
-    Status ExtractPrimaryKey(const arrow::RecordBatch& batch,
+    Status ExtractPrimaryKey(const std::shared_ptr<arrow::RecordBatch>& batch,
                             size_t row_index,
                             const std::string& key_column,
                             std::string* primary_key);
@@ -155,7 +155,7 @@ private:
     /**
      * @brief Sort record batch by primary key
      */
-    Status SortByPrimaryKey(const arrow::RecordBatch& batch,
+    Status SortByPrimaryKey(const std::shared_ptr<arrow::RecordBatch>& batch,
                            const std::string& key_column,
                            std::shared_ptr<arrow::RecordBatch>* result);
 };

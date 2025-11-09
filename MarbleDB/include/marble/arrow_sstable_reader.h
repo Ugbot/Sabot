@@ -63,6 +63,8 @@ public:
                    std::vector<std::string>* values) const override;
     Status Scan(uint64_t start_key, uint64_t end_key,
                std::vector<std::pair<uint64_t, std::string>>* results) const override;
+    Status ScanBatches(uint64_t start_key, uint64_t end_key,
+                      std::vector<std::shared_ptr<arrow::RecordBatch>>* batches) const override;
     Status GetAllKeys(std::vector<uint64_t>* keys) const override;
     std::string GetFilePath() const override;
     uint64_t GetFileSize() const override;

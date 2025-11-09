@@ -64,6 +64,26 @@ bool HashBloomFilter::MightContain(uint64_t hash) const {
     return true;  // Might be present (could be false positive)
 }
 
+std::vector<bool> HashBloomFilter::MightContainBatch(const std::vector<uint64_t>& hashes) const {
+    std::vector<bool> results;
+    results.reserve(hashes.size());
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (uint64_t hash : hashes) {
+        auto indices = GetBitIndices(hash);
+        bool might_contain = true;
+        for (size_t index : indices) {
+            if (!IsBitSet(index)) {
+                might_contain = false;  // Definitely not present
+                break;
+            }
+        }
+        results.push_back(might_contain);
+    }
+
+    return results;
+}
+
 size_t HashBloomFilter::MemoryUsage() const {
     std::lock_guard<std::mutex> lock(mutex_);
     return bits_.size() + sizeof(*this);
@@ -343,14 +363,10 @@ std::string BloomFilterStrategy::GetStats() const {
 }
 
 uint64_t BloomFilterStrategy::HashKey(const Key& key) const {
-    // Use std::hash for now
-    // In production, consider using a faster hash like xxHash or CityHash
-    std::hash<std::string> hasher;
-
-    // Assuming Key has a ToString() or similar method
-    // For now, we'll use a simple hash of the key pointer
-    // This is a placeholder - actual implementation depends on Key's structure
-    return reinterpret_cast<uint64_t>(&key);
+    // Use the Key's built-in hash function for consistency
+    // This ensures the same hash is generated for the same key value
+    // across both write and read paths
+    return key.Hash();
 }
 
 }  // namespace marble
