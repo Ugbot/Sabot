@@ -13,6 +13,8 @@ ArrowBatchMemTable::ArrowBatchMemTable(
     const Config& config)
     : schema_(std::move(schema))
     , config_(config) {
+    // Pre-allocate vector for lock-free append
+    batches_.resize(config_.max_batches);
 }
 
 Status ArrowBatchMemTable::PutBatch(const std::shared_ptr<arrow::RecordBatch>& batch) {
@@ -30,29 +32,37 @@ Status ArrowBatchMemTable::PutBatch(const std::shared_ptr<arrow::RecordBatch>& b
     }
 #endif
 
-    std::lock_guard<std::mutex> lock(mutex_);
+    // LOCK-FREE HOT PATH: Atomic fetch-add to get batch slot
+    size_t batch_idx = batch_count_.fetch_add(1, std::memory_order_relaxed);
+
+    // Check capacity (pre-allocated in constructor)
+    if (batch_idx >= config_.max_batches) {
+        // Rollback the increment
+        batch_count_.fetch_sub(1, std::memory_order_relaxed);
+        return Status::ResourceExhausted("MemTable is full");
+    }
 
     // Fast batch size estimation using Arrow's API
-    // This is faster than walking all buffers manually
     size_t batch_bytes = 0;
     auto result = arrow::ipc::GetRecordBatchSize(*batch);
     if (result.ok()) {
         batch_bytes = *result;
     } else {
-        // Fallback: rough estimate based on num_rows and columns
-        batch_bytes = batch->num_rows() * batch->num_columns() * 8;  // Rough estimate
+        // Fallback: rough estimate
+        batch_bytes = batch->num_rows() * batch->num_columns() * 8;
     }
 
-    // Store batch
-    size_t batch_idx = batches_.size();
-    batches_.push_back(batch);
+    // LOCK-FREE: Store batch in pre-allocated slot (no reallocation, no mutex)
+    batches_[batch_idx] = batch;
 
-    // Update statistics
-    total_rows_ += batch->num_rows();
-    total_bytes_ += batch_bytes;
+    // LOCK-FREE: Update statistics with atomic increments
+    total_rows_.fetch_add(batch->num_rows(), std::memory_order_relaxed);
+    total_bytes_.fetch_add(batch_bytes, std::memory_order_relaxed);
 
-    // Build row index if enabled
+    // RARE PATH: Build row index if enabled (only locks for index building)
+    // For SPARQL/RDF workloads, this is disabled (build_row_index = false)
     if (config_.build_row_index) {
+        std::lock_guard<std::mutex> lock(row_index_mutex_);
         auto status = BuildRowIndex(batch, batch_idx);
         if (!status.ok()) {
             return status;
@@ -63,7 +73,7 @@ Status ArrowBatchMemTable::PutBatch(const std::shared_ptr<arrow::RecordBatch>& b
 }
 
 Status ArrowBatchMemTable::Get(const Key& key, std::shared_ptr<Record>* record) const {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(row_index_mutex_);
 
     // Use row index for point lookup
     size_t key_hash = key.Hash();
@@ -73,17 +83,19 @@ Status ArrowBatchMemTable::Get(const Key& key, std::shared_ptr<Record>* record) 
     }
 
     const auto& location = it->second;
-    if (location.batch_idx >= batches_.size()) {
+
+    // LOCK-FREE: Read batch count atomically
+    size_t num_batches = batch_count_.load(std::memory_order_acquire);
+    if (location.batch_idx >= num_batches) {
         return Status::InternalError("Invalid batch index in row_index");
     }
 
     auto batch = batches_[location.batch_idx];
-    if (location.row_offset >= batch->num_rows()) {
+    if (!batch || location.row_offset >= batch->num_rows()) {
         return Status::InternalError("Invalid row offset in row_index");
     }
 
     // Create a SimpleRecord from the row
-    // Note: SimpleRecord wraps a RecordBatch + row offset
     *record = std::make_shared<SimpleRecord>(
         std::make_shared<Int64Key>(key_hash),
         batch,
@@ -96,10 +108,18 @@ Status ArrowBatchMemTable::Get(const Key& key, std::shared_ptr<Record>* record) 
 Status ArrowBatchMemTable::GetBatches(
     std::vector<std::shared_ptr<arrow::RecordBatch>>* batches) const {
 
-    std::lock_guard<std::mutex> lock(mutex_);
+    // LOCK-FREE: Read batch count atomically
+    size_t num_batches = batch_count_.load(std::memory_order_acquire);
 
-    // Zero-copy: return shared pointers to our batches
-    *batches = batches_;
+    // Zero-copy: return shared pointers to valid batches only
+    batches->clear();
+    batches->reserve(num_batches);
+    for (size_t i = 0; i < num_batches; ++i) {
+        auto batch = batches_[i];
+        if (batch) {
+            batches->push_back(batch);
+        }
+    }
 
     return Status::OK();
 }
@@ -109,29 +129,45 @@ Status ArrowBatchMemTable::ScanBatches(
     uint64_t end_key,
     std::vector<std::shared_ptr<arrow::RecordBatch>>* batches) const {
 
-    std::lock_guard<std::mutex> lock(mutex_);
+    // LOCK-FREE: Read batch count atomically
+    size_t num_batches = batch_count_.load(std::memory_order_acquire);
 
-    // For now, return all batches (filtering can be done by caller)
-    // TODO: Implement per-batch key range filtering using batch metadata
-    *batches = batches_;
+    // Return all valid batches (filtering can be done by caller using Arrow compute kernels)
+    batches->clear();
+    batches->reserve(num_batches);
+    for (size_t i = 0; i < num_batches; ++i) {
+        auto batch = batches_[i];
+        if (batch) {
+            batches->push_back(batch);
+        }
+    }
 
     return Status::OK();
 }
 
 bool ArrowBatchMemTable::ShouldFlush() const {
-    std::lock_guard<std::mutex> lock(mutex_);
+    // LOCK-FREE: Read statistics atomically
+    size_t bytes = total_bytes_.load(std::memory_order_relaxed);
+    size_t num_batches = batch_count_.load(std::memory_order_relaxed);
 
-    return total_bytes_ >= config_.max_bytes ||
-           batches_.size() >= config_.max_batches;
+    return bytes >= config_.max_bytes || num_batches >= config_.max_batches;
 }
 
 void ArrowBatchMemTable::Clear() {
-    std::lock_guard<std::mutex> lock(mutex_);
+    // LOCK-FREE: Reset atomic counters
+    batch_count_.store(0, std::memory_order_release);
+    total_rows_.store(0, std::memory_order_release);
+    total_bytes_.store(0, std::memory_order_release);
 
-    batches_.clear();
+    // Clear batches (no reallocation needed, just null out slots)
+    size_t max_batches = config_.max_batches;
+    for (size_t i = 0; i < max_batches; ++i) {
+        batches_[i] = nullptr;
+    }
+
+    // Clear row index (locked access since unordered_map is not lock-free)
+    std::lock_guard<std::mutex> lock(row_index_mutex_);
     row_index_.clear();
-    total_rows_ = 0;
-    total_bytes_ = 0;
 }
 
 Status ArrowBatchMemTable::BuildRowIndex(
@@ -219,8 +255,8 @@ ImmutableArrowBatchMemTable::ImmutableArrowBatchMemTable(ArrowBatchMemTable&& so
     : schema_(source.schema_)
     , batches_(std::move(source.batches_))
     , row_index_(std::move(source.row_index_))
-    , total_rows_(source.total_rows_)
-    , total_bytes_(source.total_bytes_) {
+    , total_rows_(source.total_rows_.load(std::memory_order_relaxed))
+    , total_bytes_(source.total_bytes_.load(std::memory_order_relaxed)) {
 }
 
 Status ImmutableArrowBatchMemTable::Get(
