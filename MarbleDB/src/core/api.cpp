@@ -1086,7 +1086,8 @@ private:
                     case arrow::Type::UINT64: {
                         auto arr = std::static_pointer_cast<arrow::UInt64Array>(key_column);
                         if (!arr->IsNull(i)) {
-                            key_hash = std::hash<uint64_t>{}(arr->Value(i));
+                            // Use Int64Key::Hash() for consistency with Get() path
+                            key_hash = Int64Key(arr->Value(i)).Hash();
                             key_extracted = true;
                         }
                         break;
@@ -1307,6 +1308,14 @@ public:
         auto* cf_ptr = cf_info.get();
         column_families_[descriptor.name] = std::move(cf_info);
         id_to_cf_[cf_id] = cf_ptr;
+
+        // ★★★ CONDITIONAL OPTIMIZATION PIPELINE - Only enable if requested ★★★
+        // For minimal benchmarks, disable all advanced features
+        if (!descriptor.options.optimization_config.enable_pluggable_optimizations ||
+            !descriptor.options.optimization_config.auto_configure) {
+            // Disable optimization pipeline for minimal overhead
+            cf_ptr->optimization_pipeline = nullptr;
+        }
 
         // Register column family with index persistence manager
         if (index_persistence_manager_) {

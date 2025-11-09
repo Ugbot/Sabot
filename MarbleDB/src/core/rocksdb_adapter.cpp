@@ -337,6 +337,7 @@ marble::Status DB::Open(const Options& options, const std::string& name, DB** db
     table_schema.arrow_schema = rocksdb_adapter->default_schema_;
 
     // Try to create the default table - ignore error if it already exists
+    // Note: Advanced features are disabled via ColumnFamilyOptions in CreateColumnFamily()
     auto create_status = rocksdb_adapter->impl_->CreateTable(table_schema);
     // Ignore if table already exists
 

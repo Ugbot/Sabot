@@ -62,8 +62,6 @@ MmapSSTableWriter::MmapSSTableWriter(const std::string& filepath,
     // Reserve batch buffers
     batch_keys_.reserve(kRecordBatchSize);
     batch_values_.reserve(kRecordBatchSize);
-
-              << " with zone_size=" << (zone_size_ / 1024 / 1024) << " MB\n";
 }
 
 MmapSSTableWriter::~MmapSSTableWriter() {
@@ -111,8 +109,6 @@ Status MmapSSTableWriter::Add(uint64_t key, const std::string& value) {
         current_file_size_ = zone_size_;
         write_offset_ = 0;
         data_section_start_ = 0;
-
-                  << " MB at " << mapped_region_ << "\n";
     }
 
     // Buffer entry in Arrow RecordBatch buffer
@@ -139,9 +135,6 @@ Status MmapSSTableWriter::Add(uint64_t key, const std::string& value) {
 }
 
 Status MmapSSTableWriter::ExtendAndRemap() {
-              << (current_file_size_ / 1024 / 1024) << " MB to "
-              << ((current_file_size_ + zone_size_) / 1024 / 1024) << " MB\n";
-
     // Unmap current region
     if (munmap(mapped_region_, current_file_size_) != 0) {
         return Status::IOError("Failed to unmap region during growth");
@@ -174,8 +167,6 @@ Status MmapSSTableWriter::Finish(std::unique_ptr<SSTable>* sstable) {
         return Status::InvalidArgument("Cannot finish empty SSTable");
     }
 
-              << " entries\n";
-
     // Step 1: Write RecordBatches using Arrow IPC
     auto status = WriteIndex();
     if (!status.ok()) {
@@ -204,7 +195,6 @@ Status MmapSSTableWriter::Finish(std::unique_ptr<SSTable>* sstable) {
         status = sstable_mgr_->OpenSSTable(filepath_, sstable);
 
         if (!status.ok()) {
-                      << status.message() << "\n";
             *sstable = nullptr;
             return Status::OK();  // Don't fail - data is on disk
         }
@@ -358,8 +348,6 @@ Status MmapSSTableWriter::WriteIndex() {
         return Status::OK();  // No data to write
     }
 
-              << " RecordBatches using Arrow IPC\n";
-
     // Now write RecordBatches to the mapped file using Arrow IPC
     // Create Arrow OutputStream that writes to our mapped region
     // We'll use lseek + write instead of mmap for Arrow IPC (simpler)
@@ -423,8 +411,6 @@ Status MmapSSTableWriter::WriteIndex() {
     if (!file_close_status.ok()) {
         return Status::IOError("Failed to close Arrow file: " + file_close_status.ToString());
     }
-
-              << " MB of Arrow IPC data\n";
 
     return Status::OK();
 }
@@ -497,11 +483,6 @@ Status MmapSSTableWriter::WriteMetadata() {
     if (write(fd_, &magic, sizeof(uint64_t)) != sizeof(uint64_t)) {
         return Status::IOError("Failed to write magic number");
     }
-
-              << ", min_key=" << min_key_ << ", max_key=" << max_key_
-              << ", data_min_key=" << data_min_key_ << ", data_max_key=" << data_max_key_
-              << ", has_data_range=" << has_data_range_
-              << ", sparse_index_size=" << sparse_index_.size() << "\n";
 
     return Status::OK();
 }
