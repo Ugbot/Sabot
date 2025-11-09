@@ -51,6 +51,15 @@ target_link_libraries(rocksdb_baseline PRIVATE
 add_executable(marbledb_baseline marbledb_baseline.cpp)
 target_link_libraries(marbledb_baseline PRIVATE marble)
 
+# Tonbo baseline benchmark (Rust LSM-tree comparison)
+add_executable(tonbo_baseline tonbo_baseline.cpp)
+target_include_directories(tonbo_baseline PRIVATE
+    ${CMAKE_SOURCE_DIR}/../vendor/tonbo/tonbo-ffi
+)
+target_link_libraries(tonbo_baseline PRIVATE
+    ${CMAKE_SOURCE_DIR}/../vendor/tonbo/tonbo-ffi/target/release/libtonbo_ffi.dylib
+)
+
 # RocksDB API optimizations benchmark
 add_executable(rocksdb_api_optimizations_bench rocksdb_api_optimizations_bench.cpp)
 target_include_directories(rocksdb_api_optimizations_bench PRIVATE
@@ -80,6 +89,7 @@ install(TARGETS
     batch_write_bench
     rocksdb_baseline
     marbledb_baseline
+    tonbo_baseline
     RUNTIME DESTINATION bin/benchmarks
 )
 
