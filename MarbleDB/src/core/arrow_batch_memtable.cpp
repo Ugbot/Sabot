@@ -42,21 +42,16 @@ Status ArrowBatchMemTable::PutBatch(const std::shared_ptr<arrow::RecordBatch>& b
         return Status::ResourceExhausted("MemTable is full");
     }
 
-    // Fast batch size estimation using Arrow's API
-    size_t batch_bytes = 0;
-    auto result = arrow::ipc::GetRecordBatchSize(*batch);
-    if (result.ok()) {
-        batch_bytes = *result;
-    } else {
-        // Fallback: rough estimate
-        batch_bytes = batch->num_rows() * batch->num_columns() * 8;
-    }
-
     // LOCK-FREE: Store batch in pre-allocated slot (no reallocation, no mutex)
     batches_[batch_idx] = batch;
 
     // LOCK-FREE: Update statistics with atomic increments
-    total_rows_.fetch_add(batch->num_rows(), std::memory_order_relaxed);
+    // Use fast approximation instead of expensive IPC size calculation
+    // For batch-scan workloads, we flush based on batch_count, not bytes
+    int64_t num_rows = batch->num_rows();
+    size_t batch_bytes = num_rows * batch->num_columns() * 8;  // Fast approximation
+
+    total_rows_.fetch_add(num_rows, std::memory_order_relaxed);
     total_bytes_.fetch_add(batch_bytes, std::memory_order_relaxed);
 
     // RARE PATH: Build row index if enabled (only locks for index building)
