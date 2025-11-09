@@ -664,6 +664,11 @@ public:
     uint32_t next_cf_id_ = 1;
     mutable std::mutex cf_mutex_;
 
+    // ★★★ LOCK-FREE OPTIMIZATION ★★★
+    // Atomic pointer to default column family for lock-free Get() hot path
+    // Initialized once when "default" CF is created, never changes afterwards
+    std::atomic<ColumnFamilyInfo*> default_cf_{nullptr};
+
     // LSM tree for persistent storage
     std::unique_ptr<StandardLSMTree> lsm_tree_;
 
@@ -703,16 +708,30 @@ public:
 
     // Basic operations
     Status Put(const WriteOptions& options, std::shared_ptr<Record> record) override {
-        std::lock_guard<std::mutex> lock(cf_mutex_);
+        // ★★★ LOCK-FREE FAST PATH ★★★
+        // Use atomic load to get default column family without acquiring mutex
+        auto* cf_info = default_cf_.load(std::memory_order_acquire);
 
-        // For now, assume default column family (table_name = "default")
-        // TODO: Add column family parameter support
-        auto it = column_families_.find("default");
-        if (it == column_families_.end()) {
-            return Status::InvalidArgument("Default column family does not exist. Create it first.");
+        // Slow path: default CF not initialized yet (first access or error)
+        if (!cf_info) {
+            std::lock_guard<std::mutex> lock(cf_mutex_);
+
+            // Double-check after acquiring lock
+            cf_info = default_cf_.load(std::memory_order_acquire);
+            if (!cf_info) {
+                auto it = column_families_.find("default");
+                if (it == column_families_.end()) {
+                    return Status::InvalidArgument("Default column family does not exist. Create it first.");
+                }
+                cf_info = it->second.get();
+                default_cf_.store(cf_info, std::memory_order_release);
+            }
         }
 
-        auto* cf_info = it->second.get();
+        // ★★★ NOTE: We still need a lock for modifying put_buffer (shared state) ★★★
+        // But we only acquire it AFTER getting cf_info pointer lock-free
+        // Use unique_lock instead of lock_guard to support explicit unlock()
+        std::unique_lock<std::mutex> lock(cf_mutex_);
 
         // Validate record schema matches column family
         auto record_schema = record->GetArrowSchema();
@@ -739,24 +758,64 @@ public:
         // Add to buffer
         cf_info->put_buffer.push_back(record);
 
-        // Flush if buffer is full
-        if (cf_info->put_buffer.size() >= cf_info->PUT_BATCH_SIZE) {
-            return cf_info->FlushPutBuffer(this);
+        // ★★★ CRITICAL OPTIMIZATION: Double-buffer to flush outside lock ★★★
+        // Check if buffer needs flushing
+        bool needs_flush = (cf_info->put_buffer.size() >= cf_info->PUT_BATCH_SIZE);
+
+        // If flush needed, swap buffer while holding lock, then flush outside lock
+        std::vector<std::shared_ptr<Record>> buffer_to_flush;
+        if (needs_flush) {
+            // Swap buffers (fast O(1) operation while holding lock)
+            buffer_to_flush.swap(cf_info->put_buffer);
+            // cf_info->put_buffer is now empty, can accept new Put() calls immediately
+        }
+
+        // Release lock BEFORE flushing (critical for concurrency)
+        lock.unlock();
+
+        // Flush outside lock (if needed)
+        // This allows other threads to continue Put() operations during the 1-10ms flush
+        if (needs_flush) {
+            // Temporarily restore buffer for FlushPutBuffer to process
+            cf_info->put_buffer.swap(buffer_to_flush);
+            auto flush_status = cf_info->FlushPutBuffer(this);
+            // Restore empty state
+            cf_info->put_buffer.swap(buffer_to_flush);
+
+            if (!flush_status.ok()) {
+                return flush_status;
+            }
         }
 
         return Status::OK();
     }
 
     Status Get(const ReadOptions& options, const Key& key, std::shared_ptr<Record>* record) override {
-        std::lock_guard<std::mutex> lock(cf_mutex_);
+        // ★★★ LOCK-FREE FAST PATH ★★★
+        // Use atomic load to get default column family without acquiring mutex
+        // This eliminates serialization and enables multi-core scaling
+        auto* cf_info = default_cf_.load(std::memory_order_acquire);
 
-        // For now, assume default column family
-        auto it = column_families_.find("default");
-        if (it == column_families_.end()) {
-            return Status::InvalidArgument("Default column family does not exist");
+        // Slow path: default CF not initialized yet (first access or error)
+        if (!cf_info) {
+            std::lock_guard<std::mutex> lock(cf_mutex_);
+
+            // Double-check after acquiring lock (another thread may have initialized it)
+            cf_info = default_cf_.load(std::memory_order_acquire);
+            if (!cf_info) {
+                // Fallback to hash map lookup
+                auto it = column_families_.find("default");
+                if (it == column_families_.end()) {
+                    return Status::InvalidArgument("Default column family does not exist");
+                }
+                cf_info = it->second.get();
+
+                // Initialize atomic pointer for future lock-free access
+                default_cf_.store(cf_info, std::memory_order_release);
+            }
         }
 
-        auto* cf_info = it->second.get();
+        // ✅ Fast path continues WITHOUT holding cf_mutex_ - lock-free!
 
         // ★★★ OPTIMIZATION PIPELINE - Check if we can skip this read ★★★
         if (cf_info->optimization_pipeline) {
@@ -838,15 +897,28 @@ public:
     }
 
     Status Delete(const WriteOptions& options, const Key& key) override {
-        std::lock_guard<std::mutex> lock(cf_mutex_);
+        // ★★★ LOCK-FREE FAST PATH ★★★
+        // Use atomic load to get default column family without acquiring mutex
+        auto* cf_info = default_cf_.load(std::memory_order_acquire);
 
-        // For now, assume default column family
-        auto it = column_families_.find("default");
-        if (it == column_families_.end()) {
-            return Status::InvalidArgument("Default column family does not exist");
+        // Slow path: default CF not initialized yet (first access or error)
+        if (!cf_info) {
+            std::lock_guard<std::mutex> lock(cf_mutex_);
+
+            // Double-check after acquiring lock
+            cf_info = default_cf_.load(std::memory_order_acquire);
+            if (!cf_info) {
+                auto it = column_families_.find("default");
+                if (it == column_families_.end()) {
+                    return Status::InvalidArgument("Default column family does not exist");
+                }
+                cf_info = it->second.get();
+                default_cf_.store(cf_info, std::memory_order_release);
+            }
         }
 
-        auto* cf_info = it->second.get();
+        // ★★★ NOTE: We still need a lock for modifying row_index (shared state) ★★★
+        std::lock_guard<std::mutex> lock(cf_mutex_);
 
         // Look up key in secondary index
         size_t key_hash = key.Hash();
@@ -880,15 +952,28 @@ public:
     }
 
     Status Merge(const WriteOptions& options, ColumnFamilyHandle* cf, const Key& key, const std::string& value) override {
-        std::lock_guard<std::mutex> lock(cf_mutex_);
+        // ★★★ LOCK-FREE FAST PATH ★★★
+        // Use atomic load to get default column family without acquiring mutex
+        auto* cf_info = default_cf_.load(std::memory_order_acquire);
 
-        // For now, assume default column family
-        auto it = column_families_.find("default");
-        if (it == column_families_.end()) {
-            return Status::InvalidArgument("Default column family does not exist");
+        // Slow path: default CF not initialized yet (first access or error)
+        if (!cf_info) {
+            std::lock_guard<std::mutex> lock(cf_mutex_);
+
+            // Double-check after acquiring lock
+            cf_info = default_cf_.load(std::memory_order_acquire);
+            if (!cf_info) {
+                auto it = column_families_.find("default");
+                if (it == column_families_.end()) {
+                    return Status::InvalidArgument("Default column family does not exist");
+                }
+                cf_info = it->second.get();
+                default_cf_.store(cf_info, std::memory_order_release);
+            }
         }
 
-        auto* cf_info = it->second.get();
+        // ★★★ NOTE: We still need a lock for merge operations (shared state) ★★★
+        std::lock_guard<std::mutex> lock(cf_mutex_);
 
         // Check if merge operator is configured for this column family
         if (!cf_info->merge_operator) {
@@ -1315,6 +1400,12 @@ public:
             !descriptor.options.optimization_config.auto_configure) {
             // Disable optimization pipeline for minimal overhead
             cf_ptr->optimization_pipeline = nullptr;
+        }
+
+        // ★★★ LOCK-FREE OPTIMIZATION ★★★
+        // Initialize atomic pointer for "default" column family (enables lock-free Get)
+        if (descriptor.name == "default") {
+            default_cf_.store(cf_ptr, std::memory_order_release);
         }
 
         // Register column family with index persistence manager

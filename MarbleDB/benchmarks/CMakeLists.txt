@@ -62,6 +62,13 @@ target_link_libraries(rocksdb_api_optimizations_bench PRIVATE
     ${ROCKSDB_LIBRARIES}
 )
 
+# Mutex overhead micro-benchmark
+add_executable(mutex_overhead_bench mutex_overhead_bench.cpp)
+target_include_directories(mutex_overhead_bench PRIVATE
+    ${PROJECT_SOURCE_DIR}/include
+)
+# No dependencies - standalone benchmark
+
 # Install benchmarks
 install(TARGETS
     marble_bench
