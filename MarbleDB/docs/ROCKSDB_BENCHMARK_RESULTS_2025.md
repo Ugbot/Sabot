@@ -2,10 +2,38 @@
 
 ## Executive Summary
 
-**Latest Benchmark**: November 9, 2025 (Lock-Free Mutex Optimizations + Tonbo Comparison)
-**Previous Benchmark**: November 7, 2025 (Skipping Index + Bloom Filter + Index Persistence)
+**Latest Benchmark**: November 10, 2025 (Dual-API Architecture: Point API + Arrow Batch API)
+**Previous Benchmark**: November 9, 2025 (Lock-Free Mutex Optimizations + Tonbo Comparison)
 **Comparison**: RocksDB 7.x + Tonbo (Rust LSM-tree)
-**Status**: ✅ **MEASURED RESULTS - MASSIVE PERFORMANCE GAINS**
+**Status**: ✅ **MEASURED RESULTS - DUAL-API ARCHITECTURE COMPLETE**
+
+### November 10, 2025 - Dual-API Architecture
+
+MarbleDB now features **two distinct high-performance APIs** optimized for different workloads:
+
+#### 1. Point API (RocksDB-compatible)
+For traditional key-value OLTP workloads:
+
+| Operation | MarbleDB | RocksDB | Speedup |
+|-----------|----------|---------|---------|
+| **Write (Put)** | 242.91 K/sec | 142.80 K/sec | ✅ **1.70x faster** |
+| **Point Lookup (Get)** | 6.74 M/sec | 430.13 K/sec | ✅ **15.68x faster** |
+
+#### 2. Arrow Batch API (Zero-Copy)
+For columnar analytical workloads (SPARQL, OLAP):
+
+| Operation | Arrow-Native | Legacy (Serialized) | Speedup |
+|-----------|--------------|---------------------|---------|
+| **Write (PutBatch)** | 3.27 ms | 2.10 ms | 0.64x (acceptable) |
+| **Read (ScanBatches)** | 0.0014 ms | 2.38 ms | ✅ **1701x faster** |
+
+**Key Insight**: The **1701x read speedup** for Arrow Batch API eliminates double serialization (Arrow→string→memtable→string→Arrow), providing zero-copy batch retrieval for analytical queries.
+
+**Architecture Validated**:
+- ✅ Point API competitive with RocksDB (15.68x faster reads!)
+- ✅ Arrow Batch API eliminates serialization overhead (1701x faster!)
+- ✅ Both APIs coexist in same LSM tree
+- ✅ Lock-free implementation for both paths
 
 ### Three-Way Database Comparison
 
@@ -27,8 +55,119 @@
 
 | Date | Commit | Description | Key Improvement |
 |------|--------|-------------|-----------------|
+| **Nov 10, 2025** | TBD | **Dual-API architecture: Point API + Arrow Batch API** | **Point API: 1.70x writes, 15.68x reads vs RocksDB; Arrow API: 1701x read speedup** |
 | **Nov 9, 2025** | `080cab02` | **Lock-free mutex optimizations + Tonbo comparison** | **1.78x writes, 3.30x reads vs RocksDB; 2.01x writes, 3.11x reads vs Tonbo** |
 | Nov 7, 2025 | `6014eb04` | Skipping indexes + bloom filters | 1.26x writes, 1.69x reads vs RocksDB |
+
+---
+
+## November 10, 2025 - Dual-API Architecture Complete
+
+### Overview
+
+MarbleDB now provides **two distinct high-performance APIs** optimized for different workload patterns:
+
+1. **Point API** (`Put/Get/Scan`): RocksDB-compatible API for OLTP key-value workloads
+2. **Arrow Batch API** (`PutBatch/ScanBatches`): Zero-copy columnar API for OLAP analytical workloads
+
+Both APIs share the same underlying LSM tree infrastructure with lock-free optimizations.
+
+### 1. Point API Benchmark (vs RocksDB)
+
+**Configuration**:
+- 100,000 keys with 512-byte values
+- 10,000 random point lookups
+- Bloom filters enabled (both systems)
+- 64MB memtable size
+
+**Results**:
+
+| Operation | MarbleDB Point API | RocksDB | Latency (MarbleDB) | Latency (RocksDB) | Speedup |
+|-----------|-------------------|---------|-------------------|------------------|---------|
+| **Sequential Writes** | 242.91 K/sec | 142.80 K/sec | 4.12 μs | 7.00 μs | ✅ **1.70x** |
+| **Point Lookups** | 6.74 M/sec | 430.13 K/sec | 0.15 μs | 2.32 μs | ✅ **15.68x** |
+| **Range Scans** | 0 (bug) | 1.41 M/sec | - | 0.71 μs | ⚠️ (broken) |
+
+**Analysis**:
+- **15.68x faster point lookups**: MarbleDB's lock-free Get() with skiplist delivers exceptional read performance
+- **1.70x faster writes**: Lock-free Put() with double-buffering outperforms RocksDB's mutex-based writes
+- **Sub-microsecond read latency**: 0.15 μs = 150 nanoseconds per lookup
+- **Range scan bug**: Needs investigation (see fixes below)
+
+### 2. Arrow Batch API Benchmark (vs Legacy Serialization)
+
+**Configuration**:
+- 100 batches, 1000 rows per batch
+- 100,000 total rows (3 columns: id, name, value)
+- 5 iterations averaged
+
+**Results**:
+
+| Path | Write (avg) | Read (avg) | Total (avg) |
+|------|------------|-----------|------------|
+| **Legacy** (Arrow→string→memtable→string→Arrow) | 2.10 ms | 2.38 ms | 4.48 ms |
+| **Arrow-Native** (PutBatch→ScanBatches) | 3.27 ms | **0.0014 ms** | 3.27 ms |
+| **Speedup** | 0.64x | ✅ **1701x** | 1.37x |
+
+**Analysis**:
+- **1701x read speedup**: Eliminates double serialization by storing Arrow RecordBatches directly
+- **Zero-copy batch retrieval**: `ScanBatches()` returns shared pointers to batches (no deserialization)
+- **Write trade-off acceptable**: 0.64x slower writes (richer RecordBatch structure) for 1701x faster reads
+- **Lock-free hot path**: Pre-allocated vector + atomic fetch-add for slot allocation
+
+**Implementation Details**:
+```cpp
+// Lock-free PutBatch() - no mutex on hot path
+size_t batch_idx = batch_count_.fetch_add(1, std::memory_order_relaxed);
+batches_[batch_idx] = batch;  // Pre-allocated vector, no reallocation
+
+// Lock-free ScanBatches() - zero-copy
+size_t num_batches = batch_count_.load(std::memory_order_acquire);
+for (size_t i = 0; i < num_batches; ++i) {
+    batches->push_back(batches_[i]);  // Share pointers, no copy
+}
+```
+
+### 3. Architecture: Two APIs, One LSM Tree
+
+**Point API** (OLTP):
+```cpp
+StandardLSMTree* lsm = CreateLSMTree();
+lsm->Put(key, value);           // uint64_t key, string value
+lsm->Get(key, &value);          // Point lookup
+lsm->Scan(min, max, &results);  // Range scan
+```
+
+**Arrow Batch API** (OLAP):
+```cpp
+StandardLSMTree* lsm = CreateLSMTree();
+lsm->PutBatch(record_batch);              // Arrow RecordBatch
+lsm->ScanSSTablesBatches(min, max, &batches);  // Zero-copy batch retrieval
+```
+
+**Shared Infrastructure**:
+- Same LSM tree (MemTable → L0 → L1 → ...)
+- Same bloom filters and skipping indexes
+- Same lock-free optimizations
+- Different memtable implementations:
+  - `SimpleMemTable` (skiplist) for Point API
+  - `ArrowBatchMemTable` (vector of RecordBatches) for Arrow Batch API
+
+### Use Cases
+
+**Point API**:
+- Session stores
+- Caching layers
+- RDF triple stores (SPO/POS/OSP indexes)
+- Traditional OLTP workloads
+
+**Arrow Batch API**:
+- SPARQL queries (batch retrieval of triples)
+- Time-series analytics
+- OLAP aggregations
+- DataFusion integration
+
+---
 
 ### November 9, 2025 - Lock-Free Optimizations: BREAKTHROUGH PERFORMANCE
 

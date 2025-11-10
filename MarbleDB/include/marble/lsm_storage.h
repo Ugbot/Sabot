@@ -11,6 +11,7 @@
 #include <deque>
 #include <marble/status.h>
 #include <marble/memtable.h>
+#include <marble/arrow_batch_memtable.h>
 #include <marble/sstable.h>
 #include <marble/wal.h>
 
@@ -172,6 +173,30 @@ public:
                        std::vector<std::pair<uint64_t, std::string>>* results) = 0;
 
     /**
+     * @brief Put an Arrow RecordBatch directly (zero-copy)
+     *
+     * This is the Arrow-native write path that eliminates double serialization.
+     * Batches are stored directly in ArrowBatchMemTable without string conversion.
+     *
+     * @param batch RecordBatch to store
+     * @return Status OK on success
+     */
+    virtual Status PutBatch(const std::shared_ptr<arrow::RecordBatch>& batch) = 0;
+
+    /**
+     * @brief Scan a range as Arrow RecordBatches (zero-copy)
+     *
+     * Returns data directly in Arrow format without serialization overhead.
+     *
+     * @param start_key Start of range (inclusive)
+     * @param end_key End of range (inclusive)
+     * @param batches Output vector of RecordBatches
+     * @return Status OK on success
+     */
+    virtual Status ScanSSTablesBatches(uint64_t start_key, uint64_t end_key,
+                                       std::vector<std::shared_ptr<arrow::RecordBatch>>* batches) const = 0;
+
+    /**
      * @brief Force a memtable flush to disk
      */
     virtual Status Flush() = 0;
@@ -225,7 +250,19 @@ public:
     Status Scan(uint64_t start_key, uint64_t end_key,
                std::vector<std::pair<uint64_t, std::string>>* results) override;
     Status ScanSSTablesBatches(uint64_t start_key, uint64_t end_key,
-                              std::vector<std::shared_ptr<arrow::RecordBatch>>* batches) const;
+                              std::vector<std::shared_ptr<arrow::RecordBatch>>* batches) const override;
+
+    /**
+     * @brief Put an Arrow RecordBatch directly (zero-copy)
+     *
+     * This is the Arrow-native write path that eliminates double serialization.
+     * Batches are stored directly in ArrowBatchMemTable without string conversion.
+     *
+     * @param batch RecordBatch to store
+     * @return Status OK on success
+     */
+    Status PutBatch(const std::shared_ptr<arrow::RecordBatch>& batch) override;
+
     Status Flush() override;
     Status Compact(uint64_t level) override;
     LSMTreeStats GetStats() const override;
@@ -241,9 +278,13 @@ private:
     std::unique_ptr<WalManager> wal_manager_;
     std::shared_ptr<void> shared_node_pool_;  // Shared pool for all memtables (type-erased)
 
-    // MemTables (using Simple interface for uint64_t keys)
+    // MemTables (using Simple interface for uint64_t keys) - LEGACY PATH
     std::unique_ptr<SimpleMemTable> active_memtable_;
     std::vector<std::unique_ptr<SimpleMemTable>> immutable_memtables_;
+
+    // Arrow-native MemTables - NEW ZERO-COPY PATH
+    std::unique_ptr<ArrowBatchMemTable> arrow_active_memtable_;
+    std::vector<std::unique_ptr<ImmutableArrowBatchMemTable>> arrow_immutable_memtables_;
 
     // SSTables organized by level
     // NOTE: Changed from unique_ptr to shared_ptr to support Version snapshots
@@ -272,6 +313,11 @@ private:
     Status RecoverFromDisk();
     Status SwitchMemTable();
     Status FlushMemTable(std::unique_ptr<SimpleMemTable> memtable);
+
+    // Arrow-native helper methods (NEW)
+    Status SwitchBatchMemTable();
+    Status FlushBatchMemTable(std::unique_ptr<ArrowBatchMemTable> memtable);
+
     Status ScheduleCompaction(const CompactionTask& task);
     Status PerformCompaction(const CompactionTask& task);
     Status PerformMinorCompaction(const std::vector<std::unique_ptr<SimpleMemTable>>& memtables);

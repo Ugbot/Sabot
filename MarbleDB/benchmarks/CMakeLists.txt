@@ -71,12 +71,40 @@ target_link_libraries(rocksdb_api_optimizations_bench PRIVATE
     ${ROCKSDB_LIBRARIES}
 )
 
+# MarbleDB Point API vs RocksDB comparison benchmark
+add_executable(bench_marble_vs_rocksdb_point_api bench_marble_vs_rocksdb_point_api.cpp)
+target_include_directories(bench_marble_vs_rocksdb_point_api PRIVATE
+    ${PROJECT_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/../vendor/rocksdb/include
+)
+target_link_libraries(bench_marble_vs_rocksdb_point_api PRIVATE
+    marble
+    ${CMAKE_SOURCE_DIR}/../vendor/rocksdb/build/librocksdb.a
+    z  # zlib (required by RocksDB)
+    bz2  # bzip2 (required by RocksDB)
+)
+
 # Mutex overhead micro-benchmark
 add_executable(mutex_overhead_bench mutex_overhead_bench.cpp)
 target_include_directories(mutex_overhead_bench PRIVATE
     ${PROJECT_SOURCE_DIR}/include
 )
 # No dependencies - standalone benchmark
+
+# Large-scale comparison (forces SSTable merges)
+add_executable(large_scale_comparison large_scale_comparison.cpp)
+target_include_directories(large_scale_comparison PRIVATE
+    ${PROJECT_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/../vendor/rocksdb/include
+    ${CMAKE_SOURCE_DIR}/../vendor/tonbo/tonbo-ffi
+)
+target_link_libraries(large_scale_comparison PRIVATE
+    marble
+    ${CMAKE_SOURCE_DIR}/../vendor/rocksdb/build/librocksdb.a
+    ${CMAKE_SOURCE_DIR}/../vendor/tonbo/tonbo-ffi/target/release/libtonbo_ffi.dylib
+    z  # zlib
+    bz2  # bzip2
+)
 
 # Install benchmarks
 install(TARGETS

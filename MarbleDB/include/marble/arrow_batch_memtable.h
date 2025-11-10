@@ -212,7 +212,7 @@ private:
     // NOTE: Only used if config.build_row_index = true
     // For batch-scan workloads (SPARQL/RDF), this is disabled
     std::unordered_map<size_t, RowLocation> row_index_;
-    std::mutex row_index_mutex_;  // Only locks when building row index (rare)
+    mutable std::mutex row_index_mutex_;  // Only locks when building row index (rare)
 };
 
 /**

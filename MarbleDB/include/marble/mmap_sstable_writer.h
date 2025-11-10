@@ -174,9 +174,21 @@ private:
     // State
     bool finished_;
 
+    // Bloom filter for keys (RocksDB-style deferred construction)
+    std::vector<uint64_t> key_hashes_;        // Collected hashes during Add()
+    std::vector<uint8_t> bloom_filter_bytes_; // Built once in Finish()
+    double bits_per_key_;                      // Target bits per key (10.0 default)
+
     // Helper methods for Arrow RecordBatch handling
     Status FlushBatchBuffer();
     Status CreateRecordBatchFromBuffer(std::shared_ptr<arrow::RecordBatch>* batch);
+
+    // Bloom filter helpers (RocksDB-style, same as SSTableWriterImpl)
+    int ChooseNumProbes(double bits_per_key) const;
+    void BuildBloomFilterFromHashes();
+    void SetBit(size_t bit_index);
+    bool CheckBit(size_t bit_index) const;
+    Status WriteBloomFilter();
 };
 
 /**

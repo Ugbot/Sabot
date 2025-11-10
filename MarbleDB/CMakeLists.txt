@@ -237,6 +237,7 @@ set(MARBLE_SOURCES
     src/core/file_system.cpp
     src/core/memtable.cpp
     src/core/memtable_new.cpp
+    src/core/arrow_batch_memtable.cpp
     src/core/sstable.cpp
     src/core/arrow_sstable_reader.cpp
     src/core/lsm_storage.cpp

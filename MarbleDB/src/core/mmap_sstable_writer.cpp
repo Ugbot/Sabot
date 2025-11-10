@@ -51,7 +51,8 @@ MmapSSTableWriter::MmapSSTableWriter(const std::string& filepath,
     , max_key_(0)
     , data_section_start_(0)
     , data_section_end_(0)
-    , finished_(false) {
+    , finished_(false)
+    , bits_per_key_(10.0) {  // 10 bits per key (~1% false positive rate)
 
     // Create Arrow schema for key-value storage
     arrow_schema_ = arrow::schema({
@@ -62,6 +63,9 @@ MmapSSTableWriter::MmapSSTableWriter(const std::string& filepath,
     // Reserve batch buffers
     batch_keys_.reserve(kRecordBatchSize);
     batch_values_.reserve(kRecordBatchSize);
+
+    // Reserve bloom filter hash storage
+    key_hashes_.reserve(10000);  // Pre-allocate for typical SSTable size
 }
 
 MmapSSTableWriter::~MmapSSTableWriter() {
@@ -116,6 +120,13 @@ Status MmapSSTableWriter::Add(uint64_t key, const std::string& value) {
     batch_values_.push_back(value);
     entry_count_++;
 
+    // Collect hash for deferred bloom filter construction (RocksDB-style)
+    uint64_t hash = std::hash<uint64_t>{}(key);
+    // Hash deduplication: only add if different from previous hash
+    if (key_hashes_.empty() || hash != key_hashes_.back()) {
+        key_hashes_.push_back(hash);
+    }
+
     // Update key range
     min_key_ = std::min(min_key_, key);
     max_key_ = std::max(max_key_, key);
@@ -167,6 +178,9 @@ Status MmapSSTableWriter::Finish(std::unique_ptr<SSTable>* sstable) {
         return Status::InvalidArgument("Cannot finish empty SSTable");
     }
 
+    // Step 0: Build bloom filter ONCE from collected hashes (BEFORE writing to file)
+    BuildBloomFilterFromHashes();
+
     // Step 1: Write RecordBatches using Arrow IPC
     auto status = WriteIndex();
     if (!status.ok()) {
@@ -179,16 +193,33 @@ Status MmapSSTableWriter::Finish(std::unique_ptr<SSTable>* sstable) {
         return status;
     }
 
-    // Step 3: Close file
-    if (close(fd_) != 0) {
-        return Status::IOError("Failed to close file");
+    // Step 3: Write bloom filter using raw write() on fd_ (BEFORE closing fd_)
+    if (!bloom_filter_bytes_.empty()) {
+        status = WriteBloomFilter();
+        if (!status.ok()) {
+            return status;
+        }
     }
-    fd_ = -1;
 
-    // Step 4: Mark as finished
+    // Step 4: Unmap memory region (if still mapped) and close file descriptor
+    if (mapped_region_) {
+        if (munmap(mapped_region_, current_file_size_) != 0) {
+            return Status::IOError("Failed to unmap memory region");
+        }
+        mapped_region_ = nullptr;
+    }
+
+    if (fd_ >= 0) {
+        if (close(fd_) != 0) {
+            return Status::IOError("Failed to close file descriptor");
+        }
+        fd_ = -1;
+    }
+
+    // Step 5: Mark as finished
     finished_ = true;
 
-    // Step 5: Try to reopen SSTable for reading
+    // Step 6: Try to reopen SSTable for reading
 
     if (sstable_mgr_) {
 
@@ -482,6 +513,102 @@ Status MmapSSTableWriter::WriteMetadata() {
     }
     if (write(fd_, &magic, sizeof(uint64_t)) != sizeof(uint64_t)) {
         return Status::IOError("Failed to write magic number");
+    }
+
+    return Status::OK();
+}
+
+// Bloom filter helper methods (same as SSTableWriterImpl)
+
+int MmapSSTableWriter::ChooseNumProbes(double bits_per_key) const {
+    // Optimal: ln(2) * bits_per_key ≈ 0.693 * bits_per_key
+    int num_probes = static_cast<int>(0.693 * bits_per_key);
+
+    // Clamp to reasonable range [1, 30]
+    if (num_probes < 1) num_probes = 1;
+    if (num_probes > 30) num_probes = 30;
+
+    return num_probes;
+}
+
+void MmapSSTableWriter::BuildBloomFilterFromHashes() {
+    if (key_hashes_.empty()) {
+        return;  // No keys, no bloom filter
+    }
+
+    // Calculate bloom filter size based on number of unique hashes
+    size_t num_keys = key_hashes_.size();
+    size_t num_bits = static_cast<size_t>(num_keys * bits_per_key_);
+
+    // Round up to nearest byte boundary
+    size_t num_bytes = (num_bits + 7) / 8;
+    num_bits = num_bytes * 8;  // Actual bit count (byte-aligned)
+
+    // Allocate bloom filter bytes (zero-initialized)
+    bloom_filter_bytes_.resize(num_bytes, 0);
+
+    // Calculate optimal number of hash functions
+    int num_probes = ChooseNumProbes(bits_per_key_);
+
+    // Build bloom filter from collected hashes
+    for (uint64_t hash : key_hashes_) {
+        // Double hashing: use multiple probe positions from single hash
+        for (int i = 0; i < num_probes; ++i) {
+            uint64_t h = hash + i * 0x9e3779b9;  // Golden ratio constant
+            size_t bit_index = h % num_bits;
+            SetBit(bit_index);
+        }
+    }
+
+    // Free hash storage (no longer needed)
+    key_hashes_.clear();
+    key_hashes_.shrink_to_fit();
+}
+
+void MmapSSTableWriter::SetBit(size_t bit_index) {
+    bloom_filter_bytes_[bit_index >> 3] |= (1 << (bit_index & 7));
+}
+
+bool MmapSSTableWriter::CheckBit(size_t bit_index) const {
+    return (bloom_filter_bytes_[bit_index >> 3] & (1 << (bit_index & 7))) != 0;
+}
+
+Status MmapSSTableWriter::WriteBloomFilter() {
+    if (bloom_filter_bytes_.empty()) {
+        return Status::OK();  // No bloom filter to write
+    }
+
+    // Append bloom filter to file after metadata using raw write() on fd_
+    // Format: [NUM_BITS(8)] [NUM_PROBES(4)] [BLOOM_BYTES]
+
+    size_t num_bits = bloom_filter_bytes_.size() * 8;
+    int num_probes = ChooseNumProbes(bits_per_key_);
+
+    // Check fd_ is valid
+    if (fd_ < 0) {
+        return Status::IOError("File descriptor not available for bloom filter write");
+    }
+
+    // Seek to end of file (after metadata)
+    off_t pos = lseek(fd_, 0, SEEK_END);
+    if (pos == -1) {
+        return Status::IOError("Failed to seek to end of file for bloom filter");
+    }
+
+    // Write num_bits
+    if (write(fd_, &num_bits, sizeof(num_bits)) != sizeof(num_bits)) {
+        return Status::IOError("Failed to write bloom filter num_bits");
+    }
+
+    // Write num_probes
+    if (write(fd_, &num_probes, sizeof(num_probes)) != sizeof(num_probes)) {
+        return Status::IOError("Failed to write bloom filter num_probes");
+    }
+
+    // Write bloom filter bytes
+    ssize_t bytes_written = write(fd_, bloom_filter_bytes_.data(), bloom_filter_bytes_.size());
+    if (bytes_written != static_cast<ssize_t>(bloom_filter_bytes_.size())) {
+        return Status::IOError("Failed to write bloom filter bytes");
     }
 
     return Status::OK();
