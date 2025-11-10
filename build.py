@@ -46,6 +46,8 @@ DUCKDB_BUILD_DIR = DUCKDB_VENDOR_DIR / "build" / "release"
 DUCKDB_INSTALL = DUCKDB_VENDOR_DIR / "install"
 TONBO_DIR = PROJECT_ROOT / "vendor" / "tonbo" / "bindings" / "python"
 TONBO_FFI_DIR = PROJECT_ROOT / "vendor" / "tonbo" / "tonbo-ffi"
+MARBLEDB_DIR = PROJECT_ROOT / "MarbleDB"
+MARBLEDB_BUILD_DIR = MARBLEDB_DIR / "build"
 POSTGRESQL_WAL2JSON_DIR = PROJECT_ROOT / "vendor" / "postgresql" / "wal2json"
 SABOT_CYTHON_DIR = PROJECT_ROOT / "sabot" / "_cython"
 SABOT_C_DIR = PROJECT_ROOT / "sabot" / "_c"  # Additional Cython modules
@@ -124,6 +126,9 @@ def check_dependencies():
         (DUCKDB_BUILD_DIR / "src").glob("libduckdb.*")
     )
 
+    # Check MarbleDB (local build)
+    marbledb_built = MARBLEDB_BUILD_DIR.exists() and (MARBLEDB_BUILD_DIR / "libmarble.a").exists()
+
     # Check hiredis for CyRedis
     hiredis_available = False
     try:
@@ -152,6 +157,11 @@ def check_dependencies():
     else:
         print_skip("DuckDB not built yet")
 
+    if marbledb_built:
+        print_success(f"MarbleDB found at {MARBLEDB_BUILD_DIR}")
+    else:
+        print_skip("MarbleDB not built yet")
+
     if hiredis_available:
         print_success("hiredis found (CyRedis will be built)")
     else:
@@ -168,6 +178,7 @@ def check_dependencies():
         'arrow_built': arrow_built,
         'rocksdb_built': rocksdb_built,
         'duckdb_built': duckdb_built,
+        'marbledb_built': marbledb_built,
         'hiredis_available': hiredis_available,
         'rust_available': deps['cargo'] and deps['rust'],
         'maturin_available': deps['maturin'] is not None,
@@ -582,13 +593,20 @@ def build_vendor_extensions(deps, skip=False):
 
     if skip:
         print_skip("Skipped by user (--skip-vendor)")
-        return {'cyredis': False, 'rocksdb': False, 'duckdb': False, 'tonbo': False}
+        return {
+            'cyredis': False,
+            'rocksdb': False,
+            'duckdb': False,
+            'tonbo': False,
+            'marbledb': deps['marbledb_built'],  # MarbleDB is built separately
+        }
 
     results = {
         'cyredis': build_cyredis(deps),
         'rocksdb': build_rocksdb(deps),
         'duckdb': build_duckdb(deps),
         'tonbo': build_tonbo(deps),
+        'marbledb': deps['marbledb_built'],  # MarbleDB is built separately
     }
 
     return results
@@ -614,6 +632,7 @@ def discover_cython_modules():
         'rocksdb': [],   # Needs RocksDB
         'duckdb': [],    # Needs DuckDB
         'tonbo': [],     # Needs Tonbo
+        'marbledb': [],  # Needs MarbleDB
         'mixed': [],     # Needs both RocksDB and Tonbo
         'postgresql': [], # Needs PostgreSQL libpq
     }
@@ -622,6 +641,7 @@ def discover_cython_modules():
     rocksdb_keywords = ['rocksdb', 'RocksDB']
     duckdb_keywords = ['duckdb', 'DuckDB']
     tonbo_keywords = ['tonbo', 'Tonbo']
+    marbledb_keywords = ['marble', 'MarbleDB', 'LSMTree', 'lsm_storage']
     postgresql_keywords = ['libpq', 'postgresql', 'postgres']
 
     for pyx_file in pyx_files:
@@ -646,6 +666,7 @@ def discover_cython_modules():
             has_rocksdb = any(kw in content for kw in rocksdb_keywords)
             has_duckdb = any(kw in content for kw in duckdb_keywords)
             has_tonbo = any(kw in content for kw in tonbo_keywords)
+            has_marbledb = any(kw in content for kw in marbledb_keywords)
             has_postgresql = any(kw in content for kw in postgresql_keywords)
 
             if has_rocksdb and has_tonbo:
@@ -656,6 +677,8 @@ def discover_cython_modules():
                 modules['duckdb'].append(rel_path)
             elif has_tonbo:
                 modules['tonbo'].append(rel_path)
+            elif has_marbledb:
+                modules['marbledb'].append(rel_path)
             elif has_postgresql:
                 modules['postgresql'].append(rel_path)
             elif 'arrow' in content.lower() or 'flight' in content.lower():
@@ -673,6 +696,7 @@ def discover_cython_modules():
     print(f"  - RocksDB: {len(modules['rocksdb'])}")
     print(f"  - DuckDB: {len(modules['duckdb'])}")
     print(f"  - Tonbo: {len(modules['tonbo'])}")
+    print(f"  - MarbleDB: {len(modules['marbledb'])}")
     print(f"  - PostgreSQL: {len(modules['postgresql'])}")
     print(f"  - Mixed: {len(modules['mixed'])}")
 
@@ -848,6 +872,29 @@ def build_sabot_extensions(deps, vendor_results, modules):
             ))
     else:
         results['skipped'].extend(modules['rocksdb'])
+
+    # Conditionally build MarbleDB modules
+    if vendor_results['marbledb']:
+        for module_path in modules['marbledb']:
+            module_name, pyx_path = get_module_info(module_path)
+
+            # Add MarbleDB paths
+            marbledb_include_dirs = common_include_dirs + [str(MARBLEDB_DIR / "include")]
+            marbledb_library_dirs = common_library_dirs + [str(MARBLEDB_BUILD_DIR)]
+            marbledb_link_args = common_link_args + [f"-Wl,-rpath,{str(MARBLEDB_BUILD_DIR)}"]
+
+            extensions_to_build.append(Extension(
+                module_name,
+                [pyx_path],
+                include_dirs=marbledb_include_dirs,
+                library_dirs=marbledb_library_dirs,
+                libraries=common_libraries + ["marble"],
+                extra_compile_args=common_compile_args,
+                extra_link_args=marbledb_link_args,
+                language="c++",
+            ))
+    else:
+        results['skipped'].extend(modules['marbledb'])
 
     # Conditionally build DuckDB modules
     if vendor_results['duckdb']:
