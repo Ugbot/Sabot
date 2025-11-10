@@ -132,10 +132,10 @@ private:
     std::vector<SSTableIndexEntry> index_entries_;
     size_t estimated_size_;
 
-    // Bloom filter for keys
-    std::vector<bool> bloom_filter_bits_;
-    size_t bloom_filter_size_;
-    size_t hash_functions_;
+    // Bloom filter for keys (RocksDB-style deferred construction)
+    std::vector<uint64_t> key_hashes_;        // Collected hashes during Add()
+    std::vector<uint8_t> bloom_filter_bytes_; // Built once in Finish()
+    double bits_per_key_;                      // Target bits per key (10.0 default)
 
     // File handle for writing
     std::unique_ptr<FileHandle> file_handle_;
@@ -145,6 +145,12 @@ private:
     Status WriteIndex();
     Status WriteBloomFilter();
     Status WriteMetadata();
+
+    // Bloom filter helpers (RocksDB-style)
+    int ChooseNumProbes(double bits_per_key) const;
+    void BuildBloomFilterFromHashes();
+    void SetBit(size_t bit_index);
+    bool CheckBit(size_t bit_index) const;
 };
 
 // SSTableReader implementation
@@ -225,10 +231,9 @@ private:
 SSTableWriterImpl::SSTableWriterImpl(const std::string& filepath, uint64_t level,
                                    std::shared_ptr<FileSystem> fs)
     : filepath_(filepath), level_(level), fs_(fs), estimated_size_(0),
-      bloom_filter_size_(1024 * 8), // 1KB bloom filter (8192 bits)
-      hash_functions_(3) { // 3 hash functions
-    // Initialize bloom filter bits
-    bloom_filter_bits_.resize(bloom_filter_size_, false);
+      bits_per_key_(10.0) { // 10 bits per key (~1% false positive rate)
+    // Bloom filter will be built in Finish() from collected key_hashes_
+    key_hashes_.reserve(1024); // Pre-allocate for typical SSTable size
 }
 
 SSTableWriterImpl::~SSTableWriterImpl() = default;
@@ -238,12 +243,12 @@ Status SSTableWriterImpl::Add(uint64_t key, const std::string& value) {
     auto entry = std::make_pair(key, value);
     entries_.push_back(entry);
 
-    // Update bloom filter using multiple hash functions
-    for (size_t i = 0; i < hash_functions_; ++i) {
-        // Simple hash function combination
-        size_t hash = std::hash<uint64_t>{}(key + i * 0x9e3779b9);
-        size_t bit_index = hash % bloom_filter_size_;
-        bloom_filter_bits_[bit_index] = true;
+    // Collect hash for deferred bloom filter construction (RocksDB-style)
+    uint64_t hash = std::hash<uint64_t>{}(key);
+
+    // Hash deduplication: only add if different from previous hash
+    if (key_hashes_.empty() || hash != key_hashes_.back()) {
+        key_hashes_.push_back(hash);
     }
 
     // Update estimated size
@@ -253,12 +258,17 @@ Status SSTableWriterImpl::Add(uint64_t key, const std::string& value) {
 }
 
 Status SSTableWriterImpl::Finish(std::unique_ptr<SSTable>* sstable) {
+
     if (entries_.empty()) {
         return Status::InvalidArgument("Cannot create SSTable with no entries");
     }
 
+
     // Sort entries by key
     std::sort(entries_.begin(), entries_.end());
+
+    // Build bloom filter ONCE from collected hashes (BEFORE writing to file!)
+    BuildBloomFilterFromHashes();
 
     // Create file handle
     auto status = fs_->OpenFile(filepath_,
@@ -273,19 +283,29 @@ Status SSTableWriterImpl::Finish(std::unique_ptr<SSTable>* sstable) {
 
     // Write SSTable components
     status = WriteHeader();
-    if (!status.ok()) return status;
+    if (!status.ok()) {
+        return status;
+    }
 
     status = WriteData();
-    if (!status.ok()) return status;
+    if (!status.ok()) {
+        return status;
+    }
 
     status = WriteIndex();
-    if (!status.ok()) return status;
+    if (!status.ok()) {
+        return status;
+    }
 
     status = WriteBloomFilter();
-    if (!status.ok()) return status;
+    if (!status.ok()) {
+        return status;
+    }
 
     status = WriteMetadata();
-    if (!status.ok()) return status;
+    if (!status.ok()) {
+        return status;
+    }
 
     // Create SSTable instance
     SSTableMetadata metadata;
@@ -298,9 +318,8 @@ Status SSTableWriterImpl::Finish(std::unique_ptr<SSTable>* sstable) {
         std::chrono::system_clock::now().time_since_epoch()).count();
     metadata.level = level_;
 
-    // Serialize bloom filter
-    // FIXME: Proper bloom filter serialization needed
-    metadata.bloom_filter = "";
+    // Bloom filter already built in line 269, just serialize it
+    metadata.bloom_filter = std::string(bloom_filter_bytes_.begin(), bloom_filter_bytes_.end());
 
     auto sstable_impl = std::make_unique<SSTableImpl>(filepath_, metadata, fs_);
     *sstable = std::move(sstable_impl);
@@ -317,6 +336,7 @@ size_t SSTableWriterImpl::GetEstimatedSize() const {
 }
 
 Status SSTableWriterImpl::WriteHeader() {
+
     // SSTable format:
     // [MAGIC(8)] [VERSION(4)] [INDEX_OFFSET(8)] [BLOOM_OFFSET(8)] [METADATA_OFFSET(8)]
 
@@ -333,9 +353,18 @@ Status SSTableWriterImpl::WriteHeader() {
     memcpy(&header[20], &placeholder, 8); // bloom_offset
     memcpy(&header[28], &placeholder, 8); // metadata_offset
 
+    if (!file_handle_) {
+        return Status::IOError("file_handle is null");
+    }
     auto seek_status = file_handle_->Seek(0);
-    if (!seek_status.ok()) return seek_status;
-    return file_handle_->Write(header.data(), header.size(), nullptr);
+    if (!seek_status.ok()) {
+        return seek_status;
+    }
+    auto write_status = file_handle_->Write(header.data(), header.size(), nullptr);
+    if (!write_status.ok()) {
+    } else {
+    }
+    return write_status;
 }
 
 Status SSTableWriterImpl::WriteData() {
@@ -397,46 +426,39 @@ Status SSTableWriterImpl::WriteIndex() {
 }
 
 Status SSTableWriterImpl::WriteBloomFilter() {
-    // Serialize bloom filter bits
+    // Serialize bloom filter bytes (already built in BuildBloomFilterFromHashes())
     size_t bloom_offset;
     auto size_status = file_handle_->GetSize(&bloom_offset);
     if (!size_status.ok()) return size_status;
 
-    // Convert bool vector to bytes for storage
-    size_t bytes_needed = (bloom_filter_size_ + 7) / 8; // Round up to bytes
-    std::vector<uint8_t> bloom_bytes(bytes_needed, 0);
-
-    for (size_t i = 0; i < bloom_filter_size_; ++i) {
-        if (bloom_filter_bits_[i]) {
-            size_t byte_index = i / 8;
-            size_t bit_index = i % 8;
-            bloom_bytes[byte_index] |= (1 << bit_index);
-        }
-    }
+    // Calculate num_bits and num_probes
+    size_t num_bits = bloom_filter_bytes_.size() * 8;
+    int num_probes = ChooseNumProbes(bits_per_key_);
 
     // Write bloom filter size and data
     auto seek_status = file_handle_->Seek(bloom_offset);
     if (!seek_status.ok()) return seek_status;
-    auto status = file_handle_->Write(reinterpret_cast<const char*>(&bloom_filter_size_), sizeof(size_t), nullptr);
+    auto status = file_handle_->Write(reinterpret_cast<const char*>(&num_bits), sizeof(size_t), nullptr);
     if (!status.ok()) return status;
     bloom_offset += sizeof(size_t);
 
     seek_status = file_handle_->Seek(bloom_offset);
     if (!seek_status.ok()) return seek_status;
-    status = file_handle_->Write(reinterpret_cast<const char*>(&hash_functions_), sizeof(size_t), nullptr);
+    size_t num_probes_size_t = static_cast<size_t>(num_probes);
+    status = file_handle_->Write(reinterpret_cast<const char*>(&num_probes_size_t), sizeof(size_t), nullptr);
     if (!status.ok()) return status;
     bloom_offset += sizeof(size_t);
 
     seek_status = file_handle_->Seek(bloom_offset);
     if (!seek_status.ok()) return seek_status;
-    status = file_handle_->Write(reinterpret_cast<const char*>(bloom_bytes.data()), bloom_bytes.size(), nullptr);
+    status = file_handle_->Write(reinterpret_cast<const char*>(bloom_filter_bytes_.data()), bloom_filter_bytes_.size(), nullptr);
     if (!status.ok()) return status;
 
     // Update header with bloom filter offset
     size_t current_size;
     size_status = file_handle_->GetSize(&current_size);
     if (!size_status.ok()) return size_status;
-    uint64_t final_bloom_offset = current_size - bloom_bytes.size() - 2 * sizeof(size_t);
+    uint64_t final_bloom_offset = current_size - bloom_filter_bytes_.size() - 2 * sizeof(size_t);
     seek_status = file_handle_->Seek(20);
     if (!seek_status.ok()) return seek_status;
     status = file_handle_->Write(&final_bloom_offset, sizeof(uint64_t), nullptr);
@@ -460,16 +482,8 @@ Status SSTableWriterImpl::WriteMetadata() {
         std::chrono::system_clock::now().time_since_epoch()).count();
     metadata.level = level_;
 
-    // Serialize bloom filter to metadata
-    size_t bytes_needed = (bloom_filter_size_ + 7) / 8;
-    metadata.bloom_filter.resize(bytes_needed);
-    for (size_t i = 0; i < bloom_filter_size_; ++i) {
-        if (bloom_filter_bits_[i]) {
-            size_t byte_index = i / 8;
-            size_t bit_index = i % 8;
-            metadata.bloom_filter[byte_index] |= (1 << bit_index);
-        }
-    }
+    // Use pre-built bloom filter bytes (already constructed in BuildBloomFilterFromHashes())
+    metadata.bloom_filter = std::string(bloom_filter_bytes_.begin(), bloom_filter_bytes_.end());
 
     std::string metadata_str;
     auto status = metadata.SerializeToString(&metadata_str);
@@ -490,6 +504,63 @@ Status SSTableWriterImpl::WriteMetadata() {
     if (!status.ok()) return status;
 
     return Status::OK();
+}
+
+// Bloom filter helper methods (RocksDB-style)
+
+int SSTableWriterImpl::ChooseNumProbes(double bits_per_key) const {
+    // Optimal: ln(2) * bits_per_key ≈ 0.693 * bits_per_key
+    int num_probes = static_cast<int>(0.693 * bits_per_key);
+
+    // Clamp to reasonable range [1, 30]
+    if (num_probes < 1) num_probes = 1;
+    if (num_probes > 30) num_probes = 30;
+
+    return num_probes;
+}
+
+void SSTableWriterImpl::BuildBloomFilterFromHashes() {
+
+    if (key_hashes_.empty()) {
+        return;  // No keys, no bloom filter
+    }
+
+    // Calculate bloom filter size based on number of unique hashes
+    size_t num_keys = key_hashes_.size();
+
+    size_t num_bits = static_cast<size_t>(num_keys * bits_per_key_);
+
+    // Round up to nearest byte boundary
+    size_t num_bytes = (num_bits + 7) / 8;
+    num_bits = num_bytes * 8;  // Actual bit count (byte-aligned)
+
+    // Allocate bloom filter bytes (zero-initialized)
+    bloom_filter_bytes_.resize(num_bytes, 0);
+
+    // Calculate optimal number of hash functions
+    int num_probes = ChooseNumProbes(bits_per_key_);
+
+    // Build bloom filter from collected hashes
+    for (uint64_t hash : key_hashes_) {
+        // Double hashing: use multiple probe positions from single hash
+        for (int i = 0; i < num_probes; ++i) {
+            uint64_t h = hash + i * 0x9e3779b9;  // Golden ratio constant
+            size_t bit_index = h % num_bits;
+            SetBit(bit_index);
+        }
+    }
+
+    // Free hash storage (no longer needed)
+    key_hashes_.clear();
+    key_hashes_.shrink_to_fit();
+}
+
+void SSTableWriterImpl::SetBit(size_t bit_index) {
+    bloom_filter_bytes_[bit_index >> 3] |= (1 << (bit_index & 7));
+}
+
+bool SSTableWriterImpl::CheckBit(size_t bit_index) const {
+    return (bloom_filter_bytes_[bit_index >> 3] & (1 << (bit_index & 7))) != 0;
 }
 
 // SSTableReaderImpl implementation
@@ -603,13 +674,15 @@ const SSTableMetadata& SSTableImpl::GetMetadata() const {
 }
 
 bool SSTableImpl::ContainsKey(uint64_t key) const {
-    // Check bloom filter first (if available)
-    if (metadata_.bloom_filter.empty()) {
-        return true; // Conservative: assume it might exist
+    // Load bloom filter if not already loaded
+    auto status = LoadBloomFilter();
+    if (!status.ok() || !bloom_filter_cache_) {
+        return true; // Conservative: assume it might exist if no bloom filter
     }
 
-    // FIXME: Implement bloom filter checking
-    return true;
+    // Check bloom filter using the key as a string
+    std::string key_str = std::to_string(key);
+    return bloom_filter_cache_->MightContain(key_str);
 }
 
 Status SSTableImpl::Get(uint64_t key, std::string* value) const {
@@ -785,11 +858,28 @@ Status SSTableImpl::LoadIndex() const {
 }
 
 Status SSTableImpl::LoadBloomFilter() const {
-    if (bloom_filter_loaded_ || metadata_.bloom_filter.empty()) return Status::OK();
+    if (bloom_filter_loaded_) return Status::OK();
 
-    // FIXME: Implement bloom filter deserialization
-    bloom_filter_loaded_ = true;
-    return Status::OK();
+    if (metadata_.bloom_filter.empty()) {
+        bloom_filter_loaded_ = true;
+        return Status::OK();  // No bloom filter available
+    }
+
+    // Deserialize bloom filter from metadata
+    // Convert string to vector<uint8_t>
+    std::vector<uint8_t> bloom_data(metadata_.bloom_filter.begin(),
+                                     metadata_.bloom_filter.end());
+
+    try {
+        bloom_filter_cache_ = BloomFilter::Deserialize(bloom_data);
+        bloom_filter_loaded_ = true;
+        return Status::OK();
+    } catch (const std::exception& e) {
+        // If deserialization fails, mark as loaded but leave cache null
+        // This means ContainsKey() will return true (conservative)
+        bloom_filter_loaded_ = true;
+        return Status::InvalidArgument("Failed to deserialize bloom filter: " + std::string(e.what()));
+    }
 }
 
 Status SSTableImpl::BinarySearch(uint64_t key, size_t* index_pos) const {
