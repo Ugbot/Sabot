@@ -392,85 +392,21 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanBasicGraphPattern(
             }
         }
 
-        // ZipperJoin requires sorted inputs
-        // Build sort keys (all ascending for join)
-        std::vector<SortKey> sort_keys;
-        for (const auto& col : join_columns) {
-            sort_keys.emplace_back(col, SortDirection::Ascending);
-        }
+        // Use HashJoin instead of ZipperJoin for better performance with RDF data
+        // HashJoin advantages:
+        // - No sorting required: Saves O(n log n) + O(m log m) time
+        // - O(n + m) time complexity with no duplicate key penalty
+        // - O(min(n, m)) space for hash table
+        // - Much faster for RDF workloads with many duplicate predicates
+        SABOT_LOG_PLANNER("Using HashJoin (O(n+m), no sorting required)");
 
-        // SMART SORT SELECTION:
-        // 1. Check if already sorted (from index scan)
-        // 2. If not, prefer radix sort (O(n)) for int64 columns
-        // 3. Fall back to comparison sort (O(n log n))
-
-        // Check if left input is already sorted
-        auto left_ordering = current_op->GetOutputOrdering();
-        if (!left_ordering.matches(join_columns)) {
-            SABOT_LOG_PLANNER("Left input not sorted, adding sort operator");
-
-            // Check if we can use radix sort (all int64 columns)
-            auto left_schema_result = current_op->GetOutputSchema();
-            bool use_radix = false;
-            if (left_schema_result.ok()) {
-                auto left_schema = *left_schema_result;
-                use_radix = true;
-                for (const auto& col : join_columns) {
-                    auto field = left_schema->GetFieldByName(col);
-                    if (!field || field->type()->id() != arrow::Type::INT64) {
-                        use_radix = false;
-                        break;
-                    }
-                }
-            }
-
-            if (use_radix) {
-                SABOT_LOG_PLANNER("Using radix sort (O(n)) for left input");
-                current_op = std::make_shared<RadixSortOperator>(current_op, sort_keys);
-            } else {
-                SABOT_LOG_PLANNER("Using comparison sort (O(n log n)) for left input");
-                current_op = std::make_shared<SortOperator>(current_op, sort_keys);
-            }
-        } else {
-            SABOT_LOG_PLANNER("Left input already sorted, skipping sort");
-        }
-
-        // Check if right input is already sorted
-        auto right_ordering = right_op->GetOutputOrdering();
-        if (!right_ordering.matches(join_columns)) {
-            SABOT_LOG_PLANNER("Right input not sorted, adding sort operator");
-
-            // Check if we can use radix sort (all int64 columns)
-            auto right_schema_result = right_op->GetOutputSchema();
-            bool use_radix = false;
-            if (right_schema_result.ok()) {
-                auto right_schema = *right_schema_result;
-                use_radix = true;
-                for (const auto& col : join_columns) {
-                    auto field = right_schema->GetFieldByName(col);
-                    if (!field || field->type()->id() != arrow::Type::INT64) {
-                        use_radix = false;
-                        break;
-                    }
-                }
-            }
-
-            if (use_radix) {
-                SABOT_LOG_PLANNER("Using radix sort (O(n)) for right input");
-                right_op = std::make_shared<RadixSortOperator>(right_op, sort_keys);
-            } else {
-                SABOT_LOG_PLANNER("Using comparison sort (O(n log n)) for right input");
-                right_op = std::make_shared<SortOperator>(right_op, sort_keys);
-            }
-        } else {
-            SABOT_LOG_PLANNER("Right input already sorted, skipping sort");
-        }
-
-        // Create zipper join operator (Layer 2 - O(n+m) merge join)
-        current_op = std::make_shared<ZipperJoinOperator>(
+        // Create hash join operator (Layer 2 - O(n+m) hash join)
+        current_op = std::make_shared<HashJoinOperator>(
             current_op,
             right_op,
-            join_columns
+            join_columns,
+            join_columns,  // same column names on both sides
+            JoinType::Inner
         );
     }
 
