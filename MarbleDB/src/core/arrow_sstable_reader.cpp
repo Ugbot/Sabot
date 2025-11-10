@@ -78,12 +78,36 @@ bool ArrowSSTableReader::ContainsKey(uint64_t key) const {
     //     return false;
     // }
 
-    // Fast path 3: Bloom filter
+    // Fast path 3: Bloom filter (raw format from MmapSSTableWriter)
     if (!bloom_filter_loaded_) {
         const_cast<ArrowSSTableReader*>(this)->LoadBloomFilter();
     }
-    if (bloom_filter_ && !bloom_filter_->MightContain(std::to_string(key))) {
-        return false;
+
+    // Check raw bloom filter if loaded
+    if (!bloom_bytes_.empty() && bloom_num_bits_ > 0) {
+        // Hash the key
+        std::hash<uint64_t> hasher;
+        uint64_t hash = hasher(key);
+
+        // Check all probe positions (same algorithm as MmapSSTableWriter)
+        bool might_contain = true;
+        for (int i = 0; i < bloom_num_probes_; ++i) {
+            uint64_t h = hash + i * 0x9e3779b9ULL;  // Golden ratio constant
+            size_t bit_index = h % bloom_num_bits_;
+
+            // Check bit: bloom_bytes_[bit_index >> 3] & (1 << (bit_index & 7))
+            uint8_t byte_val = bloom_bytes_[bit_index >> 3];
+            uint8_t bit_mask = 1 << (bit_index & 7);
+
+            if ((byte_val & bit_mask) == 0) {
+                might_contain = false;
+                break;
+            }
+        }
+
+        if (!might_contain) {
+            return false;  // Definitely doesn't exist
+        }
     }
 
     // Conservative: might exist
@@ -112,13 +136,30 @@ Status ArrowSSTableReader::Get(uint64_t key, std::string* value) const {
     if (!bloom_filter_loaded_) {
         const_cast<ArrowSSTableReader*>(this)->LoadBloomFilter();
     }
-    if (bloom_filter_ && !bloom_filter_->MightContain(std::to_string(key))) {
-        stats_.bloom_filter_rejections++;
-        // TODO: NegativeCache uses Key type
-        // if (negative_cache_) {
-        //     negative_cache_->RecordMiss(key);
-        // }
-        return Status::NotFound("Key not found (bloom filter)");
+
+    // Check raw bloom filter (same algorithm as ContainsKey)
+    if (!bloom_bytes_.empty() && bloom_num_bits_ > 0) {
+        std::hash<uint64_t> hasher;
+        uint64_t hash = hasher(key);
+
+        bool might_contain = true;
+        for (int i = 0; i < bloom_num_probes_; ++i) {
+            uint64_t h = hash + i * 0x9e3779b9ULL;
+            size_t bit_index = h % bloom_num_bits_;
+
+            uint8_t byte_val = bloom_bytes_[bit_index >> 3];
+            uint8_t bit_mask = 1 << (bit_index & 7);
+
+            if ((byte_val & bit_mask) == 0) {
+                might_contain = false;
+                break;
+            }
+        }
+
+        if (!might_contain) {
+            stats_.bloom_filter_rejections++;
+            return Status::NotFound("Key not found (bloom filter)");
+        }
     }
 
     // Metadata range check (O(1))
@@ -509,9 +550,62 @@ Status ArrowSSTableReader::LoadSparseIndex() {
 }
 
 Status ArrowSSTableReader::LoadBloomFilter() {
-    // TODO: Read bloom filter from metadata section
-    // For now, skip - the writer doesn't create one yet
+    if (bloom_filter_loaded_) {
+        return Status::OK();
+    }
+
+    // Check if bloom filter section exists
+    if (bloom_section_end_ == data_section_end_) {
+        // No bloom filter written
+        bloom_filter_loaded_ = true;
+        return Status::OK();
+    }
+
+    int fd = open(filepath_.c_str(), O_RDONLY);
+    if (fd < 0) {
+        return Status::IOError("Failed to open file for bloom filter: " + filepath_);
+    }
+
+    // Seek to bloom filter section (right after Arrow IPC data)
+    if (lseek(fd, data_section_end_, SEEK_SET) == -1) {
+        close(fd);
+        return Status::IOError("Failed to seek to bloom filter section");
+    }
+
+    // Read bloom filter metadata: [NUM_BITS(8)][NUM_PROBES(4)]
+    uint64_t num_bits;
+    int num_probes;
+
+    if (read(fd, &num_bits, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        close(fd);
+        return Status::IOError("Failed to read bloom filter num_bits");
+    }
+
+    if (read(fd, &num_probes, sizeof(int)) != sizeof(int)) {
+        close(fd);
+        return Status::IOError("Failed to read bloom filter num_probes");
+    }
+
+    // Calculate number of bytes
+    size_t num_bytes = (num_bits + 7) / 8;
+
+    // Read bloom filter bytes
+    bloom_bytes_.resize(num_bytes);
+    ssize_t bytes_read = read(fd, bloom_bytes_.data(), num_bytes);
+    close(fd);
+
+    if (bytes_read != static_cast<ssize_t>(num_bytes)) {
+        return Status::IOError("Failed to read bloom filter bytes");
+    }
+
+    // Store bloom filter parameters
+    bloom_num_bits_ = num_bits;
+    bloom_num_probes_ = num_probes;
+
     bloom_filter_loaded_ = true;
+    MARBLE_LOG_DEBUG(ArrowReader) << "Loaded bloom filter: " << num_bits << " bits, "
+                                   << num_probes << " probes, " << num_bytes << " bytes";
+
     return Status::OK();
 }
 

@@ -118,6 +118,11 @@ private:
     std::unique_ptr<BloomFilter> bloom_filter_;
     bool bloom_filter_loaded_ = false;
 
+    // Raw bloom filter data (MmapSSTableWriter format)
+    std::vector<uint8_t> bloom_bytes_;
+    uint64_t bloom_num_bits_ = 0;
+    int bloom_num_probes_ = 0;
+
     // Hot key cache (Aerospike-inspired)
     std::shared_ptr<HotKeyCache> hot_key_cache_;
 
