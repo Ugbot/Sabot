@@ -71,6 +71,15 @@ public:
     Status Validate() const override;
 
     /**
+     * @brief Set footer offsets (called by OpenArrowSSTable)
+     */
+    void SetFooterOffsets(uint64_t data_end, uint64_t bloom_end, uint64_t index_end) {
+        data_section_end_ = data_end;
+        bloom_section_end_ = bloom_end;
+        index_section_end_ = index_end;
+    }
+
+    /**
      * @brief Statistics for performance monitoring
      */
     struct Stats {
@@ -93,6 +102,7 @@ private:
 
     // Footer offsets (loaded from file)
     uint64_t data_section_end_ = 0;
+    uint64_t bloom_section_end_ = 0;
     uint64_t index_section_end_ = 0;
 
     // Arrow IPC data

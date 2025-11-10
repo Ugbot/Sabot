@@ -590,7 +590,7 @@ Status SSTableReaderImpl::Open(const std::string& filepath,
         return size_status;
     }
 
-    if (file_size >= 24) {  // Need at least 24 bytes for Arrow footer
+    if (file_size >= 32) {  // Need at least 32 bytes for Arrow footer
         uint64_t magic;
 
         auto seek_status = file_handle->Seek(file_size - 8);

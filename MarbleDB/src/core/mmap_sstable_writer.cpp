@@ -187,18 +187,18 @@ Status MmapSSTableWriter::Finish(std::unique_ptr<SSTable>* sstable) {
         return status;
     }
 
-    // Step 2: Write metadata (sparse index + footer)
-    status = WriteMetadata();
-    if (!status.ok()) {
-        return status;
-    }
-
-    // Step 3: Write bloom filter using raw write() on fd_ (BEFORE closing fd_)
+    // Step 2: Write bloom filter (BEFORE metadata/footer so magic is at end of file)
     if (!bloom_filter_bytes_.empty()) {
         status = WriteBloomFilter();
         if (!status.ok()) {
             return status;
         }
+    }
+
+    // Step 3: Write metadata and footer (footer contains magic at END of file)
+    status = WriteMetadata();
+    if (!status.ok()) {
+        return status;
     }
 
     // Step 4: Unmap memory region (if still mapped) and close file descriptor
@@ -455,6 +455,9 @@ Status MmapSSTableWriter::WriteMetadata() {
         return Status::IOError("Failed to seek to end of file");
     }
 
+    // Record bloom filter end position (current position after WriteBloomFilter())
+    size_t bloom_section_end = current_pos;
+
     // Write sparse index
     // Format: [COUNT(8)][KEY1(8)][BATCH_IDX1(8)][KEY2(8)][BATCH_IDX2(8)]...
     uint64_t index_count = sparse_index_.size();
@@ -503,10 +506,13 @@ Status MmapSSTableWriter::WriteMetadata() {
         return Status::IOError("Failed to write has data range flag");
     }
 
-    // Write footer: [DATA_END(8)][INDEX_END(8)][MAGIC(8)]
+    // Write footer: [DATA_END(8)][BLOOM_END(8)][INDEX_END(8)][MAGIC(8)]
     uint64_t magic = 0x4152524F57535354;  // "ARROWSST" in hex
     if (write(fd_, &data_section_end_, sizeof(uint64_t)) != sizeof(uint64_t)) {
         return Status::IOError("Failed to write data section end");
+    }
+    if (write(fd_, &bloom_section_end, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        return Status::IOError("Failed to write bloom section end");
     }
     if (write(fd_, &index_section_end, sizeof(uint64_t)) != sizeof(uint64_t)) {
         return Status::IOError("Failed to write index section end");

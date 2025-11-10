@@ -471,8 +471,8 @@ Status ArrowSSTableReader::LoadSparseIndex() {
         return Status::IOError("Failed to open file: " + filepath_);
     }
 
-    // Seek to sparse index section (right after Arrow IPC data)
-    if (lseek(fd, data_section_end_, SEEK_SET) == -1) {
+    // Seek to sparse index section (right after bloom filter)
+    if (lseek(fd, bloom_section_end_, SEEK_SET) == -1) {
         close(fd);
         return Status::IOError("Failed to seek to sparse index");
     }
@@ -574,34 +574,36 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
         return nullptr;
     }
 
-    // Read last 24 bytes for footer
+    // Read last 32 bytes for footer
     off_t file_size = lseek(fd, 0, SEEK_END);
     MARBLE_LOG_DEBUG(ArrowReader) << "file_size=" << file_size << " bytes";
 
-    if (file_size < 24) {
-        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - file too small (need 24 bytes minimum)";
+    if (file_size < 32) {
+        MARBLE_LOG_ERROR(ArrowReader) << "ERROR - file too small (need 32 bytes minimum)";
         close(fd);
         return nullptr;
     }
 
-    uint8_t footer[24];
-    if (lseek(fd, file_size - 24, SEEK_SET) == -1) {
+    uint8_t footer[32];
+    if (lseek(fd, file_size - 32, SEEK_SET) == -1) {
         MARBLE_LOG_ERROR(ArrowReader) << "ERROR - failed to seek to footer";
         close(fd);
         return nullptr;
     }
 
-    if (read(fd, footer, 24) != 24) {
+    if (read(fd, footer, 32) != 32) {
         MARBLE_LOG_ERROR(ArrowReader) << "ERROR - failed to read footer";
         close(fd);
         return nullptr;
     }
 
     uint64_t data_end = *reinterpret_cast<uint64_t*>(&footer[0]);
-    uint64_t index_end = *reinterpret_cast<uint64_t*>(&footer[8]);
-    uint64_t magic = *reinterpret_cast<uint64_t*>(&footer[16]);
+    uint64_t bloom_end = *reinterpret_cast<uint64_t*>(&footer[8]);
+    uint64_t index_end = *reinterpret_cast<uint64_t*>(&footer[16]);
+    uint64_t magic = *reinterpret_cast<uint64_t*>(&footer[24]);
 
     MARBLE_LOG_DEBUG(ArrowReader) << "Footer - data_end=" << data_end
+                                   << ", bloom_end=" << bloom_end
                                    << ", index_end=" << index_end
                                    << ", magic=0x" << std::hex << magic << std::dec;
 
@@ -705,6 +707,10 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
     MARBLE_LOG_DEBUG(ArrowReader) << "Creating ArrowSSTableReader...";
     try {
         auto reader = std::make_unique<ArrowSSTableReader>(filepath, metadata, fs);
+
+        // Store footer offsets in the reader
+        reader->SetFooterOffsets(data_end, bloom_end, index_end);
+
         MARBLE_LOG_DEBUG(ArrowReader) << "Successfully created reader";
         return reader;
     } catch (const std::exception& e) {
