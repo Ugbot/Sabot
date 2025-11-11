@@ -483,20 +483,30 @@ public:
             , current_row_idx_(0)
             , valid_(false) {
 
-            // Scan all batches for this table from LSM
+            // Scan all batches for this table from LSM using Arrow-native path
             uint64_t start_key = EncodeBatchKey(table_id, 0);
             uint64_t end_key = EncodeBatchKey(table_id + 1, 0);  // Next table's range
 
-            std::vector<std::pair<uint64_t, std::string>> scan_results;
-            auto status = lsm_->Scan(start_key, end_key, &scan_results);
+            std::vector<std::shared_ptr<arrow::RecordBatch>> scan_batches;
+            auto status = lsm_->ScanSSTablesBatches(start_key, end_key, &scan_batches);
 
             if (status.ok()) {
-                // Deserialize all batches
-                for (const auto& [batch_key, serialized_batch] : scan_results) {
-                    std::shared_ptr<arrow::RecordBatch> batch;
-                    auto deser_status = DeserializeArrowBatch(serialized_batch, &batch);
-                    if (deser_status.ok() && batch && batch->num_rows() > 0) {
-                        batches_.push_back(batch);
+                // Filter batches by cf_id metadata (ScanBatches returns all tables)
+                std::string expected_cf_id = std::to_string(table_id);
+
+                for (const auto& batch : scan_batches) {
+                    if (!batch || batch->num_rows() == 0) continue;
+
+                    // Check cf_id in metadata
+                    auto metadata = batch->schema()->metadata();
+                    if (metadata) {
+                        auto cf_id_index = metadata->FindKey("cf_id");
+                        if (cf_id_index != -1) {
+                            std::string batch_cf_id = metadata->value(cf_id_index);
+                            if (batch_cf_id == expected_cf_id) {
+                                batches_.push_back(batch);
+                            }
+                        }
                     }
                 }
 
