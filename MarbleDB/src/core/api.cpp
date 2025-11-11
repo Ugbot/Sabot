@@ -490,32 +490,81 @@ public:
             std::vector<std::shared_ptr<arrow::RecordBatch>> scan_batches;
             auto status = lsm_->ScanSSTablesBatches(start_key, end_key, &scan_batches);
 
+            std::cerr << "[DEBUG LSMBatchIterator] Constructor called for table_id: " << table_id << "\n";
+            std::cerr << "[DEBUG LSMBatchIterator] Key range: [" << start_key << ", " << end_key << "]\n";
+            std::cerr << "[DEBUG LSMBatchIterator] ScanSSTablesBatches returned " << scan_batches.size()
+                      << " batches, status: " << (status.ok() ? "OK" : status.ToString()) << "\n";
+
             if (status.ok()) {
                 // Filter batches by cf_id metadata (ScanBatches returns all tables)
                 std::string expected_cf_id = std::to_string(table_id);
+                std::cerr << "[DEBUG LSMBatchIterator] Expected cf_id: " << expected_cf_id << "\n";
 
+                int batch_num = 0;
                 for (const auto& batch : scan_batches) {
-                    if (!batch || batch->num_rows() == 0) continue;
+                    batch_num++;
+                    std::cerr << "[DEBUG LSMBatchIterator] Examining batch " << batch_num << ": ";
+
+                    if (!batch) {
+                        std::cerr << "NULL batch\n";
+                        continue;
+                    }
+                    if (batch->num_rows() == 0) {
+                        std::cerr << "Empty batch (0 rows)\n";
+                        continue;
+                    }
+
+                    std::cerr << batch->num_rows() << " rows, ";
 
                     // Check cf_id in metadata
                     auto metadata = batch->schema()->metadata();
-                    if (metadata) {
-                        auto cf_id_index = metadata->FindKey("cf_id");
-                        if (cf_id_index != -1) {
-                            std::string batch_cf_id = metadata->value(cf_id_index);
-                            if (batch_cf_id == expected_cf_id) {
-                                batches_.push_back(batch);
-                            }
-                        }
+                    if (!metadata) {
+                        std::cerr << "NO METADATA - SKIPPING\n";
+                        continue;
+                    }
+
+                    std::cerr << "has metadata, ";
+                    auto cf_id_index = metadata->FindKey("cf_id");
+                    if (cf_id_index == -1) {
+                        std::cerr << "NO cf_id KEY - SKIPPING\n";
+                        continue;
+                    }
+
+                    std::string batch_cf_id = metadata->value(cf_id_index);
+                    std::cerr << "cf_id=" << batch_cf_id;
+
+                    if (batch_cf_id == expected_cf_id) {
+                        std::cerr << " - MATCH! Adding to batches_\n";
+                        batches_.push_back(batch);
+                    } else {
+                        std::cerr << " - NO MATCH (expected " << expected_cf_id << ") - SKIPPING\n";
                     }
                 }
 
+                std::cerr << "[DEBUG LSMBatchIterator] After filtering: " << batches_.size()
+                          << " batches kept\n";
+
                 // Position at first row if we have data
+                std::cerr << "[DEBUG LSMBatchIterator] Checking if can set valid_...\n";
+                std::cerr << "[DEBUG LSMBatchIterator] batches_.empty(): " << batches_.empty() << "\n";
+                if (!batches_.empty()) {
+                    std::cerr << "[DEBUG LSMBatchIterator] batches_[0] is "
+                              << (batches_[0] ? "NOT NULL" : "NULL") << "\n";
+                    if (batches_[0]) {
+                        std::cerr << "[DEBUG LSMBatchIterator] batches_[0]->num_rows(): "
+                                  << batches_[0]->num_rows() << "\n";
+                    }
+                }
+
                 if (!batches_.empty() && batches_[0]->num_rows() > 0) {
+                    std::cerr << "[DEBUG LSMBatchIterator] Setting valid_ = true\n";
                     valid_ = true;
                     current_batch_idx_ = 0;
                     current_row_idx_ = 0;
+                } else {
+                    std::cerr << "[DEBUG LSMBatchIterator] NOT setting valid_ (batches empty or first batch has 0 rows)\n";
                 }
+                std::cerr << "[DEBUG LSMBatchIterator] Final valid_ state: " << valid_ << "\n";
             }
         }
 
@@ -545,8 +594,34 @@ public:
         std::shared_ptr<Key> key() const override {
             if (!valid_) return nullptr;
 
-            // Extract key from current row
-            // Assume first column is the key (or use row index as key)
+            auto batch = batches_[current_batch_idx_];
+
+            // For RDF triple stores with 3 int64 columns, extract TripleKey
+            if (batch->num_columns() == 3) {
+                auto col1 = std::static_pointer_cast<arrow::Int64Array>(batch->column(0));
+                auto col2 = std::static_pointer_cast<arrow::Int64Array>(batch->column(1));
+                auto col3 = std::static_pointer_cast<arrow::Int64Array>(batch->column(2));
+
+                int64_t val1 = col1->Value(current_row_idx_);
+                int64_t val2 = col2->Value(current_row_idx_);
+                int64_t val3 = col3->Value(current_row_idx_);
+
+                return std::make_shared<TripleKey>(val1, val2, val3);
+            }
+
+            // For single-column keys, extract from first column
+            if (batch->num_columns() >= 1) {
+                auto col = batch->column(0);
+                if (col->type()->id() == arrow::Type::INT64) {
+                    auto int64_col = std::static_pointer_cast<arrow::Int64Array>(col);
+                    return std::make_shared<Int64Key>(int64_col->Value(current_row_idx_));
+                } else if (col->type()->id() == arrow::Type::UINT64) {
+                    auto uint64_col = std::static_pointer_cast<arrow::UInt64Array>(col);
+                    return std::make_shared<Int64Key>(uint64_col->Value(current_row_idx_));
+                }
+            }
+
+            // Fallback: use row index as key (legacy behavior)
             uint64_t key_value = current_batch_idx_ * 10000 + current_row_idx_;
             return std::make_shared<Int64Key>(key_value);
         }
@@ -1178,11 +1253,27 @@ private:
         // uint64_t batch_key = EncodeBatchKey(cf_info->id, batch_id);
         // auto put_status = lsm_tree_->Put(batch_key, serialized_batch);
 
-        // ★★★ BUILD ROW_INDEX FOR POINT LOOKUPS ★★★
-        // Extract keys from first column and build row_index mapping
-        // This enables Get() to work with data inserted via InsertBatch()
+        // ★★★ ROW_INDEX DISABLED - COMPOUND KEY SUPPORT NEEDED ★★★
+        //
+        // ISSUE: This code only extracts the first column as the key, which breaks
+        // multi-column compound keys (e.g., RDF triples with subject/predicate/object).
+        //
+        // For RDF triple stores:
+        //   - Insert: Hashes only column(0) [subject]  →  stores as hash(5) in row_index
+        //   - Query:  Computes TripleKey(5,10,15).Hash()  →  different hash  →  lookup fails
+        //
+        // SOLUTION IN PROGRESS: Implementing CompoundKeyHasher to handle multi-column keys.
+        // See compound_key.h for the full implementation.
+        //
+        // WORKAROUND: Row index is disabled via `build_row_index = false` in lsm_storage.cpp:1206.
+        // This allows SPARQL queries to work via table scans (ScanSSTablesBatches).
+        // Point lookups (Get) won't work until compound key support is complete.
+        //
+        // TODO: Re-enable once CompoundKeyHasher is integrated (see Step 2 of roadmap)
+        //
+        /* DISABLED - COMPOUND KEY SUPPORT NEEDED
         if (batch->num_columns() > 0 && batch->num_rows() > 0) {
-            auto key_column = batch->column(0);  // Assume first column is the primary key
+            auto key_column = batch->column(0);  // ❌ BUG: Only uses first column!
 
             for (int64_t i = 0; i < batch->num_rows(); ++i) {
                 size_t key_hash = 0;
@@ -1234,6 +1325,7 @@ private:
                 }
             }
         }
+        */ // END DISABLED SECTION
 
         // Incrementally update indexes (O(m) where m = batch size, not O(n) where n = total data)
         // Initialize indexes on first insert

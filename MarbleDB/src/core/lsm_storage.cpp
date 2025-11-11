@@ -993,9 +993,28 @@ Status StandardLSMTree::ScanSSTablesBatches(uint64_t start_key, uint64_t end_key
 
     // ARROW-NATIVE PATH (zero-copy): Scan ArrowBatchMemTable if it exists
     if (arrow_active_memtable_) {
+        std::cerr << "[DEBUG ScanSSTablesBatches] Scanning arrow_active_memtable_ for range ["
+                  << start_key << ", " << end_key << "]\n";
         std::vector<std::shared_ptr<arrow::RecordBatch>> arrow_batches;
         auto status = arrow_active_memtable_->ScanBatches(start_key, end_key, &arrow_batches);
+        std::cerr << "[DEBUG ScanSSTablesBatches] ScanBatches returned " << arrow_batches.size()
+                  << " batches, status: " << (status.ok() ? "OK" : status.ToString()) << "\n";
         if (status.ok() && !arrow_batches.empty()) {
+            // Debug: Check metadata on first batch
+            if (arrow_batches[0]) {
+                auto metadata = arrow_batches[0]->schema()->metadata();
+                std::cerr << "[DEBUG ScanSSTablesBatches] First batch: " << arrow_batches[0]->num_rows()
+                          << " rows, has metadata: " << (metadata ? "YES" : "NO") << "\n";
+                if (metadata) {
+                    auto cf_id_index = metadata->FindKey("cf_id");
+                    if (cf_id_index != -1) {
+                        std::cerr << "[DEBUG ScanSSTablesBatches] First batch cf_id: "
+                                  << metadata->value(cf_id_index) << "\n";
+                    } else {
+                        std::cerr << "[DEBUG ScanSSTablesBatches] First batch has NO cf_id in metadata\n";
+                    }
+                }
+            }
             batches->insert(batches->end(), arrow_batches.begin(), arrow_batches.end());
         }
     }

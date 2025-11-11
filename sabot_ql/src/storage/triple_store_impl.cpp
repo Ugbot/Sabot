@@ -4,6 +4,7 @@
 #include <marble/db.h>
 #include <unordered_map>
 #include <algorithm>
+#include <iostream>
 
 namespace sabot_ql {
 
@@ -18,6 +19,8 @@ public:
 
     // Initialize column families for SPO, POS, OSP indexes
     arrow::Status Initialize() {
+        std::cerr << "[DEBUG TripleStoreImpl::Initialize] Starting initialization\n";
+
         // Create schema for triple storage (3 int64 columns)
         auto triple_schema = arrow::schema({
             arrow::field("col1", arrow::int64()),
@@ -32,27 +35,37 @@ public:
         cf_opts.enable_sparse_index = true;
 
         // Create column families for each index permutation
+        std::cerr << "[DEBUG TripleStoreImpl::Initialize] Creating SPO column family\n";
         marble::ColumnFamilyDescriptor spo_cf("SPO", cf_opts);
         auto status = db_->CreateColumnFamily(spo_cf, &spo_handle_);
         if (!status.ok()) {
+            std::cerr << "[DEBUG TripleStoreImpl::Initialize] SPO creation failed: " << status.ToString() << "\n";
             return arrow::Status::IOError("Failed to create SPO column family: " +
                                          status.ToString());
         }
+        std::cerr << "[DEBUG TripleStoreImpl::Initialize] SPO created successfully\n";
 
+        std::cerr << "[DEBUG TripleStoreImpl::Initialize] Creating POS column family\n";
         marble::ColumnFamilyDescriptor pos_cf("POS", cf_opts);
         status = db_->CreateColumnFamily(pos_cf, &pos_handle_);
         if (!status.ok()) {
+            std::cerr << "[DEBUG TripleStoreImpl::Initialize] POS creation failed: " << status.ToString() << "\n";
             return arrow::Status::IOError("Failed to create POS column family: " +
                                          status.ToString());
         }
+        std::cerr << "[DEBUG TripleStoreImpl::Initialize] POS created successfully\n";
 
+        std::cerr << "[DEBUG TripleStoreImpl::Initialize] Creating OSP column family\n";
         marble::ColumnFamilyDescriptor osp_cf("OSP", cf_opts);
         status = db_->CreateColumnFamily(osp_cf, &osp_handle_);
         if (!status.ok()) {
+            std::cerr << "[DEBUG TripleStoreImpl::Initialize] OSP creation failed: " << status.ToString() << "\n";
             return arrow::Status::IOError("Failed to create OSP column family: " +
                                          status.ToString());
         }
+        std::cerr << "[DEBUG TripleStoreImpl::Initialize] OSP created successfully\n";
 
+        std::cerr << "[DEBUG TripleStoreImpl::Initialize] Initialization complete\n";
         return arrow::Status::OK();
     }
 
@@ -69,23 +82,29 @@ public:
         // Insert into each index
         marble::WriteOptions write_opts;
 
+        std::cerr << "[DEBUG InsertTriples] Inserting " << triples.size() << " triples into SPO\n";
         auto status = db_->InsertBatch("SPO", spo_batch);
         if (!status.ok()) {
             return arrow::Status::IOError("Failed to insert SPO batch: " +
                                          status.ToString());
         }
+        std::cerr << "[DEBUG InsertTriples] SPO insert successful\n";
 
+        std::cerr << "[DEBUG InsertTriples] Inserting " << triples.size() << " triples into POS\n";
         status = db_->InsertBatch("POS", pos_batch);
         if (!status.ok()) {
             return arrow::Status::IOError("Failed to insert POS batch: " +
                                          status.ToString());
         }
+        std::cerr << "[DEBUG InsertTriples] POS insert successful\n";
 
+        std::cerr << "[DEBUG InsertTriples] Inserting " << triples.size() << " triples into OSP\n";
         status = db_->InsertBatch("OSP", osp_batch);
         if (!status.ok()) {
             return arrow::Status::IOError("Failed to insert OSP batch: " +
                                          status.ToString());
         }
+        std::cerr << "[DEBUG InsertTriples] OSP insert successful\n";
 
         // Update statistics
         total_triples_ += triples.size();
@@ -172,14 +191,22 @@ public:
     arrow::Result<std::shared_ptr<arrow::Table>> ScanPattern(
         const TriplePattern& pattern) override {
 
+        std::cerr << "[DEBUG TripleStoreImpl::ScanPattern] Called with pattern - S: "
+                  << (pattern.subject.has_value() ? std::to_string(*pattern.subject) : "?")
+                  << ", P: " << (pattern.predicate.has_value() ? std::to_string(*pattern.predicate) : "?")
+                  << ", O: " << (pattern.object.has_value() ? std::to_string(*pattern.object) : "?") << "\n";
+
         // Select best index for this pattern
         IndexType index = SelectIndex(pattern);
+        std::cerr << "[DEBUG TripleStoreImpl::ScanPattern] Selected index: " << IndexTypeToString(index) << "\n";
 
         // Build scan key based on bound variables
         ARROW_ASSIGN_OR_RAISE(auto scan_result, ScanIndex(index, pattern));
+        std::cerr << "[DEBUG TripleStoreImpl::ScanPattern] ScanIndex returned table with " << scan_result->num_rows() << " rows\n";
 
         // Project to requested columns (unbound variables)
         ARROW_ASSIGN_OR_RAISE(auto projected, ProjectResult(scan_result, pattern));
+        std::cerr << "[DEBUG TripleStoreImpl::ScanPattern] After projection: " << projected->num_rows() << " rows\n";
 
         return projected;
     }
@@ -235,8 +262,12 @@ public:
     }
 
     arrow::Status Flush() override {
-        // MarbleDB handles flushing internally
-        // Could add explicit flush API if needed
+        std::cerr << "[DEBUG TripleStoreImpl::Flush] Calling db_->Flush()\n";
+        auto status = db_->Flush();
+        if (!status.ok()) {
+            return arrow::Status::IOError("Failed to flush MarbleDB: " + status.ToString());
+        }
+        std::cerr << "[DEBUG TripleStoreImpl::Flush] Flush successful\n";
         return arrow::Status::OK();
     }
 
@@ -447,6 +478,12 @@ private:
     arrow::Result<std::shared_ptr<arrow::Table>> ScanIndex(
         IndexType index, const TriplePattern& pattern) {
 
+        std::cerr << "[DEBUG TripleStoreImpl::ScanIndex] Scanning index: " << IndexTypeToString(index) << "\n";
+        std::cerr << "[DEBUG TripleStoreImpl::ScanIndex] Pattern - S: "
+                  << (pattern.subject.has_value() ? std::to_string(*pattern.subject) : "?")
+                  << ", P: " << (pattern.predicate.has_value() ? std::to_string(*pattern.predicate) : "?")
+                  << ", O: " << (pattern.object.has_value() ? std::to_string(*pattern.object) : "?") << "\n";
+
         // Build key range for MarbleDB scan
         marble::KeyRange range = BuildKeyRange(index, pattern);
 
@@ -463,6 +500,7 @@ private:
             return arrow::Status::IOError("Failed to create iterator for " + cf_name +
                                          ": " + status.ToString());
         }
+        std::cerr << "[DEBUG TripleStoreImpl::ScanIndex] Iterator created successfully\n";
 
         // Stream results into Arrow builders
         // Batch size: 10K rows for efficient memory usage
@@ -478,14 +516,24 @@ private:
 
         size_t rows_scanned = 0;
 
+        // DEBUG: First try seeking to (0,0,0) to see if ANY data exists
+        std::cerr << "[DEBUG TripleStoreImpl::ScanIndex] TESTING: Seeking to (0,0,0)\n";
+        auto test_key = marble::TripleKey(0, 0, 0);
+        it->Seek(test_key);
+        std::cerr << "[DEBUG TripleStoreImpl::ScanIndex] After Seek(0,0,0), iterator valid: " << (it->Valid() ? "YES" : "NO") << "\n";
+
         // Seek to start of range
         if (range.start()) {
+            std::cerr << "[DEBUG TripleStoreImpl::ScanIndex] Seeking to range start\n";
             it->Seek(*range.start());
         } else {
             // Full scan - start from the beginning using minimal key
+            std::cerr << "[DEBUG TripleStoreImpl::ScanIndex] Full scan - seeking to minimal key (0,0,0)\n";
             auto min_key = marble::TripleKey(0, 0, 0);
             it->Seek(min_key);
         }
+
+        std::cerr << "[DEBUG TripleStoreImpl::ScanIndex] After seek to range start, iterator valid: " << (it->Valid() ? "YES" : "NO") << "\n";
 
         // Iterate through matching records
         while (it->Valid()) {
@@ -522,6 +570,8 @@ private:
 
             it->Next();
         }
+
+        std::cerr << "[DEBUG TripleStoreImpl::ScanIndex] Scanned " << rows_scanned << " matching rows\n";
 
         // Check iterator status
         if (!it->status().ok()) {
