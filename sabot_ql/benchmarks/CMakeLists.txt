@@ -67,3 +67,25 @@ set_target_properties(bench_olympics_property_paths
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/benchmarks
 )
+
+# QLever Olympics benchmark (real queries from QLever docs)
+add_executable(bench_qlever_olympics
+    bench_qlever_olympics.cpp
+)
+
+target_link_libraries(bench_qlever_olympics
+    sabot_ql
+    Arrow::arrow_shared
+    ${MARBLE_LIB_DIR}/libmarble.a
+)
+
+target_include_directories(bench_qlever_olympics PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${MARBLE_INCLUDE_DIR}
+    ${ARROW_INCLUDE_DIR}
+)
+
+set_target_properties(bench_qlever_olympics
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/benchmarks
+)
