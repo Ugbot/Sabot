@@ -44,3 +44,26 @@ set_target_properties(bench_property_paths
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/benchmarks
 )
+
+# Olympic Dataset Property Path benchmark (Multi-Agent)
+add_executable(bench_olympics_property_paths
+    bench_olympics_property_paths.cpp
+)
+
+target_link_libraries(bench_olympics_property_paths
+    sabot_ql
+    Arrow::arrow_shared
+    ${MARBLE_LIB_DIR}/libmarble.a
+    pthread  # For multi-threading
+)
+
+target_include_directories(bench_olympics_property_paths PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${MARBLE_INCLUDE_DIR}
+    ${ARROW_INCLUDE_DIR}
+)
+
+set_target_properties(bench_olympics_property_paths
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/benchmarks
+)
