@@ -1,6 +1,7 @@
 #include <sabot_ql/operators/aggregate.h>
 #include <sstream>
 #include <chrono>
+#include <iostream>
 
 namespace sabot_ql {
 
@@ -57,17 +58,36 @@ std::string GroupByOperator::BuildGroupKey(
     for (size_t i = 0; i < key_indices.size(); ++i) {
         if (i > 0) oss << "|";
 
+        std::cerr << "[AGG DEBUG BuildGroupKey] Key index " << i << " = column " << key_indices[i] << "\n";
         auto array = batch->column(key_indices[i]);
+        std::cerr << "[AGG DEBUG BuildGroupKey] Array type: " << array->type()->ToString() << "\n";
+
         if (array->IsNull(row_idx)) {
+            std::cerr << "[AGG DEBUG BuildGroupKey] Value is NULL\n";
             oss << "NULL";
         } else {
+            std::cerr << "[AGG DEBUG BuildGroupKey] Getting scalar at row " << row_idx << "...\n";
             auto scalar_result = array->GetScalar(row_idx);
             if (scalar_result.ok()) {
-                oss << scalar_result.ValueOrDie()->ToString();
+                auto scalar = scalar_result.ValueOrDie();
+                std::cerr << "[AGG DEBUG BuildGroupKey] Got scalar, type: " << scalar->type->ToString() << "\n";
+                std::cerr << "[AGG DEBUG BuildGroupKey] Scalar is_valid: " << scalar->is_valid << "\n";
+
+                // Check if scalar is valid before calling ToString()
+                if (scalar && scalar->is_valid) {
+                    std::cerr << "[AGG DEBUG BuildGroupKey] Calling ToString()...\n";
+                    oss << scalar->ToString();
+                    std::cerr << "[AGG DEBUG BuildGroupKey] ToString() succeeded\n";
+                } else {
+                    std::cerr << "[AGG DEBUG BuildGroupKey] Scalar invalid, using INVALID\n";
+                    oss << "INVALID";
+                }
             }
         }
     }
-    return oss.str();
+    std::string result = oss.str();
+    std::cerr << "[AGG DEBUG BuildGroupKey] Returning: '" << result << "'\n";
+    return result;
 }
 
 arrow::Status GroupByOperator::ComputeAggregates() {
@@ -75,32 +95,50 @@ arrow::Status GroupByOperator::ComputeAggregates() {
         return arrow::Status::OK();
     }
 
+    std::cerr << "[AGG DEBUG] ComputeAggregates() called\n";
+
     auto start = std::chrono::high_resolution_clock::now();
 
     // Materialize input
+    std::cerr << "[AGG DEBUG] Materializing input...\n";
     ARROW_ASSIGN_OR_RAISE(input_table_, input_->GetAllResults());
+    std::cerr << "[AGG DEBUG] Input table has " << input_table_->num_rows() << " rows\n";
+    std::cerr << "[AGG DEBUG] Input schema: " << input_table_->schema()->ToString() << "\n";
 
     // Resolve group key indices
+    std::cerr << "[AGG DEBUG] Resolving group keys...\n";
     std::vector<int> key_indices;
     for (const auto& key : group_keys_) {
+        std::cerr << "[AGG DEBUG] Looking for group key: " << key << "\n";
         int idx = input_table_->schema()->GetFieldIndex(key);
         if (idx < 0) {
+            std::cerr << "[AGG DEBUG] ERROR: Group key not found: " << key << "\n";
             return arrow::Status::Invalid("Group key not found: " + key);
         }
+        std::cerr << "[AGG DEBUG] Found at index " << idx << "\n";
         key_indices.push_back(idx);
     }
 
     // Build groups - iterate through table batches
+    std::cerr << "[AGG DEBUG] Building groups from batches...\n";
     ARROW_ASSIGN_OR_RAISE(auto batches, arrow::TableBatchReader(*input_table_).ToRecordBatches());
+    std::cerr << "[AGG DEBUG] Got " << batches.size() << " batches\n";
 
     int64_t global_row_offset = 0;
-    for (const auto& batch : batches) {
+    for (size_t batch_idx = 0; batch_idx < batches.size(); ++batch_idx) {
+        const auto& batch = batches[batch_idx];
+        std::cerr << "[AGG DEBUG] Processing batch " << batch_idx << " with " << batch->num_rows() << " rows\n";
+        std::cerr << "[AGG DEBUG] Batch schema: " << batch->schema()->ToString() << "\n";
+
         for (int64_t i = 0; i < batch->num_rows(); ++i) {
+            std::cerr << "[AGG DEBUG] Building group key for row " << i << "...\n";
             std::string group_key = BuildGroupKey(batch, i, key_indices);
+            std::cerr << "[AGG DEBUG] Group key: '" << group_key << "'\n";
             groups_[group_key].push_back(global_row_offset + i);
         }
         global_row_offset += batch->num_rows();
     }
+    std::cerr << "[AGG DEBUG] Built " << groups_.size() << " groups\n";
 
     // Compute aggregates for each group
     std::vector<std::shared_ptr<arrow::Array>> output_columns;
@@ -224,6 +262,11 @@ arrow::Status GroupByOperator::ComputeAggregates() {
                                             } else if (scalar->type->id() == arrow::Type::FLOAT) {
                                                 value = static_cast<double>(
                                                     std::static_pointer_cast<arrow::FloatScalar>(scalar)->value);
+                                            } else {
+                                                // ERROR: Unsupported type for numeric aggregation
+                                                return arrow::Status::Invalid(
+                                                    "Cannot compute numeric aggregate on non-numeric column type: " +
+                                                    scalar->type->ToString());
                                             }
                                             ARROW_RETURN_NOT_OK(group_values_builder.Append(value));
                                         }
@@ -618,8 +661,21 @@ arrow::Result<std::shared_ptr<arrow::Scalar>> ComputeMin(
         arrow::compute::MinMax(array, arrow::compute::ScalarAggregateOptions::Defaults(), &ctx)
     );
 
-    auto min_max_scalar = std::static_pointer_cast<arrow::StructScalar>(result.scalar());
-    return min_max_scalar->field("min");
+    auto result_scalar = result.scalar();
+
+    // Check if result is valid before accessing fields
+    if (!result_scalar->is_valid) {
+        return arrow::MakeNullScalar(arrow::float64());
+    }
+
+    // Verify it's actually a StructScalar
+    if (result_scalar->type->id() != arrow::Type::STRUCT) {
+        return arrow::Status::Invalid(
+            "MinMax returned unexpected type: " + result_scalar->type->ToString());
+    }
+
+    auto min_max_scalar = std::static_pointer_cast<arrow::StructScalar>(result_scalar);
+    return min_max_scalar->field("min").ValueOrDie();
 }
 
 arrow::Result<std::shared_ptr<arrow::Scalar>> ComputeMax(
@@ -631,8 +687,21 @@ arrow::Result<std::shared_ptr<arrow::Scalar>> ComputeMax(
         arrow::compute::MinMax(array, arrow::compute::ScalarAggregateOptions::Defaults(), &ctx)
     );
 
-    auto min_max_scalar = std::static_pointer_cast<arrow::StructScalar>(result.scalar());
-    return min_max_scalar->field("max");
+    auto result_scalar = result.scalar();
+
+    // Check if result is valid before accessing fields
+    if (!result_scalar->is_valid) {
+        return arrow::MakeNullScalar(arrow::float64());
+    }
+
+    // Verify it's actually a StructScalar
+    if (result_scalar->type->id() != arrow::Type::STRUCT) {
+        return arrow::Status::Invalid(
+            "MinMax returned unexpected type: " + result_scalar->type->ToString());
+    }
+
+    auto min_max_scalar = std::static_pointer_cast<arrow::StructScalar>(result_scalar);
+    return min_max_scalar->field("max").ValueOrDie();
 }
 
 arrow::Result<std::shared_ptr<arrow::Scalar>> ComputeGroupConcat(
@@ -655,7 +724,10 @@ arrow::Result<std::shared_ptr<arrow::Scalar>> ComputeGroupConcat(
 
         auto scalar_result = array->GetScalar(i);
         if (scalar_result.ok()) {
-            oss << scalar_result.ValueOrDie()->ToString();
+            auto scalar = scalar_result.ValueOrDie();
+            if (scalar && scalar->is_valid) {
+                oss << scalar->ToString();
+            }
         }
     }
 

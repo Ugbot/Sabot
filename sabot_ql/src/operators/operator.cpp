@@ -20,7 +20,8 @@ std::string OperatorStats::ToString() const {
 }
 
 arrow::Result<std::shared_ptr<arrow::Table>> Operator::GetAllResults() {
-    SABOT_LOG_OPERATOR("GetAllResults: Starting on " << ToString());
+    std::cerr << "[Operator::GetAllResults] ENTRY\n";
+    SABOT_LOG_OPERATOR("GetAllResults: Starting");
     std::vector<std::shared_ptr<arrow::RecordBatch>> batches;
 
     SABOT_LOG_OPERATOR("Calling HasNextBatch()");
@@ -410,9 +411,12 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> DistinctOperator::GetNextBatc
                 if (array->IsNull(i)) {
                     row_hash << "NULL;";
                 } else {
-                    auto scalar = array->GetScalar(i);
-                    if (scalar.ok()) {
-                        row_hash << scalar.ValueOrDie()->ToString() << ";";
+                    auto scalar_result = array->GetScalar(i);
+                    if (scalar_result.ok()) {
+                        auto scalar = scalar_result.ValueOrDie();
+                        if (scalar && scalar->is_valid) {
+                            row_hash << scalar->ToString() << ";";
+                        }
                     }
                 }
             }

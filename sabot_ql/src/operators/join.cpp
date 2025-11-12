@@ -84,7 +84,14 @@ std::string JoinOperator::BuildJoinKey(
         } else {
             auto scalar_result = array->GetScalar(row_idx);
             if (scalar_result.ok()) {
-                oss << scalar_result.ValueOrDie()->ToString();
+                auto scalar = scalar_result.ValueOrDie();
+                // Check if scalar is valid before calling ToString()
+                // to avoid std::bad_variant_access
+                if (scalar && scalar->is_valid) {
+                    oss << scalar->ToString();
+                } else {
+                    oss << "INVALID";
+                }
             }
         }
     }
@@ -119,11 +126,14 @@ arrow::Status HashJoinOperator::BuildHashTable() {
 
     while (true) {
         auto batch_result = reader.Next();
-        if (!batch_result.ok() || !batch_result.ValueOrDie()) {
+        if (!batch_result.ok()) {
             break;
         }
 
         batch = batch_result.ValueOrDie();
+        if (!batch) {
+            break;
+        }
 
         for (int64_t i = 0; i < batch->num_rows(); ++i) {
             std::string join_key = BuildJoinKey(batch, i, key_indices);
@@ -148,7 +158,8 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> HashJoinOperator::ProbeNextBa
     // Resolve right key indices
     ARROW_ASSIGN_OR_RAISE(auto right_schema, right_->GetOutputSchema());
     std::vector<int> right_key_indices;
-    for (const auto& key : right_keys_) {
+    for (size_t i = 0; i < right_keys_.size(); ++i) {
+        const auto& key = right_keys_[i];
         int idx = right_schema->GetFieldIndex(key);
         if (idx < 0) {
             return arrow::Status::Invalid("Join key not found in right relation: " + key);
@@ -165,11 +176,12 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> HashJoinOperator::ProbeNextBa
             }
 
             ARROW_ASSIGN_OR_RAISE(current_probe_batch_, right_->GetNextBatch());
-            probe_row_idx_ = 0;
 
             if (!current_probe_batch_) {
                 return nullptr;
             }
+
+            probe_row_idx_ = 0;
         }
 
         // Probe hash table for matches
@@ -187,6 +199,7 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> HashJoinOperator::ProbeNextBa
             );
 
             auto it = hash_table_.find(join_key);
+
             if (it != hash_table_.end()) {
                 // Found matches
                 for (int64_t left_idx : it->second) {
@@ -202,7 +215,12 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> HashJoinOperator::ProbeNextBa
         // Build output batch
         if (!left_indices.empty() || !unmatched_right_indices.empty()) {
             ARROW_ASSIGN_OR_RAISE(auto output_schema, GetOutputSchema());
-            ARROW_ASSIGN_OR_RAISE(auto left_schema, left_->GetOutputSchema());
+
+            auto left_schema_result = left_->GetOutputSchema();
+            if (!left_schema_result.ok()) {
+                return left_schema_result.status();
+            }
+            auto left_schema = left_schema_result.ValueOrDie();
 
             std::vector<std::shared_ptr<arrow::Array>> output_columns;
 
@@ -215,10 +233,11 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> HashJoinOperator::ProbeNextBa
                 ARROW_ASSIGN_OR_RAISE(auto left_idx_array, left_idx_builder.Finish());
 
                 arrow::compute::ExecContext ctx;
-                ARROW_ASSIGN_OR_RAISE(
-                    auto left_taken,
-                    arrow::compute::Take(build_table_, left_idx_array, arrow::compute::TakeOptions::Defaults(), &ctx)
-                );
+                auto take_result = arrow::compute::Take(build_table_, left_idx_array, arrow::compute::TakeOptions::Defaults(), &ctx);
+                if (!take_result.ok()) {
+                    return take_result.status();
+                }
+                auto left_taken = take_result.ValueOrDie();
 
                 // Take rows from right side
                 arrow::Int64Builder right_idx_builder;
@@ -231,8 +250,43 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> HashJoinOperator::ProbeNextBa
                 );
 
                 // Combine left and right batches
-                auto left_batch = left_taken.record_batch();
-                auto right_batch = right_taken.record_batch();
+                // Take() on a Table returns a Datum with a Table, need to convert to RecordBatch
+                std::shared_ptr<arrow::RecordBatch> left_batch;
+                if (left_taken.kind() == arrow::Datum::TABLE) {
+                    auto table = left_taken.table();
+                    ARROW_ASSIGN_OR_RAISE(auto batches, arrow::TableBatchReader(*table).ToRecordBatches());
+                    if (batches.empty()) {
+                        return arrow::Status::Invalid("Take returned empty table");
+                    }
+                    // Concatenate all batches into one
+                    if (batches.size() == 1) {
+                        left_batch = batches[0];
+                    } else {
+                        ARROW_ASSIGN_OR_RAISE(left_batch, arrow::ConcatenateRecordBatches(batches));
+                    }
+                } else if (left_taken.kind() == arrow::Datum::RECORD_BATCH) {
+                    left_batch = left_taken.record_batch();
+                } else {
+                    return arrow::Status::Invalid("Take returned unexpected Datum type");
+                }
+
+                std::shared_ptr<arrow::RecordBatch> right_batch;
+                if (right_taken.kind() == arrow::Datum::TABLE) {
+                    auto table = right_taken.table();
+                    ARROW_ASSIGN_OR_RAISE(auto batches, arrow::TableBatchReader(*table).ToRecordBatches());
+                    if (batches.empty()) {
+                        return arrow::Status::Invalid("Take returned empty table");
+                    }
+                    if (batches.size() == 1) {
+                        right_batch = batches[0];
+                    } else {
+                        ARROW_ASSIGN_OR_RAISE(right_batch, arrow::ConcatenateRecordBatches(batches));
+                    }
+                } else if (right_taken.kind() == arrow::Datum::RECORD_BATCH) {
+                    right_batch = right_taken.record_batch();
+                } else {
+                    return arrow::Status::Invalid("Take returned unexpected Datum type");
+                }
 
                 // Add left columns
                 for (int i = 0; i < left_batch->num_columns(); ++i) {
