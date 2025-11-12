@@ -121,6 +121,23 @@ arrow::Status GroupByOperator::ComputeAggregates() {
 
     // Build groups - iterate through table batches
     std::cerr << "[AGG DEBUG] Building groups from batches...\n";
+
+    // Handle empty table case
+    if (input_table_->num_rows() == 0) {
+        std::cerr << "[AGG DEBUG] Input table is empty, returning empty result\n";
+        // Create empty table with correct schema
+        ARROW_ASSIGN_OR_RAISE(auto output_schema, GetOutputSchema());
+        std::vector<std::shared_ptr<arrow::Array>> empty_arrays;
+        for (int i = 0; i < output_schema->num_fields(); ++i) {
+            ARROW_ASSIGN_OR_RAISE(auto empty_array,
+                arrow::MakeArrayOfNull(output_schema->field(i)->type(), 0));
+            empty_arrays.push_back(empty_array);
+        }
+        result_table_ = arrow::Table::Make(output_schema, empty_arrays);
+        computed_ = true;
+        return arrow::Status::OK();
+    }
+
     ARROW_ASSIGN_OR_RAISE(auto batches, arrow::TableBatchReader(*input_table_).ToRecordBatches());
     std::cerr << "[AGG DEBUG] Got " << batches.size() << " batches\n";
 
