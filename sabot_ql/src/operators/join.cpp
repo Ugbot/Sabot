@@ -484,6 +484,11 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> NestedLoopJoinOperator::GetNe
         ARROW_RETURN_NOT_OK(MaterializeRightSide());
     }
 
+    // Handle empty right table - cross product with empty set is empty
+    if (right_table_->num_rows() == 0) {
+        return nullptr;
+    }
+
     // Load left batch if needed
     if (!current_left_batch_ || left_idx_ >= current_left_batch_->num_rows()) {
         if (!left_->HasNextBatch()) {
@@ -492,13 +497,72 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> NestedLoopJoinOperator::GetNe
 
         ARROW_ASSIGN_OR_RAISE(current_left_batch_, left_->GetNextBatch());
         left_idx_ = 0;
-        right_idx_ = 0;
     }
 
-    // TODO: Implement nested loop join
-    // For now, return not implemented
+    // Get output schema
+    ARROW_ASSIGN_OR_RAISE(auto output_schema, GetOutputSchema());
+    ARROW_ASSIGN_OR_RAISE(auto left_schema, left_->GetOutputSchema());
+    ARROW_ASSIGN_OR_RAISE(auto right_schema, right_->GetOutputSchema());
 
-    return arrow::Status::NotImplemented("Nested loop join not yet implemented");
+    // Build output batch: current left row combined with ALL right rows
+    int64_t num_output_rows = right_table_->num_rows();
+    std::vector<std::shared_ptr<arrow::Array>> output_columns;
+
+    // Add left columns (replicate current left row across all right rows)
+    for (int col_idx = 0; col_idx < current_left_batch_->num_columns(); ++col_idx) {
+        auto left_array = current_left_batch_->column(col_idx);
+        auto left_type = left_array->type();
+
+        // Extract the scalar at left_idx_
+        ARROW_ASSIGN_OR_RAISE(auto left_scalar, left_array->GetScalar(left_idx_));
+
+        // Create array of replicated scalars
+        ARROW_ASSIGN_OR_RAISE(auto replicated_array,
+            arrow::MakeArrayFromScalar(*left_scalar, num_output_rows));
+        output_columns.push_back(replicated_array);
+    }
+
+    // Add right columns (all rows from right table, skip join keys if any)
+    ARROW_ASSIGN_OR_RAISE(auto right_batches,
+        arrow::TableBatchReader(*right_table_).ToRecordBatches());
+
+    // Concatenate all right batches into one
+    std::shared_ptr<arrow::RecordBatch> right_combined;
+    if (right_batches.size() == 1) {
+        right_combined = right_batches[0];
+    } else if (right_batches.size() > 1) {
+        ARROW_ASSIGN_OR_RAISE(right_combined,
+            arrow::ConcatenateRecordBatches(right_batches));
+    } else {
+        // Empty right side
+        return nullptr;
+    }
+
+    for (int col_idx = 0; col_idx < right_combined->num_columns(); ++col_idx) {
+        std::string col_name = right_schema->field(col_idx)->name();
+
+        // Check if this is a join key (skip if it is, to avoid duplicate columns)
+        bool is_join_key = false;
+        for (const auto& key : right_keys_) {
+            if (key == col_name) {
+                is_join_key = true;
+                break;
+            }
+        }
+
+        if (!is_join_key) {
+            output_columns.push_back(right_combined->column(col_idx));
+        }
+    }
+
+    // Update stats
+    stats_.rows_processed += num_output_rows;
+    stats_.batches_processed++;
+
+    // Advance to next left row
+    left_idx_++;
+
+    return arrow::RecordBatch::Make(output_schema, num_output_rows, output_columns);
 }
 
 bool NestedLoopJoinOperator::HasNextBatch() const {

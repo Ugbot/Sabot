@@ -405,10 +405,19 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanBasicGraphPattern(
 
         if (join_vars.empty()) {
             // Cross product (no join variables)
-            // Use nested loop join or hash join with no keys
-            // For now, just use hash join with dummy keys
-            // TODO: Implement proper cross product operator
-            return arrow::Status::NotImplemented("Cross product not yet supported");
+            // Use nested loop join for cross product (Cartesian product)
+            SABOT_LOG_PLANNER("Using NestedLoopJoin for cross product (no join variables)");
+
+            current_op = std::make_shared<NestedLoopJoinOperator>(
+                current_op,
+                right_op,
+                std::vector<std::string>{},  // empty join keys for cross product
+                std::vector<std::string>{},  // empty join keys for cross product
+                JoinType::Inner
+            );
+
+            // Variable mappings already updated by PlanTriplePattern
+            continue;  // Move to next triple pattern
         }
 
         // Build join column names (same columns on both sides for zipper join)
@@ -438,6 +447,38 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanBasicGraphPattern(
             join_columns,  // same column names on both sides
             JoinType::Inner
         );
+
+        // Update var_to_column mappings to track renamed columns from JOIN
+        // HashJoinOperator renames conflicting columns (e.g., "object" → "object_0")
+        ARROW_ASSIGN_OR_RAISE(auto join_schema, current_op->GetOutputSchema());
+
+        // Collect updates in a separate map (can't modify map while iterating)
+        std::unordered_map<std::string, std::string> updates;
+
+        for (const auto& [var_name, old_column] : ctx.var_to_column) {
+            // Check if this column was renamed in the join output
+            int old_idx = join_schema->GetFieldIndex(old_column);
+            if (old_idx == -1) {
+                // Column was renamed - find the new name
+                // Try suffixed versions: old_column_0, old_column_1, etc.
+                for (int suffix = 0; suffix < 10; ++suffix) {
+                    std::string new_column = old_column + "_" + std::to_string(suffix);
+                    int new_idx = join_schema->GetFieldIndex(new_column);
+                    if (new_idx >= 0) {
+                        // Found it! Store the update
+                        updates[var_name] = new_column;
+                        SABOT_LOG_PLANNER("Found renamed column: " << var_name << " " << old_column << " → " << new_column);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Apply all updates
+        for (const auto& [var_name, new_column] : updates) {
+            ctx.var_to_column[var_name] = new_column;
+            SABOT_LOG_PLANNER("Updated var_to_column: " << var_name << " → " << new_column);
+        }
     }
 
     return current_op;
@@ -758,10 +799,28 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanGroupBy(
     const std::vector<AggregateExpression>& aggregates,
     PlanningContext& ctx) {
 
+    // DEBUG: Print entire ctx.var_to_column map
+    SABOT_LOG_PLANNER("=== PlanGroupBy: ctx.var_to_column contents ===");
+    for (const auto& [var, col] : ctx.var_to_column) {
+        SABOT_LOG_PLANNER("  " << var << " → " << col);
+    }
+
+    // Get input schema to see actual columns
+    ARROW_ASSIGN_OR_RAISE(auto input_schema, input->GetOutputSchema());
+    SABOT_LOG_PLANNER("=== Input schema columns: " << input_schema->ToString());
+
     // Convert GROUP BY variables to column names
     std::vector<std::string> group_keys;
     for (const auto& var : group_by.variables) {
-        group_keys.push_back(planning::VariableToColumnName(var));
+        // Use ctx.var_to_column to get actual column name (handles JOIN renames)
+        auto it = ctx.var_to_column.find(var.name);
+        if (it != ctx.var_to_column.end()) {
+            group_keys.push_back(it->second);
+            SABOT_LOG_PLANNER("GROUP BY variable " << var.name << " → column " << it->second);
+        } else {
+            SABOT_LOG_PLANNER("ERROR: GROUP BY variable " << var.name << " NOT FOUND in ctx.var_to_column!");
+            return arrow::Status::Invalid("GROUP BY variable not in scope: " + var.name);
+        }
     }
 
     // Convert SPARQL aggregates to AggregateSpec
@@ -783,7 +842,14 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanGroupBy(
             auto& arg_expr = agg.expr->arguments[0];
             if (arg_expr->IsConstant() && arg_expr->constant.has_value()) {
                 if (auto* var = std::get_if<Variable>(&*arg_expr->constant)) {
-                    input_column = planning::VariableToColumnName(*var);
+                    // Use ctx.var_to_column to get actual column name (handles JOIN renames)
+                    auto it = ctx.var_to_column.find(var->name);
+                    if (it != ctx.var_to_column.end()) {
+                        input_column = it->second;
+                        SABOT_LOG_PLANNER("Aggregate input variable " << var->name << " → column " << it->second);
+                    } else {
+                        return arrow::Status::Invalid("Aggregate input variable not in scope: " + var->name);
+                    }
                 } else {
                     return arrow::Status::Invalid("Aggregate argument must be a variable");
                 }
@@ -838,7 +904,14 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanAggregateOnly(
             auto& arg_expr = agg.expr->arguments[0];
             if (arg_expr->IsConstant() && arg_expr->constant.has_value()) {
                 if (auto* var = std::get_if<Variable>(&*arg_expr->constant)) {
-                    input_column = planning::VariableToColumnName(*var);
+                    // Use ctx.var_to_column to get actual column name (handles JOIN renames)
+                    auto it = ctx.var_to_column.find(var->name);
+                    if (it != ctx.var_to_column.end()) {
+                        input_column = it->second;
+                        SABOT_LOG_PLANNER("Aggregate input variable " << var->name << " → column " << it->second);
+                    } else {
+                        return arrow::Status::Invalid("Aggregate input variable not in scope: " + var->name);
+                    }
                 } else {
                     return arrow::Status::Invalid("Aggregate argument must be a variable");
                 }
