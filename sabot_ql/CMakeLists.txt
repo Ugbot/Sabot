@@ -43,6 +43,11 @@ set(SABOT_QL_SOURCES
     src/storage/vocabulary_marbledb.cpp
     src/storage/bulk_loader.cpp
 
+    # Graph algorithms
+    src/graph/csr_graph.cpp
+    src/graph/transitive_closure.cpp
+    src/graph/property_paths.cpp
+
     # Bindings
     src/bindings/bindings.cpp
 
@@ -76,6 +81,7 @@ set(SABOT_QL_SOURCES
     src/sparql/ast.cpp
     src/sparql/parser.cpp
     src/sparql/planner.cpp
+    src/sparql/property_path_planner.cpp
     src/sparql/expression_evaluator.cpp
     src/sparql/query_engine.cpp
     src/sparql/arrow_function_registry.cpp
@@ -113,6 +119,9 @@ install(DIRECTORY include/sabot_ql
 # Tests
 enable_testing()
 add_subdirectory(tests)
+
+# Benchmarks
+add_subdirectory(benchmarks)
 
 # Python bindings (optional - requires pybind11)
 option(BUILD_PYTHON_BINDINGS "Build Python bindings" OFF)

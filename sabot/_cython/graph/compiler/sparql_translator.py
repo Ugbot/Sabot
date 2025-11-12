@@ -573,18 +573,40 @@ class SPARQLTranslator:
         join_col = list(common_cols)[0]
 
         try:
-            # Perform hash join using Arrow compute
-            left_indices = pc.index_in(left.column(join_col), right.column(join_col))
+            # Perform hash join using simple Python-side hash map
+            # Build hash map from right table (smaller table ideally)
+            right_col = right.column(join_col)
+            right_dict = {}
+            for i in range(len(right_col)):
+                key = right_col[i].as_py()
+                if key not in right_dict:
+                    right_dict[key] = []
+                right_dict[key].append(i)
 
-            # Filter left table where indices are valid
-            mask = pc.is_valid(left_indices)
-            joined_left = left.filter(mask)
+            # Probe left table and collect matching rows
+            left_col = left.column(join_col)
+            matched_left_indices = []
+            matched_right_indices = []
+
+            for i in range(len(left_col)):
+                key = left_col[i].as_py()
+                if key in right_dict:
+                    # For each matching right row
+                    for right_idx in right_dict[key]:
+                        matched_left_indices.append(i)
+                        matched_right_indices.append(right_idx)
+
+            if not matched_left_indices:
+                # No matches, return empty table with correct schema
+                return pa.Table.from_arrays([], names=list(set(left.column_names) | set(right.column_names)))
+
+            # Build joined table
+            joined_left = left.take(matched_left_indices)
 
             # Add columns from right that are not in left
             right_only_cols = set(right.column_names) - set(left.column_names)
             for col in right_only_cols:
-                # Match indices
-                right_values = right.column(col).take(left_indices.filter(mask))
+                right_values = right.column(col).take(matched_right_indices)
                 joined_left = joined_left.append_column(col, right_values)
 
             return joined_left

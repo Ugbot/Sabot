@@ -1,4 +1,5 @@
 #include <sabot_ql/sparql/planner.h>
+#include <sabot_ql/sparql/property_path_planner.h>
 #include <sabot_ql/sparql/expression_evaluator.h>
 #include <sabot_ql/sparql/arrow_expression_builder.h>
 #include <sabot_ql/operators/join.h>
@@ -9,6 +10,7 @@
 #include <sabot_ql/operators/bind.h>
 // Layer 2 operators (new generic implementations)
 #include <sabot_ql/execution/scan_operator.h>
+#include <sabot_ql/execution/property_path_operator.h>
 #include <sabot_ql/execution/zipper_join.h>
 #include <sabot_ql/execution/filter_operator.h>
 #include <sabot_ql/operators/rename.h>
@@ -278,10 +280,38 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanTriplePattern(
     // Convert predicate
     SABOT_LOG_PLANNER("Converting predicate");
 
-    // Check if it's a property path (not yet supported)
+    // Check if it's a property path - use property path planner
     if (pattern.IsPredicatePropertyPath()) {
-        return arrow::Status::NotImplemented(
-            "Property paths are parsed but not yet supported in query execution");
+        SABOT_LOG_PLANNER("Planning property path");
+
+        // Extract PropertyPath from PredicatePosition
+        auto* path_ptr = std::get_if<PropertyPath>(&pattern.predicate);
+        if (!path_ptr) {
+            return arrow::Status::Invalid("Invalid property path type");
+        }
+
+        // Plan the property path
+        ARROW_ASSIGN_OR_RAISE(auto path_result, PlanPropertyPath(pattern, *path_ptr, ctx));
+
+        // Build variable bindings for this property path
+        std::unordered_map<std::string, std::string> var_bindings;
+        if (auto var = pattern.GetSubjectVar()) {
+            var_bindings["subject"] = *var;
+            ctx.var_to_column[*var] = "subject";
+        }
+        if (auto var = pattern.GetObjectVar()) {
+            var_bindings["object"] = *var;
+            ctx.var_to_column[*var] = "object";
+        }
+
+        // Create description for the operator
+        std::string description = pattern.ToString();
+
+        // Wrap result in PropertyPathOperator
+        auto op = std::make_shared<PropertyPathOperator>(path_result.bindings, description);
+
+        SABOT_LOG_PLANNER("Property path planned successfully");
+        return op;
     }
 
     // Extract RDFTerm from PredicatePosition

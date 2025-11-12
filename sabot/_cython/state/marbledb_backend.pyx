@@ -20,7 +20,7 @@ from typing import Optional
 
 from .state_backend cimport StateBackend
 
-from libc.stdint cimport uint64_t, uint32_t, int64_t
+from libc.stdint cimport uint64_t, uint32_t, int64_t, UINT64_MAX
 from libcpp.string cimport string
 from libcpp.memory cimport unique_ptr, shared_ptr, make_shared
 from libcpp.vector cimport vector
@@ -114,9 +114,6 @@ cdef class MarbleDBStateBackend(StateBackend):
     Uses LSMTree Point API with string key hashing for 15.68x read speedup.
     Provides Flink-compatible state management with <200ns point lookups.
     """
-    cdef unique_ptr[LSMTree] _lsm
-    cdef str _db_path
-    cdef cbool _is_open
 
     def __init__(self, str db_path="./sabot_marbledb_state"):
         """Initialize the MarbleDB state backend."""
@@ -162,13 +159,13 @@ cdef class MarbleDBStateBackend(StateBackend):
         if not self._is_open:
             return
 
-        cdef Status status
+        cdef Status shutdown_status
 
         try:
             if self._lsm.get() != NULL:
-                status = self._lsm.get().Shutdown()
-                if not status.ok():
-                    logger.warning(f"Shutdown warning: {status.ToString().decode('utf-8')}")
+                shutdown_status = self._lsm.get().Shutdown()
+                if not shutdown_status.ok():
+                    logger.warning(f"Shutdown warning: {shutdown_status.ToString().decode('utf-8')}")
                 self._lsm.reset()
 
             self._is_open = False
@@ -182,12 +179,12 @@ cdef class MarbleDBStateBackend(StateBackend):
         if not self._is_open or self._lsm.get() == NULL:
             return
 
-        cdef Status status
+        cdef Status flush_status
 
         try:
-            status = self._lsm.get().Flush()
-            if not status.ok():
-                logger.error(f"Flush failed: {status.ToString().decode('utf-8')}")
+            flush_status = self._lsm.get().Flush()
+            if not flush_status.ok():
+                logger.error(f"Flush failed: {flush_status.ToString().decode('utf-8')}")
         except Exception as e:
             logger.error(f"Flush exception: {e}")
 
@@ -480,3 +477,208 @@ cdef class MarbleDBStateBackend(StateBackend):
         except Exception as e:
             logger.error(f"Exists raw failed: {e}")
             return False
+
+    cpdef dict multi_get_raw(self, list keys):
+        """Batch get multiple keys - uses individual Gets for now (LSMTree doesn't have MultiGet)."""
+        if not self._is_open:
+            raise RuntimeError("MarbleDB backend not open")
+
+        cdef dict results = {}
+        cdef uint64_t key_hash
+        cdef string lsm_value
+        cdef Status status
+        cdef bytes value_bytes
+
+        try:
+            for key in keys:
+                key_hash = hash_string_to_uint64(key)
+                status = self._lsm.get().Get(key_hash, &lsm_value)
+                
+                if status.ok():
+                    decoded = decode_kv(lsm_value)
+                    if decoded is not None:
+                        stored_key, value_bytes = decoded
+                        if stored_key == key:
+                            results[key] = value_bytes
+                        else:
+                            results[key] = None
+                    else:
+                        results[key] = None
+                else:
+                    results[key] = None
+
+            return results
+
+        except Exception as e:
+            logger.error(f"MultiGet raw failed: {e}")
+            raise
+
+    cpdef void delete_range_raw(self, str start_key, str end_key):
+        """Delete range of keys - uses Scan + Delete (LSMTree doesn't have DeleteRange)."""
+        if not self._is_open:
+            raise RuntimeError("MarbleDB backend not open")
+
+        cdef uint64_t start_hash = hash_string_to_uint64(start_key)
+        cdef uint64_t end_hash = hash_string_to_uint64(end_key)
+        cdef vector[pair[uint64_t, string]] results
+        cdef Status status
+        cdef Status delete_status
+        cdef uint64_t key_hash
+        cdef str stored_key
+
+        try:
+            # Scan range
+            status = self._lsm.get().Scan(start_hash, end_hash, &results)
+            if not status.ok():
+                logger.warning(f"Scan failed in delete_range: {status.ToString().decode('utf-8')}")
+                return
+
+            # Delete each key in range
+            for pair_result in results:
+                key_hash = pair_result.first
+                decoded = decode_kv(pair_result.second)
+                if decoded is not None:
+                    stored_key, _ = decoded
+                    if start_key <= stored_key < end_key:
+                        delete_status = self._lsm.get().Delete(key_hash)
+                        if not delete_status.ok():
+                            logger.warning(f"Delete failed for key {stored_key}")
+
+        except Exception as e:
+            logger.error(f"DeleteRange raw failed: {e}")
+            raise
+
+    cpdef object scan_range(self, str start_key=None, str end_key=None):
+        """Scan range using LSMTree Scan() - returns Python iterator."""
+        if not self._is_open:
+            raise RuntimeError("MarbleDB backend not open")
+
+        cdef uint64_t start_hash
+        cdef uint64_t end_hash
+        cdef vector[pair[uint64_t, string]] results
+        cdef Status scan_status
+
+        try:
+            # Determine hash range
+            if start_key is not None:
+                start_hash = hash_string_to_uint64(start_key)
+            else:
+                start_hash = 0
+
+            if end_key is not None:
+                end_hash = hash_string_to_uint64(end_key)
+            else:
+                end_hash = UINT64_MAX
+
+            # Scan
+            scan_status = self._lsm.get().Scan(start_hash, end_hash, &results)
+            if not scan_status.ok():
+                raise RuntimeError(f"Scan failed: {scan_status.ToString().decode('utf-8')}")
+
+            # Return iterator over results
+            return MarbleDBScanIterator(results, start_key, end_key)
+
+        except Exception as e:
+            logger.error(f"Scan range failed: {e}")
+            raise
+
+    cpdef str checkpoint(self):
+        """Create checkpoint - flush and return checkpoint path."""
+        if not self._is_open:
+            raise RuntimeError("MarbleDB backend not open")
+
+        cdef Status flush_status
+        cdef str checkpoint_path
+
+        try:
+            # Flush to ensure all data is persisted
+            flush_status = self._lsm.get().Flush()
+            if not flush_status.ok():
+                raise RuntimeError(f"Flush failed: {flush_status.ToString().decode('utf-8')}")
+
+            # Create checkpoint path (using timestamp)
+            import time
+            checkpoint_path = f"{self._db_path}/checkpoints/{int(time.time())}"
+            
+            # For LSMTree, checkpoint is just the data directory
+            # In full MarbleDB API, this would use CreateCheckpoint()
+            import os
+            import shutil
+            os.makedirs(checkpoint_path, exist_ok=True)
+            
+            # Copy data directory
+            data_dir = f"{self._db_path}/data"
+            if os.path.exists(data_dir):
+                shutil.copytree(data_dir, f"{checkpoint_path}/data", dirs_exist_ok=True)
+
+            return checkpoint_path
+
+        except Exception as e:
+            logger.error(f"Checkpoint failed: {e}")
+            raise
+
+    cpdef void restore(self, str checkpoint_path):
+        """Restore from checkpoint."""
+        if not checkpoint_path:
+            raise ValueError("Checkpoint path required")
+
+        try:
+            # Close current DB
+            if self._is_open:
+                self.close()
+
+            # Restore data directory
+            import os
+            import shutil
+            data_dir = f"{self._db_path}/data"
+            checkpoint_data = f"{checkpoint_path}/data"
+            
+            if os.path.exists(checkpoint_data):
+                if os.path.exists(data_dir):
+                    shutil.rmtree(data_dir)
+                shutil.copytree(checkpoint_data, data_dir)
+
+            # Reopen
+            self.open()
+
+        except Exception as e:
+            logger.error(f"Restore failed: {e}")
+            raise
+
+
+cdef class MarbleDBScanIterator:
+    """Iterator for scan results."""
+    cdef vector[pair[uint64_t, string]] _results
+    cdef size_t _index
+    cdef str _start_key
+    cdef str _end_key
+
+    def __init__(self, vector[pair[uint64_t, string]] results, str start_key=None, str end_key=None):
+        self._results = results
+        self._index = 0
+        self._start_key = start_key
+        self._end_key = end_key
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while self._index < self._results.size():
+            pair_result = self._results[self._index]
+            self._index += 1
+            
+            decoded = decode_kv(pair_result.second)
+            if decoded is None:
+                continue
+            
+            stored_key, value_bytes = decoded
+            
+            # Filter by key range if specified
+            if self._start_key is not None and stored_key < self._start_key:
+                continue
+            if self._end_key is not None and stored_key >= self._end_key:
+                continue
+            
+            return (stored_key, value_bytes)
+        
+        raise StopIteration

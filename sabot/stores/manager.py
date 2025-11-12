@@ -21,6 +21,10 @@ from .base import StoreBackend, StoreBackendConfig
 from .memory import MemoryBackend
 from .rocksdb import RocksDBBackend
 from .redis import RedisBackend
+try:
+    from .marbledb import MarbleDBStoreBackend
+except ImportError:
+    MarbleDBStoreBackend = None
 from .tonbo import TonboBackend
 from .kafka import KafkaBackend
 from .checkpoint import CheckpointManager, CheckpointConfig
@@ -28,7 +32,8 @@ from .checkpoint import CheckpointManager, CheckpointConfig
 
 class BackendType(Enum):
     """Available backend types."""
-    TONBO = "tonbo"        # Preferred: High-performance Arrow-based LSM store
+    MARBLEDB = "marbledb"  # Default: High-performance Arrow-based LSM store with bitemporal versioning
+    TONBO = "tonbo"        # Legacy: High-performance Arrow-based LSM store
     KAFKA = "kafka"        # Optional: Distributed messaging for bridging jobs/systems
     MEMORY = "memory"      # Fallback: In-memory for development
     ROCKSDB = "rocksdb"    # Alternative: Embedded key-value store
@@ -45,7 +50,7 @@ class StateIsolation(Enum):
 @dataclass
 class StateStoreConfig:
     """Configuration for the state store manager."""
-    backend_type: BackendType = BackendType.TONBO  # Tonbo is now the preferred backend
+    backend_type: BackendType = BackendType.MARBLEDB  # MarbleDB is now the default backend
     isolation_level: StateIsolation = StateIsolation.SHARED
 
     # Backend-specific configs
@@ -66,6 +71,11 @@ class StateStoreConfig:
             'namespace': 'sabot',
             'serializer': 'json'
         }
+    ))
+
+    marbledb_config: StoreBackendConfig = field(default_factory=lambda: StoreBackendConfig(
+        backend_type="marbledb",
+        path=Path("./sabot_state/marbledb")
     ))
 
     tonbo_config: StoreBackendConfig = field(default_factory=lambda: StoreBackendConfig(
@@ -430,6 +440,20 @@ class StateStoreManager:
                 config.options['namespace'] = f"{config.options.get('namespace', 'sabot')}:{backend_key}"
             backend = RedisBackend(config)
 
+        elif self.config.backend_type == BackendType.MARBLEDB:
+            try:
+                from .marbledb import MarbleDBStoreBackend
+                config = self.config.marbledb_config.copy()
+                # Add table-specific path for TABLE isolation
+                if self.config.isolation_level == StateIsolation.TABLE:
+                    config.path = config.path / backend_key
+                backend = MarbleDBStoreBackend(config)
+            except ImportError as e:
+                raise ImportError(
+                    f"MarbleDB backend not available: {e}. "
+                    "Ensure MarbleDB is built and Cython extensions are compiled."
+                ) from e
+
         elif self.config.backend_type == BackendType.TONBO:
             config = self.config.tonbo_config.copy()
             # Add table-specific path for TABLE isolation
@@ -453,6 +477,18 @@ class StateStoreManager:
 
         return backend
 
+    async def _get_backend(self, table_name: str) -> StoreBackend:
+        """Get backend for a table."""
+        backend_key = self._get_backend_key(table_name)
+        if self.config.isolation_level == StateIsolation.SHARED:
+            if self.shared_backend is None:
+                raise RuntimeError("Shared backend not initialized. Call start() first.")
+            return self.shared_backend
+        else:
+            if backend_key not in self.backends:
+                return await self._create_backend(backend_key)
+            return self.backends[backend_key]
+
     async def set_table_data(self, table_name: str, arrow_table: object) -> None:
         """
         Store Arrow table data using Tonbo's Arrow integration.
@@ -463,7 +499,9 @@ class StateStoreManager:
         """
         backend = await self._get_backend(table_name)
         if hasattr(backend, 'arrow_insert_batch'):
-            await backend.arrow_insert_batch(arrow_table)
+            # Insert batches into the table
+            for batch in arrow_table.to_batches():
+                await backend.arrow_insert_batch(table_name, batch)
         else:
             # Fallback: convert to individual records
             for batch in arrow_table.to_batches():

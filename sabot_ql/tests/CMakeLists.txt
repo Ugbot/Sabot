@@ -245,3 +245,19 @@ target_include_directories(test_sparql_e2e PRIVATE
     ${MARBLE_INCLUDE_DIR}
     ${ARROW_INCLUDE_DIR}
 )
+
+# End-to-end integration test for SPARQL 1.1 property paths
+add_executable(test_property_paths_e2e test_property_paths_e2e.cpp)
+
+target_link_libraries(test_property_paths_e2e
+    sabot_ql
+    Arrow::arrow_shared
+    ${CMAKE_SOURCE_DIR}/../vendor/arrow/cpp/build/install/lib/libarrow_compute.dylib
+    ${MARBLE_LIB_DIR}/libmarble.a
+)
+
+target_include_directories(test_property_paths_e2e PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${MARBLE_INCLUDE_DIR}
+    ${ARROW_INCLUDE_DIR}
+)

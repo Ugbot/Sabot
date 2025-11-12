@@ -32,15 +32,8 @@ arrow::Result<std::shared_ptr<arrow::Schema>> GroupByOperator::GetOutputSchema()
             case AggregateFunction::Avg:
             case AggregateFunction::Min:
             case AggregateFunction::Max:
-                // Use type of input column
-                {
-                    int idx = input_schema->GetFieldIndex(agg.input_column);
-                    if (idx >= 0) {
-                        output_type = input_schema->field(idx)->type();
-                    } else {
-                        output_type = arrow::float64();  // Default
-                    }
-                }
+                // Always float64 to match DoubleBuilder used in ComputeAggregates
+                output_type = arrow::float64();
                 break;
 
             case AggregateFunction::GroupConcat:

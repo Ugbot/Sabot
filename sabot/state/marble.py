@@ -112,19 +112,21 @@ class MarbleDBBackend(TransactionalStateBackend, DistributedStateBackend):
     
     async def scan(self, prefix: str = "") -> AsyncIterator[Tuple[str, bytes]]:
         """Scan keys with prefix."""
-        # TODO: Implement MarbleDB scan with prefix
-        # For now, not implemented efficiently - would require Scan() in C++
-        raise NotImplementedError("Scan not yet implemented for MarbleDB backend")
+        if self._backend is None:
+            raise RuntimeError("MarbleDB backend not initialized")
+        
+        # Use scan_range with prefix filtering
+        iterator = self._backend.scan_range()
+        for key, value in iterator:
+            if prefix == "" or key.startswith(prefix):
+                yield (key, value)
     
     async def multi_get(self, keys: List[str]) -> Dict[str, Optional[bytes]]:
         """Batch get multiple keys."""
         if self._backend is None:
             raise RuntimeError("MarbleDB backend not initialized")
-        # Use sequential gets for now (could optimize with C++ MultiGet later)
-        result = {}
-        for key in keys:
-            result[key] = await self.get(key)
-        return result
+        # Use Cython MultiGet for efficiency
+        return self._backend.multi_get_raw(keys)
     
     async def multi_put(self, items: Dict[str, bytes]) -> None:
         """Batch put multiple items."""
@@ -136,23 +138,38 @@ class MarbleDBBackend(TransactionalStateBackend, DistributedStateBackend):
     
     async def clear(self) -> None:
         """Clear all data."""
-        # TODO: Implement with MarbleDB DeleteRange() or full scan+delete
-        raise NotImplementedError("Clear not yet implemented for MarbleDB backend")
+        if self._backend is None:
+            raise RuntimeError("MarbleDB backend not initialized")
+        # Use delete_range with empty bounds to clear all
+        # Note: This is inefficient but works. Better would be to drop and recreate DB
+        iterator = self._backend.scan_range()
+        keys_to_delete = []
+        for key, _ in iterator:
+            keys_to_delete.append(key)
+        
+        # Delete in batches
+        for key in keys_to_delete:
+            await self.delete(key)
 
     async def items(self) -> List[Tuple[str, bytes]]:
         """Get all items."""
-        # TODO: Implement with MarbleDB Scan()
-        raise NotImplementedError("Items not yet implemented for MarbleDB backend")
+        if self._backend is None:
+            raise RuntimeError("MarbleDB backend not initialized")
+        # Use scan_range to get all items
+        iterator = self._backend.scan_range()
+        return list(iterator)
     
     async def checkpoint(self) -> str:
         """Create checkpoint."""
-        # TODO: Implement with MarbleDB checkpoint system
-        raise NotImplementedError("Checkpoint not yet implemented for MarbleDB backend")
+        if self._backend is None:
+            raise RuntimeError("MarbleDB backend not initialized")
+        return self._backend.checkpoint()
 
     async def restore(self, checkpoint_id: str) -> None:
         """Restore from checkpoint."""
-        # TODO: Implement with MarbleDB restore system
-        raise NotImplementedError("Restore not yet implemented for MarbleDB backend")
+        if self._backend is None:
+            raise RuntimeError("MarbleDB backend not initialized")
+        self._backend.restore(checkpoint_id)
     
     def close(self) -> None:
         """Close MarbleDB."""
@@ -204,8 +221,9 @@ class MarbleDBBackend(TransactionalStateBackend, DistributedStateBackend):
     
     async def delete_range(self, start_key: str, end_key: str) -> None:
         """Efficient range delete using MarbleDB DeleteRange()."""
-        # TODO: Call MarbleDB DeleteRange() for 1000x speedup
-        await super().delete_range(start_key, end_key)
+        if self._backend is None:
+            raise RuntimeError("MarbleDB backend not initialized")
+        self._backend.delete_range_raw(start_key, end_key)
     
     async def get_stats(self) -> Dict[str, Any]:
         """Get MarbleDB statistics."""

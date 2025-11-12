@@ -9,6 +9,7 @@ TripleStore: Real MarbleDB-backed implementation (No in-memory caches!)
 #include <marble/record.h>
 #include <unordered_map>
 #include <algorithm>
+#include <iostream>
 
 namespace sabot_ql {
 
@@ -104,14 +105,23 @@ public:
     arrow::Result<std::shared_ptr<arrow::Table>> ScanPattern(
         const TriplePattern& pattern) override {
 
+        std::cerr << "[DEBUG ScanPattern] Called with pattern - S: " << (pattern.subject.has_value() ? std::to_string(*pattern.subject) : "?")
+                  << ", P: " << (pattern.predicate.has_value() ? std::to_string(*pattern.predicate) : "?")
+                  << ", O: " << (pattern.object.has_value() ? std::to_string(*pattern.object) : "?") << "\n";
+
         // Choose best index for this pattern
         IndexType index = SelectIndex(pattern);
+        std::cerr << "[DEBUG ScanPattern] Selected index: " << GetColumnFamilyName(index) << "\n";
 
         // Scan using MarbleDB Iterator API (real implementation!)
         ARROW_ASSIGN_OR_RAISE(auto scan_result, ScanIndexMarbleDB(index, pattern));
 
+        std::cerr << "[DEBUG ScanPattern] ScanIndexMarbleDB returned table with " << scan_result->num_rows() << " rows\n";
+
         // Project to requested columns (unbound variables)
         ARROW_ASSIGN_OR_RAISE(auto projected, ProjectResult(scan_result, pattern));
+
+        std::cerr << "[DEBUG ScanPattern] After projection: " << projected->num_rows() << " rows\n";
 
         return projected;
     }
@@ -183,6 +193,11 @@ private:
         // Get column family for this index
         std::string cf_name = GetColumnFamilyName(index);
 
+        std::cerr << "[DEBUG ScanIndexMarbleDB] Scanning index: " << cf_name << "\n";
+        std::cerr << "[DEBUG ScanIndexMarbleDB] Pattern - S: " << (pattern.subject.has_value() ? std::to_string(*pattern.subject) : "?")
+                  << ", P: " << (pattern.predicate.has_value() ? std::to_string(*pattern.predicate) : "?")
+                  << ", O: " << (pattern.object.has_value() ? std::to_string(*pattern.object) : "?") << "\n";
+
         // Determine key range based on bound variables
         marble::KeyRange key_range = CreateKeyRange(index, pattern);
 
@@ -190,11 +205,15 @@ private:
         marble::ReadOptions read_opts;
         std::unique_ptr<marble::Iterator> iter;
 
-        auto status = db_->NewIterator(read_opts, key_range, &iter);
+        // FIX: Pass column family name to scan the correct index
+        auto status = db_->NewIterator(cf_name, read_opts, key_range, &iter);
         if (!status.ok()) {
+            std::cerr << "[DEBUG ScanIndexMarbleDB] Failed to create iterator: " << status.ToString() << "\n";
             return arrow::Status::IOError("Failed to create iterator: " +
                                          status.ToString());
         }
+
+        std::cerr << "[DEBUG ScanIndexMarbleDB] Iterator created successfully\n";
 
         // Build result by scanning with iterator
         arrow::Int64Builder col1_builder;
@@ -208,7 +227,10 @@ private:
         ARROW_RETURN_NOT_OK(col3_builder.Reserve(estimated_size));
 
         // Scan all matching triples using MarbleDB Iterator
+        size_t records_scanned = 0;
+        size_t rows_matched = 0;
         while (iter->Valid()) {
+            records_scanned++;
             // Get record from iterator
             auto record = iter->value();
 
@@ -235,6 +257,7 @@ private:
 
                     // Apply pattern filter
                     if (CheckPatternMatch(index, pattern, col1, col2, col3)) {
+                        rows_matched++;
                         ARROW_RETURN_NOT_OK(col1_builder.Append(col1));
                         ARROW_RETURN_NOT_OK(col2_builder.Append(col2));
                         ARROW_RETURN_NOT_OK(col3_builder.Append(col3));
@@ -245,6 +268,8 @@ private:
             // Move to next record
             iter->Next();
         }
+
+        std::cerr << "[DEBUG ScanIndexMarbleDB] Scanned " << records_scanned << " records, matched " << rows_matched << " rows\n";
 
         // Check iterator status
         if (!iter->status().ok()) {

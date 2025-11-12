@@ -68,6 +68,7 @@ set(BASIC_TESTS
     unit/test_optimization_strategies.cpp
     unit/test_index_persistence.cpp
     unit/test_index_persistence_e2e.cpp
+    unit/test_triple_store_minimal.cpp
     arrow/test_reader.cpp
     integration/test_mvcc_comprehensive.cpp
     integration/test_optimization_integration.cpp
