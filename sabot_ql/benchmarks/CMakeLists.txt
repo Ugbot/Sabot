@@ -89,3 +89,26 @@ set_target_properties(bench_qlever_olympics
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/benchmarks
 )
+
+# SPARQL Arrow Features Test (minimal, fast verification)
+add_executable(test_sparql_features
+    test_sparql_features.cpp
+)
+
+target_link_libraries(test_sparql_features
+    sabot_ql
+    Arrow::arrow_shared
+    ${ARROW_INCLUDE_DIR}/../lib/libarrow_compute.dylib
+    ${MARBLE_LIB_DIR}/libmarble.a
+)
+
+target_include_directories(test_sparql_features PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${MARBLE_INCLUDE_DIR}
+    ${ARROW_INCLUDE_DIR}
+)
+
+set_target_properties(test_sparql_features
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/benchmarks
+)
