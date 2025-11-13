@@ -43,3 +43,6 @@
 [submodule "benchmarks/pyspark-benchmark"]
 	path = benchmarks/pyspark-benchmark
 	url = https://github.com/DIYBigData/pyspark-benchmark.git
+[submodule "benchmarks/polars-benchmark"]
+	path = benchmarks/polars-benchmark
+	url = https://github.com/pola-rs/polars-benchmark.git

@@ -675,8 +675,16 @@ arrow::Result<std::shared_ptr<Operator>> QueryPlanner::PlanOrderBy(
     std::vector<SortKey> sort_keys;
 
     for (const auto& order : order_by) {
-        // Map SPARQL variable to column name
-        std::string column_name = planning::VariableToColumnName(order.var);
+        // Map SPARQL variable to actual column name using context
+        std::string var_name = order.var.name;
+        auto it = ctx.var_to_column.find(var_name);
+        std::string column_name;
+
+        if (it != ctx.var_to_column.end()) {
+            column_name = it->second;  // Use mapped column name
+        } else {
+            column_name = var_name;     // Fallback to variable name
+        }
 
         // Convert SPARQL OrderDirection to SortDirection
         SortDirection direction = (order.direction == OrderDirection::Ascending)
