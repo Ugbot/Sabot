@@ -229,8 +229,19 @@ arrow::Result<std::shared_ptr<arrow::Array>> ColumnComparisonExpression::Evaluat
         return arrow::Status::Invalid("Column not found: " + right_column_);
     }
 
-    auto left_array = table->column(left_idx)->chunk(0);
-    auto right_array = table->column(right_idx)->chunk(0);
+    // Get column chunks (check for empty columns)
+    auto left_col = table->column(left_idx);
+    auto right_col = table->column(right_idx);
+
+    if (left_col->num_chunks() == 0) {
+        return arrow::Status::Invalid("Left column has no chunks: " + left_column_);
+    }
+    if (right_col->num_chunks() == 0) {
+        return arrow::Status::Invalid("Right column has no chunks: " + right_column_);
+    }
+
+    auto left_array = left_col->chunk(0);
+    auto right_array = right_col->chunk(0);
 
     // Apply comparison using Arrow compute CallFunction API
     arrow::compute::ExecContext ctx;

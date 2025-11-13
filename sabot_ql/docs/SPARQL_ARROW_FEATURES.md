@@ -1,11 +1,13 @@
 # SPARQL Arrow Kernel Features
 
 **Date:** 2025-01-13
-**Status:** Complete (3/3 features implemented + O3 optimizations)
+**Status:** 2/3 features working + O3 optimizations
 **Commits:**
-- 57b232bf - Cross Product Joins (NestedLoopJoinOperator)
-- 5115d1a0 - Variable-to-Variable FILTER (ColumnComparisonExpression)
-- 4c9cc221 - O3 optimizations enabled (-O3 -march=native -DNDEBUG)
+- 57b232bf - Cross Product Joins (NestedLoopJoinOperator) ✅
+- 5115d1a0 - Variable-to-Variable FILTER (ColumnComparisonExpression) ⚠️ Crashes
+- 4c9cc221 - O3 optimizations enabled (-O3 -march=native -DNDEBUG) ✅
+- a0c756ac - Arrow compute registry initialization ✅
+- 21c50a0e - ORDER BY column naming bug fix ✅
 
 ## Overview
 
@@ -81,7 +83,14 @@ SELECT ?athlete1 ?athlete2 WHERE {
 
 ## Feature 2: Variable-to-Variable FILTER Comparisons
 
-### Status: ✅ Complete (Commit 5115d1a0)
+### Status: ⚠️ Implementation Complete but Crashes (Commit 5115d1a0)
+
+**Known Issue**: Segmentation fault when executing queries with variable-to-variable comparisons.
+- Implementation exists and is integrated into planner
+- Crashes during join/filter operation (exit code 139)
+- Scan operations complete successfully before crash
+- Safety checks added (column chunk validation) but crash persists
+- Needs debugging with stack trace to identify root cause
 
 ### Problem
 SPARQL FILTER expressions comparing two variables were unsupported:
