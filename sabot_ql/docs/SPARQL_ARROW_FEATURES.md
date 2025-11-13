@@ -1,12 +1,15 @@
 # SPARQL Arrow Kernel Features
 
 **Date:** 2025-01-13
-**Status:** Complete (3/3 features implemented)
-**Commits:** 57b232bf, 5115d1a0
+**Status:** Complete (3/3 features implemented + O3 optimizations)
+**Commits:**
+- 57b232bf - Cross Product Joins (NestedLoopJoinOperator)
+- 5115d1a0 - Variable-to-Variable FILTER (ColumnComparisonExpression)
+- 4c9cc221 - O3 optimizations enabled (-O3 -march=native -DNDEBUG)
 
 ## Overview
 
-Three critical SPARQL features were implemented using Apache Arrow compute kernels for high-performance vectorized execution. All features are production-ready and fully integrated into the query planner.
+Three critical SPARQL features were implemented using Apache Arrow compute kernels for high-performance vectorized execution. All features are production-ready, fully integrated into the query planner, and compiled with -O3 optimizations for maximum performance.
 
 ## Feature 1: Cross Product Joins (Cartesian Product)
 
