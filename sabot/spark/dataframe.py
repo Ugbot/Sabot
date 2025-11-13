@@ -140,12 +140,21 @@ class DataFrame:
         self._session = session
         
         # Convert to Stream if needed
-        if hasattr(stream_or_table, 'filter'):
-            # Already a Stream
+        import pyarrow as pa
+        from sabot.api.stream import Stream
+        
+        if isinstance(stream_or_table, Stream):
+            # Already a Sabot Stream
             self._stream = stream_or_table
+        elif isinstance(stream_or_table, pa.Table):
+            # Arrow Table - convert to Stream
+            self._stream = Stream.from_table(stream_or_table)
+        elif hasattr(stream_or_table, 'to_batches'):
+            # Has to_batches (Arrow table-like)
+            self._stream = Stream(stream_or_table.to_batches())
         else:
-            # Convert table to Stream
-            self._stream = session._engine.stream.from_table(stream_or_table)
+            # Assume iterable of batches
+            self._stream = Stream(stream_or_table)
     
     # Transformations (lazy)
     

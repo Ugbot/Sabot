@@ -1,0 +1,224 @@
+#!/usr/bin/env python3
+"""
+sabot-submit: Submit Sabot jobs to local or distributed cluster
+
+Equivalent to spark-submit for Apache Spark.
+Provides compatibility for lift-and-shift PySpark migration.
+
+Usage:
+    sabot-submit --master local[*] my_job.py
+    sabot-submit --master sabot://coordinator:8000 my_job.py --arg1 value1
+    sabot-submit --master local[4] --name MyJob --conf key=value my_job.py
+
+Examples:
+    # Local mode (single machine, all cores)
+    sabot-submit --master local[*] process_data.py /data/input /data/output
+    
+    # Local mode (4 workers)
+    sabot-submit --master local[4] process_data.py /data/input
+    
+    # Distributed mode (Sabot cluster)
+    sabot-submit --master sabot://prod-coordinator:8000 \\
+        --name ProductionETL \\
+        --conf sabot.shuffle.partitions=200 \\
+        etl_job.py s3://input/ s3://output/
+    
+    # With dependencies
+    sabot-submit --master local[*] \\
+        --py-files helper.py,utils.py \\
+        main_job.py
+
+Compatibility:
+    - Same CLI as spark-submit for easy migration
+    - Supports local[N] and distributed masters
+    - Configuration via --conf like Spark
+    - Job arguments pass through
+"""
+
+import sys
+import os
+import argparse
+import subprocess
+from pathlib import Path
+
+
+def parse_args():
+    """Parse command-line arguments (Spark-compatible)."""
+    parser = argparse.ArgumentParser(
+        description='Submit Sabot job to local or distributed cluster',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__
+    )
+    
+    # Spark-compatible options
+    parser.add_argument('--master', default='local[*]',
+                       help='Master URL: local[N] or sabot://host:port (default: local[*])')
+    parser.add_argument('--name', '--app-name', dest='name',
+                       help='Job name')
+    parser.add_argument('--conf', action='append', default=[],
+                       help='Configuration property (key=value)')
+    parser.add_argument('--py-files', 
+                       help='Comma-separated list of Python files to add to PYTHONPATH')
+    parser.add_argument('--files',
+                       help='Comma-separated list of files to distribute')
+    parser.add_argument('--archives',
+                       help='Comma-separated list of archives to extract')
+    parser.add_argument('--jars',
+                       help='Comma-separated list of JARs (ignored - Sabot is Python/C++)')
+    
+    # Sabot-specific options
+    parser.add_argument('--workers', type=int,
+                       help='Number of worker threads (local mode)')
+    parser.add_argument('--memory', 
+                       help='Memory per worker (e.g., 4G, 512M)')
+    parser.add_argument('--driver-memory',
+                       help='Driver memory allocation')
+    parser.add_argument('--executor-memory',
+                       help='Executor memory (maps to agent memory)')
+    
+    # Job script and arguments
+    parser.add_argument('script', help='Python script to run')
+    parser.add_argument('args', nargs='*', help='Arguments to pass to script')
+    
+    return parser.parse_args()
+
+
+def setup_environment(args):
+    """Setup environment for job execution."""
+    env = os.environ.copy()
+    
+    # Add py-files to PYTHONPATH
+    if args.py_files:
+        py_files = args.py_files.split(',')
+        pythonpath = env.get('PYTHONPATH', '')
+        for f in py_files:
+            pythonpath = f"{os.path.abspath(f)}:{pythonpath}"
+        env['PYTHONPATH'] = pythonpath
+    
+    # Set Sabot configuration from --conf options
+    for conf in args.conf:
+        if '=' in conf:
+            key, value = conf.split('=', 1)
+            env_key = f"SABOT_{key.upper().replace('.', '_')}"
+            env[env_key] = value
+    
+    # Set master
+    env['SABOT_MASTER'] = args.master
+    
+    # Set job name
+    if args.name:
+        env['SABOT_APP_NAME'] = args.name
+    
+    # Set worker configuration
+    if args.workers:
+        env['SABOT_WORKERS'] = str(args.workers)
+    
+    if args.memory:
+        env['SABOT_WORKER_MEMORY'] = args.memory
+    
+    return env
+
+
+def run_local(args, env):
+    """Run job in local mode."""
+    print(f"🚀 Starting Sabot job in local mode: {args.master}")
+    print(f"   Script: {args.script}")
+    if args.args:
+        print(f"   Args: {' '.join(args.args)}")
+    print()
+    
+    # Build command
+    cmd = [sys.executable, args.script] + args.args
+    
+    # Execute
+    try:
+        result = subprocess.run(cmd, env=env, check=False)
+        return result.returncode
+    except KeyboardInterrupt:
+        print("\n⚠️  Job interrupted by user")
+        return 130
+    except Exception as e:
+        print(f"❌ Job execution failed: {e}")
+        return 1
+
+
+def run_distributed(args, env):
+    """Run job in distributed mode."""
+    coordinator = args.master.replace('sabot://', '')
+    
+    print(f"🚀 Starting Sabot job in distributed mode")
+    print(f"   Coordinator: {coordinator}")
+    print(f"   Script: {args.script}")
+    if args.args:
+        print(f"   Args: {' '.join(args.args)}")
+    print()
+    
+    # For distributed mode, we'd use Sabot's job submission API
+    # For now, inject coordinator info and run locally
+    # The job itself will connect to coordinator
+    
+    env['SABOT_COORDINATOR'] = coordinator
+    env['SABOT_MODE'] = 'distributed'
+    
+    cmd = [sys.executable, args.script] + args.args
+    
+    try:
+        result = subprocess.run(cmd, env=env, check=False)
+        return result.returncode
+    except KeyboardInterrupt:
+        print("\n⚠️  Job interrupted by user")
+        return 130
+    except Exception as e:
+        print(f"❌ Job execution failed: {e}")
+        return 1
+
+
+def main():
+    """Main entry point."""
+    args = parse_args()
+    
+    # Validate script exists
+    if not os.path.exists(args.script):
+        print(f"❌ Script not found: {args.script}")
+        return 1
+    
+    # Setup environment
+    env = setup_environment(args)
+    
+    # Print configuration
+    print("="*70)
+    print("SABOT-SUBMIT - Job Submission Tool")
+    print("="*70)
+    if args.name:
+        print(f"Job name: {args.name}")
+    print(f"Master: {args.master}")
+    if args.conf:
+        print(f"Config: {', '.join(args.conf)}")
+    print("="*70)
+    print()
+    
+    # Determine execution mode
+    if args.master.startswith('local'):
+        returncode = run_local(args, env)
+    elif args.master.startswith('sabot://'):
+        returncode = run_distributed(args, env)
+    else:
+        print(f"❌ Unknown master URL: {args.master}")
+        print("   Supported: local[N] or sabot://host:port")
+        return 1
+    
+    # Print completion status
+    print()
+    print("="*70)
+    if returncode == 0:
+        print("✅ Job completed successfully")
+    else:
+        print(f"❌ Job failed with exit code {returncode}")
+    print("="*70)
+    
+    return returncode
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+

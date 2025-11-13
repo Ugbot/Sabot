@@ -58,6 +58,8 @@ struct Status {
     Status(StatusCode c, const std::string& msg = "") : code(c), message(msg) {}
     
     bool ok() const { return code == StatusCode::OK; }
+    bool IsNotFound() const { return code == StatusCode::NotFound; }
+    
     static Status OK() { return Status(); }
     static Status NotFound(const std::string& msg = "") { return Status(StatusCode::NotFound, msg); }
     static Status InvalidArgument(const std::string& msg = "") { return Status(StatusCode::InvalidArgument, msg); }
@@ -147,6 +149,20 @@ public:
     // Query operations
     virtual Status ScanTable(const std::string& table_name,
                             std::shared_ptr<arrow::Table>* table) = 0;
+    
+    // Helper: Scan table and return as batches (for easier Cython conversion)
+    virtual Status ScanTableBatches(const std::string& table_name,
+                                    std::vector<std::shared_ptr<arrow::RecordBatch>>* batches) = 0;
+    
+    // Helper: Get batch count for iteration (caches batches for GetBatchAt)
+    virtual Status GetBatchCount(const std::string& table_name, size_t* count) = 0;
+    
+    // Helper: Get batch by index (requires GetBatchCount called first)
+    virtual Status GetBatchAt(const std::string& table_name, size_t index,
+                             std::shared_ptr<arrow::RecordBatch>* batch) = 0;
+    
+    // Helper: Clear cached batches to free memory
+    virtual Status ClearBatchCache(const std::string& table_name) = 0;
     
     // Range operations
     virtual Status ScanRange(const std::string& table_name,

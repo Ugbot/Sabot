@@ -207,7 +207,7 @@ class SparkSession:
         Create DataFrame from data.
         
         Args:
-            data: Python collection or pandas DataFrame
+            data: Python collection or pandas DataFrame or Arrow Table
             schema: Schema specification
             
         Returns:
@@ -217,20 +217,29 @@ class SparkSession:
         import pyarrow as pa
         
         # Convert to Arrow table
-        if hasattr(data, 'to_arrow'):
-            # Pandas DataFrame with to_arrow
-            table = data.to_arrow()
+        if hasattr(data, '__arrow_c_stream__'):
+            # Already Arrow Table
+            table = data
+        elif hasattr(data, 'to_pandas'):
+            # Pandas DataFrame - convert to Arrow
+            table = pa.Table.from_pandas(data)
         elif isinstance(data, list):
             # Python list
-            table = pa.Table.from_pylist(data)
+            table = pa.Table.from_pylist(data) if data else pa.table({})
         else:
-            # Assume it's already Arrow-compatible
-            table = data
+            # Try pandas conversion
+            try:
+                import pandas as pd
+                if isinstance(data, pd.DataFrame):
+                    table = pa.Table.from_pandas(data)
+                else:
+                    table = pa.Table.from_pydict(data)
+            except:
+                # Last resort
+                table = pa.Table.from_pylist([data]) if not isinstance(data, list) else pa.Table.from_pylist(data)
         
-        # Wrap in Stream, then DataFrame
-        stream = self._engine.stream.from_table(table)
-        
-        return DataFrame(stream, self)
+        # Create DataFrame directly with table
+        return DataFrame(table, self)
     
     def stop(self):
         """Stop Spark session."""

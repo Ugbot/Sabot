@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
 """Sabot - Streaming framework with columnar processing and Faust-like API."""
 
+import logging
+
 # Core application
-from .app import App, RAFTStream
+try:
+    from .app import App, RAFTStream
+except ImportError as e:
+    logger = logging.getLogger(__name__)
+    logger.warning(f"App import failed: {e} - using stubs")
+    App = None
+    RAFTStream = None
 from .composable_launcher import ComposableLauncher, create_composable_launcher, launch_sabot
 from .distributed_coordinator import (
     DistributedCoordinator, SabotWorkerNode,

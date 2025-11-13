@@ -21,6 +21,7 @@ cdef extern from "sabot/storage/interface.h" namespace "sabot::storage":
         Status()
         Status(StatusCode, const string&)
         cbool ok()
+        cbool IsNotFound()
         @staticmethod
         Status OK()
         @staticmethod
@@ -56,7 +57,8 @@ cdef extern from "sabot/storage/interface.h" namespace "sabot::storage":
         Status CreateCheckpoint(string*)
         Status RestoreFromCheckpoint(const string&)
     
-    # Forward declare Arrow types
+    # Arrow C++ type declarations - use arrow/api.h namespace types directly
+    # These match what MarbleDB expects: shared_ptr<arrow::Schema>, shared_ptr<arrow::RecordBatch>, shared_ptr<arrow::Table>
     cdef extern from "arrow/api.h" namespace "arrow":
         cdef cppclass Schema:
             pass
@@ -73,6 +75,10 @@ cdef extern from "sabot/storage/interface.h" namespace "sabot::storage":
         Status ListTables(vector[string]*)
         Status InsertBatch(const string&, const shared_ptr[RecordBatch]&)
         Status ScanTable(const string&, shared_ptr[Table]*)
+        Status ScanTableBatches(const string&, vector[shared_ptr[RecordBatch]]*)
+        Status GetBatchCount(const string&, size_t*)
+        Status GetBatchAt(const string&, size_t, shared_ptr[RecordBatch]*)
+        Status ClearBatchCache(const string&)
         Status ScanRange(const string&, const string&, const string&, shared_ptr[Table]*)
         Status DeleteRange(const string&, const string&, const string&)
     

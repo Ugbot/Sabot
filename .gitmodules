@@ -40,3 +40,6 @@
 [submodule "sabot_ql/tests/rdf-tests"]
 	path = sabot_ql/tests/rdf-tests
 	url = https://github.com/w3c/rdf-tests.git
+[submodule "benchmarks/pyspark-benchmark"]
+	path = benchmarks/pyspark-benchmark
+	url = https://github.com/DIYBigData/pyspark-benchmark.git

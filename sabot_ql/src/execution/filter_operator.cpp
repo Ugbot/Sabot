@@ -200,6 +200,90 @@ std::string ComparisonExpression::ToString() const {
 }
 
 /**
+ * ColumnComparisonExpression: Generic column-to-column comparison
+ *
+ * Works with any column family - compares two columns using Arrow compute kernels
+ * Used for FILTER(?x != ?y) patterns in SPARQL
+ */
+
+ColumnComparisonExpression::ColumnComparisonExpression(
+    const std::string& left_column,
+    ComparisonOp op,
+    const std::string& right_column)
+    : left_column_(left_column)
+    , op_(op)
+    , right_column_(right_column) {}
+
+arrow::Result<std::shared_ptr<arrow::Array>> ColumnComparisonExpression::Evaluate(
+    const std::shared_ptr<arrow::Table>& table) const {
+
+    // Get left column
+    auto left_idx = table->schema()->GetFieldIndex(left_column_);
+    if (left_idx == -1) {
+        return arrow::Status::Invalid("Column not found: " + left_column_);
+    }
+
+    // Get right column
+    auto right_idx = table->schema()->GetFieldIndex(right_column_);
+    if (right_idx == -1) {
+        return arrow::Status::Invalid("Column not found: " + right_column_);
+    }
+
+    auto left_array = table->column(left_idx)->chunk(0);
+    auto right_array = table->column(right_idx)->chunk(0);
+
+    // Apply comparison using Arrow compute CallFunction API
+    arrow::compute::ExecContext ctx;
+    arrow::Datum result_datum;
+
+    std::string func_name;
+    switch (op_) {
+        case ComparisonOp::EQ:
+            func_name = "equal";
+            break;
+        case ComparisonOp::NEQ:
+            func_name = "not_equal";
+            break;
+        case ComparisonOp::LT:
+            func_name = "less";
+            break;
+        case ComparisonOp::LTE:
+            func_name = "less_equal";
+            break;
+        case ComparisonOp::GT:
+            func_name = "greater";
+            break;
+        case ComparisonOp::GTE:
+            func_name = "greater_equal";
+            break;
+        default:
+            return arrow::Status::Invalid("Unknown comparison operator");
+    }
+
+    // Compare two columns directly using Arrow compute kernel
+    ARROW_ASSIGN_OR_RAISE(
+        result_datum,
+        arrow::compute::CallFunction(func_name, {left_array, right_array}, &ctx)
+    );
+
+    return result_datum.make_array();
+}
+
+std::string ColumnComparisonExpression::ToString() const {
+    std::string op_str;
+    switch (op_) {
+        case ComparisonOp::EQ: op_str = "="; break;
+        case ComparisonOp::NEQ: op_str = "!="; break;
+        case ComparisonOp::LT: op_str = "<"; break;
+        case ComparisonOp::LTE: op_str = "<="; break;
+        case ComparisonOp::GT: op_str = ">"; break;
+        case ComparisonOp::GTE: op_str = ">="; break;
+    }
+
+    return left_column_ + " " + op_str + " " + right_column_;
+}
+
+/**
  * LogicalExpression: Generic AND/OR/NOT for any filter
  *
  * Works with any column family - combines boolean masks

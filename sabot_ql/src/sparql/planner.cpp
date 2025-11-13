@@ -1273,10 +1273,41 @@ arrow::Result<std::shared_ptr<FilterExpression>> SPARQLExpressionToFilterExpress
             if (it == ctx.var_to_column.end()) {
                 return arrow::Status::Invalid("Variable not found: " + var.name);
             }
-            std::string column_name = it->second;
+            std::string left_column_name = it->second;
 
+            // Map SPARQL operator to ComparisonOp
+            ComparisonOp cmp_op;
+            switch (sparql_expr.op) {
+                case ExprOperator::NotEqual:        cmp_op = ComparisonOp::NEQ; break;
+                case ExprOperator::LessThan:        cmp_op = ComparisonOp::LT; break;
+                case ExprOperator::LessThanEqual:   cmp_op = ComparisonOp::LTE; break;
+                case ExprOperator::GreaterThan:     cmp_op = ComparisonOp::GT; break;
+                case ExprOperator::GreaterThanEqual:cmp_op = ComparisonOp::GTE; break;
+                default: return arrow::Status::Invalid("Invalid comparison operator");
+            }
+
+            // Check if right side is a variable (variable-to-variable comparison)
+            if (right.IsConstant() && std::holds_alternative<Variable>(*right.constant)) {
+                // Variable-to-variable comparison: FILTER(?x != ?y)
+                auto right_var = std::get<Variable>(*right.constant);
+                auto right_it = ctx.var_to_column.find(right_var.name);
+                if (right_it == ctx.var_to_column.end()) {
+                    return arrow::Status::Invalid("Variable not found: " + right_var.name);
+                }
+                std::string right_column_name = right_it->second;
+
+                SABOT_LOG_PLANNER("Creating ColumnComparisonExpression: " + left_column_name + " vs " + right_column_name);
+
+                return std::make_shared<ColumnComparisonExpression>(
+                    left_column_name,
+                    cmp_op,
+                    right_column_name
+                );
+            }
+
+            // Right side is a literal (variable-to-literal comparison)
             if (!right.IsConstant() || !std::holds_alternative<Literal>(*right.constant)) {
-                return arrow::Status::NotImplemented("Right side must be literal");
+                return arrow::Status::NotImplemented("Right side must be variable or literal");
             }
 
             auto literal = std::get<Literal>(*right.constant);
@@ -1290,19 +1321,8 @@ arrow::Result<std::shared_ptr<FilterExpression>> SPARQLExpressionToFilterExpress
             int64_t value_id_bits = value_id.getBits();
             auto scalar = arrow::MakeScalar(value_id_bits);
 
-            // Map SPARQL operator to ComparisonOp
-            ComparisonOp cmp_op;
-            switch (sparql_expr.op) {
-                case ExprOperator::NotEqual:        cmp_op = ComparisonOp::NEQ; break;
-                case ExprOperator::LessThan:        cmp_op = ComparisonOp::LT; break;
-                case ExprOperator::LessThanEqual:   cmp_op = ComparisonOp::LTE; break;
-                case ExprOperator::GreaterThan:     cmp_op = ComparisonOp::GT; break;
-                case ExprOperator::GreaterThanEqual:cmp_op = ComparisonOp::GTE; break;
-                default: return arrow::Status::Invalid("Invalid comparison operator");
-            }
-
             return std::make_shared<ComparisonExpression>(
-                column_name,
+                left_column_name,
                 cmp_op,
                 scalar
             );

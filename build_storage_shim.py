@@ -13,6 +13,7 @@ from pathlib import Path
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 import pyarrow as pa
+import numpy as np
 
 # Project paths
 SABOT_ROOT = Path(__file__).parent
@@ -23,12 +24,14 @@ MARBLE_ROOT = SABOT_ROOT / "MarbleDB"
 
 # Include directories
 include_dirs = [
-    str(SABOT_ROOT / "sabot"),  # For sabot/storage/interface.h
+    str(SABOT_ROOT),  # Root for sabot/storage/interface.h
+    str(SABOT_ROOT / "sabot"),
     str(STORAGE_DIR),
     str(CYTHON_DIR / "storage"),
     str(ARROW_ROOT / "include"),
     str(MARBLE_ROOT / "include"),
     pa.get_include(),
+    np.get_include(),
 ]
 
 # Library directories
@@ -42,7 +45,7 @@ library_dirs = [
 libraries = [
     "sabot_storage",  # Our shim library
     "arrow",
-    "marbledb",
+    "marble",  # MarbleDB library is libmarble.a, not libmarbledb.a
 ]
 
 # Runtime library paths

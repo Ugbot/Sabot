@@ -91,6 +91,46 @@ private:
 };
 
 //==============================================================================
+// Column Comparison Expression - GENERIC
+//==============================================================================
+
+/**
+ * @brief Column-to-column comparison expression for filtering
+ *
+ * GENERIC: Compares two columns instead of column-to-scalar.
+ * Uses Arrow compute kernels for vectorized column comparisons.
+ *
+ * Example:
+ *   // Filter: ?athlete1 != ?athlete2
+ *   ColumnComparisonExpression("athlete1", ComparisonOp::NEQ, "athlete2")
+ *
+ *   // Filter: start_time < end_time
+ *   ColumnComparisonExpression("start_time", ComparisonOp::LT, "end_time")
+ *
+ *   // Filter: price >= cost
+ *   ColumnComparisonExpression("price", ComparisonOp::GTE, "cost")
+ */
+class ColumnComparisonExpression : public FilterExpression {
+public:
+    ColumnComparisonExpression(
+        const std::string& left_column,
+        ComparisonOp op,
+        const std::string& right_column
+    );
+
+    arrow::Result<std::shared_ptr<arrow::Array>> Evaluate(
+        const std::shared_ptr<arrow::Table>& table
+    ) const override;
+
+    std::string ToString() const override;
+
+private:
+    std::string left_column_;
+    ComparisonOp op_;
+    std::string right_column_;
+};
+
+//==============================================================================
 // Logical Expression - GENERIC
 //==============================================================================
 

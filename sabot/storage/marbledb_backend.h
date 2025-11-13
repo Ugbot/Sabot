@@ -92,6 +92,12 @@ public:
     
     Status ScanTable(const std::string& table_name,
                     std::shared_ptr<arrow::Table>* table) override;
+    Status ScanTableBatches(const std::string& table_name,
+                            std::vector<std::shared_ptr<arrow::RecordBatch>>* batches) override;
+    Status GetBatchCount(const std::string& table_name, size_t* count) override;
+    Status GetBatchAt(const std::string& table_name, size_t index,
+                     std::shared_ptr<arrow::RecordBatch>* batch) override;
+    Status ClearBatchCache(const std::string& table_name) override;
     
     Status ScanRange(const std::string& table_name,
                     const std::string& start_key,
