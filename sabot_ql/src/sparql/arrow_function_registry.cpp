@@ -71,7 +71,7 @@ void ArrowFunctionRegistry::InitializeMathFunctions() {
 }
 
 void ArrowFunctionRegistry::InitializeTemporalFunctions() {
-    // Date/time extraction
+    // Date/time extraction (Arrow built-in)
     function_map_["YEAR"] = "year";
     function_map_["MONTH"] = "month";
     function_map_["DAY"] = "day";
@@ -79,12 +79,20 @@ void ArrowFunctionRegistry::InitializeTemporalFunctions() {
     function_map_["MINUTES"] = "minute";
     function_map_["SECONDS"] = "second";
 
-    // Date/time construction
+    // Date/time construction (Arrow built-in)
     function_map_["NOW"] = "local_timestamp";
 
-    // Timezone
+    // Timezone (Arrow built-in)
     function_map_["TIMEZONE"] = "assume_timezone";
     function_map_["TZ"] = "assume_timezone";
+
+    // Sabot custom datetime kernels (SIMD-accelerated)
+    function_map_["SABOT_PARSE_DATETIME"] = "sabot_parse_datetime";
+    function_map_["SABOT_FORMAT_DATETIME"] = "sabot_format_datetime";
+    function_map_["SABOT_PARSE_FLEXIBLE"] = "sabot_parse_flexible";
+    function_map_["SABOT_ADD_DAYS_SIMD"] = "sabot_add_days_simd";
+    function_map_["SABOT_ADD_BUSINESS_DAYS"] = "sabot_add_business_days";
+    function_map_["SABOT_BUSINESS_DAYS_BETWEEN"] = "sabot_business_days_between";
 }
 
 void ArrowFunctionRegistry::InitializeConditionalFunctions() {
