@@ -112,12 +112,15 @@ Sabot/
 ├── vendor/                   # Vendored dependencies
 │   ├── arrow/                # Apache Arrow C++ (22.0.0)
 │   ├── librdkafka/           # Kafka C++ client
-│   ├── simdjson/             # SIMD JSON parser (NEW)
-│   ├── avro/                 # Apache Avro C++ (NEW)
-│   ├── protobuf/             # Google Protobuf (NEW)
+│   ├── simdjson/             # SIMD JSON parser
+│   ├── avro/                 # Apache Avro C++
+│   ├── protobuf/             # Google Protobuf
 │   ├── rocksdb/              # RocksDB
 │   ├── duckdb/               # DuckDB
-│   └── tonbo/                # Tonbo Rust DB
+│   ├── tonbo/                # Tonbo Rust DB
+│   └── cpp-datetime/         # C++ DateTime library (NEW) ✅
+│       ├── src/              # datetime.cpp/h, timespan.cpp/h
+│       └── build/            # libdatetime.a (33KB static library)
 │
 ├── archive/                  # Archived code (not in active use)
 │   └── graph_implementations/  # Abandoned graph implementation attempts
@@ -455,6 +458,7 @@ OptimizationPipeline (compose strategies)
 | protobuf | Protobuf codec | ✅ Built | ~100MB |
 | RocksDB | State backend | ✅ Built | ~100MB |
 | DuckDB | SQL engine | ✅ Built | ~200MB |
+| cpp-datetime | Date/time utilities | ✅ Built | ~33KB |
 
 **All vendored** - no system dependencies required
 
