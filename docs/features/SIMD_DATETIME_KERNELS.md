@@ -1,6 +1,6 @@
 # SIMD-Accelerated Arrow DateTime Kernels for Sabot
 
-**Status**: ✅ Phases 1-3 Complete, Phase 5 Partial (5 of 7 phases done)
+**Status**: ✅ Phases 1-3, 5 Complete (5 of 7 phases done - Integration Ready)
 **Date**: November 14, 2025
 **Location**: `vendor/arrow/cpp/src/arrow/compute/kernels/scalar_temporal_sabot.*`
 
@@ -96,12 +96,15 @@ Runtime CPU Detection
 - [ ] sabot_add_months_simd
 - [ ] sabot_add_years_simd
 
-### ✅ Phase 5: Integration (PARTIAL - 2/3 Complete)
+### ✅ Phase 5: Integration (COMPLETE)
 - ✅ Update SPARQL arrow_function_registry.cpp
 - ✅ Create Python bindings (datetime_kernels.pyx)
   - `sabot/_cython/arrow/datetime_kernels.pyx` - Cython wrappers
   - `sabot/spark/datetime.py` - Spark-compatible API
-- [ ] Add SQL datetime operations
+- ✅ Add SQL datetime operations
+  - `sabot_sql/datetime_functions.py` - DuckDB UDF registration
+  - Auto-registered with SabotSQLBridge
+  - 5 SQL functions: parse, format, add_days, add_business_days, business_days_between
 
 ### 📋 Phase 6: SIMD Optimization (Pending)
 - ✅ Runtime CPU detection (AVX2 implemented)
@@ -205,12 +208,48 @@ next_week = datetime_kernels.add_days_simd(timestamps, 7)
 deadline = datetime_kernels.add_business_days(timestamps, 5)
 ```
 
-### From SQL (TODO: Phase 5)
+### From SQL ✅
 
 ```sql
-SELECT sabot_parse_datetime(date_str, 'yyyy-MM-dd HH:mm:ss') as parsed_date,
-       sabot_add_days_simd(created_at, 30) as due_date
+-- Parse datetime strings
+SELECT sabot_parse_datetime(date_str, 'yyyy-MM-dd HH:mm:ss') as parsed_date
 FROM events;
+
+-- Format timestamps
+SELECT sabot_format_datetime(created_at, 'MM/dd/yyyy') as us_format
+FROM orders;
+
+-- SIMD add days (6.7x faster)
+SELECT sabot_add_days(created_at, 30) as due_date
+FROM tasks;
+
+-- Add business days (skip weekends)
+SELECT sabot_add_business_days(order_date, 5) as delivery_date
+FROM orders;
+
+-- Count business days between dates
+SELECT sabot_business_days_between(start_date, end_date) as work_days
+FROM projects;
+
+-- SLA monitoring example
+SELECT
+    ticket_id,
+    sabot_business_days_between(created, resolved) as resolution_days,
+    CASE WHEN resolution_days <= sla_days THEN 'Met' ELSE 'Missed' END as status
+FROM tickets;
+```
+
+**Python Example:**
+```python
+from sabot_sql import create_sabot_sql_bridge
+
+bridge = create_sabot_sql_bridge()
+# DateTime functions auto-registered!
+
+result = bridge.execute_sql("""
+    SELECT sabot_add_days(timestamp_col, 7) as next_week
+    FROM events
+""")
 ```
 
 ---

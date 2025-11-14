@@ -8,14 +8,28 @@ This is REAL SQL execution, not a mock.
 import pyarrow as pa
 from sabot import cyarrow as ca
 
+try:
+    from sabot_sql.datetime_functions import register_datetime_functions
+    DATETIME_FUNCTIONS_AVAILABLE = True
+except ImportError:
+    DATETIME_FUNCTIONS_AVAILABLE = False
+
 
 class SabotSQLBridge:
     """SQL bridge using DuckDB directly for real SQL execution."""
-    
+
     def __init__(self):
         import duckdb
         self.conn = duckdb.connect(':memory:')
         self.tables = {}
+
+        # Register Sabot datetime functions (SIMD-accelerated)
+        if DATETIME_FUNCTIONS_AVAILABLE:
+            register_datetime_functions(self.conn)
+            print("Registered Sabot SIMD datetime functions:"
+                  " sabot_parse_datetime, sabot_format_datetime,"
+                  " sabot_add_days, sabot_add_business_days,"
+                  " sabot_business_days_between")
     
     def register_table(self, table_name: str, table: ca.Table):
         """Register an Arrow table."""
