@@ -11,9 +11,11 @@ from sabot._cython.operators.shuffled_operator cimport ShuffledOperator
 
 cdef class CythonGroupByOperator(ShuffledOperator):
     """GroupBy operator using Tonbo columnar state."""
-    cdef list _keys
-    cdef dict _aggregations
-    cdef object _tonbo_state
+    cdef public list _keys
+    cdef public dict _aggregations
+    cdef public object _tonbo_state
+    cdef public object _last_result
+    cdef public object _accumulated_batches  # NEW: Accumulate batches for proper multi-key groupby
 
     cpdef object process_batch(self, object batch)
     cpdef object get_result(self)
