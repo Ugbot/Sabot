@@ -22,9 +22,10 @@ from libcpp cimport bool as cbool
 from libc.stdint cimport int64_t, uint64_t
 
 # Import Arrow for vectorized joins
+# CRITICAL: Use vendored cyarrow, NOT system pyarrow!
 try:
-    import pyarrow as pa
-    import pyarrow.compute as pc
+    from sabot import cyarrow as pa
+    pc = pa.compute if hasattr(pa, 'compute') else None
     ARROW_AVAILABLE = True
 except ImportError:
     ARROW_AVAILABLE = False
@@ -322,15 +323,20 @@ cdef class CythonHashJoinOperator(ShuffledOperator):
             join_type: 'inner', 'left', 'right', or 'outer'
             schema: Output schema (inferred)
         """
-        # Initialize ShuffledOperator with left keys as partition keys
-        # (left side gets shuffled to co-locate with right side)
-        super().__init__(
-            source=left_source,
-            partition_keys=left_keys,  # Left keys for partitioning
-            num_partitions=4,  # Will be overridden by JobManager
-            schema=schema
-        )
+        # DON'T call super().__init__() in Cython extension types!
+        # Cython automatically calls parent __cinit__ during object construction.
+        # Instead, set attributes directly that would have been set by parent.
 
+        # Set BaseOperator attributes
+        self._source = left_source
+        self._schema = schema
+        self._stateful = True
+
+        # Set ShuffledOperator attributes
+        self._partition_keys = left_keys  # Left keys for partitioning
+        self._num_partitions = 4  # Will be overridden by JobManager
+
+        # Set join-specific attributes
         self._right_source = right_source
         self._left_keys = left_keys
         self._right_keys = right_keys
@@ -380,21 +386,93 @@ cdef class CythonHashJoinOperator(ShuffledOperator):
                 yield result
 
     def _execute_local(self):
-        """Execute join locally (current logic)."""
-        # Build phase
+        """
+        Execute join locally with SMART BUILD-SIDE SELECTION.
+
+        Automatically chooses smaller side for build to minimize memory.
+        This matches PyArrow's optimizer behavior and fixes Q5/Q7 performance.
+        """
+        # Smart build-side selection: peek at first batch from each side to estimate sizes
+        left_batches = []
+        right_batches = []
+        left_total_rows = 0
+        right_total_rows = 0
+
+        # Collect first batch from left to estimate size
+        for left_batch in self._source:
+            if left_batch is not None and left_batch.num_rows > 0:
+                left_batches.append(left_batch)
+                left_total_rows += left_batch.num_rows
+                break
+
+        # Collect first batch from right to estimate size
         for right_batch in self._right_source:
             if right_batch is not None and right_batch.num_rows > 0:
-                self._hash_builder.add_batch(right_batch)
+                right_batches.append(right_batch)
+                right_total_rows += right_batch.num_rows
+                break
+
+        # Decide build side based on first batch row counts
+        # (Heuristic: first batch size correlates with total size)
+        # If right is smaller or equal, use right as build (default)
+        # If left is significantly smaller (>2x), swap and use left as build
+        use_left_as_build = left_total_rows > 0 and right_total_rows > 0 and left_total_rows < (right_total_rows / 2)
+
+        if use_left_as_build:
+            # Swap sides: build on left, probe with right
+            # This is safe for inner joins
+            # For outer joins, we need to adjust join type
+            build_batches = left_batches
+            build_source = self._source
+            build_keys = self._left_keys
+            probe_batches = right_batches
+            probe_source = self._right_source
+            probe_keys = self._right_keys
+
+            # Adjust join type for swapped sides
+            if self._join_type == 'left':
+                adjusted_join_type = 'right'  # Left outer becomes right outer
+            elif self._join_type == 'right':
+                adjusted_join_type = 'left'   # Right outer becomes left outer
+            else:
+                adjusted_join_type = self._join_type  # Inner/outer unchanged
+
+            # Rebuild hash table builder with swapped keys
+            self._hash_builder = StreamingHashTableBuilder(build_keys)
+        else:
+            # Use right as build (default/current behavior)
+            build_batches = right_batches
+            build_source = self._right_source
+            build_keys = self._right_keys
+            probe_batches = left_batches
+            probe_source = self._source
+            probe_keys = self._left_keys
+            adjusted_join_type = self._join_type
+
+        # Build phase: add peeked batches + remaining batches
+        for batch in build_batches:
+            self._hash_builder.add_batch(batch)
+
+        for batch in build_source:
+            if batch is not None and batch.num_rows > 0:
+                self._hash_builder.add_batch(batch)
 
         self._hash_builder.build_index()
 
-        # Probe phase
-        for left_batch in self._source:
-            if left_batch is None or left_batch.num_rows == 0:
+        # Probe phase: probe with peeked batches + remaining batches
+        for batch in probe_batches:
+            result = self._hash_builder.probe_batch_vectorized(
+                batch, probe_keys, adjusted_join_type
+            )
+            if result is not None:
+                yield result
+
+        for batch in probe_source:
+            if batch is None or batch.num_rows == 0:
                 continue
 
             result = self._hash_builder.probe_batch_vectorized(
-                left_batch, self._left_keys, self._join_type
+                batch, probe_keys, adjusted_join_type
             )
 
             if result is not None and result.num_rows > 0:
