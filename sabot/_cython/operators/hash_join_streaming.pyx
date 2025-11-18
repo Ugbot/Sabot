@@ -25,8 +25,11 @@ from libcpp.vector cimport vector
 # Arrow C++ imports
 cdef extern from "arrow/api.h" namespace "arrow" nogil:
     cdef cppclass CBuffer "arrow::Buffer":
-        uint8_t* data()
+        const uint8_t* data()
         int64_t size()
+
+    cdef cppclass CMutableBuffer "arrow::MutableBuffer"(CBuffer):
+        uint8_t* mutable_data()
 
     cdef cppclass CArray "arrow::Array":
         int64_t length()
@@ -112,6 +115,22 @@ cdef extern from "hash_join_avx2.h" namespace "sabot::hash_join" nogil:
                                     uint32_t* out_left, uint32_t* out_right)
 
 
+# C++ Hash Table (lightweight std::unordered_map wrapper)
+cdef extern from "hash_join_table.h" namespace "sabot::hash_join" nogil:
+    cdef cppclass HashJoinTable:
+        HashJoinTable()
+        void reserve(size_t expected_entries)
+        void insert(uint32_t hash_val, uint32_t row_index)
+        void insert_batch(const uint32_t* hashes, const uint32_t* row_indices, int count)
+        int lookup(uint32_t hash_val, uint32_t* out_indices, int max_matches) const
+        const uint32_t* lookup_all(uint32_t hash_val, int* out_count) const
+        int contains(uint32_t hash_val) const
+        size_t num_buckets() const
+        size_t num_entries() const
+        void clear()
+        size_t memory_usage() const
+
+
 # Bloom filter size (256KB = 2M bits, ~1% false positive rate for 100K keys)
 DEF BLOOM_FILTER_SIZE = 262144  # 256KB
 
@@ -144,7 +163,7 @@ cdef class StreamingHashJoin:
         CMemoryPool* _pool
 
         # Build-side state (hash table + bloom filter + table storage)
-        dict _hash_table  # Python dict: hash → [row indices]
+        HashJoinTable* _hash_table  # C++ hash table: hash → [row indices]
         shared_ptr[CBuffer] _bloom_filter
         int64_t _build_row_count
         object _build_table  # PyTable: Combined build-side table for Take operations
@@ -211,19 +230,28 @@ cdef class StreamingHashJoin:
             self._pool
         ).ValueOrDie()
 
-        # Initialize build-side state
-        self._hash_table = {}
+        # Initialize build-side state with C++ hash table
+        self._hash_table = new HashJoinTable()
+        self._hash_table.reserve(100000)  # Reserve space for 100K entries (avoid rehashing)
         self._build_row_count = 0
         self._build_table = None  # Will store combined build-side batches
 
         # Bloom filter will be allocated when we build (256KB)
         self._bloom_filter = AllocateBuffer(BLOOM_FILTER_SIZE, self._pool).ValueOrDie()
+        # Zero out the bloom filter (cast to mutable pointer)
+        memset(<void*>self._bloom_filter.get().data(), 0, BLOOM_FILTER_SIZE)
 
         # Initialize statistics
         self._total_probe_rows = 0
         self._total_matches = 0
         self._bloom_filter_hits = 0
         self._bloom_filter_misses = 0
+
+    def __dealloc__(self):
+        """Clean up C++ resources."""
+        if self._hash_table != NULL:
+            del self._hash_table
+            self._hash_table = NULL
 
     def insert_build_batch(self, object batch):
         """
@@ -272,19 +300,19 @@ cdef class StreamingHashJoin:
         # Compute hashes with SIMD (4x parallel on ARM, 8x on x86)
         cdef int num_hashed = hash_int64_simd(raw_keys, num_rows, hashes)
 
-        # Build hash table: hash → [row indices]
-        # For now, use Python dict (will upgrade to Swiss Table later)
-        cdef uint32_t hash_val
-        cdef int64_t global_row_idx
+        # Build bloom filter with SIMD (insert these hashes)
+        cdef uint8_t* bloom_filter_data = <uint8_t*>self._bloom_filter.get().data()
+        build_bloom_filter_simd(hashes, num_rows, bloom_filter_data, BLOOM_FILTER_SIZE)
 
+        # Build hash table using C++ HashJoinTable (zero-copy batch insert)
+        # Create row indices array with global offsets
+        cdef uint32_t* row_indices = <uint32_t*>self._left_indices.get().data()
+        cdef int i
         for i in range(num_rows):
-            hash_val = hashes[i]
-            global_row_idx = self._build_row_count + i
+            row_indices[i] = self._build_row_count + i
 
-            # Python dict for now (Swiss Table integration pending)
-            if hash_val not in self._hash_table:
-                self._hash_table[hash_val] = []
-            self._hash_table[hash_val].append(global_row_idx)
+        # Batch insert into C++ hash table (fast!)
+        self._hash_table.insert_batch(hashes, row_indices, num_rows)
 
         self._build_row_count += num_rows
 
@@ -327,25 +355,42 @@ cdef class StreamingHashJoin:
         # Compute hashes with SIMD (4x parallel on ARM, 8x on x86)
         cdef int num_hashed = hash_int64_simd(raw_keys, num_rows, hashes)
 
+        # Probe bloom filter with SIMD (pre-filter non-matching rows)
+        cdef uint8_t* bloom_filter_data = <uint8_t*>self._bloom_filter.get().data()
+        cdef uint8_t* match_bitvector = <uint8_t*>self._match_bitvector.get().data()
+        cdef int bloom_matches = probe_bloom_filter_simd(
+            hashes, num_rows, bloom_filter_data, BLOOM_FILTER_SIZE, match_bitvector
+        )
+
+        # Update bloom filter statistics
+        self._bloom_filter_hits += bloom_matches
+        self._bloom_filter_misses += (num_rows - bloom_matches)
+
         # Get index buffers (pre-allocated)
         cdef uint32_t* left_indices_buf = <uint32_t*>self._left_indices.get().data()
         cdef uint32_t* right_indices_buf = <uint32_t*>self._right_indices.get().data()
         cdef int match_count = 0
 
-        # Probe hash table and collect matches
+        # Probe C++ hash table and collect matches (only for rows that passed bloom filter)
         cdef uint32_t hash_val
-        cdef list build_row_indices
-        cdef int64_t build_idx
+        cdef const uint32_t* build_row_indices
+        cdef int num_build_matches
+        cdef int j
 
         for i in range(num_rows):
+            # Skip rows that didn't pass bloom filter (fast rejection)
+            if match_bitvector[i] == 0:
+                continue
+
             hash_val = hashes[i]
 
-            # Probe hash table (Python dict for now, Swiss Table pending)
-            if hash_val in self._hash_table:
-                build_row_indices = self._hash_table[hash_val]
-                for build_idx in build_row_indices:
-                    # Store match indices in pre-allocated buffers
-                    left_indices_buf[match_count] = build_idx
+            # Probe C++ hash table (zero-copy lookup)
+            build_row_indices = self._hash_table.lookup_all(hash_val, &num_build_matches)
+
+            if num_build_matches > 0:
+                # Found matches - copy to output buffers
+                for j in range(num_build_matches):
+                    left_indices_buf[match_count] = build_row_indices[j]
                     right_indices_buf[match_count] = i
                     match_count += 1
                     self._total_matches += 1
@@ -432,7 +477,7 @@ cdef class StreamingHashJoin:
         return pa.RecordBatch.from_arrays(all_columns, schema=combined_schema)
 
     def get_stats(self):
-        """Get join statistics."""
+        """Get join statistics including C++ hash table metrics."""
         return {
             'build_rows': self._build_row_count,
             'probe_rows': self._total_probe_rows,
@@ -440,8 +485,15 @@ cdef class StreamingHashJoin:
             'bloom_filter_hits': self._bloom_filter_hits,
             'bloom_filter_misses': self._bloom_filter_misses,
             'bloom_filter_selectivity': (
-                self._bloom_filter_hits / self._total_probe_rows
+                float(self._bloom_filter_hits) / float(self._total_probe_rows)
                 if self._total_probe_rows > 0 else 0.0
+            ),
+            'hash_table_buckets': self._hash_table.num_buckets(),
+            'hash_table_entries': self._hash_table.num_entries(),
+            'hash_table_memory_bytes': self._hash_table.memory_usage(),
+            'hash_table_load_factor': (
+                float(self._hash_table.num_entries()) / float(self._hash_table.num_buckets())
+                if self._hash_table.num_buckets() > 0 else 0.0
             ),
         }
 
