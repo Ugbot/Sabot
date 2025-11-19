@@ -279,11 +279,23 @@ cdef class StreamingHashJoin:
             import pyarrow as pa
             self._build_table = pa.concat_tables([self._build_table, table])
 
+        # IMPORTANT: Chunk large build batches to avoid buffer overflow
+        # The row_indices buffer is sized for MAX_BATCH_SIZE
+        batch = table.combine_chunks().to_batches()[0]
+        if batch.num_rows > MAX_BATCH_SIZE:
+            # Process in chunks
+            for offset in range(0, batch.num_rows, MAX_BATCH_SIZE):
+                chunk_size = min(MAX_BATCH_SIZE, batch.num_rows - offset)
+                chunk = batch.slice(offset, chunk_size)
+                self._insert_build_batch_chunk(chunk)
+            return
+
+        self._insert_build_batch_chunk(batch)
+
+    cdef void _insert_build_batch_chunk(self, object batch):
+        """Internal: Insert a single chunk into build table (guaranteed <= MAX_BATCH_SIZE)."""
         # Extract key column (assume single int64 key for now)
         cdef int key_col_idx = self._left_key_indices[0]
-
-        # Get batch for hash computation
-        batch = table.combine_chunks().to_batches()[0]
 
         # Unwrap Python RecordBatch to C++ RecordBatch (zero-copy)
         cdef shared_ptr[CRecordBatch] c_batch = pyarrow_unwrap_batch(batch)
@@ -335,8 +347,34 @@ cdef class StreamingHashJoin:
         if batch.num_rows == 0:
             return
 
-        self._total_probe_rows += batch.num_rows
+        # IMPORTANT: Chunk large batches to MAX_BATCH_SIZE to avoid buffer overflow
+        # Pre-allocated buffers (_match_bitvector, _hash_buffer) are sized for MAX_BATCH_SIZE
+        if batch.num_rows > MAX_BATCH_SIZE:
+            # Process in chunks
+            self._total_probe_rows += batch.num_rows  # Count once for the whole batch
+            for offset in range(0, batch.num_rows, MAX_BATCH_SIZE):
+                chunk_size = min(MAX_BATCH_SIZE, batch.num_rows - offset)
+                chunk = batch.slice(offset, chunk_size)
+                # Process each chunk (without double-counting)
+                for result in self._probe_batch_chunk(chunk):
+                    yield result
+            return
 
+        # Single batch processing (no chunking needed)
+        self._total_probe_rows += batch.num_rows
+        for result in self._probe_batch_chunk(batch):
+            yield result
+
+    def _probe_batch_chunk(self, object batch):
+        """
+        Internal: Probe a single chunk (guaranteed <= MAX_BATCH_SIZE).
+
+        This method does the actual probing work and must NOT be called
+        with batches larger than MAX_BATCH_SIZE.
+
+        Yields:
+            RecordBatch: Matched rows from join
+        """
         # Extract probe key column (assume single int64 key for now)
         cdef int key_col_idx = self._right_key_indices[0]
 
@@ -395,7 +433,7 @@ cdef class StreamingHashJoin:
                     match_count += 1
                     self._total_matches += 1
 
-                    # Check buffer overflow (should not happen with proper sizing)
+                    # Check buffer overflow (should not happen with proper chunking)
                     if match_count >= 65536:  # MAX_BATCH_SIZE
                         # Yield current batch and reset
                         result_batch = self._build_result_batch(
@@ -412,6 +450,7 @@ cdef class StreamingHashJoin:
         result_batch = self._build_result_batch(
             left_indices_buf, right_indices_buf, match_count, batch
         )
+
         yield result_batch
 
     cdef object _build_result_batch(self, uint32_t* left_indices, uint32_t* right_indices, int count, object probe_batch):

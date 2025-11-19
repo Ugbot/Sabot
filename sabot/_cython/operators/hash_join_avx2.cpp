@@ -169,8 +169,8 @@ void build_bloom_filter_avx2(const uint32_t* hashes, int num_keys,
                               uint8_t* bloom_filter, int bloom_size) {
     const uint32_t bloom_mask = (bloom_size * 8) - 1;
 
-    // Zero out bloom filter
-    memset(bloom_filter, 0, bloom_size);
+    // NOTE: Bloom filter is already zeroed in __init__
+    // Do NOT zero here as this function may be called multiple times during chunked build
 
     // Process all hashes (scalar for now - AVX2 scatter is complex)
     for (int i = 0; i < num_keys; ++i) {
