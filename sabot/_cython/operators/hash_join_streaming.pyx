@@ -55,6 +55,19 @@ cdef extern from "arrow/api.h" namespace "arrow" nogil:
     cdef cppclass CUInt32Array "arrow::UInt32Array":
         pass
 
+    cdef cppclass CField "arrow::Field":
+        pass
+
+    cdef cppclass CArrayData "arrow::ArrayData":
+        pass
+
+    # RecordBatch construction
+    cdef cppclass CRecordBatchMaker "arrow::RecordBatch":
+        @staticmethod
+        shared_ptr[CRecordBatch] Make(shared_ptr[CSchema] schema,
+                                       int64_t num_rows,
+                                       vector[shared_ptr[CArray]] columns)
+
     cdef cppclass CMemoryPool "arrow::MemoryPool":
         pass
 
@@ -69,15 +82,44 @@ cdef extern from "arrow/api.h" namespace "arrow" nogil:
 
     CResult[shared_ptr[CBuffer]] AllocateBuffer(int64_t size, CMemoryPool* pool)
 
+# Arrow Compute API for Take operation
+cdef extern from "arrow/compute/api.h" namespace "arrow::compute" nogil:
+    CResult[shared_ptr[CArray]] Take(const CArray& values,
+                                       const CArray& indices)
+
+# Arrow type/field construction
+cdef extern from "arrow/api.h" namespace "arrow" nogil:
+    shared_ptr[CField] field(const char* name, shared_ptr[CDataType] type)
+    shared_ptr[CSchema] schema(vector[shared_ptr[CField]] fields)
+
+    cdef cppclass CDataType "arrow::DataType":
+        pass
+
+# Arrow array construction from buffers
+cdef extern from "arrow/array/builder_primitive.h" namespace "arrow" nogil:
+    cdef cppclass CUInt32Builder "arrow::UInt32Builder":
+        CUInt32Builder()
+        CStatus Append(uint32_t val)
+        CStatus AppendValues(const uint32_t* values, int64_t length)
+        CResult[shared_ptr[CArray]] Finish()
+
 # Use vendored Arrow directly (via pyarrow.lib which points to vendor/arrow/python/pyarrow)
 from pyarrow.lib cimport (
     Table as PyTable,
     RecordBatch as PyRecordBatch,
     Array as PyArray,
+    Schema as PySchema,
+    DataType as PyDataType,
+    Field as PyField,
     pyarrow_unwrap_table,
     pyarrow_unwrap_batch,
+    pyarrow_unwrap_array,
+    pyarrow_unwrap_schema,
+    pyarrow_unwrap_data_type,
     pyarrow_wrap_table,
     pyarrow_wrap_batch,
+    pyarrow_wrap_array,
+    pyarrow_wrap_schema,
 )
 
 # Platform detection at compile time
@@ -455,7 +497,9 @@ cdef class StreamingHashJoin:
 
     cdef object _build_result_batch(self, uint32_t* left_indices, uint32_t* right_indices, int count, object probe_batch):
         """
-        Build result batch from match indices using Arrow compute::Take.
+        Build result batch from match indices using C++ Arrow Take.
+
+        This is the optimized C++ version that avoids Python overhead.
 
         Args:
             left_indices: Indices into build table
@@ -466,54 +510,92 @@ cdef class StreamingHashJoin:
         Returns:
             RecordBatch with joined columns from both tables
         """
+        # Build uint32 index arrays from C buffers (zero-copy using AppendValues)
+        cdef CUInt32Builder left_builder
+        cdef CUInt32Builder right_builder
+        cdef CStatus status
+        cdef CResult[shared_ptr[CArray]] result
+
+        # Append values from C arrays
+        status = left_builder.AppendValues(left_indices, count)
+        if not status.ok():
+            raise RuntimeError("Failed to build left indices array")
+
+        status = right_builder.AppendValues(right_indices, count)
+        if not status.ok():
+            raise RuntimeError("Failed to build right indices array")
+
+        # Finish building arrays
+        result = left_builder.Finish()
+        if not result.ok():
+            raise RuntimeError("Failed to finish left indices array")
+        cdef shared_ptr[CArray] left_idx_array_cpp = result.ValueOrDie()
+
+        result = right_builder.Finish()
+        if not result.ok():
+            raise RuntimeError("Failed to finish right indices array")
+        cdef shared_ptr[CArray] right_idx_array_cpp = result.ValueOrDie()
+
+        # Convert build table to RecordBatch (combine chunks)
+        # NOTE: self._build_table is a Python Table, need to combine chunks for Take operation
+        # This is a small overhead compared to the Take operations themselves
+        build_batch = self._build_table.combine_chunks().to_batches()[0]
+
+        # Unwrap build batch and probe batch to C++
+        cdef shared_ptr[CRecordBatch] c_build_batch = pyarrow_unwrap_batch(build_batch)
+        cdef shared_ptr[CRecordBatch] c_probe_batch = pyarrow_unwrap_batch(probe_batch)
+
+        # Take columns from build batch (C++ Take)
+        cdef vector[shared_ptr[CArray]] result_columns
+        cdef shared_ptr[CArray] column
+        cdef shared_ptr[CArray] taken
+        cdef int i
+
+        # Left side columns
+        for i in range(c_build_batch.get().num_columns()):
+            column = c_build_batch.get().column(i)
+            result = Take(column.get()[0], left_idx_array_cpp.get()[0])
+            if not result.ok():
+                raise RuntimeError(f"Failed to take left column {i}")
+            taken = result.ValueOrDie()
+            result_columns.push_back(taken)
+
+        # Right side columns
+        for i in range(c_probe_batch.get().num_columns()):
+            column = c_probe_batch.get().column(i)
+            result = Take(column.get()[0], right_idx_array_cpp.get()[0])
+            if not result.ok():
+                raise RuntimeError(f"Failed to take right column {i}")
+            taken = result.ValueOrDie()
+            result_columns.push_back(taken)
+
+        # Build combined schema with field renaming (left_*, right_*)
+        # For now, use Python for schema construction (C++ field construction is complex)
+        # This is a small overhead compared to the Take operations
         import pyarrow as pa
-        import pyarrow.compute as pc
 
-        # Convert C arrays to Arrow arrays for Take operations
-        left_list = [left_indices[i] for i in range(count)]
-        right_list = [right_indices[i] for i in range(count)]
-
-        left_idx_array = pa.array(left_list, type=pa.uint32())
-        right_idx_array = pa.array(right_list, type=pa.uint32())
-
-        # Take rows from build table using left indices
-        left_result_columns = []
-        for i in range(self._build_table.num_columns):
-            col = self._build_table.column(i)
-            taken = pc.take(col, left_idx_array)
-            # Combine chunks if needed (Table columns are ChunkedArrays)
-            if hasattr(taken, 'combine_chunks'):
-                taken = taken.combine_chunks()
-            left_result_columns.append(taken)
-
-        # Take rows from probe batch using right indices
-        right_result_columns = []
-        for i in range(probe_batch.num_columns):
-            col = probe_batch.column(i)
-            taken = pc.take(col, right_idx_array)
-            # Combine chunks if needed
-            if hasattr(taken, 'combine_chunks'):
-                taken = taken.combine_chunks()
-            right_result_columns.append(taken)
-
-        # Combine columns from both sides
-        all_columns = left_result_columns + right_result_columns
-
-        # Build schema (left columns + right columns)
         left_schema = self._build_table.schema
         right_schema = probe_batch.schema
 
-        # Create combined schema with unique names
         combined_fields = []
-        for i, field in enumerate(left_schema):
+        for field in left_schema:
             combined_fields.append(pa.field(f"left_{field.name}", field.type))
-        for i, field in enumerate(right_schema):
+        for field in right_schema:
             combined_fields.append(pa.field(f"right_{field.name}", field.type))
 
         combined_schema = pa.schema(combined_fields)
 
-        # Create result batch
-        return pa.RecordBatch.from_arrays(all_columns, schema=combined_schema)
+        # Unwrap Python schema to C++
+        cdef shared_ptr[CSchema] c_schema = pyarrow_unwrap_schema(combined_schema)
+
+        # Create RecordBatch using C++ RecordBatch::Make()
+        cdef shared_ptr[CRecordBatch] c_result_batch = CRecordBatchMaker.Make(
+            c_schema, count, result_columns
+        )
+
+        # Wrap C++ RecordBatch to Python and return
+        # pyarrow_wrap_batch expects const shared_ptr&, so Cython will handle the conversion
+        return pyarrow_wrap_batch(<const shared_ptr[CRecordBatch]>c_result_batch)
 
     def get_stats(self):
         """Get join statistics including C++ hash table metrics."""
