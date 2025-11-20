@@ -344,20 +344,13 @@ cdef class StreamingHashJoin:
         if self._build_batch is None:
             self._build_batch = self._build_table.combine_chunks().to_batches()[0]
 
-    cdef void _insert_build_batch_chunk(self, object batch):
-        """Internal: Insert a single chunk into build table (guaranteed <= MAX_BATCH_SIZE)."""
-        # Extract key column (assume single int64 key for now)
-        cdef int key_col_idx = self._left_key_indices[0]
-
-        # Unwrap Python RecordBatch to C++ RecordBatch (zero-copy)
-        cdef shared_ptr[CRecordBatch] c_batch = pyarrow_unwrap_batch(batch)
-        cdef int64_t num_rows = c_batch.get().num_rows()
-
-        # Get key column as C++ array
-        cdef shared_ptr[CArray] key_col = c_batch.get().column(key_col_idx)
-        cdef const CInt64Array* int64_array = <const CInt64Array*>key_col.get()
-        cdef const int64_t* raw_keys = int64_array.raw_values()
-
+    cdef void _insert_build_batch_chunk_nogil(
+        self,
+        const int64_t* raw_keys,
+        int64_t num_rows,
+        int64_t build_row_offset
+    ) nogil:
+        """Internal: C++ build insertion (runs without GIL for multi-threading)."""
         # Get hash buffer (pre-allocated, zero allocations)
         cdef uint32_t* hashes = <uint32_t*>self._hash_buffer.get().data()
 
@@ -373,10 +366,29 @@ cdef class StreamingHashJoin:
         cdef uint32_t* row_indices = <uint32_t*>self._left_indices.get().data()
         cdef int i
         for i in range(num_rows):
-            row_indices[i] = self._build_row_count + i
+            row_indices[i] = build_row_offset + i
 
         # Batch insert into C++ hash table (fast!)
         self._hash_table.insert_batch(hashes, row_indices, num_rows)
+
+    cdef void _insert_build_batch_chunk(self, object batch):
+        """Internal: Insert a single chunk into build table (guaranteed <= MAX_BATCH_SIZE)."""
+        # Extract key column (assume single int64 key for now)
+        cdef int key_col_idx = self._left_key_indices[0]
+
+        # Unwrap Python RecordBatch to C++ RecordBatch (zero-copy)
+        cdef shared_ptr[CRecordBatch] c_batch = pyarrow_unwrap_batch(batch)
+        cdef int64_t num_rows = c_batch.get().num_rows()
+
+        # Get key column as C++ array
+        cdef shared_ptr[CArray] key_col = c_batch.get().column(key_col_idx)
+        cdef const CInt64Array* int64_array = <const CInt64Array*>key_col.get()
+        cdef const int64_t* raw_keys = int64_array.raw_values()
+
+        # Release GIL and call nogil version for C++ operations
+        cdef int64_t build_row_offset = self._build_row_count
+        with nogil:
+            self._insert_build_batch_chunk_nogil(raw_keys, num_rows, build_row_offset)
 
         self._build_row_count += num_rows
 
@@ -417,6 +429,45 @@ cdef class StreamingHashJoin:
         for result in self._probe_batch_chunk(batch):
             yield result
 
+    cdef int _probe_hash_table_nogil(
+        self,
+        const uint32_t* hashes,
+        int64_t num_rows,
+        const uint8_t* match_bitvector,
+        uint32_t* left_indices_out,
+        uint32_t* right_indices_out,
+        int64_t* total_matches_out
+    ) nogil:
+        """Internal: C++ hash table probe (runs without GIL for multi-threading).
+
+        Returns: Number of matches found
+        """
+        cdef int match_count = 0
+        cdef uint32_t hash_val
+        cdef const uint32_t* build_row_indices
+        cdef int num_build_matches
+        cdef int i, j
+
+        for i in range(num_rows):
+            # Skip rows that didn't pass bloom filter (fast rejection)
+            if match_bitvector[i] == 0:
+                continue
+
+            hash_val = hashes[i]
+
+            # Probe C++ hash table (zero-copy lookup)
+            build_row_indices = self._hash_table.lookup_all(hash_val, &num_build_matches)
+
+            if num_build_matches > 0:
+                # Found matches - copy to output buffers
+                for j in range(num_build_matches):
+                    left_indices_out[match_count] = build_row_indices[j]
+                    right_indices_out[match_count] = i
+                    match_count += 1
+
+        total_matches_out[0] = match_count
+        return match_count
+
     def _probe_batch_chunk(self, object batch):
         """
         Internal: Probe a single chunk (guaranteed <= MAX_BATCH_SIZE).
@@ -452,57 +503,37 @@ cdef class StreamingHashJoin:
             hashes, num_rows, bloom_filter_data, BLOOM_FILTER_SIZE, match_bitvector
         )
 
-        # Update bloom filter statistics
-        self._bloom_filter_hits += bloom_matches
-        self._bloom_filter_misses += (num_rows - bloom_matches)
-
         # Get index buffers (pre-allocated)
         cdef uint32_t* left_indices_buf = <uint32_t*>self._left_indices.get().data()
         cdef uint32_t* right_indices_buf = <uint32_t*>self._right_indices.get().data()
+
+        # Statistics outputs
+        cdef int64_t bloom_hits = bloom_matches
+        cdef int64_t bloom_misses = num_rows - bloom_matches
+        cdef int64_t total_matches = 0
         cdef int match_count = 0
 
-        # Probe C++ hash table and collect matches (only for rows that passed bloom filter)
-        cdef uint32_t hash_val
-        cdef const uint32_t* build_row_indices
-        cdef int num_build_matches
-        cdef int j
+        # Probe C++ hash table and collect matches (release GIL for C++ operations)
+        with nogil:
+            match_count = self._probe_hash_table_nogil(
+                hashes, num_rows, match_bitvector,
+                left_indices_buf, right_indices_buf,
+                &total_matches
+            )
 
-        for i in range(num_rows):
-            # Skip rows that didn't pass bloom filter (fast rejection)
-            if match_bitvector[i] == 0:
-                continue
-
-            hash_val = hashes[i]
-
-            # Probe C++ hash table (zero-copy lookup)
-            build_row_indices = self._hash_table.lookup_all(hash_val, &num_build_matches)
-
-            if num_build_matches > 0:
-                # Found matches - copy to output buffers
-                for j in range(num_build_matches):
-                    left_indices_buf[match_count] = build_row_indices[j]
-                    right_indices_buf[match_count] = i
-                    match_count += 1
-                    self._total_matches += 1
-
-                    # Check buffer overflow (should not happen with proper chunking)
-                    if match_count >= 65536:  # MAX_BATCH_SIZE
-                        # Yield current batch and reset
-                        result_batch = self._build_result_batch(
-                            left_indices_buf, right_indices_buf, match_count, batch
-                        )
-                        yield result_batch
-                        match_count = 0
+        # Update statistics (with GIL)
+        self._bloom_filter_hits += bloom_hits
+        self._bloom_filter_misses += bloom_misses
+        self._total_matches += total_matches
 
         # If no matches, yield nothing
         if match_count == 0:
             return
 
-        # Build and yield result batch
+        # Build and yield result batch (with GIL for Python APIs)
         result_batch = self._build_result_batch(
             left_indices_buf, right_indices_buf, match_count, batch
         )
-
         yield result_batch
 
     cdef object _build_result_batch(self, uint32_t* left_indices, uint32_t* right_indices, int count, object probe_batch):
