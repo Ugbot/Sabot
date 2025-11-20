@@ -360,11 +360,27 @@ cdef class StreamingHashJoin:
         else:
             self._insert_build_batch_chunk(batch)
 
-        # Cache the build batch after all insertions (Bug #1 fix)
-        # Build table is immutable after insert completes, so we can cache the RecordBatch
-        # to avoid re-conversion in _build_result_batch()
-        if self._build_batch is None:
-            self._build_batch = self._build_table.combine_chunks().to_batches()[0]
+    def finalize_build(self):
+        """
+        Finalize build phase and cache the complete build table.
+        Must be called after all insert_build_batch() calls are complete.
+        """
+        if self._build_table is None or self._build_batch is not None:
+            return  # No table or already finalized
+
+        # Cache the ENTIRE build table as a single RecordBatch for Take operations
+        # Use combine_chunks() which returns a single Array for each column
+        arrays = []
+        for i in range(self._build_table.num_columns):
+            col = self._build_table.column(i)
+            if col.num_chunks == 0:
+                # Empty column
+                arrays.append(pa.array([], type=col.type))
+            else:
+                # Combine all chunks into one Array
+                arrays.append(col.combine_chunks())
+
+        self._build_batch = pa.RecordBatch.from_arrays(arrays, schema=self._build_table.schema)
 
     cdef void _insert_build_batch_chunk_nogil(
         self,
@@ -666,6 +682,12 @@ cdef class StreamingHashJoin:
             column = c_build_batch.get().column(i)
             result = Take(column.get()[0], left_idx_array_cpp.get()[0])
             if not result.ok():
+                print(f"DEBUG: Failed to take left column {i}")
+                print(f"  Build batch num_rows: {c_build_batch.get().num_rows()}")
+                print(f"  Build table num_rows: {self._build_table.num_rows}")
+                print(f"  Cached batch num_rows: {self._build_batch.num_rows}")
+                print(f"  Left indices length: {left_idx_array_cpp.get().length()}")
+                print(f"  Match count: {count}")
                 raise RuntimeError(f"Failed to take left column {i}")
             taken = result.ValueOrDie()
             result_columns.push_back(taken)

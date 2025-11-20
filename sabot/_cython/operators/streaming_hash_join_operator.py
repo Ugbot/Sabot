@@ -108,18 +108,19 @@ class StreamingHashJoinOperator:
             except KeyError:
                 raise ValueError(f"Right key '{key_name}' not found in schema: {right_schema}")
 
-        # Collect all left batches (need to do this to get schema and iterate later)
-        left_batches = list(self._left_source)
+        # Get schema from first left batch (don't materialize everything!)
+        first_left_batch = None
+        for batch in self._left_source:
+            first_left_batch = batch
+            break
 
-        if not left_batches:
+        if first_left_batch is None:
             # Empty left side
             if self._join_type in ('right', 'outer'):
                 # Return all right rows (no matches) - need to handle this case
                 pass
             return
 
-        # Get schema from first left batch
-        first_left_batch = left_batches[0]
         left_schema = first_left_batch.schema
 
         # Map left key names to indices
@@ -155,10 +156,20 @@ class StreamingHashJoinOperator:
         for right_batch in right_batches:
             self._join_impl.insert_build_batch(right_batch)
 
+        # Finalize build phase - cache complete build table for Take operations
+        self._join_impl.finalize_build()
+
         self._build_complete = True
 
-        # Probe with all left batches (PROBE side)
-        for left_batch in left_batches:
+        # Probe with left batches (PROBE side) - streaming!
+        # First process the first batch (already consumed to get schema)
+        if first_left_batch.num_rows > 0:
+            for result_batch in self._join_impl.probe_batch(first_left_batch):
+                if result_batch.num_rows > 0:
+                    yield result_batch
+
+        # Then stream the rest of the left batches
+        for left_batch in self._left_source:
             if left_batch.num_rows == 0:
                 continue
 
