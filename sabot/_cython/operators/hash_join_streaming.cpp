@@ -1242,6 +1242,7 @@ static CYTHON_INLINE float __PYX_NAN() {
 #include "arrow/api.h"
 #include "arrow/compute/api.h"
 #include "arrow/array/builder_primitive.h"
+#include "arrow/util/thread_pool.h"
 #include <stdio.h>
 
     #if PY_MAJOR_VERSION >= 3
@@ -1376,7 +1377,6 @@ static CYTHON_INLINE float __PYX_NAN() {
 #include "arrow/csv/api.h"
 #include "arrow/json/options.h"
 #include "arrow/json/reader.h"
-#include "arrow/util/thread_pool.h"
 
     #include "arrow/compute/function.h"
     namespace arrow {
@@ -3376,7 +3376,7 @@ struct __pyx_obj_7pyarrow_3lib_StopToken {
 };
 
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":186
+/* "sabot/_cython/operators/hash_join_streaming.pyx":196
  * 
  * 
  * cdef class StreamingHashJoin:             # <<<<<<<<<<<<<<
@@ -3396,6 +3396,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJ
   std::shared_ptr<arrow::Buffer>  _bloom_mask;
   std::shared_ptr<arrow::Buffer>  _match_bitvector;
   arrow::MemoryPool *_pool;
+  std::shared_ptr<arrow::internal::ThreadPool>  _thread_pool;
   sabot::hash_join::HashJoinTable *_hash_table;
   std::shared_ptr<arrow::Buffer>  _bloom_filter;
   int64_t _build_row_count;
@@ -3409,7 +3410,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJ
 };
 
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":395
+/* "sabot/_cython/operators/hash_join_streaming.pyx":417
  *         self._build_row_count += num_rows
  * 
  *     def probe_batch(self, object batch):             # <<<<<<<<<<<<<<
@@ -3434,7 +3435,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_st
 };
 
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":471
+/* "sabot/_cython/operators/hash_join_streaming.pyx":493
  *         return match_count
  * 
  *     def _probe_batch_chunk(self, object batch):             # <<<<<<<<<<<<<<
@@ -4768,7 +4769,7 @@ struct __pyx_vtabstruct_7pyarrow_3lib_StopToken {
 static struct __pyx_vtabstruct_7pyarrow_3lib_StopToken *__pyx_vtabptr_7pyarrow_3lib_StopToken;
 
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":186
+/* "sabot/_cython/operators/hash_join_streaming.pyx":196
  * 
  * 
  * cdef class StreamingHashJoin:             # <<<<<<<<<<<<<<
@@ -5106,6 +5107,32 @@ static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *nam
   #define __PYX_STD_MOVE_IF_SUPPORTED(x) x
 #endif
 
+/* BuildPyUnicode.proto */
+static PyObject* __Pyx_PyUnicode_BuildFromAscii(Py_ssize_t ulength, const char* chars, int clength,
+                                                int prepend_sign, char padding_char);
+
+/* COrdinalToPyUnicode.proto */
+static CYTHON_INLINE int __Pyx_CheckUnicodeValue(int value);
+static CYTHON_INLINE PyObject* __Pyx_PyUnicode_FromOrdinal_Padded(int value, Py_ssize_t width, char padding_char);
+
+/* GCCDiagnostics.proto */
+#if !defined(__INTEL_COMPILER) && defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
+#define __Pyx_HAS_GCC_DIAGNOSTIC
+#endif
+
+/* IncludeStdlibH.proto */
+#include <stdlib.h>
+
+/* CIntToPyUnicode.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyUnicode_From_int(int value, Py_ssize_t width, char padding_char, char format_char);
+
+/* JoinPyUnicode.proto */
+static PyObject* __Pyx_PyUnicode_Join(PyObject** values, Py_ssize_t value_count, Py_ssize_t result_ulength,
+                                      Py_UCS4 max_char);
+
+/* RaiseException.proto */
+static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
+
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 #define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
@@ -5199,28 +5226,6 @@ static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
 /* pep479.proto */
 static void __Pyx_Generator_Replace_StopIteration(int in_async_gen);
 
-/* RaiseException.proto */
-static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
-
-/* BuildPyUnicode.proto */
-static PyObject* __Pyx_PyUnicode_BuildFromAscii(Py_ssize_t ulength, const char* chars, int clength,
-                                                int prepend_sign, char padding_char);
-
-/* COrdinalToPyUnicode.proto */
-static CYTHON_INLINE int __Pyx_CheckUnicodeValue(int value);
-static CYTHON_INLINE PyObject* __Pyx_PyUnicode_FromOrdinal_Padded(int value, Py_ssize_t width, char padding_char);
-
-/* GCCDiagnostics.proto */
-#if !defined(__INTEL_COMPILER) && defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
-#define __Pyx_HAS_GCC_DIAGNOSTIC
-#endif
-
-/* IncludeStdlibH.proto */
-#include <stdlib.h>
-
-/* CIntToPyUnicode.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyUnicode_From_int(int value, Py_ssize_t width, char padding_char, char format_char);
-
 /* PyDictContains.proto */
 static CYTHON_INLINE int __Pyx_PyDict_ContainsTF(PyObject* item, PyObject* dict, int eq) {
     int result = PyDict_Contains(dict, item);
@@ -5285,10 +5290,6 @@ static PyObject* __Pyx_PyObject_Format(PyObject* s, PyObject* f);
 #else
 #define __Pyx_PyObject_Format(s, f) PyObject_Format(s, f)
 #endif
-
-/* JoinPyUnicode.proto */
-static PyObject* __Pyx_PyUnicode_Join(PyObject** values, Py_ssize_t value_count, Py_ssize_t result_ulength,
-                                      Py_UCS4 max_char);
 
 /* DefaultPlacementNew.proto */
 #include <new>
@@ -6024,8 +6025,8 @@ int __pyx_module_is_main_sabot___cython__operators__hash_join_streaming = 0;
 
 /* Implementation of "sabot._cython.operators.hash_join_streaming" */
 /* #### Code section: global_var ### */
-static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_RuntimeError;
+static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_TypeError;
 /* #### Code section: string_decls ### */
 static const char __pyx_k_[] = ",";
@@ -6083,6 +6084,7 @@ static const char __pyx_k_disable[] = "disable";
 static const char __pyx_k_key_col[] = "key_col";
 static const char __pyx_k_machine[] = "machine";
 static const char __pyx_k_matches[] = "matches";
+static const char __pyx_k_threads[] = " threads";
 static const char __pyx_k_add_note[] = "add_note";
 static const char __pyx_k_getstate[] = "__getstate__";
 static const char __pyx_k_num_rows[] = "num_rows";
@@ -6155,6 +6157,7 @@ static const char __pyx_k_A_QgQ_A_BfM_1_5_Q_4_S_oQ__Bk_1A[] = "\200A\360\020\000
 static const char __pyx_k_A_a_a_t1_Q_4q_Qd_r_at1_G1_l_a_l[] = "\200A\340\010\t\330\014\032\230$\230a\330\014\032\230$\230a\330\014\027\220t\2301\330\014!\240\024\240Q\330\014#\2404\240q\330\014\r\330\020\025\220Q\220d\320\032/\250r\260\025\260a\260t\2701\330\023\027\320\027*\250\"\250G\2601\340\014\"\240$\240l\260,\270a\330\014\"\240$\240l\260,\270a\330\014'\240t\250<\260}\300A\330\014\r\330\020\025\220Q\220d\230,\240l\260$\260b\270\005\270Q\270d\300,\310l\320Z[\330\023\027\220|\240<\250s\260\"\260G\2701";
 static const char __pyx_k_Failed_to_build_left_indices_arr[] = "Failed to build left indices array";
 static const char __pyx_k_Failed_to_build_right_indices_ar[] = "Failed to build right indices array";
+static const char __pyx_k_Failed_to_create_thread_pool_wit[] = "Failed to create thread pool with ";
 static const char __pyx_k_Failed_to_finish_left_indices_ar[] = "Failed to finish left indices array";
 static const char __pyx_k_Failed_to_finish_right_indices_a[] = "Failed to finish right indices array";
 static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.";
@@ -6163,7 +6166,7 @@ static const char __pyx_k_StreamingHashJoin___setstate_cyt[] = "StreamingHashJoi
 static const char __pyx_k_StreamingHashJoin__probe_batch_c[] = "StreamingHashJoin._probe_batch_chunk";
 static const char __pyx_k_StreamingHashJoin_insert_build_b[] = "StreamingHashJoin.insert_build_batch";
 static const char __pyx_k_sabot__cython_operators_hash_joi[] = "sabot._cython.operators.hash_join_streaming";
-static const char __pyx_k_self__bloom_filter_self__bloom_m[] = "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling";
+static const char __pyx_k_self__bloom_filter_self__bloom_m[] = "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling";
 static const char __pyx_k_sabot__cython_operators_hash_joi_2[] = "sabot/_cython/operators/hash_join_streaming.pyx";
 /* #### Code section: decls ### */
 static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin___init__(struct __pyx_obj_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *__pyx_v_self, PyObject *__pyx_v_left_keys, PyObject *__pyx_v_right_keys, PyObject *__pyx_v_join_type, int __pyx_v_num_threads); /* proto */
@@ -6333,7 +6336,7 @@ typedef struct {
   PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
   PyObject *__pyx_codeobj_tab[7];
-  PyObject *__pyx_string_tab[131];
+  PyObject *__pyx_string_tab[133];
   PyObject *__pyx_float_0_0;
   PyObject *__pyx_int_0;
   PyObject *__pyx_int_65536;
@@ -6393,133 +6396,135 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_kp_u_ARM_NEON_128_bit_4_way_parallel __pyx_string_tab[1]
 #define __pyx_kp_u_Failed_to_build_left_indices_arr __pyx_string_tab[2]
 #define __pyx_kp_u_Failed_to_build_right_indices_ar __pyx_string_tab[3]
-#define __pyx_kp_u_Failed_to_finish_left_indices_ar __pyx_string_tab[4]
-#define __pyx_kp_u_Failed_to_finish_right_indices_a __pyx_string_tab[5]
-#define __pyx_kp_u_Failed_to_take_left_column __pyx_string_tab[6]
-#define __pyx_kp_u_Failed_to_take_right_column __pyx_string_tab[7]
-#define __pyx_n_u_IS_ARM __pyx_string_tab[8]
-#define __pyx_n_u_IS_X86 __pyx_string_tab[9]
-#define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[10]
-#define __pyx_n_u_PLATFORM_MACHINE __pyx_string_tab[11]
-#define __pyx_n_u_RuntimeError __pyx_string_tab[12]
-#define __pyx_n_u_StreamingHashJoin __pyx_string_tab[13]
-#define __pyx_n_u_StreamingHashJoin___reduce_cytho __pyx_string_tab[14]
-#define __pyx_n_u_StreamingHashJoin___setstate_cyt __pyx_string_tab[15]
-#define __pyx_n_u_StreamingHashJoin__probe_batch_c __pyx_string_tab[16]
-#define __pyx_kp_u_StreamingHashJoin_build_rows __pyx_string_tab[17]
-#define __pyx_n_u_StreamingHashJoin_get_stats __pyx_string_tab[18]
-#define __pyx_n_u_StreamingHashJoin_insert_build_b __pyx_string_tab[19]
-#define __pyx_n_u_StreamingHashJoin_probe_batch __pyx_string_tab[20]
-#define __pyx_n_u_Table __pyx_string_tab[21]
-#define __pyx_n_u_TypeError __pyx_string_tab[22]
-#define __pyx_kp_u__2 __pyx_string_tab[23]
-#define __pyx_kp_u__3 __pyx_string_tab[24]
-#define __pyx_kp_u__4 __pyx_string_tab[25]
-#define __pyx_n_u_aarch64 __pyx_string_tab[26]
-#define __pyx_kp_u_add_note __pyx_string_tab[27]
-#define __pyx_n_u_amd64 __pyx_string_tab[28]
-#define __pyx_n_u_arm64 __pyx_string_tab[29]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[30]
-#define __pyx_n_u_batch __pyx_string_tab[31]
-#define __pyx_n_u_bloom_filter_data __pyx_string_tab[32]
-#define __pyx_n_u_bloom_filter_hits __pyx_string_tab[33]
-#define __pyx_n_u_bloom_filter_misses __pyx_string_tab[34]
-#define __pyx_n_u_bloom_filter_selectivity __pyx_string_tab[35]
-#define __pyx_n_u_bloom_hits __pyx_string_tab[36]
-#define __pyx_n_u_bloom_matches __pyx_string_tab[37]
-#define __pyx_n_u_bloom_misses __pyx_string_tab[38]
-#define __pyx_n_u_build_rows __pyx_string_tab[39]
-#define __pyx_n_u_c_batch __pyx_string_tab[40]
-#define __pyx_n_u_chunk __pyx_string_tab[41]
-#define __pyx_n_u_chunk_size __pyx_string_tab[42]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[43]
-#define __pyx_n_u_close __pyx_string_tab[44]
-#define __pyx_n_u_combine_chunks __pyx_string_tab[45]
-#define __pyx_n_u_concat_tables __pyx_string_tab[46]
-#define __pyx_n_u_cyarrow __pyx_string_tab[47]
-#define __pyx_kp_u_disable __pyx_string_tab[48]
-#define __pyx_kp_u_enable __pyx_string_tab[49]
-#define __pyx_n_u_field __pyx_string_tab[50]
-#define __pyx_n_u_from_batches __pyx_string_tab[51]
-#define __pyx_n_u_func __pyx_string_tab[52]
-#define __pyx_kp_u_gc __pyx_string_tab[53]
-#define __pyx_n_u_get_simd_platform __pyx_string_tab[54]
-#define __pyx_n_u_get_stats __pyx_string_tab[55]
-#define __pyx_n_u_getstate __pyx_string_tab[56]
-#define __pyx_n_u_hash_table_buckets __pyx_string_tab[57]
-#define __pyx_n_u_hash_table_entries __pyx_string_tab[58]
-#define __pyx_n_u_hash_table_load_factor __pyx_string_tab[59]
-#define __pyx_n_u_hash_table_memory_bytes __pyx_string_tab[60]
-#define __pyx_n_u_hashes __pyx_string_tab[61]
-#define __pyx_n_u_initializing __pyx_string_tab[62]
-#define __pyx_n_u_inner __pyx_string_tab[63]
-#define __pyx_n_u_insert_build_batch __pyx_string_tab[64]
-#define __pyx_n_u_int64_array __pyx_string_tab[65]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[66]
-#define __pyx_kp_u_isenabled __pyx_string_tab[67]
-#define __pyx_n_u_join_type __pyx_string_tab[68]
-#define __pyx_n_u_key_col __pyx_string_tab[69]
-#define __pyx_n_u_key_col_idx __pyx_string_tab[70]
-#define __pyx_n_u_left __pyx_string_tab[71]
-#define __pyx_n_u_left_indices_buf __pyx_string_tab[72]
-#define __pyx_n_u_left_keys __pyx_string_tab[73]
-#define __pyx_n_u_lower __pyx_string_tab[74]
-#define __pyx_n_u_machine __pyx_string_tab[75]
-#define __pyx_n_u_main __pyx_string_tab[76]
-#define __pyx_n_u_match_bitvector __pyx_string_tab[77]
-#define __pyx_n_u_match_count __pyx_string_tab[78]
-#define __pyx_n_u_matches __pyx_string_tab[79]
-#define __pyx_kp_u_matches_2 __pyx_string_tab[80]
-#define __pyx_n_u_module __pyx_string_tab[81]
-#define __pyx_n_u_name __pyx_string_tab[82]
-#define __pyx_n_u_name_2 __pyx_string_tab[83]
-#define __pyx_n_u_next __pyx_string_tab[84]
-#define __pyx_n_u_num_hashed __pyx_string_tab[85]
-#define __pyx_n_u_num_rows __pyx_string_tab[86]
-#define __pyx_n_u_num_threads __pyx_string_tab[87]
-#define __pyx_n_u_offset __pyx_string_tab[88]
-#define __pyx_n_u_pa __pyx_string_tab[89]
-#define __pyx_n_u_platform __pyx_string_tab[90]
-#define __pyx_n_u_pop __pyx_string_tab[91]
-#define __pyx_n_u_probe_batch __pyx_string_tab[92]
-#define __pyx_n_u_probe_batch_chunk __pyx_string_tab[93]
-#define __pyx_n_u_probe_rows __pyx_string_tab[94]
-#define __pyx_kp_u_probe_rows_2 __pyx_string_tab[95]
-#define __pyx_n_u_pyx_state __pyx_string_tab[96]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[97]
-#define __pyx_n_u_qualname __pyx_string_tab[98]
-#define __pyx_n_u_range __pyx_string_tab[99]
-#define __pyx_n_u_raw_keys __pyx_string_tab[100]
-#define __pyx_n_u_reduce __pyx_string_tab[101]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[102]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[103]
-#define __pyx_n_u_result __pyx_string_tab[104]
-#define __pyx_n_u_result_batch __pyx_string_tab[105]
-#define __pyx_n_u_right __pyx_string_tab[106]
-#define __pyx_n_u_right_indices_buf __pyx_string_tab[107]
-#define __pyx_n_u_right_keys __pyx_string_tab[108]
-#define __pyx_n_u_sabot __pyx_string_tab[109]
-#define __pyx_n_u_sabot__cython_operators_hash_joi __pyx_string_tab[110]
-#define __pyx_kp_u_sabot__cython_operators_hash_joi_2 __pyx_string_tab[111]
-#define __pyx_n_u_schema __pyx_string_tab[112]
-#define __pyx_n_u_self __pyx_string_tab[113]
-#define __pyx_kp_u_self__bloom_filter_self__bloom_m __pyx_string_tab[114]
-#define __pyx_n_u_send __pyx_string_tab[115]
-#define __pyx_n_u_set_name __pyx_string_tab[116]
-#define __pyx_n_u_setstate __pyx_string_tab[117]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[118]
-#define __pyx_n_u_slice __pyx_string_tab[119]
-#define __pyx_n_u_spec __pyx_string_tab[120]
-#define __pyx_kp_u_stringsource __pyx_string_tab[121]
-#define __pyx_n_u_table __pyx_string_tab[122]
-#define __pyx_n_u_test __pyx_string_tab[123]
-#define __pyx_n_u_throw __pyx_string_tab[124]
-#define __pyx_n_u_to_batches __pyx_string_tab[125]
-#define __pyx_n_u_total_matches __pyx_string_tab[126]
-#define __pyx_n_u_type __pyx_string_tab[127]
-#define __pyx_n_u_value __pyx_string_tab[128]
-#define __pyx_n_u_x64 __pyx_string_tab[129]
-#define __pyx_n_u_x86_64 __pyx_string_tab[130]
+#define __pyx_kp_u_Failed_to_create_thread_pool_wit __pyx_string_tab[4]
+#define __pyx_kp_u_Failed_to_finish_left_indices_ar __pyx_string_tab[5]
+#define __pyx_kp_u_Failed_to_finish_right_indices_a __pyx_string_tab[6]
+#define __pyx_kp_u_Failed_to_take_left_column __pyx_string_tab[7]
+#define __pyx_kp_u_Failed_to_take_right_column __pyx_string_tab[8]
+#define __pyx_n_u_IS_ARM __pyx_string_tab[9]
+#define __pyx_n_u_IS_X86 __pyx_string_tab[10]
+#define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[11]
+#define __pyx_n_u_PLATFORM_MACHINE __pyx_string_tab[12]
+#define __pyx_n_u_RuntimeError __pyx_string_tab[13]
+#define __pyx_n_u_StreamingHashJoin __pyx_string_tab[14]
+#define __pyx_n_u_StreamingHashJoin___reduce_cytho __pyx_string_tab[15]
+#define __pyx_n_u_StreamingHashJoin___setstate_cyt __pyx_string_tab[16]
+#define __pyx_n_u_StreamingHashJoin__probe_batch_c __pyx_string_tab[17]
+#define __pyx_kp_u_StreamingHashJoin_build_rows __pyx_string_tab[18]
+#define __pyx_n_u_StreamingHashJoin_get_stats __pyx_string_tab[19]
+#define __pyx_n_u_StreamingHashJoin_insert_build_b __pyx_string_tab[20]
+#define __pyx_n_u_StreamingHashJoin_probe_batch __pyx_string_tab[21]
+#define __pyx_n_u_Table __pyx_string_tab[22]
+#define __pyx_n_u_TypeError __pyx_string_tab[23]
+#define __pyx_kp_u__2 __pyx_string_tab[24]
+#define __pyx_kp_u__3 __pyx_string_tab[25]
+#define __pyx_kp_u__4 __pyx_string_tab[26]
+#define __pyx_n_u_aarch64 __pyx_string_tab[27]
+#define __pyx_kp_u_add_note __pyx_string_tab[28]
+#define __pyx_n_u_amd64 __pyx_string_tab[29]
+#define __pyx_n_u_arm64 __pyx_string_tab[30]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[31]
+#define __pyx_n_u_batch __pyx_string_tab[32]
+#define __pyx_n_u_bloom_filter_data __pyx_string_tab[33]
+#define __pyx_n_u_bloom_filter_hits __pyx_string_tab[34]
+#define __pyx_n_u_bloom_filter_misses __pyx_string_tab[35]
+#define __pyx_n_u_bloom_filter_selectivity __pyx_string_tab[36]
+#define __pyx_n_u_bloom_hits __pyx_string_tab[37]
+#define __pyx_n_u_bloom_matches __pyx_string_tab[38]
+#define __pyx_n_u_bloom_misses __pyx_string_tab[39]
+#define __pyx_n_u_build_rows __pyx_string_tab[40]
+#define __pyx_n_u_c_batch __pyx_string_tab[41]
+#define __pyx_n_u_chunk __pyx_string_tab[42]
+#define __pyx_n_u_chunk_size __pyx_string_tab[43]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[44]
+#define __pyx_n_u_close __pyx_string_tab[45]
+#define __pyx_n_u_combine_chunks __pyx_string_tab[46]
+#define __pyx_n_u_concat_tables __pyx_string_tab[47]
+#define __pyx_n_u_cyarrow __pyx_string_tab[48]
+#define __pyx_kp_u_disable __pyx_string_tab[49]
+#define __pyx_kp_u_enable __pyx_string_tab[50]
+#define __pyx_n_u_field __pyx_string_tab[51]
+#define __pyx_n_u_from_batches __pyx_string_tab[52]
+#define __pyx_n_u_func __pyx_string_tab[53]
+#define __pyx_kp_u_gc __pyx_string_tab[54]
+#define __pyx_n_u_get_simd_platform __pyx_string_tab[55]
+#define __pyx_n_u_get_stats __pyx_string_tab[56]
+#define __pyx_n_u_getstate __pyx_string_tab[57]
+#define __pyx_n_u_hash_table_buckets __pyx_string_tab[58]
+#define __pyx_n_u_hash_table_entries __pyx_string_tab[59]
+#define __pyx_n_u_hash_table_load_factor __pyx_string_tab[60]
+#define __pyx_n_u_hash_table_memory_bytes __pyx_string_tab[61]
+#define __pyx_n_u_hashes __pyx_string_tab[62]
+#define __pyx_n_u_initializing __pyx_string_tab[63]
+#define __pyx_n_u_inner __pyx_string_tab[64]
+#define __pyx_n_u_insert_build_batch __pyx_string_tab[65]
+#define __pyx_n_u_int64_array __pyx_string_tab[66]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[67]
+#define __pyx_kp_u_isenabled __pyx_string_tab[68]
+#define __pyx_n_u_join_type __pyx_string_tab[69]
+#define __pyx_n_u_key_col __pyx_string_tab[70]
+#define __pyx_n_u_key_col_idx __pyx_string_tab[71]
+#define __pyx_n_u_left __pyx_string_tab[72]
+#define __pyx_n_u_left_indices_buf __pyx_string_tab[73]
+#define __pyx_n_u_left_keys __pyx_string_tab[74]
+#define __pyx_n_u_lower __pyx_string_tab[75]
+#define __pyx_n_u_machine __pyx_string_tab[76]
+#define __pyx_n_u_main __pyx_string_tab[77]
+#define __pyx_n_u_match_bitvector __pyx_string_tab[78]
+#define __pyx_n_u_match_count __pyx_string_tab[79]
+#define __pyx_n_u_matches __pyx_string_tab[80]
+#define __pyx_kp_u_matches_2 __pyx_string_tab[81]
+#define __pyx_n_u_module __pyx_string_tab[82]
+#define __pyx_n_u_name __pyx_string_tab[83]
+#define __pyx_n_u_name_2 __pyx_string_tab[84]
+#define __pyx_n_u_next __pyx_string_tab[85]
+#define __pyx_n_u_num_hashed __pyx_string_tab[86]
+#define __pyx_n_u_num_rows __pyx_string_tab[87]
+#define __pyx_n_u_num_threads __pyx_string_tab[88]
+#define __pyx_n_u_offset __pyx_string_tab[89]
+#define __pyx_n_u_pa __pyx_string_tab[90]
+#define __pyx_n_u_platform __pyx_string_tab[91]
+#define __pyx_n_u_pop __pyx_string_tab[92]
+#define __pyx_n_u_probe_batch __pyx_string_tab[93]
+#define __pyx_n_u_probe_batch_chunk __pyx_string_tab[94]
+#define __pyx_n_u_probe_rows __pyx_string_tab[95]
+#define __pyx_kp_u_probe_rows_2 __pyx_string_tab[96]
+#define __pyx_n_u_pyx_state __pyx_string_tab[97]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[98]
+#define __pyx_n_u_qualname __pyx_string_tab[99]
+#define __pyx_n_u_range __pyx_string_tab[100]
+#define __pyx_n_u_raw_keys __pyx_string_tab[101]
+#define __pyx_n_u_reduce __pyx_string_tab[102]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[103]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[104]
+#define __pyx_n_u_result __pyx_string_tab[105]
+#define __pyx_n_u_result_batch __pyx_string_tab[106]
+#define __pyx_n_u_right __pyx_string_tab[107]
+#define __pyx_n_u_right_indices_buf __pyx_string_tab[108]
+#define __pyx_n_u_right_keys __pyx_string_tab[109]
+#define __pyx_n_u_sabot __pyx_string_tab[110]
+#define __pyx_n_u_sabot__cython_operators_hash_joi __pyx_string_tab[111]
+#define __pyx_kp_u_sabot__cython_operators_hash_joi_2 __pyx_string_tab[112]
+#define __pyx_n_u_schema __pyx_string_tab[113]
+#define __pyx_n_u_self __pyx_string_tab[114]
+#define __pyx_kp_u_self__bloom_filter_self__bloom_m __pyx_string_tab[115]
+#define __pyx_n_u_send __pyx_string_tab[116]
+#define __pyx_n_u_set_name __pyx_string_tab[117]
+#define __pyx_n_u_setstate __pyx_string_tab[118]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[119]
+#define __pyx_n_u_slice __pyx_string_tab[120]
+#define __pyx_n_u_spec __pyx_string_tab[121]
+#define __pyx_kp_u_stringsource __pyx_string_tab[122]
+#define __pyx_n_u_table __pyx_string_tab[123]
+#define __pyx_n_u_test __pyx_string_tab[124]
+#define __pyx_kp_u_threads __pyx_string_tab[125]
+#define __pyx_n_u_throw __pyx_string_tab[126]
+#define __pyx_n_u_to_batches __pyx_string_tab[127]
+#define __pyx_n_u_total_matches __pyx_string_tab[128]
+#define __pyx_n_u_type __pyx_string_tab[129]
+#define __pyx_n_u_value __pyx_string_tab[130]
+#define __pyx_n_u_x64 __pyx_string_tab[131]
+#define __pyx_n_u_x86_64 __pyx_string_tab[132]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -6655,7 +6660,7 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk);
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk);
   for (int i=0; i<7; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<131; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<133; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   Py_CLEAR(clear_module_state->__pyx_float_0_0);
   Py_CLEAR(clear_module_state->__pyx_int_0);
   Py_CLEAR(clear_module_state->__pyx_int_65536);
@@ -6794,7 +6799,7 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk);
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk);
   for (int i=0; i<7; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<131; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<133; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_float_0_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_65536);
@@ -9204,7 +9209,7 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyarrow_8includes_6common_PyObject_to_ob
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":224
+/* "sabot/_cython/operators/hash_join_streaming.pyx":235
  *         int64_t _bloom_filter_misses
  * 
  *     def __init__(self, list left_keys, list right_keys, str join_type='inner', int num_threads=1):             # <<<<<<<<<<<<<<
@@ -9214,7 +9219,7 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyarrow_8includes_6common_PyObject_to_ob
 
 /* Python wrapper */
 static int __pyx_pw_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin___init__, "\n        Initialize streaming hash join.\n\n        Args:\n            left_keys: Column indices for left (build) table keys\n            right_keys: Column indices for right (probe) table keys\n            join_type: Join type ('inner', 'left', 'right', 'outer')\n            num_threads: Number of probe threads (not yet implemented)\n        ");
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin___init__, "\n        Initialize streaming hash join.\n\n        Args:\n            left_keys: Column indices for left (build) table keys\n            right_keys: Column indices for right (probe) table keys\n            join_type: Join type ('inner', 'left', 'right', 'outer')\n            num_threads: Number of threads for parallel execution (default: 1)\n        ");
 #if CYTHON_UPDATE_DESCRIPTOR_DOC
 struct wrapperbase __pyx_wrapperbase_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin___init__;
 #endif
@@ -9241,49 +9246,49 @@ static int __pyx_pw_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_left_keys,&__pyx_mstate_global->__pyx_n_u_right_keys,&__pyx_mstate_global->__pyx_n_u_join_type,&__pyx_mstate_global->__pyx_n_u_num_threads,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 224, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 235, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  4:
         values[3] = __Pyx_ArgRef_VARARGS(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 224, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 235, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 224, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 235, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 224, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 235, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 224, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 235, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < (0)) __PYX_ERR(0, 224, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < (0)) __PYX_ERR(0, 235, __pyx_L3_error)
       if (!values[2]) values[2] = __Pyx_NewRef(((PyObject*)__pyx_mstate_global->__pyx_n_u_inner));
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 4, i); __PYX_ERR(0, 224, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 4, i); __PYX_ERR(0, 235, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  4:
         values[3] = __Pyx_ArgRef_VARARGS(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 224, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 235, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 224, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 235, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 224, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 235, __pyx_L3_error)
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 224, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 235, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
@@ -9293,14 +9298,14 @@ static int __pyx_pw_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
     __pyx_v_right_keys = ((PyObject*)values[1]);
     __pyx_v_join_type = ((PyObject*)values[2]);
     if (values[3]) {
-      __pyx_v_num_threads = __Pyx_PyLong_As_int(values[3]); if (unlikely((__pyx_v_num_threads == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 224, __pyx_L3_error)
+      __pyx_v_num_threads = __Pyx_PyLong_As_int(values[3]); if (unlikely((__pyx_v_num_threads == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 235, __pyx_L3_error)
     } else {
       __pyx_v_num_threads = ((int)1);
     }
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 4, __pyx_nargs); __PYX_ERR(0, 224, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 4, __pyx_nargs); __PYX_ERR(0, 235, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9311,9 +9316,9 @@ static int __pyx_pw_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_left_keys), (&PyList_Type), 1, "left_keys", 1))) __PYX_ERR(0, 224, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_right_keys), (&PyList_Type), 1, "right_keys", 1))) __PYX_ERR(0, 224, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_join_type), (&PyUnicode_Type), 1, "join_type", 1))) __PYX_ERR(0, 224, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_left_keys), (&PyList_Type), 1, "left_keys", 1))) __PYX_ERR(0, 235, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_right_keys), (&PyList_Type), 1, "right_keys", 1))) __PYX_ERR(0, 235, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_join_type), (&PyUnicode_Type), 1, "join_type", 1))) __PYX_ERR(0, 235, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin___init__(((struct __pyx_obj_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *)__pyx_v_self), __pyx_v_left_keys, __pyx_v_right_keys, __pyx_v_join_type, __pyx_v_num_threads);
 
   /* function exit code */
@@ -9334,6 +9339,7 @@ static int __pyx_pw_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 }
 
 static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin___init__(struct __pyx_obj_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *__pyx_v_self, PyObject *__pyx_v_left_keys, PyObject *__pyx_v_right_keys, PyObject *__pyx_v_join_type, int __pyx_v_num_threads) {
+  arrow::Result<std::shared_ptr<arrow::internal::ThreadPool> >  __pyx_v_tp_result;
   PyObject *__pyx_v_idx = NULL;
   int __pyx_r;
   __Pyx_RefNannyDeclarations
@@ -9342,14 +9348,21 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   Py_ssize_t __pyx_t_3;
   PyObject *__pyx_t_4 = NULL;
   int __pyx_t_5;
-  std::shared_ptr<arrow::Buffer>  __pyx_t_6;
+  int __pyx_t_6;
+  PyObject *__pyx_t_7 = NULL;
+  PyObject *__pyx_t_8 = NULL;
+  PyObject *__pyx_t_9[3];
+  PyObject *__pyx_t_10 = NULL;
+  size_t __pyx_t_11;
+  std::shared_ptr<arrow::internal::ThreadPool>  __pyx_t_12;
+  std::shared_ptr<arrow::Buffer>  __pyx_t_13;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":235
- *         """
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":248
+ * 
  *         # Store as Python lists (will convert to vectors when needed)
  *         self._left_key_indices = vector[int]()             # <<<<<<<<<<<<<<
  *         for idx in left_keys:
@@ -9359,11 +9372,11 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
     __pyx_t_1 = std::vector<int> ();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 235, __pyx_L1_error)
+    __PYX_ERR(0, 248, __pyx_L1_error)
   }
   __pyx_v_self->_left_key_indices = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_1);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":236
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":249
  *         # Store as Python lists (will convert to vectors when needed)
  *         self._left_key_indices = vector[int]()
  *         for idx in left_keys:             # <<<<<<<<<<<<<<
@@ -9372,7 +9385,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   if (unlikely(__pyx_v_left_keys == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 236, __pyx_L1_error)
+    __PYX_ERR(0, 249, __pyx_L1_error)
   }
   __pyx_t_2 = __pyx_v_left_keys; __Pyx_INCREF(__pyx_t_2);
   __pyx_t_3 = 0;
@@ -9380,33 +9393,33 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
     {
       Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
       #if !CYTHON_ASSUME_SAFE_SIZE
-      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 236, __pyx_L1_error)
+      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 249, __pyx_L1_error)
       #endif
       if (__pyx_t_3 >= __pyx_temp) break;
     }
     __pyx_t_4 = __Pyx_PyList_GetItemRef(__pyx_t_2, __pyx_t_3);
     ++__pyx_t_3;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 236, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 249, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_XDECREF_SET(__pyx_v_idx, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":237
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":250
  *         self._left_key_indices = vector[int]()
  *         for idx in left_keys:
  *             self._left_key_indices.push_back(idx)             # <<<<<<<<<<<<<<
  * 
  *         self._right_key_indices = vector[int]()
 */
-    __pyx_t_5 = __Pyx_PyLong_As_int(__pyx_v_idx); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 237, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyLong_As_int(__pyx_v_idx); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 250, __pyx_L1_error)
     try {
       __pyx_v_self->_left_key_indices.push_back(__pyx_t_5);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 237, __pyx_L1_error)
+      __PYX_ERR(0, 250, __pyx_L1_error)
     }
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":236
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":249
  *         # Store as Python lists (will convert to vectors when needed)
  *         self._left_key_indices = vector[int]()
  *         for idx in left_keys:             # <<<<<<<<<<<<<<
@@ -9416,7 +9429,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":239
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":252
  *             self._left_key_indices.push_back(idx)
  * 
  *         self._right_key_indices = vector[int]()             # <<<<<<<<<<<<<<
@@ -9427,11 +9440,11 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
     __pyx_t_1 = std::vector<int> ();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 239, __pyx_L1_error)
+    __PYX_ERR(0, 252, __pyx_L1_error)
   }
   __pyx_v_self->_right_key_indices = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_1);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":240
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":253
  * 
  *         self._right_key_indices = vector[int]()
  *         for idx in right_keys:             # <<<<<<<<<<<<<<
@@ -9440,7 +9453,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   if (unlikely(__pyx_v_right_keys == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 240, __pyx_L1_error)
+    __PYX_ERR(0, 253, __pyx_L1_error)
   }
   __pyx_t_2 = __pyx_v_right_keys; __Pyx_INCREF(__pyx_t_2);
   __pyx_t_3 = 0;
@@ -9448,33 +9461,33 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
     {
       Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
       #if !CYTHON_ASSUME_SAFE_SIZE
-      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 240, __pyx_L1_error)
+      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 253, __pyx_L1_error)
       #endif
       if (__pyx_t_3 >= __pyx_temp) break;
     }
     __pyx_t_4 = __Pyx_PyList_GetItemRef(__pyx_t_2, __pyx_t_3);
     ++__pyx_t_3;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 240, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 253, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_XDECREF_SET(__pyx_v_idx, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":241
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":254
  *         self._right_key_indices = vector[int]()
  *         for idx in right_keys:
  *             self._right_key_indices.push_back(idx)             # <<<<<<<<<<<<<<
  * 
  *         self._join_type = join_type
 */
-    __pyx_t_5 = __Pyx_PyLong_As_int(__pyx_v_idx); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 241, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyLong_As_int(__pyx_v_idx); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 254, __pyx_L1_error)
     try {
       __pyx_v_self->_right_key_indices.push_back(__pyx_t_5);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 241, __pyx_L1_error)
+      __PYX_ERR(0, 254, __pyx_L1_error)
     }
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":240
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":253
  * 
  *         self._right_key_indices = vector[int]()
  *         for idx in right_keys:             # <<<<<<<<<<<<<<
@@ -9484,7 +9497,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":243
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":256
  *             self._right_key_indices.push_back(idx)
  * 
  *         self._join_type = join_type             # <<<<<<<<<<<<<<
@@ -9497,7 +9510,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   __Pyx_DECREF(__pyx_v_self->_join_type);
   __pyx_v_self->_join_type = __pyx_v_join_type;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":244
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":257
  * 
  *         self._join_type = join_type
  *         self._num_threads = num_threads             # <<<<<<<<<<<<<<
@@ -9506,16 +9519,111 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_self->_num_threads = __pyx_v_num_threads;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":247
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":260
  * 
  *         # Get Arrow memory pool
  *         self._pool = default_memory_pool()             # <<<<<<<<<<<<<<
  * 
- *         # Pre-allocate buffers (zero allocations in hot path)
+ *         # Initialize thread pool for parallel execution (only if num_threads > 1)
 */
   __pyx_v_self->_pool = arrow::default_memory_pool();
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":254
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":263
+ * 
+ *         # Initialize thread pool for parallel execution (only if num_threads > 1)
+ *         if num_threads > 1:             # <<<<<<<<<<<<<<
+ *             # Create custom thread pool with specified threads
+ *             tp_result = CThreadPool.Make(num_threads)
+*/
+  __pyx_t_6 = (__pyx_v_num_threads > 1);
+  if (__pyx_t_6) {
+
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":265
+ *         if num_threads > 1:
+ *             # Create custom thread pool with specified threads
+ *             tp_result = CThreadPool.Make(num_threads)             # <<<<<<<<<<<<<<
+ *             if not tp_result.ok():
+ *                 raise RuntimeError(f"Failed to create thread pool with {num_threads} threads")
+*/
+    __pyx_v_tp_result = arrow::internal::ThreadPool::Make(__pyx_v_num_threads);
+
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":266
+ *             # Create custom thread pool with specified threads
+ *             tp_result = CThreadPool.Make(num_threads)
+ *             if not tp_result.ok():             # <<<<<<<<<<<<<<
+ *                 raise RuntimeError(f"Failed to create thread pool with {num_threads} threads")
+ *             self._thread_pool = tp_result.ValueOrDie()
+*/
+    __pyx_t_6 = (!(__pyx_v_tp_result.ok() != 0));
+    if (unlikely(__pyx_t_6)) {
+
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":267
+ *             tp_result = CThreadPool.Make(num_threads)
+ *             if not tp_result.ok():
+ *                 raise RuntimeError(f"Failed to create thread pool with {num_threads} threads")             # <<<<<<<<<<<<<<
+ *             self._thread_pool = tp_result.ValueOrDie()
+ *         # For single-threaded mode, _thread_pool remains null (no parallel execution)
+*/
+      __pyx_t_4 = NULL;
+      __Pyx_INCREF(__pyx_builtin_RuntimeError);
+      __pyx_t_7 = __pyx_builtin_RuntimeError; 
+      __pyx_t_8 = __Pyx_PyUnicode_From_int(__pyx_v_num_threads, 0, ' ', 'd'); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 267, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_8);
+      __pyx_t_9[0] = __pyx_mstate_global->__pyx_kp_u_Failed_to_create_thread_pool_wit;
+      __pyx_t_9[1] = __pyx_t_8;
+      __pyx_t_9[2] = __pyx_mstate_global->__pyx_kp_u_threads;
+      __pyx_t_10 = __Pyx_PyUnicode_Join(__pyx_t_9, 3, 34 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_8) + 8, 127);
+      if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 267, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+      __pyx_t_11 = 1;
+      {
+        PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_t_10};
+        __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (__pyx_t_11*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 267, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_2);
+      }
+      __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __PYX_ERR(0, 267, __pyx_L1_error)
+
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":266
+ *             # Create custom thread pool with specified threads
+ *             tp_result = CThreadPool.Make(num_threads)
+ *             if not tp_result.ok():             # <<<<<<<<<<<<<<
+ *                 raise RuntimeError(f"Failed to create thread pool with {num_threads} threads")
+ *             self._thread_pool = tp_result.ValueOrDie()
+*/
+    }
+
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":268
+ *             if not tp_result.ok():
+ *                 raise RuntimeError(f"Failed to create thread pool with {num_threads} threads")
+ *             self._thread_pool = tp_result.ValueOrDie()             # <<<<<<<<<<<<<<
+ *         # For single-threaded mode, _thread_pool remains null (no parallel execution)
+ * 
+*/
+    try {
+      __pyx_t_12 = __pyx_v_tp_result.ValueOrDie();
+    } catch(...) {
+      __Pyx_CppExn2PyErr();
+      __PYX_ERR(0, 268, __pyx_L1_error)
+    }
+    __pyx_v_self->_thread_pool = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_12);
+
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":263
+ * 
+ *         # Initialize thread pool for parallel execution (only if num_threads > 1)
+ *         if num_threads > 1:             # <<<<<<<<<<<<<<
+ *             # Create custom thread pool with specified threads
+ *             tp_result = CThreadPool.Make(num_threads)
+*/
+  }
+
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":276
  *             MAX_BATCH_SIZE * sizeof(uint32_t),
  *             self._pool
  *         ).ValueOrDie()             # <<<<<<<<<<<<<<
@@ -9523,22 +9631,22 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
  *         # Left indices buffer
 */
   try {
-    __pyx_t_6 = arrow::AllocateBuffer((0x10000 * (sizeof(uint32_t))), __pyx_v_self->_pool).ValueOrDie();
+    __pyx_t_13 = arrow::AllocateBuffer((0x10000 * (sizeof(uint32_t))), __pyx_v_self->_pool).ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 254, __pyx_L1_error)
+    __PYX_ERR(0, 276, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":251
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":273
  *         # Pre-allocate buffers (zero allocations in hot path)
  *         # Hash buffer (uint32_t * MAX_BATCH_SIZE)
  *         self._hash_buffer = AllocateBuffer(             # <<<<<<<<<<<<<<
  *             MAX_BATCH_SIZE * sizeof(uint32_t),
  *             self._pool
 */
-  __pyx_v_self->_hash_buffer = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_6);
+  __pyx_v_self->_hash_buffer = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_13);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":260
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":282
  *             MAX_BATCH_SIZE * sizeof(uint32_t),
  *             self._pool
  *         ).ValueOrDie()             # <<<<<<<<<<<<<<
@@ -9546,22 +9654,22 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
  *         # Right indices buffer
 */
   try {
-    __pyx_t_6 = arrow::AllocateBuffer((0x10000 * (sizeof(uint32_t))), __pyx_v_self->_pool).ValueOrDie();
+    __pyx_t_13 = arrow::AllocateBuffer((0x10000 * (sizeof(uint32_t))), __pyx_v_self->_pool).ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 260, __pyx_L1_error)
+    __PYX_ERR(0, 282, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":257
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":279
  * 
  *         # Left indices buffer
  *         self._left_indices = AllocateBuffer(             # <<<<<<<<<<<<<<
  *             MAX_BATCH_SIZE * sizeof(uint32_t),
  *             self._pool
 */
-  __pyx_v_self->_left_indices = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_6);
+  __pyx_v_self->_left_indices = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_13);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":266
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":288
  *             MAX_BATCH_SIZE * sizeof(uint32_t),
  *             self._pool
  *         ).ValueOrDie()             # <<<<<<<<<<<<<<
@@ -9569,22 +9677,22 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
  *         # Bloom filter mask (1 bit per row, rounded up to bytes)
 */
   try {
-    __pyx_t_6 = arrow::AllocateBuffer((0x10000 * (sizeof(uint32_t))), __pyx_v_self->_pool).ValueOrDie();
+    __pyx_t_13 = arrow::AllocateBuffer((0x10000 * (sizeof(uint32_t))), __pyx_v_self->_pool).ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 266, __pyx_L1_error)
+    __PYX_ERR(0, 288, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":263
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":285
  * 
  *         # Right indices buffer
  *         self._right_indices = AllocateBuffer(             # <<<<<<<<<<<<<<
  *             MAX_BATCH_SIZE * sizeof(uint32_t),
  *             self._pool
 */
-  __pyx_v_self->_right_indices = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_6);
+  __pyx_v_self->_right_indices = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_13);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":272
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":294
  *             (MAX_BATCH_SIZE + 7) // 8,
  *             self._pool
  *         ).ValueOrDie()             # <<<<<<<<<<<<<<
@@ -9592,22 +9700,22 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
  *         # Match bitvector (1 byte per row for SIMD convenience)
 */
   try {
-    __pyx_t_6 = arrow::AllocateBuffer(0x2000, __pyx_v_self->_pool).ValueOrDie();
+    __pyx_t_13 = arrow::AllocateBuffer(0x2000, __pyx_v_self->_pool).ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 272, __pyx_L1_error)
+    __PYX_ERR(0, 294, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":269
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":291
  * 
  *         # Bloom filter mask (1 bit per row, rounded up to bytes)
  *         self._bloom_mask = AllocateBuffer(             # <<<<<<<<<<<<<<
  *             (MAX_BATCH_SIZE + 7) // 8,
  *             self._pool
 */
-  __pyx_v_self->_bloom_mask = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_6);
+  __pyx_v_self->_bloom_mask = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_13);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":278
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":300
  *             MAX_BATCH_SIZE * sizeof(uint8_t),
  *             self._pool
  *         ).ValueOrDie()             # <<<<<<<<<<<<<<
@@ -9615,22 +9723,22 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
  *         # Initialize build-side state with C++ hash table
 */
   try {
-    __pyx_t_6 = arrow::AllocateBuffer((0x10000 * (sizeof(uint8_t))), __pyx_v_self->_pool).ValueOrDie();
+    __pyx_t_13 = arrow::AllocateBuffer((0x10000 * (sizeof(uint8_t))), __pyx_v_self->_pool).ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 278, __pyx_L1_error)
+    __PYX_ERR(0, 300, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":275
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":297
  * 
  *         # Match bitvector (1 byte per row for SIMD convenience)
  *         self._match_bitvector = AllocateBuffer(             # <<<<<<<<<<<<<<
  *             MAX_BATCH_SIZE * sizeof(uint8_t),
  *             self._pool
 */
-  __pyx_v_self->_match_bitvector = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_6);
+  __pyx_v_self->_match_bitvector = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_13);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":281
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":303
  * 
  *         # Initialize build-side state with C++ hash table
  *         self._hash_table = new HashJoinTable()             # <<<<<<<<<<<<<<
@@ -9639,7 +9747,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_self->_hash_table = new sabot::hash_join::HashJoinTable();
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":282
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":304
  *         # Initialize build-side state with C++ hash table
  *         self._hash_table = new HashJoinTable()
  *         self._hash_table.reserve(100000)  # Reserve space for 100K entries (avoid rehashing)             # <<<<<<<<<<<<<<
@@ -9648,7 +9756,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_self->_hash_table->reserve(0x186A0);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":283
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":305
  *         self._hash_table = new HashJoinTable()
  *         self._hash_table.reserve(100000)  # Reserve space for 100K entries (avoid rehashing)
  *         self._build_row_count = 0             # <<<<<<<<<<<<<<
@@ -9657,7 +9765,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_self->_build_row_count = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":284
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":306
  *         self._hash_table.reserve(100000)  # Reserve space for 100K entries (avoid rehashing)
  *         self._build_row_count = 0
  *         self._build_table = None  # Will store combined build-side batches             # <<<<<<<<<<<<<<
@@ -9670,7 +9778,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   __Pyx_DECREF(__pyx_v_self->_build_table);
   __pyx_v_self->_build_table = Py_None;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":285
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":307
  *         self._build_row_count = 0
  *         self._build_table = None  # Will store combined build-side batches
  *         self._build_batch = None  # Cached RecordBatch (to avoid re-conversion)             # <<<<<<<<<<<<<<
@@ -9683,14 +9791,14 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   __Pyx_DECREF(__pyx_v_self->_build_batch);
   __pyx_v_self->_build_batch = Py_None;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":286
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":308
  *         self._build_table = None  # Will store combined build-side batches
  *         self._build_batch = None  # Cached RecordBatch (to avoid re-conversion)
  *         self._schema_cache = {}  # Schema cache for result construction             # <<<<<<<<<<<<<<
  * 
  *         # Bloom filter will be allocated when we build (256KB)
 */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 286, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __Pyx_GOTREF(__pyx_v_self->_schema_cache);
@@ -9698,7 +9806,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   __pyx_v_self->_schema_cache = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":289
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":311
  * 
  *         # Bloom filter will be allocated when we build (256KB)
  *         self._bloom_filter = AllocateBuffer(BLOOM_FILTER_SIZE, self._pool).ValueOrDie()             # <<<<<<<<<<<<<<
@@ -9706,14 +9814,14 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
  *         memset(<void*>self._bloom_filter.get().data(), 0, BLOOM_FILTER_SIZE)
 */
   try {
-    __pyx_t_6 = arrow::AllocateBuffer(0x40000, __pyx_v_self->_pool).ValueOrDie();
+    __pyx_t_13 = arrow::AllocateBuffer(0x40000, __pyx_v_self->_pool).ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 289, __pyx_L1_error)
+    __PYX_ERR(0, 311, __pyx_L1_error)
   }
-  __pyx_v_self->_bloom_filter = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_6);
+  __pyx_v_self->_bloom_filter = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_13);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":291
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":313
  *         self._bloom_filter = AllocateBuffer(BLOOM_FILTER_SIZE, self._pool).ValueOrDie()
  *         # Zero out the bloom filter (cast to mutable pointer)
  *         memset(<void*>self._bloom_filter.get().data(), 0, BLOOM_FILTER_SIZE)             # <<<<<<<<<<<<<<
@@ -9722,7 +9830,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   (void)(memset(((void *)__pyx_v_self->_bloom_filter.get()->data()), 0, 0x40000));
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":294
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":316
  * 
  *         # Initialize statistics
  *         self._total_probe_rows = 0             # <<<<<<<<<<<<<<
@@ -9731,7 +9839,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_self->_total_probe_rows = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":295
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":317
  *         # Initialize statistics
  *         self._total_probe_rows = 0
  *         self._total_matches = 0             # <<<<<<<<<<<<<<
@@ -9740,7 +9848,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_self->_total_matches = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":296
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":318
  *         self._total_probe_rows = 0
  *         self._total_matches = 0
  *         self._bloom_filter_hits = 0             # <<<<<<<<<<<<<<
@@ -9749,7 +9857,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_self->_bloom_filter_hits = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":297
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":319
  *         self._total_matches = 0
  *         self._bloom_filter_hits = 0
  *         self._bloom_filter_misses = 0             # <<<<<<<<<<<<<<
@@ -9758,7 +9866,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_self->_bloom_filter_misses = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":224
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":235
  *         int64_t _bloom_filter_misses
  * 
  *     def __init__(self, list left_keys, list right_keys, str join_type='inner', int num_threads=1):             # <<<<<<<<<<<<<<
@@ -9772,6 +9880,9 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_XDECREF(__pyx_t_10);
   __Pyx_AddTraceback("sabot._cython.operators.hash_join_streaming.StreamingHashJoin.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
@@ -9780,7 +9891,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":299
+/* "sabot/_cython/operators/hash_join_streaming.pyx":321
  *         self._bloom_filter_misses = 0
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -9804,7 +9915,7 @@ static void __pyx_pw_5sabot_7_cython_9operators_19hash_join_streaming_17Streamin
 static void __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_2__dealloc__(struct __pyx_obj_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *__pyx_v_self) {
   int __pyx_t_1;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":301
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":323
  *     def __dealloc__(self):
  *         """Clean up C++ resources."""
  *         if self._hash_table != NULL:             # <<<<<<<<<<<<<<
@@ -9814,7 +9925,7 @@ static void __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streamin
   __pyx_t_1 = (__pyx_v_self->_hash_table != NULL);
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":302
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":324
  *         """Clean up C++ resources."""
  *         if self._hash_table != NULL:
  *             del self._hash_table             # <<<<<<<<<<<<<<
@@ -9823,7 +9934,7 @@ static void __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streamin
 */
     delete __pyx_v_self->_hash_table;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":303
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":325
  *         if self._hash_table != NULL:
  *             del self._hash_table
  *             self._hash_table = NULL             # <<<<<<<<<<<<<<
@@ -9832,7 +9943,7 @@ static void __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streamin
 */
     __pyx_v_self->_hash_table = NULL;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":301
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":323
  *     def __dealloc__(self):
  *         """Clean up C++ resources."""
  *         if self._hash_table != NULL:             # <<<<<<<<<<<<<<
@@ -9841,7 +9952,7 @@ static void __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streamin
 */
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":299
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":321
  *         self._bloom_filter_misses = 0
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -9852,7 +9963,7 @@ static void __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streamin
   /* function exit code */
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":305
+/* "sabot/_cython/operators/hash_join_streaming.pyx":327
  *             self._hash_table = NULL
  * 
  *     def insert_build_batch(self, object batch):             # <<<<<<<<<<<<<<
@@ -9900,32 +10011,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 305, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 327, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 305, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 327, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "insert_build_batch", 0) < (0)) __PYX_ERR(0, 305, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "insert_build_batch", 0) < (0)) __PYX_ERR(0, 327, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("insert_build_batch", 1, 1, 1, i); __PYX_ERR(0, 305, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("insert_build_batch", 1, 1, 1, i); __PYX_ERR(0, 327, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 305, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 327, __pyx_L3_error)
     }
     __pyx_v_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("insert_build_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 305, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("insert_build_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 327, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9969,7 +10080,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __Pyx_RefNannySetupContext("insert_build_batch", 0);
   __Pyx_INCREF(__pyx_v_batch);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":313
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":335
  *         """
  *         # Convert to table if needed
  *         if isinstance(batch, PyTable):             # <<<<<<<<<<<<<<
@@ -9979,7 +10090,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __pyx_t_1 = __Pyx_TypeCheck(__pyx_v_batch, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table); 
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":314
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":336
  *         # Convert to table if needed
  *         if isinstance(batch, PyTable):
  *             table = batch             # <<<<<<<<<<<<<<
@@ -9989,7 +10100,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __Pyx_INCREF(__pyx_v_batch);
     __pyx_v_table = __pyx_v_batch;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":313
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":335
  *         """
  *         # Convert to table if needed
  *         if isinstance(batch, PyTable):             # <<<<<<<<<<<<<<
@@ -9999,7 +10110,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     goto __pyx_L3;
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":317
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":339
  *         else:
  *             # Convert batch to table
  *             table = pa.Table.from_batches([batch])             # <<<<<<<<<<<<<<
@@ -10007,18 +10118,18 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
  *         if table.num_rows == 0:
 */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 317, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 339, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_Table); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 317, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_Table); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 339, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_3 = __pyx_t_5;
     __Pyx_INCREF(__pyx_t_3);
-    __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 317, __pyx_L1_error)
+    __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 339, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_batch);
     __Pyx_GIVEREF(__pyx_v_batch);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_4, 0, __pyx_v_batch) != (0)) __PYX_ERR(0, 317, __pyx_L1_error);
+    if (__Pyx_PyList_SET_ITEM(__pyx_t_4, 0, __pyx_v_batch) != (0)) __PYX_ERR(0, 339, __pyx_L1_error);
     __pyx_t_6 = 0;
     {
       PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_t_4};
@@ -10026,7 +10137,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 317, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 339, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __pyx_v_table = __pyx_t_2;
@@ -10034,20 +10145,20 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   }
   __pyx_L3:;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":319
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":341
  *             table = pa.Table.from_batches([batch])
  * 
  *         if table.num_rows == 0:             # <<<<<<<<<<<<<<
  *             return
  * 
 */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_table, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 319, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_table, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 341, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_2, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 319, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_2, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 341, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":320
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":342
  * 
  *         if table.num_rows == 0:
  *             return             # <<<<<<<<<<<<<<
@@ -10058,7 +10169,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":319
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":341
  *             table = pa.Table.from_batches([batch])
  * 
  *         if table.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -10067,7 +10178,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":323
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":345
  * 
  *         # Store the build table (will be used for Take operations)
  *         if self._build_table is None:             # <<<<<<<<<<<<<<
@@ -10077,7 +10188,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __pyx_t_1 = (__pyx_v_self->_build_table == Py_None);
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":324
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":346
  *         # Store the build table (will be used for Take operations)
  *         if self._build_table is None:
  *             self._build_table = table             # <<<<<<<<<<<<<<
@@ -10090,7 +10201,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __Pyx_DECREF(__pyx_v_self->_build_table);
     __pyx_v_self->_build_table = __pyx_v_table;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":323
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":345
  * 
  *         # Store the build table (will be used for Take operations)
  *         if self._build_table is None:             # <<<<<<<<<<<<<<
@@ -10100,7 +10211,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     goto __pyx_L5;
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":327
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":349
  *         else:
  *             # Concatenate with existing build table
  *             self._build_table = pa.concat_tables([self._build_table, table])             # <<<<<<<<<<<<<<
@@ -10109,19 +10220,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   /*else*/ {
     __pyx_t_5 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 327, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 349, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_concat_tables); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 327, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_concat_tables); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 349, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyList_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 327, __pyx_L1_error)
+    __pyx_t_4 = PyList_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 349, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_self->_build_table);
     __Pyx_GIVEREF(__pyx_v_self->_build_table);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_4, 0, __pyx_v_self->_build_table) != (0)) __PYX_ERR(0, 327, __pyx_L1_error);
+    if (__Pyx_PyList_SET_ITEM(__pyx_t_4, 0, __pyx_v_self->_build_table) != (0)) __PYX_ERR(0, 349, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_table);
     __Pyx_GIVEREF(__pyx_v_table);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_4, 1, __pyx_v_table) != (0)) __PYX_ERR(0, 327, __pyx_L1_error);
+    if (__Pyx_PyList_SET_ITEM(__pyx_t_4, 1, __pyx_v_table) != (0)) __PYX_ERR(0, 349, __pyx_L1_error);
     __pyx_t_6 = 1;
     #if CYTHON_UNPACK_METHODS
     if (unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -10140,7 +10251,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 327, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 349, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __Pyx_GIVEREF(__pyx_t_2);
@@ -10151,7 +10262,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   }
   __pyx_L5:;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":331
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":353
  *         # IMPORTANT: Chunk large build batches to avoid buffer overflow
  *         # The row_indices buffer is sized for MAX_BATCH_SIZE
  *         batch = table.combine_chunks().to_batches()[0]             # <<<<<<<<<<<<<<
@@ -10165,7 +10276,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
     __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_combine_chunks, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 331, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 353, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __pyx_t_3 = __pyx_t_4;
@@ -10176,31 +10287,31 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_batches, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 331, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 353, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 353, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF_SET(__pyx_v_batch, __pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":332
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":354
  *         # The row_indices buffer is sized for MAX_BATCH_SIZE
  *         batch = table.combine_chunks().to_batches()[0]
  *         if batch.num_rows > MAX_BATCH_SIZE:             # <<<<<<<<<<<<<<
  *             # Process in chunks
  *             for offset in range(0, batch.num_rows, MAX_BATCH_SIZE):
 */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 332, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_mstate_global->__pyx_int_65536, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 332, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_mstate_global->__pyx_int_65536, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 332, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":334
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":356
  *         if batch.num_rows > MAX_BATCH_SIZE:
  *             # Process in chunks
  *             for offset in range(0, batch.num_rows, MAX_BATCH_SIZE):             # <<<<<<<<<<<<<<
@@ -10210,7 +10321,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_builtin_range);
     __pyx_t_3 = __pyx_builtin_range; 
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 334, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 356, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = 1;
     {
@@ -10219,7 +10330,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 334, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 356, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
@@ -10227,9 +10338,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __pyx_t_7 = 0;
       __pyx_t_8 = NULL;
     } else {
-      __pyx_t_7 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 334, __pyx_L1_error)
+      __pyx_t_7 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 356, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_8 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 334, __pyx_L1_error)
+      __pyx_t_8 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 356, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     for (;;) {
@@ -10238,7 +10349,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
           {
             Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_3);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 334, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 356, __pyx_L1_error)
             #endif
             if (__pyx_t_7 >= __pyx_temp) break;
           }
@@ -10248,7 +10359,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
           {
             Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_3);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 334, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 356, __pyx_L1_error)
             #endif
             if (__pyx_t_7 >= __pyx_temp) break;
           }
@@ -10259,13 +10370,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
           #endif
           ++__pyx_t_7;
         }
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 334, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 356, __pyx_L1_error)
       } else {
         __pyx_t_2 = __pyx_t_8(__pyx_t_3);
         if (unlikely(!__pyx_t_2)) {
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
-            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 334, __pyx_L1_error)
+            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 356, __pyx_L1_error)
             PyErr_Clear();
           }
           break;
@@ -10275,30 +10386,30 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __Pyx_XDECREF_SET(__pyx_v_offset, __pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":335
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":357
  *             # Process in chunks
  *             for offset in range(0, batch.num_rows, MAX_BATCH_SIZE):
  *                 chunk_size = min(MAX_BATCH_SIZE, batch.num_rows - offset)             # <<<<<<<<<<<<<<
  *                 chunk = batch.slice(offset, chunk_size)
  *                 self._insert_build_batch_chunk(chunk)
 */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 335, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 357, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_5 = PyNumber_Subtract(__pyx_t_2, __pyx_v_offset); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 335, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_Subtract(__pyx_t_2, __pyx_v_offset); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 357, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_9 = 0x10000;
-      __pyx_t_4 = __Pyx_PyLong_From_long(__pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 335, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyLong_From_long(__pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 357, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_10 = PyObject_RichCompare(__pyx_t_5, __pyx_t_4, Py_LT); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 335, __pyx_L1_error)
+      __pyx_t_10 = PyObject_RichCompare(__pyx_t_5, __pyx_t_4, Py_LT); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 357, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_10); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 335, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_10); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 357, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       if (__pyx_t_1) {
         __Pyx_INCREF(__pyx_t_5);
         __pyx_t_2 = __pyx_t_5;
       } else {
-        __pyx_t_10 = __Pyx_PyLong_From_long(__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 335, __pyx_L1_error)
+        __pyx_t_10 = __Pyx_PyLong_From_long(__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 357, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_10);
         __pyx_t_2 = __pyx_t_10;
         __pyx_t_10 = 0;
@@ -10310,7 +10421,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __Pyx_XDECREF_SET(__pyx_v_chunk_size, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":336
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":358
  *             for offset in range(0, batch.num_rows, MAX_BATCH_SIZE):
  *                 chunk_size = min(MAX_BATCH_SIZE, batch.num_rows - offset)
  *                 chunk = batch.slice(offset, chunk_size)             # <<<<<<<<<<<<<<
@@ -10324,22 +10435,22 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
         PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_v_offset, __pyx_v_chunk_size};
         __pyx_t_5 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_slice, __pyx_callargs+__pyx_t_6, (3-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 336, __pyx_L1_error)
+        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 358, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
       }
       __Pyx_XDECREF_SET(__pyx_v_chunk, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":337
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":359
  *                 chunk_size = min(MAX_BATCH_SIZE, batch.num_rows - offset)
  *                 chunk = batch.slice(offset, chunk_size)
  *                 self._insert_build_batch_chunk(chunk)             # <<<<<<<<<<<<<<
  *         else:
  *             self._insert_build_batch_chunk(batch)
 */
-      ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *)__pyx_v_self->__pyx_vtab)->_insert_build_batch_chunk(__pyx_v_self, __pyx_v_chunk); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 337, __pyx_L1_error)
+      ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *)__pyx_v_self->__pyx_vtab)->_insert_build_batch_chunk(__pyx_v_self, __pyx_v_chunk); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 359, __pyx_L1_error)
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":334
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":356
  *         if batch.num_rows > MAX_BATCH_SIZE:
  *             # Process in chunks
  *             for offset in range(0, batch.num_rows, MAX_BATCH_SIZE):             # <<<<<<<<<<<<<<
@@ -10349,7 +10460,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":332
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":354
  *         # The row_indices buffer is sized for MAX_BATCH_SIZE
  *         batch = table.combine_chunks().to_batches()[0]
  *         if batch.num_rows > MAX_BATCH_SIZE:             # <<<<<<<<<<<<<<
@@ -10359,7 +10470,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     goto __pyx_L6;
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":339
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":361
  *                 self._insert_build_batch_chunk(chunk)
  *         else:
  *             self._insert_build_batch_chunk(batch)             # <<<<<<<<<<<<<<
@@ -10367,11 +10478,11 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
  *         # Cache the build batch after all insertions (Bug #1 fix)
 */
   /*else*/ {
-    ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *)__pyx_v_self->__pyx_vtab)->_insert_build_batch_chunk(__pyx_v_self, __pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 339, __pyx_L1_error)
+    ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *)__pyx_v_self->__pyx_vtab)->_insert_build_batch_chunk(__pyx_v_self, __pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 361, __pyx_L1_error)
   }
   __pyx_L6:;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":344
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":366
  *         # Build table is immutable after insert completes, so we can cache the RecordBatch
  *         # to avoid re-conversion in _build_result_batch()
  *         if self._build_batch is None:             # <<<<<<<<<<<<<<
@@ -10381,7 +10492,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __pyx_t_1 = (__pyx_v_self->_build_batch == Py_None);
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":345
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":367
  *         # to avoid re-conversion in _build_result_batch()
  *         if self._build_batch is None:
  *             self._build_batch = self._build_table.combine_chunks().to_batches()[0]             # <<<<<<<<<<<<<<
@@ -10395,7 +10506,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       PyObject *__pyx_callargs[2] = {__pyx_t_10, NULL};
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_combine_chunks, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 345, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __pyx_t_5 = __pyx_t_2;
@@ -10406,10 +10517,10 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __pyx_t_3 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_batches, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 345, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
     }
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 345, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 367, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GIVEREF(__pyx_t_2);
@@ -10418,7 +10529,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __pyx_v_self->_build_batch = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":344
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":366
  *         # Build table is immutable after insert completes, so we can cache the RecordBatch
  *         # to avoid re-conversion in _build_result_batch()
  *         if self._build_batch is None:             # <<<<<<<<<<<<<<
@@ -10427,7 +10538,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":305
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":327
  *             self._hash_table = NULL
  * 
  *     def insert_build_batch(self, object batch):             # <<<<<<<<<<<<<<
@@ -10457,7 +10568,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":347
+/* "sabot/_cython/operators/hash_join_streaming.pyx":369
  *             self._build_batch = self._build_table.combine_chunks().to_batches()[0]
  * 
  *     cdef void _insert_build_batch_chunk_nogil(             # <<<<<<<<<<<<<<
@@ -10479,7 +10590,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   int __pyx_clineno = 0;
   PyGILState_STATE __pyx_gilstate_save;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":355
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":377
  *         """Internal: C++ build insertion (runs without GIL for multi-threading)."""
  *         # Get hash buffer (pre-allocated, zero allocations)
  *         cdef uint32_t* hashes = <uint32_t*>self._hash_buffer.get().data()             # <<<<<<<<<<<<<<
@@ -10488,17 +10599,17 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_hashes = ((uint32_t *)__pyx_v_self->_hash_buffer.get()->data());
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":358
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":380
  * 
  *         # Compute hashes with SIMD (4x parallel on ARM, 8x on x86)
  *         cdef int num_hashed = hash_int64_simd(raw_keys, num_rows, hashes)             # <<<<<<<<<<<<<<
  * 
  *         # Build bloom filter with SIMD (insert these hashes)
 */
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_hash_int64_simd(__pyx_v_raw_keys, __pyx_v_num_rows, __pyx_v_hashes); if (unlikely(__pyx_t_1 == ((int)-1) && __Pyx_ErrOccurredWithGIL())) __PYX_ERR(0, 358, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_hash_int64_simd(__pyx_v_raw_keys, __pyx_v_num_rows, __pyx_v_hashes); if (unlikely(__pyx_t_1 == ((int)-1) && __Pyx_ErrOccurredWithGIL())) __PYX_ERR(0, 380, __pyx_L1_error)
   __pyx_v_num_hashed = __pyx_t_1;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":361
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":383
  * 
  *         # Build bloom filter with SIMD (insert these hashes)
  *         cdef uint8_t* bloom_filter_data = <uint8_t*>self._bloom_filter.get().data()             # <<<<<<<<<<<<<<
@@ -10507,16 +10618,16 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_bloom_filter_data = ((uint8_t *)__pyx_v_self->_bloom_filter.get()->data());
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":362
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":384
  *         # Build bloom filter with SIMD (insert these hashes)
  *         cdef uint8_t* bloom_filter_data = <uint8_t*>self._bloom_filter.get().data()
  *         build_bloom_filter_simd(hashes, num_rows, bloom_filter_data, BLOOM_FILTER_SIZE)             # <<<<<<<<<<<<<<
  * 
  *         # Build hash table using C++ HashJoinTable (zero-copy batch insert)
 */
-  __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_build_bloom_filter_simd(__pyx_v_hashes, __pyx_v_num_rows, __pyx_v_bloom_filter_data, 0x40000); if (unlikely(__Pyx_ErrOccurredWithGIL())) __PYX_ERR(0, 362, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_build_bloom_filter_simd(__pyx_v_hashes, __pyx_v_num_rows, __pyx_v_bloom_filter_data, 0x40000); if (unlikely(__Pyx_ErrOccurredWithGIL())) __PYX_ERR(0, 384, __pyx_L1_error)
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":366
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":388
  *         # Build hash table using C++ HashJoinTable (zero-copy batch insert)
  *         # Create row indices array with global offsets
  *         cdef uint32_t* row_indices = <uint32_t*>self._left_indices.get().data()             # <<<<<<<<<<<<<<
@@ -10525,7 +10636,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_row_indices = ((uint32_t *)__pyx_v_self->_left_indices.get()->data());
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":368
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":390
  *         cdef uint32_t* row_indices = <uint32_t*>self._left_indices.get().data()
  *         cdef int i
  *         for i in range(num_rows):             # <<<<<<<<<<<<<<
@@ -10537,7 +10648,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   for (__pyx_t_1 = 0; __pyx_t_1 < __pyx_t_3; __pyx_t_1+=1) {
     __pyx_v_i = __pyx_t_1;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":369
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":391
  *         cdef int i
  *         for i in range(num_rows):
  *             row_indices[i] = build_row_offset + i             # <<<<<<<<<<<<<<
@@ -10547,7 +10658,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
     (__pyx_v_row_indices[__pyx_v_i]) = (__pyx_v_build_row_offset + __pyx_v_i);
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":372
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":394
  * 
  *         # Batch insert into C++ hash table (fast!)
  *         self._hash_table.insert_batch(hashes, row_indices, num_rows)             # <<<<<<<<<<<<<<
@@ -10556,7 +10667,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_self->_hash_table->insert_batch(__pyx_v_hashes, __pyx_v_row_indices, __pyx_v_num_rows);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":347
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":369
  *             self._build_batch = self._build_table.combine_chunks().to_batches()[0]
  * 
  *     cdef void _insert_build_batch_chunk_nogil(             # <<<<<<<<<<<<<<
@@ -10573,7 +10684,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   __pyx_L0:;
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":374
+/* "sabot/_cython/operators/hash_join_streaming.pyx":396
  *         self._hash_table.insert_batch(hashes, row_indices, num_rows)
  * 
  *     cdef void _insert_build_batch_chunk(self, object batch):             # <<<<<<<<<<<<<<
@@ -10595,7 +10706,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":377
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":399
  *         """Internal: Insert a single chunk into build table (guaranteed <= MAX_BATCH_SIZE)."""
  *         # Extract key column (assume single int64 key for now)
  *         cdef int key_col_idx = self._left_key_indices[0]             # <<<<<<<<<<<<<<
@@ -10604,17 +10715,17 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_key_col_idx = (__pyx_v_self->_left_key_indices[0]);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":380
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":402
  * 
  *         # Unwrap Python RecordBatch to C++ RecordBatch (zero-copy)
  *         cdef shared_ptr[CRecordBatch] c_batch = pyarrow_unwrap_batch(batch)             # <<<<<<<<<<<<<<
  *         cdef int64_t num_rows = c_batch.get().num_rows()
  * 
 */
-  __pyx_t_1 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 380, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 402, __pyx_L1_error)
   __pyx_v_c_batch = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_1);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":381
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":403
  *         # Unwrap Python RecordBatch to C++ RecordBatch (zero-copy)
  *         cdef shared_ptr[CRecordBatch] c_batch = pyarrow_unwrap_batch(batch)
  *         cdef int64_t num_rows = c_batch.get().num_rows()             # <<<<<<<<<<<<<<
@@ -10623,7 +10734,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_num_rows = __pyx_v_c_batch.get()->num_rows();
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":384
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":406
  * 
  *         # Get key column as C++ array
  *         cdef shared_ptr[CArray] key_col = c_batch.get().column(key_col_idx)             # <<<<<<<<<<<<<<
@@ -10632,7 +10743,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_key_col = __pyx_v_c_batch.get()->column(__pyx_v_key_col_idx);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":385
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":407
  *         # Get key column as C++ array
  *         cdef shared_ptr[CArray] key_col = c_batch.get().column(key_col_idx)
  *         cdef const CInt64Array* int64_array = <const CInt64Array*>key_col.get()             # <<<<<<<<<<<<<<
@@ -10641,7 +10752,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_int64_array = ((arrow::Int64Array const *)__pyx_v_key_col.get());
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":386
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":408
  *         cdef shared_ptr[CArray] key_col = c_batch.get().column(key_col_idx)
  *         cdef const CInt64Array* int64_array = <const CInt64Array*>key_col.get()
  *         cdef const int64_t* raw_keys = int64_array.raw_values()             # <<<<<<<<<<<<<<
@@ -10650,7 +10761,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_raw_keys = __pyx_v_int64_array->raw_values();
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":389
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":411
  * 
  *         # Release GIL and call nogil version for C++ operations
  *         cdef int64_t build_row_offset = self._build_row_count             # <<<<<<<<<<<<<<
@@ -10660,7 +10771,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
   __pyx_t_2 = __pyx_v_self->_build_row_count;
   __pyx_v_build_row_offset = __pyx_t_2;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":390
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":412
  *         # Release GIL and call nogil version for C++ operations
  *         cdef int64_t build_row_offset = self._build_row_count
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10674,17 +10785,17 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
       __Pyx_FastGIL_Remember();
       /*try:*/ {
 
-        /* "sabot/_cython/operators/hash_join_streaming.pyx":391
+        /* "sabot/_cython/operators/hash_join_streaming.pyx":413
  *         cdef int64_t build_row_offset = self._build_row_count
  *         with nogil:
  *             self._insert_build_batch_chunk_nogil(raw_keys, num_rows, build_row_offset)             # <<<<<<<<<<<<<<
  * 
  *         self._build_row_count += num_rows
 */
-        ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *)__pyx_v_self->__pyx_vtab)->_insert_build_batch_chunk_nogil(__pyx_v_self, __pyx_v_raw_keys, __pyx_v_num_rows, __pyx_v_build_row_offset); if (unlikely(__Pyx_ErrOccurredWithGIL())) __PYX_ERR(0, 391, __pyx_L4_error)
+        ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *)__pyx_v_self->__pyx_vtab)->_insert_build_batch_chunk_nogil(__pyx_v_self, __pyx_v_raw_keys, __pyx_v_num_rows, __pyx_v_build_row_offset); if (unlikely(__Pyx_ErrOccurredWithGIL())) __PYX_ERR(0, 413, __pyx_L4_error)
       }
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":390
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":412
  *         # Release GIL and call nogil version for C++ operations
  *         cdef int64_t build_row_offset = self._build_row_count
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -10706,7 +10817,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
       }
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":393
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":415
  *             self._insert_build_batch_chunk_nogil(raw_keys, num_rows, build_row_offset)
  * 
  *         self._build_row_count += num_rows             # <<<<<<<<<<<<<<
@@ -10715,7 +10826,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 */
   __pyx_v_self->_build_row_count = (__pyx_v_self->_build_row_count + __pyx_v_num_rows);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":374
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":396
  *         self._hash_table.insert_batch(hashes, row_indices, num_rows)
  * 
  *     cdef void _insert_build_batch_chunk(self, object batch):             # <<<<<<<<<<<<<<
@@ -10731,7 +10842,7 @@ static void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
 }
 static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_8generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":395
+/* "sabot/_cython/operators/hash_join_streaming.pyx":417
  *         self._build_row_count += num_rows
  * 
  *     def probe_batch(self, object batch):             # <<<<<<<<<<<<<<
@@ -10779,32 +10890,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 395, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 417, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 395, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 417, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "probe_batch", 0) < (0)) __PYX_ERR(0, 395, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "probe_batch", 0) < (0)) __PYX_ERR(0, 417, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("probe_batch", 1, 1, 1, i); __PYX_ERR(0, 395, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("probe_batch", 1, 1, 1, i); __PYX_ERR(0, 417, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 395, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 417, __pyx_L3_error)
     }
     __pyx_v_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("probe_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 395, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("probe_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 417, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10837,7 +10948,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 395, __pyx_L1_error)
+    __PYX_ERR(0, 417, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -10848,7 +10959,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_batch);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_batch);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_8generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_probe_batch, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin_probe_batch, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi); if (unlikely(!gen)) __PYX_ERR(0, 395, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_8generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_probe_batch, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin_probe_batch, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi); if (unlikely(!gen)) __PYX_ERR(0, 417, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -10897,10 +11008,10 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
-    __PYX_ERR(0, 395, __pyx_L1_error)
+    __PYX_ERR(0, 417, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":405
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":427
  *         """
  *         # Convert Table to batch if needed
  *         if isinstance(batch, PyTable):             # <<<<<<<<<<<<<<
@@ -10910,7 +11021,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __pyx_t_1 = __Pyx_TypeCheck(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_ptype_7pyarrow_3lib_Table); 
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":406
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":428
  *         # Convert Table to batch if needed
  *         if isinstance(batch, PyTable):
  *             table = batch             # <<<<<<<<<<<<<<
@@ -10921,20 +11032,20 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_batch);
     __pyx_cur_scope->__pyx_v_table = __pyx_cur_scope->__pyx_v_batch;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":407
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":429
  *         if isinstance(batch, PyTable):
  *             table = batch
  *             if table.num_rows == 0:             # <<<<<<<<<<<<<<
  *                 return
  *             batch = table.combine_chunks().to_batches()[0]
 */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_table, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 407, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_table, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 429, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_2, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 407, __pyx_L1_error)
+    __pyx_t_1 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_2, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 429, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_1) {
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":408
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":430
  *             table = batch
  *             if table.num_rows == 0:
  *                 return             # <<<<<<<<<<<<<<
@@ -10945,7 +11056,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __pyx_r = Py_None; __Pyx_INCREF(Py_None);
       goto __pyx_L0;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":407
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":429
  *         if isinstance(batch, PyTable):
  *             table = batch
  *             if table.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -10954,7 +11065,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
     }
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":409
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":431
  *             if table.num_rows == 0:
  *                 return
  *             batch = table.combine_chunks().to_batches()[0]             # <<<<<<<<<<<<<<
@@ -10968,7 +11079,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
       __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_combine_chunks, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 409, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 431, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
     }
     __pyx_t_3 = __pyx_t_4;
@@ -10979,10 +11090,10 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_batches, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 409, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 431, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 409, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_cur_scope->__pyx_v_batch);
@@ -10990,7 +11101,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __Pyx_GIVEREF(__pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":405
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":427
  *         """
  *         # Convert Table to batch if needed
  *         if isinstance(batch, PyTable):             # <<<<<<<<<<<<<<
@@ -10999,20 +11110,20 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":411
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":433
  *             batch = table.combine_chunks().to_batches()[0]
  * 
  *         if batch.num_rows == 0:             # <<<<<<<<<<<<<<
  *             return
  * 
 */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 411, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 433, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_4, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 411, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_4, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 433, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":412
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":434
  * 
  *         if batch.num_rows == 0:
  *             return             # <<<<<<<<<<<<<<
@@ -11023,7 +11134,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":411
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":433
  *             batch = table.combine_chunks().to_batches()[0]
  * 
  *         if batch.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -11032,41 +11143,41 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":416
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":438
  *         # IMPORTANT: Chunk large batches to MAX_BATCH_SIZE to avoid buffer overflow
  *         # Pre-allocated buffers (_match_bitvector, _hash_buffer) are sized for MAX_BATCH_SIZE
  *         if batch.num_rows > MAX_BATCH_SIZE:             # <<<<<<<<<<<<<<
  *             # Process in chunks
  *             self._total_probe_rows += batch.num_rows  # Count once for the whole batch
 */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 416, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 438, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_mstate_global->__pyx_int_65536, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 416, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_mstate_global->__pyx_int_65536, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 438, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 416, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 438, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":418
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":440
  *         if batch.num_rows > MAX_BATCH_SIZE:
  *             # Process in chunks
  *             self._total_probe_rows += batch.num_rows  # Count once for the whole batch             # <<<<<<<<<<<<<<
  *             for offset in range(0, batch.num_rows, MAX_BATCH_SIZE):
  *                 chunk_size = min(MAX_BATCH_SIZE, batch.num_rows - offset)
 */
-    __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_cur_scope->__pyx_v_self->_total_probe_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 418, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_cur_scope->__pyx_v_self->_total_probe_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 440, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 418, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 440, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = PyNumber_InPlaceAdd(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 418, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_InPlaceAdd(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 440, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_7 = __Pyx_PyLong_As_int64_t(__pyx_t_3); if (unlikely((__pyx_t_7 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 418, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyLong_As_int64_t(__pyx_t_3); if (unlikely((__pyx_t_7 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 440, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_cur_scope->__pyx_v_self->_total_probe_rows = __pyx_t_7;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":419
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":441
  *             # Process in chunks
  *             self._total_probe_rows += batch.num_rows  # Count once for the whole batch
  *             for offset in range(0, batch.num_rows, MAX_BATCH_SIZE):             # <<<<<<<<<<<<<<
@@ -11076,7 +11187,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_builtin_range);
     __pyx_t_2 = __pyx_builtin_range; 
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 419, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = 1;
     {
@@ -11085,7 +11196,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 419, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 441, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
     }
     if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
@@ -11093,9 +11204,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __pyx_t_8 = 0;
       __pyx_t_9 = NULL;
     } else {
-      __pyx_t_8 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 419, __pyx_L1_error)
+      __pyx_t_8 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 441, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 419, __pyx_L1_error)
+      __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 441, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     for (;;) {
@@ -11104,7 +11215,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
           {
             Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 419, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 441, __pyx_L1_error)
             #endif
             if (__pyx_t_8 >= __pyx_temp) break;
           }
@@ -11114,7 +11225,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
           {
             Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 419, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 441, __pyx_L1_error)
             #endif
             if (__pyx_t_8 >= __pyx_temp) break;
           }
@@ -11125,13 +11236,13 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
           #endif
           ++__pyx_t_8;
         }
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 419, __pyx_L1_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 441, __pyx_L1_error)
       } else {
         __pyx_t_3 = __pyx_t_9(__pyx_t_2);
         if (unlikely(!__pyx_t_3)) {
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
-            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 419, __pyx_L1_error)
+            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 441, __pyx_L1_error)
             PyErr_Clear();
           }
           break;
@@ -11143,30 +11254,30 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __Pyx_GIVEREF(__pyx_t_3);
       __pyx_t_3 = 0;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":420
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":442
  *             self._total_probe_rows += batch.num_rows  # Count once for the whole batch
  *             for offset in range(0, batch.num_rows, MAX_BATCH_SIZE):
  *                 chunk_size = min(MAX_BATCH_SIZE, batch.num_rows - offset)             # <<<<<<<<<<<<<<
  *                 chunk = batch.slice(offset, chunk_size)
  *                 # Process each chunk (without double-counting)
 */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 420, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 442, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_5 = PyNumber_Subtract(__pyx_t_3, __pyx_cur_scope->__pyx_v_offset); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 420, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_Subtract(__pyx_t_3, __pyx_cur_scope->__pyx_v_offset); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 442, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_10 = 0x10000;
-      __pyx_t_4 = __Pyx_PyLong_From_long(__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 420, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyLong_From_long(__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 442, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_11 = PyObject_RichCompare(__pyx_t_5, __pyx_t_4, Py_LT); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 420, __pyx_L1_error)
+      __pyx_t_11 = PyObject_RichCompare(__pyx_t_5, __pyx_t_4, Py_LT); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 442, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 420, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 442, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       if (__pyx_t_1) {
         __Pyx_INCREF(__pyx_t_5);
         __pyx_t_3 = __pyx_t_5;
       } else {
-        __pyx_t_11 = __Pyx_PyLong_From_long(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 420, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyLong_From_long(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 442, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
         __pyx_t_3 = __pyx_t_11;
         __pyx_t_11 = 0;
@@ -11180,7 +11291,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __Pyx_GIVEREF(__pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":421
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":443
  *             for offset in range(0, batch.num_rows, MAX_BATCH_SIZE):
  *                 chunk_size = min(MAX_BATCH_SIZE, batch.num_rows - offset)
  *                 chunk = batch.slice(offset, chunk_size)             # <<<<<<<<<<<<<<
@@ -11194,7 +11305,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
         PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_offset, __pyx_cur_scope->__pyx_v_chunk_size};
         __pyx_t_5 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_slice, __pyx_callargs+__pyx_t_6, (3-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 421, __pyx_L1_error)
+        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 443, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
       }
       __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_chunk);
@@ -11202,7 +11313,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __Pyx_GIVEREF(__pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":423
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":445
  *                 chunk = batch.slice(offset, chunk_size)
  *                 # Process each chunk (without double-counting)
  *                 for result in self._probe_batch_chunk(chunk):             # <<<<<<<<<<<<<<
@@ -11216,7 +11327,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
         PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_chunk};
         __pyx_t_5 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_probe_batch_chunk, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 423, __pyx_L1_error)
+        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 445, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
       }
       if (likely(PyList_CheckExact(__pyx_t_5)) || PyTuple_CheckExact(__pyx_t_5)) {
@@ -11224,9 +11335,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
         __pyx_t_12 = 0;
         __pyx_t_13 = NULL;
       } else {
-        __pyx_t_12 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 423, __pyx_L1_error)
+        __pyx_t_12 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 445, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_13 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_3); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 423, __pyx_L1_error)
+        __pyx_t_13 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_3); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 445, __pyx_L1_error)
       }
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       for (;;) {
@@ -11235,7 +11346,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_3);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 423, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 445, __pyx_L1_error)
               #endif
               if (__pyx_t_12 >= __pyx_temp) break;
             }
@@ -11245,7 +11356,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
             {
               Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_3);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 423, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 445, __pyx_L1_error)
               #endif
               if (__pyx_t_12 >= __pyx_temp) break;
             }
@@ -11256,13 +11367,13 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
             #endif
             ++__pyx_t_12;
           }
-          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 423, __pyx_L1_error)
+          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 445, __pyx_L1_error)
         } else {
           __pyx_t_5 = __pyx_t_13(__pyx_t_3);
           if (unlikely(!__pyx_t_5)) {
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
-              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 423, __pyx_L1_error)
+              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 445, __pyx_L1_error)
               PyErr_Clear();
             }
             break;
@@ -11274,7 +11385,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
         __Pyx_GIVEREF(__pyx_t_5);
         __pyx_t_5 = 0;
 
-        /* "sabot/_cython/operators/hash_join_streaming.pyx":424
+        /* "sabot/_cython/operators/hash_join_streaming.pyx":446
  *                 # Process each chunk (without double-counting)
  *                 for result in self._probe_batch_chunk(chunk):
  *                     yield result             # <<<<<<<<<<<<<<
@@ -11308,9 +11419,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
         __pyx_t_9 = __pyx_cur_scope->__pyx_t_3;
         __pyx_t_12 = __pyx_cur_scope->__pyx_t_4;
         __pyx_t_13 = __pyx_cur_scope->__pyx_t_5;
-        if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 424, __pyx_L1_error)
+        if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 446, __pyx_L1_error)
 
-        /* "sabot/_cython/operators/hash_join_streaming.pyx":423
+        /* "sabot/_cython/operators/hash_join_streaming.pyx":445
  *                 chunk = batch.slice(offset, chunk_size)
  *                 # Process each chunk (without double-counting)
  *                 for result in self._probe_batch_chunk(chunk):             # <<<<<<<<<<<<<<
@@ -11320,7 +11431,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       }
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":419
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":441
  *             # Process in chunks
  *             self._total_probe_rows += batch.num_rows  # Count once for the whole batch
  *             for offset in range(0, batch.num_rows, MAX_BATCH_SIZE):             # <<<<<<<<<<<<<<
@@ -11330,7 +11441,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":425
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":447
  *                 for result in self._probe_batch_chunk(chunk):
  *                     yield result
  *             return             # <<<<<<<<<<<<<<
@@ -11341,7 +11452,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":416
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":438
  *         # IMPORTANT: Chunk large batches to MAX_BATCH_SIZE to avoid buffer overflow
  *         # Pre-allocated buffers (_match_bitvector, _hash_buffer) are sized for MAX_BATCH_SIZE
  *         if batch.num_rows > MAX_BATCH_SIZE:             # <<<<<<<<<<<<<<
@@ -11350,26 +11461,26 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":428
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":450
  * 
  *         # Single batch processing (no chunking needed)
  *         self._total_probe_rows += batch.num_rows             # <<<<<<<<<<<<<<
  *         for result in self._probe_batch_chunk(batch):
  *             yield result
 */
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_cur_scope->__pyx_v_self->_total_probe_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 428, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_cur_scope->__pyx_v_self->_total_probe_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 450, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 428, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 450, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = PyNumber_InPlaceAdd(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 428, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_InPlaceAdd(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 450, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_7 = __Pyx_PyLong_As_int64_t(__pyx_t_5); if (unlikely((__pyx_t_7 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 428, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyLong_As_int64_t(__pyx_t_5); if (unlikely((__pyx_t_7 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 450, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_cur_scope->__pyx_v_self->_total_probe_rows = __pyx_t_7;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":429
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":451
  *         # Single batch processing (no chunking needed)
  *         self._total_probe_rows += batch.num_rows
  *         for result in self._probe_batch_chunk(batch):             # <<<<<<<<<<<<<<
@@ -11383,7 +11494,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_batch};
     __pyx_t_5 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_probe_batch_chunk, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 429, __pyx_L1_error)
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 451, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
   }
   if (likely(PyList_CheckExact(__pyx_t_5)) || PyTuple_CheckExact(__pyx_t_5)) {
@@ -11391,9 +11502,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __pyx_t_8 = 0;
     __pyx_t_9 = NULL;
   } else {
-    __pyx_t_8 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 429, __pyx_L1_error)
+    __pyx_t_8 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 451, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 429, __pyx_L1_error)
+    __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 451, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   for (;;) {
@@ -11402,7 +11513,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_3);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 429, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 451, __pyx_L1_error)
           #endif
           if (__pyx_t_8 >= __pyx_temp) break;
         }
@@ -11412,7 +11523,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_3);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 429, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 451, __pyx_L1_error)
           #endif
           if (__pyx_t_8 >= __pyx_temp) break;
         }
@@ -11423,13 +11534,13 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
         #endif
         ++__pyx_t_8;
       }
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 429, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 451, __pyx_L1_error)
     } else {
       __pyx_t_5 = __pyx_t_9(__pyx_t_3);
       if (unlikely(!__pyx_t_5)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 429, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 451, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -11441,7 +11552,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __Pyx_GIVEREF(__pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":430
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":452
  *         self._total_probe_rows += batch.num_rows
  *         for result in self._probe_batch_chunk(batch):
  *             yield result             # <<<<<<<<<<<<<<
@@ -11466,9 +11577,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __Pyx_XGOTREF(__pyx_t_3);
     __pyx_t_8 = __pyx_cur_scope->__pyx_t_2;
     __pyx_t_9 = __pyx_cur_scope->__pyx_t_3;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 430, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 452, __pyx_L1_error)
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":429
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":451
  *         # Single batch processing (no chunking needed)
  *         self._total_probe_rows += batch.num_rows
  *         for result in self._probe_batch_chunk(batch):             # <<<<<<<<<<<<<<
@@ -11479,7 +11590,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":395
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":417
  *         self._build_row_count += num_rows
  * 
  *     def probe_batch(self, object batch):             # <<<<<<<<<<<<<<
@@ -11511,7 +11622,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":432
+/* "sabot/_cython/operators/hash_join_streaming.pyx":454
  *             yield result
  * 
  *     cdef int _probe_hash_table_nogil(             # <<<<<<<<<<<<<<
@@ -11535,7 +11646,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
   int __pyx_t_6;
   int __pyx_t_7;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":445
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":467
  *         Returns: Number of matches found
  *         """
  *         cdef int match_count = 0             # <<<<<<<<<<<<<<
@@ -11544,7 +11655,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
 */
   __pyx_v_match_count = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":451
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":473
  *         cdef int i, j
  * 
  *         for i in range(num_rows):             # <<<<<<<<<<<<<<
@@ -11556,7 +11667,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":453
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":475
  *         for i in range(num_rows):
  *             # Skip rows that didn't pass bloom filter (fast rejection)
  *             if match_bitvector[i] == 0:             # <<<<<<<<<<<<<<
@@ -11566,7 +11677,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
     __pyx_t_4 = ((__pyx_v_match_bitvector[__pyx_v_i]) == 0);
     if (__pyx_t_4) {
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":454
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":476
  *             # Skip rows that didn't pass bloom filter (fast rejection)
  *             if match_bitvector[i] == 0:
  *                 continue             # <<<<<<<<<<<<<<
@@ -11575,7 +11686,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
 */
       goto __pyx_L3_continue;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":453
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":475
  *         for i in range(num_rows):
  *             # Skip rows that didn't pass bloom filter (fast rejection)
  *             if match_bitvector[i] == 0:             # <<<<<<<<<<<<<<
@@ -11584,7 +11695,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
 */
     }
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":456
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":478
  *                 continue
  * 
  *             hash_val = hashes[i]             # <<<<<<<<<<<<<<
@@ -11593,7 +11704,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
 */
     __pyx_v_hash_val = (__pyx_v_hashes[__pyx_v_i]);
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":459
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":481
  * 
  *             # Probe C++ hash table (zero-copy lookup)
  *             build_row_indices = self._hash_table.lookup_all(hash_val, &num_build_matches)             # <<<<<<<<<<<<<<
@@ -11602,7 +11713,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
 */
     __pyx_v_build_row_indices = __pyx_v_self->_hash_table->lookup_all(__pyx_v_hash_val, (&__pyx_v_num_build_matches));
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":461
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":483
  *             build_row_indices = self._hash_table.lookup_all(hash_val, &num_build_matches)
  * 
  *             if num_build_matches > 0:             # <<<<<<<<<<<<<<
@@ -11612,7 +11723,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
     __pyx_t_4 = (__pyx_v_num_build_matches > 0);
     if (__pyx_t_4) {
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":463
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":485
  *             if num_build_matches > 0:
  *                 # Found matches - copy to output buffers
  *                 for j in range(num_build_matches):             # <<<<<<<<<<<<<<
@@ -11624,7 +11735,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
       for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
         __pyx_v_j = __pyx_t_7;
 
-        /* "sabot/_cython/operators/hash_join_streaming.pyx":464
+        /* "sabot/_cython/operators/hash_join_streaming.pyx":486
  *                 # Found matches - copy to output buffers
  *                 for j in range(num_build_matches):
  *                     left_indices_out[match_count] = build_row_indices[j]             # <<<<<<<<<<<<<<
@@ -11633,7 +11744,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
 */
         (__pyx_v_left_indices_out[__pyx_v_match_count]) = (__pyx_v_build_row_indices[__pyx_v_j]);
 
-        /* "sabot/_cython/operators/hash_join_streaming.pyx":465
+        /* "sabot/_cython/operators/hash_join_streaming.pyx":487
  *                 for j in range(num_build_matches):
  *                     left_indices_out[match_count] = build_row_indices[j]
  *                     right_indices_out[match_count] = i             # <<<<<<<<<<<<<<
@@ -11642,7 +11753,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
 */
         (__pyx_v_right_indices_out[__pyx_v_match_count]) = __pyx_v_i;
 
-        /* "sabot/_cython/operators/hash_join_streaming.pyx":466
+        /* "sabot/_cython/operators/hash_join_streaming.pyx":488
  *                     left_indices_out[match_count] = build_row_indices[j]
  *                     right_indices_out[match_count] = i
  *                     match_count += 1             # <<<<<<<<<<<<<<
@@ -11652,7 +11763,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
         __pyx_v_match_count = (__pyx_v_match_count + 1);
       }
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":461
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":483
  *             build_row_indices = self._hash_table.lookup_all(hash_val, &num_build_matches)
  * 
  *             if num_build_matches > 0:             # <<<<<<<<<<<<<<
@@ -11663,7 +11774,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
     __pyx_L3_continue:;
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":468
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":490
  *                     match_count += 1
  * 
  *         total_matches_out[0] = match_count             # <<<<<<<<<<<<<<
@@ -11672,7 +11783,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
 */
   (__pyx_v_total_matches_out[0]) = __pyx_v_match_count;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":469
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":491
  * 
  *         total_matches_out[0] = match_count
  *         return match_count             # <<<<<<<<<<<<<<
@@ -11682,7 +11793,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
   __pyx_r = __pyx_v_match_count;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":432
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":454
  *             yield result
  * 
  *     cdef int _probe_hash_table_nogil(             # <<<<<<<<<<<<<<
@@ -11696,7 +11807,7 @@ static int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingH
 }
 static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_11generator1(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":471
+/* "sabot/_cython/operators/hash_join_streaming.pyx":493
  *         return match_count
  * 
  *     def _probe_batch_chunk(self, object batch):             # <<<<<<<<<<<<<<
@@ -11744,32 +11855,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 471, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 493, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 493, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_probe_batch_chunk", 0) < (0)) __PYX_ERR(0, 471, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_probe_batch_chunk", 0) < (0)) __PYX_ERR(0, 493, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_probe_batch_chunk", 1, 1, 1, i); __PYX_ERR(0, 471, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_probe_batch_chunk", 1, 1, 1, i); __PYX_ERR(0, 493, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 471, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 493, __pyx_L3_error)
     }
     __pyx_v_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_probe_batch_chunk", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 471, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_probe_batch_chunk", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 493, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -11802,7 +11913,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 471, __pyx_L1_error)
+    __PYX_ERR(0, 493, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -11813,7 +11924,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_batch);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_batch);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_11generator1, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_probe_batch_chunk, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin__probe_batch_c, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi); if (unlikely(!gen)) __PYX_ERR(0, 471, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_11generator1, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_probe_batch_chunk, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin__probe_batch_c, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi); if (unlikely(!gen)) __PYX_ERR(0, 493, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -11852,10 +11963,10 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
-    __PYX_ERR(0, 471, __pyx_L1_error)
+    __PYX_ERR(0, 493, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":482
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":504
  *         """
  *         # Extract probe key column (assume single int64 key for now)
  *         cdef int key_col_idx = self._right_key_indices[0]             # <<<<<<<<<<<<<<
@@ -11864,17 +11975,17 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_key_col_idx = (__pyx_cur_scope->__pyx_v_self->_right_key_indices[0]);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":485
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":507
  * 
  *         # Unwrap Python RecordBatch to C++ RecordBatch (zero-copy)
  *         cdef shared_ptr[CRecordBatch] c_batch = pyarrow_unwrap_batch(batch)             # <<<<<<<<<<<<<<
  *         cdef int64_t num_rows = c_batch.get().num_rows()
  * 
 */
-  __pyx_t_1 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_cur_scope->__pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 485, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_cur_scope->__pyx_v_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 507, __pyx_L1_error)
   __pyx_cur_scope->__pyx_v_c_batch = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_1);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":486
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":508
  *         # Unwrap Python RecordBatch to C++ RecordBatch (zero-copy)
  *         cdef shared_ptr[CRecordBatch] c_batch = pyarrow_unwrap_batch(batch)
  *         cdef int64_t num_rows = c_batch.get().num_rows()             # <<<<<<<<<<<<<<
@@ -11883,7 +11994,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_num_rows = __pyx_cur_scope->__pyx_v_c_batch.get()->num_rows();
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":489
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":511
  * 
  *         # Get key column as C++ array
  *         cdef shared_ptr[CArray] key_col = c_batch.get().column(key_col_idx)             # <<<<<<<<<<<<<<
@@ -11892,7 +12003,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_key_col = __pyx_cur_scope->__pyx_v_c_batch.get()->column(__pyx_cur_scope->__pyx_v_key_col_idx);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":490
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":512
  *         # Get key column as C++ array
  *         cdef shared_ptr[CArray] key_col = c_batch.get().column(key_col_idx)
  *         cdef const CInt64Array* int64_array = <const CInt64Array*>key_col.get()             # <<<<<<<<<<<<<<
@@ -11901,7 +12012,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_int64_array = ((arrow::Int64Array const *)__pyx_cur_scope->__pyx_v_key_col.get());
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":491
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":513
  *         cdef shared_ptr[CArray] key_col = c_batch.get().column(key_col_idx)
  *         cdef const CInt64Array* int64_array = <const CInt64Array*>key_col.get()
  *         cdef const int64_t* raw_keys = int64_array.raw_values()             # <<<<<<<<<<<<<<
@@ -11910,7 +12021,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_raw_keys = __pyx_cur_scope->__pyx_v_int64_array->raw_values();
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":494
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":516
  * 
  *         # Get hash buffer (pre-allocated, zero allocations)
  *         cdef uint32_t* hashes = <uint32_t*>self._hash_buffer.get().data()             # <<<<<<<<<<<<<<
@@ -11919,17 +12030,17 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_hashes = ((uint32_t *)__pyx_cur_scope->__pyx_v_self->_hash_buffer.get()->data());
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":497
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":519
  * 
  *         # Compute hashes with SIMD (4x parallel on ARM, 8x on x86)
  *         cdef int num_hashed = hash_int64_simd(raw_keys, num_rows, hashes)             # <<<<<<<<<<<<<<
  * 
  *         # Probe bloom filter with SIMD (pre-filter non-matching rows)
 */
-  __pyx_t_2 = __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_hash_int64_simd(__pyx_cur_scope->__pyx_v_raw_keys, __pyx_cur_scope->__pyx_v_num_rows, __pyx_cur_scope->__pyx_v_hashes); if (unlikely(__pyx_t_2 == ((int)-1) && PyErr_Occurred())) __PYX_ERR(0, 497, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_hash_int64_simd(__pyx_cur_scope->__pyx_v_raw_keys, __pyx_cur_scope->__pyx_v_num_rows, __pyx_cur_scope->__pyx_v_hashes); if (unlikely(__pyx_t_2 == ((int)-1) && PyErr_Occurred())) __PYX_ERR(0, 519, __pyx_L1_error)
   __pyx_cur_scope->__pyx_v_num_hashed = __pyx_t_2;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":500
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":522
  * 
  *         # Probe bloom filter with SIMD (pre-filter non-matching rows)
  *         cdef uint8_t* bloom_filter_data = <uint8_t*>self._bloom_filter.get().data()             # <<<<<<<<<<<<<<
@@ -11938,7 +12049,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_bloom_filter_data = ((uint8_t *)__pyx_cur_scope->__pyx_v_self->_bloom_filter.get()->data());
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":501
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":523
  *         # Probe bloom filter with SIMD (pre-filter non-matching rows)
  *         cdef uint8_t* bloom_filter_data = <uint8_t*>self._bloom_filter.get().data()
  *         cdef uint8_t* match_bitvector = <uint8_t*>self._match_bitvector.get().data()             # <<<<<<<<<<<<<<
@@ -11947,17 +12058,17 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_match_bitvector = ((uint8_t *)__pyx_cur_scope->__pyx_v_self->_match_bitvector.get()->data());
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":502
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":524
  *         cdef uint8_t* bloom_filter_data = <uint8_t*>self._bloom_filter.get().data()
  *         cdef uint8_t* match_bitvector = <uint8_t*>self._match_bitvector.get().data()
  *         cdef int bloom_matches = probe_bloom_filter_simd(             # <<<<<<<<<<<<<<
  *             hashes, num_rows, bloom_filter_data, BLOOM_FILTER_SIZE, match_bitvector
  *         )
 */
-  __pyx_t_2 = __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_probe_bloom_filter_simd(__pyx_cur_scope->__pyx_v_hashes, __pyx_cur_scope->__pyx_v_num_rows, __pyx_cur_scope->__pyx_v_bloom_filter_data, 0x40000, __pyx_cur_scope->__pyx_v_match_bitvector); if (unlikely(__pyx_t_2 == ((int)-1) && PyErr_Occurred())) __PYX_ERR(0, 502, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_probe_bloom_filter_simd(__pyx_cur_scope->__pyx_v_hashes, __pyx_cur_scope->__pyx_v_num_rows, __pyx_cur_scope->__pyx_v_bloom_filter_data, 0x40000, __pyx_cur_scope->__pyx_v_match_bitvector); if (unlikely(__pyx_t_2 == ((int)-1) && PyErr_Occurred())) __PYX_ERR(0, 524, __pyx_L1_error)
   __pyx_cur_scope->__pyx_v_bloom_matches = __pyx_t_2;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":507
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":529
  * 
  *         # Get index buffers (pre-allocated)
  *         cdef uint32_t* left_indices_buf = <uint32_t*>self._left_indices.get().data()             # <<<<<<<<<<<<<<
@@ -11966,7 +12077,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_left_indices_buf = ((uint32_t *)__pyx_cur_scope->__pyx_v_self->_left_indices.get()->data());
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":508
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":530
  *         # Get index buffers (pre-allocated)
  *         cdef uint32_t* left_indices_buf = <uint32_t*>self._left_indices.get().data()
  *         cdef uint32_t* right_indices_buf = <uint32_t*>self._right_indices.get().data()             # <<<<<<<<<<<<<<
@@ -11975,7 +12086,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_right_indices_buf = ((uint32_t *)__pyx_cur_scope->__pyx_v_self->_right_indices.get()->data());
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":511
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":533
  * 
  *         # Statistics outputs
  *         cdef int64_t bloom_hits = bloom_matches             # <<<<<<<<<<<<<<
@@ -11984,7 +12095,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_bloom_hits = __pyx_cur_scope->__pyx_v_bloom_matches;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":512
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":534
  *         # Statistics outputs
  *         cdef int64_t bloom_hits = bloom_matches
  *         cdef int64_t bloom_misses = num_rows - bloom_matches             # <<<<<<<<<<<<<<
@@ -11993,7 +12104,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_bloom_misses = (__pyx_cur_scope->__pyx_v_num_rows - __pyx_cur_scope->__pyx_v_bloom_matches);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":513
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":535
  *         cdef int64_t bloom_hits = bloom_matches
  *         cdef int64_t bloom_misses = num_rows - bloom_matches
  *         cdef int64_t total_matches = 0             # <<<<<<<<<<<<<<
@@ -12002,7 +12113,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_total_matches = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":514
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":536
  *         cdef int64_t bloom_misses = num_rows - bloom_matches
  *         cdef int64_t total_matches = 0
  *         cdef int match_count = 0             # <<<<<<<<<<<<<<
@@ -12011,7 +12122,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_match_count = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":517
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":539
  * 
  *         # Probe C++ hash table and collect matches (release GIL for C++ operations)
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -12025,18 +12136,18 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __Pyx_FastGIL_Remember();
       /*try:*/ {
 
-        /* "sabot/_cython/operators/hash_join_streaming.pyx":518
+        /* "sabot/_cython/operators/hash_join_streaming.pyx":540
  *         # Probe C++ hash table and collect matches (release GIL for C++ operations)
  *         with nogil:
  *             match_count = self._probe_hash_table_nogil(             # <<<<<<<<<<<<<<
  *                 hashes, num_rows, match_bitvector,
  *                 left_indices_buf, right_indices_buf,
 */
-        __pyx_t_2 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->_probe_hash_table_nogil(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_hashes, __pyx_cur_scope->__pyx_v_num_rows, __pyx_cur_scope->__pyx_v_match_bitvector, __pyx_cur_scope->__pyx_v_left_indices_buf, __pyx_cur_scope->__pyx_v_right_indices_buf, (&__pyx_cur_scope->__pyx_v_total_matches)); if (unlikely(__Pyx_ErrOccurredWithGIL())) __PYX_ERR(0, 518, __pyx_L5_error)
+        __pyx_t_2 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->_probe_hash_table_nogil(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_hashes, __pyx_cur_scope->__pyx_v_num_rows, __pyx_cur_scope->__pyx_v_match_bitvector, __pyx_cur_scope->__pyx_v_left_indices_buf, __pyx_cur_scope->__pyx_v_right_indices_buf, (&__pyx_cur_scope->__pyx_v_total_matches)); if (unlikely(__Pyx_ErrOccurredWithGIL())) __PYX_ERR(0, 540, __pyx_L5_error)
         __pyx_cur_scope->__pyx_v_match_count = __pyx_t_2;
       }
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":517
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":539
  * 
  *         # Probe C++ hash table and collect matches (release GIL for C++ operations)
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -12058,7 +12169,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       }
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":525
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":547
  * 
  *         # Update statistics (with GIL)
  *         self._bloom_filter_hits += bloom_hits             # <<<<<<<<<<<<<<
@@ -12067,7 +12178,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_self->_bloom_filter_hits = (__pyx_cur_scope->__pyx_v_self->_bloom_filter_hits + __pyx_cur_scope->__pyx_v_bloom_hits);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":526
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":548
  *         # Update statistics (with GIL)
  *         self._bloom_filter_hits += bloom_hits
  *         self._bloom_filter_misses += bloom_misses             # <<<<<<<<<<<<<<
@@ -12076,7 +12187,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_self->_bloom_filter_misses = (__pyx_cur_scope->__pyx_v_self->_bloom_filter_misses + __pyx_cur_scope->__pyx_v_bloom_misses);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":527
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":549
  *         self._bloom_filter_hits += bloom_hits
  *         self._bloom_filter_misses += bloom_misses
  *         self._total_matches += total_matches             # <<<<<<<<<<<<<<
@@ -12085,7 +12196,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_cur_scope->__pyx_v_self->_total_matches = (__pyx_cur_scope->__pyx_v_self->_total_matches + __pyx_cur_scope->__pyx_v_total_matches);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":530
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":552
  * 
  *         # If no matches, yield nothing
  *         if match_count == 0:             # <<<<<<<<<<<<<<
@@ -12095,7 +12206,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __pyx_t_3 = (__pyx_cur_scope->__pyx_v_match_count == 0);
   if (__pyx_t_3) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":531
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":553
  *         # If no matches, yield nothing
  *         if match_count == 0:
  *             return             # <<<<<<<<<<<<<<
@@ -12106,7 +12217,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":530
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":552
  * 
  *         # If no matches, yield nothing
  *         if match_count == 0:             # <<<<<<<<<<<<<<
@@ -12115,20 +12226,20 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":534
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":556
  * 
  *         # Build and yield result batch (with GIL for Python APIs)
  *         result_batch = self._build_result_batch(             # <<<<<<<<<<<<<<
  *             left_indices_buf, right_indices_buf, match_count, batch
  *         )
 */
-  __pyx_t_4 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->_build_result_batch(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_left_indices_buf, __pyx_cur_scope->__pyx_v_right_indices_buf, __pyx_cur_scope->__pyx_v_match_count, __pyx_cur_scope->__pyx_v_batch); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 534, __pyx_L1_error)
+  __pyx_t_4 = ((struct __pyx_vtabstruct_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->_build_result_batch(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_left_indices_buf, __pyx_cur_scope->__pyx_v_right_indices_buf, __pyx_cur_scope->__pyx_v_match_count, __pyx_cur_scope->__pyx_v_batch); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 556, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_4);
   __pyx_cur_scope->__pyx_v_result_batch = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":537
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":559
  *             left_indices_buf, right_indices_buf, match_count, batch
  *         )
  *         yield result_batch             # <<<<<<<<<<<<<<
@@ -12144,10 +12255,10 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __pyx_generator->resume_label = 1;
   return __pyx_r;
   __pyx_L8_resume_from_yield:;
-  if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 537, __pyx_L1_error)
+  if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 559, __pyx_L1_error)
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":471
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":493
  *         return match_count
  * 
  *     def _probe_batch_chunk(self, object batch):             # <<<<<<<<<<<<<<
@@ -12175,7 +12286,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":539
+/* "sabot/_cython/operators/hash_join_streaming.pyx":561
  *         yield result_batch
  * 
  *     cdef object _build_result_batch(self, uint32_t* left_indices, uint32_t* right_indices, int count, object probe_batch):             # <<<<<<<<<<<<<<
@@ -12227,7 +12338,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_build_result_batch", 0);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":561
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":583
  * 
  *         # Append values from C arrays
  *         status = left_builder.AppendValues(left_indices, count)             # <<<<<<<<<<<<<<
@@ -12236,7 +12347,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   __pyx_v_status = __pyx_v_left_builder.AppendValues(__pyx_v_left_indices, __pyx_v_count);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":562
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":584
  *         # Append values from C arrays
  *         status = left_builder.AppendValues(left_indices, count)
  *         if not status.ok():             # <<<<<<<<<<<<<<
@@ -12246,7 +12357,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
   __pyx_t_1 = (!(__pyx_v_status.ok() != 0));
   if (unlikely(__pyx_t_1)) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":563
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":585
  *         status = left_builder.AppendValues(left_indices, count)
  *         if not status.ok():
  *             raise RuntimeError("Failed to build left indices array")             # <<<<<<<<<<<<<<
@@ -12262,14 +12373,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 563, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 585, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 563, __pyx_L1_error)
+    __PYX_ERR(0, 585, __pyx_L1_error)
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":562
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":584
  *         # Append values from C arrays
  *         status = left_builder.AppendValues(left_indices, count)
  *         if not status.ok():             # <<<<<<<<<<<<<<
@@ -12278,7 +12389,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":565
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":587
  *             raise RuntimeError("Failed to build left indices array")
  * 
  *         status = right_builder.AppendValues(right_indices, count)             # <<<<<<<<<<<<<<
@@ -12287,7 +12398,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   __pyx_v_status = __pyx_v_right_builder.AppendValues(__pyx_v_right_indices, __pyx_v_count);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":566
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":588
  * 
  *         status = right_builder.AppendValues(right_indices, count)
  *         if not status.ok():             # <<<<<<<<<<<<<<
@@ -12297,7 +12408,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
   __pyx_t_1 = (!(__pyx_v_status.ok() != 0));
   if (unlikely(__pyx_t_1)) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":567
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":589
  *         status = right_builder.AppendValues(right_indices, count)
  *         if not status.ok():
  *             raise RuntimeError("Failed to build right indices array")             # <<<<<<<<<<<<<<
@@ -12313,14 +12424,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 567, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 589, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 567, __pyx_L1_error)
+    __PYX_ERR(0, 589, __pyx_L1_error)
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":566
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":588
  * 
  *         status = right_builder.AppendValues(right_indices, count)
  *         if not status.ok():             # <<<<<<<<<<<<<<
@@ -12329,7 +12440,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":570
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":592
  * 
  *         # Finish building arrays
  *         result = left_builder.Finish()             # <<<<<<<<<<<<<<
@@ -12338,7 +12449,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   __pyx_v_result = __pyx_v_left_builder.Finish();
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":571
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":593
  *         # Finish building arrays
  *         result = left_builder.Finish()
  *         if not result.ok():             # <<<<<<<<<<<<<<
@@ -12348,7 +12459,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
   __pyx_t_1 = (!(__pyx_v_result.ok() != 0));
   if (unlikely(__pyx_t_1)) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":572
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":594
  *         result = left_builder.Finish()
  *         if not result.ok():
  *             raise RuntimeError("Failed to finish left indices array")             # <<<<<<<<<<<<<<
@@ -12364,14 +12475,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 572, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 594, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 572, __pyx_L1_error)
+    __PYX_ERR(0, 594, __pyx_L1_error)
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":571
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":593
  *         # Finish building arrays
  *         result = left_builder.Finish()
  *         if not result.ok():             # <<<<<<<<<<<<<<
@@ -12380,7 +12491,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":573
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":595
  *         if not result.ok():
  *             raise RuntimeError("Failed to finish left indices array")
  *         cdef shared_ptr[CArray] left_idx_array_cpp = result.ValueOrDie()             # <<<<<<<<<<<<<<
@@ -12391,11 +12502,11 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
     __pyx_t_6 = __pyx_v_result.ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 573, __pyx_L1_error)
+    __PYX_ERR(0, 595, __pyx_L1_error)
   }
   __pyx_v_left_idx_array_cpp = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_6);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":575
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":597
  *         cdef shared_ptr[CArray] left_idx_array_cpp = result.ValueOrDie()
  * 
  *         result = right_builder.Finish()             # <<<<<<<<<<<<<<
@@ -12404,7 +12515,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   __pyx_v_result = __pyx_v_right_builder.Finish();
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":576
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":598
  * 
  *         result = right_builder.Finish()
  *         if not result.ok():             # <<<<<<<<<<<<<<
@@ -12414,7 +12525,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
   __pyx_t_1 = (!(__pyx_v_result.ok() != 0));
   if (unlikely(__pyx_t_1)) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":577
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":599
  *         result = right_builder.Finish()
  *         if not result.ok():
  *             raise RuntimeError("Failed to finish right indices array")             # <<<<<<<<<<<<<<
@@ -12430,14 +12541,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 577, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 599, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 577, __pyx_L1_error)
+    __PYX_ERR(0, 599, __pyx_L1_error)
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":576
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":598
  * 
  *         result = right_builder.Finish()
  *         if not result.ok():             # <<<<<<<<<<<<<<
@@ -12446,7 +12557,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":578
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":600
  *         if not result.ok():
  *             raise RuntimeError("Failed to finish right indices array")
  *         cdef shared_ptr[CArray] right_idx_array_cpp = result.ValueOrDie()             # <<<<<<<<<<<<<<
@@ -12457,11 +12568,11 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
     __pyx_t_6 = __pyx_v_result.ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 578, __pyx_L1_error)
+    __PYX_ERR(0, 600, __pyx_L1_error)
   }
   __pyx_v_right_idx_array_cpp = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_6);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":583
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":605
  *         # Build table is immutable after insert completes, so we cached the RecordBatch
  *         # This avoids re-conversion on every result batch (20-40% performance gain)
  *         cdef shared_ptr[CRecordBatch] c_build_batch = pyarrow_unwrap_batch(self._build_batch)             # <<<<<<<<<<<<<<
@@ -12470,21 +12581,21 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   __pyx_t_2 = __pyx_v_self->_build_batch;
   __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_7 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_t_2); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 583, __pyx_L1_error)
+  __pyx_t_7 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_t_2); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 605, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_c_build_batch = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_7);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":584
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":606
  *         # This avoids re-conversion on every result batch (20-40% performance gain)
  *         cdef shared_ptr[CRecordBatch] c_build_batch = pyarrow_unwrap_batch(self._build_batch)
  *         cdef shared_ptr[CRecordBatch] c_probe_batch = pyarrow_unwrap_batch(probe_batch)             # <<<<<<<<<<<<<<
  * 
  *         # Take columns from build batch (C++ Take)
 */
-  __pyx_t_7 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_v_probe_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 584, __pyx_L1_error)
+  __pyx_t_7 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_batch(__pyx_v_probe_batch); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 606, __pyx_L1_error)
   __pyx_v_c_probe_batch = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_7);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":593
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":615
  * 
  *         # Left side columns
  *         for i in range(c_build_batch.get().num_columns()):             # <<<<<<<<<<<<<<
@@ -12496,7 +12607,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
   for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
     __pyx_v_i = __pyx_t_10;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":594
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":616
  *         # Left side columns
  *         for i in range(c_build_batch.get().num_columns()):
  *             column = c_build_batch.get().column(i)             # <<<<<<<<<<<<<<
@@ -12505,7 +12616,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
     __pyx_v_column = __pyx_v_c_build_batch.get()->column(__pyx_v_i);
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":595
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":617
  *         for i in range(c_build_batch.get().num_columns()):
  *             column = c_build_batch.get().column(i)
  *             result = Take(column.get()[0], left_idx_array_cpp.get()[0])             # <<<<<<<<<<<<<<
@@ -12514,7 +12625,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
     __pyx_v_result = arrow::compute::Take((__pyx_v_column.get()[0]), (__pyx_v_left_idx_array_cpp.get()[0]));
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":596
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":618
  *             column = c_build_batch.get().column(i)
  *             result = Take(column.get()[0], left_idx_array_cpp.get()[0])
  *             if not result.ok():             # <<<<<<<<<<<<<<
@@ -12524,7 +12635,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
     __pyx_t_1 = (!(__pyx_v_result.ok() != 0));
     if (unlikely(__pyx_t_1)) {
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":597
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":619
  *             result = Take(column.get()[0], left_idx_array_cpp.get()[0])
  *             if not result.ok():
  *                 raise RuntimeError(f"Failed to take left column {i}")             # <<<<<<<<<<<<<<
@@ -12534,9 +12645,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_t_3 = NULL;
       __Pyx_INCREF(__pyx_builtin_RuntimeError);
       __pyx_t_4 = __pyx_builtin_RuntimeError; 
-      __pyx_t_11 = __Pyx_PyUnicode_From_int(__pyx_v_i, 0, ' ', 'd'); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 597, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyUnicode_From_int(__pyx_v_i, 0, ' ', 'd'); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 619, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Failed_to_take_left_column, __pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 597, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Failed_to_take_left_column, __pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 619, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __pyx_t_5 = 1;
@@ -12546,14 +12657,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 597, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 619, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       __Pyx_Raise(__pyx_t_2, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __PYX_ERR(0, 597, __pyx_L1_error)
+      __PYX_ERR(0, 619, __pyx_L1_error)
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":596
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":618
  *             column = c_build_batch.get().column(i)
  *             result = Take(column.get()[0], left_idx_array_cpp.get()[0])
  *             if not result.ok():             # <<<<<<<<<<<<<<
@@ -12562,7 +12673,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
     }
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":598
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":620
  *             if not result.ok():
  *                 raise RuntimeError(f"Failed to take left column {i}")
  *             taken = result.ValueOrDie()             # <<<<<<<<<<<<<<
@@ -12573,11 +12684,11 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_t_6 = __pyx_v_result.ValueOrDie();
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 598, __pyx_L1_error)
+      __PYX_ERR(0, 620, __pyx_L1_error)
     }
     __pyx_v_taken = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_6);
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":599
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":621
  *                 raise RuntimeError(f"Failed to take left column {i}")
  *             taken = result.ValueOrDie()
  *             result_columns.push_back(taken)             # <<<<<<<<<<<<<<
@@ -12588,11 +12699,11 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_v_result_columns.push_back(__pyx_v_taken);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 599, __pyx_L1_error)
+      __PYX_ERR(0, 621, __pyx_L1_error)
     }
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":602
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":624
  * 
  *         # Right side columns
  *         for i in range(c_probe_batch.get().num_columns()):             # <<<<<<<<<<<<<<
@@ -12604,7 +12715,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
   for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
     __pyx_v_i = __pyx_t_10;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":603
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":625
  *         # Right side columns
  *         for i in range(c_probe_batch.get().num_columns()):
  *             column = c_probe_batch.get().column(i)             # <<<<<<<<<<<<<<
@@ -12613,7 +12724,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
     __pyx_v_column = __pyx_v_c_probe_batch.get()->column(__pyx_v_i);
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":604
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":626
  *         for i in range(c_probe_batch.get().num_columns()):
  *             column = c_probe_batch.get().column(i)
  *             result = Take(column.get()[0], right_idx_array_cpp.get()[0])             # <<<<<<<<<<<<<<
@@ -12622,7 +12733,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
     __pyx_v_result = arrow::compute::Take((__pyx_v_column.get()[0]), (__pyx_v_right_idx_array_cpp.get()[0]));
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":605
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":627
  *             column = c_probe_batch.get().column(i)
  *             result = Take(column.get()[0], right_idx_array_cpp.get()[0])
  *             if not result.ok():             # <<<<<<<<<<<<<<
@@ -12632,7 +12743,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
     __pyx_t_1 = (!(__pyx_v_result.ok() != 0));
     if (unlikely(__pyx_t_1)) {
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":606
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":628
  *             result = Take(column.get()[0], right_idx_array_cpp.get()[0])
  *             if not result.ok():
  *                 raise RuntimeError(f"Failed to take right column {i}")             # <<<<<<<<<<<<<<
@@ -12642,9 +12753,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_t_4 = NULL;
       __Pyx_INCREF(__pyx_builtin_RuntimeError);
       __pyx_t_12 = __pyx_builtin_RuntimeError; 
-      __pyx_t_3 = __Pyx_PyUnicode_From_int(__pyx_v_i, 0, ' ', 'd'); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 606, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyUnicode_From_int(__pyx_v_i, 0, ' ', 'd'); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 628, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_11 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Failed_to_take_right_column, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 606, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Failed_to_take_right_column, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 628, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_5 = 1;
@@ -12654,14 +12765,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 606, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 628, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       __Pyx_Raise(__pyx_t_2, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __PYX_ERR(0, 606, __pyx_L1_error)
+      __PYX_ERR(0, 628, __pyx_L1_error)
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":605
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":627
  *             column = c_probe_batch.get().column(i)
  *             result = Take(column.get()[0], right_idx_array_cpp.get()[0])
  *             if not result.ok():             # <<<<<<<<<<<<<<
@@ -12670,7 +12781,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
     }
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":607
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":629
  *             if not result.ok():
  *                 raise RuntimeError(f"Failed to take right column {i}")
  *             taken = result.ValueOrDie()             # <<<<<<<<<<<<<<
@@ -12681,11 +12792,11 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_t_6 = __pyx_v_result.ValueOrDie();
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 607, __pyx_L1_error)
+      __PYX_ERR(0, 629, __pyx_L1_error)
     }
     __pyx_v_taken = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_6);
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":608
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":630
  *                 raise RuntimeError(f"Failed to take right column {i}")
  *             taken = result.ValueOrDie()
  *             result_columns.push_back(taken)             # <<<<<<<<<<<<<<
@@ -12696,23 +12807,23 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_v_result_columns.push_back(__pyx_v_taken);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 608, __pyx_L1_error)
+      __PYX_ERR(0, 630, __pyx_L1_error)
     }
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":613
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":635
  *         # Cache schema per probe batch schema (Bug #2 fix)
  *         # Schema is identical for all result batches with same probe schema (10-20% gain)
  *         right_schema = probe_batch.schema             # <<<<<<<<<<<<<<
  *         if right_schema not in self._schema_cache:
  *             left_schema = self._build_batch.schema
 */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_probe_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 613, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_probe_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 635, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_right_schema = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":614
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":636
  *         # Schema is identical for all result batches with same probe schema (10-20% gain)
  *         right_schema = probe_batch.schema
  *         if right_schema not in self._schema_cache:             # <<<<<<<<<<<<<<
@@ -12721,36 +12832,36 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   if (unlikely(__pyx_v_self->_schema_cache == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 614, __pyx_L1_error)
+    __PYX_ERR(0, 636, __pyx_L1_error)
   }
-  __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_v_right_schema, __pyx_v_self->_schema_cache, Py_NE)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 614, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_v_right_schema, __pyx_v_self->_schema_cache, Py_NE)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 636, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":615
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":637
  *         right_schema = probe_batch.schema
  *         if right_schema not in self._schema_cache:
  *             left_schema = self._build_batch.schema             # <<<<<<<<<<<<<<
  *             combined_fields = []
  *             for field in left_schema:
 */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->_build_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 615, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->_build_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 637, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_v_left_schema = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":616
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":638
  *         if right_schema not in self._schema_cache:
  *             left_schema = self._build_batch.schema
  *             combined_fields = []             # <<<<<<<<<<<<<<
  *             for field in left_schema:
  *                 combined_fields.append(pa.field(f"left_{field.name}", field.type))
 */
-    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 616, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 638, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_v_combined_fields = ((PyObject*)__pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":617
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":639
  *             left_schema = self._build_batch.schema
  *             combined_fields = []
  *             for field in left_schema:             # <<<<<<<<<<<<<<
@@ -12762,9 +12873,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_t_13 = 0;
       __pyx_t_14 = NULL;
     } else {
-      __pyx_t_13 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_left_schema); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 617, __pyx_L1_error)
+      __pyx_t_13 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_left_schema); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 639, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_14 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 617, __pyx_L1_error)
+      __pyx_t_14 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 639, __pyx_L1_error)
     }
     for (;;) {
       if (likely(!__pyx_t_14)) {
@@ -12772,7 +12883,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
           {
             Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 617, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 639, __pyx_L1_error)
             #endif
             if (__pyx_t_13 >= __pyx_temp) break;
           }
@@ -12782,7 +12893,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
           {
             Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 617, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 639, __pyx_L1_error)
             #endif
             if (__pyx_t_13 >= __pyx_temp) break;
           }
@@ -12793,13 +12904,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
           #endif
           ++__pyx_t_13;
         }
-        if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 617, __pyx_L1_error)
+        if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 639, __pyx_L1_error)
       } else {
         __pyx_t_12 = __pyx_t_14(__pyx_t_2);
         if (unlikely(!__pyx_t_12)) {
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
-            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 617, __pyx_L1_error)
+            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 639, __pyx_L1_error)
             PyErr_Clear();
           }
           break;
@@ -12809,7 +12920,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __Pyx_XDECREF_SET(__pyx_v_field, __pyx_t_12);
       __pyx_t_12 = 0;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":618
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":640
  *             combined_fields = []
  *             for field in left_schema:
  *                 combined_fields.append(pa.field(f"left_{field.name}", field.type))             # <<<<<<<<<<<<<<
@@ -12817,20 +12928,20 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
  *                 combined_fields.append(pa.field(f"right_{field.name}", field.type))
 */
       __pyx_t_11 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 618, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 640, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_field); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 618, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_field); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 640, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_field, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 618, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_field, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 640, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_15 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 618, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 640, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_n_u_left, __pyx_t_15); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 618, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_n_u_left, __pyx_t_15); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 640, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_field, __pyx_mstate_global->__pyx_n_u_type); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 618, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_field, __pyx_mstate_global->__pyx_n_u_type); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 640, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
       __pyx_t_5 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -12851,13 +12962,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 618, __pyx_L1_error)
+        if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 640, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
       }
-      __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_combined_fields, __pyx_t_12); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 618, __pyx_L1_error)
+      __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_combined_fields, __pyx_t_12); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 640, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":617
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":639
  *             left_schema = self._build_batch.schema
  *             combined_fields = []
  *             for field in left_schema:             # <<<<<<<<<<<<<<
@@ -12867,7 +12978,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":619
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":641
  *             for field in left_schema:
  *                 combined_fields.append(pa.field(f"left_{field.name}", field.type))
  *             for field in right_schema:             # <<<<<<<<<<<<<<
@@ -12879,9 +12990,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_t_13 = 0;
       __pyx_t_14 = NULL;
     } else {
-      __pyx_t_13 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_right_schema); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 619, __pyx_L1_error)
+      __pyx_t_13 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_right_schema); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 641, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_14 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 619, __pyx_L1_error)
+      __pyx_t_14 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 641, __pyx_L1_error)
     }
     for (;;) {
       if (likely(!__pyx_t_14)) {
@@ -12889,7 +13000,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
           {
             Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 619, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 641, __pyx_L1_error)
             #endif
             if (__pyx_t_13 >= __pyx_temp) break;
           }
@@ -12899,7 +13010,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
           {
             Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 619, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 641, __pyx_L1_error)
             #endif
             if (__pyx_t_13 >= __pyx_temp) break;
           }
@@ -12910,13 +13021,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
           #endif
           ++__pyx_t_13;
         }
-        if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 619, __pyx_L1_error)
+        if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 641, __pyx_L1_error)
       } else {
         __pyx_t_12 = __pyx_t_14(__pyx_t_2);
         if (unlikely(!__pyx_t_12)) {
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
-            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 619, __pyx_L1_error)
+            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 641, __pyx_L1_error)
             PyErr_Clear();
           }
           break;
@@ -12926,7 +13037,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __Pyx_XDECREF_SET(__pyx_v_field, __pyx_t_12);
       __pyx_t_12 = 0;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":620
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":642
  *                 combined_fields.append(pa.field(f"left_{field.name}", field.type))
  *             for field in right_schema:
  *                 combined_fields.append(pa.field(f"right_{field.name}", field.type))             # <<<<<<<<<<<<<<
@@ -12934,20 +13045,20 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
  * 
 */
       __pyx_t_3 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 620, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 642, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_field); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 620, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_field); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 642, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_field, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 620, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_field, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 642, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
-      __pyx_t_11 = __Pyx_PyObject_FormatSimple(__pyx_t_15, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 620, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyObject_FormatSimple(__pyx_t_15, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 642, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      __pyx_t_15 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_n_u_right, __pyx_t_11); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 620, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_n_u_right, __pyx_t_11); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 642, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_field, __pyx_mstate_global->__pyx_n_u_type); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 620, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_field, __pyx_mstate_global->__pyx_n_u_type); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 642, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __pyx_t_5 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -12968,13 +13079,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
         __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 620, __pyx_L1_error)
+        if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 642, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
       }
-      __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_combined_fields, __pyx_t_12); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 620, __pyx_L1_error)
+      __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_combined_fields, __pyx_t_12); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 642, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-      /* "sabot/_cython/operators/hash_join_streaming.pyx":619
+      /* "sabot/_cython/operators/hash_join_streaming.pyx":641
  *             for field in left_schema:
  *                 combined_fields.append(pa.field(f"left_{field.name}", field.type))
  *             for field in right_schema:             # <<<<<<<<<<<<<<
@@ -12984,7 +13095,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":621
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":643
  *             for field in right_schema:
  *                 combined_fields.append(pa.field(f"right_{field.name}", field.type))
  *             self._schema_cache[right_schema] = pa.schema(combined_fields)             # <<<<<<<<<<<<<<
@@ -12992,9 +13103,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
  *         combined_schema = self._schema_cache[right_schema]
 */
     __pyx_t_12 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 621, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 643, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 621, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 643, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_5 = 1;
@@ -13014,17 +13125,17 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_11, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 621, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 643, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     if (unlikely(__pyx_v_self->_schema_cache == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 621, __pyx_L1_error)
+      __PYX_ERR(0, 643, __pyx_L1_error)
     }
-    if (unlikely((PyDict_SetItem(__pyx_v_self->_schema_cache, __pyx_v_right_schema, __pyx_t_2) < 0))) __PYX_ERR(0, 621, __pyx_L1_error)
+    if (unlikely((PyDict_SetItem(__pyx_v_self->_schema_cache, __pyx_v_right_schema, __pyx_t_2) < 0))) __PYX_ERR(0, 643, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":614
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":636
  *         # Schema is identical for all result batches with same probe schema (10-20% gain)
  *         right_schema = probe_batch.schema
  *         if right_schema not in self._schema_cache:             # <<<<<<<<<<<<<<
@@ -13033,7 +13144,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   }
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":623
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":645
  *             self._schema_cache[right_schema] = pa.schema(combined_fields)
  * 
  *         combined_schema = self._schema_cache[right_schema]             # <<<<<<<<<<<<<<
@@ -13042,24 +13153,24 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   if (unlikely(__pyx_v_self->_schema_cache == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 623, __pyx_L1_error)
+    __PYX_ERR(0, 645, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->_schema_cache, __pyx_v_right_schema); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 623, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->_schema_cache, __pyx_v_right_schema); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 645, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_combined_schema = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":626
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":648
  * 
  *         # Unwrap Python schema to C++
  *         cdef shared_ptr[CSchema] c_schema = pyarrow_unwrap_schema(combined_schema)             # <<<<<<<<<<<<<<
  * 
  *         # Create RecordBatch using C++ RecordBatch::Make()
 */
-  __pyx_t_17 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_schema(__pyx_v_combined_schema); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 626, __pyx_L1_error)
+  __pyx_t_17 = __pyx_f_7pyarrow_3lib_pyarrow_unwrap_schema(__pyx_v_combined_schema); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 648, __pyx_L1_error)
   __pyx_v_c_schema = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_17);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":629
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":651
  * 
  *         # Create RecordBatch using C++ RecordBatch::Make()
  *         cdef shared_ptr[CRecordBatch] c_result_batch = CRecordBatchMaker.Make(             # <<<<<<<<<<<<<<
@@ -13068,7 +13179,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
 */
   __pyx_v_c_result_batch = arrow::RecordBatch::Make(__pyx_v_c_schema, __pyx_v_count, __pyx_v_result_columns);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":635
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":657
  *         # Wrap C++ RecordBatch to Python and return
  *         # pyarrow_wrap_batch expects const shared_ptr&, so Cython will handle the conversion
  *         return pyarrow_wrap_batch(<const shared_ptr[CRecordBatch]>c_result_batch)             # <<<<<<<<<<<<<<
@@ -13076,13 +13187,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
  *     def get_stats(self):
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __pyx_f_7pyarrow_3lib_pyarrow_wrap_batch(((std::shared_ptr< arrow::RecordBatch>  const &)((std::shared_ptr<arrow::RecordBatch>  const )__pyx_v_c_result_batch))); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 635, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_7pyarrow_3lib_pyarrow_wrap_batch(((std::shared_ptr< arrow::RecordBatch>  const &)((std::shared_ptr<arrow::RecordBatch>  const )__pyx_v_c_result_batch))); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 657, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":539
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":561
  *         yield result_batch
  * 
  *     cdef object _build_result_batch(self, uint32_t* left_indices, uint32_t* right_indices, int count, object probe_batch):             # <<<<<<<<<<<<<<
@@ -13111,7 +13222,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17Stre
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":637
+/* "sabot/_cython/operators/hash_join_streaming.pyx":659
  *         return pyarrow_wrap_batch(<const shared_ptr[CRecordBatch]>c_result_batch)
  * 
  *     def get_stats(self):             # <<<<<<<<<<<<<<
@@ -13174,7 +13285,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_stats", 0);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":639
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":661
  *     def get_stats(self):
  *         """Get join statistics including C++ hash table metrics."""
  *         return {             # <<<<<<<<<<<<<<
@@ -13183,69 +13294,69 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __Pyx_XDECREF(__pyx_r);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":640
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":662
  *         """Get join statistics including C++ hash table metrics."""
  *         return {
  *             'build_rows': self._build_row_count,             # <<<<<<<<<<<<<<
  *             'probe_rows': self._total_probe_rows,
  *             'matches': self._total_matches,
 */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 640, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 662, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_build_row_count); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 640, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_build_row_count); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 662, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_build_rows, __pyx_t_2) < (0)) __PYX_ERR(0, 640, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_build_rows, __pyx_t_2) < (0)) __PYX_ERR(0, 662, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":641
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":663
  *         return {
  *             'build_rows': self._build_row_count,
  *             'probe_rows': self._total_probe_rows,             # <<<<<<<<<<<<<<
  *             'matches': self._total_matches,
  *             'bloom_filter_hits': self._bloom_filter_hits,
 */
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_total_probe_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 641, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_total_probe_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 663, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_probe_rows, __pyx_t_2) < (0)) __PYX_ERR(0, 640, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_probe_rows, __pyx_t_2) < (0)) __PYX_ERR(0, 662, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":642
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":664
  *             'build_rows': self._build_row_count,
  *             'probe_rows': self._total_probe_rows,
  *             'matches': self._total_matches,             # <<<<<<<<<<<<<<
  *             'bloom_filter_hits': self._bloom_filter_hits,
  *             'bloom_filter_misses': self._bloom_filter_misses,
 */
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_total_matches); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 642, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_total_matches); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 664, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_matches, __pyx_t_2) < (0)) __PYX_ERR(0, 640, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_matches, __pyx_t_2) < (0)) __PYX_ERR(0, 662, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":643
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":665
  *             'probe_rows': self._total_probe_rows,
  *             'matches': self._total_matches,
  *             'bloom_filter_hits': self._bloom_filter_hits,             # <<<<<<<<<<<<<<
  *             'bloom_filter_misses': self._bloom_filter_misses,
  *             'bloom_filter_selectivity': (
 */
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_bloom_filter_hits); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 643, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_bloom_filter_hits); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 665, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_bloom_filter_hits, __pyx_t_2) < (0)) __PYX_ERR(0, 640, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_bloom_filter_hits, __pyx_t_2) < (0)) __PYX_ERR(0, 662, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":644
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":666
  *             'matches': self._total_matches,
  *             'bloom_filter_hits': self._bloom_filter_hits,
  *             'bloom_filter_misses': self._bloom_filter_misses,             # <<<<<<<<<<<<<<
  *             'bloom_filter_selectivity': (
  *                 float(self._bloom_filter_hits) / float(self._total_probe_rows)
 */
-  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_bloom_filter_misses); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 644, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_bloom_filter_misses); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 666, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_bloom_filter_misses, __pyx_t_2) < (0)) __PYX_ERR(0, 640, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_bloom_filter_misses, __pyx_t_2) < (0)) __PYX_ERR(0, 662, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":647
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":669
  *             'bloom_filter_selectivity': (
  *                 float(self._bloom_filter_hits) / float(self._total_probe_rows)
  *                 if self._total_probe_rows > 0 else 0.0             # <<<<<<<<<<<<<<
@@ -13255,14 +13366,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __pyx_t_3 = (__pyx_v_self->_total_probe_rows > 0);
   if (__pyx_t_3) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":646
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":668
  *             'bloom_filter_misses': self._bloom_filter_misses,
  *             'bloom_filter_selectivity': (
  *                 float(self._bloom_filter_hits) / float(self._total_probe_rows)             # <<<<<<<<<<<<<<
  *                 if self._total_probe_rows > 0 else 0.0
  *             ),
 */
-    __pyx_t_4 = PyFloat_FromDouble((((double)__pyx_v_self->_bloom_filter_hits) / ((double)__pyx_v_self->_total_probe_rows))); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 646, __pyx_L1_error)
+    __pyx_t_4 = PyFloat_FromDouble((((double)__pyx_v_self->_bloom_filter_hits) / ((double)__pyx_v_self->_total_probe_rows))); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 668, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_2 = __pyx_t_4;
     __pyx_t_4 = 0;
@@ -13270,46 +13381,46 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __Pyx_INCREF(__pyx_mstate_global->__pyx_float_0_0);
     __pyx_t_2 = __pyx_mstate_global->__pyx_float_0_0;
   }
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_bloom_filter_selectivity, __pyx_t_2) < (0)) __PYX_ERR(0, 640, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_bloom_filter_selectivity, __pyx_t_2) < (0)) __PYX_ERR(0, 662, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":649
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":671
  *                 if self._total_probe_rows > 0 else 0.0
  *             ),
  *             'hash_table_buckets': self._hash_table.num_buckets(),             # <<<<<<<<<<<<<<
  *             'hash_table_entries': self._hash_table.num_entries(),
  *             'hash_table_memory_bytes': self._hash_table.memory_usage(),
 */
-  __pyx_t_2 = __Pyx_PyLong_FromSize_t(__pyx_v_self->_hash_table->num_buckets()); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 649, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_FromSize_t(__pyx_v_self->_hash_table->num_buckets()); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 671, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_hash_table_buckets, __pyx_t_2) < (0)) __PYX_ERR(0, 640, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_hash_table_buckets, __pyx_t_2) < (0)) __PYX_ERR(0, 662, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":650
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":672
  *             ),
  *             'hash_table_buckets': self._hash_table.num_buckets(),
  *             'hash_table_entries': self._hash_table.num_entries(),             # <<<<<<<<<<<<<<
  *             'hash_table_memory_bytes': self._hash_table.memory_usage(),
  *             'hash_table_load_factor': (
 */
-  __pyx_t_2 = __Pyx_PyLong_FromSize_t(__pyx_v_self->_hash_table->num_entries()); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 650, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_FromSize_t(__pyx_v_self->_hash_table->num_entries()); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 672, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_hash_table_entries, __pyx_t_2) < (0)) __PYX_ERR(0, 640, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_hash_table_entries, __pyx_t_2) < (0)) __PYX_ERR(0, 662, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":651
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":673
  *             'hash_table_buckets': self._hash_table.num_buckets(),
  *             'hash_table_entries': self._hash_table.num_entries(),
  *             'hash_table_memory_bytes': self._hash_table.memory_usage(),             # <<<<<<<<<<<<<<
  *             'hash_table_load_factor': (
  *                 float(self._hash_table.num_entries()) / float(self._hash_table.num_buckets())
 */
-  __pyx_t_2 = __Pyx_PyLong_FromSize_t(__pyx_v_self->_hash_table->memory_usage()); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 651, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_FromSize_t(__pyx_v_self->_hash_table->memory_usage()); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 673, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_hash_table_memory_bytes, __pyx_t_2) < (0)) __PYX_ERR(0, 640, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_hash_table_memory_bytes, __pyx_t_2) < (0)) __PYX_ERR(0, 662, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":654
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":676
  *             'hash_table_load_factor': (
  *                 float(self._hash_table.num_entries()) / float(self._hash_table.num_buckets())
  *                 if self._hash_table.num_buckets() > 0 else 0.0             # <<<<<<<<<<<<<<
@@ -13319,14 +13430,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __pyx_t_3 = (__pyx_v_self->_hash_table->num_buckets() > 0);
   if (__pyx_t_3) {
 
-    /* "sabot/_cython/operators/hash_join_streaming.pyx":653
+    /* "sabot/_cython/operators/hash_join_streaming.pyx":675
  *             'hash_table_memory_bytes': self._hash_table.memory_usage(),
  *             'hash_table_load_factor': (
  *                 float(self._hash_table.num_entries()) / float(self._hash_table.num_buckets())             # <<<<<<<<<<<<<<
  *                 if self._hash_table.num_buckets() > 0 else 0.0
  *             ),
 */
-    __pyx_t_4 = PyFloat_FromDouble((((double)__pyx_v_self->_hash_table->num_entries()) / ((double)__pyx_v_self->_hash_table->num_buckets()))); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 653, __pyx_L1_error)
+    __pyx_t_4 = PyFloat_FromDouble((((double)__pyx_v_self->_hash_table->num_entries()) / ((double)__pyx_v_self->_hash_table->num_buckets()))); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 675, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_2 = __pyx_t_4;
     __pyx_t_4 = 0;
@@ -13334,13 +13445,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __Pyx_INCREF(__pyx_mstate_global->__pyx_float_0_0);
     __pyx_t_2 = __pyx_mstate_global->__pyx_float_0_0;
   }
-  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_hash_table_load_factor, __pyx_t_2) < (0)) __PYX_ERR(0, 640, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_hash_table_load_factor, __pyx_t_2) < (0)) __PYX_ERR(0, 662, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":637
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":659
  *         return pyarrow_wrap_batch(<const shared_ptr[CRecordBatch]>c_result_batch)
  * 
  *     def get_stats(self):             # <<<<<<<<<<<<<<
@@ -13361,7 +13472,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":658
+/* "sabot/_cython/operators/hash_join_streaming.pyx":680
  *         }
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -13397,7 +13508,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__repr__", 0);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":659
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":681
  * 
  *     def __repr__(self):
  *         return (             # <<<<<<<<<<<<<<
@@ -13406,42 +13517,42 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __Pyx_XDECREF(__pyx_r);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":661
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":683
  *         return (
  *             f"<StreamingHashJoin "
  *             f"build_rows={self._build_row_count:,} "             # <<<<<<<<<<<<<<
  *             f"probe_rows={self._total_probe_rows:,} "
  *             f"matches={self._total_matches:,}>"
 */
-  __pyx_t_1 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_build_row_count); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 661, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_build_row_count); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 683, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_Format(__pyx_t_1, __pyx_mstate_global->__pyx_kp_u_); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 661, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Format(__pyx_t_1, __pyx_mstate_global->__pyx_kp_u_); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 683, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":662
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":684
  *             f"<StreamingHashJoin "
  *             f"build_rows={self._build_row_count:,} "
  *             f"probe_rows={self._total_probe_rows:,} "             # <<<<<<<<<<<<<<
  *             f"matches={self._total_matches:,}>"
  *         )
 */
-  __pyx_t_1 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_total_probe_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 662, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_total_probe_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 684, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_Format(__pyx_t_1, __pyx_mstate_global->__pyx_kp_u_); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 662, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Format(__pyx_t_1, __pyx_mstate_global->__pyx_kp_u_); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 684, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":663
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":685
  *             f"build_rows={self._build_row_count:,} "
  *             f"probe_rows={self._total_probe_rows:,} "
  *             f"matches={self._total_matches:,}>"             # <<<<<<<<<<<<<<
  *         )
  * 
 */
-  __pyx_t_1 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_total_matches); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 663, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_total_matches); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 685, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_Format(__pyx_t_1, __pyx_mstate_global->__pyx_kp_u_); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 663, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Format(__pyx_t_1, __pyx_mstate_global->__pyx_kp_u_); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 685, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_5[0] = __pyx_mstate_global->__pyx_kp_u_StreamingHashJoin_build_rows;
@@ -13452,7 +13563,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __pyx_t_5[5] = __pyx_t_4;
   __pyx_t_5[6] = __pyx_mstate_global->__pyx_kp_u__2;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":660
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":682
  *     def __repr__(self):
  *         return (
  *             f"<StreamingHashJoin "             # <<<<<<<<<<<<<<
@@ -13460,7 +13571,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
  *             f"probe_rows={self._total_probe_rows:,} "
 */
   __pyx_t_1 = __Pyx_PyUnicode_Join(__pyx_t_5, 7, 30 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2) + 12 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3) + 9 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4) + 1, 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4));
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 660, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 682, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -13469,7 +13580,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":658
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":680
  *         }
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -13493,7 +13604,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 
 /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):
 */
 
@@ -13549,16 +13660,16 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 
   /* "(tree fragment)":2
  * def __reduce_cython__(self):
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"             # <<<<<<<<<<<<<<
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"             # <<<<<<<<<<<<<<
  * def __setstate_cython__(self, __pyx_state):
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"
 */
   __Pyx_Raise(__pyx_builtin_TypeError, __pyx_mstate_global->__pyx_kp_u_self__bloom_filter_self__bloom_m, 0, 0);
   __PYX_ERR(1, 2, __pyx_L1_error)
 
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):
 */
 
@@ -13573,9 +13684,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 
 /* "(tree fragment)":3
  * def __reduce_cython__(self):
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"
 */
 
 /* Python wrapper */
@@ -13672,18 +13783,18 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
 
   /* "(tree fragment)":4
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"             # <<<<<<<<<<<<<<
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"             # <<<<<<<<<<<<<<
 */
   __Pyx_Raise(__pyx_builtin_TypeError, __pyx_mstate_global->__pyx_kp_u_self__bloom_filter_self__bloom_m, 0, 0);
   __PYX_ERR(1, 4, __pyx_L1_error)
 
   /* "(tree fragment)":3
  * def __reduce_cython__(self):
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"
 */
 
   /* function exit code */
@@ -13695,7 +13806,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":670
+/* "sabot/_cython/operators/hash_join_streaming.pyx":692
  * IF UNAME_MACHINE in ('arm64', 'aarch64'):
  *     # ARM: Use NEON
  *     cdef inline int hash_int64_simd(const int64_t* keys, int num_keys, uint32_t* hashes) nogil:             # <<<<<<<<<<<<<<
@@ -13706,7 +13817,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 static CYTHON_INLINE int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_hash_int64_simd(int64_t const *__pyx_v_keys, int __pyx_v_num_keys, uint32_t *__pyx_v_hashes) {
   int __pyx_r;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":671
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":693
  *     # ARM: Use NEON
  *     cdef inline int hash_int64_simd(const int64_t* keys, int num_keys, uint32_t* hashes) nogil:
  *         return hash_int64_neon(keys, num_keys, hashes)             # <<<<<<<<<<<<<<
@@ -13716,7 +13827,7 @@ static CYTHON_INLINE int __pyx_f_5sabot_7_cython_9operators_19hash_join_streamin
   __pyx_r = sabot::hash_join::hash_int64_neon(__pyx_v_keys, __pyx_v_num_keys, __pyx_v_hashes);
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":670
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":692
  * IF UNAME_MACHINE in ('arm64', 'aarch64'):
  *     # ARM: Use NEON
  *     cdef inline int hash_int64_simd(const int64_t* keys, int num_keys, uint32_t* hashes) nogil:             # <<<<<<<<<<<<<<
@@ -13729,7 +13840,7 @@ static CYTHON_INLINE int __pyx_f_5sabot_7_cython_9operators_19hash_join_streamin
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":673
+/* "sabot/_cython/operators/hash_join_streaming.pyx":695
  *         return hash_int64_neon(keys, num_keys, hashes)
  * 
  *     cdef inline int probe_bloom_filter_simd(const uint32_t* hashes, int num_keys,             # <<<<<<<<<<<<<<
@@ -13740,7 +13851,7 @@ static CYTHON_INLINE int __pyx_f_5sabot_7_cython_9operators_19hash_join_streamin
 static CYTHON_INLINE int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_probe_bloom_filter_simd(uint32_t const *__pyx_v_hashes, int __pyx_v_num_keys, uint8_t const *__pyx_v_bloom_filter, int __pyx_v_bloom_size, uint8_t *__pyx_v_match_bitvector) {
   int __pyx_r;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":676
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":698
  *                                              const uint8_t* bloom_filter, int bloom_size,
  *                                              uint8_t* match_bitvector) nogil:
  *         return probe_bloom_filter_neon(hashes, num_keys, bloom_filter, bloom_size, match_bitvector)             # <<<<<<<<<<<<<<
@@ -13750,7 +13861,7 @@ static CYTHON_INLINE int __pyx_f_5sabot_7_cython_9operators_19hash_join_streamin
   __pyx_r = sabot::hash_join::probe_bloom_filter_neon(__pyx_v_hashes, __pyx_v_num_keys, __pyx_v_bloom_filter, __pyx_v_bloom_size, __pyx_v_match_bitvector);
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":673
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":695
  *         return hash_int64_neon(keys, num_keys, hashes)
  * 
  *     cdef inline int probe_bloom_filter_simd(const uint32_t* hashes, int num_keys,             # <<<<<<<<<<<<<<
@@ -13763,7 +13874,7 @@ static CYTHON_INLINE int __pyx_f_5sabot_7_cython_9operators_19hash_join_streamin
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":678
+/* "sabot/_cython/operators/hash_join_streaming.pyx":700
  *         return probe_bloom_filter_neon(hashes, num_keys, bloom_filter, bloom_size, match_bitvector)
  * 
  *     cdef inline void build_bloom_filter_simd(const uint32_t* hashes, int num_keys,             # <<<<<<<<<<<<<<
@@ -13773,7 +13884,7 @@ static CYTHON_INLINE int __pyx_f_5sabot_7_cython_9operators_19hash_join_streamin
 
 static CYTHON_INLINE void __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_build_bloom_filter_simd(uint32_t const *__pyx_v_hashes, int __pyx_v_num_keys, uint8_t *__pyx_v_bloom_filter, int __pyx_v_bloom_size) {
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":680
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":702
  *     cdef inline void build_bloom_filter_simd(const uint32_t* hashes, int num_keys,
  *                                               uint8_t* bloom_filter, int bloom_size) nogil:
  *         build_bloom_filter_neon(hashes, num_keys, bloom_filter, bloom_size)             # <<<<<<<<<<<<<<
@@ -13782,7 +13893,7 @@ static CYTHON_INLINE void __pyx_f_5sabot_7_cython_9operators_19hash_join_streami
 */
   sabot::hash_join::build_bloom_filter_neon(__pyx_v_hashes, __pyx_v_num_keys, __pyx_v_bloom_filter, __pyx_v_bloom_size);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":678
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":700
  *         return probe_bloom_filter_neon(hashes, num_keys, bloom_filter, bloom_size, match_bitvector)
  * 
  *     cdef inline void build_bloom_filter_simd(const uint32_t* hashes, int num_keys,             # <<<<<<<<<<<<<<
@@ -13793,7 +13904,7 @@ static CYTHON_INLINE void __pyx_f_5sabot_7_cython_9operators_19hash_join_streami
   /* function exit code */
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":682
+/* "sabot/_cython/operators/hash_join_streaming.pyx":704
  *         build_bloom_filter_neon(hashes, num_keys, bloom_filter, bloom_size)
  * 
  *     cdef inline int compact_match_indices_simd(const uint8_t* match_bitvector, int num_keys,             # <<<<<<<<<<<<<<
@@ -13804,7 +13915,7 @@ static CYTHON_INLINE void __pyx_f_5sabot_7_cython_9operators_19hash_join_streami
 static CYTHON_INLINE int __pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_compact_match_indices_simd(uint8_t const *__pyx_v_match_bitvector, int __pyx_v_num_keys, uint32_t const *__pyx_v_left_indices, uint32_t const *__pyx_v_right_indices, uint32_t *__pyx_v_out_left, uint32_t *__pyx_v_out_right) {
   int __pyx_r;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":686
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":708
  *                                                 const uint32_t* right_indices,
  *                                                 uint32_t* out_left, uint32_t* out_right) nogil:
  *         return compact_match_indices_neon(match_bitvector, num_keys, left_indices,             # <<<<<<<<<<<<<<
@@ -13814,7 +13925,7 @@ static CYTHON_INLINE int __pyx_f_5sabot_7_cython_9operators_19hash_join_streamin
   __pyx_r = sabot::hash_join::compact_match_indices_neon(__pyx_v_match_bitvector, __pyx_v_num_keys, __pyx_v_left_indices, __pyx_v_right_indices, __pyx_v_out_left, __pyx_v_out_right);
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":682
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":704
  *         build_bloom_filter_neon(hashes, num_keys, bloom_filter, bloom_size)
  * 
  *     cdef inline int compact_match_indices_simd(const uint8_t* match_bitvector, int num_keys,             # <<<<<<<<<<<<<<
@@ -13827,7 +13938,7 @@ static CYTHON_INLINE int __pyx_f_5sabot_7_cython_9operators_19hash_join_streamin
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/hash_join_streaming.pyx":712
+/* "sabot/_cython/operators/hash_join_streaming.pyx":734
  * 
  * # Helper to get SIMD platform info
  * def get_simd_platform():             # <<<<<<<<<<<<<<
@@ -13857,7 +13968,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_get_s
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("get_simd_platform", 0);
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":715
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":737
  *     """Get current SIMD platform (for debugging)."""
  *     IF UNAME_MACHINE in ('arm64', 'aarch64'):
  *         return 'ARM NEON (128-bit, 4-way parallel)'             # <<<<<<<<<<<<<<
@@ -13869,7 +13980,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_get_s
   __pyx_r = __pyx_mstate_global->__pyx_kp_u_ARM_NEON_128_bit_4_way_parallel;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":712
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":734
  * 
  * # Helper to get SIMD platform info
  * def get_simd_platform():             # <<<<<<<<<<<<<<
@@ -13909,6 +14020,7 @@ static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_19hash_join_streaming_S
   __Pyx_default_placement_construct(&(p->_right_indices));
   __Pyx_default_placement_construct(&(p->_bloom_mask));
   __Pyx_default_placement_construct(&(p->_match_bitvector));
+  __Pyx_default_placement_construct(&(p->_thread_pool));
   __Pyx_default_placement_construct(&(p->_bloom_filter));
   p->_join_type = ((PyObject*)Py_None); Py_INCREF(Py_None);
   p->_build_table = Py_None; Py_INCREF(Py_None);
@@ -13942,6 +14054,7 @@ static void __pyx_tp_dealloc_5sabot_7_cython_9operators_19hash_join_streaming_St
   __Pyx_call_destructor(p->_right_indices);
   __Pyx_call_destructor(p->_bloom_mask);
   __Pyx_call_destructor(p->_match_bitvector);
+  __Pyx_call_destructor(p->_thread_pool);
   __Pyx_call_destructor(p->_bloom_filter);
   Py_CLEAR(p->_join_type);
   Py_CLEAR(p->_build_table);
@@ -14516,15 +14629,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_vtable_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin._probe_hash_table_nogil = (int (*)(struct __pyx_obj_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *, uint32_t const *, int64_t, uint8_t const *, uint32_t *, uint32_t *, int64_t *))__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin__probe_hash_table_nogil;
   __pyx_vtable_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin._build_result_batch = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin *, uint32_t *, uint32_t *, int, PyObject *))__pyx_f_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin__build_result_batch;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin)) __PYX_ERR(0, 186, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin) < (0)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin)) __PYX_ERR(0, 196, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin) < (0)) __PYX_ERR(0, 196, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin = &__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin) < (0)) __PYX_ERR(0, 186, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin) < (0)) __PYX_ERR(0, 196, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin->tp_getattro == PyObject_GenericGetAttr)) {
@@ -14533,7 +14646,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 186, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 196, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin___init__.doc = __pyx_doc_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin___init__;
@@ -14541,20 +14654,20 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin, __pyx_vtabptr_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin) < (0)) __PYX_ERR(0, 186, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin) < (0)) __PYX_ERR(0, 186, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin) < (0)) __PYX_ERR(0, 186, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin) < (0)) __PYX_ERR(0, 186, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin, __pyx_vtabptr_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin) < (0)) __PYX_ERR(0, 196, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin) < (0)) __PYX_ERR(0, 196, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin) < (0)) __PYX_ERR(0, 196, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin) < (0)) __PYX_ERR(0, 196, __pyx_L1_error)
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch)) __PYX_ERR(0, 395, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch) < (0)) __PYX_ERR(0, 395, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch)) __PYX_ERR(0, 417, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch) < (0)) __PYX_ERR(0, 417, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch = &__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch) < (0)) __PYX_ERR(0, 395, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch) < (0)) __PYX_ERR(0, 417, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct__probe_batch->tp_getattro == PyObject_GenericGetAttr)) {
@@ -14562,15 +14675,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk)) __PYX_ERR(0, 471, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk) < (0)) __PYX_ERR(0, 471, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk)) __PYX_ERR(0, 493, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk) < (0)) __PYX_ERR(0, 493, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk = &__pyx_type_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk) < (0)) __PYX_ERR(0, 471, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk) < (0)) __PYX_ERR(0, 493, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming___pyx_scope_struct_1__probe_batch_chunk->tp_getattro == PyObject_GenericGetAttr)) {
@@ -16007,37 +16120,37 @@ __Pyx_RefNannySetupContext("PyInit_hash_join_streaming", 0);
   if (unlikely((__Pyx_modinit_function_import_code(__pyx_mstate) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
   /*--- Execution code ---*/
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":126
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":136
  * 
  * # Import vendored Arrow (cyarrow) at module level
  * from sabot import cyarrow as pa             # <<<<<<<<<<<<<<
  * 
  * # Platform detection at compile time
 */
-  __pyx_t_2 = __Pyx_PyList_Pack(1, __pyx_mstate_global->__pyx_n_u_cyarrow); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyList_Pack(1, __pyx_mstate_global->__pyx_n_u_cyarrow); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot, __pyx_t_2, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot, __pyx_t_2, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_cyarrow); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_cyarrow); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pa, __pyx_t_2) < (0)) __PYX_ERR(0, 126, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pa, __pyx_t_2) < (0)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":129
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":139
  * 
  * # Platform detection at compile time
  * import platform             # <<<<<<<<<<<<<<
  * PLATFORM_MACHINE = platform.machine().lower()
  * IS_ARM = PLATFORM_MACHINE in ('arm64', 'aarch64')
 */
-  __pyx_t_3 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_platform, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_platform, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 139, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_platform, __pyx_t_3) < (0)) __PYX_ERR(0, 129, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_platform, __pyx_t_3) < (0)) __PYX_ERR(0, 139, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":130
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":140
  * # Platform detection at compile time
  * import platform
  * PLATFORM_MACHINE = platform.machine().lower()             # <<<<<<<<<<<<<<
@@ -16045,9 +16158,9 @@ __Pyx_RefNannySetupContext("PyInit_hash_join_streaming", 0);
  * IS_X86 = PLATFORM_MACHINE in ('x86_64', 'amd64', 'x64')
 */
   __pyx_t_5 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_platform); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_platform); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_machine); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_machine); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_t_8 = 1;
@@ -16056,7 +16169,7 @@ __Pyx_RefNannySetupContext("PyInit_hash_join_streaming", 0);
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 130, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 140, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __pyx_t_2 = __pyx_t_4;
@@ -16067,117 +16180,117 @@ __Pyx_RefNannySetupContext("PyInit_hash_join_streaming", 0);
     __pyx_t_3 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_lower, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 130, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 140, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
   }
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_PLATFORM_MACHINE, __pyx_t_3) < (0)) __PYX_ERR(0, 130, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_PLATFORM_MACHINE, __pyx_t_3) < (0)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":131
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":141
  * import platform
  * PLATFORM_MACHINE = platform.machine().lower()
  * IS_ARM = PLATFORM_MACHINE in ('arm64', 'aarch64')             # <<<<<<<<<<<<<<
  * IS_X86 = PLATFORM_MACHINE in ('x86_64', 'amd64', 'x64')
  * 
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_PLATFORM_MACHINE); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 131, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_PLATFORM_MACHINE); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_10 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_arm64, Py_EQ)); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 131, __pyx_L1_error)
+  __pyx_t_10 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_arm64, Py_EQ)); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 141, __pyx_L1_error)
   if (!__pyx_t_10) {
   } else {
     __pyx_t_9 = __pyx_t_10;
     goto __pyx_L2_bool_binop_done;
   }
-  __pyx_t_10 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_aarch64, Py_EQ)); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 131, __pyx_L1_error)
+  __pyx_t_10 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_aarch64, Py_EQ)); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 141, __pyx_L1_error)
   __pyx_t_9 = __pyx_t_10;
   __pyx_L2_bool_binop_done:;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 131, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_IS_ARM, __pyx_t_3) < (0)) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_IS_ARM, __pyx_t_3) < (0)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":132
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":142
  * PLATFORM_MACHINE = platform.machine().lower()
  * IS_ARM = PLATFORM_MACHINE in ('arm64', 'aarch64')
  * IS_X86 = PLATFORM_MACHINE in ('x86_64', 'amd64', 'x64')             # <<<<<<<<<<<<<<
  * 
  * 
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_PLATFORM_MACHINE); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 132, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_PLATFORM_MACHINE); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_10 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_x86_64, Py_EQ)); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 132, __pyx_L1_error)
+  __pyx_t_10 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_x86_64, Py_EQ)); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 142, __pyx_L1_error)
   if (!__pyx_t_10) {
   } else {
     __pyx_t_9 = __pyx_t_10;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_10 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_amd64, Py_EQ)); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 132, __pyx_L1_error)
+  __pyx_t_10 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_amd64, Py_EQ)); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 142, __pyx_L1_error)
   if (!__pyx_t_10) {
   } else {
     __pyx_t_9 = __pyx_t_10;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_10 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_x64, Py_EQ)); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 132, __pyx_L1_error)
+  __pyx_t_10 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_x64, Py_EQ)); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 142, __pyx_L1_error)
   __pyx_t_9 = __pyx_t_10;
   __pyx_L4_bool_binop_done:;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 132, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_IS_X86, __pyx_t_3) < (0)) __PYX_ERR(0, 132, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_IS_X86, __pyx_t_3) < (0)) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":305
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":327
  *             self._hash_table = NULL
  * 
  *     def insert_build_batch(self, object batch):             # <<<<<<<<<<<<<<
  *         """
  *         Insert a batch into the build-side hash table.
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_5insert_build_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin_insert_build_b, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 305, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_5insert_build_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin_insert_build_b, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 327, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin, __pyx_mstate_global->__pyx_n_u_insert_build_batch, __pyx_t_3) < (0)) __PYX_ERR(0, 305, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin, __pyx_mstate_global->__pyx_n_u_insert_build_batch, __pyx_t_3) < (0)) __PYX_ERR(0, 327, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":395
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":417
  *         self._build_row_count += num_rows
  * 
  *     def probe_batch(self, object batch):             # <<<<<<<<<<<<<<
  *         """
  *         Probe hash table with a batch (streaming - no materialization).
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_7probe_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin_probe_batch, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 395, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_7probe_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin_probe_batch, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 417, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin, __pyx_mstate_global->__pyx_n_u_probe_batch, __pyx_t_3) < (0)) __PYX_ERR(0, 395, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin, __pyx_mstate_global->__pyx_n_u_probe_batch, __pyx_t_3) < (0)) __PYX_ERR(0, 417, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":471
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":493
  *         return match_count
  * 
  *     def _probe_batch_chunk(self, object batch):             # <<<<<<<<<<<<<<
  *         """
  *         Internal: Probe a single chunk (guaranteed <= MAX_BATCH_SIZE).
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_10_probe_batch_chunk, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin__probe_batch_c, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 471, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_10_probe_batch_chunk, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin__probe_batch_c, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 493, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin, __pyx_mstate_global->__pyx_n_u_probe_batch_chunk, __pyx_t_3) < (0)) __PYX_ERR(0, 471, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin, __pyx_mstate_global->__pyx_n_u_probe_batch_chunk, __pyx_t_3) < (0)) __PYX_ERR(0, 493, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":637
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":659
  *         return pyarrow_wrap_batch(<const shared_ptr[CRecordBatch]>c_result_batch)
  * 
  *     def get_stats(self):             # <<<<<<<<<<<<<<
  *         """Get join statistics including C++ hash table metrics."""
  *         return {
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_13get_stats, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin_get_stats, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 637, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_13get_stats, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin_get_stats, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 659, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin, __pyx_mstate_global->__pyx_n_u_get_stats, __pyx_t_3) < (0)) __PYX_ERR(0, 637, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_19hash_join_streaming_StreamingHashJoin, __pyx_mstate_global->__pyx_n_u_get_stats, __pyx_t_3) < (0)) __PYX_ERR(0, 659, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):
 */
   __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_17__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin___reduce_cytho, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 1, __pyx_L1_error)
@@ -16187,25 +16300,25 @@ __Pyx_RefNannySetupContext("PyInit_hash_join_streaming", 0);
 
   /* "(tree fragment)":3
  * def __reduce_cython__(self):
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
- *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices cannot be converted to a Python object for pickling"
+ *     raise TypeError, "self._bloom_filter,self._bloom_mask,self._hash_buffer,self._hash_table,self._left_indices,self._match_bitvector,self._pool,self._right_indices,self._thread_pool cannot be converted to a Python object for pickling"
 */
   __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_19hash_join_streaming_17StreamingHashJoin_19__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashJoin___setstate_cyt, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_3) < (0)) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/hash_join_streaming.pyx":712
+  /* "sabot/_cython/operators/hash_join_streaming.pyx":734
  * 
  * # Helper to get SIMD platform info
  * def get_simd_platform():             # <<<<<<<<<<<<<<
  *     """Get current SIMD platform (for debugging)."""
  *     IF UNAME_MACHINE in ('arm64', 'aarch64'):
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_19hash_join_streaming_1get_simd_platform, 0, __pyx_mstate_global->__pyx_n_u_get_simd_platform, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 712, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_19hash_join_streaming_1get_simd_platform, 0, __pyx_mstate_global->__pyx_n_u_get_simd_platform, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_hash_joi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 734, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_get_simd_platform, __pyx_t_3) < (0)) __PYX_ERR(0, 712, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_get_simd_platform, __pyx_t_3) < (0)) __PYX_ERR(0, 734, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "sabot/_cython/operators/hash_join_streaming.pyx":1
@@ -16258,11 +16371,11 @@ __Pyx_RefNannySetupContext("PyInit_hash_join_streaming", 0);
 
 typedef struct {
     const char *s;
-#if 194 <= 65535
+#if 212 <= 65535
     const unsigned short n;
-#elif 194 / 2 < INT_MAX
+#elif 212 / 2 < INT_MAX
     const unsigned int n;
-#elif 194 / 2 < LONG_MAX
+#elif 212 / 2 < LONG_MAX
     const unsigned long n;
 #else
     const Py_ssize_t n;
@@ -16285,6 +16398,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_ARM_NEON_128_bit_4_way_parallel, sizeof(__pyx_k_ARM_NEON_128_bit_4_way_parallel), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_ARM_NEON_128_bit_4_way_parallel */
   {__pyx_k_Failed_to_build_left_indices_arr, sizeof(__pyx_k_Failed_to_build_left_indices_arr), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Failed_to_build_left_indices_arr */
   {__pyx_k_Failed_to_build_right_indices_ar, sizeof(__pyx_k_Failed_to_build_right_indices_ar), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Failed_to_build_right_indices_ar */
+  {__pyx_k_Failed_to_create_thread_pool_wit, sizeof(__pyx_k_Failed_to_create_thread_pool_wit), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Failed_to_create_thread_pool_wit */
   {__pyx_k_Failed_to_finish_left_indices_ar, sizeof(__pyx_k_Failed_to_finish_left_indices_ar), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Failed_to_finish_left_indices_ar */
   {__pyx_k_Failed_to_finish_right_indices_a, sizeof(__pyx_k_Failed_to_finish_right_indices_a), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Failed_to_finish_right_indices_a */
   {__pyx_k_Failed_to_take_left_column, sizeof(__pyx_k_Failed_to_take_left_column), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Failed_to_take_left_column */
@@ -16405,6 +16519,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_stringsource */
   {__pyx_k_table, sizeof(__pyx_k_table), 0, 1, 1}, /* PyObject cname: __pyx_n_u_table */
   {__pyx_k_test, sizeof(__pyx_k_test), 0, 1, 1}, /* PyObject cname: __pyx_n_u_test */
+  {__pyx_k_threads, sizeof(__pyx_k_threads), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_threads */
   {__pyx_k_throw, sizeof(__pyx_k_throw), 0, 1, 1}, /* PyObject cname: __pyx_n_u_throw */
   {__pyx_k_to_batches, sizeof(__pyx_k_to_batches), 0, 1, 1}, /* PyObject cname: __pyx_n_u_to_batches */
   {__pyx_k_total_matches, sizeof(__pyx_k_total_matches), 0, 1, 1}, /* PyObject cname: __pyx_n_u_total_matches */
@@ -16421,8 +16536,8 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, c
 
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 334, __pyx_L1_error)
-  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 563, __pyx_L1_error)
+  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 356, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -16477,22 +16592,22 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 395, 2};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 417, 2};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_table, __pyx_mstate->__pyx_n_u_offset, __pyx_mstate->__pyx_n_u_chunk_size, __pyx_mstate->__pyx_n_u_chunk, __pyx_mstate->__pyx_n_u_result};
     __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_hash_joi_2, __pyx_mstate->__pyx_n_u_probe_batch, __pyx_k_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 20, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 471, 2};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 20, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 493, 2};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_key_col_idx, __pyx_mstate->__pyx_n_u_c_batch, __pyx_mstate->__pyx_n_u_num_rows, __pyx_mstate->__pyx_n_u_key_col, __pyx_mstate->__pyx_n_u_int64_array, __pyx_mstate->__pyx_n_u_raw_keys, __pyx_mstate->__pyx_n_u_hashes, __pyx_mstate->__pyx_n_u_num_hashed, __pyx_mstate->__pyx_n_u_bloom_filter_data, __pyx_mstate->__pyx_n_u_match_bitvector, __pyx_mstate->__pyx_n_u_bloom_matches, __pyx_mstate->__pyx_n_u_left_indices_buf, __pyx_mstate->__pyx_n_u_right_indices_buf, __pyx_mstate->__pyx_n_u_bloom_hits, __pyx_mstate->__pyx_n_u_bloom_misses, __pyx_mstate->__pyx_n_u_total_matches, __pyx_mstate->__pyx_n_u_match_count, __pyx_mstate->__pyx_n_u_result_batch};
     __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_hash_joi_2, __pyx_mstate->__pyx_n_u_probe_batch_chunk, __pyx_k_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 305, 226};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 327, 226};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_table, __pyx_mstate->__pyx_n_u_offset, __pyx_mstate->__pyx_n_u_chunk_size, __pyx_mstate->__pyx_n_u_chunk};
     __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_hash_joi_2, __pyx_mstate->__pyx_n_u_insert_build_batch, __pyx_k_A_QgQ_A_BfM_1_5_Q_4_S_oQ__Bk_1A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 637, 154};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 659, 154};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_hash_joi_2, __pyx_mstate->__pyx_n_u_get_stats, __pyx_k_A_a_a_t1_Q_4q_Qd_r_at1_G1_l_a_l, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
@@ -16507,7 +16622,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 0, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 712, 9};
+    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 0, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 734, 9};
     PyObject* const varnames[] = {0};
     __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_hash_joi_2, __pyx_mstate->__pyx_n_u_get_simd_platform, __pyx_k_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
   }
@@ -17826,6 +17941,426 @@ static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *nam
     return 0;
 }
 
+/* CIntToDigits */
+static const char DIGIT_PAIRS_10[2*10*10+1] = {
+    "00010203040506070809"
+    "10111213141516171819"
+    "20212223242526272829"
+    "30313233343536373839"
+    "40414243444546474849"
+    "50515253545556575859"
+    "60616263646566676869"
+    "70717273747576777879"
+    "80818283848586878889"
+    "90919293949596979899"
+};
+static const char DIGIT_PAIRS_8[2*8*8+1] = {
+    "0001020304050607"
+    "1011121314151617"
+    "2021222324252627"
+    "3031323334353637"
+    "4041424344454647"
+    "5051525354555657"
+    "6061626364656667"
+    "7071727374757677"
+};
+static const char DIGITS_HEX[2*16+1] = {
+    "0123456789abcdef"
+    "0123456789ABCDEF"
+};
+
+/* BuildPyUnicode */
+static PyObject* __Pyx_PyUnicode_BuildFromAscii(Py_ssize_t ulength, const char* chars, int clength,
+                                                int prepend_sign, char padding_char) {
+    PyObject *uval;
+    Py_ssize_t uoffset = ulength - clength;
+#if CYTHON_USE_UNICODE_INTERNALS
+    Py_ssize_t i;
+    void *udata;
+    uval = PyUnicode_New(ulength, 127);
+    if (unlikely(!uval)) return NULL;
+    udata = PyUnicode_DATA(uval);
+    if (uoffset > 0) {
+        i = 0;
+        if (prepend_sign) {
+            __Pyx_PyUnicode_WRITE(PyUnicode_1BYTE_KIND, udata, 0, '-');
+            i++;
+        }
+        for (; i < uoffset; i++) {
+            __Pyx_PyUnicode_WRITE(PyUnicode_1BYTE_KIND, udata, i, padding_char);
+        }
+    }
+    for (i=0; i < clength; i++) {
+        __Pyx_PyUnicode_WRITE(PyUnicode_1BYTE_KIND, udata, uoffset+i, chars[i]);
+    }
+#else
+    {
+        PyObject *sign = NULL, *padding = NULL;
+        uval = NULL;
+        if (uoffset > 0) {
+            prepend_sign = !!prepend_sign;
+            if (uoffset > prepend_sign) {
+                padding = PyUnicode_FromOrdinal(padding_char);
+                if (likely(padding) && uoffset > prepend_sign + 1) {
+                    PyObject *tmp = PySequence_Repeat(padding, uoffset - prepend_sign);
+                    Py_DECREF(padding);
+                    padding = tmp;
+                }
+                if (unlikely(!padding)) goto done_or_error;
+            }
+            if (prepend_sign) {
+                sign = PyUnicode_FromOrdinal('-');
+                if (unlikely(!sign)) goto done_or_error;
+            }
+        }
+        uval = PyUnicode_DecodeASCII(chars, clength, NULL);
+        if (likely(uval) && padding) {
+            PyObject *tmp = PyUnicode_Concat(padding, uval);
+            Py_DECREF(uval);
+            uval = tmp;
+        }
+        if (likely(uval) && sign) {
+            PyObject *tmp = PyUnicode_Concat(sign, uval);
+            Py_DECREF(uval);
+            uval = tmp;
+        }
+done_or_error:
+        Py_XDECREF(padding);
+        Py_XDECREF(sign);
+    }
+#endif
+    return uval;
+}
+
+/* COrdinalToPyUnicode */
+static CYTHON_INLINE int __Pyx_CheckUnicodeValue(int value) {
+    return value <= 1114111;
+}
+static PyObject* __Pyx_PyUnicode_FromOrdinal_Padded(int value, Py_ssize_t ulength, char padding_char) {
+    if (likely(ulength <= 250)) {
+        char chars[256];
+        if (value <= 255) {
+            memset(chars, padding_char, (size_t) (ulength - 1));
+            chars[ulength-1] = (char) value;
+            return PyUnicode_DecodeLatin1(chars, ulength, NULL);
+        }
+        char *cpos = chars + sizeof(chars);
+        if (value < 0x800) {
+            *--cpos = (char) (0x80 | (value & 0x3f));
+            value >>= 6;
+            *--cpos = (char) (0xc0 | (value & 0x1f));
+        } else if (value < 0x10000) {
+            *--cpos = (char) (0x80 | (value & 0x3f));
+            value >>= 6;
+            *--cpos = (char) (0x80 | (value & 0x3f));
+            value >>= 6;
+            *--cpos = (char) (0xe0 | (value & 0x0f));
+        } else {
+            *--cpos = (char) (0x80 | (value & 0x3f));
+            value >>= 6;
+            *--cpos = (char) (0x80 | (value & 0x3f));
+            value >>= 6;
+            *--cpos = (char) (0x80 | (value & 0x3f));
+            value >>= 6;
+            *--cpos = (char) (0xf0 | (value & 0x07));
+        }
+        cpos -= ulength;
+        memset(cpos, padding_char, (size_t) (ulength - 1));
+        return PyUnicode_DecodeUTF8(cpos, chars + sizeof(chars) - cpos, NULL);
+    }
+    if (value <= 127 && CYTHON_USE_UNICODE_INTERNALS) {
+        const char chars[1] = {(char) value};
+        return __Pyx_PyUnicode_BuildFromAscii(ulength, chars, 1, 0, padding_char);
+    }
+    {
+        PyObject *uchar, *padding_uchar, *padding, *result;
+        padding_uchar = PyUnicode_FromOrdinal(padding_char);
+        if (unlikely(!padding_uchar)) return NULL;
+        padding = PySequence_Repeat(padding_uchar, ulength - 1);
+        Py_DECREF(padding_uchar);
+        if (unlikely(!padding)) return NULL;
+        uchar = PyUnicode_FromOrdinal(value);
+        if (unlikely(!uchar)) {
+            Py_DECREF(padding);
+            return NULL;
+        }
+        result = PyUnicode_Concat(padding, uchar);
+        Py_DECREF(padding);
+        Py_DECREF(uchar);
+        return result;
+    }
+}
+
+/* CIntToPyUnicode */
+static CYTHON_INLINE PyObject* __Pyx_PyUnicode_From_int(int value, Py_ssize_t width, char padding_char, char format_char) {
+    char digits[sizeof(int)*3+2];
+    char *dpos, *end = digits + sizeof(int)*3+2;
+    const char *hex_digits = DIGITS_HEX;
+    Py_ssize_t length, ulength;
+    int prepend_sign, last_one_off;
+    int remaining;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+    const int neg_one = (int) -1, const_zero = (int) 0;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif
+    const int is_unsigned = neg_one > const_zero;
+    if (format_char == 'c') {
+        if (unlikely(!(is_unsigned || value == 0 || value > 0) ||
+                     !(sizeof(value) <= 2 || value & ~ (int) 0x01fffff || __Pyx_CheckUnicodeValue((int) value)))) {
+            PyErr_SetString(PyExc_OverflowError, "%c arg not in range(0x110000)");
+            return NULL;
+        }
+        if (width <= 1) {
+            return PyUnicode_FromOrdinal((int) value);
+        }
+        return __Pyx_PyUnicode_FromOrdinal_Padded((int) value, width, padding_char);
+    }
+    if (format_char == 'X') {
+        hex_digits += 16;
+        format_char = 'x';
+    }
+    remaining = value;
+    last_one_off = 0;
+    dpos = end;
+    do {
+        int digit_pos;
+        switch (format_char) {
+        case 'o':
+            digit_pos = abs((int)(remaining % (8*8)));
+            remaining = (int) (remaining / (8*8));
+            dpos -= 2;
+            memcpy(dpos, DIGIT_PAIRS_8 + digit_pos * 2, 2);
+            last_one_off = (digit_pos < 8);
+            break;
+        case 'd':
+            digit_pos = abs((int)(remaining % (10*10)));
+            remaining = (int) (remaining / (10*10));
+            dpos -= 2;
+            memcpy(dpos, DIGIT_PAIRS_10 + digit_pos * 2, 2);
+            last_one_off = (digit_pos < 10);
+            break;
+        case 'x':
+            *(--dpos) = hex_digits[abs((int)(remaining % 16))];
+            remaining = (int) (remaining / 16);
+            break;
+        default:
+            assert(0);
+            break;
+        }
+    } while (unlikely(remaining != 0));
+    assert(!last_one_off || *dpos == '0');
+    dpos += last_one_off;
+    length = end - dpos;
+    ulength = length;
+    prepend_sign = 0;
+    if (!is_unsigned && value <= neg_one) {
+        if (padding_char == ' ' || width <= length + 1) {
+            *(--dpos) = '-';
+            ++length;
+        } else {
+            prepend_sign = 1;
+        }
+        ++ulength;
+    }
+    if (width > ulength) {
+        ulength = width;
+    }
+    if (ulength == 1) {
+        return PyUnicode_FromOrdinal(*dpos);
+    }
+    return __Pyx_PyUnicode_BuildFromAscii(ulength, dpos, (int) length, prepend_sign, padding_char);
+}
+
+/* JoinPyUnicode */
+static PyObject* __Pyx_PyUnicode_Join(PyObject** values, Py_ssize_t value_count, Py_ssize_t result_ulength,
+                                      Py_UCS4 max_char) {
+#if CYTHON_USE_UNICODE_INTERNALS && CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    PyObject *result_uval;
+    int result_ukind, kind_shift;
+    Py_ssize_t i, char_pos;
+    void *result_udata;
+    if (max_char > 1114111) max_char = 1114111;
+    result_uval = PyUnicode_New(result_ulength, max_char);
+    if (unlikely(!result_uval)) return NULL;
+    result_ukind = (max_char <= 255) ? PyUnicode_1BYTE_KIND : (max_char <= 65535) ? PyUnicode_2BYTE_KIND : PyUnicode_4BYTE_KIND;
+    kind_shift = (result_ukind == PyUnicode_4BYTE_KIND) ? 2 : result_ukind - 1;
+    result_udata = PyUnicode_DATA(result_uval);
+    assert(kind_shift == 2 || kind_shift == 1 || kind_shift == 0);
+    if (unlikely((PY_SSIZE_T_MAX >> kind_shift) - result_ulength < 0))
+        goto overflow;
+    char_pos = 0;
+    for (i=0; i < value_count; i++) {
+        int ukind;
+        Py_ssize_t ulength;
+        void *udata;
+        PyObject *uval = values[i];
+        #if !CYTHON_COMPILING_IN_LIMITED_API
+        if (__Pyx_PyUnicode_READY(uval) == (-1))
+            goto bad;
+        #endif
+        ulength = __Pyx_PyUnicode_GET_LENGTH(uval);
+        #if !CYTHON_ASSUME_SAFE_SIZE
+        if (unlikely(ulength < 0)) goto bad;
+        #endif
+        if (unlikely(!ulength))
+            continue;
+        if (unlikely((PY_SSIZE_T_MAX >> kind_shift) - ulength < char_pos))
+            goto overflow;
+        ukind = __Pyx_PyUnicode_KIND(uval);
+        udata = __Pyx_PyUnicode_DATA(uval);
+        if (ukind == result_ukind) {
+            memcpy((char *)result_udata + (char_pos << kind_shift), udata, (size_t) (ulength << kind_shift));
+        } else {
+            #if PY_VERSION_HEX >= 0x030d0000
+            if (unlikely(PyUnicode_CopyCharacters(result_uval, char_pos, uval, 0, ulength) < 0)) goto bad;
+            #elif CYTHON_COMPILING_IN_CPYTHON || defined(_PyUnicode_FastCopyCharacters)
+            _PyUnicode_FastCopyCharacters(result_uval, char_pos, uval, 0, ulength);
+            #else
+            Py_ssize_t j;
+            for (j=0; j < ulength; j++) {
+                Py_UCS4 uchar = __Pyx_PyUnicode_READ(ukind, udata, j);
+                __Pyx_PyUnicode_WRITE(result_ukind, result_udata, char_pos+j, uchar);
+            }
+            #endif
+        }
+        char_pos += ulength;
+    }
+    return result_uval;
+overflow:
+    PyErr_SetString(PyExc_OverflowError, "join() result is too long for a Python string");
+bad:
+    Py_DECREF(result_uval);
+    return NULL;
+#else
+    Py_ssize_t i;
+    PyObject *result = NULL;
+    PyObject *value_tuple = PyTuple_New(value_count);
+    if (unlikely(!value_tuple)) return NULL;
+    CYTHON_UNUSED_VAR(max_char);
+    CYTHON_UNUSED_VAR(result_ulength);
+    for (i=0; i<value_count; i++) {
+        if (__Pyx_PyTuple_SET_ITEM(value_tuple, i, values[i]) != (0)) goto bad;
+        Py_INCREF(values[i]);
+    }
+    result = PyUnicode_Join(__pyx_mstate_global->__pyx_empty_unicode, value_tuple);
+bad:
+    Py_DECREF(value_tuple);
+    return result;
+#endif
+}
+
+/* RaiseException */
+static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause) {
+    PyObject* owned_instance = NULL;
+    if (tb == Py_None) {
+        tb = 0;
+    } else if (tb && !PyTraceBack_Check(tb)) {
+        PyErr_SetString(PyExc_TypeError,
+            "raise: arg 3 must be a traceback or None");
+        goto bad;
+    }
+    if (value == Py_None)
+        value = 0;
+    if (PyExceptionInstance_Check(type)) {
+        if (value) {
+            PyErr_SetString(PyExc_TypeError,
+                "instance exception may not have a separate value");
+            goto bad;
+        }
+        value = type;
+        type = (PyObject*) Py_TYPE(value);
+    } else if (PyExceptionClass_Check(type)) {
+        PyObject *instance_class = NULL;
+        if (value && PyExceptionInstance_Check(value)) {
+            instance_class = (PyObject*) Py_TYPE(value);
+            if (instance_class != type) {
+                int is_subclass = PyObject_IsSubclass(instance_class, type);
+                if (!is_subclass) {
+                    instance_class = NULL;
+                } else if (unlikely(is_subclass == -1)) {
+                    goto bad;
+                } else {
+                    type = instance_class;
+                }
+            }
+        }
+        if (!instance_class) {
+            PyObject *args;
+            if (!value)
+                args = PyTuple_New(0);
+            else if (PyTuple_Check(value)) {
+                Py_INCREF(value);
+                args = value;
+            } else
+                args = PyTuple_Pack(1, value);
+            if (!args)
+                goto bad;
+            owned_instance = PyObject_Call(type, args, NULL);
+            Py_DECREF(args);
+            if (!owned_instance)
+                goto bad;
+            value = owned_instance;
+            if (!PyExceptionInstance_Check(value)) {
+                PyErr_Format(PyExc_TypeError,
+                             "calling %R should have returned an instance of "
+                             "BaseException, not %R",
+                             type, Py_TYPE(value));
+                goto bad;
+            }
+        }
+    } else {
+        PyErr_SetString(PyExc_TypeError,
+            "raise: exception class must be a subclass of BaseException");
+        goto bad;
+    }
+    if (cause) {
+        PyObject *fixed_cause;
+        if (cause == Py_None) {
+            fixed_cause = NULL;
+        } else if (PyExceptionClass_Check(cause)) {
+            fixed_cause = PyObject_CallObject(cause, NULL);
+            if (fixed_cause == NULL)
+                goto bad;
+        } else if (PyExceptionInstance_Check(cause)) {
+            fixed_cause = cause;
+            Py_INCREF(fixed_cause);
+        } else {
+            PyErr_SetString(PyExc_TypeError,
+                            "exception causes must derive from "
+                            "BaseException");
+            goto bad;
+        }
+        PyException_SetCause(value, fixed_cause);
+    }
+    PyErr_SetObject(type, value);
+    if (tb) {
+#if PY_VERSION_HEX >= 0x030C00A6
+        PyException_SetTraceback(value, tb);
+#elif CYTHON_FAST_THREAD_STATE
+        PyThreadState *tstate = __Pyx_PyThreadState_Current;
+        PyObject* tmp_tb = tstate->curexc_traceback;
+        if (tb != tmp_tb) {
+            Py_INCREF(tb);
+            tstate->curexc_traceback = tb;
+            Py_XDECREF(tmp_tb);
+        }
+#else
+        PyObject *tmp_type, *tmp_value, *tmp_tb;
+        PyErr_Fetch(&tmp_type, &tmp_value, &tmp_tb);
+        Py_INCREF(tb);
+        PyErr_Restore(tmp_type, tmp_value, tb);
+        Py_XDECREF(tmp_tb);
+#endif
+    }
+bad:
+    Py_XDECREF(owned_instance);
+    return;
+}
+
 /* PyDictVersioning */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
@@ -18197,348 +18732,6 @@ static void __Pyx_Generator_Replace_StopIteration(int in_async_gen) {
     PyErr_SetObject(PyExc_RuntimeError, new_exc);
 }
 
-/* RaiseException */
-static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause) {
-    PyObject* owned_instance = NULL;
-    if (tb == Py_None) {
-        tb = 0;
-    } else if (tb && !PyTraceBack_Check(tb)) {
-        PyErr_SetString(PyExc_TypeError,
-            "raise: arg 3 must be a traceback or None");
-        goto bad;
-    }
-    if (value == Py_None)
-        value = 0;
-    if (PyExceptionInstance_Check(type)) {
-        if (value) {
-            PyErr_SetString(PyExc_TypeError,
-                "instance exception may not have a separate value");
-            goto bad;
-        }
-        value = type;
-        type = (PyObject*) Py_TYPE(value);
-    } else if (PyExceptionClass_Check(type)) {
-        PyObject *instance_class = NULL;
-        if (value && PyExceptionInstance_Check(value)) {
-            instance_class = (PyObject*) Py_TYPE(value);
-            if (instance_class != type) {
-                int is_subclass = PyObject_IsSubclass(instance_class, type);
-                if (!is_subclass) {
-                    instance_class = NULL;
-                } else if (unlikely(is_subclass == -1)) {
-                    goto bad;
-                } else {
-                    type = instance_class;
-                }
-            }
-        }
-        if (!instance_class) {
-            PyObject *args;
-            if (!value)
-                args = PyTuple_New(0);
-            else if (PyTuple_Check(value)) {
-                Py_INCREF(value);
-                args = value;
-            } else
-                args = PyTuple_Pack(1, value);
-            if (!args)
-                goto bad;
-            owned_instance = PyObject_Call(type, args, NULL);
-            Py_DECREF(args);
-            if (!owned_instance)
-                goto bad;
-            value = owned_instance;
-            if (!PyExceptionInstance_Check(value)) {
-                PyErr_Format(PyExc_TypeError,
-                             "calling %R should have returned an instance of "
-                             "BaseException, not %R",
-                             type, Py_TYPE(value));
-                goto bad;
-            }
-        }
-    } else {
-        PyErr_SetString(PyExc_TypeError,
-            "raise: exception class must be a subclass of BaseException");
-        goto bad;
-    }
-    if (cause) {
-        PyObject *fixed_cause;
-        if (cause == Py_None) {
-            fixed_cause = NULL;
-        } else if (PyExceptionClass_Check(cause)) {
-            fixed_cause = PyObject_CallObject(cause, NULL);
-            if (fixed_cause == NULL)
-                goto bad;
-        } else if (PyExceptionInstance_Check(cause)) {
-            fixed_cause = cause;
-            Py_INCREF(fixed_cause);
-        } else {
-            PyErr_SetString(PyExc_TypeError,
-                            "exception causes must derive from "
-                            "BaseException");
-            goto bad;
-        }
-        PyException_SetCause(value, fixed_cause);
-    }
-    PyErr_SetObject(type, value);
-    if (tb) {
-#if PY_VERSION_HEX >= 0x030C00A6
-        PyException_SetTraceback(value, tb);
-#elif CYTHON_FAST_THREAD_STATE
-        PyThreadState *tstate = __Pyx_PyThreadState_Current;
-        PyObject* tmp_tb = tstate->curexc_traceback;
-        if (tb != tmp_tb) {
-            Py_INCREF(tb);
-            tstate->curexc_traceback = tb;
-            Py_XDECREF(tmp_tb);
-        }
-#else
-        PyObject *tmp_type, *tmp_value, *tmp_tb;
-        PyErr_Fetch(&tmp_type, &tmp_value, &tmp_tb);
-        Py_INCREF(tb);
-        PyErr_Restore(tmp_type, tmp_value, tb);
-        Py_XDECREF(tmp_tb);
-#endif
-    }
-bad:
-    Py_XDECREF(owned_instance);
-    return;
-}
-
-/* CIntToDigits */
-static const char DIGIT_PAIRS_10[2*10*10+1] = {
-    "00010203040506070809"
-    "10111213141516171819"
-    "20212223242526272829"
-    "30313233343536373839"
-    "40414243444546474849"
-    "50515253545556575859"
-    "60616263646566676869"
-    "70717273747576777879"
-    "80818283848586878889"
-    "90919293949596979899"
-};
-static const char DIGIT_PAIRS_8[2*8*8+1] = {
-    "0001020304050607"
-    "1011121314151617"
-    "2021222324252627"
-    "3031323334353637"
-    "4041424344454647"
-    "5051525354555657"
-    "6061626364656667"
-    "7071727374757677"
-};
-static const char DIGITS_HEX[2*16+1] = {
-    "0123456789abcdef"
-    "0123456789ABCDEF"
-};
-
-/* BuildPyUnicode */
-static PyObject* __Pyx_PyUnicode_BuildFromAscii(Py_ssize_t ulength, const char* chars, int clength,
-                                                int prepend_sign, char padding_char) {
-    PyObject *uval;
-    Py_ssize_t uoffset = ulength - clength;
-#if CYTHON_USE_UNICODE_INTERNALS
-    Py_ssize_t i;
-    void *udata;
-    uval = PyUnicode_New(ulength, 127);
-    if (unlikely(!uval)) return NULL;
-    udata = PyUnicode_DATA(uval);
-    if (uoffset > 0) {
-        i = 0;
-        if (prepend_sign) {
-            __Pyx_PyUnicode_WRITE(PyUnicode_1BYTE_KIND, udata, 0, '-');
-            i++;
-        }
-        for (; i < uoffset; i++) {
-            __Pyx_PyUnicode_WRITE(PyUnicode_1BYTE_KIND, udata, i, padding_char);
-        }
-    }
-    for (i=0; i < clength; i++) {
-        __Pyx_PyUnicode_WRITE(PyUnicode_1BYTE_KIND, udata, uoffset+i, chars[i]);
-    }
-#else
-    {
-        PyObject *sign = NULL, *padding = NULL;
-        uval = NULL;
-        if (uoffset > 0) {
-            prepend_sign = !!prepend_sign;
-            if (uoffset > prepend_sign) {
-                padding = PyUnicode_FromOrdinal(padding_char);
-                if (likely(padding) && uoffset > prepend_sign + 1) {
-                    PyObject *tmp = PySequence_Repeat(padding, uoffset - prepend_sign);
-                    Py_DECREF(padding);
-                    padding = tmp;
-                }
-                if (unlikely(!padding)) goto done_or_error;
-            }
-            if (prepend_sign) {
-                sign = PyUnicode_FromOrdinal('-');
-                if (unlikely(!sign)) goto done_or_error;
-            }
-        }
-        uval = PyUnicode_DecodeASCII(chars, clength, NULL);
-        if (likely(uval) && padding) {
-            PyObject *tmp = PyUnicode_Concat(padding, uval);
-            Py_DECREF(uval);
-            uval = tmp;
-        }
-        if (likely(uval) && sign) {
-            PyObject *tmp = PyUnicode_Concat(sign, uval);
-            Py_DECREF(uval);
-            uval = tmp;
-        }
-done_or_error:
-        Py_XDECREF(padding);
-        Py_XDECREF(sign);
-    }
-#endif
-    return uval;
-}
-
-/* COrdinalToPyUnicode */
-static CYTHON_INLINE int __Pyx_CheckUnicodeValue(int value) {
-    return value <= 1114111;
-}
-static PyObject* __Pyx_PyUnicode_FromOrdinal_Padded(int value, Py_ssize_t ulength, char padding_char) {
-    if (likely(ulength <= 250)) {
-        char chars[256];
-        if (value <= 255) {
-            memset(chars, padding_char, (size_t) (ulength - 1));
-            chars[ulength-1] = (char) value;
-            return PyUnicode_DecodeLatin1(chars, ulength, NULL);
-        }
-        char *cpos = chars + sizeof(chars);
-        if (value < 0x800) {
-            *--cpos = (char) (0x80 | (value & 0x3f));
-            value >>= 6;
-            *--cpos = (char) (0xc0 | (value & 0x1f));
-        } else if (value < 0x10000) {
-            *--cpos = (char) (0x80 | (value & 0x3f));
-            value >>= 6;
-            *--cpos = (char) (0x80 | (value & 0x3f));
-            value >>= 6;
-            *--cpos = (char) (0xe0 | (value & 0x0f));
-        } else {
-            *--cpos = (char) (0x80 | (value & 0x3f));
-            value >>= 6;
-            *--cpos = (char) (0x80 | (value & 0x3f));
-            value >>= 6;
-            *--cpos = (char) (0x80 | (value & 0x3f));
-            value >>= 6;
-            *--cpos = (char) (0xf0 | (value & 0x07));
-        }
-        cpos -= ulength;
-        memset(cpos, padding_char, (size_t) (ulength - 1));
-        return PyUnicode_DecodeUTF8(cpos, chars + sizeof(chars) - cpos, NULL);
-    }
-    if (value <= 127 && CYTHON_USE_UNICODE_INTERNALS) {
-        const char chars[1] = {(char) value};
-        return __Pyx_PyUnicode_BuildFromAscii(ulength, chars, 1, 0, padding_char);
-    }
-    {
-        PyObject *uchar, *padding_uchar, *padding, *result;
-        padding_uchar = PyUnicode_FromOrdinal(padding_char);
-        if (unlikely(!padding_uchar)) return NULL;
-        padding = PySequence_Repeat(padding_uchar, ulength - 1);
-        Py_DECREF(padding_uchar);
-        if (unlikely(!padding)) return NULL;
-        uchar = PyUnicode_FromOrdinal(value);
-        if (unlikely(!uchar)) {
-            Py_DECREF(padding);
-            return NULL;
-        }
-        result = PyUnicode_Concat(padding, uchar);
-        Py_DECREF(padding);
-        Py_DECREF(uchar);
-        return result;
-    }
-}
-
-/* CIntToPyUnicode */
-static CYTHON_INLINE PyObject* __Pyx_PyUnicode_From_int(int value, Py_ssize_t width, char padding_char, char format_char) {
-    char digits[sizeof(int)*3+2];
-    char *dpos, *end = digits + sizeof(int)*3+2;
-    const char *hex_digits = DIGITS_HEX;
-    Py_ssize_t length, ulength;
-    int prepend_sign, last_one_off;
-    int remaining;
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-    const int neg_one = (int) -1, const_zero = (int) 0;
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic pop
-#endif
-    const int is_unsigned = neg_one > const_zero;
-    if (format_char == 'c') {
-        if (unlikely(!(is_unsigned || value == 0 || value > 0) ||
-                     !(sizeof(value) <= 2 || value & ~ (int) 0x01fffff || __Pyx_CheckUnicodeValue((int) value)))) {
-            PyErr_SetString(PyExc_OverflowError, "%c arg not in range(0x110000)");
-            return NULL;
-        }
-        if (width <= 1) {
-            return PyUnicode_FromOrdinal((int) value);
-        }
-        return __Pyx_PyUnicode_FromOrdinal_Padded((int) value, width, padding_char);
-    }
-    if (format_char == 'X') {
-        hex_digits += 16;
-        format_char = 'x';
-    }
-    remaining = value;
-    last_one_off = 0;
-    dpos = end;
-    do {
-        int digit_pos;
-        switch (format_char) {
-        case 'o':
-            digit_pos = abs((int)(remaining % (8*8)));
-            remaining = (int) (remaining / (8*8));
-            dpos -= 2;
-            memcpy(dpos, DIGIT_PAIRS_8 + digit_pos * 2, 2);
-            last_one_off = (digit_pos < 8);
-            break;
-        case 'd':
-            digit_pos = abs((int)(remaining % (10*10)));
-            remaining = (int) (remaining / (10*10));
-            dpos -= 2;
-            memcpy(dpos, DIGIT_PAIRS_10 + digit_pos * 2, 2);
-            last_one_off = (digit_pos < 10);
-            break;
-        case 'x':
-            *(--dpos) = hex_digits[abs((int)(remaining % 16))];
-            remaining = (int) (remaining / 16);
-            break;
-        default:
-            assert(0);
-            break;
-        }
-    } while (unlikely(remaining != 0));
-    assert(!last_one_off || *dpos == '0');
-    dpos += last_one_off;
-    length = end - dpos;
-    ulength = length;
-    prepend_sign = 0;
-    if (!is_unsigned && value <= neg_one) {
-        if (padding_char == ' ' || width <= length + 1) {
-            *(--dpos) = '-';
-            ++length;
-        } else {
-            prepend_sign = 1;
-        }
-        ++ulength;
-    }
-    if (width > ulength) {
-        ulength = width;
-    }
-    if (ulength == 1) {
-        return PyUnicode_FromOrdinal(*dpos);
-    }
-    return __Pyx_PyUnicode_BuildFromAscii(ulength, dpos, (int) length, prepend_sign, padding_char);
-}
-
 /* DictGetItem */
 #if !CYTHON_COMPILING_IN_PYPY
 static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key) {
@@ -18606,84 +18799,6 @@ static PyObject* __Pyx_PyObject_Format(PyObject* obj, PyObject* format_spec) {
     return _PyUnicodeWriter_Finish(&writer);
 }
 #endif
-
-/* JoinPyUnicode */
-static PyObject* __Pyx_PyUnicode_Join(PyObject** values, Py_ssize_t value_count, Py_ssize_t result_ulength,
-                                      Py_UCS4 max_char) {
-#if CYTHON_USE_UNICODE_INTERNALS && CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    PyObject *result_uval;
-    int result_ukind, kind_shift;
-    Py_ssize_t i, char_pos;
-    void *result_udata;
-    if (max_char > 1114111) max_char = 1114111;
-    result_uval = PyUnicode_New(result_ulength, max_char);
-    if (unlikely(!result_uval)) return NULL;
-    result_ukind = (max_char <= 255) ? PyUnicode_1BYTE_KIND : (max_char <= 65535) ? PyUnicode_2BYTE_KIND : PyUnicode_4BYTE_KIND;
-    kind_shift = (result_ukind == PyUnicode_4BYTE_KIND) ? 2 : result_ukind - 1;
-    result_udata = PyUnicode_DATA(result_uval);
-    assert(kind_shift == 2 || kind_shift == 1 || kind_shift == 0);
-    if (unlikely((PY_SSIZE_T_MAX >> kind_shift) - result_ulength < 0))
-        goto overflow;
-    char_pos = 0;
-    for (i=0; i < value_count; i++) {
-        int ukind;
-        Py_ssize_t ulength;
-        void *udata;
-        PyObject *uval = values[i];
-        #if !CYTHON_COMPILING_IN_LIMITED_API
-        if (__Pyx_PyUnicode_READY(uval) == (-1))
-            goto bad;
-        #endif
-        ulength = __Pyx_PyUnicode_GET_LENGTH(uval);
-        #if !CYTHON_ASSUME_SAFE_SIZE
-        if (unlikely(ulength < 0)) goto bad;
-        #endif
-        if (unlikely(!ulength))
-            continue;
-        if (unlikely((PY_SSIZE_T_MAX >> kind_shift) - ulength < char_pos))
-            goto overflow;
-        ukind = __Pyx_PyUnicode_KIND(uval);
-        udata = __Pyx_PyUnicode_DATA(uval);
-        if (ukind == result_ukind) {
-            memcpy((char *)result_udata + (char_pos << kind_shift), udata, (size_t) (ulength << kind_shift));
-        } else {
-            #if PY_VERSION_HEX >= 0x030d0000
-            if (unlikely(PyUnicode_CopyCharacters(result_uval, char_pos, uval, 0, ulength) < 0)) goto bad;
-            #elif CYTHON_COMPILING_IN_CPYTHON || defined(_PyUnicode_FastCopyCharacters)
-            _PyUnicode_FastCopyCharacters(result_uval, char_pos, uval, 0, ulength);
-            #else
-            Py_ssize_t j;
-            for (j=0; j < ulength; j++) {
-                Py_UCS4 uchar = __Pyx_PyUnicode_READ(ukind, udata, j);
-                __Pyx_PyUnicode_WRITE(result_ukind, result_udata, char_pos+j, uchar);
-            }
-            #endif
-        }
-        char_pos += ulength;
-    }
-    return result_uval;
-overflow:
-    PyErr_SetString(PyExc_OverflowError, "join() result is too long for a Python string");
-bad:
-    Py_DECREF(result_uval);
-    return NULL;
-#else
-    Py_ssize_t i;
-    PyObject *result = NULL;
-    PyObject *value_tuple = PyTuple_New(value_count);
-    if (unlikely(!value_tuple)) return NULL;
-    CYTHON_UNUSED_VAR(max_char);
-    CYTHON_UNUSED_VAR(result_ulength);
-    for (i=0; i<value_count; i++) {
-        if (__Pyx_PyTuple_SET_ITEM(value_tuple, i, values[i]) != (0)) goto bad;
-        Py_INCREF(values[i]);
-    }
-    result = PyUnicode_Join(__pyx_mstate_global->__pyx_empty_unicode, value_tuple);
-bad:
-    Py_DECREF(value_tuple);
-    return result;
-#endif
-}
 
 /* CallTypeTraverse */
 #if !CYTHON_USE_TYPE_SPECS || (!CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x03090000)

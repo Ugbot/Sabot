@@ -103,6 +103,16 @@ cdef extern from "arrow/array/builder_primitive.h" namespace "arrow" nogil:
         CStatus AppendValues(const uint32_t* values, int64_t length)
         CResult[shared_ptr[CArray]] Finish()
 
+# Arrow ThreadPool for parallel execution
+cdef extern from "arrow/util/thread_pool.h" namespace "arrow::internal" nogil:
+    cdef cppclass CThreadPool "arrow::internal::ThreadPool":
+        @staticmethod
+        CResult[shared_ptr[CThreadPool]] Make(int num_threads)
+
+        int GetCapacity()
+
+    CThreadPool* GetCpuThreadPool()
+
 # Use vendored Arrow directly (via pyarrow.lib which points to vendor/arrow/python/pyarrow)
 from pyarrow.lib cimport (
     Table as PyTable,
@@ -206,6 +216,7 @@ cdef class StreamingHashJoin:
         shared_ptr[CBuffer] _bloom_mask
         shared_ptr[CBuffer] _match_bitvector
         CMemoryPool* _pool
+        shared_ptr[CThreadPool] _thread_pool  # For parallel execution
 
         # Build-side state (hash table + bloom filter + table storage)
         HashJoinTable* _hash_table  # C++ hash table: hash → [row indices]
@@ -229,8 +240,10 @@ cdef class StreamingHashJoin:
             left_keys: Column indices for left (build) table keys
             right_keys: Column indices for right (probe) table keys
             join_type: Join type ('inner', 'left', 'right', 'outer')
-            num_threads: Number of probe threads (not yet implemented)
+            num_threads: Number of threads for parallel execution (default: 1)
         """
+        cdef CResult[shared_ptr[CThreadPool]] tp_result
+
         # Store as Python lists (will convert to vectors when needed)
         self._left_key_indices = vector[int]()
         for idx in left_keys:
@@ -245,6 +258,15 @@ cdef class StreamingHashJoin:
 
         # Get Arrow memory pool
         self._pool = default_memory_pool()
+
+        # Initialize thread pool for parallel execution (only if num_threads > 1)
+        if num_threads > 1:
+            # Create custom thread pool with specified threads
+            tp_result = CThreadPool.Make(num_threads)
+            if not tp_result.ok():
+                raise RuntimeError(f"Failed to create thread pool with {num_threads} threads")
+            self._thread_pool = tp_result.ValueOrDie()
+        # For single-threaded mode, _thread_pool remains null (no parallel execution)
 
         # Pre-allocate buffers (zero allocations in hot path)
         # Hash buffer (uint32_t * MAX_BATCH_SIZE)
