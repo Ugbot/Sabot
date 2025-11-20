@@ -1530,9 +1530,10 @@ class Stream:
                 right_keys=['id'],
                 how='inner')
         """
-        # Try optimized StreamingHashJoin first (SIMD + caching + nogil)
-        # Performance: 87 M rows/sec peak, 9x speedup from caching
-        use_streaming_join = True  # Set to False to use PyArrow fallback
+        # Use optimized StreamingHashJoin for inner joins only
+        # For outer joins, fall back to PyArrow (simpler and correct)
+        # Performance: StreamingHashJoin: 87 M rows/sec peak, 9x speedup from caching
+        use_streaming_join = (how == 'inner')  # Only for inner joins
         if use_streaming_join:
             try:
                 from sabot._cython.operators.streaming_hash_join_operator import StreamingHashJoinOperator

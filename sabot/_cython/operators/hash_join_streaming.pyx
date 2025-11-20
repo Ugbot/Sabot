@@ -679,17 +679,20 @@ cdef class StreamingHashJoin:
             taken = result.ValueOrDie()
             result_columns.push_back(taken)
 
-        # Build combined schema with field renaming (left_*, right_*)
+        # Build combined schema WITHOUT renaming (keep original column names)
+        # This matches PyArrow's join behavior which allows duplicate column names
         # Cache schema per probe batch schema (Bug #2 fix)
         # Schema is identical for all result batches with same probe schema (10-20% gain)
         right_schema = probe_batch.schema
         if right_schema not in self._schema_cache:
             left_schema = self._build_batch.schema
             combined_fields = []
+            # Keep original field names from build table
             for field in left_schema:
-                combined_fields.append(pa.field(f"left_{field.name}", field.type))
+                combined_fields.append(field)
+            # Keep original field names from probe table (may have duplicates)
             for field in right_schema:
-                combined_fields.append(pa.field(f"right_{field.name}", field.type))
+                combined_fields.append(field)
             self._schema_cache[right_schema] = pa.schema(combined_fields)
 
         combined_schema = self._schema_cache[right_schema]

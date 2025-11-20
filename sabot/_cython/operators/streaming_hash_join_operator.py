@@ -139,6 +139,9 @@ class StreamingHashJoinOperator:
         #   left_source = probe side (first operand)
         #   right_source = build side (second operand)
         # So we need to SWAP them!
+        #
+        # NOTE: This operator is currently only used for inner joins.
+        # Outer joins fall back to PyArrow join for simplicity and correctness.
 
         # Create join operator with SWAPPED left/right
         self._join_impl = StreamingHashJoin(
