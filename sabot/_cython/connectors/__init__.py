@@ -14,6 +14,20 @@ from .mysql import (
     MySQLStreamRouter,
 )
 
+# Try to import DuckDB connector (may not be compiled)
+try:
+    from .duckdb_core import (
+        DuckDBConnection,
+        DuckDBArrowResult,
+        DuckDBError,
+    )
+    DUCKDB_AVAILABLE = True
+except ImportError:
+    DuckDBConnection = None
+    DuckDBArrowResult = None
+    DuckDBError = None
+    DUCKDB_AVAILABLE = False
+
 __all__ = [
     'MySQLCDCConfig',
     'MySQLCDCConnector',
@@ -21,4 +35,8 @@ __all__ = [
     'MySQLTableDiscovery',
     'MySQLSchemaTracker',
     'MySQLStreamRouter',
+    'DuckDBConnection',
+    'DuckDBArrowResult',
+    'DuckDBError',
+    'DUCKDB_AVAILABLE',
 ]

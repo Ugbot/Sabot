@@ -1,0 +1,138 @@
+<frozen importlib._bootstrap>:488: RuntimeWarning: sabot._cython.cyrocks.CyOptions size changed, may indicate binary incompatibility. Expected 16 from C header, got 24 from PyObject
+<frozen importlib._bootstrap>:488: RuntimeWarning: sabot._cython.cyrocks.CyDB size changed, may indicate binary incompatibility. Expected 16 from C header, got 256 from PyObject
+MarbleDB Cython store backend not available: No module named 'sabot._cython.stores.marbledb_store'
+App import failed: cannot import name 'create_join_builder' from 'sabot.joins' (/Users/bengamble/Sabot/sabot/joins/__init__.py) - using stubs
+Numba not available - UDFs will be interpreted
+
+================================================================================
+COMPLETE TPC-H BENCHMARK - ALL ENGINES
+Testing: Sabot, Polars, DuckDB, PySpark
+Queries: 1-22 (complete suite)
+================================================================================
+
+
+================================================================================
+ENGINE: SABOT_NATIVE
+================================================================================
+
+Q01: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q02: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q03: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q04: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q05: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q06: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q07: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q08: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q09: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q10: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q11: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q12: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q13: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q14: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q15: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q16: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q17: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q18: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q19: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q20: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q21: ✗ [Errno 2] No such file or directory: '/Users/benga
+Q22: ✗ [Errno 2] No such file or directory: '/Users/benga
+
+================================================================================
+ENGINE: POLARS
+================================================================================
+
+Q01: ✗ No such file or directory (os error 2): /Users/ben
+Q02: ✗ No such file or directory (os error 2): /Users/ben
+Q03: ✗ No such file or directory (os error 2): /Users/ben
+Q04: ✗ No such file or directory (os error 2): /Users/ben
+Q05: ✗ No such file or directory (os error 2): /Users/ben
+Q06: ✗ No such file or directory (os error 2): /Users/ben
+Q07: ✗ No such file or directory (os error 2): /Users/ben
+Q08: ✗ No such file or directory (os error 2): /Users/ben
+Q09: ✗ No such file or directory (os error 2): /Users/ben
+Q10: ✗ No such file or directory (os error 2): /Users/ben
+Q11: ✗ No such file or directory (os error 2): /Users/ben
+Q12: ✗ No such file or directory (os error 2): /Users/ben
+Q13: ✗ No such file or directory (os error 2): /Users/ben
+Q14: ✗ No such file or directory (os error 2): /Users/ben
+Q15: ✗ No such file or directory (os error 2): /Users/ben
+Q16: ✗ No such file or directory (os error 2): /Users/ben
+Q17: ✗ No such file or directory (os error 2): /Users/ben
+Q18: ✗ No such file or directory (os error 2): /Users/ben
+Q19: ✗ No such file or directory (os error 2): /Users/ben
+Q20: ✗ No such file or directory (os error 2): /Users/ben
+Q21: ✗ No such file or directory (os error 2): /Users/ben
+Q22: ✗ No such file or directory (os error 2): /Users/ben
+
+================================================================================
+ENGINE: DUCKDB
+================================================================================
+
+Q01: ✗ IO Error: No files found that match the pattern "/
+Q02: ✗ IO Error: No files found that match the pattern "/
+Q03: ✗ IO Error: No files found that match the pattern "/
+Q04: ✗ IO Error: No files found that match the pattern "/
+Q05: ✗ IO Error: No files found that match the pattern "/
+Q06: ✗ IO Error: No files found that match the pattern "/
+Q07: ✗ IO Error: No files found that match the pattern "/
+Q08: ✗ IO Error: No files found that match the pattern "/
+Q09: ✗ IO Error: No files found that match the pattern "/
+Q10: ✗ IO Error: No files found that match the pattern "/
+Q11: ✗ IO Error: No files found that match the pattern "/
+Q12: ✗ IO Error: No files found that match the pattern "/
+Q13: ✗ IO Error: No files found that match the pattern "/
+Q14: ✗ IO Error: No files found that match the pattern "/
+Q15: ✗ IO Error: No files found that match the pattern "/
+Q16: ✗ IO Error: No files found that match the pattern "/
+Q17: ✗ IO Error: No files found that match the pattern "/
+Q18: ✗ IO Error: No files found that match the pattern "/
+Q19: ✗ IO Error: No files found that match the pattern "/
+Q20: ✗ IO Error: No files found that match the pattern "/
+Q21: ✗ IO Error: No files found that match the pattern "/
+Q22: ✗ IO Error: No files found that match the pattern "/
+
+================================================================================
+SUMMARY - ALL ENGINES
+================================================================================
+
+Query   SABOT_NATIVE        POLARS              DUCKDB              Winner
+--------------------------------------------------------------------------------
+Q01      N/A               N/A               N/A                 -
+Q02      N/A               N/A               N/A                 -
+Q03      N/A               N/A               N/A                 -
+Q04      N/A               N/A               N/A                 -
+Q05      N/A               N/A               N/A                 -
+Q06      N/A               N/A               N/A                 -
+Q07      N/A               N/A               N/A                 -
+Q08      N/A               N/A               N/A                 -
+Q09      N/A               N/A               N/A                 -
+Q10      N/A               N/A               N/A                 -
+Q11      N/A               N/A               N/A                 -
+Q12      N/A               N/A               N/A                 -
+Q13      N/A               N/A               N/A                 -
+Q14      N/A               N/A               N/A                 -
+Q15      N/A               N/A               N/A                 -
+Q16      N/A               N/A               N/A                 -
+Q17      N/A               N/A               N/A                 -
+Q18      N/A               N/A               N/A                 -
+Q19      N/A               N/A               N/A                 -
+Q20      N/A               N/A               N/A                 -
+Q21      N/A               N/A               N/A                 -
+Q22      N/A               N/A               N/A                 -
+
+================================================================================
+ENGINE STATISTICS
+================================================================================
+
+Results saved to: /Users/bengamble/Sabot/benchmarks/tpch_comparison_scale_0.1.json
+
+================================================================================
+WINNER ANALYSIS
+================================================================================
+
+SABOT_NATIVE: 0/22 wins (0.0%)
+POLARS: 0/22 wins (0.0%)
+DUCKDB: 0/22 wins (0.0%)
+
+================================================================================

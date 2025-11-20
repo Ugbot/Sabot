@@ -214,7 +214,7 @@ class SparkSession:
             DataFrame
         """
         from .dataframe import DataFrame
-        import pyarrow as pa
+        from sabot import cyarrow as pa  # Use Sabot's vendored Arrow
         
         # Convert to Arrow table
         if hasattr(data, '__arrow_c_stream__'):

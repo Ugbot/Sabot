@@ -246,7 +246,8 @@ def create_app(
 
 # Add modulo function to pyarrow.compute namespace
 try:
-    import pyarrow.compute as pc
+    # Use Sabot's vendored Arrow (includes custom kernels)
+    pc = cyarrow.compute
     from sabot._cython.arrow.compute import modulo
     pc.modulo = modulo
 except ImportError:

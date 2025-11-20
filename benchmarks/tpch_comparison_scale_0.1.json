@@ -1,0 +1,408 @@
+{
+  "scale": 0.1,
+  "timestamp": "2025-11-14T11:32:28.613057",
+  "engines": {
+    "sabot_native": [
+      {
+        "query": 1,
+        "time": 0.00014400482177734375,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 2,
+        "time": 0.00011801719665527344,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 3,
+        "time": 4.1961669921875e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 4,
+        "time": 2.3126602172851562e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 5,
+        "time": 1.811981201171875e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 6,
+        "time": 5.2928924560546875e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 7,
+        "time": 2.3126602172851562e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 8,
+        "time": 1.71661376953125e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 9,
+        "time": 2.7179718017578125e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 10,
+        "time": 0.00010395050048828125,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 11,
+        "time": 0.00018405914306640625,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 12,
+        "time": 4.506111145019531e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 13,
+        "time": 1.9073486328125e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 14,
+        "time": 0.000125885009765625,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 15,
+        "time": 9.822845458984375e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 16,
+        "time": 0.00023698806762695312,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 17,
+        "time": 6.914138793945312e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 18,
+        "time": 8.296966552734375e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 19,
+        "time": 7.319450378417969e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 20,
+        "time": 2.47955322265625e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 21,
+        "time": 4.601478576660156e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      },
+      {
+        "query": 22,
+        "time": 6.985664367675781e-05,
+        "rows": 0,
+        "status": "ERROR: [Errno 2] No such file or directory: '/Users/benga"
+      }
+    ],
+    "polars": [
+      {
+        "query": 1,
+        "time": 0.02268695831298828,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 2,
+        "time": 0.0009639263153076172,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 3,
+        "time": 0.0005617141723632812,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 4,
+        "time": 0.0024759769439697266,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 5,
+        "time": 0.0003571510314941406,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 6,
+        "time": 0.00015783309936523438,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 7,
+        "time": 0.0013380050659179688,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 8,
+        "time": 0.0012180805206298828,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 9,
+        "time": 0.0007910728454589844,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 10,
+        "time": 0.0010540485382080078,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 11,
+        "time": 0.0009598731994628906,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 12,
+        "time": 0.008381128311157227,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 13,
+        "time": 0.0004317760467529297,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 14,
+        "time": 0.0008187294006347656,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 15,
+        "time": 0.00025010108947753906,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 16,
+        "time": 0.0032722949981689453,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 17,
+        "time": 0.0005030632019042969,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 18,
+        "time": 0.00028586387634277344,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 19,
+        "time": 0.0005409717559814453,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 20,
+        "time": 0.000530242919921875,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 21,
+        "time": 0.0003418922424316406,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      },
+      {
+        "query": 22,
+        "time": 0.0006389617919921875,
+        "rows": 0,
+        "status": "ERROR: No such file or directory (os error 2): /Users/ben"
+      }
+    ],
+    "duckdb": [
+      {
+        "query": 1,
+        "time": 0.03625321388244629,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 2,
+        "time": 0.0017380714416503906,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 3,
+        "time": 0.0007588863372802734,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 4,
+        "time": 0.00047898292541503906,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 5,
+        "time": 0.0005879402160644531,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 6,
+        "time": 0.0022859573364257812,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 7,
+        "time": 0.0007688999176025391,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 8,
+        "time": 0.001068115234375,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 9,
+        "time": 0.0011267662048339844,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 10,
+        "time": 0.0007219314575195312,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 11,
+        "time": 0.0006499290466308594,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 12,
+        "time": 0.0007998943328857422,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 13,
+        "time": 0.0004420280456542969,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 14,
+        "time": 0.0006029605865478516,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 15,
+        "time": 0.0028269290924072266,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 16,
+        "time": 0.0008680820465087891,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 17,
+        "time": 0.0004639625549316406,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 18,
+        "time": 0.00044918060302734375,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 19,
+        "time": 0.001283884048461914,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 20,
+        "time": 0.0007863044738769531,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 21,
+        "time": 0.0004112720489501953,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      },
+      {
+        "query": 22,
+        "time": 0.0009210109710693359,
+        "rows": 0,
+        "status": "ERROR: IO Error: No files found that match the pattern \"/"
+      }
+    ]
+  }
+}

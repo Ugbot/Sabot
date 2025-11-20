@@ -164,9 +164,17 @@ int main() {
         LIMIT 20
     )";
 
-    std::cout << "  SKIPPED: Variable comparison has a crash bug (segfault)\n";
-    std::cout << "  TODO: Fix variable-to-variable FILTER before re-enabling\n\n";
-    double time2 = 0.0;  // Placeholder for summary
+    Timer t2;
+    auto result2 = execute_sparql(engine, query2);
+    double time2 = t2.elapsed_ms();
+
+    if (!result2.ok()) {
+        std::cerr << "  FAILED: " << result2.status() << "\n";
+        return 1;
+    }
+    std::cout << "  Results: " << (*result2)->num_rows() << " rows\n";
+    std::cout << "  Time: " << time2 << " ms\n";
+    std::cout << "  ✓ Variable FILTER executed successfully\n\n";
 
     // Test 3: ORDER BY
     std::cout << "Test 3: ORDER BY (sort results)\n";

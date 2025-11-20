@@ -140,7 +140,7 @@ class DataFrame:
         self._session = session
         
         # Convert to Stream if needed
-        import pyarrow as pa
+        from sabot import cyarrow as pa  # Use Sabot's vendored Arrow
         from sabot.api.stream import Stream
         
         if isinstance(stream_or_table, Stream):
@@ -228,6 +228,107 @@ class DataFrame:
         
         return GroupedData(grouped_stream, self._session, list(cols))
     
+    def withColumn(self, colName: str, col):
+        """
+        Add or replace a column.
+        
+        Args:
+            colName: Column name
+            col: Column expression
+            
+        Returns:
+            DataFrame
+        """
+        # Use select to add/replace column
+        from .dataframe import Column
+        from sabot import cyarrow as ca; pc = ca.compute  # Sabot vendored Arrow
+        
+        def with_column_stream():
+            for batch in self._stream:
+                # Evaluate the column expression
+                if isinstance(col, Column):
+                    new_array = col._get_array(batch)
+                else:
+                    new_array = col
+                
+                # Check if column exists
+                from sabot import cyarrow as pa  # Sabot vendored Arrow
+                if colName in batch.schema.names:
+                    # Replace existing column
+                    idx = batch.schema.names.index(colName)
+                    arrays = [batch.column(i) if i != idx else new_array 
+                             for i in range(batch.num_columns)]
+                    names = batch.schema.names
+                else:
+                    # Add new column
+                    arrays = [batch.column(i) for i in range(batch.num_columns)]
+                    arrays.append(new_array)
+                    names = list(batch.schema.names) + [colName]
+                
+                # Create new batch
+                new_batch = pa.record_batch(arrays, names=names)
+                yield new_batch
+        
+        from sabot.api.stream import Stream
+        return DataFrame(Stream(with_column_stream()), self._session)
+    
+    def withColumnRenamed(self, existing: str, new: str):
+        """
+        Rename a column.
+        
+        Args:
+            existing: Existing column name
+            new: New column name
+            
+        Returns:
+            DataFrame
+        """
+        def renamed_stream():
+            for batch in self._stream:
+                from sabot import cyarrow as pa  # Sabot vendored Arrow
+                # Rename in schema
+                names = list(batch.schema.names)
+                if existing in names:
+                    idx = names.index(existing)
+                    names[idx] = new
+                
+                # Create new batch with renamed schema
+                new_batch = pa.record_batch(
+                    [batch.column(i) for i in range(batch.num_columns)],
+                    names=names
+                )
+                yield new_batch
+        
+        from sabot.api.stream import Stream
+        return DataFrame(Stream(renamed_stream()), self._session)
+    
+    def drop(self, *cols):
+        """
+        Drop columns.
+        
+        Args:
+            *cols: Column names to drop
+            
+        Returns:
+            DataFrame
+        """
+        cols_to_drop = set(cols)
+        
+        def drop_stream():
+            for batch in self._stream:
+                from sabot import cyarrow as pa  # Sabot vendored Arrow
+                # Keep columns not in drop list
+                keep_indices = [i for i, name in enumerate(batch.schema.names) 
+                               if name not in cols_to_drop]
+                keep_names = [batch.schema.names[i] for i in keep_indices]
+                keep_arrays = [batch.column(i) for i in keep_indices]
+                
+                new_batch = pa.record_batch(keep_arrays, names=keep_names)
+                yield new_batch
+        
+        from sabot.api.stream import Stream
+        return DataFrame(Stream(drop_stream()), self._session)
+    
     def join(self, other, on, how: str = 'inner'):
         """
         Join with another DataFrame.
@@ -264,18 +365,53 @@ class DataFrame:
     
     def orderBy(self, *cols, ascending=True):
         """
-        Sort DataFrame.
+        Sort DataFrame by columns.
         
         Args:
             *cols: Columns to sort by
-            ascending: Sort order
+            ascending: Sort order (bool or list of bool)
             
         Returns:
             DataFrame
         """
-        # TODO: Implement orderBy via SQL or custom operator
-        logger.warning("orderBy not yet fully implemented, returning self")
-        return self
+        # Extract column names
+        col_names = []
+        for c in cols:
+            if isinstance(c, str):
+                col_names.append(c)
+            elif isinstance(c, Column):
+                col_names.append(str(c._expr))
+            else:
+                col_names.append(str(c))
+        
+        # Use Arrow sort
+        def sorted_stream():
+            from sabot import cyarrow as pa  # Sabot vendored Arrow
+            from sabot import cyarrow as ca; pc = ca.compute  # Sabot vendored Arrow
+            
+            batches = list(self._stream)
+            if not batches:
+                return
+            
+            # Combine to table
+            table = pa.Table.from_batches(batches)
+            
+            # Prepare sort keys
+            if isinstance(ascending, bool):
+                sort_keys = [(col, "ascending" if ascending else "descending") for col in col_names]
+            else:
+                sort_keys = [(col, "ascending" if asc else "descending") 
+                            for col, asc in zip(col_names, ascending)]
+            
+            # Sort
+            sorted_table = table.sort_by(sort_keys)
+            
+            # Yield batches
+            for batch in sorted_table.to_batches():
+                yield batch
+        
+        from sabot.api.stream import Stream
+        return DataFrame(Stream(sorted_stream()), self._session)
     
     def limit(self, num: int):
         """
@@ -287,14 +423,218 @@ class DataFrame:
         Returns:
             DataFrame
         """
-        # TODO: Implement limit operator
-        logger.warning("limit not yet fully implemented, returning self")
-        return self
+        def limited_stream():
+            count = 0
+            for batch in self._stream:
+                if count >= num:
+                    break
+                
+                rows_needed = num - count
+                if batch.num_rows <= rows_needed:
+                    # Take whole batch
+                    yield batch
+                    count += batch.num_rows
+                else:
+                    # Take partial batch
+                    yield batch.slice(0, rows_needed)
+                    count += rows_needed
+                    break
+        
+        from sabot.api.stream import Stream
+        return DataFrame(Stream(limited_stream()), self._session)
+    
+    def unionByName(self, other, allowMissingColumns=False):
+        """
+        Union with another DataFrame by column names.
+        
+        Args:
+            other: DataFrame to union with
+            allowMissingColumns: Allow schema differences
+            
+        Returns:
+            DataFrame
+        """
+        def union_stream():
+            from sabot import cyarrow as pa  # Sabot vendored Arrow
+            
+            # Get schemas
+            self_batches = list(self._stream)
+            other_batches = list(other._stream)
+            
+            if not self_batches or not other_batches:
+                # Yield all batches from both
+                for b in self_batches:
+                    yield b
+                for b in other_batches:
+                    yield b
+                return
+            
+            # Get schemas
+            self_schema = self_batches[0].schema
+            other_schema = other_batches[0].schema
+            
+            # Union schemas (take union of column names)
+            all_columns = set(self_schema.names) | set(other_schema.names)
+            
+            # Yield self batches (add null columns if needed)
+            for batch in self_batches:
+                if allowMissingColumns and set(batch.schema.names) != all_columns:
+                    # Add missing columns as nulls
+                    arrays = [batch.column(name) if name in batch.schema.names 
+                             else pa.nulls(batch.num_rows) 
+                             for name in sorted(all_columns)]
+                    new_batch = pa.record_batch(arrays, names=sorted(all_columns))
+                    yield new_batch
+                else:
+                    yield batch
+            
+            # Yield other batches (add null columns if needed)
+            for batch in other_batches:
+                if allowMissingColumns and set(batch.schema.names) != all_columns:
+                    arrays = [batch.column(name) if name in batch.schema.names 
+                             else pa.nulls(batch.num_rows) 
+                             for name in sorted(all_columns)]
+                    new_batch = pa.record_batch(arrays, names=sorted(all_columns))
+                    yield new_batch
+                else:
+                    yield batch
+        
+        from sabot.api.stream import Stream
+        return DataFrame(Stream(union_stream()), self._session)
+    
+    def sample(self, withReplacement=False, fraction=None, seed=None):
+        """
+        Sample rows.
+        
+        Args:
+            withReplacement: Sample with replacement
+            fraction: Fraction to sample (0.0-1.0)
+            seed: Random seed
+            
+        Returns:
+            DataFrame
+        """
+        import random
+        if seed is not None:
+            random.seed(seed)
+        
+        def sample_stream():
+            for batch in self._stream:
+                if fraction is None or fraction >= 1.0:
+                    yield batch
+                else:
+                    # Sample rows
+                    import numpy as np
+                    if seed is not None:
+                        np.random.seed(seed)
+                    
+                    num_samples = int(batch.num_rows * fraction)
+                    if withReplacement:
+                        indices = np.random.choice(batch.num_rows, num_samples, replace=True)
+                    else:
+                        indices = np.random.choice(batch.num_rows, num_samples, replace=False)
+                    
+                    # Take sampled rows
+                    sampled = batch.take(sorted(indices))
+                    if sampled.num_rows > 0:
+                        yield sampled
+        
+        from sabot.api.stream import Stream
+        return DataFrame(Stream(sample_stream()), self._session)
     
     def distinct(self):
         """Get distinct rows."""
         new_stream = self._stream.distinct()
         return DataFrame(new_stream, self._session)
+    
+    def repartition(self, numPartitions: int):
+        """
+        Repartition DataFrame to specified number of partitions.
+        
+        Args:
+            numPartitions: Target number of partitions
+            
+        Returns:
+            DataFrame
+        """
+        def repartitioned_stream():
+            from sabot import cyarrow as pa  # Sabot vendored Arrow
+            
+            # Collect all batches
+            batches = list(self._stream)
+            if not batches:
+                return
+            
+            # Combine to table
+            table = pa.Table.from_batches(batches)
+            
+            # Calculate rows per partition
+            rows_per_partition = max(1, table.num_rows // numPartitions)
+            
+            # Yield batches of target size
+            for i in range(0, table.num_rows, rows_per_partition):
+                end = min(i + rows_per_partition, table.num_rows)
+                partition_table = table.slice(i, end - i)
+                for batch in partition_table.to_batches():
+                    yield batch
+        
+        from sabot.api.stream import Stream
+        return DataFrame(Stream(repartitioned_stream()), self._session)
+    
+    def coalesce(self, numPartitions: int):
+        """
+        Reduce number of partitions (optimization of repartition).
+        
+        Args:
+            numPartitions: Target number of partitions
+            
+        Returns:
+            DataFrame
+        """
+        # For now, same as repartition (optimization would avoid shuffle)
+        return self.repartition(numPartitions)
+    
+    def cache(self):
+        """
+        Cache DataFrame in memory.
+        
+        Returns:
+            DataFrame (self)
+        """
+        # Materialize the stream into memory
+        self._cached_batches = list(self._stream)
+        
+        # Create new stream from cached batches
+        def cached_stream():
+            for batch in self._cached_batches:
+                yield batch
+        
+        from sabot.api.stream import Stream
+        self._stream = Stream(cached_stream())
+        return self
+    
+    def persist(self, storageLevel=None):
+        """
+        Persist DataFrame (alias for cache).
+        
+        Args:
+            storageLevel: Storage level (ignored - always memory)
+            
+        Returns:
+            DataFrame (self)
+        """
+        return self.cache()
+    
+    def unpersist(self):
+        """
+        Unpersist DataFrame.
+        
+        Returns:
+            DataFrame (self)
+        """
+        if hasattr(self, '_cached_batches'):
+            delattr(self, '_cached_batches')
+        return self
     
     # Actions (trigger execution)
     

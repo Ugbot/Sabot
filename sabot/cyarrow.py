@@ -23,6 +23,7 @@ WHAT WORKS:
 ✅ Filtering (ArrowComputeEngine) - 50-100x faster than Python
 ✅ Direct buffer access for int64/float64 columns
 ✅ All Arrow types and operations
+✅ SIMD datetime kernels (parse/format/business days) - AVX2 accelerated
 
 PERFORMANCE:
 - Single value access: <10ns
@@ -45,12 +46,20 @@ USAGE:
     batch = pa.record_batch([...], schema=schema)
     result = pc.sum(batch['column'])
 
+    # SIMD datetime operations (AVX2 accelerated)
+    strings = pa.array(["2024-01-15 10:30:00"])
+    timestamps = pc.parse_datetime(strings, "yyyy-MM-dd HH:mm:ss")
+    formatted = pc.format_datetime(timestamps, "yyyy/MM/dd")
+    future = pc.add_days_simd(timestamps, 7)
+    biz_days = pc.business_days_between(start, end, holidays=[...])
+
 ARCHITECTURE:
 - sabot/_c/arrow_core.pyx: Core zero-copy operations
 - sabot/_cython/arrow/batch_processor.pyx: Batch processing
 - sabot/_cython/arrow/join_processor.pyx: Join operations
 - sabot/_cython/arrow/window_processor.pyx: Window operations
-- vendor/arrow/: Vendored Apache Arrow C++ source
+- sabot/_cython/arrow/datetime_kernels.pyx: SIMD datetime operations
+- vendor/arrow/: Vendored Apache Arrow C++ source (with custom kernels)
 
 All Cython implementations use `cimport pyarrow.lib` which resolves to
 vendor/arrow/python/pyarrow/lib.pxd (vendored Cython bindings).
@@ -82,8 +91,17 @@ try:
     # Import vendored Arrow types via our Cython bindings
     # The Cython modules already cimport from vendor/arrow/python/pyarrow/
     # We need the Python-level types for the API
-    # NOTE: This still imports from pyarrow module namespace, but that's built from our vendored source
+    # CRITICAL: Ensure we import vendored Arrow, not external pyarrow
     try:
+        import sys
+        import os
+        # Add vendored Arrow to sys.path FIRST
+        vendor_arrow_path = os.path.join(os.path.dirname(__file__), '..', 'vendor', 'arrow', 'python')
+        vendor_arrow_path = os.path.abspath(vendor_arrow_path)
+        if os.path.exists(vendor_arrow_path) and vendor_arrow_path not in sys.path:
+            sys.path.insert(0, vendor_arrow_path)
+        
+        # Now import - should get vendored Arrow
         import pyarrow as _pa
         Table = _pa.Table
         RecordBatch = _pa.RecordBatch
@@ -118,6 +136,14 @@ try:
     # Try to import our custom Cython compute module first
     from ._cython.arrow import compute as _cycompute
 
+    # Import SIMD datetime kernels
+    try:
+        from ._cython.arrow import datetime_kernels as _dt_kernels
+        _has_datetime_kernels = True
+    except ImportError as dt_err:
+        logger.debug(f"DateTime kernels not available: {dt_err}")
+        _has_datetime_kernels = False
+
     # Vendored Arrow compute (from our built Arrow)
     import pyarrow.compute as _pc
 
@@ -126,10 +152,22 @@ try:
         """Compute namespace that wraps both custom and vendored Arrow compute functions."""
         def __init__(self):
             self._pc = _pc
-            # Add our custom functions
+            # Add our custom hash functions
             self.hash_array = _cycompute.hash_array
             self.hash_struct = _cycompute.hash_struct
             self.hash_combine = _cycompute.hash_combine
+
+            # Add SIMD datetime kernels if available
+            if _has_datetime_kernels:
+                self.parse_datetime = _dt_kernels.parse_datetime
+                self.format_datetime = _dt_kernels.format_datetime
+                self.parse_flexible = _dt_kernels.parse_flexible
+                self.add_days_simd = _dt_kernels.add_days_simd
+                self.add_business_days = _dt_kernels.add_business_days
+                self.business_days_between = _dt_kernels.business_days_between
+                # Convenient aliases
+                self.date_add = _dt_kernels.date_add
+                self.to_datetime = _dt_kernels.to_datetime
 
         def __getattr__(self, name):
             # Delegate to vendored Arrow compute for standard functions
@@ -187,6 +225,7 @@ array = _pa.array
 scalar = _pa.scalar
 record_batch = _pa.record_batch
 table = _pa.table
+concat_tables = _pa.concat_tables
 
 # IPC and buffers
 ipc = _pa.ipc
@@ -258,7 +297,7 @@ __all__ = [
     'list_', 'struct', 'field', 'schema',
     'timestamp', 'date32', 'date64',
     # Factory functions
-    'array', 'scalar', 'record_batch', 'table',
+    'array', 'scalar', 'record_batch', 'table', 'concat_tables',
     # IPC
     'ipc', 'BufferOutputStream', 'py_buffer',
     # Type class

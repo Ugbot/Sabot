@@ -724,6 +724,10 @@ def build_sabot_extensions(deps, vendor_results, modules):
     arrow_include = str(ARROW_INSTALL / "include")
     arrow_lib = str(ARROW_INSTALL / "lib")
 
+    # Import cross-platform build utilities
+    sys.path.insert(0, str(PROJECT_ROOT))
+    from build_utils import get_compile_args
+
     common_include_dirs = [
         np.get_include(),
         arrow_include,
@@ -740,12 +744,9 @@ def build_sabot_extensions(deps, vendor_results, modules):
     common_library_dirs = [arrow_lib]
     common_libraries = ["arrow", "arrow_flight"]
 
-    common_compile_args = [
-        "-O3",
-        "-std=c++17",
-        "-Wno-unused-function",
-        "-Wno-deprecated-declarations",
-    ]
+    # Get platform-appropriate SIMD compile args (ARM NEON or x86 AVX2)
+    base_args = ["-std=c++17", "-Wno-unused-function", "-Wno-deprecated-declarations"]
+    common_compile_args = get_compile_args(base_args)
 
     # Add rpath for runtime library loading (use @loader_path relative rpath on macOS)
     import sys

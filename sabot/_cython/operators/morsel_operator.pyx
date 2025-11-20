@@ -340,6 +340,25 @@ cdef class MorselDrivenOperator(BaseOperator):
             # No need for asyncio wrapper - that causes triple-threading conflicts
             return self._process_with_local_morsels(batch)
 
+    def __iter__(self):
+        """
+        Iterate over batches from source and process with morsel execution.
+        
+        CRITICAL: Must iterate self._source (from wrapped operator), not assume
+        self._source is set on this wrapper. This enables lazy/streaming sources.
+        """
+        # Get source from wrapped operator
+        source = self._source or getattr(self._wrapped_operator, '_source', None)
+        
+        if source is None:
+            return
+        
+        # Iterate and process each batch
+        for batch in source:
+            result = self.process_batch(batch)
+            if result is not None and result.num_rows > 0:
+                yield result
+
     def get_stats(self):
         """Get morsel processing statistics."""
         stats = {

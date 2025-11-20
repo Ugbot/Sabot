@@ -37,60 +37,51 @@
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/key_value_metadata.h",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/thread_pool.h",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/value_parsing.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/api.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/arrow_to_pandas.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/async.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/benchmark.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/common.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/csv.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/extension_type.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/gdb.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/helpers.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/inference.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/ipc.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/numpy_init.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/platform.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/pyarrow.h",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/udf.h"
+            "vendor/arrow/python/pyarrow/src/arrow/python/api.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/arrow_to_pandas.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/async.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/benchmark.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/common.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/csv.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/extension_type.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/gdb.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/helpers.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/inference.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/ipc.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/numpy_init.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/platform.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/pyarrow.h",
+            "vendor/arrow/python/pyarrow/src/arrow/python/udf.h"
         ],
         "extra_compile_args": [
-            "-O3",
             "-std=c++17",
+            "-O3",
             "-Wno-unused-function",
             "-Wno-deprecated-declarations"
         ],
         "extra_link_args": [
-            "-Wl,-headerpad_max_install_names",
-            "-Wl,-rpath,@loader_path/../../vendor/arrow/cpp/build/install/lib",
-            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib",
-            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/rocksdb/install/lib"
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib"
         ],
         "include_dirs": [
-            "/Users/bengamble/Sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
+            "/opt/homebrew/lib/python3.13/site-packages/numpy/_core/include",
             "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
-            "/Users/bengamble/Sabot/vendor/arrow/python",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow",
-            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src",
-            "/Users/bengamble/Sabot/vendor/duckdb/third_party/concurrentqueue",
-            "/Users/bengamble/Sabot/sabot/_c",
-            "/Users/bengamble/Sabot/sabot/_cython/graph/storage",
-            "/Users/bengamble/Sabot/sabot/_cython/graph/traversal",
-            "/Users/bengamble/Sabot/sabot/_cython/graph/query",
-            "/Users/bengamble/Sabot/vendor/rocksdb/install/include"
+            "vendor/arrow/python",
+            "vendor/arrow/python/pyarrow",
+            "vendor/arrow/python/pyarrow/src",
+            "sabot/_c",
+            "sabot/_cython",
+            "sabot/_cython/operators"
         ],
         "language": "c++",
         "libraries": [
-            "arrow",
-            "arrow_flight",
-            "rocksdb"
+            "arrow"
         ],
         "library_dirs": [
-            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib",
-            "/Users/bengamble/Sabot/vendor/rocksdb/install/lib"
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib"
         ],
         "name": "sabot._cython.operators.joins",
         "sources": [
-            "/Users/bengamble/Sabot/sabot/_cython/operators/joins.pyx"
+            "sabot/_cython/operators/joins.pyx"
         ]
     },
     "module_name": "sabot._cython.operators.joins"
@@ -1632,13 +1623,13 @@ static const char *__pyx_filename;
 
 static const char* const __pyx_f[] = {
   "sabot/_cython/operators/joins.pyx",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/contextvars.pxd",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/datetime.pxd",
+  "cpython/contextvars.pxd",
+  "cpython/datetime.pxd",
   "<stringsource>",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/type.pxd",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/bool.pxd",
-  ".venv/lib/python3.11/site-packages/Cython/Includes/cpython/complex.pxd",
-  ".venv/lib/python3.11/site-packages/pyarrow/lib.pxd",
+  "cpython/type.pxd",
+  "cpython/bool.pxd",
+  "cpython/complex.pxd",
+  "pyarrow/lib.pxd",
   "sabot/_c/arrow_core.pxd",
   "sabot/_cython/operators/base_operator.pxd",
   "sabot/_cython/shuffle/partitioner.pxd",
@@ -1930,6 +1921,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr;
 struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__;
 struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle;
 struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local;
+struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback;
 struct __pyx_opt_args_7cpython_11contextvars_get_value;
 struct __pyx_opt_args_7cpython_11contextvars_get_value_no_default;
 
@@ -3666,7 +3658,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator {
 };
 
 
-/* "sabot/_cython/operators/joins.pyx":42
+/* "sabot/_cython/operators/joins.pyx":51
  * # ============================================================================
  * 
  * @cython.final             # <<<<<<<<<<<<<<
@@ -3686,7 +3678,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder {
 };
 
 
-/* "sabot/_cython/operators/joins.pyx":86
+/* "sabot/_cython/operators/joins.pyx":95
  *             self._schema = batch.schema
  * 
  *     def build_index(self):             # <<<<<<<<<<<<<<
@@ -3700,7 +3692,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_ind
 };
 
 
-/* "sabot/_cython/operators/joins.pyx":107
+/* "sabot/_cython/operators/joins.pyx":116
  *         for i in range(self._total_rows):
  *             # Create key tuple from all key columns
  *             key = tuple(key_lists[j][i] for j in range(len(self._key_columns)))             # <<<<<<<<<<<<<<
@@ -3718,7 +3710,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr 
 };
 
 
-/* "sabot/_cython/operators/joins.pyx":116
+/* "sabot/_cython/operators/joins.pyx":125
  *         self._is_built = True
  * 
  *     def probe_batch_vectorized(self, object left_batch, list left_keys, str join_type):             # <<<<<<<<<<<<<<
@@ -3732,7 +3724,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_ba
 };
 
 
-/* "sabot/_cython/operators/joins.pyx":147
+/* "sabot/_cython/operators/joins.pyx":156
  *         for i in range(left_batch.num_rows):
  *             # Create probe key
  *             probe_key = tuple(left_key_lists[j][i] for j in range(len(left_keys)))             # <<<<<<<<<<<<<<
@@ -3750,7 +3742,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr 
 };
 
 
-/* "sabot/_cython/operators/joins.pyx":169
+/* "sabot/_cython/operators/joins.pyx":178
  * 
  *         # Handle right side selection
  *         if any(idx is None for idx in right_indices):             # <<<<<<<<<<<<<<
@@ -3764,7 +3756,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr 
 };
 
 
-/* "sabot/_cython/operators/joins.pyx":346
+/* "sabot/_cython/operators/joins.pyx":360
  *             raise ValueError(f"Invalid join type: {join_type}")
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -3777,7 +3769,7 @@ struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__
 };
 
 
-/* "sabot/_cython/operators/joins.pyx":366
+/* "sabot/_cython/operators/joins.pyx":380
  *             yield from self._execute_local()
  * 
  *     def _execute_with_shuffle(self):             # <<<<<<<<<<<<<<
@@ -3796,14 +3788,37 @@ struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute
 };
 
 
-/* "sabot/_cython/operators/joins.pyx":382
+/* "sabot/_cython/operators/joins.pyx":396
  *                 yield result
  * 
  *     def _execute_local(self):             # <<<<<<<<<<<<<<
- *         """Execute join locally (current logic)."""
- *         # Build phase
+ *         """
+ *         Execute join locally using zero-copy hash_join from sabot_ql.
 */
 struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local {
+  PyObject_HEAD
+  PyObject *__pyx_v_arrow_join_type;
+  PyObject *__pyx_v_batch;
+  PyObject *__pyx_v_left_batches;
+  PyObject *__pyx_v_left_table;
+  PyObject *__pyx_v_result_table;
+  PyObject *__pyx_v_right_batches;
+  PyObject *__pyx_v_right_table;
+  struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self;
+  Py_ssize_t __pyx_t_0;
+  PyObject *(*__pyx_t_1)(PyObject *);
+  PyObject *__pyx_t_2;
+};
+
+
+/* "sabot/_cython/operators/joins.pyx":454
+ *             yield batch
+ * 
+ *     def _execute_local_fallback(self):             # <<<<<<<<<<<<<<
+ *         """
+ *         Fallback implementation using StreamingHashTableBuilder.
+*/
+struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback {
   PyObject_HEAD
   PyObject *__pyx_v_left_batch;
   PyObject *__pyx_v_result;
@@ -5270,7 +5285,7 @@ struct __pyx_vtabstruct_5sabot_7_cython_9operators_17shuffled_operator_ShuffledO
 static struct __pyx_vtabstruct_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator *__pyx_vtabptr_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator;
 
 
-/* "sabot/_cython/operators/joins.pyx":276
+/* "sabot/_cython/operators/joins.pyx":285
  * # ============================================================================
  * 
  * @cython.final             # <<<<<<<<<<<<<<
@@ -5284,7 +5299,7 @@ struct __pyx_vtabstruct_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator
 static struct __pyx_vtabstruct_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_vtabptr_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator;
 
 
-/* "sabot/_cython/operators/joins.pyx":450
+/* "sabot/_cython/operators/joins.pyx":527
  * # ============================================================================
  * 
  * @cython.final             # <<<<<<<<<<<<<<
@@ -5298,7 +5313,7 @@ struct __pyx_vtabstruct_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOper
 static struct __pyx_vtabstruct_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator *__pyx_vtabptr_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator;
 
 
-/* "sabot/_cython/operators/joins.pyx":551
+/* "sabot/_cython/operators/joins.pyx":628
  * # ============================================================================
  * 
  * @cython.final             # <<<<<<<<<<<<<<
@@ -5312,7 +5327,7 @@ struct __pyx_vtabstruct_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator
 static struct __pyx_vtabstruct_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator *__pyx_vtabptr_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator;
 
 
-/* "sabot/_cython/operators/joins.pyx":42
+/* "sabot/_cython/operators/joins.pyx":51
  * # ============================================================================
  * 
  * @cython.final             # <<<<<<<<<<<<<<
@@ -6302,10 +6317,6 @@ static int __Pyx_setup_reduce(PyObject* type_obj);
 /* ListPack.proto */
 static PyObject *__Pyx_PyList_Pack(Py_ssize_t n, ...);
 
-/* ImportDottedModule.proto */
-static PyObject *__Pyx_ImportDottedModule(PyObject *name, PyObject *parts_tuple);
-static PyObject *__Pyx_ImportDottedModule_WalkParts(PyObject *module, PyObject *name, PyObject *parts_tuple);
-
 /* CLineInTraceback.proto */
 #if CYTHON_CLINE_IN_TRACEBACK && CYTHON_CLINE_IN_TRACEBACK_RUNTIME
 static int __Pyx_CLineForTraceback(PyThreadState *tstate, int c_line);
@@ -6669,7 +6680,6 @@ int __pyx_module_is_main_sabot___cython__operators__joins = 0;
 static PyObject *__pyx_builtin_ImportError;
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_enumerate;
-static PyObject *__pyx_builtin_super;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_RuntimeError;
 static PyObject *__pyx_builtin_reversed;
@@ -6706,7 +6716,6 @@ static const char __pyx_k_List[] = "List";
 static const char __pyx_k_Qm_3[] = "\200\001\360\006\000\005\014\320\013%\240Q\240m\260>\300\021\330&3\260?\300!";
 static const char __pyx_k_dict[] = "__dict__";
 static const char __pyx_k_func[] = "__func__";
-static const char __pyx_k_init[] = "__init__";
 static const char __pyx_k_iter[] = "__iter__";
 static const char __pyx_k_keys[] = "keys";
 static const char __pyx_k_left[] = "left";
@@ -6716,7 +6725,6 @@ static const char __pyx_k_next[] = "next";
 static const char __pyx_k_self[] = "self";
 static const char __pyx_k_send[] = "send";
 static const char __pyx_k_sort[] = "sort";
-static const char __pyx_k_spec[] = "__spec__";
 static const char __pyx_k_take[] = "take";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_type[] = "type";
@@ -6733,8 +6741,8 @@ static const char __pyx_k_nulls[] = "nulls";
 static const char __pyx_k_outer[] = "outer";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_right[] = "_right";
+static const char __pyx_k_sabot[] = "sabot";
 static const char __pyx_k_state[] = "state";
-static const char __pyx_k_super[] = "super";
 static const char __pyx_k_throw[] = "throw";
 static const char __pyx_k_times[] = "times";
 static const char __pyx_k_value[] = "value";
@@ -6750,15 +6758,14 @@ static const char __pyx_k_pickle[] = "pickle";
 static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_result[] = "result";
 static const char __pyx_k_schema[] = "schema";
-static const char __pyx_k_source[] = "source";
 static const char __pyx_k_typing[] = "typing";
 static const char __pyx_k_update[] = "update";
 static const char __pyx_k_batches[] = "batches";
 static const char __pyx_k_compute[] = "compute";
+static const char __pyx_k_cyarrow[] = "cyarrow";
 static const char __pyx_k_disable[] = "disable";
 static const char __pyx_k_forward[] = "forward";
 static const char __pyx_k_genexpr[] = "genexpr";
-static const char __pyx_k_pyarrow[] = "pyarrow";
 static const char __pyx_k_right_2[] = "right";
 static const char __pyx_k_Optional[] = "Optional";
 static const char __pyx_k_add_note[] = "add_note";
@@ -6776,6 +6783,7 @@ static const char __pyx_k_setstate[] = "__setstate__";
 static const char __pyx_k_add_batch[] = "add_batch";
 static const char __pyx_k_direction[] = "direction";
 static const char __pyx_k_enumerate[] = "enumerate";
+static const char __pyx_k_hash_join[] = "hash_join";
 static const char __pyx_k_isenabled[] = "isenabled";
 static const char __pyx_k_join_type[] = "join_type";
 static const char __pyx_k_key_lists[] = "key_lists";
@@ -6790,8 +6798,10 @@ static const char __pyx_k_timestamp[] = "timestamp";
 static const char __pyx_k_to_pylist[] = "to_pylist";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_best_match[] = "best_match";
+static const char __pyx_k_full_outer[] = "full outer";
 static const char __pyx_k_joined_row[] = "joined_row";
 static const char __pyx_k_left_batch[] = "left_batch";
+static const char __pyx_k_left_table[] = "left_table";
 static const char __pyx_k_left_times[] = "left_times";
 static const char __pyx_k_pyx_result[] = "__pyx_result";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
@@ -6811,14 +6821,16 @@ static const char __pyx_k_left_source[] = "left_source";
 static const char __pyx_k_lower_bound[] = "lower_bound";
 static const char __pyx_k_output_rows[] = "output_rows";
 static const char __pyx_k_right_batch[] = "right_batch";
+static const char __pyx_k_right_table[] = "right_table";
 static const char __pyx_k_time_column[] = "time_column";
 static const char __pyx_k_upper_bound[] = "upper_bound";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
 static const char __pyx_k_from_batches[] = "from_batches";
-static const char __pyx_k_initializing[] = "_initializing";
 static const char __pyx_k_is_coroutine[] = "_is_coroutine";
+static const char __pyx_k_left_batches[] = "left_batches";
 static const char __pyx_k_left_indices[] = "left_indices";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
+static const char __pyx_k_result_table[] = "result_table";
 static const char __pyx_k_right_source[] = "right_source";
 static const char __pyx_k_sample_right[] = "sample_right";
 static const char __pyx_k_stringsource[] = "<stringsource>";
@@ -6828,14 +6840,13 @@ static const char __pyx_k_execute_local[] = "_execute_local";
 static const char __pyx_k_left_selected[] = "left_selected";
 static const char __pyx_k_process_batch[] = "process_batch";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
+static const char __pyx_k_right_batches[] = "right_batches";
 static const char __pyx_k_right_indices[] = "right_indices";
 static const char __pyx_k_left_key_lists[] = "left_key_lists";
-static const char __pyx_k_num_partitions[] = "num_partitions";
-static const char __pyx_k_partition_keys[] = "partition_keys";
 static const char __pyx_k_right_selected[] = "right_selected";
 static const char __pyx_k_ARROW_AVAILABLE[] = "ARROW_AVAILABLE";
+static const char __pyx_k_arrow_join_type[] = "arrow_join_type";
 static const char __pyx_k_left_shuffle_id[] = "left_shuffle_id";
-static const char __pyx_k_pyarrow_compute[] = "pyarrow.compute";
 static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_A_4_3a_1_m2Q_A_q[] = "\200A\360\016\000\t\014\2104\320\017#\2403\240a\330\014\023\2201\360\006\000\t\033\230$\230m\2502\250Q\360\006\000\t\023\220$\320\026)\320)<\270A\330\014\r\330\014\020\220\001\360\006\000\t\020\210q";
@@ -6848,11 +6859,13 @@ static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_hk_A_1_7_8_9RR_a_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"|\005\360\000\000|\005~\005\360\000\000~\005\177\005\330\004\023\320\023)\250\030\260\021\260!\330\004\007\200|\2207\230!\330\0108\270\001\3209R\320R`\320`a\330\004\013\2101";
 static const char __pyx_k_receive_partitions[] = "receive_partitions";
 static const char __pyx_k_Error_in_as_of_join[] = "Error in as-of join: ";
+static const char __pyx_k_HASH_JOIN_AVAILABLE[] = "HASH_JOIN_AVAILABLE";
 static const char __pyx_k_execute_with_shuffle[] = "_execute_with_shuffle";
 static const char __pyx_k_receive_left_shuffled[] = "_receive_left_shuffled";
 static const char __pyx_k_CythonAsofJoinOperator[] = "CythonAsofJoinOperator";
 static const char __pyx_k_CythonHashJoinOperator[] = "CythonHashJoinOperator";
 static const char __pyx_k_Error_in_interval_join[] = "Error in interval join: ";
+static const char __pyx_k_execute_local_fallback[] = "_execute_local_fallback";
 static const char __pyx_k_probe_batch_vectorized[] = "probe_batch_vectorized";
 static const char __pyx_k_receive_right_shuffled[] = "_receive_right_shuffled";
 static const char __pyx_k_StreamingHashTableBuilder[] = "StreamingHashTableBuilder";
@@ -6898,9 +6911,11 @@ static const char __pyx_k_StreamingHashTableBuilder___redu[] = "StreamingHashTab
 static const char __pyx_k_StreamingHashTableBuilder___sets[] = "StreamingHashTableBuilder.__setstate_cython__";
 static const char __pyx_k_StreamingHashTableBuilder_add_ba[] = "StreamingHashTableBuilder.add_batch";
 static const char __pyx_k_probe_batch_vectorized_locals_ge[] = "probe_batch_vectorized.<locals>.genexpr";
+static const char __pyx_k_sabot__cython_joins_ql_hash_join[] = "sabot._cython.joins_ql.hash_join";
 static const char __pyx_k_sabot__cython_operators_joins_py[] = "sabot/_cython/operators/joins.pyx";
 static const char __pyx_k_A_4_s_5_5_Q_1_t4q_O4q_3a_Kwat_1_2[] = "\200A\360\010\000\t\014\2104\320\017\037\230s\240&\250\003\2505\260\003\2605\270\n\300#\300Q\330\014\023\2201\340\010\t\340\014\017\210t\2204\220q\330\020\024\220O\2404\240q\330\024\027\220|\2403\240a\330\030\031\340\024\034\230K\240w\250a\250t\260>\300\032\3101\330\024\030\230\005\230U\240!\240;\250a\330\030$\240E\250\021\250!\330\030\036\230a\230u\240K\250w\260a\260t\2701\270B\270f\300A\330\037#\2407\250+\260W\270A\330\030\034\230N\250'\260\022\260;\270a\360\006\000\021\025\220N\240%\240q\250\004\250A\360\006\000\r\032\230\025\230g\240Q\240d\250.\270\n\300!\330\014\032\230!\340\014\020\220\005\220U\230!\2305\240\001\330\020\034\230J\240a\240q\330\020\033\2301\230E\240\025\240g\250Q\250d\260!\2602\260V\2703\270d\300'\310\025\310g\320UV\360\006\000\021\036\230Q\340\020\023\2204\220|\2403\240a\340\024\030\230\013\240=\260\010\270\001\270\024\270Q\330\030\033\230:\240S\250\001\330\034)\250\021\330\034\035\360\006\000\025\031\230\013\240=\260\004\260A\330\030\033\230:\240S\250\001\330\034)\250\021\330\034\035\360\006\000\021\024\2201\330\024!\240\023\240L\260\001\330\024\037\230w\240a\240q\360\006\000\025\"\240\023\240A\330\024\027\220t\2301\330\030'\240t\250>\270\021\270\"\270A\270Q\330\030\034\230G\240<\250u\260A\330\034\037\230t\2407\250!\330 *\250!\2507\260!\330\024\037\230w\240a\240q\340\014\017\210q\330\020\027\220r\230\034\240\\\260\021\260!\340\020\027\220q\340\010\017\210}\230A\330\014\022\220,\230a\230r\320!:\270!";
 static const char __pyx_k_CythonHashJoinOperator__execute_2[] = "CythonHashJoinOperator._execute_local";
+static const char __pyx_k_CythonHashJoinOperator__execute_3[] = "CythonHashJoinOperator._execute_local_fallback";
 static const char __pyx_k_CythonHashJoinOperator__receive_2[] = "CythonHashJoinOperator._receive_left_shuffled";
 static const char __pyx_k_Incompatible_checksums_0x_x_vs_0_2[] = "Incompatible checksums (0x%x vs (0xa031553, 0xdfd98c4, 0x0e11619) = (_hash_builder, _join_type, _key_columns, _left_keys, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_keys, _right_source, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, operator_id, parallelism))";
 static const char __pyx_k_Incompatible_checksums_0x_x_vs_0_3[] = "Incompatible checksums (0x%x vs (0x3fc2c20, 0xe5ae6a7, 0x6fdda79) = (_key_columns, _lower_bound, _morsel_size_kb, _num_partitions, _parallelism_hint, _partition_keys, _partitioner, _right_source, _rocksdb_timers, _schema, _shuffle_id, _shuffle_transport, _source, _stateful, _stateful, _task_id, _time_column, _time_indexed_state, _upper_bound, operator_id, parallelism))";
@@ -6919,10 +6934,11 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator__
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_2__iter__(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_5_execute_with_shuffle(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_8_execute_local(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_11_receive_right_shuffled(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_13_receive_left_shuffled(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_15__reduce_cython__(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_17__setstate_cython__(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_11_execute_local_fallback(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_14_receive_right_shuffled(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_16_receive_left_shuffled(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_18__reduce_cython__(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_20__setstate_cython__(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator___init__(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator *__pyx_v_self, PyObject *__pyx_v_left_source, PyObject *__pyx_v_right_source, PyObject *__pyx_v_time_column, PyObject *__pyx_v_lower_bound, PyObject *__pyx_v_upper_bound, PyObject *__pyx_v_schema); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator_2process_batch(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator *__pyx_v_self, PyObject *__pyx_v_batch); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator_4__reduce_cython__(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator *__pyx_v_self); /* proto */
@@ -6951,6 +6967,7 @@ static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_5joins___pyx_scope_stru
 static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 /* #### Code section: late_includes ### */
 /* #### Code section: module_state ### */
 /* SmallCodeConfig */
@@ -7119,6 +7136,7 @@ typedef struct {
   PyObject *__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__;
   PyObject *__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle;
   PyObject *__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local;
+  PyObject *__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback;
   PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator;
   PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator;
   PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator;
@@ -7131,15 +7149,15 @@ typedef struct {
   PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__;
   PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle;
   PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local;
+  PyTypeObject *__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_get;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
   __Pyx_CachedCFunction __pyx_umethod_PyUnicode_Type__lower;
-  PyObject *__pyx_tuple[7];
-  PyObject *__pyx_codeobj_tab[29];
-  PyObject *__pyx_string_tab[205];
+  PyObject *__pyx_tuple[6];
+  PyObject *__pyx_codeobj_tab[30];
+  PyObject *__pyx_string_tab[210];
   PyObject *__pyx_int_0;
   PyObject *__pyx_int_1;
-  PyObject *__pyx_int_4;
   PyObject *__pyx_int_14751257;
   PyObject *__pyx_int_39422562;
   PyObject *__pyx_int_66858016;
@@ -7206,6 +7224,11 @@ int __pyx_freecount_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__exec
 struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local *__pyx_freelist_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local[8];
 int __pyx_freecount_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local;
 #endif
+
+#if CYTHON_USE_FREELISTS
+struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback *__pyx_freelist_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback[8];
+int __pyx_freecount_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback;
+#endif
 /* CodeObjectCache.module_state_decls */
 struct __Pyx_CodeObjectCache __pyx_code_cache;
 
@@ -7247,198 +7270,203 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_CythonHashJoinOperator___setstat __pyx_string_tab[10]
 #define __pyx_n_u_CythonHashJoinOperator__execute __pyx_string_tab[11]
 #define __pyx_n_u_CythonHashJoinOperator__execute_2 __pyx_string_tab[12]
-#define __pyx_n_u_CythonHashJoinOperator__receive __pyx_string_tab[13]
-#define __pyx_n_u_CythonHashJoinOperator__receive_2 __pyx_string_tab[14]
-#define __pyx_n_u_CythonIntervalJoinOperator __pyx_string_tab[15]
-#define __pyx_n_u_CythonIntervalJoinOperator___red __pyx_string_tab[16]
-#define __pyx_n_u_CythonIntervalJoinOperator___set __pyx_string_tab[17]
-#define __pyx_n_u_CythonIntervalJoinOperator_proce __pyx_string_tab[18]
-#define __pyx_n_u_Dict __pyx_string_tab[19]
-#define __pyx_kp_u_Error_in_as_of_join __pyx_string_tab[20]
-#define __pyx_kp_u_Error_in_interval_join __pyx_string_tab[21]
-#define __pyx_n_u_ImportError __pyx_string_tab[22]
-#define __pyx_kp_u_Incompatible_checksums_0x_x_vs_0 __pyx_string_tab[23]
-#define __pyx_kp_u_Incompatible_checksums_0x_x_vs_0_2 __pyx_string_tab[24]
-#define __pyx_kp_u_Incompatible_checksums_0x_x_vs_0_3 __pyx_string_tab[25]
-#define __pyx_kp_u_Incompatible_checksums_0x_x_vs_0_4 __pyx_string_tab[26]
-#define __pyx_kp_u_Invalid_direction __pyx_string_tab[27]
-#define __pyx_kp_u_Invalid_join_type __pyx_string_tab[28]
-#define __pyx_n_u_List __pyx_string_tab[29]
-#define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[30]
-#define __pyx_n_u_Optional __pyx_string_tab[31]
-#define __pyx_n_u_PickleError __pyx_string_tab[32]
-#define __pyx_n_u_RecordBatch __pyx_string_tab[33]
-#define __pyx_n_u_RuntimeError __pyx_string_tab[34]
-#define __pyx_n_u_StreamingHashTableBuilder __pyx_string_tab[35]
-#define __pyx_n_u_StreamingHashTableBuilder___redu __pyx_string_tab[36]
-#define __pyx_n_u_StreamingHashTableBuilder___sets __pyx_string_tab[37]
-#define __pyx_n_u_StreamingHashTableBuilder_add_ba __pyx_string_tab[38]
-#define __pyx_n_u_StreamingHashTableBuilder_build __pyx_string_tab[39]
-#define __pyx_n_u_StreamingHashTableBuilder_probe __pyx_string_tab[40]
-#define __pyx_n_u_Table __pyx_string_tab[41]
-#define __pyx_n_u_ValueError __pyx_string_tab[42]
-#define __pyx_kp_u__2 __pyx_string_tab[43]
-#define __pyx_n_u_add_batch __pyx_string_tab[44]
-#define __pyx_kp_u_add_note __pyx_string_tab[45]
-#define __pyx_n_u_append __pyx_string_tab[46]
-#define __pyx_n_u_array __pyx_string_tab[47]
-#define __pyx_n_u_as_py __pyx_string_tab[48]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[49]
-#define __pyx_n_u_backward __pyx_string_tab[50]
-#define __pyx_n_u_batch __pyx_string_tab[51]
-#define __pyx_n_u_batches __pyx_string_tab[52]
-#define __pyx_n_u_best_match __pyx_string_tab[53]
-#define __pyx_n_u_build_index __pyx_string_tab[54]
-#define __pyx_n_u_build_index_locals_genexpr __pyx_string_tab[55]
-#define __pyx_n_u_class_getitem __pyx_string_tab[56]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[57]
-#define __pyx_n_u_close __pyx_string_tab[58]
-#define __pyx_n_u_col __pyx_string_tab[59]
-#define __pyx_n_u_collections __pyx_string_tab[60]
-#define __pyx_n_u_column __pyx_string_tab[61]
-#define __pyx_n_u_compute __pyx_string_tab[62]
-#define __pyx_n_u_create_asof_join_operator __pyx_string_tab[63]
-#define __pyx_n_u_create_hash_join_operator __pyx_string_tab[64]
-#define __pyx_n_u_create_interval_join_operator __pyx_string_tab[65]
-#define __pyx_n_u_defaultdict __pyx_string_tab[66]
-#define __pyx_n_u_dict __pyx_string_tab[67]
-#define __pyx_n_u_dict_2 __pyx_string_tab[68]
-#define __pyx_n_u_direction __pyx_string_tab[69]
-#define __pyx_kp_u_disable __pyx_string_tab[70]
-#define __pyx_n_u_e __pyx_string_tab[71]
-#define __pyx_kp_u_enable __pyx_string_tab[72]
-#define __pyx_n_u_enumerate __pyx_string_tab[73]
-#define __pyx_n_u_execute_local __pyx_string_tab[74]
-#define __pyx_n_u_execute_with_shuffle __pyx_string_tab[75]
-#define __pyx_n_u_forward __pyx_string_tab[76]
-#define __pyx_n_u_from_arrays __pyx_string_tab[77]
-#define __pyx_n_u_from_batches __pyx_string_tab[78]
-#define __pyx_n_u_from_pylist __pyx_string_tab[79]
-#define __pyx_n_u_func __pyx_string_tab[80]
-#define __pyx_kp_u_gc __pyx_string_tab[81]
-#define __pyx_n_u_genexpr __pyx_string_tab[82]
-#define __pyx_n_u_get __pyx_string_tab[83]
-#define __pyx_n_u_getstate __pyx_string_tab[84]
-#define __pyx_n_u_i __pyx_string_tab[85]
-#define __pyx_n_u_idx __pyx_string_tab[86]
-#define __pyx_n_u_init __pyx_string_tab[87]
-#define __pyx_n_u_initializing __pyx_string_tab[88]
-#define __pyx_n_u_inner __pyx_string_tab[89]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[90]
-#define __pyx_kp_u_isenabled __pyx_string_tab[91]
-#define __pyx_n_u_items __pyx_string_tab[92]
-#define __pyx_n_u_iter __pyx_string_tab[93]
-#define __pyx_n_u_j __pyx_string_tab[94]
-#define __pyx_n_u_join_type __pyx_string_tab[95]
-#define __pyx_n_u_joined_row __pyx_string_tab[96]
-#define __pyx_n_u_key __pyx_string_tab[97]
-#define __pyx_n_u_key_columns __pyx_string_tab[98]
-#define __pyx_n_u_key_lists __pyx_string_tab[99]
-#define __pyx_n_u_keys __pyx_string_tab[100]
-#define __pyx_n_u_kwargs __pyx_string_tab[101]
-#define __pyx_n_u_lambda __pyx_string_tab[102]
-#define __pyx_n_u_left __pyx_string_tab[103]
-#define __pyx_n_b_left_2 __pyx_string_tab[104]
-#define __pyx_n_u_left_batch __pyx_string_tab[105]
-#define __pyx_n_u_left_indices __pyx_string_tab[106]
-#define __pyx_n_u_left_key_lists __pyx_string_tab[107]
-#define __pyx_n_u_left_keys __pyx_string_tab[108]
-#define __pyx_n_u_left_row __pyx_string_tab[109]
-#define __pyx_n_u_left_selected __pyx_string_tab[110]
-#define __pyx_n_u_left_shuffle_id __pyx_string_tab[111]
-#define __pyx_n_u_left_source __pyx_string_tab[112]
-#define __pyx_n_u_left_time __pyx_string_tab[113]
-#define __pyx_n_u_left_times __pyx_string_tab[114]
-#define __pyx_n_u_lower __pyx_string_tab[115]
-#define __pyx_n_u_lower_bound __pyx_string_tab[116]
-#define __pyx_n_u_main __pyx_string_tab[117]
-#define __pyx_n_u_max_time __pyx_string_tab[118]
-#define __pyx_n_u_min_time __pyx_string_tab[119]
-#define __pyx_n_u_module __pyx_string_tab[120]
-#define __pyx_n_u_name __pyx_string_tab[121]
-#define __pyx_n_u_names __pyx_string_tab[122]
-#define __pyx_n_u_new __pyx_string_tab[123]
-#define __pyx_n_u_next __pyx_string_tab[124]
-#define __pyx_n_u_nulls __pyx_string_tab[125]
-#define __pyx_n_u_num_partitions __pyx_string_tab[126]
-#define __pyx_n_u_num_rows __pyx_string_tab[127]
-#define __pyx_n_u_outer __pyx_string_tab[128]
-#define __pyx_n_u_output_rows __pyx_string_tab[129]
-#define __pyx_n_u_pa __pyx_string_tab[130]
-#define __pyx_n_u_partition_keys __pyx_string_tab[131]
-#define __pyx_n_u_pc __pyx_string_tab[132]
-#define __pyx_n_u_pickle __pyx_string_tab[133]
-#define __pyx_n_u_pop __pyx_string_tab[134]
-#define __pyx_n_u_probe_batch_vectorized __pyx_string_tab[135]
-#define __pyx_n_u_probe_batch_vectorized_locals_ge __pyx_string_tab[136]
-#define __pyx_n_u_probe_key __pyx_string_tab[137]
-#define __pyx_n_u_process_batch __pyx_string_tab[138]
-#define __pyx_n_u_process_batch_locals_lambda __pyx_string_tab[139]
-#define __pyx_n_u_pyarrow __pyx_string_tab[140]
-#define __pyx_n_u_pyarrow_compute __pyx_string_tab[141]
-#define __pyx_n_u_pyx_PickleError __pyx_string_tab[142]
-#define __pyx_n_u_pyx_checksum __pyx_string_tab[143]
-#define __pyx_n_u_pyx_result __pyx_string_tab[144]
-#define __pyx_n_u_pyx_state __pyx_string_tab[145]
-#define __pyx_n_u_pyx_type __pyx_string_tab[146]
-#define __pyx_n_u_pyx_unpickle_CythonAsofJoinOpe __pyx_string_tab[147]
-#define __pyx_n_u_pyx_unpickle_CythonHashJoinOpe __pyx_string_tab[148]
-#define __pyx_n_u_pyx_unpickle_CythonIntervalJoi __pyx_string_tab[149]
-#define __pyx_n_u_pyx_unpickle_StreamingHashTabl __pyx_string_tab[150]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[151]
-#define __pyx_n_u_qualname __pyx_string_tab[152]
-#define __pyx_n_u_range __pyx_string_tab[153]
-#define __pyx_n_u_receive_left_shuffled __pyx_string_tab[154]
-#define __pyx_n_u_receive_partitions __pyx_string_tab[155]
-#define __pyx_n_u_receive_right_shuffled __pyx_string_tab[156]
-#define __pyx_n_u_reduce __pyx_string_tab[157]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[158]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[159]
-#define __pyx_n_u_result __pyx_string_tab[160]
-#define __pyx_n_u_reversed __pyx_string_tab[161]
-#define __pyx_n_b_right __pyx_string_tab[162]
-#define __pyx_n_u_right __pyx_string_tab[163]
-#define __pyx_n_u_right_2 __pyx_string_tab[164]
-#define __pyx_n_u_right_batch __pyx_string_tab[165]
-#define __pyx_n_u_right_idx __pyx_string_tab[166]
-#define __pyx_n_u_right_indices __pyx_string_tab[167]
-#define __pyx_n_u_right_keys __pyx_string_tab[168]
-#define __pyx_n_u_right_row __pyx_string_tab[169]
-#define __pyx_n_u_right_rows __pyx_string_tab[170]
-#define __pyx_n_u_right_selected __pyx_string_tab[171]
-#define __pyx_n_u_right_shuffle_id __pyx_string_tab[172]
-#define __pyx_n_u_right_source __pyx_string_tab[173]
-#define __pyx_n_u_row __pyx_string_tab[174]
-#define __pyx_n_u_sabot__cython_operators_joins __pyx_string_tab[175]
-#define __pyx_kp_u_sabot__cython_operators_joins_py __pyx_string_tab[176]
-#define __pyx_n_u_sample_right __pyx_string_tab[177]
-#define __pyx_n_u_schema __pyx_string_tab[178]
-#define __pyx_n_u_self __pyx_string_tab[179]
-#define __pyx_n_u_send __pyx_string_tab[180]
-#define __pyx_n_u_set_name __pyx_string_tab[181]
-#define __pyx_n_u_setstate __pyx_string_tab[182]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[183]
-#define __pyx_n_u_sort __pyx_string_tab[184]
-#define __pyx_n_u_source __pyx_string_tab[185]
-#define __pyx_n_u_spec __pyx_string_tab[186]
-#define __pyx_n_u_state __pyx_string_tab[187]
-#define __pyx_kp_u_stringsource __pyx_string_tab[188]
-#define __pyx_n_u_super __pyx_string_tab[189]
-#define __pyx_n_u_take __pyx_string_tab[190]
-#define __pyx_n_u_test __pyx_string_tab[191]
-#define __pyx_n_u_throw __pyx_string_tab[192]
-#define __pyx_n_u_time_column __pyx_string_tab[193]
-#define __pyx_n_u_times __pyx_string_tab[194]
-#define __pyx_n_u_timestamp __pyx_string_tab[195]
-#define __pyx_n_u_to_batches __pyx_string_tab[196]
-#define __pyx_n_u_to_pylist __pyx_string_tab[197]
-#define __pyx_n_u_type __pyx_string_tab[198]
-#define __pyx_n_u_typing __pyx_string_tab[199]
-#define __pyx_n_u_update __pyx_string_tab[200]
-#define __pyx_n_u_upper_bound __pyx_string_tab[201]
-#define __pyx_n_u_use_setstate __pyx_string_tab[202]
-#define __pyx_n_u_value __pyx_string_tab[203]
-#define __pyx_n_u_x __pyx_string_tab[204]
+#define __pyx_n_u_CythonHashJoinOperator__execute_3 __pyx_string_tab[13]
+#define __pyx_n_u_CythonHashJoinOperator__receive __pyx_string_tab[14]
+#define __pyx_n_u_CythonHashJoinOperator__receive_2 __pyx_string_tab[15]
+#define __pyx_n_u_CythonIntervalJoinOperator __pyx_string_tab[16]
+#define __pyx_n_u_CythonIntervalJoinOperator___red __pyx_string_tab[17]
+#define __pyx_n_u_CythonIntervalJoinOperator___set __pyx_string_tab[18]
+#define __pyx_n_u_CythonIntervalJoinOperator_proce __pyx_string_tab[19]
+#define __pyx_n_u_Dict __pyx_string_tab[20]
+#define __pyx_kp_u_Error_in_as_of_join __pyx_string_tab[21]
+#define __pyx_kp_u_Error_in_interval_join __pyx_string_tab[22]
+#define __pyx_n_u_HASH_JOIN_AVAILABLE __pyx_string_tab[23]
+#define __pyx_n_u_ImportError __pyx_string_tab[24]
+#define __pyx_kp_u_Incompatible_checksums_0x_x_vs_0 __pyx_string_tab[25]
+#define __pyx_kp_u_Incompatible_checksums_0x_x_vs_0_2 __pyx_string_tab[26]
+#define __pyx_kp_u_Incompatible_checksums_0x_x_vs_0_3 __pyx_string_tab[27]
+#define __pyx_kp_u_Incompatible_checksums_0x_x_vs_0_4 __pyx_string_tab[28]
+#define __pyx_kp_u_Invalid_direction __pyx_string_tab[29]
+#define __pyx_kp_u_Invalid_join_type __pyx_string_tab[30]
+#define __pyx_n_u_List __pyx_string_tab[31]
+#define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[32]
+#define __pyx_n_u_Optional __pyx_string_tab[33]
+#define __pyx_n_u_PickleError __pyx_string_tab[34]
+#define __pyx_n_u_RecordBatch __pyx_string_tab[35]
+#define __pyx_n_u_RuntimeError __pyx_string_tab[36]
+#define __pyx_n_u_StreamingHashTableBuilder __pyx_string_tab[37]
+#define __pyx_n_u_StreamingHashTableBuilder___redu __pyx_string_tab[38]
+#define __pyx_n_u_StreamingHashTableBuilder___sets __pyx_string_tab[39]
+#define __pyx_n_u_StreamingHashTableBuilder_add_ba __pyx_string_tab[40]
+#define __pyx_n_u_StreamingHashTableBuilder_build __pyx_string_tab[41]
+#define __pyx_n_u_StreamingHashTableBuilder_probe __pyx_string_tab[42]
+#define __pyx_n_u_Table __pyx_string_tab[43]
+#define __pyx_n_u_ValueError __pyx_string_tab[44]
+#define __pyx_kp_u__2 __pyx_string_tab[45]
+#define __pyx_n_u_add_batch __pyx_string_tab[46]
+#define __pyx_kp_u_add_note __pyx_string_tab[47]
+#define __pyx_n_u_append __pyx_string_tab[48]
+#define __pyx_n_u_array __pyx_string_tab[49]
+#define __pyx_n_u_arrow_join_type __pyx_string_tab[50]
+#define __pyx_n_u_as_py __pyx_string_tab[51]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[52]
+#define __pyx_n_u_backward __pyx_string_tab[53]
+#define __pyx_n_u_batch __pyx_string_tab[54]
+#define __pyx_n_u_batches __pyx_string_tab[55]
+#define __pyx_n_u_best_match __pyx_string_tab[56]
+#define __pyx_n_u_build_index __pyx_string_tab[57]
+#define __pyx_n_u_build_index_locals_genexpr __pyx_string_tab[58]
+#define __pyx_n_u_class_getitem __pyx_string_tab[59]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[60]
+#define __pyx_n_u_close __pyx_string_tab[61]
+#define __pyx_n_u_col __pyx_string_tab[62]
+#define __pyx_n_u_collections __pyx_string_tab[63]
+#define __pyx_n_u_column __pyx_string_tab[64]
+#define __pyx_n_u_compute __pyx_string_tab[65]
+#define __pyx_n_u_create_asof_join_operator __pyx_string_tab[66]
+#define __pyx_n_u_create_hash_join_operator __pyx_string_tab[67]
+#define __pyx_n_u_create_interval_join_operator __pyx_string_tab[68]
+#define __pyx_n_u_cyarrow __pyx_string_tab[69]
+#define __pyx_n_u_defaultdict __pyx_string_tab[70]
+#define __pyx_n_u_dict __pyx_string_tab[71]
+#define __pyx_n_u_dict_2 __pyx_string_tab[72]
+#define __pyx_n_u_direction __pyx_string_tab[73]
+#define __pyx_kp_u_disable __pyx_string_tab[74]
+#define __pyx_n_u_e __pyx_string_tab[75]
+#define __pyx_kp_u_enable __pyx_string_tab[76]
+#define __pyx_n_u_enumerate __pyx_string_tab[77]
+#define __pyx_n_u_execute_local __pyx_string_tab[78]
+#define __pyx_n_u_execute_local_fallback __pyx_string_tab[79]
+#define __pyx_n_u_execute_with_shuffle __pyx_string_tab[80]
+#define __pyx_n_u_forward __pyx_string_tab[81]
+#define __pyx_n_u_from_arrays __pyx_string_tab[82]
+#define __pyx_n_u_from_batches __pyx_string_tab[83]
+#define __pyx_n_u_from_pylist __pyx_string_tab[84]
+#define __pyx_kp_u_full_outer __pyx_string_tab[85]
+#define __pyx_n_u_func __pyx_string_tab[86]
+#define __pyx_kp_u_gc __pyx_string_tab[87]
+#define __pyx_n_u_genexpr __pyx_string_tab[88]
+#define __pyx_n_u_get __pyx_string_tab[89]
+#define __pyx_n_u_getstate __pyx_string_tab[90]
+#define __pyx_n_u_hash_join __pyx_string_tab[91]
+#define __pyx_n_u_i __pyx_string_tab[92]
+#define __pyx_n_u_idx __pyx_string_tab[93]
+#define __pyx_n_u_inner __pyx_string_tab[94]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[95]
+#define __pyx_kp_u_isenabled __pyx_string_tab[96]
+#define __pyx_n_u_items __pyx_string_tab[97]
+#define __pyx_n_u_iter __pyx_string_tab[98]
+#define __pyx_n_u_j __pyx_string_tab[99]
+#define __pyx_n_u_join_type __pyx_string_tab[100]
+#define __pyx_n_u_joined_row __pyx_string_tab[101]
+#define __pyx_n_u_key __pyx_string_tab[102]
+#define __pyx_n_u_key_columns __pyx_string_tab[103]
+#define __pyx_n_u_key_lists __pyx_string_tab[104]
+#define __pyx_n_u_keys __pyx_string_tab[105]
+#define __pyx_n_u_kwargs __pyx_string_tab[106]
+#define __pyx_n_u_lambda __pyx_string_tab[107]
+#define __pyx_n_u_left __pyx_string_tab[108]
+#define __pyx_n_b_left_2 __pyx_string_tab[109]
+#define __pyx_n_u_left_batch __pyx_string_tab[110]
+#define __pyx_n_u_left_batches __pyx_string_tab[111]
+#define __pyx_n_u_left_indices __pyx_string_tab[112]
+#define __pyx_n_u_left_key_lists __pyx_string_tab[113]
+#define __pyx_n_u_left_keys __pyx_string_tab[114]
+#define __pyx_n_u_left_row __pyx_string_tab[115]
+#define __pyx_n_u_left_selected __pyx_string_tab[116]
+#define __pyx_n_u_left_shuffle_id __pyx_string_tab[117]
+#define __pyx_n_u_left_source __pyx_string_tab[118]
+#define __pyx_n_u_left_table __pyx_string_tab[119]
+#define __pyx_n_u_left_time __pyx_string_tab[120]
+#define __pyx_n_u_left_times __pyx_string_tab[121]
+#define __pyx_n_u_lower __pyx_string_tab[122]
+#define __pyx_n_u_lower_bound __pyx_string_tab[123]
+#define __pyx_n_u_main __pyx_string_tab[124]
+#define __pyx_n_u_max_time __pyx_string_tab[125]
+#define __pyx_n_u_min_time __pyx_string_tab[126]
+#define __pyx_n_u_module __pyx_string_tab[127]
+#define __pyx_n_u_name __pyx_string_tab[128]
+#define __pyx_n_u_names __pyx_string_tab[129]
+#define __pyx_n_u_new __pyx_string_tab[130]
+#define __pyx_n_u_next __pyx_string_tab[131]
+#define __pyx_n_u_nulls __pyx_string_tab[132]
+#define __pyx_n_u_num_rows __pyx_string_tab[133]
+#define __pyx_n_u_outer __pyx_string_tab[134]
+#define __pyx_n_u_output_rows __pyx_string_tab[135]
+#define __pyx_n_u_pa __pyx_string_tab[136]
+#define __pyx_n_u_pc __pyx_string_tab[137]
+#define __pyx_n_u_pickle __pyx_string_tab[138]
+#define __pyx_n_u_pop __pyx_string_tab[139]
+#define __pyx_n_u_probe_batch_vectorized __pyx_string_tab[140]
+#define __pyx_n_u_probe_batch_vectorized_locals_ge __pyx_string_tab[141]
+#define __pyx_n_u_probe_key __pyx_string_tab[142]
+#define __pyx_n_u_process_batch __pyx_string_tab[143]
+#define __pyx_n_u_process_batch_locals_lambda __pyx_string_tab[144]
+#define __pyx_n_u_pyx_PickleError __pyx_string_tab[145]
+#define __pyx_n_u_pyx_checksum __pyx_string_tab[146]
+#define __pyx_n_u_pyx_result __pyx_string_tab[147]
+#define __pyx_n_u_pyx_state __pyx_string_tab[148]
+#define __pyx_n_u_pyx_type __pyx_string_tab[149]
+#define __pyx_n_u_pyx_unpickle_CythonAsofJoinOpe __pyx_string_tab[150]
+#define __pyx_n_u_pyx_unpickle_CythonHashJoinOpe __pyx_string_tab[151]
+#define __pyx_n_u_pyx_unpickle_CythonIntervalJoi __pyx_string_tab[152]
+#define __pyx_n_u_pyx_unpickle_StreamingHashTabl __pyx_string_tab[153]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[154]
+#define __pyx_n_u_qualname __pyx_string_tab[155]
+#define __pyx_n_u_range __pyx_string_tab[156]
+#define __pyx_n_u_receive_left_shuffled __pyx_string_tab[157]
+#define __pyx_n_u_receive_partitions __pyx_string_tab[158]
+#define __pyx_n_u_receive_right_shuffled __pyx_string_tab[159]
+#define __pyx_n_u_reduce __pyx_string_tab[160]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[161]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[162]
+#define __pyx_n_u_result __pyx_string_tab[163]
+#define __pyx_n_u_result_table __pyx_string_tab[164]
+#define __pyx_n_u_reversed __pyx_string_tab[165]
+#define __pyx_n_b_right __pyx_string_tab[166]
+#define __pyx_n_u_right __pyx_string_tab[167]
+#define __pyx_n_u_right_2 __pyx_string_tab[168]
+#define __pyx_n_u_right_batch __pyx_string_tab[169]
+#define __pyx_n_u_right_batches __pyx_string_tab[170]
+#define __pyx_n_u_right_idx __pyx_string_tab[171]
+#define __pyx_n_u_right_indices __pyx_string_tab[172]
+#define __pyx_n_u_right_keys __pyx_string_tab[173]
+#define __pyx_n_u_right_row __pyx_string_tab[174]
+#define __pyx_n_u_right_rows __pyx_string_tab[175]
+#define __pyx_n_u_right_selected __pyx_string_tab[176]
+#define __pyx_n_u_right_shuffle_id __pyx_string_tab[177]
+#define __pyx_n_u_right_source __pyx_string_tab[178]
+#define __pyx_n_u_right_table __pyx_string_tab[179]
+#define __pyx_n_u_row __pyx_string_tab[180]
+#define __pyx_n_u_sabot __pyx_string_tab[181]
+#define __pyx_n_u_sabot__cython_joins_ql_hash_join __pyx_string_tab[182]
+#define __pyx_n_u_sabot__cython_operators_joins __pyx_string_tab[183]
+#define __pyx_kp_u_sabot__cython_operators_joins_py __pyx_string_tab[184]
+#define __pyx_n_u_sample_right __pyx_string_tab[185]
+#define __pyx_n_u_schema __pyx_string_tab[186]
+#define __pyx_n_u_self __pyx_string_tab[187]
+#define __pyx_n_u_send __pyx_string_tab[188]
+#define __pyx_n_u_set_name __pyx_string_tab[189]
+#define __pyx_n_u_setstate __pyx_string_tab[190]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[191]
+#define __pyx_n_u_sort __pyx_string_tab[192]
+#define __pyx_n_u_state __pyx_string_tab[193]
+#define __pyx_kp_u_stringsource __pyx_string_tab[194]
+#define __pyx_n_u_take __pyx_string_tab[195]
+#define __pyx_n_u_test __pyx_string_tab[196]
+#define __pyx_n_u_throw __pyx_string_tab[197]
+#define __pyx_n_u_time_column __pyx_string_tab[198]
+#define __pyx_n_u_times __pyx_string_tab[199]
+#define __pyx_n_u_timestamp __pyx_string_tab[200]
+#define __pyx_n_u_to_batches __pyx_string_tab[201]
+#define __pyx_n_u_to_pylist __pyx_string_tab[202]
+#define __pyx_n_u_type __pyx_string_tab[203]
+#define __pyx_n_u_typing __pyx_string_tab[204]
+#define __pyx_n_u_update __pyx_string_tab[205]
+#define __pyx_n_u_upper_bound __pyx_string_tab[206]
+#define __pyx_n_u_use_setstate __pyx_string_tab[207]
+#define __pyx_n_u_value __pyx_string_tab[208]
+#define __pyx_n_u_x __pyx_string_tab[209]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -7601,12 +7629,13 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle);
   Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local);
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local);
-  for (int i=0; i<7; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<29; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<205; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback);
+  Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback);
+  for (int i=0; i<6; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
+  for (int i=0; i<30; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<210; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   Py_CLEAR(clear_module_state->__pyx_int_0);
   Py_CLEAR(clear_module_state->__pyx_int_1);
-  Py_CLEAR(clear_module_state->__pyx_int_4);
   Py_CLEAR(clear_module_state->__pyx_int_14751257);
   Py_CLEAR(clear_module_state->__pyx_int_39422562);
   Py_CLEAR(clear_module_state->__pyx_int_66858016);
@@ -7781,12 +7810,13 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle);
   Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local);
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local);
-  for (int i=0; i<7; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<29; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<205; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback);
+  Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback);
+  for (int i=0; i<6; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
+  for (int i=0; i<30; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<210; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_1);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_4);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_14751257);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_39422562);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_66858016);
@@ -10205,7 +10235,7 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyarrow_8includes_6common_PyObject_to_ob
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":59
+/* "sabot/_cython/operators/joins.pyx":68
  *         object _schema                   # Schema of accumulated batches
  * 
  *     def __init__(self, key_columns: List[str]):             # <<<<<<<<<<<<<<
@@ -10239,32 +10269,32 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_key_columns,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 59, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 68, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 59, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 68, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 59, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 68, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, i); __PYX_ERR(0, 59, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, i); __PYX_ERR(0, 68, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 59, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 68, __pyx_L3_error)
     }
     __pyx_v_key_columns = ((PyObject*)values[0]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 59, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 68, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10275,7 +10305,7 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_key_columns), (&PyList_Type), 0, "key_columns", 2))) __PYX_ERR(0, 59, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_key_columns), (&PyList_Type), 0, "key_columns", 2))) __PYX_ERR(0, 68, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder___init__(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder *)__pyx_v_self), __pyx_v_key_columns);
 
   /* function exit code */
@@ -10304,14 +10334,14 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":61
+  /* "sabot/_cython/operators/joins.pyx":70
  *     def __init__(self, key_columns: List[str]):
  *         """Initialize builder with key columns."""
  *         self._batches = []             # <<<<<<<<<<<<<<
  *         self._concatenated = None
  *         self._hash_index = {}
 */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 70, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->_batches);
@@ -10319,7 +10349,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
   __pyx_v_self->_batches = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":62
+  /* "sabot/_cython/operators/joins.pyx":71
  *         """Initialize builder with key columns."""
  *         self._batches = []
  *         self._concatenated = None             # <<<<<<<<<<<<<<
@@ -10332,14 +10362,14 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
   __Pyx_DECREF(__pyx_v_self->_concatenated);
   __pyx_v_self->_concatenated = Py_None;
 
-  /* "sabot/_cython/operators/joins.pyx":63
+  /* "sabot/_cython/operators/joins.pyx":72
  *         self._batches = []
  *         self._concatenated = None
  *         self._hash_index = {}             # <<<<<<<<<<<<<<
  *         self._key_columns = key_columns
  *         self._is_built = False
 */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 72, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->_hash_index);
@@ -10347,7 +10377,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
   __pyx_v_self->_hash_index = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":64
+  /* "sabot/_cython/operators/joins.pyx":73
  *         self._concatenated = None
  *         self._hash_index = {}
  *         self._key_columns = key_columns             # <<<<<<<<<<<<<<
@@ -10360,7 +10390,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
   __Pyx_DECREF(__pyx_v_self->_key_columns);
   __pyx_v_self->_key_columns = __pyx_v_key_columns;
 
-  /* "sabot/_cython/operators/joins.pyx":65
+  /* "sabot/_cython/operators/joins.pyx":74
  *         self._hash_index = {}
  *         self._key_columns = key_columns
  *         self._is_built = False             # <<<<<<<<<<<<<<
@@ -10369,7 +10399,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
 */
   __pyx_v_self->_is_built = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":66
+  /* "sabot/_cython/operators/joins.pyx":75
  *         self._key_columns = key_columns
  *         self._is_built = False
  *         self._total_rows = 0             # <<<<<<<<<<<<<<
@@ -10378,7 +10408,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
 */
   __pyx_v_self->_total_rows = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":67
+  /* "sabot/_cython/operators/joins.pyx":76
  *         self._is_built = False
  *         self._total_rows = 0
  *         self._schema = None             # <<<<<<<<<<<<<<
@@ -10391,7 +10421,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
   __Pyx_DECREF(__pyx_v_self->_schema);
   __pyx_v_self->_schema = Py_None;
 
-  /* "sabot/_cython/operators/joins.pyx":59
+  /* "sabot/_cython/operators/joins.pyx":68
  *         object _schema                   # Schema of accumulated batches
  * 
  *     def __init__(self, key_columns: List[str]):             # <<<<<<<<<<<<<<
@@ -10411,7 +10441,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":69
+/* "sabot/_cython/operators/joins.pyx":78
  *         self._schema = None
  * 
  *     cpdef void add_batch(self, object batch):             # <<<<<<<<<<<<<<
@@ -10440,7 +10470,7 @@ static void __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("add_batch", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":76
+  /* "sabot/_cython/operators/joins.pyx":85
  *             batch: Arrow RecordBatch to add
  *         """
  *         if batch is None or batch.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -10453,15 +10483,15 @@ static void __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
     __pyx_t_1 = __pyx_t_2;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_3, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_3, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_1 = __pyx_t_2;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/joins.pyx":77
+    /* "sabot/_cython/operators/joins.pyx":86
  *         """
  *         if batch is None or batch.num_rows == 0:
  *             return             # <<<<<<<<<<<<<<
@@ -10470,7 +10500,7 @@ static void __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
 */
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/joins.pyx":76
+    /* "sabot/_cython/operators/joins.pyx":85
  *             batch: Arrow RecordBatch to add
  *         """
  *         if batch is None or batch.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -10479,7 +10509,7 @@ static void __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":79
+  /* "sabot/_cython/operators/joins.pyx":88
  *             return
  * 
  *         self._batches.append(batch)             # <<<<<<<<<<<<<<
@@ -10488,30 +10518,30 @@ static void __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
 */
   if (unlikely(__pyx_v_self->_batches == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-    __PYX_ERR(0, 79, __pyx_L1_error)
+    __PYX_ERR(0, 88, __pyx_L1_error)
   }
-  __pyx_t_4 = __Pyx_PyList_Append(__pyx_v_self->_batches, __pyx_v_batch); if (unlikely(__pyx_t_4 == ((int)-1))) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyList_Append(__pyx_v_self->_batches, __pyx_v_batch); if (unlikely(__pyx_t_4 == ((int)-1))) __PYX_ERR(0, 88, __pyx_L1_error)
 
-  /* "sabot/_cython/operators/joins.pyx":80
+  /* "sabot/_cython/operators/joins.pyx":89
  * 
  *         self._batches.append(batch)
  *         self._total_rows += batch.num_rows             # <<<<<<<<<<<<<<
  *         self._is_built = False
  * 
 */
-  __pyx_t_3 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_total_rows); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From_int64_t(__pyx_v_self->_total_rows); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 89, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 89, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_6 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 89, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_7 = __Pyx_PyLong_As_int64_t(__pyx_t_6); if (unlikely((__pyx_t_7 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyLong_As_int64_t(__pyx_t_6); if (unlikely((__pyx_t_7 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 89, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_v_self->_total_rows = __pyx_t_7;
 
-  /* "sabot/_cython/operators/joins.pyx":81
+  /* "sabot/_cython/operators/joins.pyx":90
  *         self._batches.append(batch)
  *         self._total_rows += batch.num_rows
  *         self._is_built = False             # <<<<<<<<<<<<<<
@@ -10520,7 +10550,7 @@ static void __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
 */
   __pyx_v_self->_is_built = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":83
+  /* "sabot/_cython/operators/joins.pyx":92
  *         self._is_built = False
  * 
  *         if self._schema is None:             # <<<<<<<<<<<<<<
@@ -10530,14 +10560,14 @@ static void __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
   __pyx_t_1 = (__pyx_v_self->_schema == Py_None);
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/joins.pyx":84
+    /* "sabot/_cython/operators/joins.pyx":93
  * 
  *         if self._schema is None:
  *             self._schema = batch.schema             # <<<<<<<<<<<<<<
  * 
  *     def build_index(self):
 */
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 84, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 93, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_6);
     __Pyx_GOTREF(__pyx_v_self->_schema);
@@ -10545,7 +10575,7 @@ static void __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
     __pyx_v_self->_schema = __pyx_t_6;
     __pyx_t_6 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":83
+    /* "sabot/_cython/operators/joins.pyx":92
  *         self._is_built = False
  * 
  *         if self._schema is None:             # <<<<<<<<<<<<<<
@@ -10554,7 +10584,7 @@ static void __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilde
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":69
+  /* "sabot/_cython/operators/joins.pyx":78
  *         self._schema = None
  * 
  *     cpdef void add_batch(self, object batch):             # <<<<<<<<<<<<<<
@@ -10613,32 +10643,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 69, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 78, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 69, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 78, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "add_batch", 0) < 0) __PYX_ERR(0, 69, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "add_batch", 0) < 0) __PYX_ERR(0, 78, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("add_batch", 1, 1, 1, i); __PYX_ERR(0, 69, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("add_batch", 1, 1, 1, i); __PYX_ERR(0, 78, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 69, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 78, __pyx_L3_error)
     }
     __pyx_v_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("add_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 69, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("add_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 78, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10668,8 +10698,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("add_batch", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_add_batch(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 69, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_add_batch(__pyx_v_self, __pyx_v_batch, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -10686,7 +10716,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":86
+/* "sabot/_cython/operators/joins.pyx":95
  *             self._schema = batch.schema
  * 
  *     def build_index(self):             # <<<<<<<<<<<<<<
@@ -10736,9 +10766,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11build_index_2generator3(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
+static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11build_index_2generator4(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/joins.pyx":107
+/* "sabot/_cython/operators/joins.pyx":116
  *         for i in range(self._total_rows):
  *             # Create key tuple from all key columns
  *             key = tuple(key_lists[j][i] for j in range(len(self._key_columns)))             # <<<<<<<<<<<<<<
@@ -10758,7 +10788,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 107, __pyx_L1_error)
+    __PYX_ERR(0, 116, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -10769,7 +10799,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __Pyx_INCREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11build_index_2generator3, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_genexpr, __pyx_mstate_global->__pyx_n_u_build_index_locals_genexpr, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 107, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11build_index_2generator4, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_genexpr, __pyx_mstate_global->__pyx_n_u_build_index_locals_genexpr, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -10785,7 +10815,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   return __pyx_r;
 }
 
-static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11build_index_2generator3(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11build_index_2generator4(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
 {
   struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr *__pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr *)__pyx_generator->closure);
   PyObject *__pyx_r = NULL;
@@ -10793,6 +10823,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   Py_ssize_t __pyx_t_2;
   Py_ssize_t __pyx_t_3;
   Py_ssize_t __pyx_t_4;
+  PyObject *__pyx_t_5 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -10808,29 +10839,32 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
-    __PYX_ERR(0, 107, __pyx_L1_error)
+    __PYX_ERR(0, 116, __pyx_L1_error)
   }
-  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 107, __pyx_L1_error) }
+  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 116, __pyx_L1_error) }
   __pyx_t_1 = __pyx_cur_scope->__pyx_genexpr_arg_0;
   __Pyx_INCREF(__pyx_t_1);
   if (unlikely(__pyx_t_1 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 107, __pyx_L1_error)
+    __PYX_ERR(0, 116, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 116, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = __pyx_t_2;
   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
     __pyx_cur_scope->__pyx_v_j = __pyx_t_4;
-    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_key_lists)) { __Pyx_RaiseClosureNameError("key_lists"); __PYX_ERR(0, 107, __pyx_L1_error) }
+    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_key_lists)) { __Pyx_RaiseClosureNameError("key_lists"); __PYX_ERR(0, 116, __pyx_L1_error) }
     if (unlikely(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_key_lists == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 107, __pyx_L1_error)
+      __PYX_ERR(0, 116, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_GetItemInt(__Pyx_PyList_GET_ITEM(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_key_lists, __pyx_cur_scope->__pyx_v_j), __pyx_cur_scope->__pyx_outer_scope->__pyx_v_i, int64_t, 1, __Pyx_PyLong_From_int64_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 107, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_key_lists, __pyx_cur_scope->__pyx_v_j, Py_ssize_t, 1, PyLong_FromSsize_t, 1, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_r = __pyx_t_1;
-    __pyx_t_1 = 0;
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, __pyx_cur_scope->__pyx_outer_scope->__pyx_v_i, int64_t, 1, __Pyx_PyLong_From_int64_t, 0, 1, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 116, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_r = __pyx_t_5;
+    __pyx_t_5 = 0;
     __pyx_cur_scope->__pyx_t_0 = __pyx_t_2;
     __pyx_cur_scope->__pyx_t_1 = __pyx_t_3;
     __pyx_cur_scope->__pyx_t_2 = __pyx_t_4;
@@ -10844,7 +10878,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTable
     __pyx_t_2 = __pyx_cur_scope->__pyx_t_0;
     __pyx_t_3 = __pyx_cur_scope->__pyx_t_1;
     __pyx_t_4 = __pyx_cur_scope->__pyx_t_2;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 107, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 116, __pyx_L1_error)
   }
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
@@ -10853,6 +10887,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_5);
   if (__Pyx_PyErr_Occurred()) {
     __Pyx_Generator_Replace_StopIteration(0);
     __Pyx_AddTraceback("genexpr", __pyx_clineno, __pyx_lineno, __pyx_filename);
@@ -10868,7 +10903,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":86
+/* "sabot/_cython/operators/joins.pyx":95
  *             self._schema = batch.schema
  * 
  *     def build_index(self):             # <<<<<<<<<<<<<<
@@ -10880,7 +10915,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index *__pyx_cur_scope;
   PyObject *__pyx_v_key = NULL;
   PyObject *__pyx_7genexpr__pyx_v_col = NULL;
-  PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11build_index_2generator3 = 0;
+  PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11build_index_2generator4 = 0;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -10906,12 +10941,12 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 86, __pyx_L1_error)
+    __PYX_ERR(0, 95, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
 
-  /* "sabot/_cython/operators/joins.pyx":92
+  /* "sabot/_cython/operators/joins.pyx":101
  *         Uses bulk array operations instead of row-by-row conversion.
  *         """
  *         if self._is_built or not self._batches:             # <<<<<<<<<<<<<<
@@ -10928,7 +10963,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   else
   {
     Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_self->_batches);
-    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 92, __pyx_L1_error)
+    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 101, __pyx_L1_error)
     __pyx_t_2 = (__pyx_temp != 0);
   }
 
@@ -10937,7 +10972,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/joins.pyx":93
+    /* "sabot/_cython/operators/joins.pyx":102
  *         """
  *         if self._is_built or not self._batches:
  *             return             # <<<<<<<<<<<<<<
@@ -10948,7 +10983,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/joins.pyx":92
+    /* "sabot/_cython/operators/joins.pyx":101
  *         Uses bulk array operations instead of row-by-row conversion.
  *         """
  *         if self._is_built or not self._batches:             # <<<<<<<<<<<<<<
@@ -10957,16 +10992,16 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":96
+  /* "sabot/_cython/operators/joins.pyx":105
  * 
  *         # Concatenate all batches into single Table
  *         self._concatenated = pa.Table.from_batches(self._batches)             # <<<<<<<<<<<<<<
  * 
  *         # Extract key columns as Python lists (bulk operation)
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 105, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_Table); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_Table); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 105, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_t_5 = __pyx_t_7;
@@ -10977,7 +11012,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
     __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_from_batches, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 96, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 105, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __Pyx_GIVEREF(__pyx_t_4);
@@ -10986,7 +11021,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __pyx_v_self->_concatenated = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":100
+  /* "sabot/_cython/operators/joins.pyx":109
  *         # Extract key columns as Python lists (bulk operation)
  *         # This is much faster than row-by-row .as_py()
  *         key_lists = [self._concatenated.column(col).to_pylist()             # <<<<<<<<<<<<<<
@@ -10994,10 +11029,10 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
  * 
 */
   { /* enter inner scope */
-    __pyx_t_4 = PyList_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 100, __pyx_L8_error)
+    __pyx_t_4 = PyList_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 109, __pyx_L8_error)
     __Pyx_GOTREF(__pyx_t_4);
 
-    /* "sabot/_cython/operators/joins.pyx":101
+    /* "sabot/_cython/operators/joins.pyx":110
  *         # This is much faster than row-by-row .as_py()
  *         key_lists = [self._concatenated.column(col).to_pylist()
  *                      for col in self._key_columns]             # <<<<<<<<<<<<<<
@@ -11006,7 +11041,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
     if (unlikely(__pyx_v_self->_key_columns == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 101, __pyx_L8_error)
+      __PYX_ERR(0, 110, __pyx_L8_error)
     }
     __pyx_t_7 = __pyx_v_self->_key_columns; __Pyx_INCREF(__pyx_t_7);
     __pyx_t_9 = 0;
@@ -11014,18 +11049,18 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
       {
         Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_7);
         #if !CYTHON_ASSUME_SAFE_SIZE
-        if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 101, __pyx_L8_error)
+        if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 110, __pyx_L8_error)
         #endif
         if (__pyx_t_9 >= __pyx_temp) break;
       }
       __pyx_t_5 = __Pyx_PyList_GetItemRef(__pyx_t_7, __pyx_t_9);
       ++__pyx_t_9;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 101, __pyx_L8_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 110, __pyx_L8_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_XDECREF_SET(__pyx_7genexpr__pyx_v_col, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":100
+      /* "sabot/_cython/operators/joins.pyx":109
  *         # Extract key columns as Python lists (bulk operation)
  *         # This is much faster than row-by-row .as_py()
  *         key_lists = [self._concatenated.column(col).to_pylist()             # <<<<<<<<<<<<<<
@@ -11039,7 +11074,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
         PyObject *__pyx_callargs[2] = {__pyx_t_11, __pyx_7genexpr__pyx_v_col};
         __pyx_t_10 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 100, __pyx_L8_error)
+        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 109, __pyx_L8_error)
         __Pyx_GOTREF(__pyx_t_10);
       }
       __pyx_t_6 = __pyx_t_10;
@@ -11050,13 +11085,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
         __pyx_t_5 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_pylist, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 100, __pyx_L8_error)
+        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 109, __pyx_L8_error)
         __Pyx_GOTREF(__pyx_t_5);
       }
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_4, (PyObject*)__pyx_t_5))) __PYX_ERR(0, 100, __pyx_L8_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_4, (PyObject*)__pyx_t_5))) __PYX_ERR(0, 109, __pyx_L8_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":101
+      /* "sabot/_cython/operators/joins.pyx":110
  *         # This is much faster than row-by-row .as_py()
  *         key_lists = [self._concatenated.column(col).to_pylist()
  *                      for col in self._key_columns]             # <<<<<<<<<<<<<<
@@ -11076,7 +11111,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __pyx_cur_scope->__pyx_v_key_lists = ((PyObject*)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":105
+  /* "sabot/_cython/operators/joins.pyx":114
  *         # Build hash index: key tuple  list of row indices
  *         cdef int64_t i
  *         for i in range(self._total_rows):             # <<<<<<<<<<<<<<
@@ -11088,22 +11123,22 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
     __pyx_cur_scope->__pyx_v_i = __pyx_t_14;
 
-    /* "sabot/_cython/operators/joins.pyx":107
+    /* "sabot/_cython/operators/joins.pyx":116
  *         for i in range(self._total_rows):
  *             # Create key tuple from all key columns
  *             key = tuple(key_lists[j][i] for j in range(len(self._key_columns)))             # <<<<<<<<<<<<<<
  * 
  *             # Add row index to hash table
 */
-    __pyx_t_4 = __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11build_index_genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_self->_key_columns); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 107, __pyx_L1_error)
+    __pyx_t_4 = __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11build_index_genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_self->_key_columns); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_7 = __Pyx_PySequence_Tuple(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 107, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PySequence_Tuple(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_XDECREF_SET(__pyx_v_key, ((PyObject*)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":110
+    /* "sabot/_cython/operators/joins.pyx":119
  * 
  *             # Add row index to hash table
  *             if key not in self._hash_index:             # <<<<<<<<<<<<<<
@@ -11112,28 +11147,28 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
     if (unlikely(__pyx_v_self->_hash_index == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 110, __pyx_L1_error)
+      __PYX_ERR(0, 119, __pyx_L1_error)
     }
-    __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_v_key, __pyx_v_self->_hash_index, Py_NE)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 110, __pyx_L1_error)
+    __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_v_key, __pyx_v_self->_hash_index, Py_NE)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 119, __pyx_L1_error)
     if (__pyx_t_1) {
 
-      /* "sabot/_cython/operators/joins.pyx":111
+      /* "sabot/_cython/operators/joins.pyx":120
  *             # Add row index to hash table
  *             if key not in self._hash_index:
  *                 self._hash_index[key] = []             # <<<<<<<<<<<<<<
  *             self._hash_index[key].append(i)
  * 
 */
-      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 111, __pyx_L1_error)
+      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 120, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       if (unlikely(__pyx_v_self->_hash_index == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 111, __pyx_L1_error)
+        __PYX_ERR(0, 120, __pyx_L1_error)
       }
-      if (unlikely((PyDict_SetItem(__pyx_v_self->_hash_index, __pyx_v_key, __pyx_t_7) < 0))) __PYX_ERR(0, 111, __pyx_L1_error)
+      if (unlikely((PyDict_SetItem(__pyx_v_self->_hash_index, __pyx_v_key, __pyx_t_7) < 0))) __PYX_ERR(0, 120, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":110
+      /* "sabot/_cython/operators/joins.pyx":119
  * 
  *             # Add row index to hash table
  *             if key not in self._hash_index:             # <<<<<<<<<<<<<<
@@ -11142,7 +11177,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
     }
 
-    /* "sabot/_cython/operators/joins.pyx":112
+    /* "sabot/_cython/operators/joins.pyx":121
  *             if key not in self._hash_index:
  *                 self._hash_index[key] = []
  *             self._hash_index[key].append(i)             # <<<<<<<<<<<<<<
@@ -11151,18 +11186,18 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
     if (unlikely(__pyx_v_self->_hash_index == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 112, __pyx_L1_error)
+      __PYX_ERR(0, 121, __pyx_L1_error)
     }
-    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->_hash_index, __pyx_v_key); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 112, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->_hash_index, __pyx_v_key); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 121, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = __Pyx_PyLong_From_int64_t(__pyx_cur_scope->__pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 112, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyLong_From_int64_t(__pyx_cur_scope->__pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 121, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_15 = __Pyx_PyObject_Append(__pyx_t_7, __pyx_t_4); if (unlikely(__pyx_t_15 == ((int)-1))) __PYX_ERR(0, 112, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_Append(__pyx_t_7, __pyx_t_4); if (unlikely(__pyx_t_15 == ((int)-1))) __PYX_ERR(0, 121, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
 
-  /* "sabot/_cython/operators/joins.pyx":114
+  /* "sabot/_cython/operators/joins.pyx":123
  *             self._hash_index[key].append(i)
  * 
  *         self._is_built = True             # <<<<<<<<<<<<<<
@@ -11171,7 +11206,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
   __pyx_v_self->_is_built = 1;
 
-  /* "sabot/_cython/operators/joins.pyx":86
+  /* "sabot/_cython/operators/joins.pyx":95
  *             self._schema = batch.schema
  * 
  *     def build_index(self):             # <<<<<<<<<<<<<<
@@ -11194,14 +11229,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_key);
   __Pyx_XDECREF(__pyx_7genexpr__pyx_v_col);
-  __Pyx_XDECREF(__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11build_index_2generator3);
+  __Pyx_XDECREF(__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11build_index_2generator4);
   __Pyx_DECREF((PyObject *)__pyx_cur_scope);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":116
+/* "sabot/_cython/operators/joins.pyx":125
  *         self._is_built = True
  * 
  *     def probe_batch_vectorized(self, object left_batch, list left_keys, str join_type):             # <<<<<<<<<<<<<<
@@ -11251,38 +11286,38 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_left_batch,&__pyx_mstate_global->__pyx_n_u_left_keys,&__pyx_mstate_global->__pyx_n_u_join_type,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 116, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 125, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 116, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 125, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 116, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 125, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 116, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 125, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "probe_batch_vectorized", 0) < 0) __PYX_ERR(0, 116, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "probe_batch_vectorized", 0) < 0) __PYX_ERR(0, 125, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("probe_batch_vectorized", 1, 3, 3, i); __PYX_ERR(0, 116, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("probe_batch_vectorized", 1, 3, 3, i); __PYX_ERR(0, 125, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 3)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 116, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 125, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 116, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 125, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 116, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 125, __pyx_L3_error)
     }
     __pyx_v_left_batch = values[0];
     __pyx_v_left_keys = ((PyObject*)values[1]);
@@ -11290,7 +11325,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("probe_batch_vectorized", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 116, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("probe_batch_vectorized", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 125, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -11301,8 +11336,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_left_keys), (&PyList_Type), 1, "left_keys", 1))) __PYX_ERR(0, 116, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_join_type), (&PyUnicode_Type), 1, "join_type", 1))) __PYX_ERR(0, 116, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_left_keys), (&PyList_Type), 1, "left_keys", 1))) __PYX_ERR(0, 125, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_join_type), (&PyUnicode_Type), 1, "join_type", 1))) __PYX_ERR(0, 125, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_6probe_batch_vectorized(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder *)__pyx_v_self), __pyx_v_left_batch, __pyx_v_left_keys, __pyx_v_join_type);
 
   /* function exit code */
@@ -11321,9 +11356,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_2generator4(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
+static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_2generator5(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/joins.pyx":147
+/* "sabot/_cython/operators/joins.pyx":156
  *         for i in range(left_batch.num_rows):
  *             # Create probe key
  *             probe_key = tuple(left_key_lists[j][i] for j in range(len(left_keys)))             # <<<<<<<<<<<<<<
@@ -11343,7 +11378,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 147, __pyx_L1_error)
+    __PYX_ERR(0, 156, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -11354,7 +11389,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __Pyx_INCREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_2generator4, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_genexpr, __pyx_mstate_global->__pyx_n_u_probe_batch_vectorized_locals_ge, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 147, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_2generator5, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_genexpr, __pyx_mstate_global->__pyx_n_u_probe_batch_vectorized_locals_ge, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 156, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -11370,7 +11405,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   return __pyx_r;
 }
 
-static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_2generator4(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_2generator5(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
 {
   struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr *__pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr *)__pyx_generator->closure);
   PyObject *__pyx_r = NULL;
@@ -11378,6 +11413,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   Py_ssize_t __pyx_t_2;
   Py_ssize_t __pyx_t_3;
   PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -11393,26 +11429,29 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
-    __PYX_ERR(0, 147, __pyx_L1_error)
+    __PYX_ERR(0, 156, __pyx_L1_error)
   }
-  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 147, __pyx_L1_error) }
+  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 156, __pyx_L1_error) }
   if (unlikely(__pyx_cur_scope->__pyx_genexpr_arg_0 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 147, __pyx_L1_error)
+    __PYX_ERR(0, 156, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyList_GET_SIZE(__pyx_cur_scope->__pyx_genexpr_arg_0); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyList_GET_SIZE(__pyx_cur_scope->__pyx_genexpr_arg_0); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 156, __pyx_L1_error)
   __pyx_t_2 = __pyx_t_1;
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_cur_scope->__pyx_v_j = __pyx_t_3;
-    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_left_key_lists)) { __Pyx_RaiseClosureNameError("left_key_lists"); __PYX_ERR(0, 147, __pyx_L1_error) }
+    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_left_key_lists)) { __Pyx_RaiseClosureNameError("left_key_lists"); __PYX_ERR(0, 156, __pyx_L1_error) }
     if (unlikely(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_left_key_lists == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 147, __pyx_L1_error)
+      __PYX_ERR(0, 156, __pyx_L1_error)
     }
-    __pyx_t_4 = __Pyx_GetItemInt(__Pyx_PyList_GET_ITEM(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_left_key_lists, __pyx_cur_scope->__pyx_v_j), __pyx_cur_scope->__pyx_outer_scope->__pyx_v_i, int64_t, 1, __Pyx_PyLong_From_int64_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 147, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_left_key_lists, __pyx_cur_scope->__pyx_v_j, Py_ssize_t, 1, PyLong_FromSsize_t, 1, 1, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_r = __pyx_t_4;
-    __pyx_t_4 = 0;
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_4, __pyx_cur_scope->__pyx_outer_scope->__pyx_v_i, int64_t, 1, __Pyx_PyLong_From_int64_t, 0, 1, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_r = __pyx_t_5;
+    __pyx_t_5 = 0;
     __pyx_cur_scope->__pyx_t_0 = __pyx_t_1;
     __pyx_cur_scope->__pyx_t_1 = __pyx_t_2;
     __pyx_cur_scope->__pyx_t_2 = __pyx_t_3;
@@ -11426,7 +11465,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTable
     __pyx_t_1 = __pyx_cur_scope->__pyx_t_0;
     __pyx_t_2 = __pyx_cur_scope->__pyx_t_1;
     __pyx_t_3 = __pyx_cur_scope->__pyx_t_2;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 147, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 156, __pyx_L1_error)
   }
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
@@ -11435,6 +11474,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
   if (__Pyx_PyErr_Occurred()) {
     __Pyx_Generator_Replace_StopIteration(0);
     __Pyx_AddTraceback("genexpr", __pyx_clineno, __pyx_lineno, __pyx_filename);
@@ -11449,9 +11489,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_5generator5(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
+static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_5generator6(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/joins.pyx":169
+/* "sabot/_cython/operators/joins.pyx":178
  * 
  *         # Handle right side selection
  *         if any(idx is None for idx in right_indices):             # <<<<<<<<<<<<<<
@@ -11471,7 +11511,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 169, __pyx_L1_error)
+    __PYX_ERR(0, 178, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -11479,7 +11519,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __Pyx_INCREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_5generator5, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_genexpr, __pyx_mstate_global->__pyx_n_u_probe_batch_vectorized_locals_ge, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 169, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_5generator6, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_genexpr, __pyx_mstate_global->__pyx_n_u_probe_batch_vectorized_locals_ge, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 178, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -11495,7 +11535,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   return __pyx_r;
 }
 
-static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_5generator5(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_5generator6(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
 {
   struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr *__pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr *)__pyx_generator->closure);
   PyObject *__pyx_r = NULL;
@@ -11515,21 +11555,21 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTable
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 169, __pyx_L1_error)
-  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 169, __pyx_L1_error) }
+  if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 178, __pyx_L1_error)
+  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 178, __pyx_L1_error) }
   __pyx_t_1 = __pyx_cur_scope->__pyx_genexpr_arg_0; __Pyx_INCREF(__pyx_t_1);
   __pyx_t_2 = 0;
   for (;;) {
     {
       Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
       #if !CYTHON_ASSUME_SAFE_SIZE
-      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 169, __pyx_L1_error)
+      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 178, __pyx_L1_error)
       #endif
       if (__pyx_t_2 >= __pyx_temp) break;
     }
     __pyx_t_3 = __Pyx_PyList_GetItemRef(__pyx_t_1, __pyx_t_2);
     ++__pyx_t_2;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 169, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 178, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_idx);
     __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_idx, __pyx_t_3);
@@ -11573,7 +11613,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":116
+/* "sabot/_cython/operators/joins.pyx":125
  *         self._is_built = True
  * 
  *     def probe_batch_vectorized(self, object left_batch, list left_keys, str join_type):             # <<<<<<<<<<<<<<
@@ -11591,8 +11631,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   PyObject *__pyx_v_left_selected = NULL;
   PyObject *__pyx_v_right_selected = NULL;
   PyObject *__pyx_8genexpr2__pyx_v_col = NULL;
-  PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_2generator4 = 0;
-  PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_5generator5 = 0;
+  PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_2generator5 = 0;
+  PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_5generator6 = 0;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -11619,12 +11659,12 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 116, __pyx_L1_error)
+    __PYX_ERR(0, 125, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
 
-  /* "sabot/_cython/operators/joins.pyx":128
+  /* "sabot/_cython/operators/joins.pyx":137
  *             Joined RecordBatch
  *         """
  *         if not self._is_built:             # <<<<<<<<<<<<<<
@@ -11634,7 +11674,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __pyx_t_1 = (!(__pyx_v_self->_is_built != 0));
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/joins.pyx":129
+    /* "sabot/_cython/operators/joins.pyx":138
  *         """
  *         if not self._is_built:
  *             self.build_index()             # <<<<<<<<<<<<<<
@@ -11648,12 +11688,12 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
       PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_build_index, __pyx_callargs+__pyx_t_4, (1-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 129, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 138, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":128
+    /* "sabot/_cython/operators/joins.pyx":137
  *             Joined RecordBatch
  *         """
  *         if not self._is_built:             # <<<<<<<<<<<<<<
@@ -11662,7 +11702,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":131
+  /* "sabot/_cython/operators/joins.pyx":140
  *             self.build_index()
  * 
  *         if self._concatenated is None or self._total_rows == 0:             # <<<<<<<<<<<<<<
@@ -11680,7 +11720,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __pyx_L5_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/joins.pyx":132
+    /* "sabot/_cython/operators/joins.pyx":141
  * 
  *         if self._concatenated is None or self._total_rows == 0:
  *             if join_type in ('left', 'outer'):             # <<<<<<<<<<<<<<
@@ -11689,20 +11729,20 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
     __Pyx_INCREF(__pyx_v_join_type);
     __pyx_t_6 = __pyx_v_join_type;
-    __pyx_t_5 = (__Pyx_PyUnicode_Equals(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_left, Py_EQ)); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 132, __pyx_L1_error)
+    __pyx_t_5 = (__Pyx_PyUnicode_Equals(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_left, Py_EQ)); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 141, __pyx_L1_error)
     if (!__pyx_t_5) {
     } else {
       __pyx_t_1 = __pyx_t_5;
       goto __pyx_L8_bool_binop_done;
     }
-    __pyx_t_5 = (__Pyx_PyUnicode_Equals(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_outer, Py_EQ)); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 132, __pyx_L1_error)
+    __pyx_t_5 = (__Pyx_PyUnicode_Equals(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_outer, Py_EQ)); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 141, __pyx_L1_error)
     __pyx_t_1 = __pyx_t_5;
     __pyx_L8_bool_binop_done:;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_5 = __pyx_t_1;
     if (__pyx_t_5) {
 
-      /* "sabot/_cython/operators/joins.pyx":133
+      /* "sabot/_cython/operators/joins.pyx":142
  *         if self._concatenated is None or self._total_rows == 0:
  *             if join_type in ('left', 'outer'):
  *                 return left_batch             # <<<<<<<<<<<<<<
@@ -11714,7 +11754,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
       __pyx_r = __pyx_v_left_batch;
       goto __pyx_L0;
 
-      /* "sabot/_cython/operators/joins.pyx":132
+      /* "sabot/_cython/operators/joins.pyx":141
  * 
  *         if self._concatenated is None or self._total_rows == 0:
  *             if join_type in ('left', 'outer'):             # <<<<<<<<<<<<<<
@@ -11723,7 +11763,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
     }
 
-    /* "sabot/_cython/operators/joins.pyx":135
+    /* "sabot/_cython/operators/joins.pyx":144
  *                 return left_batch
  *             else:
  *                 return None             # <<<<<<<<<<<<<<
@@ -11736,7 +11776,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
       goto __pyx_L0;
     }
 
-    /* "sabot/_cython/operators/joins.pyx":131
+    /* "sabot/_cython/operators/joins.pyx":140
  *             self.build_index()
  * 
  *         if self._concatenated is None or self._total_rows == 0:             # <<<<<<<<<<<<<<
@@ -11745,7 +11785,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":138
+  /* "sabot/_cython/operators/joins.pyx":147
  * 
  *         # Extract left keys as Python lists (bulk)
  *         left_key_lists = [left_batch.column(col).to_pylist() for col in left_keys]             # <<<<<<<<<<<<<<
@@ -11753,11 +11793,11 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
  *         # Build indices for take operations
 */
   { /* enter inner scope */
-    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 138, __pyx_L12_error)
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 147, __pyx_L12_error)
     __Pyx_GOTREF(__pyx_t_2);
     if (unlikely(__pyx_v_left_keys == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 138, __pyx_L12_error)
+      __PYX_ERR(0, 147, __pyx_L12_error)
     }
     __pyx_t_3 = __pyx_v_left_keys; __Pyx_INCREF(__pyx_t_3);
     __pyx_t_7 = 0;
@@ -11765,13 +11805,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
       {
         Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_3);
         #if !CYTHON_ASSUME_SAFE_SIZE
-        if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 138, __pyx_L12_error)
+        if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 147, __pyx_L12_error)
         #endif
         if (__pyx_t_7 >= __pyx_temp) break;
       }
       __pyx_t_8 = __Pyx_PyList_GetItemRef(__pyx_t_3, __pyx_t_7);
       ++__pyx_t_7;
-      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 138, __pyx_L12_error)
+      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 147, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_XDECREF_SET(__pyx_8genexpr2__pyx_v_col, __pyx_t_8);
       __pyx_t_8 = 0;
@@ -11782,7 +11822,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
         PyObject *__pyx_callargs[2] = {__pyx_t_11, __pyx_8genexpr2__pyx_v_col};
         __pyx_t_10 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_4, (2-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 138, __pyx_L12_error)
+        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 147, __pyx_L12_error)
         __Pyx_GOTREF(__pyx_t_10);
       }
       __pyx_t_9 = __pyx_t_10;
@@ -11793,10 +11833,10 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
         __pyx_t_8 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_pylist, __pyx_callargs+__pyx_t_4, (1-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-        if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 138, __pyx_L12_error)
+        if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 147, __pyx_L12_error)
         __Pyx_GOTREF(__pyx_t_8);
       }
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_t_8))) __PYX_ERR(0, 138, __pyx_L12_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_t_8))) __PYX_ERR(0, 147, __pyx_L12_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -11811,61 +11851,61 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __pyx_cur_scope->__pyx_v_left_key_lists = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":141
+  /* "sabot/_cython/operators/joins.pyx":150
  * 
  *         # Build indices for take operations
  *         left_indices = []             # <<<<<<<<<<<<<<
  *         right_indices = []
  * 
 */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_left_indices = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":142
+  /* "sabot/_cython/operators/joins.pyx":151
  *         # Build indices for take operations
  *         left_indices = []
  *         right_indices = []             # <<<<<<<<<<<<<<
  * 
  *         cdef int64_t i
 */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 151, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_right_indices = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":145
+  /* "sabot/_cython/operators/joins.pyx":154
  * 
  *         cdef int64_t i
  *         for i in range(left_batch.num_rows):             # <<<<<<<<<<<<<<
  *             # Create probe key
  *             probe_key = tuple(left_key_lists[j][i] for j in range(len(left_keys)))
 */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_left_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_left_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_7 = __Pyx_PyIndex_AsSsize_t(__pyx_t_2); if (unlikely((__pyx_t_7 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyIndex_AsSsize_t(__pyx_t_2); if (unlikely((__pyx_t_7 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_12 = __pyx_t_7;
   for (__pyx_t_13 = 0; __pyx_t_13 < __pyx_t_12; __pyx_t_13+=1) {
     __pyx_cur_scope->__pyx_v_i = __pyx_t_13;
 
-    /* "sabot/_cython/operators/joins.pyx":147
+    /* "sabot/_cython/operators/joins.pyx":156
  *         for i in range(left_batch.num_rows):
  *             # Create probe key
  *             probe_key = tuple(left_key_lists[j][i] for j in range(len(left_keys)))             # <<<<<<<<<<<<<<
  * 
  *             # Lookup in hash index
 */
-    __pyx_t_2 = __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_left_keys); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 147, __pyx_L1_error)
+    __pyx_t_2 = __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_left_keys); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PySequence_Tuple(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 147, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PySequence_Tuple(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 156, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_probe_key, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":150
+    /* "sabot/_cython/operators/joins.pyx":159
  * 
  *             # Lookup in hash index
  *             right_rows = self._hash_index.get(probe_key, [])             # <<<<<<<<<<<<<<
@@ -11874,27 +11914,27 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
     if (unlikely(__pyx_v_self->_hash_index == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "get");
-      __PYX_ERR(0, 150, __pyx_L1_error)
+      __PYX_ERR(0, 159, __pyx_L1_error)
     }
-    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 150, __pyx_L1_error)
+    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 159, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_self->_hash_index, __pyx_v_probe_key, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 150, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_self->_hash_index, __pyx_v_probe_key, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF_SET(__pyx_v_right_rows, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":152
+    /* "sabot/_cython/operators/joins.pyx":161
  *             right_rows = self._hash_index.get(probe_key, [])
  * 
  *             if right_rows:             # <<<<<<<<<<<<<<
  *                 # Inner/Left join: emit one output row per match
  *                 for right_idx in right_rows:
 */
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_right_rows); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_right_rows); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 161, __pyx_L1_error)
     if (__pyx_t_5) {
 
-      /* "sabot/_cython/operators/joins.pyx":154
+      /* "sabot/_cython/operators/joins.pyx":163
  *             if right_rows:
  *                 # Inner/Left join: emit one output row per match
  *                 for right_idx in right_rows:             # <<<<<<<<<<<<<<
@@ -11906,9 +11946,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
         __pyx_t_14 = 0;
         __pyx_t_15 = NULL;
       } else {
-        __pyx_t_14 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_right_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 154, __pyx_L1_error)
+        __pyx_t_14 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_right_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 163, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_15 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 154, __pyx_L1_error)
+        __pyx_t_15 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 163, __pyx_L1_error)
       }
       for (;;) {
         if (likely(!__pyx_t_15)) {
@@ -11916,7 +11956,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 154, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 163, __pyx_L1_error)
               #endif
               if (__pyx_t_14 >= __pyx_temp) break;
             }
@@ -11926,7 +11966,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
             {
               Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 154, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 163, __pyx_L1_error)
               #endif
               if (__pyx_t_14 >= __pyx_temp) break;
             }
@@ -11937,13 +11977,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
             #endif
             ++__pyx_t_14;
           }
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 154, __pyx_L1_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
         } else {
           __pyx_t_3 = __pyx_t_15(__pyx_t_2);
           if (unlikely(!__pyx_t_3)) {
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
-              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 154, __pyx_L1_error)
+              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 163, __pyx_L1_error)
               PyErr_Clear();
             }
             break;
@@ -11953,28 +11993,28 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
         __Pyx_XDECREF_SET(__pyx_v_right_idx, __pyx_t_3);
         __pyx_t_3 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":155
+        /* "sabot/_cython/operators/joins.pyx":164
  *                 # Inner/Left join: emit one output row per match
  *                 for right_idx in right_rows:
  *                     left_indices.append(i)             # <<<<<<<<<<<<<<
  *                     right_indices.append(right_idx)
  *             elif join_type in ('left', 'outer'):
 */
-        __pyx_t_3 = __Pyx_PyLong_From_int64_t(__pyx_cur_scope->__pyx_v_i); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 155, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyLong_From_int64_t(__pyx_cur_scope->__pyx_v_i); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 164, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_left_indices, __pyx_t_3); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 155, __pyx_L1_error)
+        __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_left_indices, __pyx_t_3); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 164, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":156
+        /* "sabot/_cython/operators/joins.pyx":165
  *                 for right_idx in right_rows:
  *                     left_indices.append(i)
  *                     right_indices.append(right_idx)             # <<<<<<<<<<<<<<
  *             elif join_type in ('left', 'outer'):
  *                 # Left/Outer join: emit left row with nulls
 */
-        __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_right_indices, __pyx_v_right_idx); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 156, __pyx_L1_error)
+        __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_right_indices, __pyx_v_right_idx); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 165, __pyx_L1_error)
 
-        /* "sabot/_cython/operators/joins.pyx":154
+        /* "sabot/_cython/operators/joins.pyx":163
  *             if right_rows:
  *                 # Inner/Left join: emit one output row per match
  *                 for right_idx in right_rows:             # <<<<<<<<<<<<<<
@@ -11984,7 +12024,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
       }
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":152
+      /* "sabot/_cython/operators/joins.pyx":161
  *             right_rows = self._hash_index.get(probe_key, [])
  * 
  *             if right_rows:             # <<<<<<<<<<<<<<
@@ -11994,7 +12034,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
       goto __pyx_L19;
     }
 
-    /* "sabot/_cython/operators/joins.pyx":157
+    /* "sabot/_cython/operators/joins.pyx":166
  *                     left_indices.append(i)
  *                     right_indices.append(right_idx)
  *             elif join_type in ('left', 'outer'):             # <<<<<<<<<<<<<<
@@ -12003,41 +12043,41 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
     __Pyx_INCREF(__pyx_v_join_type);
     __pyx_t_6 = __pyx_v_join_type;
-    __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_left, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 157, __pyx_L1_error)
+    __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_left, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 166, __pyx_L1_error)
     if (!__pyx_t_1) {
     } else {
       __pyx_t_5 = __pyx_t_1;
       goto __pyx_L23_bool_binop_done;
     }
-    __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_outer, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 157, __pyx_L1_error)
+    __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_outer, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 166, __pyx_L1_error)
     __pyx_t_5 = __pyx_t_1;
     __pyx_L23_bool_binop_done:;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_1 = __pyx_t_5;
     if (__pyx_t_1) {
 
-      /* "sabot/_cython/operators/joins.pyx":159
+      /* "sabot/_cython/operators/joins.pyx":168
  *             elif join_type in ('left', 'outer'):
  *                 # Left/Outer join: emit left row with nulls
  *                 left_indices.append(i)             # <<<<<<<<<<<<<<
  *                 right_indices.append(None)  # Will handle nulls below
  * 
 */
-      __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_cur_scope->__pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyLong_From_int64_t(__pyx_cur_scope->__pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 168, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_left_indices, __pyx_t_2); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_left_indices, __pyx_t_2); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 168, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":160
+      /* "sabot/_cython/operators/joins.pyx":169
  *                 # Left/Outer join: emit left row with nulls
  *                 left_indices.append(i)
  *                 right_indices.append(None)  # Will handle nulls below             # <<<<<<<<<<<<<<
  * 
  *         if not left_indices:
 */
-      __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_right_indices, Py_None); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 160, __pyx_L1_error)
+      __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_right_indices, Py_None); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 169, __pyx_L1_error)
 
-      /* "sabot/_cython/operators/joins.pyx":157
+      /* "sabot/_cython/operators/joins.pyx":166
  *                     left_indices.append(i)
  *                     right_indices.append(right_idx)
  *             elif join_type in ('left', 'outer'):             # <<<<<<<<<<<<<<
@@ -12048,7 +12088,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
     __pyx_L19:;
   }
 
-  /* "sabot/_cython/operators/joins.pyx":162
+  /* "sabot/_cython/operators/joins.pyx":171
  *                 right_indices.append(None)  # Will handle nulls below
  * 
  *         if not left_indices:             # <<<<<<<<<<<<<<
@@ -12057,14 +12097,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
   {
     Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_left_indices);
-    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 162, __pyx_L1_error)
+    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 171, __pyx_L1_error)
     __pyx_t_1 = (__pyx_temp != 0);
   }
 
   __pyx_t_5 = (!__pyx_t_1);
   if (__pyx_t_5) {
 
-    /* "sabot/_cython/operators/joins.pyx":163
+    /* "sabot/_cython/operators/joins.pyx":172
  * 
  *         if not left_indices:
  *             return None             # <<<<<<<<<<<<<<
@@ -12075,7 +12115,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/joins.pyx":162
+    /* "sabot/_cython/operators/joins.pyx":171
  *                 right_indices.append(None)  # Will handle nulls below
  * 
  *         if not left_indices:             # <<<<<<<<<<<<<<
@@ -12084,7 +12124,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":166
+  /* "sabot/_cython/operators/joins.pyx":175
  * 
  *         # Use Arrow take() kernel for vectorized selection (SIMD-accelerated)
  *         left_selected = left_batch.take(pa.array(left_indices))             # <<<<<<<<<<<<<<
@@ -12094,9 +12134,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __pyx_t_3 = __pyx_v_left_batch;
   __Pyx_INCREF(__pyx_t_3);
   __pyx_t_10 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 166, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 175, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 166, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 175, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   __pyx_t_4 = 1;
@@ -12116,7 +12156,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
     __pyx_t_8 = __Pyx_PyObject_FastCall(__pyx_t_11, __pyx_callargs+__pyx_t_4, (2-__pyx_t_4) | (__pyx_t_4*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 166, __pyx_L1_error)
+    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
   }
   __pyx_t_4 = 0;
@@ -12125,29 +12165,29 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_take, __pyx_callargs+__pyx_t_4, (2-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 166, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __pyx_v_left_selected = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":169
+  /* "sabot/_cython/operators/joins.pyx":178
  * 
  *         # Handle right side selection
  *         if any(idx is None for idx in right_indices):             # <<<<<<<<<<<<<<
  *             # Has nulls - need to handle left join case
  *             right_selected = self._take_with_nulls(self._concatenated, right_indices)
 */
-  __pyx_t_2 = __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_3genexpr(NULL, __pyx_v_right_indices); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_2 = __pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_3genexpr(NULL, __pyx_v_right_indices); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 178, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_8 = __Pyx_Generator_GetInlinedResult(__pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_Generator_GetInlinedResult(__pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 178, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 178, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   if (__pyx_t_5) {
 
-    /* "sabot/_cython/operators/joins.pyx":171
+    /* "sabot/_cython/operators/joins.pyx":180
  *         if any(idx is None for idx in right_indices):
  *             # Has nulls - need to handle left join case
  *             right_selected = self._take_with_nulls(self._concatenated, right_indices)             # <<<<<<<<<<<<<<
@@ -12156,13 +12196,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
 */
     __pyx_t_8 = __pyx_v_self->_concatenated;
     __Pyx_INCREF(__pyx_t_8);
-    __pyx_t_2 = __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder__take_with_nulls(__pyx_v_self, __pyx_t_8, __pyx_v_right_indices); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
+    __pyx_t_2 = __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder__take_with_nulls(__pyx_v_self, __pyx_t_8, __pyx_v_right_indices); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 180, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_v_right_selected = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":169
+    /* "sabot/_cython/operators/joins.pyx":178
  * 
  *         # Handle right side selection
  *         if any(idx is None for idx in right_indices):             # <<<<<<<<<<<<<<
@@ -12172,7 +12212,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
     goto __pyx_L26;
   }
 
-  /* "sabot/_cython/operators/joins.pyx":174
+  /* "sabot/_cython/operators/joins.pyx":183
  *         else:
  *             # All valid indices - use fast take
  *             right_selected = self._concatenated.take(pa.array(right_indices))             # <<<<<<<<<<<<<<
@@ -12183,9 +12223,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
     __pyx_t_8 = __pyx_v_self->_concatenated;
     __Pyx_INCREF(__pyx_t_8);
     __pyx_t_11 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 174, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 183, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_array); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 174, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_array); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 183, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     __pyx_t_4 = 1;
@@ -12205,7 +12245,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
       __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_9, __pyx_callargs+__pyx_t_4, (2-__pyx_t_4) | (__pyx_t_4*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 174, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
     }
     __pyx_t_4 = 0;
@@ -12214,7 +12254,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_take, __pyx_callargs+__pyx_t_4, (2-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 174, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 183, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __pyx_v_right_selected = __pyx_t_2;
@@ -12222,7 +12262,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   }
   __pyx_L26:;
 
-  /* "sabot/_cython/operators/joins.pyx":177
+  /* "sabot/_cython/operators/joins.pyx":186
  * 
  *         # Combine left and right (handle column name conflicts)
  *         return self._combine_batches(left_selected, right_selected, left_keys)             # <<<<<<<<<<<<<<
@@ -12230,13 +12270,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
  *     cdef object _take_with_nulls(self, object table, list indices):
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder__combine_batches(__pyx_v_self, __pyx_v_left_selected, __pyx_v_right_selected, __pyx_v_left_keys); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder__combine_batches(__pyx_v_self, __pyx_v_left_selected, __pyx_v_right_selected, __pyx_v_left_keys); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 186, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/joins.pyx":116
+  /* "sabot/_cython/operators/joins.pyx":125
  *         self._is_built = True
  * 
  *     def probe_batch_vectorized(self, object left_batch, list left_keys, str join_type):             # <<<<<<<<<<<<<<
@@ -12264,15 +12304,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   __Pyx_XDECREF(__pyx_v_left_selected);
   __Pyx_XDECREF(__pyx_v_right_selected);
   __Pyx_XDECREF(__pyx_8genexpr2__pyx_v_col);
-  __Pyx_XDECREF(__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_2generator4);
-  __Pyx_XDECREF(__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_5generator5);
+  __Pyx_XDECREF(__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_2generator5);
+  __Pyx_XDECREF(__pyx_gb_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_22probe_batch_vectorized_5generator6);
   __Pyx_DECREF((PyObject *)__pyx_cur_scope);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":179
+/* "sabot/_cython/operators/joins.pyx":188
  *         return self._combine_batches(left_selected, right_selected, left_keys)
  * 
  *     cdef object _take_with_nulls(self, object table, list indices):             # <<<<<<<<<<<<<<
@@ -12318,31 +12358,31 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_take_with_nulls", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":182
+  /* "sabot/_cython/operators/joins.pyx":191
  *         """Take from table handling None indices (for left join)."""
  *         # Split into valid and null positions
  *         valid_indices = []             # <<<<<<<<<<<<<<
  *         valid_positions = []
  * 
 */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_valid_indices = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":183
+  /* "sabot/_cython/operators/joins.pyx":192
  *         # Split into valid and null positions
  *         valid_indices = []
  *         valid_positions = []             # <<<<<<<<<<<<<<
  * 
  *         for pos, idx in enumerate(indices):
 */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_valid_positions = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":185
+  /* "sabot/_cython/operators/joins.pyx":194
  *         valid_positions = []
  * 
  *         for pos, idx in enumerate(indices):             # <<<<<<<<<<<<<<
@@ -12356,20 +12396,20 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     {
       Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
       #if !CYTHON_ASSUME_SAFE_SIZE
-      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 185, __pyx_L1_error)
+      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 194, __pyx_L1_error)
       #endif
       if (__pyx_t_3 >= __pyx_temp) break;
     }
     __pyx_t_4 = __Pyx_PyList_GetItemRef(__pyx_t_1, __pyx_t_3);
     ++__pyx_t_3;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 185, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 194, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_XDECREF_SET(__pyx_v_idx, __pyx_t_4);
     __pyx_t_4 = 0;
     __pyx_v_pos = __pyx_t_2;
     __pyx_t_2 = (__pyx_t_2 + 1);
 
-    /* "sabot/_cython/operators/joins.pyx":186
+    /* "sabot/_cython/operators/joins.pyx":195
  * 
  *         for pos, idx in enumerate(indices):
  *             if idx is not None:             # <<<<<<<<<<<<<<
@@ -12379,28 +12419,28 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __pyx_t_5 = (__pyx_v_idx != Py_None);
     if (__pyx_t_5) {
 
-      /* "sabot/_cython/operators/joins.pyx":187
+      /* "sabot/_cython/operators/joins.pyx":196
  *         for pos, idx in enumerate(indices):
  *             if idx is not None:
  *                 valid_indices.append(idx)             # <<<<<<<<<<<<<<
  *                 valid_positions.append(pos)
  * 
 */
-      __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_valid_indices, __pyx_v_idx); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 187, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_valid_indices, __pyx_v_idx); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 196, __pyx_L1_error)
 
-      /* "sabot/_cython/operators/joins.pyx":188
+      /* "sabot/_cython/operators/joins.pyx":197
  *             if idx is not None:
  *                 valid_indices.append(idx)
  *                 valid_positions.append(pos)             # <<<<<<<<<<<<<<
  * 
  *         if not valid_indices:
 */
-      __pyx_t_4 = PyLong_FromSsize_t(__pyx_v_pos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_4 = PyLong_FromSsize_t(__pyx_v_pos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 197, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_valid_positions, __pyx_t_4); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_valid_positions, __pyx_t_4); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 197, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":186
+      /* "sabot/_cython/operators/joins.pyx":195
  * 
  *         for pos, idx in enumerate(indices):
  *             if idx is not None:             # <<<<<<<<<<<<<<
@@ -12409,7 +12449,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
     }
 
-    /* "sabot/_cython/operators/joins.pyx":185
+    /* "sabot/_cython/operators/joins.pyx":194
  *         valid_positions = []
  * 
  *         for pos, idx in enumerate(indices):             # <<<<<<<<<<<<<<
@@ -12419,7 +12459,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":190
+  /* "sabot/_cython/operators/joins.pyx":199
  *                 valid_positions.append(pos)
  * 
  *         if not valid_indices:             # <<<<<<<<<<<<<<
@@ -12428,14 +12468,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
   {
     Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_valid_indices);
-    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 190, __pyx_L1_error)
+    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 199, __pyx_L1_error)
     __pyx_t_5 = (__pyx_temp != 0);
   }
 
   __pyx_t_7 = (!__pyx_t_5);
   if (__pyx_t_7) {
 
-    /* "sabot/_cython/operators/joins.pyx":192
+    /* "sabot/_cython/operators/joins.pyx":201
  *         if not valid_indices:
  *             # All nulls - return table with all null values
  *             return self._create_null_batch(table.schema, len(indices))             # <<<<<<<<<<<<<<
@@ -12443,21 +12483,21 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
  *         # Take valid rows
 */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_table, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 192, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_table, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     if (unlikely(__pyx_v_indices == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-      __PYX_ERR(0, 192, __pyx_L1_error)
+      __PYX_ERR(0, 201, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyList_GET_SIZE(__pyx_v_indices); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 192, __pyx_L1_error)
-    __pyx_t_4 = __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder__create_null_batch(__pyx_v_self, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 192, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyList_GET_SIZE(__pyx_v_indices); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 201, __pyx_L1_error)
+    __pyx_t_4 = __pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder__create_null_batch(__pyx_v_self, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_r = __pyx_t_4;
     __pyx_t_4 = 0;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/joins.pyx":190
+    /* "sabot/_cython/operators/joins.pyx":199
  *                 valid_positions.append(pos)
  * 
  *         if not valid_indices:             # <<<<<<<<<<<<<<
@@ -12466,7 +12506,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":195
+  /* "sabot/_cython/operators/joins.pyx":204
  * 
  *         # Take valid rows
  *         selected = table.take(pa.array(valid_indices))             # <<<<<<<<<<<<<<
@@ -12476,9 +12516,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   __pyx_t_1 = __pyx_v_table;
   __Pyx_INCREF(__pyx_t_1);
   __pyx_t_9 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 204, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 204, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
   __pyx_t_12 = 1;
@@ -12498,7 +12538,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __pyx_t_8 = __Pyx_PyObject_FastCall(__pyx_t_11, __pyx_callargs+__pyx_t_12, (2-__pyx_t_12) | (__pyx_t_12*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 195, __pyx_L1_error)
+    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
   }
   __pyx_t_12 = 0;
@@ -12507,29 +12547,29 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_take, __pyx_callargs+__pyx_t_12, (2-__pyx_t_12) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 195, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __pyx_v_selected = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":198
+  /* "sabot/_cython/operators/joins.pyx":207
  * 
  *         # If all valid, return as-is
  *         if len(valid_indices) == len(indices):             # <<<<<<<<<<<<<<
  *             return selected
  * 
 */
-  __pyx_t_2 = __Pyx_PyList_GET_SIZE(__pyx_v_valid_indices); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyList_GET_SIZE(__pyx_v_valid_indices); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 207, __pyx_L1_error)
   if (unlikely(__pyx_v_indices == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 198, __pyx_L1_error)
+    __PYX_ERR(0, 207, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyList_GET_SIZE(__pyx_v_indices); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyList_GET_SIZE(__pyx_v_indices); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 207, __pyx_L1_error)
   __pyx_t_7 = (__pyx_t_2 == __pyx_t_3);
   if (__pyx_t_7) {
 
-    /* "sabot/_cython/operators/joins.pyx":199
+    /* "sabot/_cython/operators/joins.pyx":208
  *         # If all valid, return as-is
  *         if len(valid_indices) == len(indices):
  *             return selected             # <<<<<<<<<<<<<<
@@ -12541,7 +12581,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __pyx_r = __pyx_v_selected;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/joins.pyx":198
+    /* "sabot/_cython/operators/joins.pyx":207
  * 
  *         # If all valid, return as-is
  *         if len(valid_indices) == len(indices):             # <<<<<<<<<<<<<<
@@ -12550,7 +12590,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":203
+  /* "sabot/_cython/operators/joins.pyx":212
  *         # Need to insert nulls at appropriate positions
  *         # For now, use Python fallback (TODO: optimize with Arrow)
  *         result_dict = {col: [] for col in selected.schema.names}             # <<<<<<<<<<<<<<
@@ -12558,11 +12598,11 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
  *         selected_list = selected.to_pylist()
 */
   { /* enter inner scope */
-    __pyx_t_4 = PyDict_New(); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 203, __pyx_L11_error)
+    __pyx_t_4 = PyDict_New(); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 212, __pyx_L11_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_selected, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 203, __pyx_L11_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_selected, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 212, __pyx_L11_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L11_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L11_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
@@ -12570,9 +12610,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
       __pyx_t_3 = 0;
       __pyx_t_13 = NULL;
     } else {
-      __pyx_t_3 = -1; __pyx_t_8 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 203, __pyx_L11_error)
+      __pyx_t_3 = -1; __pyx_t_8 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 212, __pyx_L11_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_13 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_8); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 203, __pyx_L11_error)
+      __pyx_t_13 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_8); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 212, __pyx_L11_error)
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     for (;;) {
@@ -12581,7 +12621,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
           {
             Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_8);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 203, __pyx_L11_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 212, __pyx_L11_error)
             #endif
             if (__pyx_t_3 >= __pyx_temp) break;
           }
@@ -12591,7 +12631,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
           {
             Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_8);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 203, __pyx_L11_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 212, __pyx_L11_error)
             #endif
             if (__pyx_t_3 >= __pyx_temp) break;
           }
@@ -12602,13 +12642,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
           #endif
           ++__pyx_t_3;
         }
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L11_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L11_error)
       } else {
         __pyx_t_1 = __pyx_t_13(__pyx_t_8);
         if (unlikely(!__pyx_t_1)) {
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
-            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 203, __pyx_L11_error)
+            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 212, __pyx_L11_error)
             PyErr_Clear();
           }
           break;
@@ -12617,9 +12657,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_XDECREF_SET(__pyx_8genexpr5__pyx_v_col, __pyx_t_1);
       __pyx_t_1 = 0;
-      __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L11_error)
+      __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L11_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (unlikely(PyDict_SetItem(__pyx_t_4, (PyObject*)__pyx_8genexpr5__pyx_v_col, (PyObject*)__pyx_t_1))) __PYX_ERR(0, 203, __pyx_L11_error)
+      if (unlikely(PyDict_SetItem(__pyx_t_4, (PyObject*)__pyx_8genexpr5__pyx_v_col, (PyObject*)__pyx_t_1))) __PYX_ERR(0, 212, __pyx_L11_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -12633,7 +12673,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   __pyx_v_result_dict = ((PyObject*)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":205
+  /* "sabot/_cython/operators/joins.pyx":214
  *         result_dict = {col: [] for col in selected.schema.names}
  * 
  *         selected_list = selected.to_pylist()             # <<<<<<<<<<<<<<
@@ -12647,13 +12687,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     PyObject *__pyx_callargs[2] = {__pyx_t_8, NULL};
     __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_pylist, __pyx_callargs+__pyx_t_12, (1-__pyx_t_12) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 205, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 214, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __pyx_v_selected_list = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":206
+  /* "sabot/_cython/operators/joins.pyx":215
  * 
  *         selected_list = selected.to_pylist()
  *         selected_idx = 0             # <<<<<<<<<<<<<<
@@ -12663,7 +12703,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   __Pyx_INCREF(__pyx_mstate_global->__pyx_int_0);
   __pyx_v_selected_idx = __pyx_mstate_global->__pyx_int_0;
 
-  /* "sabot/_cython/operators/joins.pyx":208
+  /* "sabot/_cython/operators/joins.pyx":217
  *         selected_idx = 0
  * 
  *         for pos in range(len(indices)):             # <<<<<<<<<<<<<<
@@ -12672,14 +12712,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
   if (unlikely(__pyx_v_indices == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 208, __pyx_L1_error)
+    __PYX_ERR(0, 217, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyList_GET_SIZE(__pyx_v_indices); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 208, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyList_GET_SIZE(__pyx_v_indices); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 217, __pyx_L1_error)
   __pyx_t_2 = __pyx_t_3;
   for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_2; __pyx_t_14+=1) {
     __pyx_v_pos = __pyx_t_14;
 
-    /* "sabot/_cython/operators/joins.pyx":209
+    /* "sabot/_cython/operators/joins.pyx":218
  * 
  *         for pos in range(len(indices)):
  *             if indices[pos] is not None:             # <<<<<<<<<<<<<<
@@ -12688,24 +12728,27 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
     if (unlikely(__pyx_v_indices == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 209, __pyx_L1_error)
+      __PYX_ERR(0, 218, __pyx_L1_error)
     }
-    __pyx_t_7 = (__Pyx_PyList_GET_ITEM(__pyx_v_indices, __pyx_v_pos) != Py_None);
+    __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_indices, __pyx_v_pos, Py_ssize_t, 1, PyLong_FromSsize_t, 1, 1, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 218, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_7 = (__pyx_t_4 != Py_None);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_7) {
 
-      /* "sabot/_cython/operators/joins.pyx":210
+      /* "sabot/_cython/operators/joins.pyx":219
  *         for pos in range(len(indices)):
  *             if indices[pos] is not None:
  *                 row = selected_list[selected_idx]             # <<<<<<<<<<<<<<
  *                 for col in result_dict:
  *                     result_dict[col].append(row[col])
 */
-      __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_selected_list, __pyx_v_selected_idx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 210, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_selected_list, __pyx_v_selected_idx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 219, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_XDECREF_SET(__pyx_v_row, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":211
+      /* "sabot/_cython/operators/joins.pyx":220
  *             if indices[pos] is not None:
  *                 row = selected_list[selected_idx]
  *                 for col in result_dict:             # <<<<<<<<<<<<<<
@@ -12713,7 +12756,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
  *                 selected_idx += 1
 */
       __pyx_t_15 = 0;
-      __pyx_t_8 = __Pyx_dict_iterator(__pyx_v_result_dict, 1, ((PyObject *)NULL), (&__pyx_t_16), (&__pyx_t_17)); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_dict_iterator(__pyx_v_result_dict, 1, ((PyObject *)NULL), (&__pyx_t_16), (&__pyx_t_17)); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_XDECREF(__pyx_t_4);
       __pyx_t_4 = __pyx_t_8;
@@ -12721,41 +12764,41 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
       while (1) {
         __pyx_t_18 = __Pyx_dict_iter_next(__pyx_t_4, __pyx_t_16, &__pyx_t_15, &__pyx_t_8, NULL, NULL, __pyx_t_17);
         if (unlikely(__pyx_t_18 == 0)) break;
-        if (unlikely(__pyx_t_18 == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+        if (unlikely(__pyx_t_18 == -1)) __PYX_ERR(0, 220, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_XDECREF_SET(__pyx_v_col, __pyx_t_8);
         __pyx_t_8 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":212
+        /* "sabot/_cython/operators/joins.pyx":221
  *                 row = selected_list[selected_idx]
  *                 for col in result_dict:
  *                     result_dict[col].append(row[col])             # <<<<<<<<<<<<<<
  *                 selected_idx += 1
  *             else:
 */
-        __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_result_dict, __pyx_v_col); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 212, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_result_dict, __pyx_v_col); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 221, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_row, __pyx_v_col); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_row, __pyx_v_col); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 221, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_6 = __Pyx_PyObject_Append(__pyx_t_8, __pyx_t_1); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 212, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_Append(__pyx_t_8, __pyx_t_1); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 221, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       }
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":213
+      /* "sabot/_cython/operators/joins.pyx":222
  *                 for col in result_dict:
  *                     result_dict[col].append(row[col])
  *                 selected_idx += 1             # <<<<<<<<<<<<<<
  *             else:
  *                 for col in result_dict:
 */
-      __pyx_t_4 = __Pyx_PyLong_AddObjC(__pyx_v_selected_idx, __pyx_mstate_global->__pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 213, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyLong_AddObjC(__pyx_v_selected_idx, __pyx_mstate_global->__pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF_SET(__pyx_v_selected_idx, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":209
+      /* "sabot/_cython/operators/joins.pyx":218
  * 
  *         for pos in range(len(indices)):
  *             if indices[pos] is not None:             # <<<<<<<<<<<<<<
@@ -12765,7 +12808,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
       goto __pyx_L18;
     }
 
-    /* "sabot/_cython/operators/joins.pyx":215
+    /* "sabot/_cython/operators/joins.pyx":224
  *                 selected_idx += 1
  *             else:
  *                 for col in result_dict:             # <<<<<<<<<<<<<<
@@ -12774,7 +12817,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
     /*else*/ {
       __pyx_t_16 = 0;
-      __pyx_t_1 = __Pyx_dict_iterator(__pyx_v_result_dict, 1, ((PyObject *)NULL), (&__pyx_t_15), (&__pyx_t_17)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_dict_iterator(__pyx_v_result_dict, 1, ((PyObject *)NULL), (&__pyx_t_15), (&__pyx_t_17)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_XDECREF(__pyx_t_4);
       __pyx_t_4 = __pyx_t_1;
@@ -12782,21 +12825,21 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
       while (1) {
         __pyx_t_18 = __Pyx_dict_iter_next(__pyx_t_4, __pyx_t_15, &__pyx_t_16, &__pyx_t_1, NULL, NULL, __pyx_t_17);
         if (unlikely(__pyx_t_18 == 0)) break;
-        if (unlikely(__pyx_t_18 == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
+        if (unlikely(__pyx_t_18 == -1)) __PYX_ERR(0, 224, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_XDECREF_SET(__pyx_v_col, __pyx_t_1);
         __pyx_t_1 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":216
+        /* "sabot/_cython/operators/joins.pyx":225
  *             else:
  *                 for col in result_dict:
  *                     result_dict[col].append(None)             # <<<<<<<<<<<<<<
  * 
  *         return pa.RecordBatch.from_pylist([result_dict[col] for col in result_dict],
 */
-        __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_result_dict, __pyx_v_col); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_result_dict, __pyx_v_col); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 225, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_6 = __Pyx_PyObject_Append(__pyx_t_1, Py_None); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 216, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_Append(__pyx_t_1, Py_None); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 225, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       }
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -12804,7 +12847,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __pyx_L18:;
   }
 
-  /* "sabot/_cython/operators/joins.pyx":218
+  /* "sabot/_cython/operators/joins.pyx":227
  *                     result_dict[col].append(None)
  * 
  *         return pa.RecordBatch.from_pylist([result_dict[col] for col in result_dict],             # <<<<<<<<<<<<<<
@@ -12812,18 +12855,18 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
  * 
 */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 218, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 227, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_RecordBatch); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 218, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_RecordBatch); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 227, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __pyx_t_1 = __pyx_t_11;
   __Pyx_INCREF(__pyx_t_1);
   { /* enter inner scope */
-    __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 218, __pyx_L25_error)
+    __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 227, __pyx_L25_error)
     __Pyx_GOTREF(__pyx_t_8);
     __pyx_t_3 = 0;
-    __pyx_t_10 = __Pyx_dict_iterator(__pyx_v_result_dict, 1, ((PyObject *)NULL), (&__pyx_t_2), (&__pyx_t_17)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 218, __pyx_L25_error)
+    __pyx_t_10 = __Pyx_dict_iterator(__pyx_v_result_dict, 1, ((PyObject *)NULL), (&__pyx_t_2), (&__pyx_t_17)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 227, __pyx_L25_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_XDECREF(__pyx_t_9);
     __pyx_t_9 = __pyx_t_10;
@@ -12831,13 +12874,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     while (1) {
       __pyx_t_18 = __Pyx_dict_iter_next(__pyx_t_9, __pyx_t_2, &__pyx_t_3, &__pyx_t_10, NULL, NULL, __pyx_t_17);
       if (unlikely(__pyx_t_18 == 0)) break;
-      if (unlikely(__pyx_t_18 == -1)) __PYX_ERR(0, 218, __pyx_L25_error)
+      if (unlikely(__pyx_t_18 == -1)) __PYX_ERR(0, 227, __pyx_L25_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_XDECREF_SET(__pyx_8genexpr6__pyx_v_col, __pyx_t_10);
       __pyx_t_10 = 0;
-      __pyx_t_10 = __Pyx_PyDict_GetItem(__pyx_v_result_dict, __pyx_8genexpr6__pyx_v_col); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 218, __pyx_L25_error)
+      __pyx_t_10 = __Pyx_PyDict_GetItem(__pyx_v_result_dict, __pyx_8genexpr6__pyx_v_col); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 227, __pyx_L25_error)
       __Pyx_GOTREF(__pyx_t_10);
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_8, (PyObject*)__pyx_t_10))) __PYX_ERR(0, 218, __pyx_L25_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_8, (PyObject*)__pyx_t_10))) __PYX_ERR(0, 227, __pyx_L25_error)
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -12849,35 +12892,35 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __pyx_L28_exit_scope:;
   } /* exit inner scope */
 
-  /* "sabot/_cython/operators/joins.pyx":219
+  /* "sabot/_cython/operators/joins.pyx":228
  * 
  *         return pa.RecordBatch.from_pylist([result_dict[col] for col in result_dict],
  *                                           schema=selected.schema)             # <<<<<<<<<<<<<<
  * 
  *     cdef object _create_null_batch(self, object schema, int64_t num_rows):
 */
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_selected, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_selected, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 228, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __pyx_t_12 = 0;
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_1, __pyx_t_8};
-    __pyx_t_10 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 218, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 227, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_schema, __pyx_t_9, __pyx_t_10, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 218, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_schema, __pyx_t_9, __pyx_t_10, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 227, __pyx_L1_error)
     __pyx_t_4 = __Pyx_Object_VectorcallMethod_CallFromBuilder(__pyx_mstate_global->__pyx_n_u_from_pylist, __pyx_callargs+__pyx_t_12, (2-__pyx_t_12) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_10);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 218, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 227, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __pyx_r = __pyx_t_4;
   __pyx_t_4 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/joins.pyx":179
+  /* "sabot/_cython/operators/joins.pyx":188
  *         return self._combine_batches(left_selected, right_selected, left_keys)
  * 
  *     cdef object _take_with_nulls(self, object table, list indices):             # <<<<<<<<<<<<<<
@@ -12912,7 +12955,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":221
+/* "sabot/_cython/operators/joins.pyx":230
  *                                           schema=selected.schema)
  * 
  *     cdef object _create_null_batch(self, object schema, int64_t num_rows):             # <<<<<<<<<<<<<<
@@ -12941,19 +12984,19 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_create_null_batch", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":223
+  /* "sabot/_cython/operators/joins.pyx":232
  *     cdef object _create_null_batch(self, object schema, int64_t num_rows):
  *         """Create batch with all null values."""
  *         arrays = []             # <<<<<<<<<<<<<<
  *         for field in schema:
  *             arrays.append(pa.nulls(num_rows, type=field.type))
 */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 232, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_arrays = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":224
+  /* "sabot/_cython/operators/joins.pyx":233
  *         """Create batch with all null values."""
  *         arrays = []
  *         for field in schema:             # <<<<<<<<<<<<<<
@@ -12965,9 +13008,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __pyx_t_2 = 0;
     __pyx_t_3 = NULL;
   } else {
-    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_schema); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_schema); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 233, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_3 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 233, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_3)) {
@@ -12975,7 +13018,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 224, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 233, __pyx_L1_error)
           #endif
           if (__pyx_t_2 >= __pyx_temp) break;
         }
@@ -12985,7 +13028,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 224, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 233, __pyx_L1_error)
           #endif
           if (__pyx_t_2 >= __pyx_temp) break;
         }
@@ -12996,13 +13039,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
         #endif
         ++__pyx_t_2;
       }
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 224, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 233, __pyx_L1_error)
     } else {
       __pyx_t_4 = __pyx_t_3(__pyx_t_1);
       if (unlikely(!__pyx_t_4)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 224, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 233, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -13012,7 +13055,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __Pyx_XDECREF_SET(__pyx_v_field, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":225
+    /* "sabot/_cython/operators/joins.pyx":234
  *         arrays = []
  *         for field in schema:
  *             arrays.append(pa.nulls(num_rows, type=field.type))             # <<<<<<<<<<<<<<
@@ -13020,14 +13063,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
  * 
 */
     __pyx_t_5 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 225, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 234, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_nulls); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 225, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_nulls); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 234, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyLong_From_int64_t(__pyx_v_num_rows); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 225, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyLong_From_int64_t(__pyx_v_num_rows); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 234, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_field, __pyx_mstate_global->__pyx_n_u_type); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 225, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_field, __pyx_mstate_global->__pyx_n_u_type); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 234, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __pyx_t_9 = 1;
     #if CYTHON_UNPACK_METHODS
@@ -13043,22 +13086,22 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     #endif
     {
       PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_5, __pyx_t_6};
-      __pyx_t_10 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 225, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 234, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
-      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_type, __pyx_t_8, __pyx_t_10, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_type, __pyx_t_8, __pyx_t_10, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 234, __pyx_L1_error)
       __pyx_t_4 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_7, __pyx_callargs+__pyx_t_9, (2-__pyx_t_9) | (__pyx_t_9*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_10);
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 225, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 234, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
     }
-    __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_arrays, __pyx_t_4); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 225, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_arrays, __pyx_t_4); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 234, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":224
+    /* "sabot/_cython/operators/joins.pyx":233
  *         """Create batch with all null values."""
  *         arrays = []
  *         for field in schema:             # <<<<<<<<<<<<<<
@@ -13068,7 +13111,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":226
+  /* "sabot/_cython/operators/joins.pyx":235
  *         for field in schema:
  *             arrays.append(pa.nulls(num_rows, type=field.type))
  *         return pa.RecordBatch.from_arrays(arrays, schema=schema)             # <<<<<<<<<<<<<<
@@ -13076,9 +13119,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
  *     cdef object _combine_batches(self, object left_batch, object right_batch, list join_keys):
 */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_RecordBatch); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_RecordBatch); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_t_4 = __pyx_t_10;
@@ -13086,21 +13129,21 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   __pyx_t_9 = 0;
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_4, __pyx_v_arrays};
-    __pyx_t_7 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 226, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_schema, __pyx_v_schema, __pyx_t_7, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 226, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_schema, __pyx_v_schema, __pyx_t_7, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 235, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_VectorcallMethod_CallFromBuilder(__pyx_mstate_global->__pyx_n_u_from_arrays, __pyx_callargs+__pyx_t_9, (2-__pyx_t_9) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_7);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 226, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/joins.pyx":221
+  /* "sabot/_cython/operators/joins.pyx":230
  *                                           schema=selected.schema)
  * 
  *     cdef object _create_null_batch(self, object schema, int64_t num_rows):             # <<<<<<<<<<<<<<
@@ -13127,7 +13170,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":228
+/* "sabot/_cython/operators/joins.pyx":237
  *         return pa.RecordBatch.from_arrays(arrays, schema=schema)
  * 
  *     cdef object _combine_batches(self, object left_batch, object right_batch, list join_keys):             # <<<<<<<<<<<<<<
@@ -13158,34 +13201,34 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   __Pyx_RefNannySetupContext("_combine_batches", 0);
   __Pyx_INCREF(__pyx_v_right_batch);
 
-  /* "sabot/_cython/operators/joins.pyx":241
+  /* "sabot/_cython/operators/joins.pyx":250
  *         """
  *         # Convert right_batch to RecordBatch if it's a Table
  *         if isinstance(right_batch, pa.Table):             # <<<<<<<<<<<<<<
  *             right_batch = right_batch.to_batches()[0] if right_batch.num_rows > 0 else None
  * 
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_Table); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_Table); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 250, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = PyObject_IsInstance(__pyx_v_right_batch, __pyx_t_2); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_3 = PyObject_IsInstance(__pyx_v_right_batch, __pyx_t_2); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 250, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_3) {
 
-    /* "sabot/_cython/operators/joins.pyx":242
+    /* "sabot/_cython/operators/joins.pyx":251
  *         # Convert right_batch to RecordBatch if it's a Table
  *         if isinstance(right_batch, pa.Table):
  *             right_batch = right_batch.to_batches()[0] if right_batch.num_rows > 0 else None             # <<<<<<<<<<<<<<
  * 
  *         if right_batch is None:
 */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 242, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 251, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 242, __pyx_L1_error)
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 251, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 242, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 251, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_3) {
       __pyx_t_1 = __pyx_v_right_batch;
@@ -13195,10 +13238,10 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
         PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
         __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_batches, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 242, __pyx_L1_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 251, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 242, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 251, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_t_2 = __pyx_t_1;
@@ -13210,7 +13253,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __Pyx_DECREF_SET(__pyx_v_right_batch, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":241
+    /* "sabot/_cython/operators/joins.pyx":250
  *         """
  *         # Convert right_batch to RecordBatch if it's a Table
  *         if isinstance(right_batch, pa.Table):             # <<<<<<<<<<<<<<
@@ -13219,7 +13262,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":244
+  /* "sabot/_cython/operators/joins.pyx":253
  *             right_batch = right_batch.to_batches()[0] if right_batch.num_rows > 0 else None
  * 
  *         if right_batch is None:             # <<<<<<<<<<<<<<
@@ -13229,7 +13272,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   __pyx_t_3 = (__pyx_v_right_batch == Py_None);
   if (__pyx_t_3) {
 
-    /* "sabot/_cython/operators/joins.pyx":245
+    /* "sabot/_cython/operators/joins.pyx":254
  * 
  *         if right_batch is None:
  *             return left_batch             # <<<<<<<<<<<<<<
@@ -13241,7 +13284,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __pyx_r = __pyx_v_left_batch;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/joins.pyx":244
+    /* "sabot/_cython/operators/joins.pyx":253
  *             right_batch = right_batch.to_batches()[0] if right_batch.num_rows > 0 else None
  * 
  *         if right_batch is None:             # <<<<<<<<<<<<<<
@@ -13250,31 +13293,31 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":248
+  /* "sabot/_cython/operators/joins.pyx":257
  * 
  *         # Build combined schema
  *         arrays = []             # <<<<<<<<<<<<<<
  *         names = []
  * 
 */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 248, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 257, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_arrays = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":249
+  /* "sabot/_cython/operators/joins.pyx":258
  *         # Build combined schema
  *         arrays = []
  *         names = []             # <<<<<<<<<<<<<<
  * 
  *         # Add all left columns
 */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 249, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 258, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_names = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":252
+  /* "sabot/_cython/operators/joins.pyx":261
  * 
  *         # Add all left columns
  *         for i, name in enumerate(left_batch.schema.names):             # <<<<<<<<<<<<<<
@@ -13283,9 +13326,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
   __Pyx_INCREF(__pyx_mstate_global->__pyx_int_0);
   __pyx_t_2 = __pyx_mstate_global->__pyx_int_0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_left_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_left_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 261, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 261, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (likely(PyList_CheckExact(__pyx_t_4)) || PyTuple_CheckExact(__pyx_t_4)) {
@@ -13293,9 +13336,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __pyx_t_6 = 0;
     __pyx_t_7 = NULL;
   } else {
-    __pyx_t_6 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
+    __pyx_t_6 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 261, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 252, __pyx_L1_error)
+    __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 261, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   for (;;) {
@@ -13304,7 +13347,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 252, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 261, __pyx_L1_error)
           #endif
           if (__pyx_t_6 >= __pyx_temp) break;
         }
@@ -13314,7 +13357,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 252, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 261, __pyx_L1_error)
           #endif
           if (__pyx_t_6 >= __pyx_temp) break;
         }
@@ -13325,13 +13368,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
         #endif
         ++__pyx_t_6;
       }
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 252, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 261, __pyx_L1_error)
     } else {
       __pyx_t_4 = __pyx_t_7(__pyx_t_1);
       if (unlikely(!__pyx_t_4)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 252, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 261, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -13342,13 +13385,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __pyx_t_4 = 0;
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_2);
-    __pyx_t_4 = __Pyx_PyLong_AddObjC(__pyx_t_2, __pyx_mstate_global->__pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 252, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyLong_AddObjC(__pyx_t_2, __pyx_mstate_global->__pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 261, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2);
     __pyx_t_2 = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":253
+    /* "sabot/_cython/operators/joins.pyx":262
  *         # Add all left columns
  *         for i, name in enumerate(left_batch.schema.names):
  *             arrays.append(left_batch.column(i))             # <<<<<<<<<<<<<<
@@ -13362,22 +13405,22 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
       PyObject *__pyx_callargs[2] = {__pyx_t_8, __pyx_v_i};
       __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 253, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 262, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
     }
-    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_arrays, __pyx_t_4); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 253, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_arrays, __pyx_t_4); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 262, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":254
+    /* "sabot/_cython/operators/joins.pyx":263
  *         for i, name in enumerate(left_batch.schema.names):
  *             arrays.append(left_batch.column(i))
  *             names.append(name)             # <<<<<<<<<<<<<<
  * 
  *         # Add right columns (skip join keys, handle name conflicts)
 */
-    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_names, __pyx_v_name); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 254, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_names, __pyx_v_name); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 263, __pyx_L1_error)
 
-    /* "sabot/_cython/operators/joins.pyx":252
+    /* "sabot/_cython/operators/joins.pyx":261
  * 
  *         # Add all left columns
  *         for i, name in enumerate(left_batch.schema.names):             # <<<<<<<<<<<<<<
@@ -13388,19 +13431,19 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":257
+  /* "sabot/_cython/operators/joins.pyx":266
  * 
  *         # Add right columns (skip join keys, handle name conflicts)
  *         join_key_set = set(join_keys)             # <<<<<<<<<<<<<<
  *         for i, name in enumerate(right_batch.schema.names):
  *             if name in join_key_set:
 */
-  __pyx_t_2 = PySet_New(__pyx_v_join_keys); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __pyx_t_2 = PySet_New(__pyx_v_join_keys); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 266, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_join_key_set = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":258
+  /* "sabot/_cython/operators/joins.pyx":267
  *         # Add right columns (skip join keys, handle name conflicts)
  *         join_key_set = set(join_keys)
  *         for i, name in enumerate(right_batch.schema.names):             # <<<<<<<<<<<<<<
@@ -13409,9 +13452,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
   __Pyx_INCREF(__pyx_mstate_global->__pyx_int_0);
   __pyx_t_2 = __pyx_mstate_global->__pyx_int_0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 258, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 258, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 267, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (likely(PyList_CheckExact(__pyx_t_4)) || PyTuple_CheckExact(__pyx_t_4)) {
@@ -13419,9 +13462,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __pyx_t_6 = 0;
     __pyx_t_7 = NULL;
   } else {
-    __pyx_t_6 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 258, __pyx_L1_error)
+    __pyx_t_6 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 258, __pyx_L1_error)
+    __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 267, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   for (;;) {
@@ -13430,7 +13473,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 258, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 267, __pyx_L1_error)
           #endif
           if (__pyx_t_6 >= __pyx_temp) break;
         }
@@ -13440,7 +13483,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 258, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 267, __pyx_L1_error)
           #endif
           if (__pyx_t_6 >= __pyx_temp) break;
         }
@@ -13451,13 +13494,13 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
         #endif
         ++__pyx_t_6;
       }
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 258, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 267, __pyx_L1_error)
     } else {
       __pyx_t_4 = __pyx_t_7(__pyx_t_1);
       if (unlikely(!__pyx_t_4)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 258, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 267, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -13468,23 +13511,23 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
     __pyx_t_4 = 0;
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_2);
-    __pyx_t_4 = __Pyx_PyLong_AddObjC(__pyx_t_2, __pyx_mstate_global->__pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 258, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyLong_AddObjC(__pyx_t_2, __pyx_mstate_global->__pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 267, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2);
     __pyx_t_2 = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":259
+    /* "sabot/_cython/operators/joins.pyx":268
  *         join_key_set = set(join_keys)
  *         for i, name in enumerate(right_batch.schema.names):
  *             if name in join_key_set:             # <<<<<<<<<<<<<<
  *                 continue  # Skip join keys (already in left)
  * 
 */
-    __pyx_t_3 = (__Pyx_PySet_ContainsTF(__pyx_v_name, __pyx_v_join_key_set, Py_EQ)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 259, __pyx_L1_error)
+    __pyx_t_3 = (__Pyx_PySet_ContainsTF(__pyx_v_name, __pyx_v_join_key_set, Py_EQ)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 268, __pyx_L1_error)
     if (__pyx_t_3) {
 
-      /* "sabot/_cython/operators/joins.pyx":260
+      /* "sabot/_cython/operators/joins.pyx":269
  *         for i, name in enumerate(right_batch.schema.names):
  *             if name in join_key_set:
  *                 continue  # Skip join keys (already in left)             # <<<<<<<<<<<<<<
@@ -13493,7 +13536,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
       goto __pyx_L8_continue;
 
-      /* "sabot/_cython/operators/joins.pyx":259
+      /* "sabot/_cython/operators/joins.pyx":268
  *         join_key_set = set(join_keys)
  *         for i, name in enumerate(right_batch.schema.names):
  *             if name in join_key_set:             # <<<<<<<<<<<<<<
@@ -13502,32 +13545,32 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
     }
 
-    /* "sabot/_cython/operators/joins.pyx":263
+    /* "sabot/_cython/operators/joins.pyx":272
  * 
  *             # Handle name conflict
  *             if name in names:             # <<<<<<<<<<<<<<
  *                 name = f"{name}_right"
  * 
 */
-    __pyx_t_3 = (__Pyx_PySequence_ContainsTF(__pyx_v_name, __pyx_v_names, Py_EQ)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 263, __pyx_L1_error)
+    __pyx_t_3 = (__Pyx_PySequence_ContainsTF(__pyx_v_name, __pyx_v_names, Py_EQ)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 272, __pyx_L1_error)
     if (__pyx_t_3) {
 
-      /* "sabot/_cython/operators/joins.pyx":264
+      /* "sabot/_cython/operators/joins.pyx":273
  *             # Handle name conflict
  *             if name in names:
  *                 name = f"{name}_right"             # <<<<<<<<<<<<<<
  * 
  *             arrays.append(right_batch.column(i))
 */
-      __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_v_name, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 264, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_v_name, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 273, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_8 = __Pyx_PyUnicode_ConcatInPlace(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_right); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 264, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyUnicode_ConcatInPlace(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_right); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 273, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF_SET(__pyx_v_name, __pyx_t_8);
       __pyx_t_8 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":263
+      /* "sabot/_cython/operators/joins.pyx":272
  * 
  *             # Handle name conflict
  *             if name in names:             # <<<<<<<<<<<<<<
@@ -13536,7 +13579,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
 */
     }
 
-    /* "sabot/_cython/operators/joins.pyx":266
+    /* "sabot/_cython/operators/joins.pyx":275
  *                 name = f"{name}_right"
  * 
  *             arrays.append(right_batch.column(i))             # <<<<<<<<<<<<<<
@@ -13550,22 +13593,22 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
       PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_v_i};
       __pyx_t_8 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 266, __pyx_L1_error)
+      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 275, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
     }
-    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_arrays, __pyx_t_8); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 266, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_arrays, __pyx_t_8); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 275, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":267
+    /* "sabot/_cython/operators/joins.pyx":276
  * 
  *             arrays.append(right_batch.column(i))
  *             names.append(name)             # <<<<<<<<<<<<<<
  * 
  *         return pa.RecordBatch.from_arrays(arrays, names=names)
 */
-    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_names, __pyx_v_name); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 267, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_names, __pyx_v_name); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 276, __pyx_L1_error)
 
-    /* "sabot/_cython/operators/joins.pyx":258
+    /* "sabot/_cython/operators/joins.pyx":267
  *         # Add right columns (skip join keys, handle name conflicts)
  *         join_key_set = set(join_keys)
  *         for i, name in enumerate(right_batch.schema.names):             # <<<<<<<<<<<<<<
@@ -13577,7 +13620,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":269
+  /* "sabot/_cython/operators/joins.pyx":278
  *             names.append(name)
  * 
  *         return pa.RecordBatch.from_arrays(arrays, names=names)             # <<<<<<<<<<<<<<
@@ -13585,9 +13628,9 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
  * 
 */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_RecordBatch); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_RecordBatch); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __pyx_t_1 = __pyx_t_4;
@@ -13595,21 +13638,21 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableB
   __pyx_t_5 = 0;
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_1, __pyx_v_arrays};
-    __pyx_t_8 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 269, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_names, __pyx_v_names, __pyx_t_8, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 269, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_names, __pyx_v_names, __pyx_t_8, __pyx_callargs+2, 0) < 0) __PYX_ERR(0, 278, __pyx_L1_error)
     __pyx_t_2 = __Pyx_Object_VectorcallMethod_CallFromBuilder(__pyx_mstate_global->__pyx_n_u_from_arrays, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_8);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 269, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/joins.pyx":228
+  /* "sabot/_cython/operators/joins.pyx":237
  *         return pa.RecordBatch.from_arrays(arrays, schema=schema)
  * 
  *     cdef object _combine_batches(self, object left_batch, object right_batch, list join_keys):             # <<<<<<<<<<<<<<
@@ -14077,7 +14120,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_25StreamingHashTable
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":312
+/* "sabot/_cython/operators/joins.pyx":321
  *     """
  * 
  *     def __init__(self, left_source, right_source, left_keys: List[str],             # <<<<<<<<<<<<<<
@@ -14116,41 +14159,41 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_1
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_left_source,&__pyx_mstate_global->__pyx_n_u_right_source,&__pyx_mstate_global->__pyx_n_u_left_keys,&__pyx_mstate_global->__pyx_n_u_right_keys,&__pyx_mstate_global->__pyx_n_u_join_type,&__pyx_mstate_global->__pyx_n_u_schema,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 312, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 321, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  6:
         values[5] = __Pyx_ArgRef_VARARGS(__pyx_args, 5);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 312, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 321, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  5:
         values[4] = __Pyx_ArgRef_VARARGS(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 312, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 321, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_VARARGS(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 312, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 321, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 312, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 321, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 312, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 321, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 312, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 321, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 312, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 321, __pyx_L3_error)
       if (!values[4]) values[4] = __Pyx_NewRef(((PyObject*)__pyx_mstate_global->__pyx_n_u_inner));
 
-      /* "sabot/_cython/operators/joins.pyx":313
+      /* "sabot/_cython/operators/joins.pyx":322
  * 
  *     def __init__(self, left_source, right_source, left_keys: List[str],
  *                  right_keys: List[str], join_type: str = 'inner', schema=None):             # <<<<<<<<<<<<<<
@@ -14159,27 +14202,27 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_1
 */
       if (!values[5]) values[5] = __Pyx_NewRef(((PyObject *)Py_None));
       for (Py_ssize_t i = __pyx_nargs; i < 4; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 4, 6, i); __PYX_ERR(0, 312, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 4, 6, i); __PYX_ERR(0, 321, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  6:
         values[5] = __Pyx_ArgRef_VARARGS(__pyx_args, 5);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 312, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 321, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  5:
         values[4] = __Pyx_ArgRef_VARARGS(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 312, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 321, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_VARARGS(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 312, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 321, __pyx_L3_error)
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 312, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 321, __pyx_L3_error)
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 312, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 321, __pyx_L3_error)
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 312, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 321, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
@@ -14195,7 +14238,7 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_1
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 4, 6, __pyx_nargs); __PYX_ERR(0, 312, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 4, 6, __pyx_nargs); __PYX_ERR(0, 321, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -14206,12 +14249,12 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_1
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_left_keys), (&PyList_Type), 0, "left_keys", 2))) __PYX_ERR(0, 312, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_right_keys), (&PyList_Type), 0, "right_keys", 2))) __PYX_ERR(0, 313, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_join_type), (&PyUnicode_Type), 0, "join_type", 2))) __PYX_ERR(0, 313, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_left_keys), (&PyList_Type), 0, "left_keys", 2))) __PYX_ERR(0, 321, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_right_keys), (&PyList_Type), 0, "right_keys", 2))) __PYX_ERR(0, 322, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_join_type), (&PyUnicode_Type), 0, "join_type", 2))) __PYX_ERR(0, 322, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator___init__(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *)__pyx_v_self), __pyx_v_left_source, __pyx_v_right_source, __pyx_v_left_keys, __pyx_v_right_keys, __pyx_v_join_type, __pyx_v_schema);
 
-  /* "sabot/_cython/operators/joins.pyx":312
+  /* "sabot/_cython/operators/joins.pyx":321
  *     """
  * 
  *     def __init__(self, left_source, right_source, left_keys: List[str],             # <<<<<<<<<<<<<<
@@ -14242,67 +14285,76 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator__
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_4;
   PyObject *__pyx_t_5 = NULL;
-  size_t __pyx_t_6;
-  PyObject *__pyx_t_7 = NULL;
-  int __pyx_t_8;
-  int __pyx_t_9;
+  int __pyx_t_6;
+  int __pyx_t_7;
+  PyObject *__pyx_t_8 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":327
- *         # Initialize ShuffledOperator with left keys as partition keys
- *         # (left side gets shuffled to co-locate with right side)
- *         super().__init__(             # <<<<<<<<<<<<<<
- *             source=left_source,
- *             partition_keys=left_keys,  # Left keys for partitioning
+  /* "sabot/_cython/operators/joins.pyx":339
+ * 
+ *         # Set BaseOperator attributes
+ *         self._source = left_source             # <<<<<<<<<<<<<<
+ *         self._schema = schema
+ *         self._stateful = True
 */
-  __pyx_t_4 = NULL;
-  __Pyx_INCREF(__pyx_builtin_super);
-  __pyx_t_5 = __pyx_builtin_super; 
-  __pyx_t_6 = 1;
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_4, ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator), ((PyObject *)__pyx_v_self)};
-    __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+__pyx_t_6, (3-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 327, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-  }
-  __pyx_t_2 = __pyx_t_3;
-  __Pyx_INCREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_v_left_source);
+  __Pyx_GIVEREF(__pyx_v_left_source);
+  __Pyx_GOTREF(__pyx_v_self->__pyx_base.__pyx_base._source);
+  __Pyx_DECREF(__pyx_v_self->__pyx_base.__pyx_base._source);
+  __pyx_v_self->__pyx_base.__pyx_base._source = __pyx_v_left_source;
 
-  /* "sabot/_cython/operators/joins.pyx":331
- *             partition_keys=left_keys,  # Left keys for partitioning
- *             num_partitions=4,  # Will be overridden by JobManager
- *             schema=schema             # <<<<<<<<<<<<<<
- *         )
+  /* "sabot/_cython/operators/joins.pyx":340
+ *         # Set BaseOperator attributes
+ *         self._source = left_source
+ *         self._schema = schema             # <<<<<<<<<<<<<<
+ *         self._stateful = True
  * 
 */
-  __pyx_t_6 = 0;
-  {
-    PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 4 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_5 = __Pyx_MakeVectorcallBuilderKwds(4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 327, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_source, __pyx_v_left_source, __pyx_t_5, __pyx_callargs+1, 0) < 0) __PYX_ERR(0, 327, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_partition_keys, __pyx_v_left_keys, __pyx_t_5, __pyx_callargs+1, 1) < 0) __PYX_ERR(0, 327, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_num_partitions, __pyx_mstate_global->__pyx_int_4, __pyx_t_5, __pyx_callargs+1, 2) < 0) __PYX_ERR(0, 327, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_schema, __pyx_v_schema, __pyx_t_5, __pyx_callargs+1, 3) < 0) __PYX_ERR(0, 327, __pyx_L1_error)
-    __pyx_t_1 = __Pyx_Object_VectorcallMethod_CallFromBuilder(__pyx_mstate_global->__pyx_n_u_init, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_5);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 327, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_INCREF(__pyx_v_schema);
+  __Pyx_GIVEREF(__pyx_v_schema);
+  __Pyx_GOTREF(__pyx_v_self->__pyx_base.__pyx_base._schema);
+  __Pyx_DECREF(__pyx_v_self->__pyx_base.__pyx_base._schema);
+  __pyx_v_self->__pyx_base.__pyx_base._schema = __pyx_v_schema;
 
-  /* "sabot/_cython/operators/joins.pyx":334
- *         )
+  /* "sabot/_cython/operators/joins.pyx":341
+ *         self._source = left_source
+ *         self._schema = schema
+ *         self._stateful = True             # <<<<<<<<<<<<<<
  * 
+ *         # Set ShuffledOperator attributes
+*/
+  __pyx_v_self->__pyx_base._stateful = 1;
+
+  /* "sabot/_cython/operators/joins.pyx":344
+ * 
+ *         # Set ShuffledOperator attributes
+ *         self._partition_keys = left_keys  # Left keys for partitioning             # <<<<<<<<<<<<<<
+ *         self._num_partitions = 4  # Will be overridden by JobManager
+ * 
+*/
+  __Pyx_INCREF(__pyx_v_left_keys);
+  __Pyx_GIVEREF(__pyx_v_left_keys);
+  __Pyx_GOTREF(__pyx_v_self->__pyx_base._partition_keys);
+  __Pyx_DECREF(__pyx_v_self->__pyx_base._partition_keys);
+  __pyx_v_self->__pyx_base._partition_keys = __pyx_v_left_keys;
+
+  /* "sabot/_cython/operators/joins.pyx":345
+ *         # Set ShuffledOperator attributes
+ *         self._partition_keys = left_keys  # Left keys for partitioning
+ *         self._num_partitions = 4  # Will be overridden by JobManager             # <<<<<<<<<<<<<<
+ * 
+ *         # Set join-specific attributes
+*/
+  __pyx_v_self->__pyx_base._num_partitions = 4;
+
+  /* "sabot/_cython/operators/joins.pyx":348
+ * 
+ *         # Set join-specific attributes
  *         self._right_source = right_source             # <<<<<<<<<<<<<<
  *         self._left_keys = left_keys
  *         self._right_keys = right_keys
@@ -14313,8 +14365,8 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator__
   __Pyx_DECREF(__pyx_v_self->_right_source);
   __pyx_v_self->_right_source = __pyx_v_right_source;
 
-  /* "sabot/_cython/operators/joins.pyx":335
- * 
+  /* "sabot/_cython/operators/joins.pyx":349
+ *         # Set join-specific attributes
  *         self._right_source = right_source
  *         self._left_keys = left_keys             # <<<<<<<<<<<<<<
  *         self._right_keys = right_keys
@@ -14326,7 +14378,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator__
   __Pyx_DECREF(__pyx_v_self->_left_keys);
   __pyx_v_self->_left_keys = __pyx_v_left_keys;
 
-  /* "sabot/_cython/operators/joins.pyx":336
+  /* "sabot/_cython/operators/joins.pyx":350
  *         self._right_source = right_source
  *         self._left_keys = left_keys
  *         self._right_keys = right_keys             # <<<<<<<<<<<<<<
@@ -14339,14 +14391,14 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator__
   __Pyx_DECREF(__pyx_v_self->_right_keys);
   __pyx_v_self->_right_keys = __pyx_v_right_keys;
 
-  /* "sabot/_cython/operators/joins.pyx":337
+  /* "sabot/_cython/operators/joins.pyx":351
  *         self._left_keys = left_keys
  *         self._right_keys = right_keys
  *         self._join_type = join_type.lower()             # <<<<<<<<<<<<<<
  * 
  *         # Create streaming hash table builder
 */
-  __pyx_t_1 = __Pyx_CallUnboundCMethod0(&__pyx_mstate_global->__pyx_umethod_PyUnicode_Type__lower, __pyx_v_join_type); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CallUnboundCMethod0(&__pyx_mstate_global->__pyx_umethod_PyUnicode_Type__lower, __pyx_v_join_type); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 351, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->_join_type);
@@ -14354,23 +14406,23 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator__
   __pyx_v_self->_join_type = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":340
+  /* "sabot/_cython/operators/joins.pyx":354
  * 
  *         # Create streaming hash table builder
  *         self._hash_builder = StreamingHashTableBuilder(right_keys)             # <<<<<<<<<<<<<<
  * 
  *         # Validate join type
 */
-  __pyx_t_3 = NULL;
+  __pyx_t_2 = NULL;
   __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder);
-  __pyx_t_5 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder); 
-  __pyx_t_6 = 1;
+  __pyx_t_3 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder); 
+  __pyx_t_4 = 1;
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_right_keys};
-    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 340, __pyx_L1_error)
+    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_right_keys};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_4, (2-__pyx_t_4) | (__pyx_t_4*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 354, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __Pyx_GIVEREF((PyObject *)__pyx_t_1);
@@ -14379,7 +14431,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator__
   __pyx_v_self->_hash_builder = ((PyObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":343
+  /* "sabot/_cython/operators/joins.pyx":357
  * 
  *         # Validate join type
  *         if self._join_type not in ('inner', 'left', 'right', 'outer'):             # <<<<<<<<<<<<<<
@@ -14387,59 +14439,59 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator__
  * 
 */
   __Pyx_INCREF(__pyx_v_self->_join_type);
-  __pyx_t_7 = __pyx_v_self->_join_type;
-  __pyx_t_9 = (__Pyx_PyUnicode_Equals(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_inner, Py_NE)); if (unlikely((__pyx_t_9 < 0))) __PYX_ERR(0, 343, __pyx_L1_error)
-  if (__pyx_t_9) {
+  __pyx_t_5 = __pyx_v_self->_join_type;
+  __pyx_t_7 = (__Pyx_PyUnicode_Equals(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_inner, Py_NE)); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 357, __pyx_L1_error)
+  if (__pyx_t_7) {
   } else {
-    __pyx_t_8 = __pyx_t_9;
+    __pyx_t_6 = __pyx_t_7;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_9 = (__Pyx_PyUnicode_Equals(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_left, Py_NE)); if (unlikely((__pyx_t_9 < 0))) __PYX_ERR(0, 343, __pyx_L1_error)
-  if (__pyx_t_9) {
+  __pyx_t_7 = (__Pyx_PyUnicode_Equals(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_left, Py_NE)); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 357, __pyx_L1_error)
+  if (__pyx_t_7) {
   } else {
-    __pyx_t_8 = __pyx_t_9;
+    __pyx_t_6 = __pyx_t_7;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_9 = (__Pyx_PyUnicode_Equals(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_right_2, Py_NE)); if (unlikely((__pyx_t_9 < 0))) __PYX_ERR(0, 343, __pyx_L1_error)
-  if (__pyx_t_9) {
+  __pyx_t_7 = (__Pyx_PyUnicode_Equals(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_right_2, Py_NE)); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 357, __pyx_L1_error)
+  if (__pyx_t_7) {
   } else {
-    __pyx_t_8 = __pyx_t_9;
+    __pyx_t_6 = __pyx_t_7;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_9 = (__Pyx_PyUnicode_Equals(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_outer, Py_NE)); if (unlikely((__pyx_t_9 < 0))) __PYX_ERR(0, 343, __pyx_L1_error)
-  __pyx_t_8 = __pyx_t_9;
+  __pyx_t_7 = (__Pyx_PyUnicode_Equals(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_outer, Py_NE)); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 357, __pyx_L1_error)
+  __pyx_t_6 = __pyx_t_7;
   __pyx_L4_bool_binop_done:;
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_9 = __pyx_t_8;
-  if (unlikely(__pyx_t_9)) {
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_7 = __pyx_t_6;
+  if (unlikely(__pyx_t_7)) {
 
-    /* "sabot/_cython/operators/joins.pyx":344
+    /* "sabot/_cython/operators/joins.pyx":358
  *         # Validate join type
  *         if self._join_type not in ('inner', 'left', 'right', 'outer'):
  *             raise ValueError(f"Invalid join type: {join_type}")             # <<<<<<<<<<<<<<
  * 
  *     def __iter__(self):
 */
-    __pyx_t_5 = NULL;
+    __pyx_t_3 = NULL;
     __Pyx_INCREF(__pyx_builtin_ValueError);
-    __pyx_t_3 = __pyx_builtin_ValueError; 
-    __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Invalid_join_type, __pyx_v_join_type); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 344, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = 1;
+    __pyx_t_2 = __pyx_builtin_ValueError; 
+    __pyx_t_8 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Invalid_join_type, __pyx_v_join_type); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 358, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __pyx_t_4 = 1;
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_t_2};
-      __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-      __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+      PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_t_8};
+      __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+__pyx_t_4, (2-__pyx_t_4) | (__pyx_t_4*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 344, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 358, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 344, __pyx_L1_error)
+    __PYX_ERR(0, 358, __pyx_L1_error)
 
-    /* "sabot/_cython/operators/joins.pyx":343
+    /* "sabot/_cython/operators/joins.pyx":357
  * 
  *         # Validate join type
  *         if self._join_type not in ('inner', 'left', 'right', 'outer'):             # <<<<<<<<<<<<<<
@@ -14448,7 +14500,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator__
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":312
+  /* "sabot/_cython/operators/joins.pyx":321
  *     """
  * 
  *     def __init__(self, left_source, right_source, left_keys: List[str],             # <<<<<<<<<<<<<<
@@ -14463,9 +14515,8 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator__
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
   __Pyx_AddTraceback("sabot._cython.operators.joins.CythonHashJoinOperator.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
@@ -14474,7 +14525,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator__
 }
 static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_4generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/joins.pyx":346
+/* "sabot/_cython/operators/joins.pyx":360
  *             raise ValueError(f"Invalid join type: {join_type}")
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -14513,7 +14564,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__ *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 346, __pyx_L1_error)
+    __PYX_ERR(0, 360, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -14521,7 +14572,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_4generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_iter, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator___iter, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 346, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_4generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_iter, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator___iter, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 360, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -14562,10 +14613,10 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
-    __PYX_ERR(0, 346, __pyx_L1_error)
+    __PYX_ERR(0, 360, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/joins.pyx":359
+  /* "sabot/_cython/operators/joins.pyx":373
  *         1. Same as current logic (build full table, probe full stream)
  *         """
  *         if self._shuffle_transport is not None:             # <<<<<<<<<<<<<<
@@ -14575,7 +14626,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __pyx_t_1 = (__pyx_cur_scope->__pyx_v_self->__pyx_base._shuffle_transport != Py_None);
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/joins.pyx":361
+    /* "sabot/_cython/operators/joins.pyx":375
  *         if self._shuffle_transport is not None:
  *             # Distributed shuffle mode
  *             yield from self._execute_with_shuffle()             # <<<<<<<<<<<<<<
@@ -14589,7 +14640,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
       PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_execute_with_shuffle, __pyx_callargs+__pyx_t_4, (1-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 361, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 375, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __pyx_t_5 = __Pyx_Generator_Yield_From(__pyx_generator, __pyx_t_2, &__pyx_r);
@@ -14603,16 +14654,16 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
       __pyx_generator->resume_label = 1;
       return __pyx_r;
       __pyx_L5_resume_from_yield_from:;
-      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 361, __pyx_L1_error)
+      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 375, __pyx_L1_error)
     } else if (likely(__pyx_t_5 == PYGEN_RETURN)) {
       __Pyx_GOTREF(__pyx_r);
       __Pyx_DECREF(__pyx_r); __pyx_r = 0;
     } else {
       __Pyx_XGOTREF(__pyx_r);
-      __PYX_ERR(0, 361, __pyx_L1_error)
+      __PYX_ERR(0, 375, __pyx_L1_error)
     }
 
-    /* "sabot/_cython/operators/joins.pyx":359
+    /* "sabot/_cython/operators/joins.pyx":373
  *         1. Same as current logic (build full table, probe full stream)
  *         """
  *         if self._shuffle_transport is not None:             # <<<<<<<<<<<<<<
@@ -14622,7 +14673,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     goto __pyx_L4;
   }
 
-  /* "sabot/_cython/operators/joins.pyx":364
+  /* "sabot/_cython/operators/joins.pyx":378
  *         else:
  *             # Local mode (current logic)
  *             yield from self._execute_local()             # <<<<<<<<<<<<<<
@@ -14637,7 +14688,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
       PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_execute_local, __pyx_callargs+__pyx_t_4, (1-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 364, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 378, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __pyx_t_5 = __Pyx_Generator_Yield_From(__pyx_generator, __pyx_t_2, &__pyx_r);
@@ -14651,19 +14702,19 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
       __pyx_generator->resume_label = 2;
       return __pyx_r;
       __pyx_L6_resume_from_yield_from:;
-      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 364, __pyx_L1_error)
+      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 378, __pyx_L1_error)
     } else if (likely(__pyx_t_5 == PYGEN_RETURN)) {
       __Pyx_GOTREF(__pyx_r);
       __Pyx_DECREF(__pyx_r); __pyx_r = 0;
     } else {
       __Pyx_XGOTREF(__pyx_r);
-      __PYX_ERR(0, 364, __pyx_L1_error)
+      __PYX_ERR(0, 378, __pyx_L1_error)
     }
   }
   __pyx_L4:;
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "sabot/_cython/operators/joins.pyx":346
+  /* "sabot/_cython/operators/joins.pyx":360
  *             raise ValueError(f"Invalid join type: {join_type}")
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -14693,7 +14744,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 }
 static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_7generator1(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/joins.pyx":366
+/* "sabot/_cython/operators/joins.pyx":380
  *             yield from self._execute_local()
  * 
  *     def _execute_with_shuffle(self):             # <<<<<<<<<<<<<<
@@ -14756,7 +14807,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 366, __pyx_L1_error)
+    __PYX_ERR(0, 380, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -14764,7 +14815,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_7generator1, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_execute_with_shuffle, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__execute, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 366, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_7generator1, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_execute_with_shuffle, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__execute, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 380, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -14806,10 +14857,10 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
-    __PYX_ERR(0, 366, __pyx_L1_error)
+    __PYX_ERR(0, 380, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/joins.pyx":369
+  /* "sabot/_cython/operators/joins.pyx":383
  *         """Execute join with shuffled inputs."""
  *         # Build phase: receive shuffled right side for this partition
  *         for right_batch in self._receive_right_shuffled():             # <<<<<<<<<<<<<<
@@ -14823,7 +14874,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_receive_right_shuffled, __pyx_callargs+__pyx_t_3, (1-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 383, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
@@ -14831,9 +14882,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 369, __pyx_L1_error)
+    __pyx_t_4 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 383, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 369, __pyx_L1_error)
+    __pyx_t_5 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 383, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -14842,7 +14893,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 369, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 383, __pyx_L1_error)
           #endif
           if (__pyx_t_4 >= __pyx_temp) break;
         }
@@ -14852,7 +14903,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 369, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 383, __pyx_L1_error)
           #endif
           if (__pyx_t_4 >= __pyx_temp) break;
         }
@@ -14863,13 +14914,13 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         #endif
         ++__pyx_t_4;
       }
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 383, __pyx_L1_error)
     } else {
       __pyx_t_1 = __pyx_t_5(__pyx_t_2);
       if (unlikely(!__pyx_t_1)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 369, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 383, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -14881,7 +14932,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __Pyx_GIVEREF(__pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":370
+    /* "sabot/_cython/operators/joins.pyx":384
  *         # Build phase: receive shuffled right side for this partition
  *         for right_batch in self._receive_right_shuffled():
  *             self._hash_builder.add_batch(right_batch)             # <<<<<<<<<<<<<<
@@ -14895,12 +14946,12 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
       PyObject *__pyx_callargs[2] = {__pyx_t_6, __pyx_cur_scope->__pyx_v_right_batch};
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_add_batch, __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 370, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 384, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":369
+    /* "sabot/_cython/operators/joins.pyx":383
  *         """Execute join with shuffled inputs."""
  *         # Build phase: receive shuffled right side for this partition
  *         for right_batch in self._receive_right_shuffled():             # <<<<<<<<<<<<<<
@@ -14910,7 +14961,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":372
+  /* "sabot/_cython/operators/joins.pyx":386
  *             self._hash_builder.add_batch(right_batch)
  * 
  *         self._hash_builder.build_index()             # <<<<<<<<<<<<<<
@@ -14924,12 +14975,12 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_build_index, __pyx_callargs+__pyx_t_3, (1-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 372, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 386, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":375
+  /* "sabot/_cython/operators/joins.pyx":389
  * 
  *         # Probe phase: receive shuffled left side for this partition
  *         for left_batch in self._receive_left_shuffled():             # <<<<<<<<<<<<<<
@@ -14943,7 +14994,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_receive_left_shuffled, __pyx_callargs+__pyx_t_3, (1-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 375, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
@@ -14951,9 +15002,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 375, __pyx_L1_error)
+    __pyx_t_4 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 389, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 375, __pyx_L1_error)
+    __pyx_t_5 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 389, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   for (;;) {
@@ -14962,7 +15013,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 375, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 389, __pyx_L1_error)
           #endif
           if (__pyx_t_4 >= __pyx_temp) break;
         }
@@ -14972,7 +15023,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 375, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 389, __pyx_L1_error)
           #endif
           if (__pyx_t_4 >= __pyx_temp) break;
         }
@@ -14983,13 +15034,13 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         #endif
         ++__pyx_t_4;
       }
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 375, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
     } else {
       __pyx_t_2 = __pyx_t_5(__pyx_t_1);
       if (unlikely(!__pyx_t_2)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 375, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 389, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -15001,7 +15052,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __Pyx_GIVEREF(__pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":376
+    /* "sabot/_cython/operators/joins.pyx":390
  *         # Probe phase: receive shuffled left side for this partition
  *         for left_batch in self._receive_left_shuffled():
  *             result = self._hash_builder.probe_batch_vectorized(             # <<<<<<<<<<<<<<
@@ -15011,7 +15062,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __pyx_t_6 = __pyx_cur_scope->__pyx_v_self->_hash_builder;
     __Pyx_INCREF(__pyx_t_6);
 
-    /* "sabot/_cython/operators/joins.pyx":377
+    /* "sabot/_cython/operators/joins.pyx":391
  *         for left_batch in self._receive_left_shuffled():
  *             result = self._hash_builder.probe_batch_vectorized(
  *                 left_batch, self._left_keys, self._join_type             # <<<<<<<<<<<<<<
@@ -15023,7 +15074,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
       PyObject *__pyx_callargs[4] = {__pyx_t_6, __pyx_cur_scope->__pyx_v_left_batch, __pyx_cur_scope->__pyx_v_self->_left_keys, __pyx_cur_scope->__pyx_v_self->_join_type};
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_probe_batch_vectorized, __pyx_callargs+__pyx_t_3, (4-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 376, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 390, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_result);
@@ -15031,7 +15082,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __Pyx_GIVEREF(__pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":379
+    /* "sabot/_cython/operators/joins.pyx":393
  *                 left_batch, self._left_keys, self._join_type
  *             )
  *             if result is not None:             # <<<<<<<<<<<<<<
@@ -15041,7 +15092,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __pyx_t_7 = (__pyx_cur_scope->__pyx_v_result != Py_None);
     if (__pyx_t_7) {
 
-      /* "sabot/_cython/operators/joins.pyx":380
+      /* "sabot/_cython/operators/joins.pyx":394
  *             )
  *             if result is not None:
  *                 yield result             # <<<<<<<<<<<<<<
@@ -15066,9 +15117,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
       __Pyx_XGOTREF(__pyx_t_1);
       __pyx_t_4 = __pyx_cur_scope->__pyx_t_1;
       __pyx_t_5 = __pyx_cur_scope->__pyx_t_2;
-      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 380, __pyx_L1_error)
+      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 394, __pyx_L1_error)
 
-      /* "sabot/_cython/operators/joins.pyx":379
+      /* "sabot/_cython/operators/joins.pyx":393
  *                 left_batch, self._left_keys, self._join_type
  *             )
  *             if result is not None:             # <<<<<<<<<<<<<<
@@ -15077,7 +15128,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 */
     }
 
-    /* "sabot/_cython/operators/joins.pyx":375
+    /* "sabot/_cython/operators/joins.pyx":389
  * 
  *         # Probe phase: receive shuffled left side for this partition
  *         for left_batch in self._receive_left_shuffled():             # <<<<<<<<<<<<<<
@@ -15088,7 +15139,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "sabot/_cython/operators/joins.pyx":366
+  /* "sabot/_cython/operators/joins.pyx":380
  *             yield from self._execute_local()
  * 
  *     def _execute_with_shuffle(self):             # <<<<<<<<<<<<<<
@@ -15119,12 +15170,12 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 }
 static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_10generator2(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "sabot/_cython/operators/joins.pyx":382
+/* "sabot/_cython/operators/joins.pyx":396
  *                 yield result
  * 
  *     def _execute_local(self):             # <<<<<<<<<<<<<<
- *         """Execute join locally (current logic)."""
- *         # Build phase
+ *         """
+ *         Execute join locally using zero-copy hash_join from sabot_ql.
 */
 
 /* Python wrapper */
@@ -15135,7 +15186,7 @@ PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_8_execute_local, "Execute join locally (current logic).");
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_8_execute_local, "\n        Execute join locally using zero-copy hash_join from sabot_ql.\n\n        This implementation:\n        1. Collects all batches from both sides into Tables\n        2. Calls sabot_ql HashJoinOperator via zero-copy Cython wrapper\n        3. Yields batches from the result Table\n\n        Zero-copy architecture:\n        - Uses Arrow shared_ptr throughout (no data copies)\n        - Hash table stores indices only (minimal memory)\n        - sabot_ql optimizes build-side selection internally\n        ");
 static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_9_execute_local = {"_execute_local", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_9_execute_local, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_8_execute_local};
 static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_9_execute_local(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
@@ -15182,7 +15233,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 382, __pyx_L1_error)
+    __PYX_ERR(0, 396, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -15190,7 +15241,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_10generator2, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_execute_local, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__execute_2, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 382, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_10generator2, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_execute_local, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__execute_2, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 396, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -15210,6 +15261,796 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 {
   struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local *__pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local *)__pyx_generator->closure);
   PyObject *__pyx_r = NULL;
+  int __pyx_t_1;
+  PyObject *__pyx_t_2 = NULL;
+  int __pyx_t_3;
+  int __pyx_t_4;
+  PyObject *__pyx_t_5 = NULL;
+  size_t __pyx_t_6;
+  __Pyx_PySendResult __pyx_t_7;
+  Py_ssize_t __pyx_t_8;
+  PyObject *(*__pyx_t_9)(PyObject *);
+  PyObject *__pyx_t_10 = NULL;
+  int __pyx_t_11;
+  PyObject *__pyx_t_12 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_execute_local", 0);
+  switch (__pyx_generator->resume_label) {
+    case 0: goto __pyx_L3_first_run;
+    case 1: goto __pyx_L7_resume_from_yield_from;
+    case 2: goto __pyx_L26_resume_from_yield;
+    default: /* CPython raises the right error here */
+    __Pyx_RefNannyFinishContext();
+    return NULL;
+  }
+  __pyx_L3_first_run:;
+  if (unlikely(__pyx_sent_value != Py_None)) {
+    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
+    __PYX_ERR(0, 396, __pyx_L1_error)
+  }
+
+  /* "sabot/_cython/operators/joins.pyx":410
+ *         - sabot_ql optimizes build-side selection internally
+ *         """
+ *         if not HASH_JOIN_AVAILABLE or hash_join is None:             # <<<<<<<<<<<<<<
+ *             # Fallback to old implementation if hash_join not available
+ *             # This uses StreamingHashTableBuilder (Python dict-based)
+*/
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_HASH_JOIN_AVAILABLE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 410, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 410, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_4 = (!__pyx_t_3);
+  if (!__pyx_t_4) {
+  } else {
+    __pyx_t_1 = __pyx_t_4;
+    goto __pyx_L5_bool_binop_done;
+  }
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_hash_join); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 410, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = (__pyx_t_2 == Py_None);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_1 = __pyx_t_4;
+  __pyx_L5_bool_binop_done:;
+  if (__pyx_t_1) {
+
+    /* "sabot/_cython/operators/joins.pyx":413
+ *             # Fallback to old implementation if hash_join not available
+ *             # This uses StreamingHashTableBuilder (Python dict-based)
+ *             yield from self._execute_local_fallback()             # <<<<<<<<<<<<<<
+ *             return
+ * 
+*/
+    __pyx_t_5 = ((PyObject *)__pyx_cur_scope->__pyx_v_self);
+    __Pyx_INCREF(__pyx_t_5);
+    __pyx_t_6 = 0;
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
+      __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_execute_local_fallback, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+      __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 413, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+    }
+    __pyx_t_7 = __Pyx_Generator_Yield_From(__pyx_generator, __pyx_t_2, &__pyx_r);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (likely(__pyx_t_7 == PYGEN_NEXT)) {
+      __Pyx_GOTREF(__pyx_r);
+      __Pyx_XGIVEREF(__pyx_r);
+      __Pyx_RefNannyFinishContext();
+      __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+      /* return from generator, yielding value */
+      __pyx_generator->resume_label = 1;
+      return __pyx_r;
+      __pyx_L7_resume_from_yield_from:;
+      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 413, __pyx_L1_error)
+    } else if (likely(__pyx_t_7 == PYGEN_RETURN)) {
+      __Pyx_GOTREF(__pyx_r);
+      __Pyx_DECREF(__pyx_r); __pyx_r = 0;
+    } else {
+      __Pyx_XGOTREF(__pyx_r);
+      __PYX_ERR(0, 413, __pyx_L1_error)
+    }
+
+    /* "sabot/_cython/operators/joins.pyx":414
+ *             # This uses StreamingHashTableBuilder (Python dict-based)
+ *             yield from self._execute_local_fallback()
+ *             return             # <<<<<<<<<<<<<<
+ * 
+ *         # Collect all batches from left side
+*/
+    __Pyx_XDECREF(__pyx_r);
+    __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+    goto __pyx_L0;
+
+    /* "sabot/_cython/operators/joins.pyx":410
+ *         - sabot_ql optimizes build-side selection internally
+ *         """
+ *         if not HASH_JOIN_AVAILABLE or hash_join is None:             # <<<<<<<<<<<<<<
+ *             # Fallback to old implementation if hash_join not available
+ *             # This uses StreamingHashTableBuilder (Python dict-based)
+*/
+  }
+
+  /* "sabot/_cython/operators/joins.pyx":417
+ * 
+ *         # Collect all batches from left side
+ *         left_batches = []             # <<<<<<<<<<<<<<
+ *         for batch in self._source:
+ *             if batch is not None and batch.num_rows > 0:
+*/
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 417, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_cur_scope->__pyx_v_left_batches = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/joins.pyx":418
+ *         # Collect all batches from left side
+ *         left_batches = []
+ *         for batch in self._source:             # <<<<<<<<<<<<<<
+ *             if batch is not None and batch.num_rows > 0:
+ *                 left_batches.append(batch)
+*/
+  if (likely(PyList_CheckExact(__pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_base._source)) || PyTuple_CheckExact(__pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_base._source)) {
+    __pyx_t_2 = __pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_base._source; __Pyx_INCREF(__pyx_t_2);
+    __pyx_t_8 = 0;
+    __pyx_t_9 = NULL;
+  } else {
+    __pyx_t_8 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_base._source); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 418, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 418, __pyx_L1_error)
+  }
+  for (;;) {
+    if (likely(!__pyx_t_9)) {
+      if (likely(PyList_CheckExact(__pyx_t_2))) {
+        {
+          Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
+          #if !CYTHON_ASSUME_SAFE_SIZE
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 418, __pyx_L1_error)
+          #endif
+          if (__pyx_t_8 >= __pyx_temp) break;
+        }
+        __pyx_t_5 = __Pyx_PyList_GetItemRef(__pyx_t_2, __pyx_t_8);
+        ++__pyx_t_8;
+      } else {
+        {
+          Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
+          #if !CYTHON_ASSUME_SAFE_SIZE
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 418, __pyx_L1_error)
+          #endif
+          if (__pyx_t_8 >= __pyx_temp) break;
+        }
+        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+        __pyx_t_5 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_8));
+        #else
+        __pyx_t_5 = __Pyx_PySequence_ITEM(__pyx_t_2, __pyx_t_8);
+        #endif
+        ++__pyx_t_8;
+      }
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 418, __pyx_L1_error)
+    } else {
+      __pyx_t_5 = __pyx_t_9(__pyx_t_2);
+      if (unlikely(!__pyx_t_5)) {
+        PyObject* exc_type = PyErr_Occurred();
+        if (exc_type) {
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 418, __pyx_L1_error)
+          PyErr_Clear();
+        }
+        break;
+      }
+    }
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_batch);
+    __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_batch, __pyx_t_5);
+    __Pyx_GIVEREF(__pyx_t_5);
+    __pyx_t_5 = 0;
+
+    /* "sabot/_cython/operators/joins.pyx":419
+ *         left_batches = []
+ *         for batch in self._source:
+ *             if batch is not None and batch.num_rows > 0:             # <<<<<<<<<<<<<<
+ *                 left_batches.append(batch)
+ * 
+*/
+    __pyx_t_4 = (__pyx_cur_scope->__pyx_v_batch != Py_None);
+    if (__pyx_t_4) {
+    } else {
+      __pyx_t_1 = __pyx_t_4;
+      goto __pyx_L11_bool_binop_done;
+    }
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 419, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_10 = PyObject_RichCompare(__pyx_t_5, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 419, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_10); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 419, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __pyx_t_1 = __pyx_t_4;
+    __pyx_L11_bool_binop_done:;
+    if (__pyx_t_1) {
+
+      /* "sabot/_cython/operators/joins.pyx":420
+ *         for batch in self._source:
+ *             if batch is not None and batch.num_rows > 0:
+ *                 left_batches.append(batch)             # <<<<<<<<<<<<<<
+ * 
+ *         # Collect all batches from right side
+*/
+      __pyx_t_11 = __Pyx_PyList_Append(__pyx_cur_scope->__pyx_v_left_batches, __pyx_cur_scope->__pyx_v_batch); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 420, __pyx_L1_error)
+
+      /* "sabot/_cython/operators/joins.pyx":419
+ *         left_batches = []
+ *         for batch in self._source:
+ *             if batch is not None and batch.num_rows > 0:             # <<<<<<<<<<<<<<
+ *                 left_batches.append(batch)
+ * 
+*/
+    }
+
+    /* "sabot/_cython/operators/joins.pyx":418
+ *         # Collect all batches from left side
+ *         left_batches = []
+ *         for batch in self._source:             # <<<<<<<<<<<<<<
+ *             if batch is not None and batch.num_rows > 0:
+ *                 left_batches.append(batch)
+*/
+  }
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/joins.pyx":423
+ * 
+ *         # Collect all batches from right side
+ *         right_batches = []             # <<<<<<<<<<<<<<
+ *         for batch in self._right_source:
+ *             if batch is not None and batch.num_rows > 0:
+*/
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 423, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_cur_scope->__pyx_v_right_batches = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/joins.pyx":424
+ *         # Collect all batches from right side
+ *         right_batches = []
+ *         for batch in self._right_source:             # <<<<<<<<<<<<<<
+ *             if batch is not None and batch.num_rows > 0:
+ *                 right_batches.append(batch)
+*/
+  if (likely(PyList_CheckExact(__pyx_cur_scope->__pyx_v_self->_right_source)) || PyTuple_CheckExact(__pyx_cur_scope->__pyx_v_self->_right_source)) {
+    __pyx_t_2 = __pyx_cur_scope->__pyx_v_self->_right_source; __Pyx_INCREF(__pyx_t_2);
+    __pyx_t_8 = 0;
+    __pyx_t_9 = NULL;
+  } else {
+    __pyx_t_8 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_self->_right_source); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 424, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 424, __pyx_L1_error)
+  }
+  for (;;) {
+    if (likely(!__pyx_t_9)) {
+      if (likely(PyList_CheckExact(__pyx_t_2))) {
+        {
+          Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
+          #if !CYTHON_ASSUME_SAFE_SIZE
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 424, __pyx_L1_error)
+          #endif
+          if (__pyx_t_8 >= __pyx_temp) break;
+        }
+        __pyx_t_10 = __Pyx_PyList_GetItemRef(__pyx_t_2, __pyx_t_8);
+        ++__pyx_t_8;
+      } else {
+        {
+          Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
+          #if !CYTHON_ASSUME_SAFE_SIZE
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 424, __pyx_L1_error)
+          #endif
+          if (__pyx_t_8 >= __pyx_temp) break;
+        }
+        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+        __pyx_t_10 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_8));
+        #else
+        __pyx_t_10 = __Pyx_PySequence_ITEM(__pyx_t_2, __pyx_t_8);
+        #endif
+        ++__pyx_t_8;
+      }
+      if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 424, __pyx_L1_error)
+    } else {
+      __pyx_t_10 = __pyx_t_9(__pyx_t_2);
+      if (unlikely(!__pyx_t_10)) {
+        PyObject* exc_type = PyErr_Occurred();
+        if (exc_type) {
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 424, __pyx_L1_error)
+          PyErr_Clear();
+        }
+        break;
+      }
+    }
+    __Pyx_GOTREF(__pyx_t_10);
+    __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_batch);
+    __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_batch, __pyx_t_10);
+    __Pyx_GIVEREF(__pyx_t_10);
+    __pyx_t_10 = 0;
+
+    /* "sabot/_cython/operators/joins.pyx":425
+ *         right_batches = []
+ *         for batch in self._right_source:
+ *             if batch is not None and batch.num_rows > 0:             # <<<<<<<<<<<<<<
+ *                 right_batches.append(batch)
+ * 
+*/
+    __pyx_t_4 = (__pyx_cur_scope->__pyx_v_batch != Py_None);
+    if (__pyx_t_4) {
+    } else {
+      __pyx_t_1 = __pyx_t_4;
+      goto __pyx_L17_bool_binop_done;
+    }
+    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 425, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_t_5 = PyObject_RichCompare(__pyx_t_10, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 425, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 425, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_1 = __pyx_t_4;
+    __pyx_L17_bool_binop_done:;
+    if (__pyx_t_1) {
+
+      /* "sabot/_cython/operators/joins.pyx":426
+ *         for batch in self._right_source:
+ *             if batch is not None and batch.num_rows > 0:
+ *                 right_batches.append(batch)             # <<<<<<<<<<<<<<
+ * 
+ *         # Handle empty inputs
+*/
+      __pyx_t_11 = __Pyx_PyList_Append(__pyx_cur_scope->__pyx_v_right_batches, __pyx_cur_scope->__pyx_v_batch); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 426, __pyx_L1_error)
+
+      /* "sabot/_cython/operators/joins.pyx":425
+ *         right_batches = []
+ *         for batch in self._right_source:
+ *             if batch is not None and batch.num_rows > 0:             # <<<<<<<<<<<<<<
+ *                 right_batches.append(batch)
+ * 
+*/
+    }
+
+    /* "sabot/_cython/operators/joins.pyx":424
+ *         # Collect all batches from right side
+ *         right_batches = []
+ *         for batch in self._right_source:             # <<<<<<<<<<<<<<
+ *             if batch is not None and batch.num_rows > 0:
+ *                 right_batches.append(batch)
+*/
+  }
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/joins.pyx":429
+ * 
+ *         # Handle empty inputs
+ *         if not left_batches or not right_batches:             # <<<<<<<<<<<<<<
+ *             # For inner join, empty result
+ *             # For outer joins, would need special handling (not implemented yet)
+*/
+  {
+    Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_cur_scope->__pyx_v_left_batches);
+    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 429, __pyx_L1_error)
+    __pyx_t_4 = (__pyx_temp != 0);
+  }
+
+  __pyx_t_3 = (!__pyx_t_4);
+  if (!__pyx_t_3) {
+  } else {
+    __pyx_t_1 = __pyx_t_3;
+    goto __pyx_L21_bool_binop_done;
+  }
+  {
+    Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_cur_scope->__pyx_v_right_batches);
+    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 429, __pyx_L1_error)
+    __pyx_t_3 = (__pyx_temp != 0);
+  }
+
+  __pyx_t_4 = (!__pyx_t_3);
+  __pyx_t_1 = __pyx_t_4;
+  __pyx_L21_bool_binop_done:;
+  if (__pyx_t_1) {
+
+    /* "sabot/_cython/operators/joins.pyx":432
+ *             # For inner join, empty result
+ *             # For outer joins, would need special handling (not implemented yet)
+ *             return             # <<<<<<<<<<<<<<
+ * 
+ *         # Materialize into Tables (uses Arrow shared_ptr, no copy)
+*/
+    __Pyx_XDECREF(__pyx_r);
+    __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+    goto __pyx_L0;
+
+    /* "sabot/_cython/operators/joins.pyx":429
+ * 
+ *         # Handle empty inputs
+ *         if not left_batches or not right_batches:             # <<<<<<<<<<<<<<
+ *             # For inner join, empty result
+ *             # For outer joins, would need special handling (not implemented yet)
+*/
+  }
+
+  /* "sabot/_cython/operators/joins.pyx":435
+ * 
+ *         # Materialize into Tables (uses Arrow shared_ptr, no copy)
+ *         left_table = pa.Table.from_batches(left_batches)             # <<<<<<<<<<<<<<
+ *         right_table = pa.Table.from_batches(right_batches)
+ * 
+*/
+  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 435, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_Table); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 435, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_12);
+  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  __pyx_t_5 = __pyx_t_12;
+  __Pyx_INCREF(__pyx_t_5);
+  __pyx_t_6 = 0;
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_cur_scope->__pyx_v_left_batches};
+    __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_from_batches, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 435, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+  }
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_cur_scope->__pyx_v_left_table = __pyx_t_2;
+  __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/joins.pyx":436
+ *         # Materialize into Tables (uses Arrow shared_ptr, no copy)
+ *         left_table = pa.Table.from_batches(left_batches)
+ *         right_table = pa.Table.from_batches(right_batches)             # <<<<<<<<<<<<<<
+ * 
+ *         # Map join type to Arrow join type
+*/
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 436, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_Table); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 436, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_12 = __pyx_t_10;
+  __Pyx_INCREF(__pyx_t_12);
+  __pyx_t_6 = 0;
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_12, __pyx_cur_scope->__pyx_v_right_batches};
+    __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_from_batches, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 436, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+  }
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_cur_scope->__pyx_v_right_table = __pyx_t_2;
+  __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/joins.pyx":439
+ * 
+ *         # Map join type to Arrow join type
+ *         arrow_join_type = self._join_type             # <<<<<<<<<<<<<<
+ *         if arrow_join_type == 'outer':
+ *             arrow_join_type = 'full outer'
+*/
+  __pyx_t_2 = __pyx_cur_scope->__pyx_v_self->_join_type;
+  __Pyx_INCREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_cur_scope->__pyx_v_arrow_join_type = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/joins.pyx":440
+ *         # Map join type to Arrow join type
+ *         arrow_join_type = self._join_type
+ *         if arrow_join_type == 'outer':             # <<<<<<<<<<<<<<
+ *             arrow_join_type = 'full outer'
+ * 
+*/
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_cur_scope->__pyx_v_arrow_join_type, __pyx_mstate_global->__pyx_n_u_outer, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 440, __pyx_L1_error)
+  if (__pyx_t_1) {
+
+    /* "sabot/_cython/operators/joins.pyx":441
+ *         arrow_join_type = self._join_type
+ *         if arrow_join_type == 'outer':
+ *             arrow_join_type = 'full outer'             # <<<<<<<<<<<<<<
+ * 
+ *         # Execute zero-copy hash join via sabot_ql
+*/
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_kp_u_full_outer);
+    __Pyx_GOTREF(__pyx_cur_scope->__pyx_v_arrow_join_type);
+    __Pyx_DECREF_SET(__pyx_cur_scope->__pyx_v_arrow_join_type, __pyx_mstate_global->__pyx_kp_u_full_outer);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_kp_u_full_outer);
+
+    /* "sabot/_cython/operators/joins.pyx":440
+ *         # Map join type to Arrow join type
+ *         arrow_join_type = self._join_type
+ *         if arrow_join_type == 'outer':             # <<<<<<<<<<<<<<
+ *             arrow_join_type = 'full outer'
+ * 
+*/
+  }
+
+  /* "sabot/_cython/operators/joins.pyx":444
+ * 
+ *         # Execute zero-copy hash join via sabot_ql
+ *         result_table = hash_join(             # <<<<<<<<<<<<<<
+ *             left_table, right_table,
+ *             self._left_keys, self._right_keys,
+*/
+  __pyx_t_10 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_hash_join); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 444, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_12);
+
+  /* "sabot/_cython/operators/joins.pyx":447
+ *             left_table, right_table,
+ *             self._left_keys, self._right_keys,
+ *             join_type=arrow_join_type             # <<<<<<<<<<<<<<
+ *         )
+ * 
+*/
+  __pyx_t_6 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_12))) {
+    __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_12);
+    assert(__pyx_t_10);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_12);
+    __Pyx_INCREF(__pyx_t_10);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_12, __pyx__function);
+    __pyx_t_6 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[5 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_10, __pyx_cur_scope->__pyx_v_left_table, __pyx_cur_scope->__pyx_v_right_table, __pyx_cur_scope->__pyx_v_self->_left_keys, __pyx_cur_scope->__pyx_v_self->_right_keys};
+    __pyx_t_5 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 444, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_join_type, __pyx_cur_scope->__pyx_v_arrow_join_type, __pyx_t_5, __pyx_callargs+5, 0) < 0) __PYX_ERR(0, 444, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_12, __pyx_callargs+__pyx_t_6, (5-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_5);
+    __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 444, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+  }
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_cur_scope->__pyx_v_result_table = __pyx_t_2;
+  __pyx_t_2 = 0;
+
+  /* "sabot/_cython/operators/joins.pyx":451
+ * 
+ *         # Yield batches from result (zero-copy slicing)
+ *         for batch in result_table.to_batches():             # <<<<<<<<<<<<<<
+ *             yield batch
+ * 
+*/
+  __pyx_t_12 = __pyx_cur_scope->__pyx_v_result_table;
+  __Pyx_INCREF(__pyx_t_12);
+  __pyx_t_6 = 0;
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
+    __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_batches, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 451, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+  }
+  if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
+    __pyx_t_12 = __pyx_t_2; __Pyx_INCREF(__pyx_t_12);
+    __pyx_t_8 = 0;
+    __pyx_t_9 = NULL;
+  } else {
+    __pyx_t_8 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 451, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_12);
+    __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_12); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 451, __pyx_L1_error)
+  }
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  for (;;) {
+    if (likely(!__pyx_t_9)) {
+      if (likely(PyList_CheckExact(__pyx_t_12))) {
+        {
+          Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_12);
+          #if !CYTHON_ASSUME_SAFE_SIZE
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 451, __pyx_L1_error)
+          #endif
+          if (__pyx_t_8 >= __pyx_temp) break;
+        }
+        __pyx_t_2 = __Pyx_PyList_GetItemRef(__pyx_t_12, __pyx_t_8);
+        ++__pyx_t_8;
+      } else {
+        {
+          Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_12);
+          #if !CYTHON_ASSUME_SAFE_SIZE
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 451, __pyx_L1_error)
+          #endif
+          if (__pyx_t_8 >= __pyx_temp) break;
+        }
+        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+        __pyx_t_2 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_8));
+        #else
+        __pyx_t_2 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_8);
+        #endif
+        ++__pyx_t_8;
+      }
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 451, __pyx_L1_error)
+    } else {
+      __pyx_t_2 = __pyx_t_9(__pyx_t_12);
+      if (unlikely(!__pyx_t_2)) {
+        PyObject* exc_type = PyErr_Occurred();
+        if (exc_type) {
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 451, __pyx_L1_error)
+          PyErr_Clear();
+        }
+        break;
+      }
+    }
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_batch);
+    __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_batch, __pyx_t_2);
+    __Pyx_GIVEREF(__pyx_t_2);
+    __pyx_t_2 = 0;
+
+    /* "sabot/_cython/operators/joins.pyx":452
+ *         # Yield batches from result (zero-copy slicing)
+ *         for batch in result_table.to_batches():
+ *             yield batch             # <<<<<<<<<<<<<<
+ * 
+ *     def _execute_local_fallback(self):
+*/
+    __Pyx_INCREF(__pyx_cur_scope->__pyx_v_batch);
+    __pyx_r = __pyx_cur_scope->__pyx_v_batch;
+    __pyx_cur_scope->__pyx_t_0 = __pyx_t_8;
+    __pyx_cur_scope->__pyx_t_1 = __pyx_t_9;
+    __Pyx_XGIVEREF(__pyx_t_12);
+    __pyx_cur_scope->__pyx_t_2 = __pyx_t_12;
+    __Pyx_XGIVEREF(__pyx_r);
+    __Pyx_RefNannyFinishContext();
+    __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+    /* return from generator, yielding value */
+    __pyx_generator->resume_label = 2;
+    return __pyx_r;
+    __pyx_L26_resume_from_yield:;
+    __pyx_t_8 = __pyx_cur_scope->__pyx_t_0;
+    __pyx_t_9 = __pyx_cur_scope->__pyx_t_1;
+    __pyx_t_12 = __pyx_cur_scope->__pyx_t_2;
+    __pyx_cur_scope->__pyx_t_2 = 0;
+    __Pyx_XGOTREF(__pyx_t_12);
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 452, __pyx_L1_error)
+
+    /* "sabot/_cython/operators/joins.pyx":451
+ * 
+ *         # Yield batches from result (zero-copy slicing)
+ *         for batch in result_table.to_batches():             # <<<<<<<<<<<<<<
+ *             yield batch
+ * 
+*/
+  }
+  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
+
+  /* "sabot/_cython/operators/joins.pyx":396
+ *                 yield result
+ * 
+ *     def _execute_local(self):             # <<<<<<<<<<<<<<
+ *         """
+ *         Execute join locally using zero-copy hash_join from sabot_ql.
+*/
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_XDECREF(__pyx_t_12);
+  if (__Pyx_PyErr_Occurred()) {
+    __Pyx_Generator_Replace_StopIteration(0);
+    __Pyx_AddTraceback("_execute_local", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  }
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  #if !CYTHON_USE_EXC_INFO_STACK
+  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+  #endif
+  __pyx_generator->resume_label = -1;
+  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_13generator3(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
+
+/* "sabot/_cython/operators/joins.pyx":454
+ *             yield batch
+ * 
+ *     def _execute_local_fallback(self):             # <<<<<<<<<<<<<<
+ *         """
+ *         Fallback implementation using StreamingHashTableBuilder.
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_12_execute_local_fallback(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_11_execute_local_fallback, "\n        Fallback implementation using StreamingHashTableBuilder.\n\n        This is used when hash_join is not available.\n        Uses Python dict-based hash table (slower, but functional).\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_12_execute_local_fallback = {"_execute_local_fallback", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_12_execute_local_fallback, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_11_execute_local_fallback};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_12_execute_local_fallback(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_execute_local_fallback (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  if (unlikely(__pyx_nargs > 0)) { __Pyx_RaiseArgtupleInvalid("_execute_local_fallback", 1, 0, 0, __pyx_nargs); return NULL; }
+  const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+  if (unlikely(__pyx_kwds_len < 0)) return NULL;
+  if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("_execute_local_fallback", __pyx_kwds); return NULL;}
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_11_execute_local_fallback(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_11_execute_local_fallback(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self) {
+  struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback *__pyx_cur_scope;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("_execute_local_fallback", 0);
+  __pyx_cur_scope = (struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback *)__pyx_tp_new_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback, __pyx_mstate_global->__pyx_empty_tuple, NULL);
+  if (unlikely(!__pyx_cur_scope)) {
+    __pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback *)Py_None);
+    __Pyx_INCREF(Py_None);
+    __PYX_ERR(0, 454, __pyx_L1_error)
+  } else {
+    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
+  }
+  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
+  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  {
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_13generator3, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_execute_local_fallback, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__execute_3, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins); if (unlikely(!gen)) __PYX_ERR(0, 454, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_cur_scope);
+    __Pyx_RefNannyFinishContext();
+    return (PyObject *) gen;
+  }
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("sabot._cython.operators.joins.CythonHashJoinOperator._execute_local_fallback", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_13generator3(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+{
+  struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback *__pyx_cur_scope = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback *)__pyx_generator->closure);
+  PyObject *__pyx_r = NULL;
   PyObject *__pyx_t_1 = NULL;
   Py_ssize_t __pyx_t_2;
   PyObject *(*__pyx_t_3)(PyObject *);
@@ -15222,7 +16063,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("_execute_local", 0);
+  __Pyx_RefNannySetupContext("_execute_local_fallback", 0);
   switch (__pyx_generator->resume_label) {
     case 0: goto __pyx_L3_first_run;
     case 1: goto __pyx_L18_resume_from_yield;
@@ -15233,12 +16074,12 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
-    __PYX_ERR(0, 382, __pyx_L1_error)
+    __PYX_ERR(0, 454, __pyx_L1_error)
   }
 
-  /* "sabot/_cython/operators/joins.pyx":385
- *         """Execute join locally (current logic)."""
- *         # Build phase
+  /* "sabot/_cython/operators/joins.pyx":462
+ *         """
+ *         # Build phase: always builds on right side
  *         for right_batch in self._right_source:             # <<<<<<<<<<<<<<
  *             if right_batch is not None and right_batch.num_rows > 0:
  *                 self._hash_builder.add_batch(right_batch)
@@ -15248,9 +16089,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __pyx_t_2 = 0;
     __pyx_t_3 = NULL;
   } else {
-    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_self->_right_source); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 385, __pyx_L1_error)
+    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_self->_right_source); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 462, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 385, __pyx_L1_error)
+    __pyx_t_3 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 462, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_3)) {
@@ -15258,7 +16099,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 385, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 462, __pyx_L1_error)
           #endif
           if (__pyx_t_2 >= __pyx_temp) break;
         }
@@ -15268,7 +16109,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 385, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 462, __pyx_L1_error)
           #endif
           if (__pyx_t_2 >= __pyx_temp) break;
         }
@@ -15279,13 +16120,13 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         #endif
         ++__pyx_t_2;
       }
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 385, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 462, __pyx_L1_error)
     } else {
       __pyx_t_4 = __pyx_t_3(__pyx_t_1);
       if (unlikely(!__pyx_t_4)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 385, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 462, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -15297,8 +16138,8 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __Pyx_GIVEREF(__pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":386
- *         # Build phase
+    /* "sabot/_cython/operators/joins.pyx":463
+ *         # Build phase: always builds on right side
  *         for right_batch in self._right_source:
  *             if right_batch is not None and right_batch.num_rows > 0:             # <<<<<<<<<<<<<<
  *                 self._hash_builder.add_batch(right_batch)
@@ -15310,17 +16151,17 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
       __pyx_t_5 = __pyx_t_6;
       goto __pyx_L7_bool_binop_done;
     }
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 386, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 463, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_7 = PyObject_RichCompare(__pyx_t_4, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 386, __pyx_L1_error)
+    __pyx_t_7 = PyObject_RichCompare(__pyx_t_4, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 463, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 386, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 463, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_5 = __pyx_t_6;
     __pyx_L7_bool_binop_done:;
     if (__pyx_t_5) {
 
-      /* "sabot/_cython/operators/joins.pyx":387
+      /* "sabot/_cython/operators/joins.pyx":464
  *         for right_batch in self._right_source:
  *             if right_batch is not None and right_batch.num_rows > 0:
  *                 self._hash_builder.add_batch(right_batch)             # <<<<<<<<<<<<<<
@@ -15334,13 +16175,13 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_cur_scope->__pyx_v_right_batch};
         __pyx_t_7 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_add_batch, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 387, __pyx_L1_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 464, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
       }
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":386
- *         # Build phase
+      /* "sabot/_cython/operators/joins.pyx":463
+ *         # Build phase: always builds on right side
  *         for right_batch in self._right_source:
  *             if right_batch is not None and right_batch.num_rows > 0:             # <<<<<<<<<<<<<<
  *                 self._hash_builder.add_batch(right_batch)
@@ -15348,9 +16189,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 */
     }
 
-    /* "sabot/_cython/operators/joins.pyx":385
- *         """Execute join locally (current logic)."""
- *         # Build phase
+    /* "sabot/_cython/operators/joins.pyx":462
+ *         """
+ *         # Build phase: always builds on right side
  *         for right_batch in self._right_source:             # <<<<<<<<<<<<<<
  *             if right_batch is not None and right_batch.num_rows > 0:
  *                 self._hash_builder.add_batch(right_batch)
@@ -15358,12 +16199,12 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":389
+  /* "sabot/_cython/operators/joins.pyx":466
  *                 self._hash_builder.add_batch(right_batch)
  * 
  *         self._hash_builder.build_index()             # <<<<<<<<<<<<<<
  * 
- *         # Probe phase
+ *         # Probe phase: probes with left side
 */
   __pyx_t_7 = __pyx_cur_scope->__pyx_v_self->_hash_builder;
   __Pyx_INCREF(__pyx_t_7);
@@ -15372,14 +16213,14 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     PyObject *__pyx_callargs[2] = {__pyx_t_7, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_build_index, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 389, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 466, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":392
+  /* "sabot/_cython/operators/joins.pyx":469
  * 
- *         # Probe phase
+ *         # Probe phase: probes with left side
  *         for left_batch in self._source:             # <<<<<<<<<<<<<<
  *             if left_batch is None or left_batch.num_rows == 0:
  *                 continue
@@ -15389,9 +16230,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __pyx_t_2 = 0;
     __pyx_t_3 = NULL;
   } else {
-    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_base._source); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 392, __pyx_L1_error)
+    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_base._source); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 469, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 392, __pyx_L1_error)
+    __pyx_t_3 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 469, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_3)) {
@@ -15399,7 +16240,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 392, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 469, __pyx_L1_error)
           #endif
           if (__pyx_t_2 >= __pyx_temp) break;
         }
@@ -15409,7 +16250,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 392, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 469, __pyx_L1_error)
           #endif
           if (__pyx_t_2 >= __pyx_temp) break;
         }
@@ -15420,13 +16261,13 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
         #endif
         ++__pyx_t_2;
       }
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 392, __pyx_L1_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 469, __pyx_L1_error)
     } else {
       __pyx_t_7 = __pyx_t_3(__pyx_t_1);
       if (unlikely(!__pyx_t_7)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 392, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 469, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -15438,8 +16279,8 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __Pyx_GIVEREF(__pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":393
- *         # Probe phase
+    /* "sabot/_cython/operators/joins.pyx":470
+ *         # Probe phase: probes with left side
  *         for left_batch in self._source:
  *             if left_batch is None or left_batch.num_rows == 0:             # <<<<<<<<<<<<<<
  *                 continue
@@ -15451,15 +16292,15 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
       __pyx_t_5 = __pyx_t_6;
       goto __pyx_L13_bool_binop_done;
     }
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_left_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 393, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_left_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 470, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_6 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_7, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 393, __pyx_L1_error)
+    __pyx_t_6 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_7, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 470, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_5 = __pyx_t_6;
     __pyx_L13_bool_binop_done:;
     if (__pyx_t_5) {
 
-      /* "sabot/_cython/operators/joins.pyx":394
+      /* "sabot/_cython/operators/joins.pyx":471
  *         for left_batch in self._source:
  *             if left_batch is None or left_batch.num_rows == 0:
  *                 continue             # <<<<<<<<<<<<<<
@@ -15468,8 +16309,8 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 */
       goto __pyx_L10_continue;
 
-      /* "sabot/_cython/operators/joins.pyx":393
- *         # Probe phase
+      /* "sabot/_cython/operators/joins.pyx":470
+ *         # Probe phase: probes with left side
  *         for left_batch in self._source:
  *             if left_batch is None or left_batch.num_rows == 0:             # <<<<<<<<<<<<<<
  *                 continue
@@ -15477,7 +16318,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 */
     }
 
-    /* "sabot/_cython/operators/joins.pyx":396
+    /* "sabot/_cython/operators/joins.pyx":473
  *                 continue
  * 
  *             result = self._hash_builder.probe_batch_vectorized(             # <<<<<<<<<<<<<<
@@ -15487,7 +16328,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __pyx_t_4 = __pyx_cur_scope->__pyx_v_self->_hash_builder;
     __Pyx_INCREF(__pyx_t_4);
 
-    /* "sabot/_cython/operators/joins.pyx":397
+    /* "sabot/_cython/operators/joins.pyx":474
  * 
  *             result = self._hash_builder.probe_batch_vectorized(
  *                 left_batch, self._left_keys, self._join_type             # <<<<<<<<<<<<<<
@@ -15499,7 +16340,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
       PyObject *__pyx_callargs[4] = {__pyx_t_4, __pyx_cur_scope->__pyx_v_left_batch, __pyx_cur_scope->__pyx_v_self->_left_keys, __pyx_cur_scope->__pyx_v_self->_join_type};
       __pyx_t_7 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_probe_batch_vectorized, __pyx_callargs+__pyx_t_8, (4-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 396, __pyx_L1_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 473, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
     }
     __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_result);
@@ -15507,7 +16348,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __Pyx_GIVEREF(__pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":400
+    /* "sabot/_cython/operators/joins.pyx":477
  *             )
  * 
  *             if result is not None and result.num_rows > 0:             # <<<<<<<<<<<<<<
@@ -15520,17 +16361,17 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
       __pyx_t_5 = __pyx_t_6;
       goto __pyx_L16_bool_binop_done;
     }
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_result, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 400, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_result, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 477, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = PyObject_RichCompare(__pyx_t_7, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 400, __pyx_L1_error)
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_7, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 477, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 400, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 477, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_5 = __pyx_t_6;
     __pyx_L16_bool_binop_done:;
     if (__pyx_t_5) {
 
-      /* "sabot/_cython/operators/joins.pyx":401
+      /* "sabot/_cython/operators/joins.pyx":478
  * 
  *             if result is not None and result.num_rows > 0:
  *                 yield result             # <<<<<<<<<<<<<<
@@ -15555,9 +16396,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
       __Pyx_XGOTREF(__pyx_t_1);
       __pyx_t_2 = __pyx_cur_scope->__pyx_t_1;
       __pyx_t_3 = __pyx_cur_scope->__pyx_t_2;
-      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 401, __pyx_L1_error)
+      if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 478, __pyx_L1_error)
 
-      /* "sabot/_cython/operators/joins.pyx":400
+      /* "sabot/_cython/operators/joins.pyx":477
  *             )
  * 
  *             if result is not None and result.num_rows > 0:             # <<<<<<<<<<<<<<
@@ -15566,9 +16407,9 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 */
     }
 
-    /* "sabot/_cython/operators/joins.pyx":392
+    /* "sabot/_cython/operators/joins.pyx":469
  * 
- *         # Probe phase
+ *         # Probe phase: probes with left side
  *         for left_batch in self._source:             # <<<<<<<<<<<<<<
  *             if left_batch is None or left_batch.num_rows == 0:
  *                 continue
@@ -15578,12 +16419,12 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "sabot/_cython/operators/joins.pyx":382
- *                 yield result
+  /* "sabot/_cython/operators/joins.pyx":454
+ *             yield batch
  * 
- *     def _execute_local(self):             # <<<<<<<<<<<<<<
- *         """Execute join locally (current logic)."""
- *         # Build phase
+ *     def _execute_local_fallback(self):             # <<<<<<<<<<<<<<
+ *         """
+ *         Fallback implementation using StreamingHashTableBuilder.
 */
 
   /* function exit code */
@@ -15595,7 +16436,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __Pyx_XDECREF(__pyx_t_7);
   if (__Pyx_PyErr_Occurred()) {
     __Pyx_Generator_Replace_StopIteration(0);
-    __Pyx_AddTraceback("_execute_local", __pyx_clineno, __pyx_lineno, __pyx_filename);
+    __Pyx_AddTraceback("_execute_local_fallback", __pyx_clineno, __pyx_lineno, __pyx_filename);
   }
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -15608,7 +16449,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":403
+/* "sabot/_cython/operators/joins.pyx":480
  *                 yield result
  * 
  *     def _receive_right_shuffled(self):             # <<<<<<<<<<<<<<
@@ -15617,16 +16458,16 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_12_receive_right_shuffled(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_15_receive_right_shuffled(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_11_receive_right_shuffled, "\n        Receive shuffled right side batches for this partition.\n\n        Uses ShuffleTransport to fetch partitions that have been\n        shuffled by key to this task.\n        ");
-static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_12_receive_right_shuffled = {"_receive_right_shuffled", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_12_receive_right_shuffled, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_11_receive_right_shuffled};
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_12_receive_right_shuffled(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_14_receive_right_shuffled, "\n        Receive shuffled right side batches for this partition.\n\n        Uses ShuffleTransport to fetch partitions that have been\n        shuffled by key to this task.\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_15_receive_right_shuffled = {"_receive_right_shuffled", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_15_receive_right_shuffled, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_14_receive_right_shuffled};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_15_receive_right_shuffled(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -15652,14 +16493,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("_receive_right_shuffled", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_11_receive_right_shuffled(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_14_receive_right_shuffled(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_11_receive_right_shuffled(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_14_receive_right_shuffled(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self) {
   PyObject *__pyx_v_right_shuffle_id = NULL;
   PyObject *__pyx_v_batches = NULL;
   PyObject *__pyx_r = NULL;
@@ -15674,7 +16515,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_receive_right_shuffled", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":410
+  /* "sabot/_cython/operators/joins.pyx":487
  *         shuffled by key to this task.
  *         """
  *         if self._shuffle_transport is None:             # <<<<<<<<<<<<<<
@@ -15684,7 +16525,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __pyx_t_1 = (__pyx_v_self->__pyx_base._shuffle_transport == Py_None);
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/joins.pyx":411
+    /* "sabot/_cython/operators/joins.pyx":488
  *         """
  *         if self._shuffle_transport is None:
  *             return []             # <<<<<<<<<<<<<<
@@ -15692,13 +16533,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
  *         # Right side uses a separate shuffle ID (append "_right" to distinguish)
 */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 411, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 488, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/joins.pyx":410
+    /* "sabot/_cython/operators/joins.pyx":487
  *         shuffled by key to this task.
  *         """
  *         if self._shuffle_transport is None:             # <<<<<<<<<<<<<<
@@ -15707,19 +16548,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":414
+  /* "sabot/_cython/operators/joins.pyx":491
  * 
  *         # Right side uses a separate shuffle ID (append "_right" to distinguish)
  *         right_shuffle_id = self._shuffle_id + b"_right"             # <<<<<<<<<<<<<<
  * 
  *         # Receive partitions for this task
 */
-  __pyx_t_2 = PyNumber_Add(__pyx_v_self->__pyx_base._shuffle_id, __pyx_mstate_global->__pyx_n_b_right); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 414, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Add(__pyx_v_self->__pyx_base._shuffle_id, __pyx_mstate_global->__pyx_n_b_right); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 491, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_right_shuffle_id = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":417
+  /* "sabot/_cython/operators/joins.pyx":494
  * 
  *         # Receive partitions for this task
  *         batches = self._shuffle_transport.receive_partitions(             # <<<<<<<<<<<<<<
@@ -15729,14 +16570,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __pyx_t_3 = __pyx_v_self->__pyx_base._shuffle_transport;
   __Pyx_INCREF(__pyx_t_3);
 
-  /* "sabot/_cython/operators/joins.pyx":419
+  /* "sabot/_cython/operators/joins.pyx":496
  *         batches = self._shuffle_transport.receive_partitions(
  *             right_shuffle_id,
  *             self._task_id             # <<<<<<<<<<<<<<
  *         )
  * 
 */
-  __pyx_t_4 = __Pyx_PyLong_From_int32_t(__pyx_v_self->__pyx_base._task_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 419, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyLong_From_int32_t(__pyx_v_self->__pyx_base._task_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 496, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 0;
   {
@@ -15744,13 +16585,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_receive_partitions, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 417, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 494, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __pyx_v_batches = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":422
+  /* "sabot/_cython/operators/joins.pyx":499
  *         )
  * 
  *         return batches             # <<<<<<<<<<<<<<
@@ -15762,7 +16603,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __pyx_r = __pyx_v_batches;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/joins.pyx":403
+  /* "sabot/_cython/operators/joins.pyx":480
  *                 yield result
  * 
  *     def _receive_right_shuffled(self):             # <<<<<<<<<<<<<<
@@ -15785,7 +16626,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":424
+/* "sabot/_cython/operators/joins.pyx":501
  *         return batches
  * 
  *     def _receive_left_shuffled(self):             # <<<<<<<<<<<<<<
@@ -15794,16 +16635,16 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_14_receive_left_shuffled(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_17_receive_left_shuffled(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_13_receive_left_shuffled, "\n        Receive shuffled left side batches for this partition.\n\n        Uses ShuffleTransport to fetch partitions that have been\n        shuffled by key to this task.\n        ");
-static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_14_receive_left_shuffled = {"_receive_left_shuffled", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_14_receive_left_shuffled, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_13_receive_left_shuffled};
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_14_receive_left_shuffled(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_16_receive_left_shuffled, "\n        Receive shuffled left side batches for this partition.\n\n        Uses ShuffleTransport to fetch partitions that have been\n        shuffled by key to this task.\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_17_receive_left_shuffled = {"_receive_left_shuffled", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_17_receive_left_shuffled, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_16_receive_left_shuffled};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_17_receive_left_shuffled(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -15829,14 +16670,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("_receive_left_shuffled", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_13_receive_left_shuffled(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_16_receive_left_shuffled(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_13_receive_left_shuffled(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_16_receive_left_shuffled(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self) {
   PyObject *__pyx_v_left_shuffle_id = NULL;
   PyObject *__pyx_v_batches = NULL;
   PyObject *__pyx_r = NULL;
@@ -15851,7 +16692,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_receive_left_shuffled", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":431
+  /* "sabot/_cython/operators/joins.pyx":508
  *         shuffled by key to this task.
  *         """
  *         if self._shuffle_transport is None:             # <<<<<<<<<<<<<<
@@ -15861,7 +16702,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __pyx_t_1 = (__pyx_v_self->__pyx_base._shuffle_transport == Py_None);
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/joins.pyx":432
+    /* "sabot/_cython/operators/joins.pyx":509
  *         """
  *         if self._shuffle_transport is None:
  *             return []             # <<<<<<<<<<<<<<
@@ -15869,13 +16710,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
  *         # Left side uses a separate shuffle ID (append "_left" to distinguish)
 */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 432, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 509, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/joins.pyx":431
+    /* "sabot/_cython/operators/joins.pyx":508
  *         shuffled by key to this task.
  *         """
  *         if self._shuffle_transport is None:             # <<<<<<<<<<<<<<
@@ -15884,19 +16725,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":435
+  /* "sabot/_cython/operators/joins.pyx":512
  * 
  *         # Left side uses a separate shuffle ID (append "_left" to distinguish)
  *         left_shuffle_id = self._shuffle_id + b"_left"             # <<<<<<<<<<<<<<
  * 
  *         # Receive partitions for this task
 */
-  __pyx_t_2 = PyNumber_Add(__pyx_v_self->__pyx_base._shuffle_id, __pyx_mstate_global->__pyx_n_b_left_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 435, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Add(__pyx_v_self->__pyx_base._shuffle_id, __pyx_mstate_global->__pyx_n_b_left_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 512, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_left_shuffle_id = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":438
+  /* "sabot/_cython/operators/joins.pyx":515
  * 
  *         # Receive partitions for this task
  *         batches = self._shuffle_transport.receive_partitions(             # <<<<<<<<<<<<<<
@@ -15906,14 +16747,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __pyx_t_3 = __pyx_v_self->__pyx_base._shuffle_transport;
   __Pyx_INCREF(__pyx_t_3);
 
-  /* "sabot/_cython/operators/joins.pyx":440
+  /* "sabot/_cython/operators/joins.pyx":517
  *         batches = self._shuffle_transport.receive_partitions(
  *             left_shuffle_id,
  *             self._task_id             # <<<<<<<<<<<<<<
  *         )
  * 
 */
-  __pyx_t_4 = __Pyx_PyLong_From_int32_t(__pyx_v_self->__pyx_base._task_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 440, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyLong_From_int32_t(__pyx_v_self->__pyx_base._task_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 517, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 0;
   {
@@ -15921,13 +16762,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_receive_partitions, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 438, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 515, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __pyx_v_batches = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":443
+  /* "sabot/_cython/operators/joins.pyx":520
  *         )
  * 
  *         return batches             # <<<<<<<<<<<<<<
@@ -15939,7 +16780,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   __pyx_r = __pyx_v_batches;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/joins.pyx":424
+  /* "sabot/_cython/operators/joins.pyx":501
  *         return batches
  * 
  *     def _receive_left_shuffled(self):             # <<<<<<<<<<<<<<
@@ -15969,15 +16810,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_16__reduce_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_19__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_16__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_16__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_16__reduce_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_19__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_19__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_19__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -16003,14 +16844,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("__reduce_cython__", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_15__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_18__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_15__reduce_cython__(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_18__reduce_cython__(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self) {
   PyObject *__pyx_v_state = 0;
   PyObject *__pyx_v__dict = 0;
   int __pyx_v_use_setstate;
@@ -16386,15 +17227,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_18__setstate_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_21__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_18__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_18__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_18__setstate_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_21__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_21__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_21__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -16460,7 +17301,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_17__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *)__pyx_v_self), __pyx_v___pyx_state);
+  __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_20__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *)__pyx_v_self), __pyx_v___pyx_state);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -16470,7 +17311,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_17__setstate_cython__(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_20__setstate_cython__(struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -16509,7 +17350,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonHashJoinOper
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":471
+/* "sabot/_cython/operators/joins.pyx":548
  *     """
  * 
  *     def __init__(self, left_source, right_source, time_column: str,             # <<<<<<<<<<<<<<
@@ -16548,40 +17389,40 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperat
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_left_source,&__pyx_mstate_global->__pyx_n_u_right_source,&__pyx_mstate_global->__pyx_n_u_time_column,&__pyx_mstate_global->__pyx_n_u_lower_bound,&__pyx_mstate_global->__pyx_n_u_upper_bound,&__pyx_mstate_global->__pyx_n_u_schema,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 471, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 548, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  6:
         values[5] = __Pyx_ArgRef_VARARGS(__pyx_args, 5);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 548, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  5:
         values[4] = __Pyx_ArgRef_VARARGS(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 548, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_VARARGS(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 548, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 548, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 548, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 548, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 471, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 548, __pyx_L3_error)
 
-      /* "sabot/_cython/operators/joins.pyx":472
+      /* "sabot/_cython/operators/joins.pyx":549
  * 
  *     def __init__(self, left_source, right_source, time_column: str,
  *                  lower_bound: int, upper_bound: int, schema=None):             # <<<<<<<<<<<<<<
@@ -16590,25 +17431,25 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperat
 */
       if (!values[5]) values[5] = __Pyx_NewRef(((PyObject *)Py_None));
       for (Py_ssize_t i = __pyx_nargs; i < 5; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 5, 6, i); __PYX_ERR(0, 471, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 5, 6, i); __PYX_ERR(0, 548, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  6:
         values[5] = __Pyx_ArgRef_VARARGS(__pyx_args, 5);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 548, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  5:
         values[4] = __Pyx_ArgRef_VARARGS(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 548, __pyx_L3_error)
         values[3] = __Pyx_ArgRef_VARARGS(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 548, __pyx_L3_error)
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 548, __pyx_L3_error)
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 548, __pyx_L3_error)
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 471, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 548, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
@@ -16623,7 +17464,7 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperat
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 5, 6, __pyx_nargs); __PYX_ERR(0, 471, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 5, 6, __pyx_nargs); __PYX_ERR(0, 548, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -16634,12 +17475,12 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperat
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_time_column), (&PyUnicode_Type), 0, "time_column", 2))) __PYX_ERR(0, 471, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_lower_bound), (&PyLong_Type), 0, "lower_bound", 2))) __PYX_ERR(0, 472, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_upper_bound), (&PyLong_Type), 0, "upper_bound", 2))) __PYX_ERR(0, 472, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_time_column), (&PyUnicode_Type), 0, "time_column", 2))) __PYX_ERR(0, 548, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_lower_bound), (&PyLong_Type), 0, "lower_bound", 2))) __PYX_ERR(0, 549, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_upper_bound), (&PyLong_Type), 0, "upper_bound", 2))) __PYX_ERR(0, 549, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator___init__(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator *)__pyx_v_self), __pyx_v_left_source, __pyx_v_right_source, __pyx_v_time_column, __pyx_v_lower_bound, __pyx_v_upper_bound, __pyx_v_schema);
 
-  /* "sabot/_cython/operators/joins.pyx":471
+  /* "sabot/_cython/operators/joins.pyx":548
  *     """
  * 
  *     def __init__(self, left_source, right_source, time_column: str,             # <<<<<<<<<<<<<<
@@ -16674,7 +17515,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperat
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":484
+  /* "sabot/_cython/operators/joins.pyx":561
  *             schema: Output schema (inferred)
  *         """
  *         self._source = left_source             # <<<<<<<<<<<<<<
@@ -16687,7 +17528,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperat
   __Pyx_DECREF(__pyx_v_self->__pyx_base.__pyx_base._source);
   __pyx_v_self->__pyx_base.__pyx_base._source = __pyx_v_left_source;
 
-  /* "sabot/_cython/operators/joins.pyx":485
+  /* "sabot/_cython/operators/joins.pyx":562
  *         """
  *         self._source = left_source
  *         self._right_source = right_source             # <<<<<<<<<<<<<<
@@ -16700,7 +17541,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperat
   __Pyx_DECREF(__pyx_v_self->_right_source);
   __pyx_v_self->_right_source = __pyx_v_right_source;
 
-  /* "sabot/_cython/operators/joins.pyx":486
+  /* "sabot/_cython/operators/joins.pyx":563
  *         self._source = left_source
  *         self._right_source = right_source
  *         self._schema = schema             # <<<<<<<<<<<<<<
@@ -16713,7 +17554,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperat
   __Pyx_DECREF(__pyx_v_self->__pyx_base.__pyx_base._schema);
   __pyx_v_self->__pyx_base.__pyx_base._schema = __pyx_v_schema;
 
-  /* "sabot/_cython/operators/joins.pyx":487
+  /* "sabot/_cython/operators/joins.pyx":564
  *         self._right_source = right_source
  *         self._schema = schema
  *         self._time_column = time_column             # <<<<<<<<<<<<<<
@@ -16726,34 +17567,34 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperat
   __Pyx_DECREF(__pyx_v_self->_time_column);
   __pyx_v_self->_time_column = __pyx_v_time_column;
 
-  /* "sabot/_cython/operators/joins.pyx":488
+  /* "sabot/_cython/operators/joins.pyx":565
  *         self._schema = schema
  *         self._time_column = time_column
  *         self._lower_bound = lower_bound             # <<<<<<<<<<<<<<
  *         self._upper_bound = upper_bound
  * 
 */
-  __pyx_t_1 = __Pyx_PyLong_As_long(__pyx_v_lower_bound); if (unlikely((__pyx_t_1 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 488, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyLong_As_long(__pyx_v_lower_bound); if (unlikely((__pyx_t_1 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 565, __pyx_L1_error)
   __pyx_v_self->_lower_bound = __pyx_t_1;
 
-  /* "sabot/_cython/operators/joins.pyx":489
+  /* "sabot/_cython/operators/joins.pyx":566
  *         self._time_column = time_column
  *         self._lower_bound = lower_bound
  *         self._upper_bound = upper_bound             # <<<<<<<<<<<<<<
  * 
  *         # Time-indexed state: timestamp -> list of rows
 */
-  __pyx_t_1 = __Pyx_PyLong_As_long(__pyx_v_upper_bound); if (unlikely((__pyx_t_1 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 489, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyLong_As_long(__pyx_v_upper_bound); if (unlikely((__pyx_t_1 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 566, __pyx_L1_error)
   __pyx_v_self->_upper_bound = __pyx_t_1;
 
-  /* "sabot/_cython/operators/joins.pyx":492
+  /* "sabot/_cython/operators/joins.pyx":569
  * 
  *         # Time-indexed state: timestamp -> list of rows
  *         self._time_indexed_state = {}             # <<<<<<<<<<<<<<
  *         self._rocksdb_timers = None  # TODO: Initialize RocksDB timer service
  * 
 */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 492, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 569, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __Pyx_GOTREF(__pyx_v_self->_time_indexed_state);
@@ -16761,7 +17602,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperat
   __pyx_v_self->_time_indexed_state = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":493
+  /* "sabot/_cython/operators/joins.pyx":570
  *         # Time-indexed state: timestamp -> list of rows
  *         self._time_indexed_state = {}
  *         self._rocksdb_timers = None  # TODO: Initialize RocksDB timer service             # <<<<<<<<<<<<<<
@@ -16774,7 +17615,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperat
   __Pyx_DECREF(__pyx_v_self->_rocksdb_timers);
   __pyx_v_self->_rocksdb_timers = Py_None;
 
-  /* "sabot/_cython/operators/joins.pyx":471
+  /* "sabot/_cython/operators/joins.pyx":548
  *     """
  * 
  *     def __init__(self, left_source, right_source, time_column: str,             # <<<<<<<<<<<<<<
@@ -16794,7 +17635,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperat
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":495
+/* "sabot/_cython/operators/joins.pyx":572
  *         self._rocksdb_timers = None  # TODO: Initialize RocksDB timer service
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -16842,32 +17683,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 495, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 572, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 495, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 572, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batch", 0) < 0) __PYX_ERR(0, 495, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batch", 0) < 0) __PYX_ERR(0, 572, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, i); __PYX_ERR(0, 495, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, i); __PYX_ERR(0, 572, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 495, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 572, __pyx_L3_error)
     }
     __pyx_v_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 495, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 572, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -16945,16 +17786,16 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("process_batch", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":499
+  /* "sabot/_cython/operators/joins.pyx":576
  *     def process_batch(self, object batch):
  *         """Process batch with interval join logic."""
  *         if not ARROW_AVAILABLE or batch is None or batch.num_rows == 0:             # <<<<<<<<<<<<<<
  *             return None
  * 
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_ARROW_AVAILABLE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 499, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_ARROW_AVAILABLE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 576, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 499, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 576, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_4 = (!__pyx_t_3);
   if (!__pyx_t_4) {
@@ -16968,15 +17809,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
     __pyx_t_1 = __pyx_t_4;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 499, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 576, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_2, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 499, __pyx_L1_error)
+  __pyx_t_4 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_2, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 576, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_1 = __pyx_t_4;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/joins.pyx":500
+    /* "sabot/_cython/operators/joins.pyx":577
  *         """Process batch with interval join logic."""
  *         if not ARROW_AVAILABLE or batch is None or batch.num_rows == 0:
  *             return None             # <<<<<<<<<<<<<<
@@ -16987,7 +17828,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/joins.pyx":499
+    /* "sabot/_cython/operators/joins.pyx":576
  *     def process_batch(self, object batch):
  *         """Process batch with interval join logic."""
  *         if not ARROW_AVAILABLE or batch is None or batch.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -16996,7 +17837,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":502
+  /* "sabot/_cython/operators/joins.pyx":579
  *             return None
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -17012,18 +17853,18 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
     __Pyx_XGOTREF(__pyx_t_7);
     /*try:*/ {
 
-      /* "sabot/_cython/operators/joins.pyx":505
+      /* "sabot/_cython/operators/joins.pyx":582
  *             # First, index all right-side events by time
  *             # (In streaming, this would be maintained incrementally)
  *             if not self._time_indexed_state:             # <<<<<<<<<<<<<<
  *                 for right_batch in self._right_source:
  *                     if right_batch is None:
 */
-      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_self->_time_indexed_state); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 505, __pyx_L7_error)
+      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_self->_time_indexed_state); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 582, __pyx_L7_error)
       __pyx_t_4 = (!__pyx_t_1);
       if (__pyx_t_4) {
 
-        /* "sabot/_cython/operators/joins.pyx":506
+        /* "sabot/_cython/operators/joins.pyx":583
  *             # (In streaming, this would be maintained incrementally)
  *             if not self._time_indexed_state:
  *                 for right_batch in self._right_source:             # <<<<<<<<<<<<<<
@@ -17035,9 +17876,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
           __pyx_t_8 = 0;
           __pyx_t_9 = NULL;
         } else {
-          __pyx_t_8 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_self->_right_source); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 506, __pyx_L7_error)
+          __pyx_t_8 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_self->_right_source); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 583, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 506, __pyx_L7_error)
+          __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 583, __pyx_L7_error)
         }
         for (;;) {
           if (likely(!__pyx_t_9)) {
@@ -17045,7 +17886,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
               {
                 Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
                 #if !CYTHON_ASSUME_SAFE_SIZE
-                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 506, __pyx_L7_error)
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 583, __pyx_L7_error)
                 #endif
                 if (__pyx_t_8 >= __pyx_temp) break;
               }
@@ -17055,7 +17896,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
               {
                 Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
                 #if !CYTHON_ASSUME_SAFE_SIZE
-                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 506, __pyx_L7_error)
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 583, __pyx_L7_error)
                 #endif
                 if (__pyx_t_8 >= __pyx_temp) break;
               }
@@ -17066,13 +17907,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
               #endif
               ++__pyx_t_8;
             }
-            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 506, __pyx_L7_error)
+            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 583, __pyx_L7_error)
           } else {
             __pyx_t_10 = __pyx_t_9(__pyx_t_2);
             if (unlikely(!__pyx_t_10)) {
               PyObject* exc_type = PyErr_Occurred();
               if (exc_type) {
-                if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 506, __pyx_L7_error)
+                if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 583, __pyx_L7_error)
                 PyErr_Clear();
               }
               break;
@@ -17082,7 +17923,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
           __Pyx_XDECREF_SET(__pyx_v_right_batch, __pyx_t_10);
           __pyx_t_10 = 0;
 
-          /* "sabot/_cython/operators/joins.pyx":507
+          /* "sabot/_cython/operators/joins.pyx":584
  *             if not self._time_indexed_state:
  *                 for right_batch in self._right_source:
  *                     if right_batch is None:             # <<<<<<<<<<<<<<
@@ -17092,7 +17933,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
           __pyx_t_4 = (__pyx_v_right_batch == Py_None);
           if (__pyx_t_4) {
 
-            /* "sabot/_cython/operators/joins.pyx":508
+            /* "sabot/_cython/operators/joins.pyx":585
  *                 for right_batch in self._right_source:
  *                     if right_batch is None:
  *                         continue             # <<<<<<<<<<<<<<
@@ -17101,7 +17942,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
 */
             goto __pyx_L14_continue;
 
-            /* "sabot/_cython/operators/joins.pyx":507
+            /* "sabot/_cython/operators/joins.pyx":584
  *             if not self._time_indexed_state:
  *                 for right_batch in self._right_source:
  *                     if right_batch is None:             # <<<<<<<<<<<<<<
@@ -17110,7 +17951,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
 */
           }
 
-          /* "sabot/_cython/operators/joins.pyx":510
+          /* "sabot/_cython/operators/joins.pyx":587
  *                         continue
  * 
  *                     times = right_batch.column(self._time_column).to_pylist()             # <<<<<<<<<<<<<<
@@ -17124,7 +17965,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
             PyObject *__pyx_callargs[2] = {__pyx_t_13, __pyx_v_self->_time_column};
             __pyx_t_12 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-            if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 510, __pyx_L7_error)
+            if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 587, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_12);
           }
           __pyx_t_11 = __pyx_t_12;
@@ -17135,13 +17976,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
             __pyx_t_10 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_pylist, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
             __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 510, __pyx_L7_error)
+            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 587, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_10);
           }
           __Pyx_XDECREF_SET(__pyx_v_times, __pyx_t_10);
           __pyx_t_10 = 0;
 
-          /* "sabot/_cython/operators/joins.pyx":511
+          /* "sabot/_cython/operators/joins.pyx":588
  * 
  *                     times = right_batch.column(self._time_column).to_pylist()
  *                     for i in range(right_batch.num_rows):             # <<<<<<<<<<<<<<
@@ -17151,7 +17992,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
           __pyx_t_12 = NULL;
           __Pyx_INCREF(__pyx_builtin_range);
           __pyx_t_11 = __pyx_builtin_range; 
-          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 511, __pyx_L7_error)
+          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 588, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_13);
           __pyx_t_14 = 1;
           {
@@ -17160,7 +18001,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
             __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
             __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 511, __pyx_L7_error)
+            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 588, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_10);
           }
           if (likely(PyList_CheckExact(__pyx_t_10)) || PyTuple_CheckExact(__pyx_t_10)) {
@@ -17168,9 +18009,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
             __pyx_t_15 = 0;
             __pyx_t_16 = NULL;
           } else {
-            __pyx_t_15 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 511, __pyx_L7_error)
+            __pyx_t_15 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 588, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_16 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_11); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 511, __pyx_L7_error)
+            __pyx_t_16 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_11); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 588, __pyx_L7_error)
           }
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
           for (;;) {
@@ -17179,7 +18020,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                 {
                   Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_11);
                   #if !CYTHON_ASSUME_SAFE_SIZE
-                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 511, __pyx_L7_error)
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 588, __pyx_L7_error)
                   #endif
                   if (__pyx_t_15 >= __pyx_temp) break;
                 }
@@ -17189,7 +18030,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                 {
                   Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_11);
                   #if !CYTHON_ASSUME_SAFE_SIZE
-                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 511, __pyx_L7_error)
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 588, __pyx_L7_error)
                   #endif
                   if (__pyx_t_15 >= __pyx_temp) break;
                 }
@@ -17200,13 +18041,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                 #endif
                 ++__pyx_t_15;
               }
-              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 511, __pyx_L7_error)
+              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 588, __pyx_L7_error)
             } else {
               __pyx_t_10 = __pyx_t_16(__pyx_t_11);
               if (unlikely(!__pyx_t_10)) {
                 PyObject* exc_type = PyErr_Occurred();
                 if (exc_type) {
-                  if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 511, __pyx_L7_error)
+                  if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 588, __pyx_L7_error)
                   PyErr_Clear();
                 }
                 break;
@@ -17216,19 +18057,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
             __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_10);
             __pyx_t_10 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":512
+            /* "sabot/_cython/operators/joins.pyx":589
  *                     times = right_batch.column(self._time_column).to_pylist()
  *                     for i in range(right_batch.num_rows):
  *                         timestamp = times[i]             # <<<<<<<<<<<<<<
  *                         row = {col: right_batch.column(col)[i].as_py()
  *                                for col in right_batch.schema.names}
 */
-            __pyx_t_10 = __Pyx_PyObject_GetItem(__pyx_v_times, __pyx_v_i); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 512, __pyx_L7_error)
+            __pyx_t_10 = __Pyx_PyObject_GetItem(__pyx_v_times, __pyx_v_i); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 589, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_10);
             __Pyx_XDECREF_SET(__pyx_v_timestamp, __pyx_t_10);
             __pyx_t_10 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":513
+            /* "sabot/_cython/operators/joins.pyx":590
  *                     for i in range(right_batch.num_rows):
  *                         timestamp = times[i]
  *                         row = {col: right_batch.column(col)[i].as_py()             # <<<<<<<<<<<<<<
@@ -17236,19 +18077,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
  *                         if timestamp not in self._time_indexed_state:
 */
             { /* enter inner scope */
-              __pyx_t_10 = PyDict_New(); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 513, __pyx_L21_error)
+              __pyx_t_10 = PyDict_New(); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 590, __pyx_L21_error)
               __Pyx_GOTREF(__pyx_t_10);
 
-              /* "sabot/_cython/operators/joins.pyx":514
+              /* "sabot/_cython/operators/joins.pyx":591
  *                         timestamp = times[i]
  *                         row = {col: right_batch.column(col)[i].as_py()
  *                                for col in right_batch.schema.names}             # <<<<<<<<<<<<<<
  *                         if timestamp not in self._time_indexed_state:
  *                             self._time_indexed_state[timestamp] = []
 */
-              __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 514, __pyx_L21_error)
+              __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 591, __pyx_L21_error)
               __Pyx_GOTREF(__pyx_t_13);
-              __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 514, __pyx_L21_error)
+              __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 591, __pyx_L21_error)
               __Pyx_GOTREF(__pyx_t_12);
               __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
               if (likely(PyList_CheckExact(__pyx_t_12)) || PyTuple_CheckExact(__pyx_t_12)) {
@@ -17256,9 +18097,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                 __pyx_t_17 = 0;
                 __pyx_t_18 = NULL;
               } else {
-                __pyx_t_17 = -1; __pyx_t_13 = PyObject_GetIter(__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 514, __pyx_L21_error)
+                __pyx_t_17 = -1; __pyx_t_13 = PyObject_GetIter(__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 591, __pyx_L21_error)
                 __Pyx_GOTREF(__pyx_t_13);
-                __pyx_t_18 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_13); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 514, __pyx_L21_error)
+                __pyx_t_18 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_13); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 591, __pyx_L21_error)
               }
               __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
               for (;;) {
@@ -17267,7 +18108,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                     {
                       Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_13);
                       #if !CYTHON_ASSUME_SAFE_SIZE
-                      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 514, __pyx_L21_error)
+                      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 591, __pyx_L21_error)
                       #endif
                       if (__pyx_t_17 >= __pyx_temp) break;
                     }
@@ -17277,7 +18118,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                     {
                       Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_13);
                       #if !CYTHON_ASSUME_SAFE_SIZE
-                      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 514, __pyx_L21_error)
+                      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 591, __pyx_L21_error)
                       #endif
                       if (__pyx_t_17 >= __pyx_temp) break;
                     }
@@ -17288,13 +18129,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                     #endif
                     ++__pyx_t_17;
                   }
-                  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 514, __pyx_L21_error)
+                  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 591, __pyx_L21_error)
                 } else {
                   __pyx_t_12 = __pyx_t_18(__pyx_t_13);
                   if (unlikely(!__pyx_t_12)) {
                     PyObject* exc_type = PyErr_Occurred();
                     if (exc_type) {
-                      if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 514, __pyx_L21_error)
+                      if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 591, __pyx_L21_error)
                       PyErr_Clear();
                     }
                     break;
@@ -17304,7 +18145,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                 __Pyx_XDECREF_SET(__pyx_8genexpr7__pyx_v_col, __pyx_t_12);
                 __pyx_t_12 = 0;
 
-                /* "sabot/_cython/operators/joins.pyx":513
+                /* "sabot/_cython/operators/joins.pyx":590
  *                     for i in range(right_batch.num_rows):
  *                         timestamp = times[i]
  *                         row = {col: right_batch.column(col)[i].as_py()             # <<<<<<<<<<<<<<
@@ -17318,10 +18159,10 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                   PyObject *__pyx_callargs[2] = {__pyx_t_21, __pyx_8genexpr7__pyx_v_col};
                   __pyx_t_20 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
                   __Pyx_XDECREF(__pyx_t_21); __pyx_t_21 = 0;
-                  if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 513, __pyx_L21_error)
+                  if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 590, __pyx_L21_error)
                   __Pyx_GOTREF(__pyx_t_20);
                 }
-                __pyx_t_21 = __Pyx_PyObject_GetItem(__pyx_t_20, __pyx_v_i); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 513, __pyx_L21_error)
+                __pyx_t_21 = __Pyx_PyObject_GetItem(__pyx_t_20, __pyx_v_i); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 590, __pyx_L21_error)
                 __Pyx_GOTREF(__pyx_t_21);
                 __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
                 __pyx_t_19 = __pyx_t_21;
@@ -17332,13 +18173,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                   __pyx_t_12 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_as_py, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
                   __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
                   __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
-                  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 513, __pyx_L21_error)
+                  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 590, __pyx_L21_error)
                   __Pyx_GOTREF(__pyx_t_12);
                 }
-                if (unlikely(PyDict_SetItem(__pyx_t_10, (PyObject*)__pyx_8genexpr7__pyx_v_col, (PyObject*)__pyx_t_12))) __PYX_ERR(0, 513, __pyx_L21_error)
+                if (unlikely(PyDict_SetItem(__pyx_t_10, (PyObject*)__pyx_8genexpr7__pyx_v_col, (PyObject*)__pyx_t_12))) __PYX_ERR(0, 590, __pyx_L21_error)
                 __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-                /* "sabot/_cython/operators/joins.pyx":514
+                /* "sabot/_cython/operators/joins.pyx":591
  *                         timestamp = times[i]
  *                         row = {col: right_batch.column(col)[i].as_py()
  *                                for col in right_batch.schema.names}             # <<<<<<<<<<<<<<
@@ -17357,7 +18198,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
             __Pyx_XDECREF_SET(__pyx_v_row, ((PyObject*)__pyx_t_10));
             __pyx_t_10 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":515
+            /* "sabot/_cython/operators/joins.pyx":592
  *                         row = {col: right_batch.column(col)[i].as_py()
  *                                for col in right_batch.schema.names}
  *                         if timestamp not in self._time_indexed_state:             # <<<<<<<<<<<<<<
@@ -17366,28 +18207,28 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
 */
             if (unlikely(__pyx_v_self->_time_indexed_state == Py_None)) {
               PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-              __PYX_ERR(0, 515, __pyx_L7_error)
+              __PYX_ERR(0, 592, __pyx_L7_error)
             }
-            __pyx_t_4 = (__Pyx_PyDict_ContainsTF(__pyx_v_timestamp, __pyx_v_self->_time_indexed_state, Py_NE)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 515, __pyx_L7_error)
+            __pyx_t_4 = (__Pyx_PyDict_ContainsTF(__pyx_v_timestamp, __pyx_v_self->_time_indexed_state, Py_NE)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 592, __pyx_L7_error)
             if (__pyx_t_4) {
 
-              /* "sabot/_cython/operators/joins.pyx":516
+              /* "sabot/_cython/operators/joins.pyx":593
  *                                for col in right_batch.schema.names}
  *                         if timestamp not in self._time_indexed_state:
  *                             self._time_indexed_state[timestamp] = []             # <<<<<<<<<<<<<<
  *                         self._time_indexed_state[timestamp].append(row)
  * 
 */
-              __pyx_t_10 = PyList_New(0); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 516, __pyx_L7_error)
+              __pyx_t_10 = PyList_New(0); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 593, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_10);
               if (unlikely(__pyx_v_self->_time_indexed_state == Py_None)) {
                 PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-                __PYX_ERR(0, 516, __pyx_L7_error)
+                __PYX_ERR(0, 593, __pyx_L7_error)
               }
-              if (unlikely((PyDict_SetItem(__pyx_v_self->_time_indexed_state, __pyx_v_timestamp, __pyx_t_10) < 0))) __PYX_ERR(0, 516, __pyx_L7_error)
+              if (unlikely((PyDict_SetItem(__pyx_v_self->_time_indexed_state, __pyx_v_timestamp, __pyx_t_10) < 0))) __PYX_ERR(0, 593, __pyx_L7_error)
               __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-              /* "sabot/_cython/operators/joins.pyx":515
+              /* "sabot/_cython/operators/joins.pyx":592
  *                         row = {col: right_batch.column(col)[i].as_py()
  *                                for col in right_batch.schema.names}
  *                         if timestamp not in self._time_indexed_state:             # <<<<<<<<<<<<<<
@@ -17396,7 +18237,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
 */
             }
 
-            /* "sabot/_cython/operators/joins.pyx":517
+            /* "sabot/_cython/operators/joins.pyx":594
  *                         if timestamp not in self._time_indexed_state:
  *                             self._time_indexed_state[timestamp] = []
  *                         self._time_indexed_state[timestamp].append(row)             # <<<<<<<<<<<<<<
@@ -17405,14 +18246,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
 */
             if (unlikely(__pyx_v_self->_time_indexed_state == Py_None)) {
               PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-              __PYX_ERR(0, 517, __pyx_L7_error)
+              __PYX_ERR(0, 594, __pyx_L7_error)
             }
-            __pyx_t_10 = __Pyx_PyDict_GetItem(__pyx_v_self->_time_indexed_state, __pyx_v_timestamp); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 517, __pyx_L7_error)
+            __pyx_t_10 = __Pyx_PyDict_GetItem(__pyx_v_self->_time_indexed_state, __pyx_v_timestamp); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 594, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_10);
-            __pyx_t_22 = __Pyx_PyObject_Append(__pyx_t_10, __pyx_v_row); if (unlikely(__pyx_t_22 == ((int)-1))) __PYX_ERR(0, 517, __pyx_L7_error)
+            __pyx_t_22 = __Pyx_PyObject_Append(__pyx_t_10, __pyx_v_row); if (unlikely(__pyx_t_22 == ((int)-1))) __PYX_ERR(0, 594, __pyx_L7_error)
             __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":511
+            /* "sabot/_cython/operators/joins.pyx":588
  * 
  *                     times = right_batch.column(self._time_column).to_pylist()
  *                     for i in range(right_batch.num_rows):             # <<<<<<<<<<<<<<
@@ -17422,7 +18263,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
           }
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-          /* "sabot/_cython/operators/joins.pyx":506
+          /* "sabot/_cython/operators/joins.pyx":583
  *             # (In streaming, this would be maintained incrementally)
  *             if not self._time_indexed_state:
  *                 for right_batch in self._right_source:             # <<<<<<<<<<<<<<
@@ -17433,7 +18274,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":505
+        /* "sabot/_cython/operators/joins.pyx":582
  *             # First, index all right-side events by time
  *             # (In streaming, this would be maintained incrementally)
  *             if not self._time_indexed_state:             # <<<<<<<<<<<<<<
@@ -17442,7 +18283,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
 */
       }
 
-      /* "sabot/_cython/operators/joins.pyx":520
+      /* "sabot/_cython/operators/joins.pyx":597
  * 
  *             # Probe with left batch
  *             left_times = batch.column(self._time_column).to_pylist()             # <<<<<<<<<<<<<<
@@ -17456,7 +18297,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
         PyObject *__pyx_callargs[2] = {__pyx_t_13, __pyx_v_self->_time_column};
         __pyx_t_10 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 520, __pyx_L7_error)
+        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 597, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_10);
       }
       __pyx_t_11 = __pyx_t_10;
@@ -17467,25 +18308,25 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
         __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_pylist, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 520, __pyx_L7_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 597, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       __pyx_v_left_times = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":521
+      /* "sabot/_cython/operators/joins.pyx":598
  *             # Probe with left batch
  *             left_times = batch.column(self._time_column).to_pylist()
  *             output_rows = []             # <<<<<<<<<<<<<<
  * 
  *             for i in range(batch.num_rows):
 */
-      __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 521, __pyx_L7_error)
+      __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 598, __pyx_L7_error)
       __Pyx_GOTREF(__pyx_t_2);
       __pyx_v_output_rows = ((PyObject*)__pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":523
+      /* "sabot/_cython/operators/joins.pyx":600
  *             output_rows = []
  * 
  *             for i in range(batch.num_rows):             # <<<<<<<<<<<<<<
@@ -17495,7 +18336,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
       __pyx_t_10 = NULL;
       __Pyx_INCREF(__pyx_builtin_range);
       __pyx_t_11 = __pyx_builtin_range; 
-      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 523, __pyx_L7_error)
+      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 600, __pyx_L7_error)
       __Pyx_GOTREF(__pyx_t_13);
       __pyx_t_14 = 1;
       {
@@ -17504,7 +18345,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 523, __pyx_L7_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 600, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
@@ -17512,9 +18353,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
         __pyx_t_8 = 0;
         __pyx_t_9 = NULL;
       } else {
-        __pyx_t_8 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 523, __pyx_L7_error)
+        __pyx_t_8 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 600, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 523, __pyx_L7_error)
+        __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 600, __pyx_L7_error)
       }
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       for (;;) {
@@ -17523,7 +18364,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_11);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 523, __pyx_L7_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 600, __pyx_L7_error)
               #endif
               if (__pyx_t_8 >= __pyx_temp) break;
             }
@@ -17533,7 +18374,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
             {
               Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_11);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 523, __pyx_L7_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 600, __pyx_L7_error)
               #endif
               if (__pyx_t_8 >= __pyx_temp) break;
             }
@@ -17544,13 +18385,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
             #endif
             ++__pyx_t_8;
           }
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 523, __pyx_L7_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 600, __pyx_L7_error)
         } else {
           __pyx_t_2 = __pyx_t_9(__pyx_t_11);
           if (unlikely(!__pyx_t_2)) {
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
-              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 523, __pyx_L7_error)
+              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 600, __pyx_L7_error)
               PyErr_Clear();
             }
             break;
@@ -17560,19 +18401,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
         __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_2);
         __pyx_t_2 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":524
+        /* "sabot/_cython/operators/joins.pyx":601
  * 
  *             for i in range(batch.num_rows):
  *                 left_time = left_times[i]             # <<<<<<<<<<<<<<
  *                 left_row = {col: batch.column(col)[i].as_py() for col in batch.schema.names}
  * 
 */
-        __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_left_times, __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 524, __pyx_L7_error)
+        __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_left_times, __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 601, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_XDECREF_SET(__pyx_v_left_time, __pyx_t_2);
         __pyx_t_2 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":525
+        /* "sabot/_cython/operators/joins.pyx":602
  *             for i in range(batch.num_rows):
  *                 left_time = left_times[i]
  *                 left_row = {col: batch.column(col)[i].as_py() for col in batch.schema.names}             # <<<<<<<<<<<<<<
@@ -17580,11 +18421,11 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
  *                 # Find right rows within interval
 */
         { /* enter inner scope */
-          __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 525, __pyx_L33_error)
+          __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 602, __pyx_L33_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 525, __pyx_L33_error)
+          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 602, __pyx_L33_error)
           __Pyx_GOTREF(__pyx_t_13);
-          __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 525, __pyx_L33_error)
+          __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 602, __pyx_L33_error)
           __Pyx_GOTREF(__pyx_t_10);
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
           if (likely(PyList_CheckExact(__pyx_t_10)) || PyTuple_CheckExact(__pyx_t_10)) {
@@ -17592,9 +18433,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
             __pyx_t_15 = 0;
             __pyx_t_16 = NULL;
           } else {
-            __pyx_t_15 = -1; __pyx_t_13 = PyObject_GetIter(__pyx_t_10); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 525, __pyx_L33_error)
+            __pyx_t_15 = -1; __pyx_t_13 = PyObject_GetIter(__pyx_t_10); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 602, __pyx_L33_error)
             __Pyx_GOTREF(__pyx_t_13);
-            __pyx_t_16 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_13); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 525, __pyx_L33_error)
+            __pyx_t_16 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_13); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 602, __pyx_L33_error)
           }
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
           for (;;) {
@@ -17603,7 +18444,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                 {
                   Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_13);
                   #if !CYTHON_ASSUME_SAFE_SIZE
-                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 525, __pyx_L33_error)
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 602, __pyx_L33_error)
                   #endif
                   if (__pyx_t_15 >= __pyx_temp) break;
                 }
@@ -17613,7 +18454,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                 {
                   Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_13);
                   #if !CYTHON_ASSUME_SAFE_SIZE
-                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 525, __pyx_L33_error)
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 602, __pyx_L33_error)
                   #endif
                   if (__pyx_t_15 >= __pyx_temp) break;
                 }
@@ -17624,13 +18465,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                 #endif
                 ++__pyx_t_15;
               }
-              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 525, __pyx_L33_error)
+              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 602, __pyx_L33_error)
             } else {
               __pyx_t_10 = __pyx_t_16(__pyx_t_13);
               if (unlikely(!__pyx_t_10)) {
                 PyObject* exc_type = PyErr_Occurred();
                 if (exc_type) {
-                  if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 525, __pyx_L33_error)
+                  if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 602, __pyx_L33_error)
                   PyErr_Clear();
                 }
                 break;
@@ -17646,10 +18487,10 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
               PyObject *__pyx_callargs[2] = {__pyx_t_19, __pyx_8genexpr8__pyx_v_col};
               __pyx_t_21 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
               __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
-              if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 525, __pyx_L33_error)
+              if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 602, __pyx_L33_error)
               __Pyx_GOTREF(__pyx_t_21);
             }
-            __pyx_t_19 = __Pyx_PyObject_GetItem(__pyx_t_21, __pyx_v_i); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 525, __pyx_L33_error)
+            __pyx_t_19 = __Pyx_PyObject_GetItem(__pyx_t_21, __pyx_v_i); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 602, __pyx_L33_error)
             __Pyx_GOTREF(__pyx_t_19);
             __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
             __pyx_t_12 = __pyx_t_19;
@@ -17660,10 +18501,10 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
               __pyx_t_10 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_as_py, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
               __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
               __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
-              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 525, __pyx_L33_error)
+              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 602, __pyx_L33_error)
               __Pyx_GOTREF(__pyx_t_10);
             }
-            if (unlikely(PyDict_SetItem(__pyx_t_2, (PyObject*)__pyx_8genexpr8__pyx_v_col, (PyObject*)__pyx_t_10))) __PYX_ERR(0, 525, __pyx_L33_error)
+            if (unlikely(PyDict_SetItem(__pyx_t_2, (PyObject*)__pyx_8genexpr8__pyx_v_col, (PyObject*)__pyx_t_10))) __PYX_ERR(0, 602, __pyx_L33_error)
             __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
           }
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
@@ -17677,37 +18518,37 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
         __Pyx_XDECREF_SET(__pyx_v_left_row, ((PyObject*)__pyx_t_2));
         __pyx_t_2 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":528
+        /* "sabot/_cython/operators/joins.pyx":605
  * 
  *                 # Find right rows within interval
  *                 min_time = left_time + self._lower_bound             # <<<<<<<<<<<<<<
  *                 max_time = left_time + self._upper_bound
  * 
 */
-        __pyx_t_2 = __Pyx_PyLong_From_long(__pyx_v_self->_lower_bound); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 528, __pyx_L7_error)
+        __pyx_t_2 = __Pyx_PyLong_From_long(__pyx_v_self->_lower_bound); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 605, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_13 = PyNumber_Add(__pyx_v_left_time, __pyx_t_2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 528, __pyx_L7_error)
+        __pyx_t_13 = PyNumber_Add(__pyx_v_left_time, __pyx_t_2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 605, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_13);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_XDECREF_SET(__pyx_v_min_time, __pyx_t_13);
         __pyx_t_13 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":529
+        /* "sabot/_cython/operators/joins.pyx":606
  *                 # Find right rows within interval
  *                 min_time = left_time + self._lower_bound
  *                 max_time = left_time + self._upper_bound             # <<<<<<<<<<<<<<
  * 
  *                 # Scan time index (TODO: optimize with RocksDB range scan)
 */
-        __pyx_t_13 = __Pyx_PyLong_From_long(__pyx_v_self->_upper_bound); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 529, __pyx_L7_error)
+        __pyx_t_13 = __Pyx_PyLong_From_long(__pyx_v_self->_upper_bound); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 606, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_13);
-        __pyx_t_2 = PyNumber_Add(__pyx_v_left_time, __pyx_t_13); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 529, __pyx_L7_error)
+        __pyx_t_2 = PyNumber_Add(__pyx_v_left_time, __pyx_t_13); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 606, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
         __Pyx_XDECREF_SET(__pyx_v_max_time, __pyx_t_2);
         __pyx_t_2 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":532
+        /* "sabot/_cython/operators/joins.pyx":609
  * 
  *                 # Scan time index (TODO: optimize with RocksDB range scan)
  *                 for timestamp, right_rows in self._time_indexed_state.items():             # <<<<<<<<<<<<<<
@@ -17717,9 +18558,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
         __pyx_t_15 = 0;
         if (unlikely(__pyx_v_self->_time_indexed_state == Py_None)) {
           PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "items");
-          __PYX_ERR(0, 532, __pyx_L7_error)
+          __PYX_ERR(0, 609, __pyx_L7_error)
         }
-        __pyx_t_13 = __Pyx_dict_iterator(__pyx_v_self->_time_indexed_state, 1, __pyx_mstate_global->__pyx_n_u_items, (&__pyx_t_17), (&__pyx_t_23)); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 532, __pyx_L7_error)
+        __pyx_t_13 = __Pyx_dict_iterator(__pyx_v_self->_time_indexed_state, 1, __pyx_mstate_global->__pyx_n_u_items, (&__pyx_t_17), (&__pyx_t_23)); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 609, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_13);
         __Pyx_XDECREF(__pyx_t_2);
         __pyx_t_2 = __pyx_t_13;
@@ -17727,7 +18568,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
         while (1) {
           __pyx_t_24 = __Pyx_dict_iter_next(__pyx_t_2, __pyx_t_17, &__pyx_t_15, &__pyx_t_13, &__pyx_t_10, NULL, __pyx_t_23);
           if (unlikely(__pyx_t_24 == 0)) break;
-          if (unlikely(__pyx_t_24 == -1)) __PYX_ERR(0, 532, __pyx_L7_error)
+          if (unlikely(__pyx_t_24 == -1)) __PYX_ERR(0, 609, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_13);
           __Pyx_GOTREF(__pyx_t_10);
           __Pyx_XDECREF_SET(__pyx_v_timestamp, __pyx_t_13);
@@ -17735,23 +18576,23 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
           __Pyx_XDECREF_SET(__pyx_v_right_rows, __pyx_t_10);
           __pyx_t_10 = 0;
 
-          /* "sabot/_cython/operators/joins.pyx":533
+          /* "sabot/_cython/operators/joins.pyx":610
  *                 # Scan time index (TODO: optimize with RocksDB range scan)
  *                 for timestamp, right_rows in self._time_indexed_state.items():
  *                     if min_time <= timestamp <= max_time:             # <<<<<<<<<<<<<<
  *                         for right_row in right_rows:
  *                             joined_row = {**left_row, **right_row}
 */
-          __pyx_t_10 = PyObject_RichCompare(__pyx_v_min_time, __pyx_v_timestamp, Py_LE); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 533, __pyx_L7_error)
+          __pyx_t_10 = PyObject_RichCompare(__pyx_v_min_time, __pyx_v_timestamp, Py_LE); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 610, __pyx_L7_error)
           if (__Pyx_PyObject_IsTrue(__pyx_t_10)) {
             __Pyx_DECREF(__pyx_t_10);
-            __pyx_t_10 = PyObject_RichCompare(__pyx_v_timestamp, __pyx_v_max_time, Py_LE); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 533, __pyx_L7_error)
+            __pyx_t_10 = PyObject_RichCompare(__pyx_v_timestamp, __pyx_v_max_time, Py_LE); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 610, __pyx_L7_error)
           }
-          __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_10); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 533, __pyx_L7_error)
+          __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_10); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 610, __pyx_L7_error)
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
           if (__pyx_t_4) {
 
-            /* "sabot/_cython/operators/joins.pyx":534
+            /* "sabot/_cython/operators/joins.pyx":611
  *                 for timestamp, right_rows in self._time_indexed_state.items():
  *                     if min_time <= timestamp <= max_time:
  *                         for right_row in right_rows:             # <<<<<<<<<<<<<<
@@ -17763,9 +18604,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
               __pyx_t_25 = 0;
               __pyx_t_16 = NULL;
             } else {
-              __pyx_t_25 = -1; __pyx_t_10 = PyObject_GetIter(__pyx_v_right_rows); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 534, __pyx_L7_error)
+              __pyx_t_25 = -1; __pyx_t_10 = PyObject_GetIter(__pyx_v_right_rows); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 611, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_10);
-              __pyx_t_16 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_10); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 534, __pyx_L7_error)
+              __pyx_t_16 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_10); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 611, __pyx_L7_error)
             }
             for (;;) {
               if (likely(!__pyx_t_16)) {
@@ -17773,7 +18614,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                   {
                     Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_10);
                     #if !CYTHON_ASSUME_SAFE_SIZE
-                    if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 534, __pyx_L7_error)
+                    if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 611, __pyx_L7_error)
                     #endif
                     if (__pyx_t_25 >= __pyx_temp) break;
                   }
@@ -17783,7 +18624,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                   {
                     Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_10);
                     #if !CYTHON_ASSUME_SAFE_SIZE
-                    if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 534, __pyx_L7_error)
+                    if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 611, __pyx_L7_error)
                     #endif
                     if (__pyx_t_25 >= __pyx_temp) break;
                   }
@@ -17794,13 +18635,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
                   #endif
                   ++__pyx_t_25;
                 }
-                if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 534, __pyx_L7_error)
+                if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 611, __pyx_L7_error)
               } else {
                 __pyx_t_13 = __pyx_t_16(__pyx_t_10);
                 if (unlikely(!__pyx_t_13)) {
                   PyObject* exc_type = PyErr_Occurred();
                   if (exc_type) {
-                    if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 534, __pyx_L7_error)
+                    if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 611, __pyx_L7_error)
                     PyErr_Clear();
                   }
                   break;
@@ -17810,36 +18651,36 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
               __Pyx_XDECREF_SET(__pyx_v_right_row, __pyx_t_13);
               __pyx_t_13 = 0;
 
-              /* "sabot/_cython/operators/joins.pyx":535
+              /* "sabot/_cython/operators/joins.pyx":612
  *                     if min_time <= timestamp <= max_time:
  *                         for right_row in right_rows:
  *                             joined_row = {**left_row, **right_row}             # <<<<<<<<<<<<<<
  *                             output_rows.append(joined_row)
  * 
 */
-              __pyx_t_13 = PyDict_Copy(__pyx_v_left_row); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 535, __pyx_L7_error)
+              __pyx_t_13 = PyDict_Copy(__pyx_v_left_row); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 612, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_13);
               if (unlikely(__pyx_v_right_row == Py_None)) {
                 PyErr_SetString(PyExc_TypeError, "argument after ** must be a mapping, not NoneType");
-                __PYX_ERR(0, 535, __pyx_L7_error)
+                __PYX_ERR(0, 612, __pyx_L7_error)
               }
               if (unlikely(PyDict_Update(__pyx_t_13, __pyx_v_right_row) < 0)) {
                 if (PyErr_ExceptionMatches(PyExc_AttributeError)) __Pyx_RaiseMappingExpectedError(__pyx_v_right_row);
-                __PYX_ERR(0, 535, __pyx_L7_error)
+                __PYX_ERR(0, 612, __pyx_L7_error)
               }
               __Pyx_XDECREF_SET(__pyx_v_joined_row, ((PyObject*)__pyx_t_13));
               __pyx_t_13 = 0;
 
-              /* "sabot/_cython/operators/joins.pyx":536
+              /* "sabot/_cython/operators/joins.pyx":613
  *                         for right_row in right_rows:
  *                             joined_row = {**left_row, **right_row}
  *                             output_rows.append(joined_row)             # <<<<<<<<<<<<<<
  * 
  *             if output_rows:
 */
-              __pyx_t_22 = __Pyx_PyList_Append(__pyx_v_output_rows, __pyx_v_joined_row); if (unlikely(__pyx_t_22 == ((int)-1))) __PYX_ERR(0, 536, __pyx_L7_error)
+              __pyx_t_22 = __Pyx_PyList_Append(__pyx_v_output_rows, __pyx_v_joined_row); if (unlikely(__pyx_t_22 == ((int)-1))) __PYX_ERR(0, 613, __pyx_L7_error)
 
-              /* "sabot/_cython/operators/joins.pyx":534
+              /* "sabot/_cython/operators/joins.pyx":611
  *                 for timestamp, right_rows in self._time_indexed_state.items():
  *                     if min_time <= timestamp <= max_time:
  *                         for right_row in right_rows:             # <<<<<<<<<<<<<<
@@ -17849,7 +18690,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
             }
             __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":533
+            /* "sabot/_cython/operators/joins.pyx":610
  *                 # Scan time index (TODO: optimize with RocksDB range scan)
  *                 for timestamp, right_rows in self._time_indexed_state.items():
  *                     if min_time <= timestamp <= max_time:             # <<<<<<<<<<<<<<
@@ -17860,7 +18701,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":523
+        /* "sabot/_cython/operators/joins.pyx":600
  *             output_rows = []
  * 
  *             for i in range(batch.num_rows):             # <<<<<<<<<<<<<<
@@ -17870,7 +18711,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
       }
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":538
+      /* "sabot/_cython/operators/joins.pyx":615
  *                             output_rows.append(joined_row)
  * 
  *             if output_rows:             # <<<<<<<<<<<<<<
@@ -17879,13 +18720,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
 */
       {
         Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_output_rows);
-        if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 538, __pyx_L7_error)
+        if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 615, __pyx_L7_error)
         __pyx_t_4 = (__pyx_temp != 0);
       }
 
       if (__pyx_t_4) {
 
-        /* "sabot/_cython/operators/joins.pyx":539
+        /* "sabot/_cython/operators/joins.pyx":616
  * 
  *             if output_rows:
  *                 return pa.RecordBatch.from_pylist(output_rows)             # <<<<<<<<<<<<<<
@@ -17893,9 +18734,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
  *                 return None
 */
         __Pyx_XDECREF(__pyx_r);
-        __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 539, __pyx_L7_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 616, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_10);
-        __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_RecordBatch); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 539, __pyx_L7_error)
+        __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_RecordBatch); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 616, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_13);
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
         __pyx_t_2 = __pyx_t_13;
@@ -17906,14 +18747,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
           __pyx_t_11 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_from_pylist, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 539, __pyx_L7_error)
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 616, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_11);
         }
         __pyx_r = __pyx_t_11;
         __pyx_t_11 = 0;
         goto __pyx_L11_try_return;
 
-        /* "sabot/_cython/operators/joins.pyx":538
+        /* "sabot/_cython/operators/joins.pyx":615
  *                             output_rows.append(joined_row)
  * 
  *             if output_rows:             # <<<<<<<<<<<<<<
@@ -17922,7 +18763,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
 */
       }
 
-      /* "sabot/_cython/operators/joins.pyx":541
+      /* "sabot/_cython/operators/joins.pyx":618
  *                 return pa.RecordBatch.from_pylist(output_rows)
  *             else:
  *                 return None             # <<<<<<<<<<<<<<
@@ -17935,7 +18776,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
         goto __pyx_L11_try_return;
       }
 
-      /* "sabot/_cython/operators/joins.pyx":502
+      /* "sabot/_cython/operators/joins.pyx":579
  *             return None
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -17953,7 +18794,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
     __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
     __Pyx_XDECREF(__pyx_t_21); __pyx_t_21 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":543
+    /* "sabot/_cython/operators/joins.pyx":620
  *                 return None
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -17963,7 +18804,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
     __pyx_t_23 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_23) {
       __Pyx_AddTraceback("sabot._cython.operators.joins.CythonIntervalJoinOperator.process_batch", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_11, &__pyx_t_13, &__pyx_t_2) < 0) __PYX_ERR(0, 543, __pyx_L9_except_error)
+      if (__Pyx_GetException(&__pyx_t_11, &__pyx_t_13, &__pyx_t_2) < 0) __PYX_ERR(0, 620, __pyx_L9_except_error)
       __Pyx_XGOTREF(__pyx_t_11);
       __Pyx_XGOTREF(__pyx_t_13);
       __Pyx_XGOTREF(__pyx_t_2);
@@ -17971,7 +18812,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
       __pyx_v_e = __pyx_t_13;
       /*try:*/ {
 
-        /* "sabot/_cython/operators/joins.pyx":544
+        /* "sabot/_cython/operators/joins.pyx":621
  * 
  *         except Exception as e:
  *             raise RuntimeError(f"Error in interval join: {e}")             # <<<<<<<<<<<<<<
@@ -17981,9 +18822,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
         __pyx_t_19 = NULL;
         __Pyx_INCREF(__pyx_builtin_RuntimeError);
         __pyx_t_12 = __pyx_builtin_RuntimeError; 
-        __pyx_t_21 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 544, __pyx_L51_error)
+        __pyx_t_21 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 621, __pyx_L51_error)
         __Pyx_GOTREF(__pyx_t_21);
-        __pyx_t_20 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Error_in_interval_join, __pyx_t_21); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 544, __pyx_L51_error)
+        __pyx_t_20 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Error_in_interval_join, __pyx_t_21); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 621, __pyx_L51_error)
         __Pyx_GOTREF(__pyx_t_20);
         __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
         __pyx_t_14 = 1;
@@ -17993,15 +18834,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
           __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
           __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 544, __pyx_L51_error)
+          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 621, __pyx_L51_error)
           __Pyx_GOTREF(__pyx_t_10);
         }
         __Pyx_Raise(__pyx_t_10, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-        __PYX_ERR(0, 544, __pyx_L51_error)
+        __PYX_ERR(0, 621, __pyx_L51_error)
       }
 
-      /* "sabot/_cython/operators/joins.pyx":543
+      /* "sabot/_cython/operators/joins.pyx":620
  *                 return None
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -18047,7 +18888,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
     }
     goto __pyx_L9_except_error;
 
-    /* "sabot/_cython/operators/joins.pyx":502
+    /* "sabot/_cython/operators/joins.pyx":579
  *             return None
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -18068,7 +18909,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/operators/joins.pyx":495
+  /* "sabot/_cython/operators/joins.pyx":572
  *         self._rocksdb_timers = None  # TODO: Initialize RocksDB timer service
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -18663,7 +19504,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_26CythonIntervalJoin
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":572
+/* "sabot/_cython/operators/joins.pyx":649
  *     """
  * 
  *     def __init__(self, left_source, right_source, time_column: str,             # <<<<<<<<<<<<<<
@@ -18701,37 +19542,37 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator_1
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_left_source,&__pyx_mstate_global->__pyx_n_u_right_source,&__pyx_mstate_global->__pyx_n_u_time_column,&__pyx_mstate_global->__pyx_n_u_direction,&__pyx_mstate_global->__pyx_n_u_schema,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 572, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 649, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  5:
         values[4] = __Pyx_ArgRef_VARARGS(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 572, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 649, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_VARARGS(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 572, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 649, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 572, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 649, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 572, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 649, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 572, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 649, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 572, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 649, __pyx_L3_error)
       if (!values[3]) values[3] = __Pyx_NewRef(((PyObject*)__pyx_mstate_global->__pyx_n_u_backward));
 
-      /* "sabot/_cython/operators/joins.pyx":573
+      /* "sabot/_cython/operators/joins.pyx":650
  * 
  *     def __init__(self, left_source, right_source, time_column: str,
  *                  direction: str = 'backward', schema=None):             # <<<<<<<<<<<<<<
@@ -18740,25 +19581,25 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator_1
 */
       if (!values[4]) values[4] = __Pyx_NewRef(((PyObject *)Py_None));
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 3, 5, i); __PYX_ERR(0, 572, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 3, 5, i); __PYX_ERR(0, 649, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  5:
         values[4] = __Pyx_ArgRef_VARARGS(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 572, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 649, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_VARARGS(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 572, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 649, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_VARARGS(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 572, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 649, __pyx_L3_error)
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 572, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 649, __pyx_L3_error)
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 572, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 649, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
@@ -18773,7 +19614,7 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator_1
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 3, 5, __pyx_nargs); __PYX_ERR(0, 572, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 3, 5, __pyx_nargs); __PYX_ERR(0, 649, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -18784,11 +19625,11 @@ static int __pyx_pw_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator_1
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_time_column), (&PyUnicode_Type), 0, "time_column", 2))) __PYX_ERR(0, 572, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_direction), (&PyUnicode_Type), 0, "direction", 2))) __PYX_ERR(0, 573, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_time_column), (&PyUnicode_Type), 0, "time_column", 2))) __PYX_ERR(0, 649, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_direction), (&PyUnicode_Type), 0, "direction", 2))) __PYX_ERR(0, 650, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator___init__(((struct __pyx_obj_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator *)__pyx_v_self), __pyx_v_left_source, __pyx_v_right_source, __pyx_v_time_column, __pyx_v_direction, __pyx_v_schema);
 
-  /* "sabot/_cython/operators/joins.pyx":572
+  /* "sabot/_cython/operators/joins.pyx":649
  *     """
  * 
  *     def __init__(self, left_source, right_source, time_column: str,             # <<<<<<<<<<<<<<
@@ -18829,7 +19670,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator__
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":584
+  /* "sabot/_cython/operators/joins.pyx":661
  *             schema: Output schema
  *         """
  *         self._source = left_source             # <<<<<<<<<<<<<<
@@ -18842,7 +19683,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator__
   __Pyx_DECREF(__pyx_v_self->__pyx_base.__pyx_base._source);
   __pyx_v_self->__pyx_base.__pyx_base._source = __pyx_v_left_source;
 
-  /* "sabot/_cython/operators/joins.pyx":585
+  /* "sabot/_cython/operators/joins.pyx":662
  *         """
  *         self._source = left_source
  *         self._right_source = right_source             # <<<<<<<<<<<<<<
@@ -18855,7 +19696,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator__
   __Pyx_DECREF(__pyx_v_self->_right_source);
   __pyx_v_self->_right_source = __pyx_v_right_source;
 
-  /* "sabot/_cython/operators/joins.pyx":586
+  /* "sabot/_cython/operators/joins.pyx":663
  *         self._source = left_source
  *         self._right_source = right_source
  *         self._schema = schema             # <<<<<<<<<<<<<<
@@ -18868,7 +19709,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator__
   __Pyx_DECREF(__pyx_v_self->__pyx_base.__pyx_base._schema);
   __pyx_v_self->__pyx_base.__pyx_base._schema = __pyx_v_schema;
 
-  /* "sabot/_cython/operators/joins.pyx":587
+  /* "sabot/_cython/operators/joins.pyx":664
  *         self._right_source = right_source
  *         self._schema = schema
  *         self._time_column = time_column             # <<<<<<<<<<<<<<
@@ -18881,14 +19722,14 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator__
   __Pyx_DECREF(__pyx_v_self->_time_column);
   __pyx_v_self->_time_column = __pyx_v_time_column;
 
-  /* "sabot/_cython/operators/joins.pyx":588
+  /* "sabot/_cython/operators/joins.pyx":665
  *         self._schema = schema
  *         self._time_column = time_column
  *         self._direction = direction.lower()             # <<<<<<<<<<<<<<
  * 
  *         # Sorted state: list of (timestamp, row) tuples
 */
-  __pyx_t_1 = __Pyx_CallUnboundCMethod0(&__pyx_mstate_global->__pyx_umethod_PyUnicode_Type__lower, __pyx_v_direction); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 588, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CallUnboundCMethod0(&__pyx_mstate_global->__pyx_umethod_PyUnicode_Type__lower, __pyx_v_direction); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 665, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->_direction);
@@ -18896,14 +19737,14 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator__
   __pyx_v_self->_direction = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":591
+  /* "sabot/_cython/operators/joins.pyx":668
  * 
  *         # Sorted state: list of (timestamp, row) tuples
  *         self._sorted_state = []             # <<<<<<<<<<<<<<
  * 
  *         if self._direction not in ('backward', 'forward'):
 */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 591, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->_sorted_state);
@@ -18911,7 +19752,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator__
   __pyx_v_self->_sorted_state = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":593
+  /* "sabot/_cython/operators/joins.pyx":670
  *         self._sorted_state = []
  * 
  *         if self._direction not in ('backward', 'forward'):             # <<<<<<<<<<<<<<
@@ -18920,20 +19761,20 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator__
 */
   __Pyx_INCREF(__pyx_v_self->_direction);
   __pyx_t_2 = __pyx_v_self->_direction;
-  __pyx_t_4 = (__Pyx_PyUnicode_Equals(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_backward, Py_NE)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 593, __pyx_L1_error)
+  __pyx_t_4 = (__Pyx_PyUnicode_Equals(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_backward, Py_NE)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 670, __pyx_L1_error)
   if (__pyx_t_4) {
   } else {
     __pyx_t_3 = __pyx_t_4;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_4 = (__Pyx_PyUnicode_Equals(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_forward, Py_NE)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 593, __pyx_L1_error)
+  __pyx_t_4 = (__Pyx_PyUnicode_Equals(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_forward, Py_NE)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 670, __pyx_L1_error)
   __pyx_t_3 = __pyx_t_4;
   __pyx_L4_bool_binop_done:;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_4 = __pyx_t_3;
   if (unlikely(__pyx_t_4)) {
 
-    /* "sabot/_cython/operators/joins.pyx":594
+    /* "sabot/_cython/operators/joins.pyx":671
  * 
  *         if self._direction not in ('backward', 'forward'):
  *             raise ValueError(f"Invalid direction: {direction}")             # <<<<<<<<<<<<<<
@@ -18943,7 +19784,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator__
     __pyx_t_5 = NULL;
     __Pyx_INCREF(__pyx_builtin_ValueError);
     __pyx_t_6 = __pyx_builtin_ValueError; 
-    __pyx_t_7 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Invalid_direction, __pyx_v_direction); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 594, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Invalid_direction, __pyx_v_direction); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 671, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_8 = 1;
     {
@@ -18952,14 +19793,14 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator__
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 594, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 594, __pyx_L1_error)
+    __PYX_ERR(0, 671, __pyx_L1_error)
 
-    /* "sabot/_cython/operators/joins.pyx":593
+    /* "sabot/_cython/operators/joins.pyx":670
  *         self._sorted_state = []
  * 
  *         if self._direction not in ('backward', 'forward'):             # <<<<<<<<<<<<<<
@@ -18968,7 +19809,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator__
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":572
+  /* "sabot/_cython/operators/joins.pyx":649
  *     """
  * 
  *     def __init__(self, left_source, right_source, time_column: str,             # <<<<<<<<<<<<<<
@@ -18992,7 +19833,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator__
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":596
+/* "sabot/_cython/operators/joins.pyx":673
  *             raise ValueError(f"Invalid direction: {direction}")
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -19040,32 +19881,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 596, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 673, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 596, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 673, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batch", 0) < 0) __PYX_ERR(0, 596, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "process_batch", 0) < 0) __PYX_ERR(0, 673, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, i); __PYX_ERR(0, 596, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, i); __PYX_ERR(0, 673, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 596, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 673, __pyx_L3_error)
     }
     __pyx_v_batch = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 596, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("process_batch", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 673, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -19086,7 +19927,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":618
+/* "sabot/_cython/operators/joins.pyx":695
  * 
  *                 # Sort by timestamp
  *                 self._sorted_state.sort(key=lambda x: x[0])             # <<<<<<<<<<<<<<
@@ -19133,32 +19974,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_x,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 618, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 695, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 618, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 695, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "lambda3", 0) < 0) __PYX_ERR(0, 618, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "lambda3", 0) < 0) __PYX_ERR(0, 695, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("lambda3", 1, 1, 1, i); __PYX_ERR(0, 618, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("lambda3", 1, 1, 1, i); __PYX_ERR(0, 695, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 618, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 695, __pyx_L3_error)
     }
     __pyx_v_x = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("lambda3", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 618, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("lambda3", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 695, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -19188,7 +20029,7 @@ static PyObject *__pyx_lambda_funcdef_lambda3(CYTHON_UNUSED PyObject *__pyx_self
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("lambda3", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_x, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 618, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_x, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 695, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -19205,7 +20046,7 @@ static PyObject *__pyx_lambda_funcdef_lambda3(CYTHON_UNUSED PyObject *__pyx_self
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":596
+/* "sabot/_cython/operators/joins.pyx":673
  *             raise ValueError(f"Invalid direction: {direction}")
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -19270,16 +20111,16 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("process_batch", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":600
+  /* "sabot/_cython/operators/joins.pyx":677
  *     def process_batch(self, object batch):
  *         """Process batch with as-of join logic."""
  *         if not ARROW_AVAILABLE or batch is None or batch.num_rows == 0:             # <<<<<<<<<<<<<<
  *             return None
  * 
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_ARROW_AVAILABLE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 600, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_ARROW_AVAILABLE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 677, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 600, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 677, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_4 = (!__pyx_t_3);
   if (!__pyx_t_4) {
@@ -19293,15 +20134,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
     __pyx_t_1 = __pyx_t_4;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 600, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 677, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_2, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 600, __pyx_L1_error)
+  __pyx_t_4 = (__Pyx_PyLong_BoolEqObjC(__pyx_t_2, __pyx_mstate_global->__pyx_int_0, 0, 0)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 677, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_1 = __pyx_t_4;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "sabot/_cython/operators/joins.pyx":601
+    /* "sabot/_cython/operators/joins.pyx":678
  *         """Process batch with as-of join logic."""
  *         if not ARROW_AVAILABLE or batch is None or batch.num_rows == 0:
  *             return None             # <<<<<<<<<<<<<<
@@ -19312,7 +20153,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "sabot/_cython/operators/joins.pyx":600
+    /* "sabot/_cython/operators/joins.pyx":677
  *     def process_batch(self, object batch):
  *         """Process batch with as-of join logic."""
  *         if not ARROW_AVAILABLE or batch is None or batch.num_rows == 0:             # <<<<<<<<<<<<<<
@@ -19321,7 +20162,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
   }
 
-  /* "sabot/_cython/operators/joins.pyx":603
+  /* "sabot/_cython/operators/joins.pyx":680
  *             return None
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -19337,7 +20178,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
     __Pyx_XGOTREF(__pyx_t_7);
     /*try:*/ {
 
-      /* "sabot/_cython/operators/joins.pyx":605
+      /* "sabot/_cython/operators/joins.pyx":682
  *         try:
  *             # Build sorted right-side state
  *             if not self._sorted_state:             # <<<<<<<<<<<<<<
@@ -19348,14 +20189,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
       else
       {
         Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_self->_sorted_state);
-        if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 605, __pyx_L7_error)
+        if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 682, __pyx_L7_error)
         __pyx_t_1 = (__pyx_temp != 0);
       }
 
       __pyx_t_4 = (!__pyx_t_1);
       if (__pyx_t_4) {
 
-        /* "sabot/_cython/operators/joins.pyx":606
+        /* "sabot/_cython/operators/joins.pyx":683
  *             # Build sorted right-side state
  *             if not self._sorted_state:
  *                 for right_batch in self._right_source:             # <<<<<<<<<<<<<<
@@ -19367,9 +20208,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
           __pyx_t_8 = 0;
           __pyx_t_9 = NULL;
         } else {
-          __pyx_t_8 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_self->_right_source); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 606, __pyx_L7_error)
+          __pyx_t_8 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_self->_right_source); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 683, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 606, __pyx_L7_error)
+          __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 683, __pyx_L7_error)
         }
         for (;;) {
           if (likely(!__pyx_t_9)) {
@@ -19377,7 +20218,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               {
                 Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
                 #if !CYTHON_ASSUME_SAFE_SIZE
-                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 606, __pyx_L7_error)
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 683, __pyx_L7_error)
                 #endif
                 if (__pyx_t_8 >= __pyx_temp) break;
               }
@@ -19387,7 +20228,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               {
                 Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
                 #if !CYTHON_ASSUME_SAFE_SIZE
-                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 606, __pyx_L7_error)
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 683, __pyx_L7_error)
                 #endif
                 if (__pyx_t_8 >= __pyx_temp) break;
               }
@@ -19398,13 +20239,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               #endif
               ++__pyx_t_8;
             }
-            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 606, __pyx_L7_error)
+            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 683, __pyx_L7_error)
           } else {
             __pyx_t_10 = __pyx_t_9(__pyx_t_2);
             if (unlikely(!__pyx_t_10)) {
               PyObject* exc_type = PyErr_Occurred();
               if (exc_type) {
-                if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 606, __pyx_L7_error)
+                if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 683, __pyx_L7_error)
                 PyErr_Clear();
               }
               break;
@@ -19414,7 +20255,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
           __Pyx_XDECREF_SET(__pyx_v_right_batch, __pyx_t_10);
           __pyx_t_10 = 0;
 
-          /* "sabot/_cython/operators/joins.pyx":607
+          /* "sabot/_cython/operators/joins.pyx":684
  *             if not self._sorted_state:
  *                 for right_batch in self._right_source:
  *                     if right_batch is None:             # <<<<<<<<<<<<<<
@@ -19424,7 +20265,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
           __pyx_t_4 = (__pyx_v_right_batch == Py_None);
           if (__pyx_t_4) {
 
-            /* "sabot/_cython/operators/joins.pyx":608
+            /* "sabot/_cython/operators/joins.pyx":685
  *                 for right_batch in self._right_source:
  *                     if right_batch is None:
  *                         continue             # <<<<<<<<<<<<<<
@@ -19433,7 +20274,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
             goto __pyx_L14_continue;
 
-            /* "sabot/_cython/operators/joins.pyx":607
+            /* "sabot/_cython/operators/joins.pyx":684
  *             if not self._sorted_state:
  *                 for right_batch in self._right_source:
  *                     if right_batch is None:             # <<<<<<<<<<<<<<
@@ -19442,7 +20283,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
           }
 
-          /* "sabot/_cython/operators/joins.pyx":610
+          /* "sabot/_cython/operators/joins.pyx":687
  *                         continue
  * 
  *                     times = right_batch.column(self._time_column).to_pylist()             # <<<<<<<<<<<<<<
@@ -19456,7 +20297,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             PyObject *__pyx_callargs[2] = {__pyx_t_13, __pyx_v_self->_time_column};
             __pyx_t_12 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-            if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 610, __pyx_L7_error)
+            if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 687, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_12);
           }
           __pyx_t_11 = __pyx_t_12;
@@ -19467,13 +20308,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             __pyx_t_10 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_pylist, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
             __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 610, __pyx_L7_error)
+            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 687, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_10);
           }
           __Pyx_XDECREF_SET(__pyx_v_times, __pyx_t_10);
           __pyx_t_10 = 0;
 
-          /* "sabot/_cython/operators/joins.pyx":611
+          /* "sabot/_cython/operators/joins.pyx":688
  * 
  *                     times = right_batch.column(self._time_column).to_pylist()
  *                     for i in range(right_batch.num_rows):             # <<<<<<<<<<<<<<
@@ -19483,7 +20324,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
           __pyx_t_12 = NULL;
           __Pyx_INCREF(__pyx_builtin_range);
           __pyx_t_11 = __pyx_builtin_range; 
-          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 611, __pyx_L7_error)
+          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 688, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_13);
           __pyx_t_14 = 1;
           {
@@ -19492,7 +20333,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
             __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 611, __pyx_L7_error)
+            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 688, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_10);
           }
           if (likely(PyList_CheckExact(__pyx_t_10)) || PyTuple_CheckExact(__pyx_t_10)) {
@@ -19500,9 +20341,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             __pyx_t_15 = 0;
             __pyx_t_16 = NULL;
           } else {
-            __pyx_t_15 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 611, __pyx_L7_error)
+            __pyx_t_15 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 688, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_16 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_11); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 611, __pyx_L7_error)
+            __pyx_t_16 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_11); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 688, __pyx_L7_error)
           }
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
           for (;;) {
@@ -19511,7 +20352,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                 {
                   Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_11);
                   #if !CYTHON_ASSUME_SAFE_SIZE
-                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 611, __pyx_L7_error)
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 688, __pyx_L7_error)
                   #endif
                   if (__pyx_t_15 >= __pyx_temp) break;
                 }
@@ -19521,7 +20362,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                 {
                   Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_11);
                   #if !CYTHON_ASSUME_SAFE_SIZE
-                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 611, __pyx_L7_error)
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 688, __pyx_L7_error)
                   #endif
                   if (__pyx_t_15 >= __pyx_temp) break;
                 }
@@ -19532,13 +20373,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                 #endif
                 ++__pyx_t_15;
               }
-              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 611, __pyx_L7_error)
+              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 688, __pyx_L7_error)
             } else {
               __pyx_t_10 = __pyx_t_16(__pyx_t_11);
               if (unlikely(!__pyx_t_10)) {
                 PyObject* exc_type = PyErr_Occurred();
                 if (exc_type) {
-                  if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 611, __pyx_L7_error)
+                  if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 688, __pyx_L7_error)
                   PyErr_Clear();
                 }
                 break;
@@ -19548,19 +20389,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_10);
             __pyx_t_10 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":612
+            /* "sabot/_cython/operators/joins.pyx":689
  *                     times = right_batch.column(self._time_column).to_pylist()
  *                     for i in range(right_batch.num_rows):
  *                         timestamp = times[i]             # <<<<<<<<<<<<<<
  *                         row = {col: right_batch.column(col)[i].as_py()
  *                                for col in right_batch.schema.names}
 */
-            __pyx_t_10 = __Pyx_PyObject_GetItem(__pyx_v_times, __pyx_v_i); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 612, __pyx_L7_error)
+            __pyx_t_10 = __Pyx_PyObject_GetItem(__pyx_v_times, __pyx_v_i); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 689, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_10);
             __Pyx_XDECREF_SET(__pyx_v_timestamp, __pyx_t_10);
             __pyx_t_10 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":613
+            /* "sabot/_cython/operators/joins.pyx":690
  *                     for i in range(right_batch.num_rows):
  *                         timestamp = times[i]
  *                         row = {col: right_batch.column(col)[i].as_py()             # <<<<<<<<<<<<<<
@@ -19568,19 +20409,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
  *                         self._sorted_state.append((timestamp, row))
 */
             { /* enter inner scope */
-              __pyx_t_10 = PyDict_New(); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 613, __pyx_L21_error)
+              __pyx_t_10 = PyDict_New(); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 690, __pyx_L21_error)
               __Pyx_GOTREF(__pyx_t_10);
 
-              /* "sabot/_cython/operators/joins.pyx":614
+              /* "sabot/_cython/operators/joins.pyx":691
  *                         timestamp = times[i]
  *                         row = {col: right_batch.column(col)[i].as_py()
  *                                for col in right_batch.schema.names}             # <<<<<<<<<<<<<<
  *                         self._sorted_state.append((timestamp, row))
  * 
 */
-              __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 614, __pyx_L21_error)
+              __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 691, __pyx_L21_error)
               __Pyx_GOTREF(__pyx_t_13);
-              __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 614, __pyx_L21_error)
+              __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 691, __pyx_L21_error)
               __Pyx_GOTREF(__pyx_t_12);
               __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
               if (likely(PyList_CheckExact(__pyx_t_12)) || PyTuple_CheckExact(__pyx_t_12)) {
@@ -19588,9 +20429,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                 __pyx_t_17 = 0;
                 __pyx_t_18 = NULL;
               } else {
-                __pyx_t_17 = -1; __pyx_t_13 = PyObject_GetIter(__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 614, __pyx_L21_error)
+                __pyx_t_17 = -1; __pyx_t_13 = PyObject_GetIter(__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 691, __pyx_L21_error)
                 __Pyx_GOTREF(__pyx_t_13);
-                __pyx_t_18 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_13); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 614, __pyx_L21_error)
+                __pyx_t_18 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_13); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 691, __pyx_L21_error)
               }
               __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
               for (;;) {
@@ -19599,7 +20440,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                     {
                       Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_13);
                       #if !CYTHON_ASSUME_SAFE_SIZE
-                      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 614, __pyx_L21_error)
+                      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 691, __pyx_L21_error)
                       #endif
                       if (__pyx_t_17 >= __pyx_temp) break;
                     }
@@ -19609,7 +20450,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                     {
                       Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_13);
                       #if !CYTHON_ASSUME_SAFE_SIZE
-                      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 614, __pyx_L21_error)
+                      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 691, __pyx_L21_error)
                       #endif
                       if (__pyx_t_17 >= __pyx_temp) break;
                     }
@@ -19620,13 +20461,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                     #endif
                     ++__pyx_t_17;
                   }
-                  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 614, __pyx_L21_error)
+                  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 691, __pyx_L21_error)
                 } else {
                   __pyx_t_12 = __pyx_t_18(__pyx_t_13);
                   if (unlikely(!__pyx_t_12)) {
                     PyObject* exc_type = PyErr_Occurred();
                     if (exc_type) {
-                      if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 614, __pyx_L21_error)
+                      if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 691, __pyx_L21_error)
                       PyErr_Clear();
                     }
                     break;
@@ -19636,7 +20477,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                 __Pyx_XDECREF_SET(__pyx_8genexpr9__pyx_v_col, __pyx_t_12);
                 __pyx_t_12 = 0;
 
-                /* "sabot/_cython/operators/joins.pyx":613
+                /* "sabot/_cython/operators/joins.pyx":690
  *                     for i in range(right_batch.num_rows):
  *                         timestamp = times[i]
  *                         row = {col: right_batch.column(col)[i].as_py()             # <<<<<<<<<<<<<<
@@ -19650,10 +20491,10 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                   PyObject *__pyx_callargs[2] = {__pyx_t_21, __pyx_8genexpr9__pyx_v_col};
                   __pyx_t_20 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
                   __Pyx_XDECREF(__pyx_t_21); __pyx_t_21 = 0;
-                  if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 613, __pyx_L21_error)
+                  if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 690, __pyx_L21_error)
                   __Pyx_GOTREF(__pyx_t_20);
                 }
-                __pyx_t_21 = __Pyx_PyObject_GetItem(__pyx_t_20, __pyx_v_i); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 613, __pyx_L21_error)
+                __pyx_t_21 = __Pyx_PyObject_GetItem(__pyx_t_20, __pyx_v_i); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 690, __pyx_L21_error)
                 __Pyx_GOTREF(__pyx_t_21);
                 __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
                 __pyx_t_19 = __pyx_t_21;
@@ -19664,13 +20505,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                   __pyx_t_12 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_as_py, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
                   __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
                   __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
-                  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 613, __pyx_L21_error)
+                  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 690, __pyx_L21_error)
                   __Pyx_GOTREF(__pyx_t_12);
                 }
-                if (unlikely(PyDict_SetItem(__pyx_t_10, (PyObject*)__pyx_8genexpr9__pyx_v_col, (PyObject*)__pyx_t_12))) __PYX_ERR(0, 613, __pyx_L21_error)
+                if (unlikely(PyDict_SetItem(__pyx_t_10, (PyObject*)__pyx_8genexpr9__pyx_v_col, (PyObject*)__pyx_t_12))) __PYX_ERR(0, 690, __pyx_L21_error)
                 __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-                /* "sabot/_cython/operators/joins.pyx":614
+                /* "sabot/_cython/operators/joins.pyx":691
  *                         timestamp = times[i]
  *                         row = {col: right_batch.column(col)[i].as_py()
  *                                for col in right_batch.schema.names}             # <<<<<<<<<<<<<<
@@ -19689,7 +20530,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             __Pyx_XDECREF_SET(__pyx_v_row, ((PyObject*)__pyx_t_10));
             __pyx_t_10 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":615
+            /* "sabot/_cython/operators/joins.pyx":692
  *                         row = {col: right_batch.column(col)[i].as_py()
  *                                for col in right_batch.schema.names}
  *                         self._sorted_state.append((timestamp, row))             # <<<<<<<<<<<<<<
@@ -19698,20 +20539,20 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
             if (unlikely(__pyx_v_self->_sorted_state == Py_None)) {
               PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-              __PYX_ERR(0, 615, __pyx_L7_error)
+              __PYX_ERR(0, 692, __pyx_L7_error)
             }
-            __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 615, __pyx_L7_error)
+            __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 692, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_10);
             __Pyx_INCREF(__pyx_v_timestamp);
             __Pyx_GIVEREF(__pyx_v_timestamp);
-            if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_v_timestamp) != (0)) __PYX_ERR(0, 615, __pyx_L7_error);
+            if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_v_timestamp) != (0)) __PYX_ERR(0, 692, __pyx_L7_error);
             __Pyx_INCREF(__pyx_v_row);
             __Pyx_GIVEREF(__pyx_v_row);
-            if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_v_row) != (0)) __PYX_ERR(0, 615, __pyx_L7_error);
-            __pyx_t_22 = __Pyx_PyList_Append(__pyx_v_self->_sorted_state, __pyx_t_10); if (unlikely(__pyx_t_22 == ((int)-1))) __PYX_ERR(0, 615, __pyx_L7_error)
+            if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_v_row) != (0)) __PYX_ERR(0, 692, __pyx_L7_error);
+            __pyx_t_22 = __Pyx_PyList_Append(__pyx_v_self->_sorted_state, __pyx_t_10); if (unlikely(__pyx_t_22 == ((int)-1))) __PYX_ERR(0, 692, __pyx_L7_error)
             __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":611
+            /* "sabot/_cython/operators/joins.pyx":688
  * 
  *                     times = right_batch.column(self._time_column).to_pylist()
  *                     for i in range(right_batch.num_rows):             # <<<<<<<<<<<<<<
@@ -19721,7 +20562,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
           }
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-          /* "sabot/_cython/operators/joins.pyx":606
+          /* "sabot/_cython/operators/joins.pyx":683
  *             # Build sorted right-side state
  *             if not self._sorted_state:
  *                 for right_batch in self._right_source:             # <<<<<<<<<<<<<<
@@ -19732,7 +20573,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":618
+        /* "sabot/_cython/operators/joins.pyx":695
  * 
  *                 # Sort by timestamp
  *                 self._sorted_state.sort(key=lambda x: x[0])             # <<<<<<<<<<<<<<
@@ -19741,24 +20582,24 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
         __pyx_t_11 = __pyx_v_self->_sorted_state;
         __Pyx_INCREF(__pyx_t_11);
-        __pyx_t_10 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator_13process_batch_lambda3, 0, __pyx_mstate_global->__pyx_n_u_process_batch_locals_lambda, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 618, __pyx_L7_error)
+        __pyx_t_10 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator_13process_batch_lambda3, 0, __pyx_mstate_global->__pyx_n_u_process_batch_locals_lambda, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 695, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_10);
         __pyx_t_14 = 0;
         {
           PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_11, NULL};
-          __pyx_t_13 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 618, __pyx_L7_error)
+          __pyx_t_13 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 695, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_13);
-          if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_key, __pyx_t_10, __pyx_t_13, __pyx_callargs+1, 0) < 0) __PYX_ERR(0, 618, __pyx_L7_error)
+          if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_key, __pyx_t_10, __pyx_t_13, __pyx_callargs+1, 0) < 0) __PYX_ERR(0, 695, __pyx_L7_error)
           __pyx_t_2 = __Pyx_Object_VectorcallMethod_CallFromBuilder(__pyx_mstate_global->__pyx_n_u_sort, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_13);
           __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 618, __pyx_L7_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 695, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":605
+        /* "sabot/_cython/operators/joins.pyx":682
  *         try:
  *             # Build sorted right-side state
  *             if not self._sorted_state:             # <<<<<<<<<<<<<<
@@ -19767,7 +20608,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
       }
 
-      /* "sabot/_cython/operators/joins.pyx":621
+      /* "sabot/_cython/operators/joins.pyx":698
  * 
  *             # Probe with left batch
  *             left_times = batch.column(self._time_column).to_pylist()             # <<<<<<<<<<<<<<
@@ -19781,7 +20622,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
         PyObject *__pyx_callargs[2] = {__pyx_t_11, __pyx_v_self->_time_column};
         __pyx_t_10 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 621, __pyx_L7_error)
+        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 698, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_10);
       }
       __pyx_t_13 = __pyx_t_10;
@@ -19792,25 +20633,25 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
         __pyx_t_2 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_to_pylist, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 621, __pyx_L7_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 698, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       __pyx_v_left_times = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":622
+      /* "sabot/_cython/operators/joins.pyx":699
  *             # Probe with left batch
  *             left_times = batch.column(self._time_column).to_pylist()
  *             output_rows = []             # <<<<<<<<<<<<<<
  * 
  *             for i in range(batch.num_rows):
 */
-      __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 622, __pyx_L7_error)
+      __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 699, __pyx_L7_error)
       __Pyx_GOTREF(__pyx_t_2);
       __pyx_v_output_rows = ((PyObject*)__pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":624
+      /* "sabot/_cython/operators/joins.pyx":701
  *             output_rows = []
  * 
  *             for i in range(batch.num_rows):             # <<<<<<<<<<<<<<
@@ -19820,7 +20661,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
       __pyx_t_10 = NULL;
       __Pyx_INCREF(__pyx_builtin_range);
       __pyx_t_13 = __pyx_builtin_range; 
-      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 624, __pyx_L7_error)
+      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 701, __pyx_L7_error)
       __Pyx_GOTREF(__pyx_t_11);
       __pyx_t_14 = 1;
       {
@@ -19829,7 +20670,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 624, __pyx_L7_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 701, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
@@ -19837,9 +20678,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
         __pyx_t_8 = 0;
         __pyx_t_9 = NULL;
       } else {
-        __pyx_t_8 = -1; __pyx_t_13 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 624, __pyx_L7_error)
+        __pyx_t_8 = -1; __pyx_t_13 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 701, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_13);
-        __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_13); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 624, __pyx_L7_error)
+        __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_13); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 701, __pyx_L7_error)
       }
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       for (;;) {
@@ -19848,7 +20689,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_13);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 624, __pyx_L7_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 701, __pyx_L7_error)
               #endif
               if (__pyx_t_8 >= __pyx_temp) break;
             }
@@ -19858,7 +20699,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             {
               Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_13);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 624, __pyx_L7_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 701, __pyx_L7_error)
               #endif
               if (__pyx_t_8 >= __pyx_temp) break;
             }
@@ -19869,13 +20710,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             #endif
             ++__pyx_t_8;
           }
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 624, __pyx_L7_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 701, __pyx_L7_error)
         } else {
           __pyx_t_2 = __pyx_t_9(__pyx_t_13);
           if (unlikely(!__pyx_t_2)) {
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
-              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 624, __pyx_L7_error)
+              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 701, __pyx_L7_error)
               PyErr_Clear();
             }
             break;
@@ -19885,19 +20726,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
         __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_2);
         __pyx_t_2 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":625
+        /* "sabot/_cython/operators/joins.pyx":702
  * 
  *             for i in range(batch.num_rows):
  *                 left_time = left_times[i]             # <<<<<<<<<<<<<<
  *                 left_row = {col: batch.column(col)[i].as_py() for col in batch.schema.names}
  * 
 */
-        __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_left_times, __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 625, __pyx_L7_error)
+        __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_left_times, __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 702, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_XDECREF_SET(__pyx_v_left_time, __pyx_t_2);
         __pyx_t_2 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":626
+        /* "sabot/_cython/operators/joins.pyx":703
  *             for i in range(batch.num_rows):
  *                 left_time = left_times[i]
  *                 left_row = {col: batch.column(col)[i].as_py() for col in batch.schema.names}             # <<<<<<<<<<<<<<
@@ -19905,11 +20746,11 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
  *                 # Binary search for as-of match
 */
         { /* enter inner scope */
-          __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 626, __pyx_L32_error)
+          __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 703, __pyx_L32_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 626, __pyx_L32_error)
+          __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_schema); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 703, __pyx_L32_error)
           __Pyx_GOTREF(__pyx_t_11);
-          __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 626, __pyx_L32_error)
+          __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_names); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 703, __pyx_L32_error)
           __Pyx_GOTREF(__pyx_t_10);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
           if (likely(PyList_CheckExact(__pyx_t_10)) || PyTuple_CheckExact(__pyx_t_10)) {
@@ -19917,9 +20758,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             __pyx_t_15 = 0;
             __pyx_t_16 = NULL;
           } else {
-            __pyx_t_15 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 626, __pyx_L32_error)
+            __pyx_t_15 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 703, __pyx_L32_error)
             __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_16 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_11); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 626, __pyx_L32_error)
+            __pyx_t_16 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_11); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 703, __pyx_L32_error)
           }
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
           for (;;) {
@@ -19928,7 +20769,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                 {
                   Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_11);
                   #if !CYTHON_ASSUME_SAFE_SIZE
-                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 626, __pyx_L32_error)
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 703, __pyx_L32_error)
                   #endif
                   if (__pyx_t_15 >= __pyx_temp) break;
                 }
@@ -19938,7 +20779,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                 {
                   Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_11);
                   #if !CYTHON_ASSUME_SAFE_SIZE
-                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 626, __pyx_L32_error)
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 703, __pyx_L32_error)
                   #endif
                   if (__pyx_t_15 >= __pyx_temp) break;
                 }
@@ -19949,13 +20790,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                 #endif
                 ++__pyx_t_15;
               }
-              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 626, __pyx_L32_error)
+              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 703, __pyx_L32_error)
             } else {
               __pyx_t_10 = __pyx_t_16(__pyx_t_11);
               if (unlikely(!__pyx_t_10)) {
                 PyObject* exc_type = PyErr_Occurred();
                 if (exc_type) {
-                  if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 626, __pyx_L32_error)
+                  if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 703, __pyx_L32_error)
                   PyErr_Clear();
                 }
                 break;
@@ -19971,10 +20812,10 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               PyObject *__pyx_callargs[2] = {__pyx_t_19, __pyx_9genexpr10__pyx_v_col};
               __pyx_t_21 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_column, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
               __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
-              if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 626, __pyx_L32_error)
+              if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 703, __pyx_L32_error)
               __Pyx_GOTREF(__pyx_t_21);
             }
-            __pyx_t_19 = __Pyx_PyObject_GetItem(__pyx_t_21, __pyx_v_i); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 626, __pyx_L32_error)
+            __pyx_t_19 = __Pyx_PyObject_GetItem(__pyx_t_21, __pyx_v_i); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 703, __pyx_L32_error)
             __Pyx_GOTREF(__pyx_t_19);
             __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
             __pyx_t_12 = __pyx_t_19;
@@ -19985,10 +20826,10 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               __pyx_t_10 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_as_py, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
               __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
               __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
-              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 626, __pyx_L32_error)
+              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 703, __pyx_L32_error)
               __Pyx_GOTREF(__pyx_t_10);
             }
-            if (unlikely(PyDict_SetItem(__pyx_t_2, (PyObject*)__pyx_9genexpr10__pyx_v_col, (PyObject*)__pyx_t_10))) __PYX_ERR(0, 626, __pyx_L32_error)
+            if (unlikely(PyDict_SetItem(__pyx_t_2, (PyObject*)__pyx_9genexpr10__pyx_v_col, (PyObject*)__pyx_t_10))) __PYX_ERR(0, 703, __pyx_L32_error)
             __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
           }
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
@@ -20002,7 +20843,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
         __Pyx_XDECREF_SET(__pyx_v_left_row, ((PyObject*)__pyx_t_2));
         __pyx_t_2 = 0;
 
-        /* "sabot/_cython/operators/joins.pyx":629
+        /* "sabot/_cython/operators/joins.pyx":706
  * 
  *                 # Binary search for as-of match
  *                 best_match = None             # <<<<<<<<<<<<<<
@@ -20012,17 +20853,17 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
         __Pyx_INCREF(Py_None);
         __Pyx_XDECREF_SET(__pyx_v_best_match, Py_None);
 
-        /* "sabot/_cython/operators/joins.pyx":631
+        /* "sabot/_cython/operators/joins.pyx":708
  *                 best_match = None
  * 
  *                 if self._direction == 'backward':             # <<<<<<<<<<<<<<
  *                     # Find most recent right row where right.time <= left.time
  *                     for timestamp, right_row in reversed(self._sorted_state):
 */
-        __pyx_t_4 = (__Pyx_PyUnicode_Equals(__pyx_v_self->_direction, __pyx_mstate_global->__pyx_n_u_backward, Py_EQ)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 631, __pyx_L7_error)
+        __pyx_t_4 = (__Pyx_PyUnicode_Equals(__pyx_v_self->_direction, __pyx_mstate_global->__pyx_n_u_backward, Py_EQ)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 708, __pyx_L7_error)
         if (__pyx_t_4) {
 
-          /* "sabot/_cython/operators/joins.pyx":633
+          /* "sabot/_cython/operators/joins.pyx":710
  *                 if self._direction == 'backward':
  *                     # Find most recent right row where right.time <= left.time
  *                     for timestamp, right_row in reversed(self._sorted_state):             # <<<<<<<<<<<<<<
@@ -20031,12 +20872,12 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
           if (unlikely(__pyx_v_self->_sorted_state == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-            __PYX_ERR(0, 633, __pyx_L7_error)
+            __PYX_ERR(0, 710, __pyx_L7_error)
           }
           __pyx_t_2 = __pyx_v_self->_sorted_state; __Pyx_INCREF(__pyx_t_2);
           __pyx_t_15 = __Pyx_PyList_GET_SIZE(__pyx_t_2);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_t_15 < 0))) __PYX_ERR(0, 633, __pyx_L7_error)
+          if (unlikely((__pyx_t_15 < 0))) __PYX_ERR(0, 710, __pyx_L7_error)
           #endif
           --__pyx_t_15;
           for (;;) {
@@ -20044,13 +20885,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 633, __pyx_L7_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 710, __pyx_L7_error)
               #endif
               if (__pyx_t_15 >= __pyx_temp) break;
             }
             __pyx_t_11 = __Pyx_PyList_GetItemRef(__pyx_t_2, __pyx_t_15);
             --__pyx_t_15;
-            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 633, __pyx_L7_error)
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 710, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_11);
             if ((likely(PyTuple_CheckExact(__pyx_t_11))) || (PyList_CheckExact(__pyx_t_11))) {
               PyObject* sequence = __pyx_t_11;
@@ -20058,7 +20899,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               if (unlikely(size != 2)) {
                 if (size > 2) __Pyx_RaiseTooManyValuesError(2);
                 else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-                __PYX_ERR(0, 633, __pyx_L7_error)
+                __PYX_ERR(0, 710, __pyx_L7_error)
               }
               #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
               if (likely(PyTuple_CheckExact(sequence))) {
@@ -20068,22 +20909,22 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                 __Pyx_INCREF(__pyx_t_19);
               } else {
                 __pyx_t_10 = __Pyx_PyList_GetItemRef(sequence, 0);
-                if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 633, __pyx_L7_error)
+                if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 710, __pyx_L7_error)
                 __Pyx_XGOTREF(__pyx_t_10);
                 __pyx_t_19 = __Pyx_PyList_GetItemRef(sequence, 1);
-                if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 633, __pyx_L7_error)
+                if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 710, __pyx_L7_error)
                 __Pyx_XGOTREF(__pyx_t_19);
               }
               #else
-              __pyx_t_10 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 633, __pyx_L7_error)
+              __pyx_t_10 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 710, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_10);
-              __pyx_t_19 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 633, __pyx_L7_error)
+              __pyx_t_19 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 710, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_19);
               #endif
               __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
             } else {
               Py_ssize_t index = -1;
-              __pyx_t_12 = PyObject_GetIter(__pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 633, __pyx_L7_error)
+              __pyx_t_12 = PyObject_GetIter(__pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 710, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_12);
               __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
               __pyx_t_23 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_12);
@@ -20091,7 +20932,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               __Pyx_GOTREF(__pyx_t_10);
               index = 1; __pyx_t_19 = __pyx_t_23(__pyx_t_12); if (unlikely(!__pyx_t_19)) goto __pyx_L40_unpacking_failed;
               __Pyx_GOTREF(__pyx_t_19);
-              if (__Pyx_IternextUnpackEndCheck(__pyx_t_23(__pyx_t_12), 2) < 0) __PYX_ERR(0, 633, __pyx_L7_error)
+              if (__Pyx_IternextUnpackEndCheck(__pyx_t_23(__pyx_t_12), 2) < 0) __PYX_ERR(0, 710, __pyx_L7_error)
               __pyx_t_23 = NULL;
               __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
               goto __pyx_L41_unpacking_done;
@@ -20099,7 +20940,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
               __pyx_t_23 = NULL;
               if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-              __PYX_ERR(0, 633, __pyx_L7_error)
+              __PYX_ERR(0, 710, __pyx_L7_error)
               __pyx_L41_unpacking_done:;
             }
             __Pyx_XDECREF_SET(__pyx_v_timestamp, __pyx_t_10);
@@ -20107,19 +20948,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             __Pyx_XDECREF_SET(__pyx_v_right_row, __pyx_t_19);
             __pyx_t_19 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":634
+            /* "sabot/_cython/operators/joins.pyx":711
  *                     # Find most recent right row where right.time <= left.time
  *                     for timestamp, right_row in reversed(self._sorted_state):
  *                         if timestamp <= left_time:             # <<<<<<<<<<<<<<
  *                             best_match = right_row
  *                             break
 */
-            __pyx_t_11 = PyObject_RichCompare(__pyx_v_timestamp, __pyx_v_left_time, Py_LE); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 634, __pyx_L7_error)
-            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 634, __pyx_L7_error)
+            __pyx_t_11 = PyObject_RichCompare(__pyx_v_timestamp, __pyx_v_left_time, Py_LE); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 711, __pyx_L7_error)
+            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 711, __pyx_L7_error)
             __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
             if (__pyx_t_4) {
 
-              /* "sabot/_cython/operators/joins.pyx":635
+              /* "sabot/_cython/operators/joins.pyx":712
  *                     for timestamp, right_row in reversed(self._sorted_state):
  *                         if timestamp <= left_time:
  *                             best_match = right_row             # <<<<<<<<<<<<<<
@@ -20129,7 +20970,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               __Pyx_INCREF(__pyx_v_right_row);
               __Pyx_DECREF_SET(__pyx_v_best_match, __pyx_v_right_row);
 
-              /* "sabot/_cython/operators/joins.pyx":636
+              /* "sabot/_cython/operators/joins.pyx":713
  *                         if timestamp <= left_time:
  *                             best_match = right_row
  *                             break             # <<<<<<<<<<<<<<
@@ -20138,7 +20979,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
               goto __pyx_L39_break;
 
-              /* "sabot/_cython/operators/joins.pyx":634
+              /* "sabot/_cython/operators/joins.pyx":711
  *                     # Find most recent right row where right.time <= left.time
  *                     for timestamp, right_row in reversed(self._sorted_state):
  *                         if timestamp <= left_time:             # <<<<<<<<<<<<<<
@@ -20147,7 +20988,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
             }
 
-            /* "sabot/_cython/operators/joins.pyx":633
+            /* "sabot/_cython/operators/joins.pyx":710
  *                 if self._direction == 'backward':
  *                     # Find most recent right row where right.time <= left.time
  *                     for timestamp, right_row in reversed(self._sorted_state):             # <<<<<<<<<<<<<<
@@ -20162,7 +21003,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
           goto __pyx_L43_for_end;
           __pyx_L43_for_end:;
 
-          /* "sabot/_cython/operators/joins.pyx":631
+          /* "sabot/_cython/operators/joins.pyx":708
  *                 best_match = None
  * 
  *                 if self._direction == 'backward':             # <<<<<<<<<<<<<<
@@ -20172,7 +21013,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
           goto __pyx_L37;
         }
 
-        /* "sabot/_cython/operators/joins.pyx":639
+        /* "sabot/_cython/operators/joins.pyx":716
  *                 else:  # forward
  *                     # Find earliest right row where right.time >= left.time
  *                     for timestamp, right_row in self._sorted_state:             # <<<<<<<<<<<<<<
@@ -20182,7 +21023,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
         /*else*/ {
           if (unlikely(__pyx_v_self->_sorted_state == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-            __PYX_ERR(0, 639, __pyx_L7_error)
+            __PYX_ERR(0, 716, __pyx_L7_error)
           }
           __pyx_t_2 = __pyx_v_self->_sorted_state; __Pyx_INCREF(__pyx_t_2);
           __pyx_t_15 = 0;
@@ -20190,13 +21031,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 639, __pyx_L7_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 716, __pyx_L7_error)
               #endif
               if (__pyx_t_15 >= __pyx_temp) break;
             }
             __pyx_t_11 = __Pyx_PyList_GetItemRef(__pyx_t_2, __pyx_t_15);
             ++__pyx_t_15;
-            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 639, __pyx_L7_error)
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 716, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_11);
             if ((likely(PyTuple_CheckExact(__pyx_t_11))) || (PyList_CheckExact(__pyx_t_11))) {
               PyObject* sequence = __pyx_t_11;
@@ -20204,7 +21045,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               if (unlikely(size != 2)) {
                 if (size > 2) __Pyx_RaiseTooManyValuesError(2);
                 else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-                __PYX_ERR(0, 639, __pyx_L7_error)
+                __PYX_ERR(0, 716, __pyx_L7_error)
               }
               #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
               if (likely(PyTuple_CheckExact(sequence))) {
@@ -20214,22 +21055,22 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
                 __Pyx_INCREF(__pyx_t_10);
               } else {
                 __pyx_t_19 = __Pyx_PyList_GetItemRef(sequence, 0);
-                if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 639, __pyx_L7_error)
+                if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 716, __pyx_L7_error)
                 __Pyx_XGOTREF(__pyx_t_19);
                 __pyx_t_10 = __Pyx_PyList_GetItemRef(sequence, 1);
-                if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 639, __pyx_L7_error)
+                if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 716, __pyx_L7_error)
                 __Pyx_XGOTREF(__pyx_t_10);
               }
               #else
-              __pyx_t_19 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 639, __pyx_L7_error)
+              __pyx_t_19 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 716, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_19);
-              __pyx_t_10 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 639, __pyx_L7_error)
+              __pyx_t_10 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 716, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_10);
               #endif
               __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
             } else {
               Py_ssize_t index = -1;
-              __pyx_t_12 = PyObject_GetIter(__pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 639, __pyx_L7_error)
+              __pyx_t_12 = PyObject_GetIter(__pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 716, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_12);
               __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
               __pyx_t_23 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_12);
@@ -20237,7 +21078,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               __Pyx_GOTREF(__pyx_t_19);
               index = 1; __pyx_t_10 = __pyx_t_23(__pyx_t_12); if (unlikely(!__pyx_t_10)) goto __pyx_L46_unpacking_failed;
               __Pyx_GOTREF(__pyx_t_10);
-              if (__Pyx_IternextUnpackEndCheck(__pyx_t_23(__pyx_t_12), 2) < 0) __PYX_ERR(0, 639, __pyx_L7_error)
+              if (__Pyx_IternextUnpackEndCheck(__pyx_t_23(__pyx_t_12), 2) < 0) __PYX_ERR(0, 716, __pyx_L7_error)
               __pyx_t_23 = NULL;
               __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
               goto __pyx_L47_unpacking_done;
@@ -20245,7 +21086,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
               __pyx_t_23 = NULL;
               if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-              __PYX_ERR(0, 639, __pyx_L7_error)
+              __PYX_ERR(0, 716, __pyx_L7_error)
               __pyx_L47_unpacking_done:;
             }
             __Pyx_XDECREF_SET(__pyx_v_timestamp, __pyx_t_19);
@@ -20253,19 +21094,19 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             __Pyx_XDECREF_SET(__pyx_v_right_row, __pyx_t_10);
             __pyx_t_10 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":640
+            /* "sabot/_cython/operators/joins.pyx":717
  *                     # Find earliest right row where right.time >= left.time
  *                     for timestamp, right_row in self._sorted_state:
  *                         if timestamp >= left_time:             # <<<<<<<<<<<<<<
  *                             best_match = right_row
  *                             break
 */
-            __pyx_t_11 = PyObject_RichCompare(__pyx_v_timestamp, __pyx_v_left_time, Py_GE); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 640, __pyx_L7_error)
-            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 640, __pyx_L7_error)
+            __pyx_t_11 = PyObject_RichCompare(__pyx_v_timestamp, __pyx_v_left_time, Py_GE); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 717, __pyx_L7_error)
+            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 717, __pyx_L7_error)
             __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
             if (__pyx_t_4) {
 
-              /* "sabot/_cython/operators/joins.pyx":641
+              /* "sabot/_cython/operators/joins.pyx":718
  *                     for timestamp, right_row in self._sorted_state:
  *                         if timestamp >= left_time:
  *                             best_match = right_row             # <<<<<<<<<<<<<<
@@ -20275,7 +21116,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
               __Pyx_INCREF(__pyx_v_right_row);
               __Pyx_DECREF_SET(__pyx_v_best_match, __pyx_v_right_row);
 
-              /* "sabot/_cython/operators/joins.pyx":642
+              /* "sabot/_cython/operators/joins.pyx":719
  *                         if timestamp >= left_time:
  *                             best_match = right_row
  *                             break             # <<<<<<<<<<<<<<
@@ -20284,7 +21125,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
               goto __pyx_L45_break;
 
-              /* "sabot/_cython/operators/joins.pyx":640
+              /* "sabot/_cython/operators/joins.pyx":717
  *                     # Find earliest right row where right.time >= left.time
  *                     for timestamp, right_row in self._sorted_state:
  *                         if timestamp >= left_time:             # <<<<<<<<<<<<<<
@@ -20293,7 +21134,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
             }
 
-            /* "sabot/_cython/operators/joins.pyx":639
+            /* "sabot/_cython/operators/joins.pyx":716
  *                 else:  # forward
  *                     # Find earliest right row where right.time >= left.time
  *                     for timestamp, right_row in self._sorted_state:             # <<<<<<<<<<<<<<
@@ -20310,46 +21151,46 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
         }
         __pyx_L37:;
 
-        /* "sabot/_cython/operators/joins.pyx":645
+        /* "sabot/_cython/operators/joins.pyx":722
  * 
  *                 # Emit joined row
  *                 if best_match:             # <<<<<<<<<<<<<<
  *                     joined_row = {**left_row, **best_match}
  *                     output_rows.append(joined_row)
 */
-        __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_best_match); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 645, __pyx_L7_error)
+        __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_best_match); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 722, __pyx_L7_error)
         if (__pyx_t_4) {
 
-          /* "sabot/_cython/operators/joins.pyx":646
+          /* "sabot/_cython/operators/joins.pyx":723
  *                 # Emit joined row
  *                 if best_match:
  *                     joined_row = {**left_row, **best_match}             # <<<<<<<<<<<<<<
  *                     output_rows.append(joined_row)
  *                 else:
 */
-          __pyx_t_2 = PyDict_Copy(__pyx_v_left_row); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 646, __pyx_L7_error)
+          __pyx_t_2 = PyDict_Copy(__pyx_v_left_row); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 723, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_2);
           if (unlikely(__pyx_v_best_match == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "argument after ** must be a mapping, not NoneType");
-            __PYX_ERR(0, 646, __pyx_L7_error)
+            __PYX_ERR(0, 723, __pyx_L7_error)
           }
           if (unlikely(PyDict_Update(__pyx_t_2, __pyx_v_best_match) < 0)) {
             if (PyErr_ExceptionMatches(PyExc_AttributeError)) __Pyx_RaiseMappingExpectedError(__pyx_v_best_match);
-            __PYX_ERR(0, 646, __pyx_L7_error)
+            __PYX_ERR(0, 723, __pyx_L7_error)
           }
           __Pyx_XDECREF_SET(__pyx_v_joined_row, ((PyObject*)__pyx_t_2));
           __pyx_t_2 = 0;
 
-          /* "sabot/_cython/operators/joins.pyx":647
+          /* "sabot/_cython/operators/joins.pyx":724
  *                 if best_match:
  *                     joined_row = {**left_row, **best_match}
  *                     output_rows.append(joined_row)             # <<<<<<<<<<<<<<
  *                 else:
  *                     # No match - emit left row with nulls
 */
-          __pyx_t_22 = __Pyx_PyList_Append(__pyx_v_output_rows, __pyx_v_joined_row); if (unlikely(__pyx_t_22 == ((int)-1))) __PYX_ERR(0, 647, __pyx_L7_error)
+          __pyx_t_22 = __Pyx_PyList_Append(__pyx_v_output_rows, __pyx_v_joined_row); if (unlikely(__pyx_t_22 == ((int)-1))) __PYX_ERR(0, 724, __pyx_L7_error)
 
-          /* "sabot/_cython/operators/joins.pyx":645
+          /* "sabot/_cython/operators/joins.pyx":722
  * 
  *                 # Emit joined row
  *                 if best_match:             # <<<<<<<<<<<<<<
@@ -20359,7 +21200,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
           goto __pyx_L50;
         }
 
-        /* "sabot/_cython/operators/joins.pyx":650
+        /* "sabot/_cython/operators/joins.pyx":727
  *                 else:
  *                     # No match - emit left row with nulls
  *                     joined_row = {**left_row}             # <<<<<<<<<<<<<<
@@ -20367,12 +21208,12 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
  *                         sample_right = self._sorted_state[0][1]
 */
         /*else*/ {
-          __pyx_t_2 = PyDict_Copy(__pyx_v_left_row); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 650, __pyx_L7_error)
+          __pyx_t_2 = PyDict_Copy(__pyx_v_left_row); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 727, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_XDECREF_SET(__pyx_v_joined_row, ((PyObject*)__pyx_t_2));
           __pyx_t_2 = 0;
 
-          /* "sabot/_cython/operators/joins.pyx":651
+          /* "sabot/_cython/operators/joins.pyx":728
  *                     # No match - emit left row with nulls
  *                     joined_row = {**left_row}
  *                     if self._sorted_state:             # <<<<<<<<<<<<<<
@@ -20383,13 +21224,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
           else
           {
             Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_self->_sorted_state);
-            if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 651, __pyx_L7_error)
+            if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 728, __pyx_L7_error)
             __pyx_t_4 = (__pyx_temp != 0);
           }
 
           if (__pyx_t_4) {
 
-            /* "sabot/_cython/operators/joins.pyx":652
+            /* "sabot/_cython/operators/joins.pyx":729
  *                     joined_row = {**left_row}
  *                     if self._sorted_state:
  *                         sample_right = self._sorted_state[0][1]             # <<<<<<<<<<<<<<
@@ -20398,14 +21239,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
             if (unlikely(__pyx_v_self->_sorted_state == Py_None)) {
               PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-              __PYX_ERR(0, 652, __pyx_L7_error)
+              __PYX_ERR(0, 729, __pyx_L7_error)
             }
-            __pyx_t_2 = __Pyx_GetItemInt(__Pyx_PyList_GET_ITEM(__pyx_v_self->_sorted_state, 0), 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 652, __pyx_L7_error)
+            __pyx_t_2 = __Pyx_GetItemInt(__Pyx_PyList_GET_ITEM(__pyx_v_self->_sorted_state, 0), 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 729, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_XDECREF_SET(__pyx_v_sample_right, __pyx_t_2);
             __pyx_t_2 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":653
+            /* "sabot/_cython/operators/joins.pyx":730
  *                     if self._sorted_state:
  *                         sample_right = self._sorted_state[0][1]
  *                         for col in sample_right.keys():             # <<<<<<<<<<<<<<
@@ -20415,9 +21256,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             __pyx_t_15 = 0;
             if (unlikely(__pyx_v_sample_right == Py_None)) {
               PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-              __PYX_ERR(0, 653, __pyx_L7_error)
+              __PYX_ERR(0, 730, __pyx_L7_error)
             }
-            __pyx_t_11 = __Pyx_dict_iterator(__pyx_v_sample_right, 0, __pyx_mstate_global->__pyx_n_u_keys, (&__pyx_t_17), (&__pyx_t_24)); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 653, __pyx_L7_error)
+            __pyx_t_11 = __Pyx_dict_iterator(__pyx_v_sample_right, 0, __pyx_mstate_global->__pyx_n_u_keys, (&__pyx_t_17), (&__pyx_t_24)); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 730, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_XDECREF(__pyx_t_2);
             __pyx_t_2 = __pyx_t_11;
@@ -20425,31 +21266,31 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             while (1) {
               __pyx_t_25 = __Pyx_dict_iter_next(__pyx_t_2, __pyx_t_17, &__pyx_t_15, &__pyx_t_11, NULL, NULL, __pyx_t_24);
               if (unlikely(__pyx_t_25 == 0)) break;
-              if (unlikely(__pyx_t_25 == -1)) __PYX_ERR(0, 653, __pyx_L7_error)
+              if (unlikely(__pyx_t_25 == -1)) __PYX_ERR(0, 730, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_11);
               __Pyx_XDECREF_SET(__pyx_v_col, __pyx_t_11);
               __pyx_t_11 = 0;
 
-              /* "sabot/_cython/operators/joins.pyx":654
+              /* "sabot/_cython/operators/joins.pyx":731
  *                         sample_right = self._sorted_state[0][1]
  *                         for col in sample_right.keys():
  *                             if col not in joined_row:             # <<<<<<<<<<<<<<
  *                                 joined_row[col] = None
  *                     output_rows.append(joined_row)
 */
-              __pyx_t_4 = (__Pyx_PyDict_ContainsTF(__pyx_v_col, __pyx_v_joined_row, Py_NE)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 654, __pyx_L7_error)
+              __pyx_t_4 = (__Pyx_PyDict_ContainsTF(__pyx_v_col, __pyx_v_joined_row, Py_NE)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 731, __pyx_L7_error)
               if (__pyx_t_4) {
 
-                /* "sabot/_cython/operators/joins.pyx":655
+                /* "sabot/_cython/operators/joins.pyx":732
  *                         for col in sample_right.keys():
  *                             if col not in joined_row:
  *                                 joined_row[col] = None             # <<<<<<<<<<<<<<
  *                     output_rows.append(joined_row)
  * 
 */
-                if (unlikely((PyDict_SetItem(__pyx_v_joined_row, __pyx_v_col, Py_None) < 0))) __PYX_ERR(0, 655, __pyx_L7_error)
+                if (unlikely((PyDict_SetItem(__pyx_v_joined_row, __pyx_v_col, Py_None) < 0))) __PYX_ERR(0, 732, __pyx_L7_error)
 
-                /* "sabot/_cython/operators/joins.pyx":654
+                /* "sabot/_cython/operators/joins.pyx":731
  *                         sample_right = self._sorted_state[0][1]
  *                         for col in sample_right.keys():
  *                             if col not in joined_row:             # <<<<<<<<<<<<<<
@@ -20460,7 +21301,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
             }
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-            /* "sabot/_cython/operators/joins.pyx":651
+            /* "sabot/_cython/operators/joins.pyx":728
  *                     # No match - emit left row with nulls
  *                     joined_row = {**left_row}
  *                     if self._sorted_state:             # <<<<<<<<<<<<<<
@@ -20469,18 +21310,18 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
           }
 
-          /* "sabot/_cython/operators/joins.pyx":656
+          /* "sabot/_cython/operators/joins.pyx":733
  *                             if col not in joined_row:
  *                                 joined_row[col] = None
  *                     output_rows.append(joined_row)             # <<<<<<<<<<<<<<
  * 
  *             if output_rows:
 */
-          __pyx_t_22 = __Pyx_PyList_Append(__pyx_v_output_rows, __pyx_v_joined_row); if (unlikely(__pyx_t_22 == ((int)-1))) __PYX_ERR(0, 656, __pyx_L7_error)
+          __pyx_t_22 = __Pyx_PyList_Append(__pyx_v_output_rows, __pyx_v_joined_row); if (unlikely(__pyx_t_22 == ((int)-1))) __PYX_ERR(0, 733, __pyx_L7_error)
         }
         __pyx_L50:;
 
-        /* "sabot/_cython/operators/joins.pyx":624
+        /* "sabot/_cython/operators/joins.pyx":701
  *             output_rows = []
  * 
  *             for i in range(batch.num_rows):             # <<<<<<<<<<<<<<
@@ -20490,7 +21331,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
       }
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":658
+      /* "sabot/_cython/operators/joins.pyx":735
  *                     output_rows.append(joined_row)
  * 
  *             if output_rows:             # <<<<<<<<<<<<<<
@@ -20499,13 +21340,13 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
       {
         Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_output_rows);
-        if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 658, __pyx_L7_error)
+        if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 735, __pyx_L7_error)
         __pyx_t_4 = (__pyx_temp != 0);
       }
 
       if (__pyx_t_4) {
 
-        /* "sabot/_cython/operators/joins.pyx":659
+        /* "sabot/_cython/operators/joins.pyx":736
  * 
  *             if output_rows:
  *                 return pa.RecordBatch.from_pylist(output_rows)             # <<<<<<<<<<<<<<
@@ -20513,9 +21354,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
  *                 return None
 */
         __Pyx_XDECREF(__pyx_r);
-        __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 659, __pyx_L7_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 736, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_RecordBatch); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 659, __pyx_L7_error)
+        __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_RecordBatch); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 736, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_10);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __pyx_t_2 = __pyx_t_10;
@@ -20526,14 +21367,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
           __pyx_t_13 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_from_pylist, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 659, __pyx_L7_error)
+          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 736, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_13);
         }
         __pyx_r = __pyx_t_13;
         __pyx_t_13 = 0;
         goto __pyx_L11_try_return;
 
-        /* "sabot/_cython/operators/joins.pyx":658
+        /* "sabot/_cython/operators/joins.pyx":735
  *                     output_rows.append(joined_row)
  * 
  *             if output_rows:             # <<<<<<<<<<<<<<
@@ -20542,7 +21383,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
 */
       }
 
-      /* "sabot/_cython/operators/joins.pyx":661
+      /* "sabot/_cython/operators/joins.pyx":738
  *                 return pa.RecordBatch.from_pylist(output_rows)
  *             else:
  *                 return None             # <<<<<<<<<<<<<<
@@ -20555,7 +21396,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
         goto __pyx_L11_try_return;
       }
 
-      /* "sabot/_cython/operators/joins.pyx":603
+      /* "sabot/_cython/operators/joins.pyx":680
  *             return None
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -20573,7 +21414,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
     __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
     __Pyx_XDECREF(__pyx_t_21); __pyx_t_21 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":663
+    /* "sabot/_cython/operators/joins.pyx":740
  *                 return None
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -20583,7 +21424,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
     __pyx_t_24 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_24) {
       __Pyx_AddTraceback("sabot._cython.operators.joins.CythonAsofJoinOperator.process_batch", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_13, &__pyx_t_10, &__pyx_t_2) < 0) __PYX_ERR(0, 663, __pyx_L9_except_error)
+      if (__Pyx_GetException(&__pyx_t_13, &__pyx_t_10, &__pyx_t_2) < 0) __PYX_ERR(0, 740, __pyx_L9_except_error)
       __Pyx_XGOTREF(__pyx_t_13);
       __Pyx_XGOTREF(__pyx_t_10);
       __Pyx_XGOTREF(__pyx_t_2);
@@ -20591,7 +21432,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
       __pyx_v_e = __pyx_t_10;
       /*try:*/ {
 
-        /* "sabot/_cython/operators/joins.pyx":664
+        /* "sabot/_cython/operators/joins.pyx":741
  * 
  *         except Exception as e:
  *             raise RuntimeError(f"Error in as-of join: {e}")             # <<<<<<<<<<<<<<
@@ -20601,9 +21442,9 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
         __pyx_t_19 = NULL;
         __Pyx_INCREF(__pyx_builtin_RuntimeError);
         __pyx_t_12 = __pyx_builtin_RuntimeError; 
-        __pyx_t_21 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 664, __pyx_L62_error)
+        __pyx_t_21 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 741, __pyx_L62_error)
         __Pyx_GOTREF(__pyx_t_21);
-        __pyx_t_20 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Error_in_as_of_join, __pyx_t_21); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 664, __pyx_L62_error)
+        __pyx_t_20 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Error_in_as_of_join, __pyx_t_21); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 741, __pyx_L62_error)
         __Pyx_GOTREF(__pyx_t_20);
         __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
         __pyx_t_14 = 1;
@@ -20613,15 +21454,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
           __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
           __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 664, __pyx_L62_error)
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 741, __pyx_L62_error)
           __Pyx_GOTREF(__pyx_t_11);
         }
         __Pyx_Raise(__pyx_t_11, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __PYX_ERR(0, 664, __pyx_L62_error)
+        __PYX_ERR(0, 741, __pyx_L62_error)
       }
 
-      /* "sabot/_cython/operators/joins.pyx":663
+      /* "sabot/_cython/operators/joins.pyx":740
  *                 return None
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -20667,7 +21508,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
     }
     goto __pyx_L9_except_error;
 
-    /* "sabot/_cython/operators/joins.pyx":603
+    /* "sabot/_cython/operators/joins.pyx":680
  *             return None
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -20688,7 +21529,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/operators/joins.pyx":596
+  /* "sabot/_cython/operators/joins.pyx":673
  *             raise ValueError(f"Invalid direction: {direction}")
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -21269,7 +22110,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOper
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":671
+/* "sabot/_cython/operators/joins.pyx":748
  * # ============================================================================
  * 
  * def create_hash_join_operator(left_source, right_source, left_keys, right_keys,             # <<<<<<<<<<<<<<
@@ -21324,53 +22165,53 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_left_source,&__pyx_mstate_global->__pyx_n_u_right_source,&__pyx_mstate_global->__pyx_n_u_left_keys,&__pyx_mstate_global->__pyx_n_u_right_keys,&__pyx_mstate_global->__pyx_n_u_join_type,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 671, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 748, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  5:
         values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 671, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 748, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 671, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 748, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 671, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 748, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 671, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 748, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 671, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 748, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_hash_join_operator", 1) < 0) __PYX_ERR(0, 671, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_hash_join_operator", 1) < 0) __PYX_ERR(0, 748, __pyx_L3_error)
       if (!values[4]) values[4] = __Pyx_NewRef(((PyObject *)((PyObject*)__pyx_mstate_global->__pyx_n_u_inner)));
       for (Py_ssize_t i = __pyx_nargs; i < 4; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_hash_join_operator", 0, 4, 5, i); __PYX_ERR(0, 671, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_hash_join_operator", 0, 4, 5, i); __PYX_ERR(0, 748, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  5:
         values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 671, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 748, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 671, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 748, __pyx_L3_error)
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 671, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 748, __pyx_L3_error)
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 671, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 748, __pyx_L3_error)
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 671, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 748, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
@@ -21384,7 +22225,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_hash_join_operator", 0, 4, 5, __pyx_nargs); __PYX_ERR(0, 671, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_hash_join_operator", 0, 4, 5, __pyx_nargs); __PYX_ERR(0, 748, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -21420,7 +22261,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_create_hash_join_ope
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_hash_join_operator", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":674
+  /* "sabot/_cython/operators/joins.pyx":751
  *                                join_type='inner', **kwargs):
  *     """Factory function for hash join operator."""
  *     return CythonHashJoinOperator(left_source, right_source, left_keys,             # <<<<<<<<<<<<<<
@@ -21432,14 +22273,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_create_hash_join_ope
   __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator);
   __pyx_t_3 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator); 
 
-  /* "sabot/_cython/operators/joins.pyx":675
+  /* "sabot/_cython/operators/joins.pyx":752
  *     """Factory function for hash join operator."""
  *     return CythonHashJoinOperator(left_source, right_source, left_keys,
  *                                    right_keys, join_type, **kwargs)             # <<<<<<<<<<<<<<
  * 
  * 
 */
-  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 675, __pyx_L1_error)
+  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 752, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 1;
   {
@@ -21448,14 +22289,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_create_hash_join_ope
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 674, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 751, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __pyx_r = ((PyObject *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/joins.pyx":671
+  /* "sabot/_cython/operators/joins.pyx":748
  * # ============================================================================
  * 
  * def create_hash_join_operator(left_source, right_source, left_keys, right_keys,             # <<<<<<<<<<<<<<
@@ -21477,7 +22318,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_create_hash_join_ope
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":678
+/* "sabot/_cython/operators/joins.pyx":755
  * 
  * 
  * def create_interval_join_operator(left_source, right_source, time_column,             # <<<<<<<<<<<<<<
@@ -21532,50 +22373,50 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_left_source,&__pyx_mstate_global->__pyx_n_u_right_source,&__pyx_mstate_global->__pyx_n_u_time_column,&__pyx_mstate_global->__pyx_n_u_lower_bound,&__pyx_mstate_global->__pyx_n_u_upper_bound,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 678, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 755, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  5:
         values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 678, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 755, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 678, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 755, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 678, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 755, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 678, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 755, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 678, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 755, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_interval_join_operator", 1) < 0) __PYX_ERR(0, 678, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_interval_join_operator", 1) < 0) __PYX_ERR(0, 755, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 5; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_interval_join_operator", 1, 5, 5, i); __PYX_ERR(0, 678, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_interval_join_operator", 1, 5, 5, i); __PYX_ERR(0, 755, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 5)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 678, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 755, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 678, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 755, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 678, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 755, __pyx_L3_error)
       values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 678, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 755, __pyx_L3_error)
       values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 678, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 755, __pyx_L3_error)
     }
     __pyx_v_left_source = values[0];
     __pyx_v_right_source = values[1];
@@ -21585,7 +22426,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_interval_join_operator", 1, 5, 5, __pyx_nargs); __PYX_ERR(0, 678, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_interval_join_operator", 1, 5, 5, __pyx_nargs); __PYX_ERR(0, 755, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -21621,7 +22462,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_2create_interval_joi
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_interval_join_operator", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":681
+  /* "sabot/_cython/operators/joins.pyx":758
  *                                    lower_bound, upper_bound, **kwargs):
  *     """Factory function for interval join operator."""
  *     return CythonIntervalJoinOperator(left_source, right_source, time_column,             # <<<<<<<<<<<<<<
@@ -21633,14 +22474,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_2create_interval_joi
   __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator);
   __pyx_t_3 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator); 
 
-  /* "sabot/_cython/operators/joins.pyx":682
+  /* "sabot/_cython/operators/joins.pyx":759
  *     """Factory function for interval join operator."""
  *     return CythonIntervalJoinOperator(left_source, right_source, time_column,
  *                                       lower_bound, upper_bound, **kwargs)             # <<<<<<<<<<<<<<
  * 
  * 
 */
-  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 682, __pyx_L1_error)
+  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 759, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 1;
   {
@@ -21649,14 +22490,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_2create_interval_joi
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 681, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 758, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __pyx_r = ((PyObject *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/joins.pyx":678
+  /* "sabot/_cython/operators/joins.pyx":755
  * 
  * 
  * def create_interval_join_operator(left_source, right_source, time_column,             # <<<<<<<<<<<<<<
@@ -21678,7 +22519,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_2create_interval_joi
   return __pyx_r;
 }
 
-/* "sabot/_cython/operators/joins.pyx":685
+/* "sabot/_cython/operators/joins.pyx":762
  * 
  * 
  * def create_asof_join_operator(left_source, right_source, time_column,             # <<<<<<<<<<<<<<
@@ -21732,47 +22573,47 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_left_source,&__pyx_mstate_global->__pyx_n_u_right_source,&__pyx_mstate_global->__pyx_n_u_time_column,&__pyx_mstate_global->__pyx_n_u_direction,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 685, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 762, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 685, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 762, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 685, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 762, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 685, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 762, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 685, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 762, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_asof_join_operator", 1) < 0) __PYX_ERR(0, 685, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, __pyx_v_kwargs, values, kwd_pos_args, __pyx_kwds_len, "create_asof_join_operator", 1) < 0) __PYX_ERR(0, 762, __pyx_L3_error)
       if (!values[3]) values[3] = __Pyx_NewRef(((PyObject *)((PyObject*)__pyx_mstate_global->__pyx_n_u_backward)));
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_asof_join_operator", 0, 3, 4, i); __PYX_ERR(0, 685, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_asof_join_operator", 0, 3, 4, i); __PYX_ERR(0, 762, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 685, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 762, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 685, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 762, __pyx_L3_error)
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 685, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 762, __pyx_L3_error)
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 685, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 762, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
@@ -21785,7 +22626,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_asof_join_operator", 0, 3, 4, __pyx_nargs); __PYX_ERR(0, 685, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_asof_join_operator", 0, 3, 4, __pyx_nargs); __PYX_ERR(0, 762, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -21821,7 +22662,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_4create_asof_join_op
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_asof_join_operator", 0);
 
-  /* "sabot/_cython/operators/joins.pyx":688
+  /* "sabot/_cython/operators/joins.pyx":765
  *                                direction='backward', **kwargs):
  *     """Factory function for as-of join operator."""
  *     return CythonAsofJoinOperator(left_source, right_source, time_column,             # <<<<<<<<<<<<<<
@@ -21832,12 +22673,12 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_4create_asof_join_op
   __Pyx_INCREF((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator);
   __pyx_t_3 = ((PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator); 
 
-  /* "sabot/_cython/operators/joins.pyx":689
+  /* "sabot/_cython/operators/joins.pyx":766
  *     """Factory function for as-of join operator."""
  *     return CythonAsofJoinOperator(left_source, right_source, time_column,
  *                                   direction, **kwargs)             # <<<<<<<<<<<<<<
 */
-  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 689, __pyx_L1_error)
+  __pyx_t_4 = PyDict_Copy(__pyx_v_kwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 766, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 1;
   {
@@ -21846,14 +22687,14 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_5joins_4create_asof_join_op
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 688, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 765, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __pyx_r = ((PyObject *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/operators/joins.pyx":685
+  /* "sabot/_cython/operators/joins.pyx":762
  * 
  * 
  * def create_asof_join_operator(left_source, right_source, time_column,             # <<<<<<<<<<<<<<
@@ -22158,7 +22999,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Stream
   int __pyx_t_6;
   PyObject *__pyx_t_7 = NULL;
   PyObject *__pyx_t_8 = NULL;
-  size_t __pyx_t_9;
+  PyObject *__pyx_t_9 = NULL;
+  size_t __pyx_t_10;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -22175,8 +23017,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Stream
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 0);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_batches);
@@ -22187,8 +23029,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Stream
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 1);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_concatenated);
   __Pyx_DECREF(__pyx_v___pyx_result->_concatenated);
@@ -22198,8 +23040,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Stream
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 2);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 2, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyDict_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("dict", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_hash_index);
@@ -22210,14 +23052,17 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Stream
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 3)); if (unlikely((__pyx_t_2 == ((bool)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 3, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_2 == ((bool)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->_is_built = __pyx_t_2;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 4);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 4, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_key_columns);
@@ -22228,8 +23073,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Stream
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 5);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 5, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_schema);
   __Pyx_DECREF(__pyx_v___pyx_result->_schema);
@@ -22239,7 +23084,10 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Stream
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyLong_As_int64_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 6)); if (unlikely((__pyx_t_3 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 6, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyLong_As_int64_t(__pyx_t_1); if (unlikely((__pyx_t_3 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->_total_rows = __pyx_t_3;
 
   /* "(tree fragment)":13
@@ -22277,11 +23125,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Stream
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
       __PYX_ERR(3, 14, __pyx_L1_error)
     }
-    __pyx_t_9 = 0;
+    __pyx_t_9 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 7, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(3, 14, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_10 = 0;
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_7, __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 7)};
-      __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_update, __pyx_callargs+__pyx_t_9, (2-__pyx_t_9) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+      PyObject *__pyx_callargs[2] = {__pyx_t_7, __pyx_t_9};
+      __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_update, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 14, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
@@ -22311,6 +23162,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Stream
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_XDECREF(__pyx_t_9);
   __Pyx_AddTraceback("sabot._cython.operators.joins.__pyx_unpickle_StreamingHashTableBuilder__set_state", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
@@ -22603,7 +23455,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   int __pyx_t_7;
   PyObject *__pyx_t_8 = NULL;
   PyObject *__pyx_t_9 = NULL;
-  size_t __pyx_t_10;
+  PyObject *__pyx_t_10 = NULL;
+  size_t __pyx_t_11;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -22620,8 +23473,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 0);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_hash_builder);
   __Pyx_DECREF(__pyx_v___pyx_result->_hash_builder);
@@ -22631,8 +23484,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 1);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_join_type);
@@ -22643,8 +23496,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 2);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 2, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._key_columns);
@@ -22655,8 +23508,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 3);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 3, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_left_keys);
@@ -22667,26 +23520,35 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyLong_As_int64_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 4)); if (unlikely((__pyx_t_2 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 4, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyLong_As_int64_t(__pyx_t_1); if (unlikely((__pyx_t_2 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._morsel_size_kb = __pyx_t_2;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 5)); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 5, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__pyx_t_1); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._num_partitions = __pyx_t_3;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_4 = __Pyx_PyLong_As_int(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 6)); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 6, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base.__pyx_base._parallelism_hint = __pyx_t_4;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 7);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 7, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._partition_keys);
@@ -22697,8 +23559,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 8);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 8, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_Partitioner))))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF((PyObject *)__pyx_v___pyx_result->__pyx_base._partitioner);
@@ -22709,8 +23571,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 9);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 9, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_right_keys);
@@ -22721,8 +23583,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 10);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 10, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_right_source);
   __Pyx_DECREF(__pyx_v___pyx_result->_right_source);
@@ -22732,8 +23594,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 11);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 11, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._schema);
   __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._schema);
@@ -22743,8 +23605,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 12);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 12, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._shuffle_id);
@@ -22755,8 +23617,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 13);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 13, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._shuffle_transport);
   __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base._shuffle_transport);
@@ -22766,8 +23628,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 14);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 14, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._source);
   __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._source);
@@ -22777,26 +23639,35 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 15)); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 15, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._stateful = __pyx_t_5;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 16)); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 16, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._stateful = __pyx_t_5;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 17)); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 17, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__pyx_t_1); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._task_id = __pyx_t_3;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 18);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 18, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.operator_id);
@@ -22807,7 +23678,10 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 19)); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 19, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__pyx_t_1); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base.parallelism = __pyx_t_3;
 
   /* "(tree fragment)":13
@@ -22845,11 +23719,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
       __PYX_ERR(3, 14, __pyx_L1_error)
     }
-    __pyx_t_10 = 0;
+    __pyx_t_10 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 20, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(3, 14, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_t_11 = 0;
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_8, __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 20)};
-      __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_update, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+      PyObject *__pyx_callargs[2] = {__pyx_t_8, __pyx_t_10};
+      __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_update, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 14, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
@@ -22879,6 +23756,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_10);
   __Pyx_AddTraceback("sabot._cython.operators.joins.__pyx_unpickle_CythonHashJoinOperator__set_state", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
@@ -23172,7 +24050,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   int __pyx_t_8;
   PyObject *__pyx_t_9 = NULL;
   PyObject *__pyx_t_10 = NULL;
-  size_t __pyx_t_11;
+  PyObject *__pyx_t_11 = NULL;
+  size_t __pyx_t_12;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -23189,8 +24068,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 0);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._key_columns);
@@ -23201,32 +24080,44 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyLong_As_long(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 1)); if (unlikely((__pyx_t_2 == (long)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyLong_As_long(__pyx_t_1); if (unlikely((__pyx_t_2 == (long)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->_lower_bound = __pyx_t_2;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyLong_As_int64_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 2)); if (unlikely((__pyx_t_3 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 2, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyLong_As_int64_t(__pyx_t_1); if (unlikely((__pyx_t_3 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._morsel_size_kb = __pyx_t_3;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_4 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 3)); if (unlikely((__pyx_t_4 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 3, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyLong_As_int32_t(__pyx_t_1); if (unlikely((__pyx_t_4 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._num_partitions = __pyx_t_4;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_PyLong_As_int(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 4)); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 4, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_5 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base.__pyx_base._parallelism_hint = __pyx_t_5;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 5);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 5, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._partition_keys);
@@ -23237,8 +24128,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 6);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 6, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_Partitioner))))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF((PyObject *)__pyx_v___pyx_result->__pyx_base._partitioner);
@@ -23249,8 +24140,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 7);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 7, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_right_source);
   __Pyx_DECREF(__pyx_v___pyx_result->_right_source);
@@ -23260,8 +24151,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 8);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 8, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_rocksdb_timers);
   __Pyx_DECREF(__pyx_v___pyx_result->_rocksdb_timers);
@@ -23271,8 +24162,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 9);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 9, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._schema);
   __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._schema);
@@ -23282,8 +24173,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 10);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 10, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._shuffle_id);
@@ -23294,8 +24185,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 11);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 11, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._shuffle_transport);
   __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base._shuffle_transport);
@@ -23305,8 +24196,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 12);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 12, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._source);
   __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._source);
@@ -23316,26 +24207,35 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 13)); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 13, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._stateful = __pyx_t_6;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 14)); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 14, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._stateful = __pyx_t_6;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_4 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 15)); if (unlikely((__pyx_t_4 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 15, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyLong_As_int32_t(__pyx_t_1); if (unlikely((__pyx_t_4 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._task_id = __pyx_t_4;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 16);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 16, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_time_column);
@@ -23346,8 +24246,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 17);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 17, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyDict_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("dict", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_time_indexed_state);
@@ -23358,14 +24258,17 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyLong_As_long(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 18)); if (unlikely((__pyx_t_2 == (long)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 18, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyLong_As_long(__pyx_t_1); if (unlikely((__pyx_t_2 == (long)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->_upper_bound = __pyx_t_2;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 19);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 19, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.operator_id);
@@ -23376,7 +24279,10 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_4 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 20)); if (unlikely((__pyx_t_4 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 20, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyLong_As_int32_t(__pyx_t_1); if (unlikely((__pyx_t_4 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base.parallelism = __pyx_t_4;
 
   /* "(tree fragment)":13
@@ -23414,11 +24320,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
       __PYX_ERR(3, 14, __pyx_L1_error)
     }
-    __pyx_t_11 = 0;
+    __pyx_t_11 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 21, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(3, 14, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_t_12 = 0;
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_9, __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 21)};
-      __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_update, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+      PyObject *__pyx_callargs[2] = {__pyx_t_9, __pyx_t_11};
+      __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_update, __pyx_callargs+__pyx_t_12, (2-__pyx_t_12) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+      __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 14, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
@@ -23448,6 +24357,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_9);
   __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_XDECREF(__pyx_t_11);
   __Pyx_AddTraceback("sabot._cython.operators.joins.__pyx_unpickle_CythonIntervalJoinOperator__set_state", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
@@ -23740,7 +24650,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   int __pyx_t_7;
   PyObject *__pyx_t_8 = NULL;
   PyObject *__pyx_t_9 = NULL;
-  size_t __pyx_t_10;
+  PyObject *__pyx_t_10 = NULL;
+  size_t __pyx_t_11;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -23757,8 +24668,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 0);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_direction);
@@ -23769,8 +24680,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 1);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._key_columns);
@@ -23781,26 +24692,35 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyLong_As_int64_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 2)); if (unlikely((__pyx_t_2 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 2, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyLong_As_int64_t(__pyx_t_1); if (unlikely((__pyx_t_2 == ((int64_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._morsel_size_kb = __pyx_t_2;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 3)); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 3, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__pyx_t_1); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._num_partitions = __pyx_t_3;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_4 = __Pyx_PyLong_As_int(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 4)); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 4, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base.__pyx_base._parallelism_hint = __pyx_t_4;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 5);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 5, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._partition_keys);
@@ -23811,8 +24731,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 6);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 6, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_7shuffle_11partitioner_Partitioner))))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF((PyObject *)__pyx_v___pyx_result->__pyx_base._partitioner);
@@ -23823,8 +24743,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 7);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 7, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_right_source);
   __Pyx_DECREF(__pyx_v___pyx_result->_right_source);
@@ -23834,8 +24754,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 8);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 8, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._schema);
   __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._schema);
@@ -23845,8 +24765,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 9);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 9, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._shuffle_id);
@@ -23857,8 +24777,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 10);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 10, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._shuffle_transport);
   __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base._shuffle_transport);
@@ -23868,8 +24788,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 11);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 11, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_sorted_state);
@@ -23880,8 +24800,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 12);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 12, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._source);
   __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base.__pyx_base._source);
@@ -23891,26 +24811,35 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 13)); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 13, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._stateful = __pyx_t_5;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 14)); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 14, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._stateful = __pyx_t_5;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 15)); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 15, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__pyx_t_1); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base._task_id = __pyx_t_3;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 16);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 16, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->_time_column);
@@ -23921,8 +24850,8 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 17);
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 17, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(3, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.operator_id);
@@ -23933,7 +24862,10 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(3, 12, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 18)); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 18, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyLong_As_int32_t(__pyx_t_1); if (unlikely((__pyx_t_3 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(3, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v___pyx_result->__pyx_base.parallelism = __pyx_t_3;
 
   /* "(tree fragment)":13
@@ -23971,11 +24903,14 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
       __PYX_ERR(3, 14, __pyx_L1_error)
     }
-    __pyx_t_10 = 0;
+    __pyx_t_10 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 19, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(3, 14, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_t_11 = 0;
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_8, __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 19)};
-      __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_update, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+      PyObject *__pyx_callargs[2] = {__pyx_t_8, __pyx_t_10};
+      __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_update, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 14, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
@@ -24005,6 +24940,7 @@ static PyObject *__pyx_f_5sabot_7_cython_9operators_5joins___pyx_unpickle_Cython
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_10);
   __Pyx_AddTraceback("sabot._cython.operators.joins.__pyx_unpickle_CythonAsofJoinOperator__set_state", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
@@ -24110,10 +25046,11 @@ static int __pyx_tp_clear_5sabot_7_cython_9operators_5joins_CythonHashJoinOperat
 static PyMethodDef __pyx_methods_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator[] = {
   {"_execute_with_shuffle", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_6_execute_with_shuffle, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_5_execute_with_shuffle},
   {"_execute_local", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_9_execute_local, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_8_execute_local},
-  {"_receive_right_shuffled", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_12_receive_right_shuffled, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_11_receive_right_shuffled},
-  {"_receive_left_shuffled", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_14_receive_left_shuffled, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_13_receive_left_shuffled},
-  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_16__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_18__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"_execute_local_fallback", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_12_execute_local_fallback, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_11_execute_local_fallback},
+  {"_receive_right_shuffled", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_15_receive_right_shuffled, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_14_receive_right_shuffled},
+  {"_receive_left_shuffled", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_17_receive_left_shuffled, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_16_receive_left_shuffled},
+  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_19__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_21__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 #if CYTHON_USE_TYPE_SPECS
@@ -25949,11 +26886,15 @@ static void __pyx_tp_dealloc_5sabot_7_cython_9operators_5joins___pyx_scope_struc
   }
   #endif
   PyObject_GC_UnTrack(o);
-  Py_CLEAR(p->__pyx_v_left_batch);
-  Py_CLEAR(p->__pyx_v_result);
-  Py_CLEAR(p->__pyx_v_right_batch);
+  Py_CLEAR(p->__pyx_v_arrow_join_type);
+  Py_CLEAR(p->__pyx_v_batch);
+  Py_CLEAR(p->__pyx_v_left_batches);
+  Py_CLEAR(p->__pyx_v_left_table);
+  Py_CLEAR(p->__pyx_v_result_table);
+  Py_CLEAR(p->__pyx_v_right_batches);
+  Py_CLEAR(p->__pyx_v_right_table);
   Py_CLEAR(p->__pyx_v_self);
-  Py_CLEAR(p->__pyx_t_0);
+  Py_CLEAR(p->__pyx_t_2);
   #if CYTHON_USE_FREELISTS
   if (((int)(__pyx_mstate_global->__pyx_freecount_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local < 8) & (int)(Py_TYPE(o)->tp_basicsize == sizeof(struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local)))) {
     __pyx_mstate_global->__pyx_freelist_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local[__pyx_mstate_global->__pyx_freecount_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local++] = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local *)o);
@@ -25978,20 +26919,29 @@ static int __pyx_tp_traverse_5sabot_7_cython_9operators_5joins___pyx_scope_struc
     e = __Pyx_call_type_traverse(o, 1, v, a);
     if (e) return e;
   }
-  if (p->__pyx_v_left_batch) {
-    e = (*v)(p->__pyx_v_left_batch, a); if (e) return e;
+  if (p->__pyx_v_batch) {
+    e = (*v)(p->__pyx_v_batch, a); if (e) return e;
   }
-  if (p->__pyx_v_result) {
-    e = (*v)(p->__pyx_v_result, a); if (e) return e;
+  if (p->__pyx_v_left_batches) {
+    e = (*v)(p->__pyx_v_left_batches, a); if (e) return e;
   }
-  if (p->__pyx_v_right_batch) {
-    e = (*v)(p->__pyx_v_right_batch, a); if (e) return e;
+  if (p->__pyx_v_left_table) {
+    e = (*v)(p->__pyx_v_left_table, a); if (e) return e;
+  }
+  if (p->__pyx_v_result_table) {
+    e = (*v)(p->__pyx_v_result_table, a); if (e) return e;
+  }
+  if (p->__pyx_v_right_batches) {
+    e = (*v)(p->__pyx_v_right_batches, a); if (e) return e;
+  }
+  if (p->__pyx_v_right_table) {
+    e = (*v)(p->__pyx_v_right_table, a); if (e) return e;
   }
   if (p->__pyx_v_self) {
     e = (*v)(((PyObject *)p->__pyx_v_self), a); if (e) return e;
   }
-  if (p->__pyx_t_0) {
-    e = (*v)(p->__pyx_t_0, a); if (e) return e;
+  if (p->__pyx_t_2) {
+    e = (*v)(p->__pyx_t_2, a); if (e) return e;
   }
   return 0;
 }
@@ -26057,6 +27007,178 @@ static PyTypeObject __pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_str
   0, /*tp_init*/
   0, /*tp_alloc*/
   __pyx_tp_new_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local, /*tp_new*/
+  0, /*tp_free*/
+  0, /*tp_is_gc*/
+  0, /*tp_bases*/
+  0, /*tp_mro*/
+  0, /*tp_cache*/
+  0, /*tp_subclasses*/
+  0, /*tp_weaklist*/
+  0, /*tp_del*/
+  0, /*tp_version_tag*/
+  #if CYTHON_USE_TP_FINALIZE
+  0, /*tp_finalize*/
+  #else
+  NULL, /*tp_finalize*/
+  #endif
+  #if PY_VERSION_HEX >= 0x030800b1 && (!CYTHON_COMPILING_IN_PYPY || PYPY_VERSION_NUM >= 0x07030800)
+  0, /*tp_vectorcall*/
+  #endif
+  #if __PYX_NEED_TP_PRINT_SLOT == 1
+  0, /*tp_print*/
+  #endif
+  #if PY_VERSION_HEX >= 0x030C0000
+  0, /*tp_watched*/
+  #endif
+  #if PY_VERSION_HEX >= 0x030d00A4
+  0, /*tp_versions_used*/
+  #endif
+  #if CYTHON_COMPILING_IN_PYPY && PY_VERSION_HEX >= 0x03090000 && PY_VERSION_HEX < 0x030a0000
+  0, /*tp_pypy_flags*/
+  #endif
+};
+#endif
+
+static PyObject *__pyx_tp_new_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+  PyObject *o;
+  #if CYTHON_COMPILING_IN_LIMITED_API
+  allocfunc alloc_func = (allocfunc)PyType_GetSlot(t, Py_tp_alloc);
+  o = alloc_func(t, 0);
+  #else
+  #if CYTHON_USE_FREELISTS
+  if (likely((int)(__pyx_mstate_global->__pyx_freecount_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback > 0) & (int)(t->tp_basicsize == sizeof(struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback)))) {
+    o = (PyObject*)__pyx_mstate_global->__pyx_freelist_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback[--__pyx_mstate_global->__pyx_freecount_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback];
+    memset(o, 0, sizeof(struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback));
+    (void) PyObject_INIT(o, t);
+    PyObject_GC_Track(o);
+  } else
+  #endif
+  {
+    o = (*t->tp_alloc)(t, 0);
+    if (unlikely(!o)) return 0;
+  }
+  #endif
+  return o;
+}
+
+static void __pyx_tp_dealloc_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback(PyObject *o) {
+  struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback *p = (struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback *)o;
+  #if CYTHON_USE_TP_FINALIZE
+  if (unlikely((PY_VERSION_HEX >= 0x03080000 || __Pyx_PyType_HasFeature(Py_TYPE(o), Py_TPFLAGS_HAVE_FINALIZE)) && __Pyx_PyObject_GetSlot(o, tp_finalize, destructor)) && !__Pyx_PyObject_GC_IsFinalized(o)) {
+    if (__Pyx_PyObject_GetSlot(o, tp_dealloc, destructor) == __pyx_tp_dealloc_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback) {
+      if (PyObject_CallFinalizerFromDealloc(o)) return;
+    }
+  }
+  #endif
+  PyObject_GC_UnTrack(o);
+  Py_CLEAR(p->__pyx_v_left_batch);
+  Py_CLEAR(p->__pyx_v_result);
+  Py_CLEAR(p->__pyx_v_right_batch);
+  Py_CLEAR(p->__pyx_v_self);
+  Py_CLEAR(p->__pyx_t_0);
+  #if CYTHON_USE_FREELISTS
+  if (((int)(__pyx_mstate_global->__pyx_freecount_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback < 8) & (int)(Py_TYPE(o)->tp_basicsize == sizeof(struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback)))) {
+    __pyx_mstate_global->__pyx_freelist_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback[__pyx_mstate_global->__pyx_freecount_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback++] = ((struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback *)o);
+  } else
+  #endif
+  {
+    #if CYTHON_USE_TYPE_SLOTS
+    (*Py_TYPE(o)->tp_free)(o);
+    #else
+    {
+      freefunc tp_free = (freefunc)PyType_GetSlot(Py_TYPE(o), Py_tp_free);
+      if (tp_free) tp_free(o);
+    }
+    #endif
+  }
+}
+
+static int __pyx_tp_traverse_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback(PyObject *o, visitproc v, void *a) {
+  int e;
+  struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback *p = (struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback *)o;
+  {
+    e = __Pyx_call_type_traverse(o, 1, v, a);
+    if (e) return e;
+  }
+  if (p->__pyx_v_left_batch) {
+    e = (*v)(p->__pyx_v_left_batch, a); if (e) return e;
+  }
+  if (p->__pyx_v_result) {
+    e = (*v)(p->__pyx_v_result, a); if (e) return e;
+  }
+  if (p->__pyx_v_right_batch) {
+    e = (*v)(p->__pyx_v_right_batch, a); if (e) return e;
+  }
+  if (p->__pyx_v_self) {
+    e = (*v)(((PyObject *)p->__pyx_v_self), a); if (e) return e;
+  }
+  if (p->__pyx_t_0) {
+    e = (*v)(p->__pyx_t_0, a); if (e) return e;
+  }
+  return 0;
+}
+#if CYTHON_USE_TYPE_SPECS
+static PyType_Slot __pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback_slots[] = {
+  {Py_tp_dealloc, (void *)__pyx_tp_dealloc_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback},
+  {Py_tp_traverse, (void *)__pyx_tp_traverse_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback},
+  {Py_tp_new, (void *)__pyx_tp_new_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback},
+  {0, 0},
+};
+static PyType_Spec __pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback_spec = {
+  "sabot._cython.operators.joins.__pyx_scope_struct_8__execute_local_fallback",
+  sizeof(struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback),
+  0,
+  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_HAVE_FINALIZE,
+  __pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback_slots,
+};
+#else
+
+static PyTypeObject __pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback = {
+  PyVarObject_HEAD_INIT(0, 0)
+  "sabot._cython.operators.joins.""__pyx_scope_struct_8__execute_local_fallback", /*tp_name*/
+  sizeof(struct __pyx_obj_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback), /*tp_basicsize*/
+  0, /*tp_itemsize*/
+  __pyx_tp_dealloc_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback, /*tp_dealloc*/
+  #if PY_VERSION_HEX < 0x030800b4
+  0, /*tp_print*/
+  #endif
+  #if PY_VERSION_HEX >= 0x030800b4
+  0, /*tp_vectorcall_offset*/
+  #endif
+  0, /*tp_getattr*/
+  0, /*tp_setattr*/
+  0, /*tp_as_async*/
+  0, /*tp_repr*/
+  0, /*tp_as_number*/
+  0, /*tp_as_sequence*/
+  0, /*tp_as_mapping*/
+  0, /*tp_hash*/
+  0, /*tp_call*/
+  0, /*tp_str*/
+  0, /*tp_getattro*/
+  0, /*tp_setattro*/
+  0, /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_HAVE_FINALIZE, /*tp_flags*/
+  0, /*tp_doc*/
+  __pyx_tp_traverse_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback, /*tp_traverse*/
+  0, /*tp_clear*/
+  0, /*tp_richcompare*/
+  0, /*tp_weaklistoffset*/
+  0, /*tp_iter*/
+  0, /*tp_iternext*/
+  0, /*tp_methods*/
+  0, /*tp_members*/
+  0, /*tp_getset*/
+  0, /*tp_base*/
+  0, /*tp_dict*/
+  0, /*tp_descr_get*/
+  0, /*tp_descr_set*/
+  #if !CYTHON_USE_TYPE_SPECS
+  0, /*tp_dictoffset*/
+  #endif
+  0, /*tp_init*/
+  0, /*tp_alloc*/
+  __pyx_tp_new_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -26159,12 +27281,12 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_vtabptr_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator = &__pyx_vtable_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator;
   __pyx_vtable_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator.__pyx_base = *__pyx_vtabptr_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 276, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator_spec, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator)) __PYX_ERR(0, 276, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator) < 0) __PYX_ERR(0, 276, __pyx_L1_error)
+  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator)) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator = &__pyx_type_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator;
   #endif
@@ -26172,7 +27294,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator->tp_base = __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator;
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator) < 0) __PYX_ERR(0, 276, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator->tp_getattro == PyObject_GenericGetAttr)) {
@@ -26181,7 +27303,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 276, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 285, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator___init__.doc = __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator___init__;
@@ -26191,7 +27313,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, "__iter__"); if (unlikely(!wrapper)) __PYX_ERR(0, 276, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, "__iter__"); if (unlikely(!wrapper)) __PYX_ERR(0, 285, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_2__iter__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_2__iter__.doc = __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_2__iter__;
@@ -26199,19 +27321,19 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_vtabptr_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator) < 0) __PYX_ERR(0, 276, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator) < 0) __PYX_ERR(0, 276, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator) < 0) __PYX_ERR(0, 276, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator) < 0) __PYX_ERR(0, 276, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_vtabptr_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
   __pyx_vtabptr_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator = &__pyx_vtable_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator;
   __pyx_vtable_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator.__pyx_base = *__pyx_vtabptr_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 450, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 527, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator_spec, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator)) __PYX_ERR(0, 450, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator) < 0) __PYX_ERR(0, 450, __pyx_L1_error)
+  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator)) __PYX_ERR(0, 527, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator) < 0) __PYX_ERR(0, 527, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator = &__pyx_type_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator;
   #endif
@@ -26219,7 +27341,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator->tp_base = __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator;
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator) < 0) __PYX_ERR(0, 450, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator) < 0) __PYX_ERR(0, 527, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator->tp_getattro == PyObject_GenericGetAttr)) {
@@ -26228,7 +27350,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 450, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 527, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator___init__.doc = __pyx_doc_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator___init__;
@@ -26236,19 +27358,19 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator, __pyx_vtabptr_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator) < 0) __PYX_ERR(0, 450, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator) < 0) __PYX_ERR(0, 450, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonIntervalJoinOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator) < 0) __PYX_ERR(0, 450, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator) < 0) __PYX_ERR(0, 450, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator, __pyx_vtabptr_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator) < 0) __PYX_ERR(0, 527, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator) < 0) __PYX_ERR(0, 527, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonIntervalJoinOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator) < 0) __PYX_ERR(0, 527, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator) < 0) __PYX_ERR(0, 527, __pyx_L1_error)
   __pyx_vtabptr_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator = &__pyx_vtable_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator;
   __pyx_vtable_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator.__pyx_base = *__pyx_vtabptr_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 551, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_Pack(1, (PyObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 628, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator_spec, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator)) __PYX_ERR(0, 551, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator) < 0) __PYX_ERR(0, 551, __pyx_L1_error)
+  if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator)) __PYX_ERR(0, 628, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator) < 0) __PYX_ERR(0, 628, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator = &__pyx_type_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator;
   #endif
@@ -26256,7 +27378,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator->tp_base = __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_17shuffled_operator_ShuffledOperator;
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator) < 0) __PYX_ERR(0, 551, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator) < 0) __PYX_ERR(0, 628, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator->tp_getattro == PyObject_GenericGetAttr)) {
@@ -26265,7 +27387,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 551, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 628, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator___init__.doc = __pyx_doc_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator___init__;
@@ -26273,25 +27395,25 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator, __pyx_vtabptr_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator) < 0) __PYX_ERR(0, 551, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator) < 0) __PYX_ERR(0, 551, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonAsofJoinOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator) < 0) __PYX_ERR(0, 551, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator) < 0) __PYX_ERR(0, 551, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator, __pyx_vtabptr_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator) < 0) __PYX_ERR(0, 628, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator) < 0) __PYX_ERR(0, 628, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_CythonAsofJoinOperator, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator) < 0) __PYX_ERR(0, 628, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator) < 0) __PYX_ERR(0, 628, __pyx_L1_error)
   __pyx_vtabptr_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder = &__pyx_vtable_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder;
   __pyx_vtable_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder.add_batch = (void (*)(struct __pyx_obj_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_add_batch;
   __pyx_vtable_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder._take_with_nulls = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder *, PyObject *, PyObject *))__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder__take_with_nulls;
   __pyx_vtable_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder._create_null_batch = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder *, PyObject *, int64_t))__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder__create_null_batch;
   __pyx_vtable_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder._combine_batches = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder *, PyObject *, PyObject *, PyObject *))__pyx_f_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder__combine_batches;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder)) __PYX_ERR(0, 42, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder)) __PYX_ERR(0, 51, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder = &__pyx_type_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder->tp_getattro == PyObject_GenericGetAttr)) {
@@ -26300,7 +27422,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 42, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 51, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder___init__.doc = __pyx_doc_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder___init__;
@@ -26308,20 +27430,20 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, __pyx_vtabptr_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_StreamingHashTableBuilder, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, __pyx_vtabptr_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_StreamingHashTableBuilder, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index)) __PYX_ERR(0, 86, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index) < 0) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index)) __PYX_ERR(0, 95, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index) < 0) __PYX_ERR(0, 95, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index = &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index) < 0) __PYX_ERR(0, 86, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index) < 0) __PYX_ERR(0, 95, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct__build_index->tp_getattro == PyObject_GenericGetAttr)) {
@@ -26329,15 +27451,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr)) __PYX_ERR(0, 107, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr) < 0) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr)) __PYX_ERR(0, 116, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr) < 0) __PYX_ERR(0, 116, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr = &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr) < 0) __PYX_ERR(0, 107, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr) < 0) __PYX_ERR(0, 116, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_1_genexpr->tp_getattro == PyObject_GenericGetAttr)) {
@@ -26345,15 +27467,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized)) __PYX_ERR(0, 116, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized) < 0) __PYX_ERR(0, 116, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized)) __PYX_ERR(0, 125, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized) < 0) __PYX_ERR(0, 125, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized = &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized) < 0) __PYX_ERR(0, 116, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized) < 0) __PYX_ERR(0, 125, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_2_probe_batch_vectorized->tp_getattro == PyObject_GenericGetAttr)) {
@@ -26361,15 +27483,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr)) __PYX_ERR(0, 147, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr) < 0) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr)) __PYX_ERR(0, 156, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr) < 0) __PYX_ERR(0, 156, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr = &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr) < 0) __PYX_ERR(0, 147, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr) < 0) __PYX_ERR(0, 156, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_3_genexpr->tp_getattro == PyObject_GenericGetAttr)) {
@@ -26377,15 +27499,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr)) __PYX_ERR(0, 169, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr) < 0) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr)) __PYX_ERR(0, 178, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr) < 0) __PYX_ERR(0, 178, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr = &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr) < 0) __PYX_ERR(0, 169, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr) < 0) __PYX_ERR(0, 178, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_4_genexpr->tp_getattro == PyObject_GenericGetAttr)) {
@@ -26393,15 +27515,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__ = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter___spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__)) __PYX_ERR(0, 346, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter___spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__) < 0) __PYX_ERR(0, 346, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__ = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter___spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__)) __PYX_ERR(0, 360, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter___spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__) < 0) __PYX_ERR(0, 360, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__ = &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__) < 0) __PYX_ERR(0, 346, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__) < 0) __PYX_ERR(0, 360, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_5___iter__->tp_getattro == PyObject_GenericGetAttr)) {
@@ -26409,15 +27531,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle)) __PYX_ERR(0, 366, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle) < 0) __PYX_ERR(0, 366, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle)) __PYX_ERR(0, 380, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle) < 0) __PYX_ERR(0, 380, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle = &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle) < 0) __PYX_ERR(0, 366, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle) < 0) __PYX_ERR(0, 380, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_6__execute_with_shuffle->tp_getattro == PyObject_GenericGetAttr)) {
@@ -26425,19 +27547,35 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local)) __PYX_ERR(0, 382, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local) < 0) __PYX_ERR(0, 382, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local)) __PYX_ERR(0, 396, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local) < 0) __PYX_ERR(0, 396, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local = &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local) < 0) __PYX_ERR(0, 382, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local) < 0) __PYX_ERR(0, 396, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local->tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_7__execute_local->tp_getattro = PyObject_GenericGetAttr;
+  }
+  #endif
+  #if CYTHON_USE_TYPE_SPECS
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback)) __PYX_ERR(0, 454, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback) < 0) __PYX_ERR(0, 454, __pyx_L1_error)
+  #else
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback = &__pyx_type_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback;
+  #endif
+  #if !CYTHON_COMPILING_IN_LIMITED_API
+  #endif
+  #if !CYTHON_USE_TYPE_SPECS
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback) < 0) __PYX_ERR(0, 454, __pyx_L1_error)
+  #endif
+  #if !CYTHON_COMPILING_IN_LIMITED_API
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback->tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_mstate->__pyx_ptype_5sabot_7_cython_9operators_5joins___pyx_scope_struct_8__execute_local_fallback->tp_getattro = PyObject_GenericGetAttr;
   }
   #endif
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -27842,6 +28980,7 @@ static CYTHON_SMALL_CODE int __pyx_pymod_exec_joins(PyObject *__pyx_pyinit_modul
   PyObject *__pyx_t_5 = NULL;
   int __pyx_t_6;
   PyObject *__pyx_t_7 = NULL;
+  int __pyx_t_8;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -27996,12 +29135,12 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":25
- * 
+  /* "sabot/_cython/operators/joins.pyx":26
  * # Import Arrow for vectorized joins
+ * # CRITICAL: Use vendored cyarrow, NOT system pyarrow!
  * try:             # <<<<<<<<<<<<<<
- *     import pyarrow as pa
- *     import pyarrow.compute as pc
+ *     from sabot import cyarrow as pa
+ *     pc = pa.compute if hasattr(pa, 'compute') else None
 */
   {
     __Pyx_PyThreadState_declare
@@ -28012,45 +29151,65 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
     __Pyx_XGOTREF(__pyx_t_5);
     /*try:*/ {
 
-      /* "sabot/_cython/operators/joins.pyx":26
- * # Import Arrow for vectorized joins
+      /* "sabot/_cython/operators/joins.pyx":27
+ * # CRITICAL: Use vendored cyarrow, NOT system pyarrow!
  * try:
- *     import pyarrow as pa             # <<<<<<<<<<<<<<
- *     import pyarrow.compute as pc
+ *     from sabot import cyarrow as pa             # <<<<<<<<<<<<<<
+ *     pc = pa.compute if hasattr(pa, 'compute') else None
  *     ARROW_AVAILABLE = True
 */
-      __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_pyarrow, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L2_error)
+      __pyx_t_2 = __Pyx_PyList_Pack(1, __pyx_mstate_global->__pyx_n_u_cyarrow); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L2_error)
       __Pyx_GOTREF(__pyx_t_2);
-      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pa, __pyx_t_2) < 0) __PYX_ERR(0, 26, __pyx_L2_error)
+      __pyx_t_3 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot, __pyx_t_2, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 27, __pyx_L2_error)
+      __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_cyarrow); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L2_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pa, __pyx_t_2) < 0) __PYX_ERR(0, 27, __pyx_L2_error)
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":27
+      /* "sabot/_cython/operators/joins.pyx":28
  * try:
- *     import pyarrow as pa
- *     import pyarrow.compute as pc             # <<<<<<<<<<<<<<
+ *     from sabot import cyarrow as pa
+ *     pc = pa.compute if hasattr(pa, 'compute') else None             # <<<<<<<<<<<<<<
  *     ARROW_AVAILABLE = True
  * except ImportError:
 */
-      __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_pyarrow_compute, __pyx_mstate_global->__pyx_tuple[4]); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L2_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L2_error)
       __Pyx_GOTREF(__pyx_t_2);
-      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pc, __pyx_t_2) < 0) __PYX_ERR(0, 27, __pyx_L2_error)
+      __pyx_t_6 = __Pyx_HasAttr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_compute); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 28, __pyx_L2_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      if (__pyx_t_6) {
+        __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L2_error)
+        __Pyx_GOTREF(__pyx_t_2);
+        __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_compute); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 28, __pyx_L2_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __pyx_t_3 = __pyx_t_7;
+        __pyx_t_7 = 0;
+      } else {
+        __Pyx_INCREF(Py_None);
+        __pyx_t_3 = Py_None;
+      }
+      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pc, __pyx_t_3) < 0) __PYX_ERR(0, 28, __pyx_L2_error)
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "sabot/_cython/operators/joins.pyx":28
- *     import pyarrow as pa
- *     import pyarrow.compute as pc
+      /* "sabot/_cython/operators/joins.pyx":29
+ *     from sabot import cyarrow as pa
+ *     pc = pa.compute if hasattr(pa, 'compute') else None
  *     ARROW_AVAILABLE = True             # <<<<<<<<<<<<<<
  * except ImportError:
  *     ARROW_AVAILABLE = False
 */
-      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_ARROW_AVAILABLE, Py_True) < 0) __PYX_ERR(0, 28, __pyx_L2_error)
+      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_ARROW_AVAILABLE, Py_True) < 0) __PYX_ERR(0, 29, __pyx_L2_error)
 
-      /* "sabot/_cython/operators/joins.pyx":25
- * 
+      /* "sabot/_cython/operators/joins.pyx":26
  * # Import Arrow for vectorized joins
+ * # CRITICAL: Use vendored cyarrow, NOT system pyarrow!
  * try:             # <<<<<<<<<<<<<<
- *     import pyarrow as pa
- *     import pyarrow.compute as pc
+ *     from sabot import cyarrow as pa
+ *     pc = pa.compute if hasattr(pa, 'compute') else None
 */
     }
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -28060,61 +29219,62 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
     __pyx_L2_error:;
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "sabot/_cython/operators/joins.pyx":29
- *     import pyarrow.compute as pc
+    /* "sabot/_cython/operators/joins.pyx":30
+ *     pc = pa.compute if hasattr(pa, 'compute') else None
  *     ARROW_AVAILABLE = True
  * except ImportError:             # <<<<<<<<<<<<<<
  *     ARROW_AVAILABLE = False
  *     pa = None
 */
-    __pyx_t_6 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_ImportError);
-    if (__pyx_t_6) {
+    __pyx_t_8 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_ImportError);
+    if (__pyx_t_8) {
       __Pyx_AddTraceback("sabot._cython.operators.joins", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_3, &__pyx_t_7) < 0) __PYX_ERR(0, 29, __pyx_L4_except_error)
-      __Pyx_XGOTREF(__pyx_t_2);
+      if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_7, &__pyx_t_2) < 0) __PYX_ERR(0, 30, __pyx_L4_except_error)
       __Pyx_XGOTREF(__pyx_t_3);
       __Pyx_XGOTREF(__pyx_t_7);
+      __Pyx_XGOTREF(__pyx_t_2);
 
-      /* "sabot/_cython/operators/joins.pyx":30
+      /* "sabot/_cython/operators/joins.pyx":31
  *     ARROW_AVAILABLE = True
  * except ImportError:
  *     ARROW_AVAILABLE = False             # <<<<<<<<<<<<<<
  *     pa = None
  *     pc = None
 */
-      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_ARROW_AVAILABLE, Py_False) < 0) __PYX_ERR(0, 30, __pyx_L4_except_error)
+      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_ARROW_AVAILABLE, Py_False) < 0) __PYX_ERR(0, 31, __pyx_L4_except_error)
 
-      /* "sabot/_cython/operators/joins.pyx":31
+      /* "sabot/_cython/operators/joins.pyx":32
  * except ImportError:
  *     ARROW_AVAILABLE = False
  *     pa = None             # <<<<<<<<<<<<<<
  *     pc = None
  * 
 */
-      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pa, Py_None) < 0) __PYX_ERR(0, 31, __pyx_L4_except_error)
+      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pa, Py_None) < 0) __PYX_ERR(0, 32, __pyx_L4_except_error)
 
-      /* "sabot/_cython/operators/joins.pyx":32
+      /* "sabot/_cython/operators/joins.pyx":33
  *     ARROW_AVAILABLE = False
  *     pa = None
  *     pc = None             # <<<<<<<<<<<<<<
  * 
- * # Import base operator
+ * # Import zero-copy hash join from sabot_ql
 */
-      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pc, Py_None) < 0) __PYX_ERR(0, 32, __pyx_L4_except_error)
-      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pc, Py_None) < 0) __PYX_ERR(0, 33, __pyx_L4_except_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       goto __pyx_L3_exception_handled;
     }
     goto __pyx_L4_except_error;
 
-    /* "sabot/_cython/operators/joins.pyx":25
- * 
+    /* "sabot/_cython/operators/joins.pyx":26
  * # Import Arrow for vectorized joins
+ * # CRITICAL: Use vendored cyarrow, NOT system pyarrow!
  * try:             # <<<<<<<<<<<<<<
- *     import pyarrow as pa
- *     import pyarrow.compute as pc
+ *     from sabot import cyarrow as pa
+ *     pc = pa.compute if hasattr(pa, 'compute') else None
 */
     __pyx_L4_except_error:;
     __Pyx_XGIVEREF(__pyx_t_1);
@@ -28130,51 +29290,171 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
     __pyx_L7_try_end:;
   }
 
-  /* "sabot/_cython/operators/joins.pyx":69
+  /* "sabot/_cython/operators/joins.pyx":36
+ * 
+ * # Import zero-copy hash join from sabot_ql
+ * try:             # <<<<<<<<<<<<<<
+ *     from sabot._cython.joins_ql.hash_join import hash_join
+ *     HASH_JOIN_AVAILABLE = True
+*/
+  {
+    __Pyx_PyThreadState_declare
+    __Pyx_PyThreadState_assign
+    __Pyx_ExceptionSave(&__pyx_t_5, &__pyx_t_4, &__pyx_t_1);
+    __Pyx_XGOTREF(__pyx_t_5);
+    __Pyx_XGOTREF(__pyx_t_4);
+    __Pyx_XGOTREF(__pyx_t_1);
+    /*try:*/ {
+
+      /* "sabot/_cython/operators/joins.pyx":37
+ * # Import zero-copy hash join from sabot_ql
+ * try:
+ *     from sabot._cython.joins_ql.hash_join import hash_join             # <<<<<<<<<<<<<<
+ *     HASH_JOIN_AVAILABLE = True
+ * except ImportError:
+*/
+      __pyx_t_2 = __Pyx_PyList_Pack(1, __pyx_mstate_global->__pyx_n_u_hash_join); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L10_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_7 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_sabot__cython_joins_ql_hash_join, __pyx_t_2, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 37, __pyx_L10_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_hash_join); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L10_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_hash_join, __pyx_t_2) < 0) __PYX_ERR(0, 37, __pyx_L10_error)
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+
+      /* "sabot/_cython/operators/joins.pyx":38
+ * try:
+ *     from sabot._cython.joins_ql.hash_join import hash_join
+ *     HASH_JOIN_AVAILABLE = True             # <<<<<<<<<<<<<<
+ * except ImportError:
+ *     HASH_JOIN_AVAILABLE = False
+*/
+      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_HASH_JOIN_AVAILABLE, Py_True) < 0) __PYX_ERR(0, 38, __pyx_L10_error)
+
+      /* "sabot/_cython/operators/joins.pyx":36
+ * 
+ * # Import zero-copy hash join from sabot_ql
+ * try:             # <<<<<<<<<<<<<<
+ *     from sabot._cython.joins_ql.hash_join import hash_join
+ *     HASH_JOIN_AVAILABLE = True
+*/
+    }
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    goto __pyx_L15_try_end;
+    __pyx_L10_error:;
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+
+    /* "sabot/_cython/operators/joins.pyx":39
+ *     from sabot._cython.joins_ql.hash_join import hash_join
+ *     HASH_JOIN_AVAILABLE = True
+ * except ImportError:             # <<<<<<<<<<<<<<
+ *     HASH_JOIN_AVAILABLE = False
+ *     hash_join = None
+*/
+    __pyx_t_8 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_ImportError);
+    if (__pyx_t_8) {
+      __Pyx_AddTraceback("sabot._cython.operators.joins", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      if (__Pyx_GetException(&__pyx_t_7, &__pyx_t_2, &__pyx_t_3) < 0) __PYX_ERR(0, 39, __pyx_L12_except_error)
+      __Pyx_XGOTREF(__pyx_t_7);
+      __Pyx_XGOTREF(__pyx_t_2);
+      __Pyx_XGOTREF(__pyx_t_3);
+
+      /* "sabot/_cython/operators/joins.pyx":40
+ *     HASH_JOIN_AVAILABLE = True
+ * except ImportError:
+ *     HASH_JOIN_AVAILABLE = False             # <<<<<<<<<<<<<<
+ *     hash_join = None
+ * 
+*/
+      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_HASH_JOIN_AVAILABLE, Py_False) < 0) __PYX_ERR(0, 40, __pyx_L12_except_error)
+
+      /* "sabot/_cython/operators/joins.pyx":41
+ * except ImportError:
+ *     HASH_JOIN_AVAILABLE = False
+ *     hash_join = None             # <<<<<<<<<<<<<<
+ * 
+ * # Import base operator
+*/
+      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_hash_join, Py_None) < 0) __PYX_ERR(0, 41, __pyx_L12_except_error)
+      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      goto __pyx_L11_exception_handled;
+    }
+    goto __pyx_L12_except_error;
+
+    /* "sabot/_cython/operators/joins.pyx":36
+ * 
+ * # Import zero-copy hash join from sabot_ql
+ * try:             # <<<<<<<<<<<<<<
+ *     from sabot._cython.joins_ql.hash_join import hash_join
+ *     HASH_JOIN_AVAILABLE = True
+*/
+    __pyx_L12_except_error:;
+    __Pyx_XGIVEREF(__pyx_t_5);
+    __Pyx_XGIVEREF(__pyx_t_4);
+    __Pyx_XGIVEREF(__pyx_t_1);
+    __Pyx_ExceptionReset(__pyx_t_5, __pyx_t_4, __pyx_t_1);
+    goto __pyx_L1_error;
+    __pyx_L11_exception_handled:;
+    __Pyx_XGIVEREF(__pyx_t_5);
+    __Pyx_XGIVEREF(__pyx_t_4);
+    __Pyx_XGIVEREF(__pyx_t_1);
+    __Pyx_ExceptionReset(__pyx_t_5, __pyx_t_4, __pyx_t_1);
+    __pyx_L15_try_end:;
+  }
+
+  /* "sabot/_cython/operators/joins.pyx":78
  *         self._schema = None
  * 
  *     cpdef void add_batch(self, object batch):             # <<<<<<<<<<<<<<
  *         """
  *         Add batch to build side (streaming accumulation).
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_3add_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashTableBuilder_add_ba, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 69, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, __pyx_mstate_global->__pyx_n_u_add_batch, __pyx_t_7) < 0) __PYX_ERR(0, 69, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_3add_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashTableBuilder_add_ba, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, __pyx_mstate_global->__pyx_n_u_add_batch, __pyx_t_3) < 0) __PYX_ERR(0, 78, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":86
+  /* "sabot/_cython/operators/joins.pyx":95
  *             self._schema = batch.schema
  * 
  *     def build_index(self):             # <<<<<<<<<<<<<<
  *         """
  *         Build hash index from accumulated batches (vectorized).
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_5build_index, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashTableBuilder_build, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 86, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, __pyx_mstate_global->__pyx_n_u_build_index, __pyx_t_7) < 0) __PYX_ERR(0, 86, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_5build_index, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashTableBuilder_build, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, __pyx_mstate_global->__pyx_n_u_build_index, __pyx_t_3) < 0) __PYX_ERR(0, 95, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":116
+  /* "sabot/_cython/operators/joins.pyx":125
  *         self._is_built = True
  * 
  *     def probe_batch_vectorized(self, object left_batch, list left_keys, str join_type):             # <<<<<<<<<<<<<<
  *         """
  *         Vectorized probe using Arrow C++ take kernel.
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_7probe_batch_vectorized, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashTableBuilder_probe, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 116, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, __pyx_mstate_global->__pyx_n_u_probe_batch_vectorized, __pyx_t_7) < 0) __PYX_ERR(0, 116, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_7probe_batch_vectorized, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashTableBuilder_probe, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, __pyx_mstate_global->__pyx_n_u_probe_batch_vectorized, __pyx_t_3) < 0) __PYX_ERR(0, 125, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     cdef tuple state
  *     cdef object _dict
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_9__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashTableBuilder___redu, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_7) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_9__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashTableBuilder___redu, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11])); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_3) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":16
  *     else:
@@ -28182,68 +29462,80 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_StreamingHashTableBuilder__set_state(self, __pyx_state)
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashTableBuilder___sets, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 16, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_7) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_25StreamingHashTableBuilder_11__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_StreamingHashTableBuilder___sets, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[12])); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 16, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_StreamingHashTableBuilder, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_3) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":366
+  /* "sabot/_cython/operators/joins.pyx":380
  *             yield from self._execute_local()
  * 
  *     def _execute_with_shuffle(self):             # <<<<<<<<<<<<<<
  *         """Execute join with shuffled inputs."""
  *         # Build phase: receive shuffled right side for this partition
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_6_execute_with_shuffle, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__execute, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 366, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_execute_with_shuffle, __pyx_t_7) < 0) __PYX_ERR(0, 366, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_6_execute_with_shuffle, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__execute, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_execute_with_shuffle, __pyx_t_3) < 0) __PYX_ERR(0, 380, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":382
+  /* "sabot/_cython/operators/joins.pyx":396
  *                 yield result
  * 
  *     def _execute_local(self):             # <<<<<<<<<<<<<<
- *         """Execute join locally (current logic)."""
- *         # Build phase
+ *         """
+ *         Execute join locally using zero-copy hash_join from sabot_ql.
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_9_execute_local, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__execute_2, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 382, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_execute_local, __pyx_t_7) < 0) __PYX_ERR(0, 382, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_9_execute_local, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__execute_2, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 396, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_execute_local, __pyx_t_3) < 0) __PYX_ERR(0, 396, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":403
+  /* "sabot/_cython/operators/joins.pyx":454
+ *             yield batch
+ * 
+ *     def _execute_local_fallback(self):             # <<<<<<<<<<<<<<
+ *         """
+ *         Fallback implementation using StreamingHashTableBuilder.
+*/
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_12_execute_local_fallback, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__execute_3, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 454, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_execute_local_fallback, __pyx_t_3) < 0) __PYX_ERR(0, 454, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "sabot/_cython/operators/joins.pyx":480
  *                 yield result
  * 
  *     def _receive_right_shuffled(self):             # <<<<<<<<<<<<<<
  *         """
  *         Receive shuffled right side batches for this partition.
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_12_receive_right_shuffled, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__receive, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[12])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 403, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_receive_right_shuffled, __pyx_t_7) < 0) __PYX_ERR(0, 403, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_15_receive_right_shuffled, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__receive, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[13])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 480, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_receive_right_shuffled, __pyx_t_3) < 0) __PYX_ERR(0, 480, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":424
+  /* "sabot/_cython/operators/joins.pyx":501
  *         return batches
  * 
  *     def _receive_left_shuffled(self):             # <<<<<<<<<<<<<<
  *         """
  *         Receive shuffled left side batches for this partition.
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_14_receive_left_shuffled, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__receive_2, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[13])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 424, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_receive_left_shuffled, __pyx_t_7) < 0) __PYX_ERR(0, 424, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_17_receive_left_shuffled, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator__receive_2, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[14])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 501, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_receive_left_shuffled, __pyx_t_3) < 0) __PYX_ERR(0, 501, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     cdef tuple state
  *     cdef object _dict
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_16__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator___reduce, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[14])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_7) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_19__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator___reduce, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[15])); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_3) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":16
  *     else:
@@ -28251,32 +29543,32 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonHashJoinOperator__set_state(self, __pyx_state)
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_18__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator___setstat, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[15])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 16, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_7) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonHashJoinOperator_21__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonHashJoinOperator___setstat, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[16])); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 16, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonHashJoinOperator, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_3) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":495
+  /* "sabot/_cython/operators/joins.pyx":572
  *         self._rocksdb_timers = None  # TODO: Initialize RocksDB timer service
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
  *     def process_batch(self, object batch):
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator_3process_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonIntervalJoinOperator_proce, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[16])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 495, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator, __pyx_mstate_global->__pyx_n_u_process_batch, __pyx_t_7) < 0) __PYX_ERR(0, 495, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator_3process_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonIntervalJoinOperator_proce, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[17])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 572, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator, __pyx_mstate_global->__pyx_n_u_process_batch, __pyx_t_3) < 0) __PYX_ERR(0, 572, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     cdef tuple state
  *     cdef object _dict
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator_5__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonIntervalJoinOperator___red, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[17])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_7) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator_5__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonIntervalJoinOperator___red, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[18])); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_3) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":16
  *     else:
@@ -28284,32 +29576,32 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonIntervalJoinOperator__set_state(self, __pyx_state)
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator_7__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonIntervalJoinOperator___set, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[18])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 16, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_7) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_26CythonIntervalJoinOperator_7__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonIntervalJoinOperator___set, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[19])); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 16, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonIntervalJoinOperator, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_3) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":596
+  /* "sabot/_cython/operators/joins.pyx":673
  *             raise ValueError(f"Invalid direction: {direction}")
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
  *     def process_batch(self, object batch):
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator_3process_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonAsofJoinOperator_process_b, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[19])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 596, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator, __pyx_mstate_global->__pyx_n_u_process_batch, __pyx_t_7) < 0) __PYX_ERR(0, 596, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator_3process_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonAsofJoinOperator_process_b, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[20])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 673, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator, __pyx_mstate_global->__pyx_n_u_process_batch, __pyx_t_3) < 0) __PYX_ERR(0, 673, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     cdef tuple state
  *     cdef object _dict
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator_5__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonAsofJoinOperator___reduce, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[20])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_7) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator_5__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonAsofJoinOperator___reduce, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[21])); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_3) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":16
  *     else:
@@ -28317,58 +29609,58 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_CythonAsofJoinOperator__set_state(self, __pyx_state)
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator_7__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonAsofJoinOperator___setstat, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[21])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 16, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_7) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_22CythonAsofJoinOperator_7__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_CythonAsofJoinOperator___setstat, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[22])); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 16, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_9operators_5joins_CythonAsofJoinOperator, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_3) < 0) __PYX_ERR(3, 16, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":671
+  /* "sabot/_cython/operators/joins.pyx":748
  * # ============================================================================
  * 
  * def create_hash_join_operator(left_source, right_source, left_keys, right_keys,             # <<<<<<<<<<<<<<
  *                                join_type='inner', **kwargs):
  *     """Factory function for hash join operator."""
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_1create_hash_join_operator, 0, __pyx_mstate_global->__pyx_n_u_create_hash_join_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[22])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 671, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_7, __pyx_mstate_global->__pyx_tuple[5]);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_hash_join_operator, __pyx_t_7) < 0) __PYX_ERR(0, 671, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_1create_hash_join_operator, 0, __pyx_mstate_global->__pyx_n_u_create_hash_join_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[23])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 748, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_3, __pyx_mstate_global->__pyx_tuple[4]);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_hash_join_operator, __pyx_t_3) < 0) __PYX_ERR(0, 748, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":678
+  /* "sabot/_cython/operators/joins.pyx":755
  * 
  * 
  * def create_interval_join_operator(left_source, right_source, time_column,             # <<<<<<<<<<<<<<
  *                                    lower_bound, upper_bound, **kwargs):
  *     """Factory function for interval join operator."""
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_3create_interval_join_operator, 0, __pyx_mstate_global->__pyx_n_u_create_interval_join_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[23])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 678, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_interval_join_operator, __pyx_t_7) < 0) __PYX_ERR(0, 678, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_3create_interval_join_operator, 0, __pyx_mstate_global->__pyx_n_u_create_interval_join_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[24])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 755, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_interval_join_operator, __pyx_t_3) < 0) __PYX_ERR(0, 755, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/operators/joins.pyx":685
+  /* "sabot/_cython/operators/joins.pyx":762
  * 
  * 
  * def create_asof_join_operator(left_source, right_source, time_column,             # <<<<<<<<<<<<<<
  *                                direction='backward', **kwargs):
  *     """Factory function for as-of join operator."""
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_5create_asof_join_operator, 0, __pyx_mstate_global->__pyx_n_u_create_asof_join_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[24])); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 685, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_7, __pyx_mstate_global->__pyx_tuple[6]);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_asof_join_operator, __pyx_t_7) < 0) __PYX_ERR(0, 685, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_5create_asof_join_operator, 0, __pyx_mstate_global->__pyx_n_u_create_asof_join_operator, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[25])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 762, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_3, __pyx_mstate_global->__pyx_tuple[5]);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_create_asof_join_operator, __pyx_t_3) < 0) __PYX_ERR(0, 762, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_StreamingHashTableBuilder(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_7__pyx_unpickle_StreamingHashTableBuilder, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_StreamingHashTabl, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[25])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_StreamingHashTabl, __pyx_t_7) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_7__pyx_unpickle_StreamingHashTableBuilder, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_StreamingHashTabl, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[26])); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_StreamingHashTabl, __pyx_t_3) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":11
  *         __pyx_unpickle_StreamingHashTableBuilder__set_state(<StreamingHashTableBuilder> __pyx_result, __pyx_state)
@@ -28377,20 +29669,20 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
  *     __pyx_result._batches = __pyx_state[0]; __pyx_result._concatenated = __pyx_state[1]; __pyx_result._hash_index = __pyx_state[2]; __pyx_result._is_built = __pyx_state[3]; __pyx_result._key_columns = __pyx_state[4]; __pyx_result._schema = __pyx_state[5]; __pyx_result._total_rows = __pyx_state[6]
  *     if len(__pyx_state) > 7 and hasattr(__pyx_result, '__dict__'):
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_9__pyx_unpickle_CythonHashJoinOperator, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonHashJoinOpe, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[26])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonHashJoinOpe, __pyx_t_7) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_9__pyx_unpickle_CythonHashJoinOperator, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonHashJoinOpe, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[27])); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonHashJoinOpe, __pyx_t_3) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_CythonIntervalJoinOperator(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_11__pyx_unpickle_CythonIntervalJoinOperator, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonIntervalJoi, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[27])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonIntervalJoi, __pyx_t_7) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_11__pyx_unpickle_CythonIntervalJoinOperator, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonIntervalJoi, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[28])); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonIntervalJoi, __pyx_t_3) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":11
  *         __pyx_unpickle_CythonIntervalJoinOperator__set_state(<CythonIntervalJoinOperator> __pyx_result, __pyx_state)
@@ -28399,20 +29691,20 @@ __Pyx_RefNannySetupContext("PyInit_joins", 0);
  *     __pyx_result._key_columns = __pyx_state[0]; __pyx_result._lower_bound = __pyx_state[1]; __pyx_result._morsel_size_kb = __pyx_state[2]; __pyx_result._num_partitions = __pyx_state[3]; __pyx_result._parallelism_hint = __pyx_state[4]; __pyx_result._partition_keys = __pyx_state[5]; __pyx_result._partitioner = __pyx_state[6]; __pyx_result._right_source = __pyx_state[7]; __pyx_result._rocksdb_timers = __pyx_state[8]; __pyx_result._schema = __pyx_state[9]; __pyx_result._shuffle_id = __pyx_state[10]; __pyx_result._shuffle_transport = __pyx_state[11]; __pyx_result._source = __pyx_state[12]; __pyx_result._stateful = __pyx_state[13]; __pyx_result._stateful = __pyx_state[14]; __pyx_result._task_id = __pyx_state[15]; __pyx_result._time_column = __pyx_state[16]; __pyx_result._time_indexed_state = __pyx_state[17]; __pyx_result._upper_bound = __pyx_state[18]; __pyx_result.operator_id = __pyx_state[19]; __pyx_result.parallelism = __pyx_state[20]
  *     if len(__pyx_state) > 21 and hasattr(__pyx_result, '__dict__'):
 */
-  __pyx_t_7 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_13__pyx_unpickle_CythonAsofJoinOperator, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[28])); if (unlikely(!__pyx_t_7)) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe, __pyx_t_7) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_9operators_5joins_13__pyx_unpickle_CythonAsofJoinOperator, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_operators_joins, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[29])); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe, __pyx_t_3) < 0) __PYX_ERR(3, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "sabot/_cython/operators/joins.pyx":1
  * # cython: language_level=3             # <<<<<<<<<<<<<<
  * """
  * Cython Join Operators
 */
-  __pyx_t_7 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_test, __pyx_t_7) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_test, __pyx_t_3) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /*--- Wrapped vars code ---*/
 
@@ -28487,6 +29779,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_CythonHashJoinOperator___setstat, sizeof(__pyx_k_CythonHashJoinOperator___setstat), 0, 1, 1}, /* PyObject cname: __pyx_n_u_CythonHashJoinOperator___setstat */
   {__pyx_k_CythonHashJoinOperator__execute, sizeof(__pyx_k_CythonHashJoinOperator__execute), 0, 1, 1}, /* PyObject cname: __pyx_n_u_CythonHashJoinOperator__execute */
   {__pyx_k_CythonHashJoinOperator__execute_2, sizeof(__pyx_k_CythonHashJoinOperator__execute_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_CythonHashJoinOperator__execute_2 */
+  {__pyx_k_CythonHashJoinOperator__execute_3, sizeof(__pyx_k_CythonHashJoinOperator__execute_3), 0, 1, 1}, /* PyObject cname: __pyx_n_u_CythonHashJoinOperator__execute_3 */
   {__pyx_k_CythonHashJoinOperator__receive, sizeof(__pyx_k_CythonHashJoinOperator__receive), 0, 1, 1}, /* PyObject cname: __pyx_n_u_CythonHashJoinOperator__receive */
   {__pyx_k_CythonHashJoinOperator__receive_2, sizeof(__pyx_k_CythonHashJoinOperator__receive_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_CythonHashJoinOperator__receive_2 */
   {__pyx_k_CythonIntervalJoinOperator, sizeof(__pyx_k_CythonIntervalJoinOperator), 0, 1, 1}, /* PyObject cname: __pyx_n_u_CythonIntervalJoinOperator */
@@ -28496,6 +29789,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_Dict, sizeof(__pyx_k_Dict), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Dict */
   {__pyx_k_Error_in_as_of_join, sizeof(__pyx_k_Error_in_as_of_join), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Error_in_as_of_join */
   {__pyx_k_Error_in_interval_join, sizeof(__pyx_k_Error_in_interval_join), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Error_in_interval_join */
+  {__pyx_k_HASH_JOIN_AVAILABLE, sizeof(__pyx_k_HASH_JOIN_AVAILABLE), 0, 1, 1}, /* PyObject cname: __pyx_n_u_HASH_JOIN_AVAILABLE */
   {__pyx_k_ImportError, sizeof(__pyx_k_ImportError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ImportError */
   {__pyx_k_Incompatible_checksums_0x_x_vs_0, sizeof(__pyx_k_Incompatible_checksums_0x_x_vs_0), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Incompatible_checksums_0x_x_vs_0 */
   {__pyx_k_Incompatible_checksums_0x_x_vs_0_2, sizeof(__pyx_k_Incompatible_checksums_0x_x_vs_0_2), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Incompatible_checksums_0x_x_vs_0_2 */
@@ -28522,6 +29816,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_add_note, sizeof(__pyx_k_add_note), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_add_note */
   {__pyx_k_append, sizeof(__pyx_k_append), 0, 1, 1}, /* PyObject cname: __pyx_n_u_append */
   {__pyx_k_array, sizeof(__pyx_k_array), 0, 1, 1}, /* PyObject cname: __pyx_n_u_array */
+  {__pyx_k_arrow_join_type, sizeof(__pyx_k_arrow_join_type), 0, 1, 1}, /* PyObject cname: __pyx_n_u_arrow_join_type */
   {__pyx_k_as_py, sizeof(__pyx_k_as_py), 0, 1, 1}, /* PyObject cname: __pyx_n_u_as_py */
   {__pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 1, 1}, /* PyObject cname: __pyx_n_u_asyncio_coroutines */
   {__pyx_k_backward, sizeof(__pyx_k_backward), 0, 1, 1}, /* PyObject cname: __pyx_n_u_backward */
@@ -28540,6 +29835,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_create_asof_join_operator, sizeof(__pyx_k_create_asof_join_operator), 0, 1, 1}, /* PyObject cname: __pyx_n_u_create_asof_join_operator */
   {__pyx_k_create_hash_join_operator, sizeof(__pyx_k_create_hash_join_operator), 0, 1, 1}, /* PyObject cname: __pyx_n_u_create_hash_join_operator */
   {__pyx_k_create_interval_join_operator, sizeof(__pyx_k_create_interval_join_operator), 0, 1, 1}, /* PyObject cname: __pyx_n_u_create_interval_join_operator */
+  {__pyx_k_cyarrow, sizeof(__pyx_k_cyarrow), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cyarrow */
   {__pyx_k_defaultdict, sizeof(__pyx_k_defaultdict), 0, 1, 1}, /* PyObject cname: __pyx_n_u_defaultdict */
   {__pyx_k_dict, sizeof(__pyx_k_dict), 0, 1, 1}, /* PyObject cname: __pyx_n_u_dict */
   {__pyx_k_dict_2, sizeof(__pyx_k_dict_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_dict_2 */
@@ -28549,20 +29845,21 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_enable, sizeof(__pyx_k_enable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_enable */
   {__pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_enumerate */
   {__pyx_k_execute_local, sizeof(__pyx_k_execute_local), 0, 1, 1}, /* PyObject cname: __pyx_n_u_execute_local */
+  {__pyx_k_execute_local_fallback, sizeof(__pyx_k_execute_local_fallback), 0, 1, 1}, /* PyObject cname: __pyx_n_u_execute_local_fallback */
   {__pyx_k_execute_with_shuffle, sizeof(__pyx_k_execute_with_shuffle), 0, 1, 1}, /* PyObject cname: __pyx_n_u_execute_with_shuffle */
   {__pyx_k_forward, sizeof(__pyx_k_forward), 0, 1, 1}, /* PyObject cname: __pyx_n_u_forward */
   {__pyx_k_from_arrays, sizeof(__pyx_k_from_arrays), 0, 1, 1}, /* PyObject cname: __pyx_n_u_from_arrays */
   {__pyx_k_from_batches, sizeof(__pyx_k_from_batches), 0, 1, 1}, /* PyObject cname: __pyx_n_u_from_batches */
   {__pyx_k_from_pylist, sizeof(__pyx_k_from_pylist), 0, 1, 1}, /* PyObject cname: __pyx_n_u_from_pylist */
+  {__pyx_k_full_outer, sizeof(__pyx_k_full_outer), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_full_outer */
   {__pyx_k_func, sizeof(__pyx_k_func), 0, 1, 1}, /* PyObject cname: __pyx_n_u_func */
   {__pyx_k_gc, sizeof(__pyx_k_gc), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_gc */
   {__pyx_k_genexpr, sizeof(__pyx_k_genexpr), 0, 1, 1}, /* PyObject cname: __pyx_n_u_genexpr */
   {__pyx_k_get, sizeof(__pyx_k_get), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get */
   {__pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_getstate */
+  {__pyx_k_hash_join, sizeof(__pyx_k_hash_join), 0, 1, 1}, /* PyObject cname: __pyx_n_u_hash_join */
   {__pyx_k_i, sizeof(__pyx_k_i), 0, 1, 1}, /* PyObject cname: __pyx_n_u_i */
   {__pyx_k_idx, sizeof(__pyx_k_idx), 0, 1, 1}, /* PyObject cname: __pyx_n_u_idx */
-  {__pyx_k_init, sizeof(__pyx_k_init), 0, 1, 1}, /* PyObject cname: __pyx_n_u_init */
-  {__pyx_k_initializing, sizeof(__pyx_k_initializing), 0, 1, 1}, /* PyObject cname: __pyx_n_u_initializing */
   {__pyx_k_inner, sizeof(__pyx_k_inner), 0, 1, 1}, /* PyObject cname: __pyx_n_u_inner */
   {__pyx_k_is_coroutine, sizeof(__pyx_k_is_coroutine), 0, 1, 1}, /* PyObject cname: __pyx_n_u_is_coroutine */
   {__pyx_k_isenabled, sizeof(__pyx_k_isenabled), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_isenabled */
@@ -28580,6 +29877,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_left, sizeof(__pyx_k_left), 0, 1, 1}, /* PyObject cname: __pyx_n_u_left */
   {__pyx_k_left_2, sizeof(__pyx_k_left_2), 0, 0, 1}, /* PyObject cname: __pyx_n_b_left_2 */
   {__pyx_k_left_batch, sizeof(__pyx_k_left_batch), 0, 1, 1}, /* PyObject cname: __pyx_n_u_left_batch */
+  {__pyx_k_left_batches, sizeof(__pyx_k_left_batches), 0, 1, 1}, /* PyObject cname: __pyx_n_u_left_batches */
   {__pyx_k_left_indices, sizeof(__pyx_k_left_indices), 0, 1, 1}, /* PyObject cname: __pyx_n_u_left_indices */
   {__pyx_k_left_key_lists, sizeof(__pyx_k_left_key_lists), 0, 1, 1}, /* PyObject cname: __pyx_n_u_left_key_lists */
   {__pyx_k_left_keys, sizeof(__pyx_k_left_keys), 0, 1, 1}, /* PyObject cname: __pyx_n_u_left_keys */
@@ -28587,6 +29885,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_left_selected, sizeof(__pyx_k_left_selected), 0, 1, 1}, /* PyObject cname: __pyx_n_u_left_selected */
   {__pyx_k_left_shuffle_id, sizeof(__pyx_k_left_shuffle_id), 0, 1, 1}, /* PyObject cname: __pyx_n_u_left_shuffle_id */
   {__pyx_k_left_source, sizeof(__pyx_k_left_source), 0, 1, 1}, /* PyObject cname: __pyx_n_u_left_source */
+  {__pyx_k_left_table, sizeof(__pyx_k_left_table), 0, 1, 1}, /* PyObject cname: __pyx_n_u_left_table */
   {__pyx_k_left_time, sizeof(__pyx_k_left_time), 0, 1, 1}, /* PyObject cname: __pyx_n_u_left_time */
   {__pyx_k_left_times, sizeof(__pyx_k_left_times), 0, 1, 1}, /* PyObject cname: __pyx_n_u_left_times */
   {__pyx_k_lower, sizeof(__pyx_k_lower), 0, 1, 1}, /* PyObject cname: __pyx_n_u_lower */
@@ -28600,12 +29899,10 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_new, sizeof(__pyx_k_new), 0, 1, 1}, /* PyObject cname: __pyx_n_u_new */
   {__pyx_k_next, sizeof(__pyx_k_next), 0, 1, 1}, /* PyObject cname: __pyx_n_u_next */
   {__pyx_k_nulls, sizeof(__pyx_k_nulls), 0, 1, 1}, /* PyObject cname: __pyx_n_u_nulls */
-  {__pyx_k_num_partitions, sizeof(__pyx_k_num_partitions), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_partitions */
   {__pyx_k_num_rows, sizeof(__pyx_k_num_rows), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_rows */
   {__pyx_k_outer, sizeof(__pyx_k_outer), 0, 1, 1}, /* PyObject cname: __pyx_n_u_outer */
   {__pyx_k_output_rows, sizeof(__pyx_k_output_rows), 0, 1, 1}, /* PyObject cname: __pyx_n_u_output_rows */
   {__pyx_k_pa, sizeof(__pyx_k_pa), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pa */
-  {__pyx_k_partition_keys, sizeof(__pyx_k_partition_keys), 0, 1, 1}, /* PyObject cname: __pyx_n_u_partition_keys */
   {__pyx_k_pc, sizeof(__pyx_k_pc), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pc */
   {__pyx_k_pickle, sizeof(__pyx_k_pickle), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pickle */
   {__pyx_k_pop, sizeof(__pyx_k_pop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pop */
@@ -28614,8 +29911,6 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_probe_key, sizeof(__pyx_k_probe_key), 0, 1, 1}, /* PyObject cname: __pyx_n_u_probe_key */
   {__pyx_k_process_batch, sizeof(__pyx_k_process_batch), 0, 1, 1}, /* PyObject cname: __pyx_n_u_process_batch */
   {__pyx_k_process_batch_locals_lambda, sizeof(__pyx_k_process_batch_locals_lambda), 0, 1, 1}, /* PyObject cname: __pyx_n_u_process_batch_locals_lambda */
-  {__pyx_k_pyarrow, sizeof(__pyx_k_pyarrow), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyarrow */
-  {__pyx_k_pyarrow_compute, sizeof(__pyx_k_pyarrow_compute), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyarrow_compute */
   {__pyx_k_pyx_PickleError, sizeof(__pyx_k_pyx_PickleError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_PickleError */
   {__pyx_k_pyx_checksum, sizeof(__pyx_k_pyx_checksum), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_checksum */
   {__pyx_k_pyx_result, sizeof(__pyx_k_pyx_result), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_result */
@@ -28635,11 +29930,13 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_reduce_cython */
   {__pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 1, 1}, /* PyObject cname: __pyx_n_u_reduce_ex */
   {__pyx_k_result, sizeof(__pyx_k_result), 0, 1, 1}, /* PyObject cname: __pyx_n_u_result */
+  {__pyx_k_result_table, sizeof(__pyx_k_result_table), 0, 1, 1}, /* PyObject cname: __pyx_n_u_result_table */
   {__pyx_k_reversed, sizeof(__pyx_k_reversed), 0, 1, 1}, /* PyObject cname: __pyx_n_u_reversed */
   {__pyx_k_right, sizeof(__pyx_k_right), 0, 0, 1}, /* PyObject cname: __pyx_n_b_right */
   {__pyx_k_right, sizeof(__pyx_k_right), 0, 1, 1}, /* PyObject cname: __pyx_n_u_right */
   {__pyx_k_right_2, sizeof(__pyx_k_right_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_right_2 */
   {__pyx_k_right_batch, sizeof(__pyx_k_right_batch), 0, 1, 1}, /* PyObject cname: __pyx_n_u_right_batch */
+  {__pyx_k_right_batches, sizeof(__pyx_k_right_batches), 0, 1, 1}, /* PyObject cname: __pyx_n_u_right_batches */
   {__pyx_k_right_idx, sizeof(__pyx_k_right_idx), 0, 1, 1}, /* PyObject cname: __pyx_n_u_right_idx */
   {__pyx_k_right_indices, sizeof(__pyx_k_right_indices), 0, 1, 1}, /* PyObject cname: __pyx_n_u_right_indices */
   {__pyx_k_right_keys, sizeof(__pyx_k_right_keys), 0, 1, 1}, /* PyObject cname: __pyx_n_u_right_keys */
@@ -28648,7 +29945,10 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_right_selected, sizeof(__pyx_k_right_selected), 0, 1, 1}, /* PyObject cname: __pyx_n_u_right_selected */
   {__pyx_k_right_shuffle_id, sizeof(__pyx_k_right_shuffle_id), 0, 1, 1}, /* PyObject cname: __pyx_n_u_right_shuffle_id */
   {__pyx_k_right_source, sizeof(__pyx_k_right_source), 0, 1, 1}, /* PyObject cname: __pyx_n_u_right_source */
+  {__pyx_k_right_table, sizeof(__pyx_k_right_table), 0, 1, 1}, /* PyObject cname: __pyx_n_u_right_table */
   {__pyx_k_row, sizeof(__pyx_k_row), 0, 1, 1}, /* PyObject cname: __pyx_n_u_row */
+  {__pyx_k_sabot, sizeof(__pyx_k_sabot), 0, 1, 1}, /* PyObject cname: __pyx_n_u_sabot */
+  {__pyx_k_sabot__cython_joins_ql_hash_join, sizeof(__pyx_k_sabot__cython_joins_ql_hash_join), 0, 1, 1}, /* PyObject cname: __pyx_n_u_sabot__cython_joins_ql_hash_join */
   {__pyx_k_sabot__cython_operators_joins, sizeof(__pyx_k_sabot__cython_operators_joins), 0, 1, 1}, /* PyObject cname: __pyx_n_u_sabot__cython_operators_joins */
   {__pyx_k_sabot__cython_operators_joins_py, sizeof(__pyx_k_sabot__cython_operators_joins_py), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_sabot__cython_operators_joins_py */
   {__pyx_k_sample_right, sizeof(__pyx_k_sample_right), 0, 1, 1}, /* PyObject cname: __pyx_n_u_sample_right */
@@ -28659,11 +29959,8 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate */
   {__pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate_cython */
   {__pyx_k_sort, sizeof(__pyx_k_sort), 0, 1, 1}, /* PyObject cname: __pyx_n_u_sort */
-  {__pyx_k_source, sizeof(__pyx_k_source), 0, 1, 1}, /* PyObject cname: __pyx_n_u_source */
-  {__pyx_k_spec, sizeof(__pyx_k_spec), 0, 1, 1}, /* PyObject cname: __pyx_n_u_spec */
   {__pyx_k_state, sizeof(__pyx_k_state), 0, 1, 1}, /* PyObject cname: __pyx_n_u_state */
   {__pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_stringsource */
-  {__pyx_k_super, sizeof(__pyx_k_super), 0, 1, 1}, /* PyObject cname: __pyx_n_u_super */
   {__pyx_k_take, sizeof(__pyx_k_take), 0, 1, 1}, /* PyObject cname: __pyx_n_u_take */
   {__pyx_k_test, sizeof(__pyx_k_test), 0, 1, 1}, /* PyObject cname: __pyx_n_u_test */
   {__pyx_k_throw, sizeof(__pyx_k_throw), 0, 1, 1}, /* PyObject cname: __pyx_n_u_throw */
@@ -28688,13 +29985,12 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, c
 
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
-  __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(0, 29, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 105, __pyx_L1_error)
-  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 185, __pyx_L1_error)
-  __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_super); if (!__pyx_builtin_super) __PYX_ERR(0, 327, __pyx_L1_error)
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 344, __pyx_L1_error)
-  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 544, __pyx_L1_error)
-  __pyx_builtin_reversed = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_reversed); if (!__pyx_builtin_reversed) __PYX_ERR(0, 633, __pyx_L1_error)
+  __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(0, 30, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 114, __pyx_L1_error)
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 194, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 358, __pyx_L1_error)
+  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 621, __pyx_L1_error)
+  __pyx_builtin_reversed = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_reversed); if (!__pyx_builtin_reversed) __PYX_ERR(0, 710, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -28726,38 +30022,27 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[3]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[3]);
 
-  /* "sabot/_cython/operators/joins.pyx":27
- * try:
- *     import pyarrow as pa
- *     import pyarrow.compute as pc             # <<<<<<<<<<<<<<
- *     ARROW_AVAILABLE = True
- * except ImportError:
-*/
-  __pyx_mstate_global->__pyx_tuple[4] = PyTuple_Pack(2, __pyx_mstate_global->__pyx_n_u_pyarrow, __pyx_mstate_global->__pyx_n_u_compute); if (unlikely(!__pyx_mstate_global->__pyx_tuple[4])) __PYX_ERR(0, 27, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[4]);
-  __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[4]);
-
-  /* "sabot/_cython/operators/joins.pyx":671
+  /* "sabot/_cython/operators/joins.pyx":748
  * # ============================================================================
  * 
  * def create_hash_join_operator(left_source, right_source, left_keys, right_keys,             # <<<<<<<<<<<<<<
  *                                join_type='inner', **kwargs):
  *     """Factory function for hash join operator."""
 */
-  __pyx_mstate_global->__pyx_tuple[5] = PyTuple_Pack(1, ((PyObject*)__pyx_mstate_global->__pyx_n_u_inner)); if (unlikely(!__pyx_mstate_global->__pyx_tuple[5])) __PYX_ERR(0, 671, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[5]);
-  __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[5]);
+  __pyx_mstate_global->__pyx_tuple[4] = PyTuple_Pack(1, ((PyObject*)__pyx_mstate_global->__pyx_n_u_inner)); if (unlikely(!__pyx_mstate_global->__pyx_tuple[4])) __PYX_ERR(0, 748, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[4]);
+  __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[4]);
 
-  /* "sabot/_cython/operators/joins.pyx":685
+  /* "sabot/_cython/operators/joins.pyx":762
  * 
  * 
  * def create_asof_join_operator(left_source, right_source, time_column,             # <<<<<<<<<<<<<<
  *                                direction='backward', **kwargs):
  *     """Factory function for as-of join operator."""
 */
-  __pyx_mstate_global->__pyx_tuple[6] = PyTuple_Pack(1, ((PyObject*)__pyx_mstate_global->__pyx_n_u_backward)); if (unlikely(!__pyx_mstate_global->__pyx_tuple[6])) __PYX_ERR(0, 685, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[6]);
-  __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[6]);
+  __pyx_mstate_global->__pyx_tuple[5] = PyTuple_Pack(1, ((PyObject*)__pyx_mstate_global->__pyx_n_u_backward)); if (unlikely(!__pyx_mstate_global->__pyx_tuple[5])) __PYX_ERR(0, 762, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[5]);
+  __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[5]);
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -28777,7 +30062,6 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   if (__Pyx_InitStrings(__pyx_string_tab, __pyx_mstate->__pyx_string_tab, __pyx_string_tab_encodings) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   __pyx_mstate->__pyx_int_0 = PyLong_FromLong(0); if (unlikely(!__pyx_mstate->__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_1 = PyLong_FromLong(1); if (unlikely(!__pyx_mstate->__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_4 = PyLong_FromLong(4); if (unlikely(!__pyx_mstate->__pyx_int_4)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_14751257 = PyLong_FromLong(14751257L); if (unlikely(!__pyx_mstate->__pyx_int_14751257)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_39422562 = PyLong_FromLong(39422562L); if (unlikely(!__pyx_mstate->__pyx_int_39422562)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_66858016 = PyLong_FromLong(66858016L); if (unlikely(!__pyx_mstate->__pyx_int_66858016)) __PYX_ERR(0, 1, __pyx_L1_error)
@@ -28820,149 +30104,154 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 107, 2};
+    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 116, 2};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_j};
     __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_genexpr, __pyx_k_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 147, 2};
+    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 156, 2};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_j};
     __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_genexpr, __pyx_k_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 169, 2};
+    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 178, 2};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_idx};
     __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_genexpr, __pyx_k_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 346, 2};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 360, 2};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_iter, __pyx_k_A_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 366, 2};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 380, 2};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_right_batch, __pyx_mstate->__pyx_n_u_left_batch, __pyx_mstate->__pyx_n_u_result};
     __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_execute_with_shuffle, __pyx_k_A_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 382, 2};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_right_batch, __pyx_mstate->__pyx_n_u_left_batch, __pyx_mstate->__pyx_n_u_result};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 8, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 396, 2};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_left_batches, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_right_batches, __pyx_mstate->__pyx_n_u_left_table, __pyx_mstate->__pyx_n_u_right_table, __pyx_mstate->__pyx_n_u_arrow_join_type, __pyx_mstate->__pyx_n_u_result_table};
     __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_execute_local, __pyx_k_A_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 618, 8};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 454, 2};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_right_batch, __pyx_mstate->__pyx_n_u_left_batch, __pyx_mstate->__pyx_n_u_result};
+    __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_execute_local_fallback, __pyx_k_A_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
+  }
+  {
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 695, 8};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_x};
-    __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_lambda, __pyx_k_Jaq, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_lambda, __pyx_k_Jaq, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 69, 74};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 78, 74};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch};
-    __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_add_batch, __pyx_k_A_6_E_E_3a_IWAQ_E_M_4y_1_5, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_add_batch, __pyx_k_A_6_E_E_3a_IWAQ_E_M_4y_1_5, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 86, 142};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 95, 142};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_key_lists, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_key, __pyx_mstate->__pyx_n_u_col, __pyx_mstate->__pyx_n_u_genexpr, __pyx_mstate->__pyx_n_u_genexpr};
-    __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_build_index, __pyx_k_A_4_T_Q_Rv_4q_AT_wat_Q_A_E_at1_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_build_index, __pyx_k_A_4_T_Q_Rv_4q_AT_wat_Q_A_E_at1_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 17, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 116, 293};
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 17, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 125, 293};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_left_batch, __pyx_mstate->__pyx_n_u_left_keys, __pyx_mstate->__pyx_n_u_join_type, __pyx_mstate->__pyx_n_u_left_key_lists, __pyx_mstate->__pyx_n_u_left_indices, __pyx_mstate->__pyx_n_u_right_indices, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_probe_key, __pyx_mstate->__pyx_n_u_right_rows, __pyx_mstate->__pyx_n_u_right_idx, __pyx_mstate->__pyx_n_u_left_selected, __pyx_mstate->__pyx_n_u_right_selected, __pyx_mstate->__pyx_n_u_col, __pyx_mstate->__pyx_n_u_genexpr, __pyx_mstate->__pyx_n_u_genexpr, __pyx_mstate->__pyx_n_u_genexpr};
-    __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_probe_batch_vectorized, __pyx_k_A_4t1_A_4_c_c_Q_z_XQ_q_q_G1D_T_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_probe_batch_vectorized, __pyx_k_A_4t1_A_4_c_c_Q_z_XQ_q_q_G1D_T_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 214};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_state, __pyx_mstate->__pyx_n_u_dict_2, __pyx_mstate->__pyx_n_u_use_setstate};
-    __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_D_0_N_lRVVeeiisswwx_G1F_a_vWA, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[11] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_D_0_N_lRVVeeiisswwx_G1F_a_vWA, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[11])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 16, 11};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[11] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_7q_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[11])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[12] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_7q_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[12])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 403, 64};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 480, 64};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_right_shuffle_id, __pyx_mstate->__pyx_n_u_batches};
-    __pyx_mstate_global->__pyx_codeobj_tab[12] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_receive_right_shuffled, __pyx_k_A_4_3a_1_4_Ba_A_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[12])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[13] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_receive_right_shuffled, __pyx_k_A_4_3a_1_4_Ba_A_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[13])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 424, 64};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 501, 64};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_left_shuffle_id, __pyx_mstate->__pyx_n_u_batches};
-    __pyx_mstate_global->__pyx_codeobj_tab[13] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_receive_left_shuffled, __pyx_k_A_4_3a_1_m2Q_A_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[13])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[14] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_receive_left_shuffled, __pyx_k_A_4_3a_1_m2Q_A_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[14])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 687};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_state, __pyx_mstate->__pyx_n_u_dict_2, __pyx_mstate->__pyx_n_u_use_setstate};
-    __pyx_mstate_global->__pyx_codeobj_tab[14] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_oT_VZZllp_q_C_C_G_G_____q_q_u, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[14])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[15] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_oT_VZZllp_q_C_C_G_G_____q_q_u, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[15])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 16, 11};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[15] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_4AV1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[15])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[16] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_4AV1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[16])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 19, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 495, 384};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 19, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 572, 384};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_right_batch, __pyx_mstate->__pyx_n_u_times, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_timestamp, __pyx_mstate->__pyx_n_u_row, __pyx_mstate->__pyx_n_u_left_times, __pyx_mstate->__pyx_n_u_output_rows, __pyx_mstate->__pyx_n_u_left_time, __pyx_mstate->__pyx_n_u_left_row, __pyx_mstate->__pyx_n_u_min_time, __pyx_mstate->__pyx_n_u_max_time, __pyx_mstate->__pyx_n_u_right_rows, __pyx_mstate->__pyx_n_u_right_row, __pyx_mstate->__pyx_n_u_joined_row, __pyx_mstate->__pyx_n_u_e, __pyx_mstate->__pyx_n_u_col, __pyx_mstate->__pyx_n_u_col};
-    __pyx_mstate_global->__pyx_codeobj_tab[16] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_4_s_5_5_Q_1_t4q_O4q_3a_Kwat_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[16])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[17] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_4_s_5_5_Q_1_t4q_O4q_3a_Kwat_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[17])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 674};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_state, __pyx_mstate->__pyx_n_u_dict_2, __pyx_mstate->__pyx_n_u_use_setstate};
-    __pyx_mstate_global->__pyx_codeobj_tab[17] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_O47I_M__ccww_N_N_R_R_a_a_e_e, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[17])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[18] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_O47I_M__ccww_N_N_R_R_a_a_e_e, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[18])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 16, 11};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[18] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_8_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[18])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[19] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_8_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[19])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 19, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 596, 467};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 19, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 673, 467};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_batch, __pyx_mstate->__pyx_n_u_right_batch, __pyx_mstate->__pyx_n_u_times, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_timestamp, __pyx_mstate->__pyx_n_u_row, __pyx_mstate->__pyx_n_u_left_times, __pyx_mstate->__pyx_n_u_output_rows, __pyx_mstate->__pyx_n_u_left_time, __pyx_mstate->__pyx_n_u_left_row, __pyx_mstate->__pyx_n_u_best_match, __pyx_mstate->__pyx_n_u_right_row, __pyx_mstate->__pyx_n_u_joined_row, __pyx_mstate->__pyx_n_u_sample_right, __pyx_mstate->__pyx_n_u_col, __pyx_mstate->__pyx_n_u_e, __pyx_mstate->__pyx_n_u_col, __pyx_mstate->__pyx_n_u_col};
-    __pyx_mstate_global->__pyx_codeobj_tab[19] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_4_s_5_5_Q_1_t4q_O4q_3a_Kwat_1_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[19])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[20] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_process_batch, __pyx_k_A_4_s_5_5_Q_1_t4q_O4q_3a_Kwat_1_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[20])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 638};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_state, __pyx_mstate->__pyx_n_u_dict_2, __pyx_mstate->__pyx_n_u_use_setstate};
-    __pyx_mstate_global->__pyx_codeobj_tab[20] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_d_5GtK_aauuy_z_L_L_P_P_____c, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[20])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[21] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_d_5GtK_aauuy_z_L_L_P_P_____c, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[21])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 16, 11};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[21] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_4AV1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[21])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[22] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_4AV1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[22])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 671, 26};
+    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 748, 26};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_left_source, __pyx_mstate->__pyx_n_u_right_source, __pyx_mstate->__pyx_n_u_left_keys, __pyx_mstate->__pyx_n_u_right_keys, __pyx_mstate->__pyx_n_u_join_type, __pyx_mstate->__pyx_n_u_kwargs};
-    __pyx_mstate_global->__pyx_codeobj_tab[22] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_create_hash_join_operator, __pyx_k_Q_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[22])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[23] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_create_hash_join_operator, __pyx_k_Q_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[23])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 678, 25};
+    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 755, 25};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_left_source, __pyx_mstate->__pyx_n_u_right_source, __pyx_mstate->__pyx_n_u_time_column, __pyx_mstate->__pyx_n_u_lower_bound, __pyx_mstate->__pyx_n_u_upper_bound, __pyx_mstate->__pyx_n_u_kwargs};
-    __pyx_mstate_global->__pyx_codeobj_tab[23] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_create_interval_join_operator, __pyx_k_Qm_3, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[23])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[24] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_create_interval_join_operator, __pyx_k_Qm_3, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[24])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 685, 24};
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS), 762, 24};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_left_source, __pyx_mstate->__pyx_n_u_right_source, __pyx_mstate->__pyx_n_u_time_column, __pyx_mstate->__pyx_n_u_direction, __pyx_mstate->__pyx_n_u_kwargs};
-    __pyx_mstate_global->__pyx_codeobj_tab[24] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_create_asof_join_operator, __pyx_k_Q_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[24])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[25] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_operators_joins_py, __pyx_mstate->__pyx_n_u_create_asof_join_operator, __pyx_k_Q_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[25])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 90};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_type, __pyx_mstate->__pyx_n_u_pyx_checksum, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_pyx_PickleError, __pyx_mstate->__pyx_n_u_pyx_result};
-    __pyx_mstate_global->__pyx_codeobj_tab[25] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_StreamingHashTabl, __pyx_k_hk_A_1_A_A_B_HAQ_7_1_XXffg_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[25])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[26] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_StreamingHashTabl, __pyx_k_hk_A_1_A_A_B_HAQ_7_1_XXffg_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[26])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 90};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_type, __pyx_mstate->__pyx_n_u_pyx_checksum, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_pyx_PickleError, __pyx_mstate->__pyx_n_u_pyx_result};
-    __pyx_mstate_global->__pyx_codeobj_tab[26] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonHashJoinOpe, __pyx_k_hk_A_1_7_8_9RR_a_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[26])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[27] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonHashJoinOpe, __pyx_k_hk_A_1_7_8_9RR_a_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[27])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 90};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_type, __pyx_mstate->__pyx_n_u_pyx_checksum, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_pyx_PickleError, __pyx_mstate->__pyx_n_u_pyx_result};
-    __pyx_mstate_global->__pyx_codeobj_tab[27] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonIntervalJoi, __pyx_k_hk_A_1_X_X_Z_Z_XQa_7_A_ZZhhi_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[27])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[28] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonIntervalJoi, __pyx_k_hk_A_1_X_X_Z_Z_XQa_7_A_ZZhhi_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[28])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 90};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_type, __pyx_mstate->__pyx_n_u_pyx_checksum, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_pyx_PickleError, __pyx_mstate->__pyx_n_u_pyx_result};
-    __pyx_mstate_global->__pyx_codeobj_tab[28] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe, __pyx_k_hk_A_1_q_q_s_s_t_7_8_9RR_a_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[28])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[29] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_CythonAsofJoinOpe, __pyx_k_hk_A_1_q_q_s_s_t_7_8_9RR_a_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[29])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;
@@ -35263,120 +36552,6 @@ static PyObject *__Pyx_PyList_Pack(Py_ssize_t n, ...) {
     end:
     va_end(va);
     return l;
-}
-
-/* ImportDottedModule */
-static PyObject *__Pyx__ImportDottedModule_Error(PyObject *name, PyObject *parts_tuple, Py_ssize_t count) {
-    PyObject *partial_name = NULL, *slice = NULL, *sep = NULL;
-    Py_ssize_t size;
-    if (unlikely(PyErr_Occurred())) {
-        PyErr_Clear();
-    }
-#if CYTHON_ASSUME_SAFE_SIZE
-    size = PyTuple_GET_SIZE(parts_tuple);
-#else
-    size = PyTuple_Size(parts_tuple);
-    if (size < 0) goto bad;
-#endif
-    if (likely(size == count)) {
-        partial_name = name;
-    } else {
-        slice = PySequence_GetSlice(parts_tuple, 0, count);
-        if (unlikely(!slice))
-            goto bad;
-        sep = PyUnicode_FromStringAndSize(".", 1);
-        if (unlikely(!sep))
-            goto bad;
-        partial_name = PyUnicode_Join(sep, slice);
-    }
-    PyErr_Format(
-        PyExc_ModuleNotFoundError,
-        "No module named '%U'", partial_name);
-bad:
-    Py_XDECREF(sep);
-    Py_XDECREF(slice);
-    Py_XDECREF(partial_name);
-    return NULL;
-}
-static PyObject *__Pyx__ImportDottedModule_Lookup(PyObject *name) {
-    PyObject *imported_module;
-#if (CYTHON_COMPILING_IN_PYPY && PYPY_VERSION_NUM  < 0x07030400) ||\
-        CYTHON_COMPILING_IN_GRAAL
-    PyObject *modules = PyImport_GetModuleDict();
-    if (unlikely(!modules))
-        return NULL;
-    imported_module = __Pyx_PyDict_GetItemStr(modules, name);
-    Py_XINCREF(imported_module);
-#else
-    imported_module = PyImport_GetModule(name);
-#endif
-    return imported_module;
-}
-static PyObject *__Pyx_ImportDottedModule_WalkParts(PyObject *module, PyObject *name, PyObject *parts_tuple) {
-    Py_ssize_t i, nparts;
-#if CYTHON_ASSUME_SAFE_SIZE
-    nparts = PyTuple_GET_SIZE(parts_tuple);
-#else
-    nparts = PyTuple_Size(parts_tuple);
-    if (nparts < 0) return NULL;
-#endif
-    for (i=1; i < nparts && module; i++) {
-        PyObject *part, *submodule;
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        part = PyTuple_GET_ITEM(parts_tuple, i);
-#else
-        part = __Pyx_PySequence_ITEM(parts_tuple, i);
-        if (!part) return NULL;
-#endif
-        submodule = __Pyx_PyObject_GetAttrStrNoError(module, part);
-#if !(CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS)
-        Py_DECREF(part);
-#endif
-        Py_DECREF(module);
-        module = submodule;
-    }
-    if (unlikely(!module)) {
-        return __Pyx__ImportDottedModule_Error(name, parts_tuple, i);
-    }
-    return module;
-}
-static PyObject *__Pyx__ImportDottedModule(PyObject *name, PyObject *parts_tuple) {
-    PyObject *imported_module;
-    PyObject *module = __Pyx_Import(name, NULL, 0);
-    if (!parts_tuple || unlikely(!module))
-        return module;
-    imported_module = __Pyx__ImportDottedModule_Lookup(name);
-    if (likely(imported_module)) {
-        Py_DECREF(module);
-        return imported_module;
-    }
-    PyErr_Clear();
-    return __Pyx_ImportDottedModule_WalkParts(module, name, parts_tuple);
-}
-static PyObject *__Pyx_ImportDottedModule(PyObject *name, PyObject *parts_tuple) {
-#if CYTHON_COMPILING_IN_CPYTHON
-    PyObject *module = __Pyx__ImportDottedModule_Lookup(name);
-    if (likely(module)) {
-        PyObject *spec = __Pyx_PyObject_GetAttrStrNoError(module, __pyx_mstate_global->__pyx_n_u_spec);
-        if (likely(spec)) {
-            PyObject *unsafe = __Pyx_PyObject_GetAttrStrNoError(spec, __pyx_mstate_global->__pyx_n_u_initializing);
-            if (likely(!unsafe || !__Pyx_PyObject_IsTrue(unsafe))) {
-                Py_DECREF(spec);
-                spec = NULL;
-            }
-            Py_XDECREF(unsafe);
-        }
-        if (likely(!spec)) {
-            PyErr_Clear();
-            return module;
-        }
-        Py_DECREF(spec);
-        Py_DECREF(module);
-    } else if (PyErr_Occurred()) {
-        PyErr_Clear();
-    }
-#endif
-    return __Pyx__ImportDottedModule(name, parts_tuple);
 }
 
 /* CLineInTraceback */

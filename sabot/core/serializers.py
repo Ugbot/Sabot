@@ -16,9 +16,9 @@ from typing import Any, Dict, List, Union, Optional
 from abc import ABC, abstractmethod
 
 try:
-    # Import pyarrow directly for full API access
-    import pyarrow as pa
-    import pyarrow.compute as pc
+    # Use Sabot's vendored Arrow (cyarrow) for custom kernels and zero-copy
+    from sabot import cyarrow as pa
+    pc = pa.compute  # Includes custom kernels: hash_array, hash_combine
     ARROW_AVAILABLE = True
 except ImportError:
     ARROW_AVAILABLE = False

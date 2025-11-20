@@ -229,7 +229,8 @@ arrow::Result<std::shared_ptr<arrow::Array>> ColumnComparisonExpression::Evaluat
         return arrow::Status::Invalid("Column not found: " + right_column_);
     }
 
-    // Get column chunks (check for empty columns)
+    // Get column chunks and combine them into single arrays
+    // Tables can have multiple chunks (one per RecordBatch), so we need to combine them
     auto left_col = table->column(left_idx);
     auto right_col = table->column(right_idx);
 
@@ -240,8 +241,29 @@ arrow::Result<std::shared_ptr<arrow::Array>> ColumnComparisonExpression::Evaluat
         return arrow::Status::Invalid("Right column has no chunks: " + right_column_);
     }
 
-    auto left_array = left_col->chunk(0);
-    auto right_array = right_col->chunk(0);
+    // Combine all chunks into single arrays
+    std::shared_ptr<arrow::Array> left_array;
+    std::shared_ptr<arrow::Array> right_array;
+
+    if (left_col->num_chunks() == 1) {
+        left_array = left_col->chunk(0);
+    } else {
+        // Concatenate all chunks into a single array
+        ARROW_ASSIGN_OR_RAISE(
+            left_array,
+            arrow::Concatenate(left_col->chunks())
+        );
+    }
+
+    if (right_col->num_chunks() == 1) {
+        right_array = right_col->chunk(0);
+    } else {
+        // Concatenate all chunks into a single array
+        ARROW_ASSIGN_OR_RAISE(
+            right_array,
+            arrow::Concatenate(right_col->chunks())
+        );
+    }
 
     // Apply comparison using Arrow compute CallFunction API
     arrow::compute::ExecContext ctx;

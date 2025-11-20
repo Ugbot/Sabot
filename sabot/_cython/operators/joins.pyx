@@ -32,6 +32,14 @@ except ImportError:
     pa = None
     pc = None
 
+# Import zero-copy hash join from sabot_ql
+try:
+    from sabot._cython.joins_ql.hash_join import hash_join
+    HASH_JOIN_AVAILABLE = True
+except ImportError:
+    HASH_JOIN_AVAILABLE = False
+    hash_join = None
+
 # Import base operator
 from sabot._cython.operators.shuffled_operator cimport ShuffledOperator
 
@@ -387,92 +395,83 @@ cdef class CythonHashJoinOperator(ShuffledOperator):
 
     def _execute_local(self):
         """
-        Execute join locally with SMART BUILD-SIDE SELECTION.
+        Execute join locally using zero-copy hash_join from sabot_ql.
 
-        Automatically chooses smaller side for build to minimize memory.
-        This matches PyArrow's optimizer behavior and fixes Q5/Q7 performance.
+        This implementation:
+        1. Collects all batches from both sides into Tables
+        2. Calls sabot_ql HashJoinOperator via zero-copy Cython wrapper
+        3. Yields batches from the result Table
+
+        Zero-copy architecture:
+        - Uses Arrow shared_ptr throughout (no data copies)
+        - Hash table stores indices only (minimal memory)
+        - sabot_ql optimizes build-side selection internally
         """
-        # Smart build-side selection: peek at first batch from each side to estimate sizes
+        if not HASH_JOIN_AVAILABLE or hash_join is None:
+            # Fallback to old implementation if hash_join not available
+            # This uses StreamingHashTableBuilder (Python dict-based)
+            yield from self._execute_local_fallback()
+            return
+
+        # Collect all batches from left side
         left_batches = []
+        for batch in self._source:
+            if batch is not None and batch.num_rows > 0:
+                left_batches.append(batch)
+
+        # Collect all batches from right side
         right_batches = []
-        left_total_rows = 0
-        right_total_rows = 0
+        for batch in self._right_source:
+            if batch is not None and batch.num_rows > 0:
+                right_batches.append(batch)
 
-        # Collect first batch from left to estimate size
-        for left_batch in self._source:
-            if left_batch is not None and left_batch.num_rows > 0:
-                left_batches.append(left_batch)
-                left_total_rows += left_batch.num_rows
-                break
+        # Handle empty inputs
+        if not left_batches or not right_batches:
+            # For inner join, empty result
+            # For outer joins, would need special handling (not implemented yet)
+            return
 
-        # Collect first batch from right to estimate size
+        # Materialize into Tables (uses Arrow shared_ptr, no copy)
+        left_table = pa.Table.from_batches(left_batches)
+        right_table = pa.Table.from_batches(right_batches)
+
+        # Map join type to Arrow join type
+        arrow_join_type = self._join_type
+        if arrow_join_type == 'outer':
+            arrow_join_type = 'full outer'
+
+        # Execute zero-copy hash join via sabot_ql
+        result_table = hash_join(
+            left_table, right_table,
+            self._left_keys, self._right_keys,
+            join_type=arrow_join_type
+        )
+
+        # Yield batches from result (zero-copy slicing)
+        for batch in result_table.to_batches():
+            yield batch
+
+    def _execute_local_fallback(self):
+        """
+        Fallback implementation using StreamingHashTableBuilder.
+
+        This is used when hash_join is not available.
+        Uses Python dict-based hash table (slower, but functional).
+        """
+        # Build phase: always builds on right side
         for right_batch in self._right_source:
             if right_batch is not None and right_batch.num_rows > 0:
-                right_batches.append(right_batch)
-                right_total_rows += right_batch.num_rows
-                break
-
-        # Decide build side based on first batch row counts
-        # (Heuristic: first batch size correlates with total size)
-        # If right is smaller or equal, use right as build (default)
-        # If left is significantly smaller (>2x), swap and use left as build
-        use_left_as_build = left_total_rows > 0 and right_total_rows > 0 and left_total_rows < (right_total_rows / 2)
-
-        if use_left_as_build:
-            # Swap sides: build on left, probe with right
-            # This is safe for inner joins
-            # For outer joins, we need to adjust join type
-            build_batches = left_batches
-            build_source = self._source
-            build_keys = self._left_keys
-            probe_batches = right_batches
-            probe_source = self._right_source
-            probe_keys = self._right_keys
-
-            # Adjust join type for swapped sides
-            if self._join_type == 'left':
-                adjusted_join_type = 'right'  # Left outer becomes right outer
-            elif self._join_type == 'right':
-                adjusted_join_type = 'left'   # Right outer becomes left outer
-            else:
-                adjusted_join_type = self._join_type  # Inner/outer unchanged
-
-            # Rebuild hash table builder with swapped keys
-            self._hash_builder = StreamingHashTableBuilder(build_keys)
-        else:
-            # Use right as build (default/current behavior)
-            build_batches = right_batches
-            build_source = self._right_source
-            build_keys = self._right_keys
-            probe_batches = left_batches
-            probe_source = self._source
-            probe_keys = self._left_keys
-            adjusted_join_type = self._join_type
-
-        # Build phase: add peeked batches + remaining batches
-        for batch in build_batches:
-            self._hash_builder.add_batch(batch)
-
-        for batch in build_source:
-            if batch is not None and batch.num_rows > 0:
-                self._hash_builder.add_batch(batch)
+                self._hash_builder.add_batch(right_batch)
 
         self._hash_builder.build_index()
 
-        # Probe phase: probe with peeked batches + remaining batches
-        for batch in probe_batches:
-            result = self._hash_builder.probe_batch_vectorized(
-                batch, probe_keys, adjusted_join_type
-            )
-            if result is not None:
-                yield result
-
-        for batch in probe_source:
-            if batch is None or batch.num_rows == 0:
+        # Probe phase: probes with left side
+        for left_batch in self._source:
+            if left_batch is None or left_batch.num_rows == 0:
                 continue
 
             result = self._hash_builder.probe_batch_vectorized(
-                batch, probe_keys, adjusted_join_type
+                left_batch, self._left_keys, self._join_type
             )
 
             if result is not None and result.num_rows > 0:

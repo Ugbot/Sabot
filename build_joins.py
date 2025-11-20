@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the joins module."""
+"""Build the joins module with cross-platform SIMD support."""
 
 import sys
 import os
@@ -7,6 +7,12 @@ from pathlib import Path
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 import numpy as np
+
+# Import cross-platform build utilities
+from build_utils import get_compile_args, print_platform_info
+
+# Print platform info for debugging
+print_platform_info()
 
 # Module to build
 module_path = "sabot/_cython/operators/joins.pyx"
@@ -30,6 +36,12 @@ include_dirs = [
     str(Path("sabot/_cython/operators")),
 ]
 
+# Get platform-appropriate SIMD compile args
+base_args = ["-std=c++17", "-Wno-unused-function", "-Wno-deprecated-declarations"]
+compile_args = get_compile_args(base_args)
+
+print(f"\nCompile args: {' '.join(compile_args)}")
+
 # Create extension
 ext = Extension(
     "sabot._cython.operators.joins",
@@ -38,7 +50,7 @@ ext = Extension(
     library_dirs=[arrow_lib],
     libraries=["arrow"],
     language="c++",
-    extra_compile_args=["-std=c++17", "-O3", "-Wno-unused-function", "-Wno-deprecated-declarations"],
+    extra_compile_args=compile_args,
     extra_link_args=[f"-Wl,-rpath,{arrow_lib}"],
 )
 
