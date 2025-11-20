@@ -6428,7 +6428,7 @@ typedef struct {
   PyObject *__pyx_string_tab[156];
   PyObject *__pyx_float_0_0;
   PyObject *__pyx_int_0;
-  PyObject *__pyx_int_65536;
+  PyObject *__pyx_int_4096;
 /* #### Code section: module_state_contents ### */
 
 #if CYTHON_USE_FREELISTS
@@ -6789,7 +6789,7 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   for (int i=0; i<156; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   Py_CLEAR(clear_module_state->__pyx_float_0_0);
   Py_CLEAR(clear_module_state->__pyx_int_0);
-  Py_CLEAR(clear_module_state->__pyx_int_65536);
+  Py_CLEAR(clear_module_state->__pyx_int_4096);
   return 0;
 }
 #endif
@@ -6932,7 +6932,7 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   for (int i=0; i<156; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_float_0_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_65536);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_4096);
   return 0;
 }
 #endif
@@ -9761,7 +9761,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
  *         # Left indices buffer
 */
   try {
-    __pyx_t_13 = arrow::AllocateBuffer((0x10000 * (sizeof(uint32_t))), __pyx_v_self->_pool).ValueOrDie();
+    __pyx_t_13 = arrow::AllocateBuffer((0x1000 * (sizeof(uint32_t))), __pyx_v_self->_pool).ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
     __PYX_ERR(0, 276, __pyx_L1_error)
@@ -9784,7 +9784,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
  *         # Right indices buffer
 */
   try {
-    __pyx_t_13 = arrow::AllocateBuffer((0x10000 * (sizeof(uint32_t))), __pyx_v_self->_pool).ValueOrDie();
+    __pyx_t_13 = arrow::AllocateBuffer((0x1000 * (sizeof(uint32_t))), __pyx_v_self->_pool).ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
     __PYX_ERR(0, 282, __pyx_L1_error)
@@ -9807,7 +9807,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
  *         # Bloom filter mask (1 bit per row, rounded up to bytes)
 */
   try {
-    __pyx_t_13 = arrow::AllocateBuffer((0x10000 * (sizeof(uint32_t))), __pyx_v_self->_pool).ValueOrDie();
+    __pyx_t_13 = arrow::AllocateBuffer((0x1000 * (sizeof(uint32_t))), __pyx_v_self->_pool).ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
     __PYX_ERR(0, 288, __pyx_L1_error)
@@ -9830,7 +9830,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
  *         # Match bitvector (1 byte per row for SIMD convenience)
 */
   try {
-    __pyx_t_13 = arrow::AllocateBuffer(0x2000, __pyx_v_self->_pool).ValueOrDie();
+    __pyx_t_13 = arrow::AllocateBuffer(0x200, __pyx_v_self->_pool).ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
     __PYX_ERR(0, 294, __pyx_L1_error)
@@ -9853,7 +9853,7 @@ static int __pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Streaming
  *         # Initialize build-side state with C++ hash table
 */
   try {
-    __pyx_t_13 = arrow::AllocateBuffer((0x10000 * (sizeof(uint8_t))), __pyx_v_self->_pool).ValueOrDie();
+    __pyx_t_13 = arrow::AllocateBuffer((0x1000 * (sizeof(uint8_t))), __pyx_v_self->_pool).ValueOrDie();
   } catch(...) {
     __Pyx_CppExn2PyErr();
     __PYX_ERR(0, 300, __pyx_L1_error)
@@ -10435,7 +10435,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_mstate_global->__pyx_int_65536, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_mstate_global->__pyx_int_4096, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10455,7 +10455,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = 1;
     {
-      PyObject *__pyx_callargs[4] = {__pyx_t_4, __pyx_mstate_global->__pyx_int_0, __pyx_t_5, __pyx_mstate_global->__pyx_int_65536};
+      PyObject *__pyx_callargs[4] = {__pyx_t_4, __pyx_mstate_global->__pyx_int_0, __pyx_t_5, __pyx_mstate_global->__pyx_int_4096};
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_6, (4-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -10528,7 +10528,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __pyx_t_5 = PyNumber_Subtract(__pyx_t_2, __pyx_v_offset); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 357, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_9 = 0x10000;
+      __pyx_t_9 = 0x1000;
       __pyx_t_4 = __Pyx_PyLong_From_long(__pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 357, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_10 = PyObject_RichCompare(__pyx_t_5, __pyx_t_4, Py_LT); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 357, __pyx_L1_error)
@@ -11614,7 +11614,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
 */
   __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_batch, __pyx_mstate_global->__pyx_n_u_num_rows); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 454, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_mstate_global->__pyx_int_65536, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 454, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_mstate_global->__pyx_int_4096, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 454, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 454, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -11653,7 +11653,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = 1;
     {
-      PyObject *__pyx_callargs[4] = {__pyx_t_4, __pyx_mstate_global->__pyx_int_0, __pyx_t_5, __pyx_mstate_global->__pyx_int_65536};
+      PyObject *__pyx_callargs[4] = {__pyx_t_4, __pyx_mstate_global->__pyx_int_0, __pyx_t_5, __pyx_mstate_global->__pyx_int_4096};
       __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+__pyx_t_6, (4-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -11728,7 +11728,7 @@ static PyObject *__pyx_gb_5sabot_7_cython_9operators_19hash_join_streaming_17Str
       __pyx_t_5 = PyNumber_Subtract(__pyx_t_3, __pyx_cur_scope->__pyx_v_offset); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 458, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_10 = 0x10000;
+      __pyx_t_10 = 0x1000;
       __pyx_t_4 = __Pyx_PyLong_From_long(__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 458, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_11 = PyObject_RichCompare(__pyx_t_5, __pyx_t_4, Py_LT); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 458, __pyx_L1_error)
@@ -18555,7 +18555,7 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   if (__Pyx_InitStrings(__pyx_string_tab, __pyx_mstate->__pyx_string_tab, __pyx_string_tab_encodings) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   __pyx_mstate->__pyx_float_0_0 = PyFloat_FromDouble(0.0); if (unlikely(!__pyx_mstate->__pyx_float_0_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_0 = PyLong_FromLong(0); if (unlikely(!__pyx_mstate->__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_int_65536 = PyLong_FromLong(65536L); if (unlikely(!__pyx_mstate->__pyx_int_65536)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_4096 = PyLong_FromLong(4096); if (unlikely(!__pyx_mstate->__pyx_int_4096)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;

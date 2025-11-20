@@ -190,7 +190,7 @@ cdef extern from "hash_join_table.h" namespace "sabot::hash_join" nogil:
 DEF BLOOM_FILTER_SIZE = 262144  # 256KB
 
 # Maximum batch size for pre-allocated buffers
-DEF MAX_BATCH_SIZE = 65536  # 64K rows
+DEF MAX_BATCH_SIZE = 4096  # 4K rows (DuckDB-style chunks)
 
 
 cdef class StreamingHashJoin:
