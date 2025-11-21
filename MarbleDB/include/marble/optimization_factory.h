@@ -157,6 +157,17 @@ public:
         bool enable_predicate_bloom = true,
         bool enable_join_hints = true);
 
+    /**
+     * Create StringPredicateStrategy (SIMD-accelerated string filtering).
+     *
+     * @param schema Table schema (auto-detects string columns)
+     * @param max_vocabulary_cache_size Maximum vocabulary cache entries (for RDF)
+     * @return StringPredicateStrategy instance
+     */
+    static std::unique_ptr<OptimizationStrategy> CreateStringPredicate(
+        const std::shared_ptr<arrow::Schema>& schema = nullptr,
+        size_t max_vocabulary_cache_size = 10000);
+
     //==========================================================================
     // Configuration helpers
     //==========================================================================

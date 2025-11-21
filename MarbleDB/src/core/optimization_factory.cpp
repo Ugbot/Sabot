@@ -6,6 +6,7 @@
 #include "marble/bloom_filter_strategy.h"
 #include "marble/cache_strategy.h"
 #include "marble/skipping_index_strategy.h"
+#include "marble/optimizations/string_predicate_strategy.h"
 #include <algorithm>
 #include <cmath>
 #include <cctype>
@@ -159,6 +160,20 @@ bool OptimizationFactory::IsDocumentSchema(const std::shared_ptr<arrow::Schema>&
     return total_fields > 2 && string_binary_count > total_fields / 2;
 }
 
+bool HasStringColumns(const std::shared_ptr<arrow::Schema>& schema) {
+    // Check if schema has any string columns
+    for (int i = 0; i < schema->num_fields(); ++i) {
+        auto field = schema->field(i);
+        auto type_id = field->type()->id();
+
+        if (type_id == arrow::Type::STRING ||
+            type_id == arrow::Type::LARGE_STRING) {
+            return true;
+        }
+    }
+    return false;
+}
+
 //==============================================================================
 // Auto-configuration
 //==============================================================================
@@ -172,7 +187,17 @@ std::unique_ptr<OptimizationPipeline> OptimizationFactory::CreateForSchema(
     SchemaType type = DetectSchemaType(schema);
 
     // Create pipeline for detected type
-    return CreateForSchemaType(type, caps, hints);
+    auto pipeline = std::make_unique<OptimizationPipeline>();
+
+    // Add string predicate optimization if schema has string columns
+    if (schema && HasStringColumns(schema)) {
+        pipeline->AddStrategy(CreateStringPredicate(schema));
+    }
+
+    // Apply other workload hints
+    ApplyWorkloadHints(pipeline.get(), type, hints, caps);
+
+    return pipeline;
 }
 
 std::unique_ptr<OptimizationPipeline> OptimizationFactory::CreateForSchemaType(
@@ -308,6 +333,19 @@ std::unique_ptr<OptimizationStrategy> OptimizationFactory::CreateTripleStore(
     // TODO: Implement when TripleStoreStrategy is available
     // return std::make_unique<TripleStoreStrategy>(enable_predicate_bloom, enable_join_hints);
     return nullptr;
+}
+
+std::unique_ptr<OptimizationStrategy> OptimizationFactory::CreateStringPredicate(
+    const std::shared_ptr<arrow::Schema>& schema,
+    size_t max_vocabulary_cache_size) {
+
+    if (schema) {
+        // Auto-configure based on schema (enable all string columns)
+        return StringPredicateStrategy::AutoConfigure(schema);
+    } else {
+        // Manual configuration (caller must enable columns)
+        return std::make_unique<StringPredicateStrategy>();
+    }
 }
 
 //==============================================================================

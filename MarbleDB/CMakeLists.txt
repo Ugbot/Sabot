@@ -46,6 +46,7 @@ endif()
 # Dependencies
 find_package(Boost REQUIRED COMPONENTS filesystem system coroutine)
 find_package(Threads REQUIRED)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
 # Use ONLY vendored Arrow (never system Arrow per project requirements)
 set(ARROW_VENDORED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/arrow/cpp/build/install)
@@ -180,6 +181,7 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/simdjson/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/arrow/python/pyarrow/src)
 
 # Add NuRaft includes if enabled
 if(MARBLE_ENABLE_RAFT AND NURAFT_FOUND)
@@ -267,6 +269,7 @@ set(MARBLE_SOURCES
     src/core/bloom_filter_strategy.cpp
     src/core/cache_strategy.cpp
     src/core/index_persistence.cpp
+    src/core/optimizations/string_predicate_strategy.cpp
     src/arrow/reader.cpp
     src/arrow/lsm_iterator.cpp
     vendor/simdjson/singleheader/simdjson.cpp
@@ -299,6 +302,7 @@ if(MARBLE_BUILD_STATIC)
             Boost::filesystem
             Boost::system
             Threads::Threads
+            Python3::Python
     )
 
     # Link NuRaft if enabled
@@ -328,6 +332,7 @@ if(MARBLE_BUILD_STATIC)
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:include>
+            ${Python3_INCLUDE_DIRS}
     )
 
     # Alias for backward compatibility
@@ -348,6 +353,7 @@ if(MARBLE_BUILD_SHARED)
             Boost::filesystem
             Boost::system
             Threads::Threads
+            Python3::Python
     )
 
     # Link NuRaft if enabled
@@ -377,6 +383,7 @@ if(MARBLE_BUILD_SHARED)
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:include>
+            ${Python3_INCLUDE_DIRS}
     )
 
     # Alias for convenience
