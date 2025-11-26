@@ -1,25 +1,25 @@
 # Sabot Project Map
 
 **Version:** 0.1.0
-**Last Updated:** November 11, 2025
-**Status:** Production Ready (Core Components + SPARQL)
+**Last Updated:** November 26, 2025
+**Status:** Alpha - Experimental
 
 ## Quick Summary
 
 **What Works**:
-- ✅ C++ Agent architecture with Python fallback
-- ✅ Kafka integration (librdkafka + simdjson) - 5-8x faster
-- ✅ Schema Registry (Avro, Protobuf, JSON)
-- ✅ Stream API with Arrow operations
-- ✅ Distributed execution (2-4 agents tested)
+- ✅ Arrow columnar operations
 - ✅ SQL via DuckDB integration
-- ✅ Graph queries (Cypher) with Arrow storage
-- ✅ RDF/SPARQL (95% feature complete, O(n²) bug fixed with HashJoin)
-- ✅ 71+ Cython modules built (including marbledb_backend)
+- ✅ Basic stream operators (filter, map, window)
 
-**What's Being Improved**:
-- ⏳ SQL string operations (using Arrow compute kernels)
-- ⏳ Full Avro/Protobuf decoders (infrastructure ready)
+**Partially Working**:
+- ⚠️ RDF/SPARQL - basic queries, rough around edges
+- ⚠️ Kafka integration - basic source/sink
+- ⚠️ State backends - memory works, others experimental
+
+**Not Working**:
+- ❌ Cypher/Graph queries - parser incomplete
+- ❌ Distributed execution - infrastructure only
+- ❌ Production streaming
 
 ## Repository Structure
 
@@ -37,12 +37,12 @@ Sabot/
 │   │   ├── shuffle/          # Network shuffle
 │   │   ├── operators/        # Stream operators
 │   │   ├── fintech/          # Fintech kernels (11 built)
-│   │   └── graph/            # Graph query engine (Cypher/SPARQL) ✅
-│   │       ├── compiler/     # Cypher & SPARQL parsers
-│   │       ├── engine/       # GraphQueryEngine (main API)
-│   │       ├── query/        # Pattern matching kernels (3-37M matches/sec)
-│   │       ├── storage/      # PyPropertyGraph (Arrow storage)
-│   │       └── traversal/    # Graph algorithms (BFS, PageRank, etc.)
+│   │   └── graph/            # Graph query engine (incomplete)
+│   │       ├── compiler/     # Cypher parser (incomplete)
+│   │       ├── engine/       # GraphQueryEngine
+│   │       ├── query/        # Pattern matching kernels
+│   │       ├── storage/      # PyPropertyGraph
+│   │       └── traversal/    # Graph algorithms
 │   ├── api/                  # Public Stream API
 │   ├── kafka/                # Kafka Python layer
 │   ├── agent.py              # Agent with C++ core integration
@@ -263,57 +263,25 @@ Sabot/
 
 **Status**: Infrastructure complete, integration in progress
 
-### RDF/SPARQL ✅ PRODUCTION READY
+### RDF/SPARQL ⚠️ BASIC FUNCTIONALITY
 
-**Implementation** (`sabot/rdf.py`, `sabot/_cython/graph/`, `sabot_ql/src/sparql/`):
-- ✅ RDF triple storage with 3-index strategy (SPO, POS, OSP)
-- ✅ SPARQL 1.1 parser (95% feature complete)
-- ✅ User-friendly Python API
-- ✅ Arrow-native storage
-- ✅ PREFIX management
-- ✅ **HashJoin implementation (O(n²) bug fixed!)**
+**Implementation** (`sabot/rdf.py`, `sabot_ql/`):
+- ⚠️ RDF triple storage (basic)
+- ⚠️ SPARQL parser (basic queries work)
+- ⚠️ Python API exists but rough
 
-**Recent Fix** (November 11, 2025):
-- ✅ Replaced ZipperJoin with HashJoin in C++ planner (`sabot_ql/src/sparql/planner.cpp`)
-- ✅ Removed 77 lines of sorting logic (O(n log n) overhead eliminated)
-- ✅ O(n+m) join complexity instead of O(n²) with duplicates
-- ✅ All 7/7 SPARQL unit tests passing
-- ✅ Expected 25-50x speedup on large datasets
-- 📋 Details: `docs/session-reports/sparql_hashjoin_fix_summary.md`
+**What Works**:
+- Basic SELECT queries
+- Simple triple patterns
+- LIMIT, OFFSET
 
-**Previous Performance Issues** (FIXED):
-- ❌ Was using ZipperJoin: O(n log n) + O(m log m) sorting + O(n²) with duplicates
-- ❌ Was: 130K triples = 25s for 2-pattern query
-- ✅ Now: HashJoin O(n+m), expected ~500-1000ms (25-50x faster)
+**What's Rough**:
+- Error handling
+- Complex queries may fail
+- Performance not optimized
+- Missing OPTIONAL, UNION
 
-**Feature Completeness**: 95%
-- ✅ SELECT, WHERE, PREFIX, FILTER, LIMIT, OFFSET, DISTINCT
-- ✅ Multi-pattern joins (with HashJoin)
-- ✅ Aggregates (COUNT, SUM, AVG, MIN, MAX)
-- ✅ ORDER BY, GROUP BY
-- ❌ OPTIONAL (not implemented)
-- ❌ UNION (not implemented)
-- ❌ Blank nodes (not implemented)
-
-**Usability**:
-- ✅ Demos and tutorials (<1K triples)
-- ✅ Development (1-10K triples)
-- ✅ **Production (>10K triples) - NOW ENABLED**
-
-**Implementation Note**:
-Two SPARQL implementations exist:
-1. **C++ Engine** (`sabot_ql/`) - ✅ HashJoin fix applied, production-ready
-2. **Python Engine** (`sabot/_cython/graph/`) - Still has O(n²), for demos only
-
-Use C++ engine via Cython bindings for production workloads.
-
-**Documentation**:
-- ✅ API docs: `docs/features/rdf_sparql.md`
-- ✅ Examples: `examples/RDF_EXAMPLES.md`
-- ✅ Performance analysis: `docs/features/graph/SPARQL_PERFORMANCE_ANALYSIS.md`
-- ✅ Fix summary: `docs/session-reports/sparql_hashjoin_fix_summary.md`
-
-**Status**: ✅ Production ready for large RDF datasets (>10K triples)
+**Status**: Functional for basic queries, needs polish
 
 ### MarbleDB Storage Engine 🔄 ARCHITECTURE REFACTOR IN PROGRESS
 
@@ -529,51 +497,16 @@ OptimizationPipeline (compose strategies)
 - ✅ libprotobuf
 - ✅ libsabot_sql.dylib
 
-## Performance Verified
+## Performance
 
-### vs PySpark
+Performance claims in this repository have not been independently verified and should be treated skeptically.
 
-| Operation | Speedup | Status |
-|-----------|---------|--------|
-| JSON Parsing | 6-632x | ✅ Verified |
-| Filter+Map | 303-10,625x | ✅ Verified |
-| JOIN | 112-1,129x | ✅ Verified |
-| Aggregation | 460-4,553x | ✅ Verified |
+**What we can say:**
+- DuckDB SQL execution is fast (it's DuckDB)
+- Arrow IPC loading is faster than CSV (expected)
+- Cython modules faster than pure Python (expected)
 
-**Average**: ~2,287x faster than PySpark
-
-### vs DuckDB (ClickBench)
-
-| Operation | Result | Status |
-|-----------|--------|--------|
-| Numeric Agg | 2-6x faster | ✅ Verified |
-| String Ops | 2-20x slower | ⚠️ Being fixed |
-| Overall | ~1.3x slower | ⚠️ String bottleneck |
-
-**Wins**: Sabot 22, DuckDB 13 (out of 37 queries)
-
-### Kafka Throughput
-
-| Codec | Throughput | Status |
-|-------|-----------|--------|
-| JSON | 150K+ msg/s | ✅ Verified |
-| Avro | 120K+ msg/s | ✅ Infrastructure ready |
-| Protobuf | 100K+ msg/s | ✅ Infrastructure ready |
-
-**vs Python**: 5-8x faster
-
-## Current Focus
-
-### String Operations Optimization ⏳
-
-**Problem**: 2-20x slower on string operations vs DuckDB
-
-**Solution**: Use Arrow compute string kernels
-- ✅ `string_operations.{h,cpp}` created
-- ✅ Uses Arrow SIMD-optimized functions
-- ⏳ Integration into execution path
-
-**Expected**: 3-5x improvement, competitive with DuckDB
+Historical benchmark data exists in `docs/benchmarks/` but may be outdated or inaccurate.
 
 ## File Locations
 
@@ -604,22 +537,12 @@ OptimizationPipeline (compose strategies)
 
 ## Key Metrics
 
-**Total Code**: ~100,000 lines
-- C++: ~15,000 lines
-- Python: ~30,000 lines
-- Cython: ~20,000 lines
-- Documentation: ~35,000 lines
+**Codebase Size**: Large (exact counts not verified)
+**Cython Modules**: Many built, functionality varies
+**Examples**: Some work, some need setup/dependencies
+**Test Coverage**: Low
 
-**Modules Built**: 70/108 Cython modules
-**Examples Working**: 14/14 core examples
-**Performance**: 5-10,000x vs PySpark, competitive with DuckDB
-
-**Organization**:
-- Tests organized: 174 Python files + 9 C++ files across unit/, integration/, debug/, cpp/
-- Test directories moved: test_venv, qlever_test, .qlever_test_env
-- Benchmarks organized: 40+ files by purpose (vs_pyspark, vs_duckdb, internal, etc.)
-- Documentation organized: 125+ markdown files in docs/ folders
-- Root directory clean: 0 test files, only essential files remain
+**Status**: Alpha - experimental project, not production ready
 
 ## Critical Findings
 
@@ -644,10 +567,10 @@ OptimizationPipeline (compose strategies)
 
 ## Next Steps
 
-1. **Integrate string operations** into SQL execution
-2. **Fix Avro/Protobuf** build issues
-3. **Build Cython sabot_sql wrapper**
-4. **Expand test coverage**
+1. **Complete Cypher parser** - Graph queries don't work
+2. **Polish SPARQL** - Basic functionality needs improvement
+3. **Expand test coverage** - Currently low
+4. **Improve documentation** - Many docs outdated
 
 ## Documentation
 
@@ -664,6 +587,8 @@ OptimizationPipeline (compose strategies)
 
 ---
 
-**Status**: ✅ Production ready for streaming/Kafka workloads
-**SQL**: Competitive with DuckDB, improvements in progress
-**Performance**: Proven 5-10,000x advantages on streaming operations
+**Status**: Alpha - experimental, not production ready
+**SQL**: Works via DuckDB
+**Streaming**: Experimental
+**Graph/Cypher**: Not functional
+**SPARQL**: Basic queries work
