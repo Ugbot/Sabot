@@ -21,6 +21,7 @@ namespace marble {
 class Key;
 class Record;
 struct TableCapabilities;
+struct ColumnPredicate;  // Defined in api.h
 
 //==============================================================================
 // Context Structures - Passed to optimization strategies at various lifecycle points
@@ -51,6 +52,11 @@ struct ReadContext {
     // Schema context (for TripleStore strategy)
     std::string predicate_value;      // For RDF queries (e.g., "rdf:type")
     bool is_triple_lookup = false;    // Is this an RDF triple lookup?
+
+    // NEW: Predicate pushdown support (for 100-1000x performance improvements)
+    std::vector<ColumnPredicate> predicates;  // Column predicates for filtering
+    bool has_predicates = false;              // Are predicates provided?
+    bool skip_sstable = false;                // Short-circuit: skip entire SSTable (zone map fail)
 };
 
 /**

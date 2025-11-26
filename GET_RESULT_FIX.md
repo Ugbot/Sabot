@@ -83,3 +83,4 @@ self._last_result = None  # ← Add this
 
 
 
+

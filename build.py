@@ -520,6 +520,72 @@ def build_duckdb_cpp(skip=False):
         return None
 
 
+def build_marbledb(skip=False):
+    """Build MarbleDB C++ library."""
+    print_phase("3.7", 8, "Building MarbleDB C++...")
+
+    if skip:
+        print_skip("Skipped by user (--skip-vendor)")
+        return None
+
+    if not MARBLEDB_DIR.exists():
+        print_error(f"MarbleDB source not found at {MARBLEDB_DIR}")
+        return None
+
+    # Check if already built
+    if (MARBLEDB_BUILD_DIR / "libmarble.a").exists():
+        print_success(f"MarbleDB already built at {MARBLEDB_BUILD_DIR}")
+        return MARBLEDB_BUILD_DIR
+
+    cmake = find_executable('cmake', ['cmake3'])
+    if not cmake:
+        print_error("CMake not found")
+        return None
+
+    # Detect number of CPU cores
+    try:
+        num_jobs = multiprocessing.cpu_count()
+    except:
+        num_jobs = 4
+
+    print(f"Building MarbleDB C++ (using {num_jobs} parallel jobs)...")
+    print(f"Source: {MARBLEDB_DIR}")
+    print(f"Build dir: {MARBLEDB_BUILD_DIR}")
+
+    # Create build directory
+    MARBLEDB_BUILD_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Configure with CMake
+    print("Configuring MarbleDB with CMake...")
+    try:
+        subprocess.run(
+            [cmake, '..', '-DCMAKE_BUILD_TYPE=Release'],
+            cwd=MARBLEDB_BUILD_DIR,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE
+        )
+    except subprocess.CalledProcessError as e:
+        print_error(f"CMake configuration failed: {e.stderr.decode()[:200]}")
+        return None
+
+    # Build with make
+    print("Building MarbleDB...")
+    try:
+        subprocess.run(
+            ['make', 'marble_static', f'-j{num_jobs}'],
+            cwd=MARBLEDB_BUILD_DIR,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE
+        )
+        print_success(f"MarbleDB C++ built successfully")
+        return MARBLEDB_BUILD_DIR
+    except subprocess.CalledProcessError as e:
+        print_error(f"MarbleDB build failed: {e.stderr.decode()[:200]}")
+        return None
+
+
 # ==============================================================================
 # Phase 4: Build Vendored Python Extensions
 # ==============================================================================
@@ -1251,6 +1317,12 @@ def main():
     if not duckdb_build:
         print_error("DuckDB C++ build failed - DuckDB connectors will be skipped")
         # Don't fail - DuckDB modules will just be skipped
+
+    # Phase 3.7: Build MarbleDB
+    marbledb_build = build_marbledb(skip=args.skip_vendor)
+    if not marbledb_build:
+        print_error("MarbleDB C++ build failed - MarbleDB modules will be skipped")
+        # Don't fail - MarbleDB modules will just be skipped
 
     # Phase 4: Build vendor extensions
     vendor_results = build_vendor_extensions(deps, skip=args.skip_vendor)

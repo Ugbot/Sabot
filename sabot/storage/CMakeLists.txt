@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find dependencies
 # Arrow - try to find it, otherwise use common paths
-set(ARROW_ROOT "${CMAKE_SOURCE_DIR}/../../../vendor/arrow/cpp/build/install")
+set(ARROW_ROOT "${CMAKE_SOURCE_DIR}/../../vendor/arrow/cpp/build/install")
 if(EXISTS "${ARROW_ROOT}/include")
     set(Arrow_INCLUDE_DIRS "${ARROW_ROOT}/include")
     set(Arrow_LIBRARIES "${ARROW_ROOT}/lib/libarrow.a")

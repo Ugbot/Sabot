@@ -10,6 +10,7 @@
 #include "marble/optimization_factory.h"
 #include "marble/table_capabilities.h"
 #include "marble/record.h"
+#include "marble/api.h"  // For ColumnPredicate definition
 #include <thread>
 #include <random>
 

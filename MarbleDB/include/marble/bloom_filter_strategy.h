@@ -150,6 +150,9 @@ private:
 
     // Hash a key
     uint64_t HashKey(const Key& key) const;
+
+    // Hash an Arrow Scalar for predicate checking
+    uint64_t HashScalar(const std::shared_ptr<arrow::Scalar>& value) const;
 };
 
 }  // namespace marble

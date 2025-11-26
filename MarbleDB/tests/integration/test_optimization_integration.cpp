@@ -9,9 +9,65 @@
 #include "marble/bloom_filter_strategy.h"
 #include "marble/cache_strategy.h"
 #include "marble/table_capabilities.h"
+#include "marble/record.h"  // For Key definition
+#include "marble/api.h"  // For ColumnPredicate definition
 #include <arrow/api.h>
 
 namespace marble {
+
+// Mock implementations for testing
+class MockKey : public Key {
+public:
+    explicit MockKey(uint64_t value) : value_(value) {}
+
+    int Compare(const Key& other) const override {
+        const MockKey* other_key = dynamic_cast<const MockKey*>(&other);
+        if (!other_key) return -1;
+        if (value_ < other_key->value_) return -1;
+        if (value_ > other_key->value_) return 1;
+        return 0;
+    }
+
+    arrow::Result<std::shared_ptr<arrow::Scalar>> ToArrowScalar() const override {
+        return arrow::MakeScalar(arrow::uint64(), value_);
+    }
+
+    std::shared_ptr<Key> Clone() const override {
+        return std::make_shared<MockKey>(value_);
+    }
+
+    std::string ToString() const override {
+        return std::to_string(value_);
+    }
+
+    size_t Hash() const override {
+        return std::hash<uint64_t>{}(value_);
+    }
+
+    uint64_t GetValue() const { return value_; }
+
+private:
+    uint64_t value_;
+};
+
+class MockRecord : public Record {
+public:
+    explicit MockRecord(const std::shared_ptr<arrow::RecordBatch>& batch)
+        : batch_(batch), row_index_(0) {}
+
+    std::shared_ptr<arrow::RecordBatch> GetBatch() const {
+        return batch_;
+    }
+
+    size_t GetRowIndex() const {
+        return row_index_;
+    }
+
+private:
+    std::shared_ptr<arrow::RecordBatch> batch_;
+    size_t row_index_;
+};
+
 
 //==============================================================================
 // Schema Detection Tests
@@ -238,7 +294,7 @@ TEST_F(AutoConfigurationTest, WorkloadHintsRangeScan) {
 
 TEST_F(AutoConfigurationTest, ManualStrategySelection) {
     // Use manual configuration
-    auto bloom = OptimizationFactory::CreateHashBloomFilter(100000, 0.001);
+    auto bloom = OptimizationFactory::CreateBloomFilter(100000, 0.001);
     auto cache = OptimizationFactory::CreateCache(5000, 500);
 
     ASSERT_NE(bloom, nullptr);
@@ -340,10 +396,14 @@ TEST_F(OptimizationIntegrationTest, FlushSerializesMetadata) {
         pipeline_->OnWrite(&wctx);
     }
 
-    // Simulate flush
-    FlushContext fctx;
-    fctx.memtable_batch = nullptr;
-    fctx.num_records = 20;
+    // Simulate flush with a dummy batch
+    std::vector<std::shared_ptr<arrow::Array>> dummy_arrays;
+    for (int i = 0; i < schema_->num_fields(); ++i) {
+        auto builder = arrow::MakeBuilder(schema_->field(i)->type()).ValueOrDie();
+        dummy_arrays.push_back(builder->Finish().ValueOrDie());
+    }
+    auto dummy_batch = arrow::RecordBatch::Make(schema_, 0, dummy_arrays);
+    FlushContext fctx{dummy_batch, 20};
 
     Status s = pipeline_->OnFlush(&fctx);
     EXPECT_TRUE(s.ok());
@@ -408,7 +468,7 @@ TEST_F(ConfigurationParametersTest, HashBloomFilterParameters) {
     size_t expected_keys = 1000000;
     size_t memory_budget = 125000;  // 125KB = 1MB bits
 
-    auto [num_bits, num_hash, fpr] = OptimizationFactory::EstimateHashBloomFilterParams(
+    auto [num_bits, num_hash, fpr] = OptimizationFactory::EstimateBloomFilterParams(
         expected_keys, memory_budget);
 
     EXPECT_GT(num_bits, 0);
@@ -444,87 +504,6 @@ TEST_F(ConfigurationParametersTest, BlockSize) {
 }
 
 }  // namespace marble
-
-// Mock implementations for compilation
-namespace marble {
-class MockKey : public Key {
-public:
-    explicit MockKey(uint64_t value) : value_(value) {}
-
-    int Compare(const Key& other) const override {
-        const MockKey* other_key = dynamic_cast<const MockKey*>(&other);
-        if (!other_key) return -1;
-        if (value_ < other_key->value_) return -1;
-        if (value_ > other_key->value_) return 1;
-        return 0;
-    }
-
-    arrow::Result<std::shared_ptr<arrow::Scalar>> ToArrowScalar() const override {
-        return arrow::MakeScalar(arrow::uint64(), value_);
-    }
-
-    std::shared_ptr<Key> Clone() const override {
-        return std::make_shared<MockKey>(value_);
-    }
-
-    std::string ToString() const override {
-        return std::to_string(value_);
-    }
-
-    size_t Hash() const override {
-        return std::hash<uint64_t>{}(value_);
-    }
-
-    uint64_t GetValue() const { return value_; }
-
-private:
-    uint64_t value_;
-};
-
-class MockRecord : public Record {
-public:
-    MockRecord() : begin_ts_(0), commit_ts_(0) {}
-
-    std::shared_ptr<Key> GetKey() const override {
-        return std::make_shared<MockKey>(0);
-    }
-
-    arrow::Result<std::shared_ptr<arrow::RecordBatch>> ToRecordBatch() const override {
-        auto schema = arrow::schema({arrow::field("id", arrow::uint64())});
-        auto id_array = arrow::UInt64Builder().Finish().ValueOrDie();
-        return arrow::RecordBatch::Make(schema, 0, {id_array});
-    }
-
-    std::shared_ptr<arrow::Schema> GetArrowSchema() const override {
-        return arrow::schema({arrow::field("id", arrow::uint64())});
-    }
-
-    std::unique_ptr<RecordRef> AsRecordRef() const override {
-        return nullptr;
-    }
-
-    void SetMVCCInfo(uint64_t begin_ts, uint64_t commit_ts) override {
-        begin_ts_ = begin_ts;
-        commit_ts_ = commit_ts;
-    }
-
-    uint64_t GetBeginTimestamp() const override {
-        return begin_ts_;
-    }
-
-    uint64_t GetCommitTimestamp() const override {
-        return commit_ts_;
-    }
-
-    bool IsVisible(uint64_t snapshot_ts) const override {
-        return snapshot_ts >= begin_ts_ && (commit_ts_ == 0 || snapshot_ts < commit_ts_);
-    }
-
-private:
-    uint64_t begin_ts_;
-    uint64_t commit_ts_;
-};
-}
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

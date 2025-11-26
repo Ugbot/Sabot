@@ -611,3 +611,19 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/MarbleDBConfigVersion.cmake
     DESTINATION lib/cmake/MarbleDB
 )
+
+# Standalone benchmark for predicate pushdown
+add_executable(benchmark_predicate_pushdown
+    build/benchmark_predicate_pushdown.cpp
+)
+
+target_link_libraries(benchmark_predicate_pushdown
+    marble_static
+    arrow_shared
+    parquet_shared
+)
+
+target_include_directories(benchmark_predicate_pushdown PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/arrow/cpp/build/install/include
+)

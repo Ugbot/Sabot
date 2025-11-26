@@ -5,6 +5,7 @@
  */
 
 #include "test_utils.h"
+#include "marble/api.h"
 #include <arrow/io/api.h>
 #include <arrow/ipc/api.h>
 #include <algorithm>
@@ -229,8 +230,9 @@ bool RecordBatchValidator::ValidateUniqueValues(
     }
 
     // Use Arrow's unique function to check for duplicates
-    auto unique_result = arrow::compute::Unique(column).ValueOrDie();
-    return unique_result->length() == batch->num_rows();
+    auto unique_result = arrow::compute::CallFunction("unique", {column}).ValueOrDie();
+    auto unique_array = unique_result.array();
+    return unique_array->length == batch->num_rows();
 }
 
 //==============================================================================
@@ -332,9 +334,9 @@ std::vector<ColumnPredicate> TestPredicateFactory::CreateNumericPredicates(
     const std::string& column_name, double min_val, double max_val) {
 
     return {
-        ColumnPredicate(column_name, PredicateType::kGreaterThan,
+        ColumnPredicate(column_name, ColumnPredicate::PredicateType::kGreaterThan,
                        arrow::MakeScalar(min_val)),
-        ColumnPredicate(column_name, PredicateType::kLessThan,
+        ColumnPredicate(column_name, ColumnPredicate::PredicateType::kLessThan,
                        arrow::MakeScalar(max_val))
     };
 }
@@ -344,7 +346,7 @@ std::vector<ColumnPredicate> TestPredicateFactory::CreateStringPredicates(
 
     std::vector<ColumnPredicate> predicates;
     for (const auto& value : values) {
-        predicates.emplace_back(column_name, PredicateType::kEqual,
+        predicates.emplace_back(column_name, ColumnPredicate::PredicateType::kEqual,
                                arrow::MakeScalar(value));
     }
     return predicates;
@@ -352,9 +354,9 @@ std::vector<ColumnPredicate> TestPredicateFactory::CreateStringPredicates(
 
 std::vector<ColumnPredicate> TestPredicateFactory::CreateComplexPredicates() {
     return {
-        ColumnPredicate("age", PredicateType::kGreaterThan, arrow::MakeScalar<int64_t>(25)),
-        ColumnPredicate("salary", PredicateType::kGreaterThan, arrow::MakeScalar<double>(50000.0)),
-        ColumnPredicate("department", PredicateType::kEqual, arrow::MakeScalar<std::string>("Engineering"))
+        ColumnPredicate("age", ColumnPredicate::PredicateType::kGreaterThan, arrow::MakeScalar<int64_t>(25)),
+        ColumnPredicate("salary", ColumnPredicate::PredicateType::kGreaterThan, arrow::MakeScalar<double>(50000.0)),
+        ColumnPredicate("department", ColumnPredicate::PredicateType::kEqual, arrow::MakeScalar<std::string>("Engineering"))
     };
 }
 
@@ -382,7 +384,7 @@ Status TestDataPersistence::LoadBatchFromFile(
     const std::string& filepath, std::shared_ptr<arrow::RecordBatch>* batch) {
 
     ARROW_ASSIGN_OR_RAISE(auto input_stream, arrow::io::ReadableFile::Open(filepath));
-    ARROW_ASSIGN_OR_RAISE(auto reader, arrow::ipc::OpenFile(input_stream));
+    ARROW_ASSIGN_OR_RAISE(auto reader, arrow::ipc::RecordBatchFileReader::Open(input_stream));
 
     ARROW_ASSIGN_OR_RAISE(*batch, reader->ReadRecordBatch(0));
 
