@@ -283,135 +283,36 @@ Sabot/
 
 **Status**: Functional for basic queries, needs polish
 
-### MarbleDB Storage Engine 🔄 ARCHITECTURE REFACTOR IN PROGRESS
+### MarbleDB Storage Engine ⚠️ ALPHA
 
 **Overview**:
-MarbleDB is an Arrow-native LSM storage engine designed for multiple workloads:
-- RDF triple stores (SPARQL queries)
-- OLTP key-value (session stores, caching)
-- Time-series analytics (metrics, logs)
-- Property graphs (Cypher queries)
+MarbleDB is an Arrow-native LSM storage engine.
 
 **Current Status** (`MarbleDB/`):
-- ✅ Core LSM tree implementation
-- ✅ Arrow RecordBatch storage
-- ✅ SSTable format with Arrow IPC
-- ✅ RocksDB compatibility layer
-- ✅ Compaction strategies
-- ✅ Bloom filters (RDF-specific, hardcoded)
-- ✅ Hot key cache (designed but not integrated)
-- ✅ Skipping indexes (built incrementally)
-- 🔄 **Pluggable Optimization Architecture** (NEW)
+- ✅ Library compiles (`libmarble.a`)
+- ✅ 19/19 unit tests passing
+- ✅ Basic LSM operations
+- ✅ Bloom filter strategy
+- ✅ Cache strategy
+- ✅ Optimization pipeline
+- ⚠️ Arrow-native path experimental
+- ❌ Not production tested
 
-**Recent Performance Improvements**:
-- ✅ Batch cache: 20x read improvement (99.7K → 2.0M ops/sec)
-- ✅ Hot key cache integration: Ready for skewed workloads
-- ✅ RocksDB Put buffering: Optimized with InsertBatch
+**Benchmarks (100K rows):**
 
-**Pluggable Optimization Architecture** 🚀 **Phase 0: Planning Complete**
+| Path | Write | Read | Total |
+|------|-------|------|-------|
+| Legacy | 1.87ms | 2.58ms | 4.45ms |
+| Arrow-Native | 3.27ms | 0.07ms | 3.34ms |
 
-**Problem**: Current optimizations are hardcoded globally:
-- Bloom filters hardcoded for RDF triples (3 int64 columns)
-- Time-series workloads pay bloom filter overhead despite only doing range scans
-- No way to configure optimizations per-table
+Arrow reads ~39x faster (zero-copy), writes slower, ~1.3x overall.
 
-**Solution**: Strategy pattern for pluggable, per-table optimizations
+**RocksDB Baseline (100K keys):**
+- Writes: 178 K/sec
+- Lookups: 357 K/sec
+- Scans: 4.4 M/sec
 
-**Design Docs**:
-- 📋 `MarbleDB/docs/planning/PLUGGABLE_OPTIMIZATIONS_DESIGN.md` (55KB)
-  - Comprehensive architecture design
-  - API specifications
-  - Migration strategy
-  - Expected performance improvements
-
-- 📋 `MarbleDB/docs/planning/OPTIMIZATION_REFACTOR_ROADMAP.md` (63KB)
-  - 6-phase implementation plan (14 days)
-  - Detailed task breakdowns
-  - Success criteria for each phase
-  - Risk assessment and mitigation
-
-**Architecture Overview**:
-```
-OptimizationFactory (auto-detect schema)
-    ↓
-OptimizationPipeline (compose strategies)
-    ↓
-├─ BloomFilterStrategy     (RDF, key-value)
-├─ CacheStrategy          (OLTP, hot keys)
-├─ SkippingIndexStrategy  (time-series, analytics)
-└─ TripleStoreStrategy    (RDF-specific)
-```
-
-**Implementation Strategy**:
-- ✅ Phase 0: Planning & Documentation (COMPLETE)
-- 📋 Phase 1: Core Infrastructure (Days 2-3)
-  - Base OptimizationStrategy interface
-  - OptimizationPipeline framework
-  - Integration with ColumnFamilyOptions
-
-- 📋 Phase 2: Strategy Implementations (Days 4-6)
-  - BloomFilterStrategy
-  - CacheStrategy
-  - SkippingIndexStrategy
-  - TripleStoreStrategy
-
-- 📋 Phase 3: Auto-Configuration (Days 7-8)
-  - Schema type detection (RDF vs key-value vs time-series)
-  - WorkloadHints system
-  - Factory auto-configuration logic
-
-- 📋 Phase 4: Integration & Migration (Days 9-11)
-  - Hook integration (Get/Put/Compact/Flush)
-  - Dual code paths (old + new systems run in parallel)
-  - Validation and performance comparison
-
-- 📋 Phase 5: Comprehensive Validation (Days 12-13)
-  - All tests pass (unit + integration)
-  - Performance benchmarks
-  - Memory profiling
-
-- 📋 Phase 6: Finalization (Day 14)
-  - User documentation
-  - Tuning guide
-  - Migration guide
-
-**Expected Performance Improvements**:
-- RDF triple queries: **2-5x faster** (predicate-aware bloom filters)
-- OLTP hot key access: **10-50x faster** (adaptive caching)
-- Time-series range scans: **100-1000x faster** (skipping indexes)
-
-**Key Benefits**:
-- ✅ Per-table optimization configuration
-- ✅ Auto-configuration based on schema type
-- ✅ Easy to add new optimization strategies
-- ✅ Pay only for enabled optimizations (memory efficiency)
-- ✅ Incremental migration (new system alongside old code)
-
-**Files Being Created**:
-- `include/marble/optimization_strategy.h` - Base interface
-- `include/marble/optimization_factory.h` - Factory + auto-config
-- `include/marble/optimizations/*.h` - 4 strategy implementations
-- `src/core/optimization_strategy.cpp` - Base framework
-- `src/core/optimizations/*.cpp` - Strategy implementations
-
-**Files Being Modified**:
-- `include/marble/column_family.h` - Add OptimizationConfig
-- `src/core/api.cpp` - Integrate optimization hooks
-- `src/core/sstable.cpp` - Serialize optimization metadata
-- `src/core/lsm_storage.cpp` - Compaction integration
-
-**Migration Approach**:
-- Incremental (not big-bang refactor)
-- New system runs alongside old code initially
-- Per-table opt-in via `optimization_config.auto_configure = true`
-- Validation ensures identical results
-- Old code removed only after full validation
-
-**Status**:
-- ✅ Design complete and reviewed
-- ✅ Roadmap documented
-- 📋 Implementation Phase 1 ready to start
-- 🎯 Target: 14 days to production-ready
+See `MarbleDB/README.md` for details.
 
 ## Vendored Dependencies
 
