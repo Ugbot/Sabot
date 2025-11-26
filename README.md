@@ -6,24 +6,24 @@
 
 Sabot is a Python framework that brings Apache Arrow's columnar performance to data processing workflows. Unlike PySpark's JVM overhead or Ray's distributed complexity, Sabot provides zero-copy Arrow operations with Cython acceleration for massive throughput on single machines.
 
-## 🎯 NEW: Unified Architecture (October 2025)
+## 🎯 Unified Architecture (October 2025)
 
-Sabot now has a **unified entry point** for all functionality:
+Sabot provides a **unified entry point** for data processing:
 
 ```python
 from sabot import Sabot
 
 # Create unified engine
-engine = Sabot(mode='local')  # or 'distributed'
+engine = Sabot(mode='local')
 
 # Stream processing
 stream = engine.stream.from_kafka('topic').filter(lambda b: b.column('x') > 10)
 
-# SQL processing
+# SQL processing (via DuckDB)
 result = engine.sql("SELECT * FROM table WHERE x > 10")
 
-# Graph processing
-matches = engine.graph.cypher("MATCH (a)-[:KNOWS]->(b) RETURN a, b")
+# RDF/SPARQL (functional, basic queries)
+results = engine.sparql("SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 10")
 
 # Clean shutdown
 engine.shutdown()
@@ -70,121 +70,40 @@ This is an experimental research project exploring the design space of:
 - Kafka streaming integration with columnar efficiency
 
 **Current State (v0.1.0-alpha):**
-- ✅ **CyArrow**: Production-ready zero-copy Arrow operations (104M rows/sec joins)
-- ✅ **Graph Processing**: High-performance graph analytics (3-37M matches/sec pattern matching)
-- ✅ **SabotQL**: SPARQL query engine for RDF triple stores (23,798 queries/sec, integrated into pipelines)
-- ✅ **DataLoader**: High-performance CSV/Arrow IPC loading (52x faster than CSV)
-- ✅ **Streaming Agents**: Faust-inspired Kafka processing with columnar data
-- ✅ **Cython Acceleration**: SIMD-accelerated compute kernels
-- ⚠️ Distributed features are experimental (checkpoints, state management)
-- ⚠️ Test coverage is limited (~5%)
+- ✅ **Arrow Operations**: Zero-copy Arrow columnar processing
+- ✅ **SQL Engine**: DuckDB-based SQL execution
+- ⚠️ **RDF/SPARQL**: Functional for basic queries, rough around edges
+- ⚠️ **Kafka Integration**: Basic source/sink working
+- ❌ **Cypher/Graph**: Not functional (parser incomplete)
+- ⚠️ Distributed features are experimental
+- ⚠️ Test coverage is limited
 - ⚠️ Not recommended for production use
 
-## Performance: Why Choose Sabot Over PySpark/Ray?
+## Design Philosophy
 
-**Sabot delivers PySpark-level performance without the JVM overhead:**
+Sabot explores Arrow-native data processing in Python:
 
-### Core Data Processing (M3 MacBook Pro, 11.2M rows)
-- **Hash Joins**: 104M rows/sec (11.2M row join in 107ms)
-- **Data Loading (Arrow IPC)**: 5M rows/sec (10M rows in 2 seconds, memory-mapped)
-- **Data Loading (CSV)**: 0.5-1.0M rows/sec (multi-threaded)
-- **Arrow IPC vs CSV**: 52x faster loading (10M rows: 2s vs 103s)
-- **File Compression**: 50-70% size reduction (5.6GB → 2.4GB)
-- **Zero-copy operations**: ~2-3ns per element (SIMD-accelerated)
-
-**Fintech Enrichment Pipeline (Complete workflow):**
-- **Total Pipeline**: 2.3 seconds end-to-end
-- **Hash Join**: 104.6M rows/sec throughput
-- **Window Operations**: ~2-3ns per element (SIMD-accelerated)
-- **Spread Calculation**: Vectorized compute kernels
-- **Data Loading**: 2.1 seconds (10M + 1.2M rows)
-
-**vs PySpark (same workload, anecdotal):**
-- PySpark: ~30-60 seconds (JVM startup + serialization overhead)
-- Sabot: 2.3 seconds (pure Python + Arrow + Cython)
-
-**vs Ray:**
-- Ray: Distributed coordination overhead even for single-machine
-- Sabot: Direct columnar operations with zero serialization
-
-### Streaming Performance
-**Real-time Fraud Detection (Kafka + columnar processing):**
-- **Throughput**: 143K-260K transactions/sec
-- **Latency p50/p95/p99**: 0.01ms / 0.01ms / 0.01ms
-- **Pattern Detection**: velocity, amount anomaly, geo-impossible
-- **Stateful Processing**: 1M+ state operations/sec
-
-**Experimental Features (In Development):**
-- Distributed agent runtime (Ray-like actor model)
-- RocksDB state backend (persistent state)
-- GPU acceleration via RAFT
-- Complex event processing (CEP)
-
-### Auto-Numba UDF Compilation
-
-**Automatic 10-100x speedup for user-defined functions - transparently!**
-
-Sabot automatically compiles Python UDFs with Numba JIT for massive performance gains. No code changes required - just write normal Python and Sabot handles the rest.
-
-**Status:** ✅ **Phase 2 Complete** - Fully integrated with CythonMapOperator, tested and benchmarked.
-
-```python
-# User writes normal Python - Sabot auto-compiles it!
-def my_transform(batch):
-    # Extract numpy arrays from Arrow columns
-    values = batch.column('value').to_numpy()
-    results = []
-
-    # Numba-compiled computation
-    for i in range(len(values)):
-        total = 0
-        for j in range(100):
-            total += values[i] * j
-        results.append(total)
-
-    # Return new RecordBatch
-    return batch.append_column('computed', pa.array(results))
-
-# Automatically compiled with Numba @njit (10-50x faster)
-stream = Stream.from_kafka('data').map(my_transform)
-```
-
-**How it works:**
-1. AST analysis detects function patterns (loops, NumPy array ops, etc.)
-2. Chooses optimal compilation strategy (`@njit` vs `@vectorize`)
-3. Compiles with Numba transparently for batch processing
-4. Falls back to Python if compilation fails
-5. Caches compiled functions for reuse
-
-**Performance:**
-- Scalar loops: 10-50x speedup
-- NumPy operations: 50-100x speedup
-- Compilation overhead: <100ms (first-time only)
-- Cache hit: <1ms
-
-**Works with batch-first architecture!**
+- **Arrow-first**: All data operations use Apache Arrow columnar format
+- **SQL via DuckDB**: Leverage DuckDB's optimized SQL engine
+- **Cython acceleration**: Performance-critical paths in Cython
+- **Streaming experiments**: Kafka integration for stream processing (experimental)
 
 ## Design Goals
 
-🚀 **PySpark Performance in Pure Python**
-- **CyArrow**: Zero-copy Arrow operations (104M rows/sec joins)
-- **Arrow IPC**: Memory-mapped data loading (52x faster than CSV)
-- **SIMD Acceleration**: Vectorized operations beating PySpark throughput
-- **Cython DataLoader**: Multi-threaded CSV parsing, auto-format detection
+**Arrow-Native Processing**
+- Zero-copy Arrow operations where possible
+- DuckDB for SQL execution
+- Cython for performance-critical code
 
-⚡ **Ray-Like Distributed Processing (Experimental)**
-- Actor-based agents for distributed computation
-- Distributed checkpointing (Chandy-Lamport barriers)
-- Complex event processing (CEP) with pattern matching
-- Stateful stream processing with persistence backends
+**Streaming (Experimental)**
+- Kafka source/sink integration
+- Basic stream operators
+- State management experiments
 
-🔧 **Pythonic API - No JVM, No Serialization**
-- Unified imports: `import sabot as sb`
-- Zero-copy operations: `from sabot.cyarrow import load_data, hash_join_batches`
-- Decorator-based agents: `@app.agent()` (experimental - see note below)
-- Multiple data formats: Arrow IPC, CSV, Parquet, Avro
-
-**Note on Agent API:** The `@app.agent()` decorator is experimental. Agents register successfully but stream consumption requires manual message deserialization. See `examples/fraud_app.py` for working pattern.
+**Query Languages**
+- SQL via DuckDB (working)
+- SPARQL for RDF (basic)
+- Cypher for graphs (not working)
 
 ## Quick Start
 
@@ -342,197 +261,74 @@ Sabot combines **Arrow's columnar performance** with **Python's ecosystem**:
 
 ### Core Modules
 
-| Module | Description | Performance |
-|--------|-------------|-------------|
-| **cyarrow** | Zero-copy Arrow operations (hash joins, windows) | 104M rows/sec |
-| **DataLoader** | Multi-threaded data loading (CSV, Arrow IPC) | 5M rows/sec (Arrow) |
-| **checkpoint** | Distributed snapshots (Chandy-Lamport) | <10μs initiation |
-| **state** | Managed state (Memory, RocksDB, Redis, Tonbo) | 1M+ ops/sec |
-| **time** | Watermarks, timers, event-time | <5μs tracking |
-| **agents** | Actor-based stream processors (experimental) | - |
-| **features** | Feature engineering for ML pipelines (CyRedis) | Streaming features |
-| **tonbo** | LSM state backend (Rust FFI, production-ready) | 72K writes/sec, 241K reads/sec |
-| **shuffle** | Lock-free network transport (Arrow Flight) | Zero-copy distributed shuffle |
-| **graph** | Graph storage, traversal, and pattern matching | 3-37M matches/sec |
+| Module | Description | Status |
+|--------|-------------|--------|
+| **cyarrow** | Zero-copy Arrow operations | ✅ Working |
+| **sql** | DuckDB-based SQL execution | ✅ Working |
+| **sparql** | RDF triple store queries | ⚠️ Basic |
+| **kafka** | Kafka source/sink | ⚠️ Basic |
+| **state** | Memory/RocksDB backends | ⚠️ Experimental |
+| **checkpoint** | Distributed snapshots | ⚠️ Experimental |
+| **graph/cypher** | Graph pattern matching | ❌ Not working |
 
-### Feature Engineering (`sabot/features/`)
+### Additional Modules (Experimental)
 
-Real-time feature computation and storage for ML pipelines:
+These modules exist but are experimental or incomplete:
 
-```python
-from sabot import Stream
-from sabot.features import FeatureStore
-
-# Initialize CyRedis-backed feature store
-feature_store = FeatureStore(redis_url="localhost:6379", db=0)
-await feature_store.initialize()
-
-# Compute features using standard operators + feature extractors
-stream = (Stream.from_kafka("ticker-data")
-    .with_features([
-        'price_rolling_mean_5m',
-        'volume_std_1h',
-        'spread_percentile_95'
-    ])
-    .to_feature_store(
-        feature_store=feature_store,
-        entity_key_column='symbol',
-        feature_columns=['price_rolling_mean_5m', 'volume_std_1h', 'spread_percentile_95'],
-        ttl=300
-    ))
-```
-
-**Features:**
-- ✅ Cython-accelerated extractors (RollingMean, RollingStd, Percentile, TimeBased)
-- ✅ CyRedis backend with async batch writes
-- ✅ TTL-based expiration for streaming features
-- ✅ Composable with standard Stream API operators
-- ✅ Working demo: `examples/crypto_features_demo.py`
-
-### Tonbo State Backend
-
-Production-ready LSM storage engine (Rust FFI):
-
-```python
-from sabot.stores import TonboBackend
-
-# Create Tonbo state backend
-backend = TonboBackend(path="./state/tonbo", cython_enabled=True)
-await backend.start()
-
-# High-performance operations
-await backend.set("user:123", {"name": "Alice", "tier": "gold"})
-value = await backend.get("user:123")
-await backend.batch_set([("key1", val1), ("key2", val2)])
-```
-
-**Performance (Oct 6, 2025):**
-- ✅ **72K writes/sec**, **241K reads/sec**, **135K batch ops/sec**
-- ✅ Rust FFI with zero-copy Arrow integration
-- ✅ Used for: dimension tables, checkpoints, materializations
-- ✅ 7 test files passing (4 unit, 3 integration)
-- ✅ Status: **PRODUCTION READY**
-
-### Lock-Free Network Shuffle
-
-Zero-copy distributed data transfer using Arrow Flight:
-
-**Features:**
-- ✅ **Lock-free Arrow Flight transport** (`flight_transport_lockfree.pyx`) - atomic connection pooling
-- ✅ **SPSC/MPSC ring buffers** (`lock_free_queue.pyx`) - concurrent partition queues
-- ✅ **Atomic partition store** (`atomic_partition_store.pyx`) - LMAX Disruptor-style hash table
-- ✅ **Zero-copy network transfer** - direct Arrow RecordBatch serialization
-- ✅ 8 compiled modules in `sabot/_cython/shuffle/`
-
-**Use Cases:**
-- Distributed joins and aggregations
-- Repartitioning operations
-- Multi-stage dataflow pipelines
+- **Feature Engineering** (`sabot/features/`) - Feature store concepts, not production-ready
+- **State Backends** - Memory backend works, RocksDB/Tonbo experimental
+- **Shuffle** - Network shuffle infrastructure exists, not fully tested
 
 ### Graph Processing (`sabot/_cython/graph/`)
 
-High-performance graph analytics and pattern matching built on Arrow columnar format.
+**Status: ❌ Cypher parser incomplete - not functional**
 
-**Features:**
-- ✅ **Columnar Graph Storage**: Property graphs with CSR/CSC adjacency
-- ✅ **Graph Traversal**: BFS, DFS, shortest paths, PageRank, centrality, connected components
-- ✅ **Pattern Matching**: 2-hop, 3-hop, variable-length paths with cost-based optimization
-- ✅ **Zero-Copy Operations**: Direct Arrow buffer access for maximum throughput
+Graph processing modules exist but the Cypher query language parser is incomplete. Basic graph storage structures are in place but query execution does not work.
 
-**Performance (M1 Pro, October 2025):**
-- 2-hop patterns: 3-37M matches/sec
-- 3-hop patterns: 2.7-5.6M matches/sec
-- Graph traversal: 10-50M nodes/sec
-- Join optimizer: <0.130ms overhead
+**What exists (not working end-to-end):**
+- Graph storage structures (CSR/CSC adjacency)
+- Basic traversal algorithms (BFS, DFS)
+- Pattern matching kernels (incomplete)
 
-**API Example:**
+**What's needed:**
+- Complete Cypher parser
+- Query planner integration
+- End-to-end testing
+
+See [GRAPH_QUERY_ENGINE.md](docs/features/graph/GRAPH_QUERY_ENGINE.md) for architecture documentation.
+
+## Example: Basic Usage
+
+See `examples/00_quickstart/` for simple examples:
+
 ```python
-import pyarrow as pa
-from sabot._cython.graph import PropertyGraph, VertexTable, EdgeTable
-from sabot._cython.graph.query import match_2hop
-from sabot._cython.graph.traversal import pagerank
+from sabot.api.stream import Stream
 
-# Create social graph
-vertices = pa.table({
-    'id': pa.array([0, 1, 2, 3], type=pa.int64()),
-    'label': pa.array(['Person', 'Person', 'Person', 'Company']).dictionary_encode(),
-    'name': ['Alice', 'Bob', 'Charlie', 'Acme Corp']
-})
+# Basic stream operations
+stream = (Stream.from_list([1, 2, 3, 4, 5])
+    .filter(lambda x: x > 2)
+    .map(lambda x: x * 2))
 
-edges = pa.table({
-    'source': pa.array([0, 1, 0, 2], type=pa.int64()),
-    'target': pa.array([1, 2, 3, 3], type=pa.int64()),
-    'type': pa.array(['KNOWS', 'KNOWS', 'WORKS_AT', 'WORKS_AT']).dictionary_encode()
-})
-
-# Create property graph
-graph = PropertyGraph(VertexTable(vertices), EdgeTable(edges))
-graph.build_csr()
-
-# Find 2-hop patterns: Person → Person → Person
-result = match_2hop(edges, edges)
-print(f"Found {result.num_matches()} friend-of-friend connections")
-
-# Run PageRank
-ranks = pagerank(edges, num_vertices=4, damping=0.85, max_iterations=20)
-print(f"PageRank scores: {ranks.to_pylist()}")
-
-# Get neighbors
-neighbors = graph.get_neighbors(0)  # Alice's neighbors
-print(f"Alice knows: {neighbors.to_pylist()}")
+for item in stream:
+    print(item)
 ```
 
-**Use Cases:**
-- Social network analysis (friend-of-friend recommendations)
-- Fraud detection (money laundering pattern matching)
-- Knowledge graph inference
-- Supply chain tracking
-- Network influence analysis
+For SQL queries:
+```python
+from sabot_sql import SabotSQL
 
-**Comprehensive Documentation**: See [GRAPH_QUERY_ENGINE.md](docs/features/graph/GRAPH_QUERY_ENGINE.md) for complete API reference, examples, and benchmarks.
-
-**Working Examples**:
-- `examples/social_network_analysis.py` - Friend recommendations
-- `examples/fraud_detection_optimizer.py` - Money laundering patterns
-- `examples/pattern_sabot_integration.py` - Integration with Sabot operators
-
-**Test Suite**: 27 tests, 100% passing
-```bash
-pytest tests/unit/graph/test_pattern_matching.py -v
+sql = SabotSQL()
+result = sql.query("SELECT * FROM 'data.parquet' WHERE value > 10")
 ```
 
-## Example: Fintech Data Enrichment (Zero-Copy Arrow)
+For RDF/SPARQL (basic):
+```python
+from sabot.rdf import RDFStore
 
-The fintech enrichment demo shows how Sabot processes **millions of rows with Arrow columnar operations**:
-
-```bash
-# One-time: Convert CSV to Arrow IPC format (52x faster loading)
-cd examples/fintech_enrichment_demo
-python convert_csv_to_arrow.py
-
-# Enable Arrow IPC and run
-export SABOT_USE_ARROW=1
-./run_demo.sh --securities 10000000 --quotes 1200000
+store = RDFStore()
+store.load("data.nt")
+results = store.query("SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 10")
 ```
-
-**How Arrow Batch Processing Works:**
-- **Arrow Joins**: Convert RecordBatches to Tables, perform SIMD-accelerated hash joins
-- **Zero-Copy Operations**: Direct memory access to Arrow buffers (no Python object creation)
-- **SIMD Acceleration**: PyArrow compute kernels use vectorized operations
-- **Memory-Mapped Loading**: Arrow IPC files loaded directly into memory without copying
-
-**Performance Results (M3 MacBook Pro, 11.2M rows):**
-- **Total Pipeline**: 2.3 seconds end-to-end (vs 103s with CSV)
-- **Hash Join**: 104.6M rows/sec (11.2M rows joined in 107ms)
-- **Data Loading**: 2.1 seconds (10M securities + 1.2M quotes)
-- **File Size**: 50-70% smaller than CSV (5.6GB → 2.4GB)
-- **Speedup**: 46x faster than traditional CSV processing
-
-**vs PySpark for this workload:**
-- PySpark: ~30-60 seconds (JVM startup, serialization, garbage collection)
-- Sabot: 2.3 seconds (pure Python + Arrow + Cython acceleration)
-
-See `docs/guides/` for user guides and `docs/benchmarks/` for performance analysis.
 
 ## CLI Reference
 
@@ -712,42 +508,25 @@ docker compose down
 
 ## Examples
 
-| Example | Description | Performance | Location |
-|---------|-------------|-------------|----------|
-| **Fintech Enrichment** | 11.2M row joins with Arrow IPC | 104M rows/sec | `examples/fintech_enrichment_demo/` |
-| **Arrow Data Loading** | CSV to Arrow IPC conversion | 52x faster | `examples/fintech_enrichment_demo/convert_csv_to_arrow.py` |
-| **Zero-Copy Operations** | Hash joins, windows, filtering | SIMD-accelerated | `examples/fintech_enrichment_demo/arrow_optimized_enrichment.py` |
-| **Fraud Detection** | Real-time fraud detection (experimental) | 3-6K txn/s | `examples/fraud_app.py` |
-| **Crypto Features** | Real-time feature engineering pipeline | Redis feature store | `examples/crypto_features_demo.py` |
-| **Graph Pattern Matching** | Friend-of-friend recommendations | 3-37M matches/sec | `examples/social_network_analysis.py` |
-| **Graph Fraud Detection** | Money laundering pattern detection | 2.7-5.6M matches/sec | `examples/fraud_detection_optimizer.py` |
-| **Graph Traversal** | BFS, DFS, PageRank, shortest paths | 10-50M nodes/sec | `examples/property_graph_demo.py` |
+| Example | Description | Status | Location |
+|---------|-------------|--------|----------|
+| **Quickstart** | Basic stream operations | ✅ Working | `examples/00_quickstart/` |
+| **Local Pipelines** | Filter, map, window ops | ✅ Working | `examples/01_local_pipelines/` |
+| **SQL Queries** | DuckDB-based SQL | ✅ Working | `examples/api/` |
+| **RDF/SPARQL** | Triple store queries | ⚠️ Basic | `examples/sabot_ql_integration/` |
+| **Kafka Streaming** | Source/sink integration | ⚠️ Basic | `examples/streaming/` |
+| **Fintech Demo** | Data enrichment pipeline | ⚠️ Needs setup | `examples/fintech_enrichment_demo/` |
 
 ## Benchmark Results
 
-**Fintech Enrichment Demo (M3 MacBook Pro, 11.2M rows):**
-- **Hash Join**: 104.6M rows/sec (11.2M rows in 107ms)
-- **Arrow IPC Loading**: 5M rows/sec (10M rows in 2 seconds)
-- **CSV Loading**: 0.5M rows/sec (multi-threaded)
-- **Total Pipeline**: 2.3 seconds (vs 103s with CSV - **46x faster**)
-- **File Size**: 50-70% reduction (5.6GB → 2.4GB)
-- **Memory Usage**: Memory-mapped (minimal footprint)
+Performance benchmarks have not been independently verified. Historical benchmark claims in this repository should be treated skeptically.
 
-**CyArrow Zero-Copy Operations:**
-- **Window Computation**: ~2-3ns per element (SIMD)
-- **Filtering**: 50-100x faster than Python loops
-- **Sorting**: 10M+ rows/sec with zero-copy slicing
-- **Buffer Access**: ~5ns per element (direct C++ pointers)
+**What we can say:**
+- Arrow IPC loading is faster than CSV (expected)
+- DuckDB SQL execution is fast (it's DuckDB)
+- Cython modules provide speedup over pure Python
 
-**State Backend Operations (MemoryBackend):**
-- **Get/Put latency**: Sub-millisecond
-- **Sustained throughput**: 1M+ operations/second (Cython)
-
-**Notes on Benchmarks:**
-- Measured on M3 MacBook Pro (8-core, 18GB RAM)
-- Arrow IPC with memory-mapped I/O
-- Real fintech data (10M securities, 1.2M quotes)
-- All benchmarks are reproducible (see `docs/benchmarks/`)
+See `docs/benchmarks/` for historical benchmark data (may be outdated).
 
 ## Documentation
 
@@ -762,73 +541,49 @@ docker compose down
 - **[PROJECT_MAP.md](PROJECT_MAP.md)** - Directory structure and module status
 
 ### Features
-- **[Graph Query Engine](docs/features/graph/GRAPH_QUERY_ENGINE.md)** - Graph analytics and pattern matching (3-37M matches/sec)
-- **[RDF/SPARQL](docs/features/graph/rdf_sparql.md)** - RDF triple store and SPARQL queries
-- **[Kafka Integration](docs/features/kafka/)** - Kafka streaming documentation
-- **[SQL Engine](docs/features/sql/)** - SQL and DuckDB integration
-- **[Fintech Kernels](docs/features/fintech/)** - Financial computation kernels
+- **[RDF/SPARQL](docs/features/graph/rdf_sparql.md)** - RDF triple store (basic queries working)
+- **[SQL Engine](docs/features/sql/)** - DuckDB-based SQL execution
+- **[Kafka Integration](docs/features/kafka/)** - Basic Kafka source/sink
+- **[Graph/Cypher](docs/features/graph/GRAPH_QUERY_ENGINE.md)** - Architecture docs (not functional)
 
 ## Comparison to Other Frameworks
 
 | Feature | Sabot | PySpark | Ray | Apache Flink |
 |---------|-------|---------|-----|--------------|
 | **Language** | Python | Python (JVM) | Python | Java/Scala |
-| **Performance** | ✅ **104M rows/sec** (Arrow + Cython) | 🐌 10-50x slower (JVM serialization) | ⚠️ Distributed overhead | ✅ Production-scale |
-| **Columnar Processing** | ✅ **Zero-copy Arrow** (SIMD-accelerated) | ⚠️ Arrow integration | ❌ No | ⚠️ Limited |
-| **Data Loading** | ✅ **52x faster** (Arrow IPC) | 🐌 Standard | 🐌 Standard | 🐌 Standard |
-| **Memory Efficiency** | ✅ **Memory-mapped** (no copies) | 🐌 JVM heap | ⚠️ Object serialization | ✅ Native |
-| **Graph Processing** | ✅ **3-37M matches/sec** (native) | ⚠️ GraphX (JVM overhead) | ❌ No native support | ⚠️ Gelly (limited) |
-| **Setup Complexity** | ✅ **Single pip install** | 🐌 JVM + Spark cluster | 🐌 Distributed setup | 🐌 Cluster management |
-| **Debugging** | ✅ **Pure Python** (pdb, breakpoints) | 🐌 JVM stack traces | ⚠️ Distributed complexity | 🐌 JVM debugging |
-| **Streaming** | ⚠️ Experimental agents | ✅ Structured Streaming | ✅ Ray Data | ✅ Production |
-| **Production Ready** | ✅ CyArrow (yes), ✅ Graph (yes), ⚠️ Streaming (no) | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Columnar Processing** | ✅ Arrow-native | ⚠️ Arrow integration | ❌ No | ⚠️ Limited |
+| **SQL** | ✅ DuckDB-based | ✅ SparkSQL | ⚠️ Limited | ✅ FlinkSQL |
+| **Streaming** | ⚠️ Experimental | ✅ Structured Streaming | ✅ Ray Data | ✅ Production |
+| **Graph Processing** | ❌ Not working | ⚠️ GraphX | ❌ No | ⚠️ Gelly |
+| **RDF/SPARQL** | ⚠️ Basic | ❌ No | ❌ No | ❌ No |
+| **Setup Complexity** | ✅ Simple | 🐌 JVM + cluster | 🐌 Distributed | 🐌 Cluster |
+| **Production Ready** | ❌ Alpha | ✅ Yes | ✅ Yes | ✅ Yes |
 
 ## Roadmap
 
 ### Current Status (v0.1.0-alpha)
-**Working (Production-Quality):**
-- ✅ **CyArrow**: Zero-copy hash joins (104M rows/sec)
-- ✅ **DataLoader**: Multi-threaded CSV, memory-mapped Arrow IPC
-- ✅ **Arrow IPC Format**: 52x faster than CSV, 50-70% smaller files
-- ✅ **SIMD Operations**: Window functions, filtering, sorting
-- ✅ **Graph Processing**: Storage, traversal, pattern matching (3-37M matches/sec)
-- ✅ **Cython checkpoint coordinator** (Chandy-Lamport barriers)
-- ✅ **Memory state backend** with Cython acceleration
-- ✅ **Fintech enrichment demo** (11.2M rows in 2.3s)
 
-**Working (Experimental):**
-- ⚠️ Basic Kafka source/sink with schema registry
-- ⚠️ Watermark tracking primitives
-- ⚠️ CLI scaffolding (Faust-style)
-- ⚠️ Fraud detection demo (3K-6K txn/s)
+**Working:**
+- ✅ Arrow columnar operations
+- ✅ SQL via DuckDB integration
+- ✅ Basic stream operators (filter, map, window)
 
-**In Progress:**
-- 🚧 Agent runtime execution layer (partially stubbed)
-- 🚧 RocksDB state backend integration
-- 🚧 Distributed coordination
-- 🚧 Complex event processing (CEP)
+**Partially Working:**
+- ⚠️ RDF/SPARQL - basic queries work, needs polish
+- ⚠️ Kafka integration - basic source/sink
+- ⚠️ State backends - memory works, RocksDB experimental
 
-**Known Limitations:**
-- ⚠️ Test coverage ~5% for streaming features
-- ⚠️ Agent runtime has mock implementations
-- ⚠️ CLI uses stubs in places
-- ✅ CyArrow & DataLoader are well-tested and performant
+**Not Working:**
+- ❌ Cypher/Graph queries - parser incomplete
+- ❌ Distributed execution - infrastructure only
+- ❌ Production streaming - experimental only
 
-### Planned (v0.2.0)
-- 🎯 Complete agent runtime implementation
-- 🎯 Comprehensive integration tests
-- 🎯 RocksDB state backend completion
-- 🎯 Improved error handling and recovery
-- 🎯 Performance benchmarking suite
-- 🎯 Production-ready checkpointing
-
-### Future Ideas (v0.3.0+)
-- 📋 GPU acceleration via RAFT
-- 📋 Advanced CEP patterns
-- 📋 SQL/Table API
-- 📋 Web UI for monitoring
-- 📋 S3/HDFS connectors
-- 📋 Query optimizer
+### Needs Work
+- Complete Cypher parser
+- Polish SPARQL implementation
+- Improve test coverage
+- Better error handling
+- Documentation updates
 
 ## Contributing
 
@@ -876,29 +631,21 @@ Built with:
 
 ---
 
-## When to Choose Sabot vs PySpark vs Ray
+## When to Choose Sabot
 
-**Choose Sabot when:**
-- You need **PySpark-level performance** without JVM overhead
-- You're processing **large columnar datasets** (Arrow IPC, Parquet)
-- You need **high-performance graph analytics** (pattern matching, traversals)
-- You want **pure Python debugging** (pdb, breakpoints, no JVM stack traces)
-- **Single-machine performance** is your primary concern
-- You need **fast iteration** during development
+**Sabot might be useful if:**
+- You want Arrow-native columnar processing in Python
+- You need SQL queries via DuckDB
+- You're experimenting with RDF/SPARQL in Python
+- You want a simpler alternative to PySpark for local processing
 
-**Choose PySpark when:**
-- You need **production-scale distributed processing**
-- Your team is already invested in the Spark ecosystem
-- You have **existing Spark clusters** and infrastructure
-- **Java/Scala performance** is acceptable for your use case
+**Choose PySpark/Ray/Flink when:**
+- You need production-ready distributed processing
+- You need battle-tested streaming
+- You need reliable graph processing
 
-**Choose Ray when:**
-- You need **distributed actor-based processing**
-- You're building **complex ML pipelines** with distributed training
-- **Python-first distributed computing** is your priority
+**This is experimental alpha software.** Many features are incomplete or non-functional. Use for experimentation and learning, not production.
 
-**This is experimental alpha software.** The CyArrow columnar processing and graph analytics are production-quality, but streaming features are experimental. We welcome feedback and contributions!
-
-**Ready to try it?**
-- **Columnar processing**: [Fintech Enrichment Demo](examples/fintech_enrichment_demo/) - 11.2M rows in 2.3 seconds
-- **Graph analytics**: [Graph Query Engine](docs/features/graph/GRAPH_QUERY_ENGINE.md) - 3-37M matches/sec pattern matching
+**Getting Started:**
+- See `examples/00_quickstart/` for basic usage
+- See `examples/sabot_ql_integration/` for RDF/SPARQL examples
