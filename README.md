@@ -29,7 +29,7 @@ matches = engine.graph.cypher("MATCH (a)-[:KNOWS]->(b) RETURN a, b")
 engine.shutdown()
 ```
 
-**See:** [Unified Architecture Guide](README_UNIFIED_ARCHITECTURE.md)
+**See:** [Unified Architecture Guide](docs/architecture/README_UNIFIED_ARCHITECTURE.md)
 
 ## Classic API (Still Supported)
 
@@ -489,7 +489,7 @@ print(f"Alice knows: {neighbors.to_pylist()}")
 - Supply chain tracking
 - Network influence analysis
 
-**Comprehensive Documentation**: See [GRAPH_QUERY_ENGINE.md](docs/GRAPH_QUERY_ENGINE.md) for complete API reference, examples, and benchmarks.
+**Comprehensive Documentation**: See [GRAPH_QUERY_ENGINE.md](docs/features/graph/GRAPH_QUERY_ENGINE.md) for complete API reference, examples, and benchmarks.
 
 **Working Examples**:
 - `examples/social_network_analysis.py` - Friend recommendations
@@ -532,7 +532,7 @@ export SABOT_USE_ARROW=1
 - PySpark: ~30-60 seconds (JVM startup, serialization, garbage collection)
 - Sabot: 2.3 seconds (pure Python + Arrow + Cython acceleration)
 
-See [DATA_FORMATS.md](DATA_FORMATS.md) for format guide and [PERFORMANCE_SUMMARY.md](PERFORMANCE_SUMMARY.md) for detailed benchmarks.
+See `docs/guides/` for user guides and `docs/benchmarks/` for performance analysis.
 
 ## CLI Reference
 
@@ -747,28 +747,26 @@ docker compose down
 - Measured on M3 MacBook Pro (8-core, 18GB RAM)
 - Arrow IPC with memory-mapped I/O
 - Real fintech data (10M securities, 1.2M quotes)
-- All benchmarks are reproducible (see `PERFORMANCE_SUMMARY.md`)
+- All benchmarks are reproducible (see `docs/benchmarks/`)
 
 ## Documentation
 
-### Performance & Data Formats
-- **[PERFORMANCE_SUMMARY.md](PERFORMANCE_SUMMARY.md)** - Benchmark results and analysis
-- **[DATA_FORMATS.md](DATA_FORMATS.md)** - Format comparison (Arrow IPC, CSV, Parquet)
-- **[CYARROW.md](CYARROW.md)** - CyArrow API reference and zero-copy operations
-- **[DEMO_QUICKSTART.md](DEMO_QUICKSTART.md)** - Fintech demo quick start
+### Guides
+- **[QUICKSTART.md](docs/guides/QUICKSTART.md)** - Getting started guide
+- **[GETTING_STARTED.md](docs/guides/GETTING_STARTED.md)** - Detailed setup instructions
+- **[DOCUMENTATION.md](docs/guides/DOCUMENTATION.md)** - Full documentation index
 
-### Graph Processing
-- **[GRAPH_QUERY_ENGINE.md](docs/GRAPH_QUERY_ENGINE.md)** - Complete graph API documentation
-  - Columnar graph storage (CSR/CSC adjacency)
-  - Graph traversal algorithms (BFS, DFS, PageRank, etc.)
-  - Pattern matching (2-hop, 3-hop, variable-length paths)
-  - Query optimization and planning
-  - Performance benchmarks (3-37M matches/sec)
+### Architecture
+- **[ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)** - System architecture overview
+- **[README_UNIFIED_ARCHITECTURE.md](docs/architecture/README_UNIFIED_ARCHITECTURE.md)** - Unified API design
+- **[PROJECT_MAP.md](PROJECT_MAP.md)** - Directory structure and module status
 
-### Architecture & Development
-- **[PROJECT_MAP.md](PROJECT_MAP.md)** - Directory structure and module overview
-- **[Architecture](docs/ARCHITECTURE.md)** - Deep dive into internals (if exists)
-- **[API Reference](docs/API_REFERENCE.md)** - API documentation (if exists)
+### Features
+- **[Graph Query Engine](docs/features/graph/GRAPH_QUERY_ENGINE.md)** - Graph analytics and pattern matching (3-37M matches/sec)
+- **[RDF/SPARQL](docs/features/graph/rdf_sparql.md)** - RDF triple store and SPARQL queries
+- **[Kafka Integration](docs/features/kafka/)** - Kafka streaming documentation
+- **[SQL Engine](docs/features/sql/)** - SQL and DuckDB integration
+- **[Fintech Kernels](docs/features/fintech/)** - Financial computation kernels
 
 ## Comparison to Other Frameworks
 
@@ -849,7 +847,7 @@ Sabot is an experimental research project and welcomes contributions! This is a 
 - Check existing issues and roadmap before starting major work
 - Add tests for any new functionality
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines (if available).
+See GitHub issues for contribution opportunities.
 
 ## License
 
@@ -903,4 +901,4 @@ Built with:
 
 **Ready to try it?**
 - **Columnar processing**: [Fintech Enrichment Demo](examples/fintech_enrichment_demo/) - 11.2M rows in 2.3 seconds
-- **Graph analytics**: [Graph Query Engine](docs/GRAPH_QUERY_ENGINE.md) - 3-37M matches/sec pattern matching
+- **Graph analytics**: [Graph Query Engine](docs/features/graph/GRAPH_QUERY_ENGINE.md) - 3-37M matches/sec pattern matching
