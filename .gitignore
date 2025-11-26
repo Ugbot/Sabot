@@ -264,3 +264,117 @@ sabot_orchestrator.db
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# ===========================================
+# Large Data Files (benchmarks, test data)
+# ===========================================
+
+# Parquet files (benchmark datasets, test data)
+*.parquet
+
+# N-Triples and RDF data files
+*.nt
+*.nq
+*.ttl
+*.rdf
+*.owl
+
+# TPC-H benchmark data files
+*.tbl
+
+# ===========================================
+# Binary / Compiled Libraries
+# ===========================================
+
+# Static libraries
+*.a
+
+# Dynamic libraries (macOS)
+*.dylib
+
+# Shared objects (Linux)
+# Note: *.so already covered above in "C extensions"
+
+# JAR files (Java archives)
+*.jar
+
+# ===========================================
+# Build Directories and Artifacts
+# ===========================================
+
+# Build output directories
+**/build/
+**/cmake-build-*/
+
+# Object files
+*.o
+*.obj
+
+# Precompiled headers
+*.gch
+*.pch
+
+# ===========================================
+# Benchmark Data Directories
+# ===========================================
+
+# ClickBench data
+benchmarks/vs_duckdb/clickbench/
+
+# Polars benchmark data
+benchmarks/polars-benchmark/data/
+
+# PySpark benchmark data
+benchmarks/pyspark-benchmark/data/
+
+# RDF benchmark study data
+benchmarks/studies/rdf_benchmarks/KROWN/
+
+# Kuzu study reference data
+benchmarks/studies/kuzu_study/reference/
+
+# ===========================================
+# Vendored Library Build Artifacts
+# ===========================================
+
+# sabot_sql vendored builds (should be rebuilt locally)
+sabot_sql/vendored/
+sabot_sql/avro-cpp/
+sabot_sql/librdkafka/
+sabot_sql/protobuf/
+sabot_sql/simdjson/
+
+# Built shared libraries in bindings
+sabot_ql/bindings/python/*.dylib
+sabot_ql/bindings/python/*.so
+
+# ===========================================
+# Archive Data (abandoned implementations)
+# ===========================================
+
+# Archived graph implementation datasets
+archive/graph_implementations/*/dataset/
+archive/graph_implementations/*/vendored/*/dataset/
+archive/graph_implementations/*/vendored/*/extension/
+
+# ===========================================
+# Test Output and Coverage
+# ===========================================
+
+# HTML coverage reports
+htmlcov/
+
+# Test databases and temporary data
+test_data/
+test_output/
+*.test_db/
+
+# ===========================================
+# IDE and Editor
+# ===========================================
+
+# VSCode
+.vscode/
+
+# JetBrains IDEs
+.idea/
