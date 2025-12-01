@@ -223,12 +223,9 @@ public:
             throw std::runtime_error("Failed to initialize index persistence manager: " + status.ToString());
         }
 
-        // Initialize MVCC manager
-        initializeMVCC();
-        // TODO: Fix global_mvcc_manager - MVCCManager is forward-declared so can't use unique_ptr
-        mvcc_manager_ = nullptr;  // global_mvcc_manager.get();
-
-        // MVCC manager is initialized in its constructor
+        // Initialize MVCC manager using factory functions from version.h
+        mvcc_manager_owned_ = CreateMVCCManager(CreateDefaultTimestampProvider());
+        mvcc_manager_ = mvcc_manager_owned_.get();
 
         // ★★★ CREATE DEFAULT COLUMN FAMILY ★★★
         // Create a default column family with a generic schema so that Get() without
@@ -251,8 +248,7 @@ public:
     }
 
     ~SimpleMarbleDB() {
-        // Cleanup MVCC on shutdown
-        shutdownMVCC();
+        // MVCC manager cleanup is automatic via unique_ptr
     }
 
     // Column Family management
@@ -2212,7 +2208,8 @@ public:
 private:
     std::string path_;
     std::unique_ptr<WalManager> wal_manager_;
-    MVCCManager* mvcc_manager_;
+    std::unique_ptr<MVCCManager> mvcc_manager_owned_;  // Owns the MVCC manager
+    MVCCManager* mvcc_manager_;  // Raw pointer for interface compatibility
     std::unique_ptr<IndexPersistenceManager> index_persistence_manager_;
 };
 
