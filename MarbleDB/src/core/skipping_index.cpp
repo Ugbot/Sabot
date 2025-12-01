@@ -9,6 +9,106 @@
 namespace marble {
 
 //==============================================================================
+// Scalar Comparison Helper for Block-Level Skipping
+//==============================================================================
+
+// Returns: -1 if a < b, 0 if a == b, 1 if a > b
+static int CompareScalars(const std::shared_ptr<arrow::Scalar>& a,
+                          const std::shared_ptr<arrow::Scalar>& b) {
+    if (!a || !b || !a->is_valid || !b->is_valid) {
+        // Handle nulls: non-null > null
+        if (a && a->is_valid && (!b || !b->is_valid)) return 1;
+        if (b && b->is_valid && (!a || !a->is_valid)) return -1;
+        return 0;
+    }
+
+    // Type must match
+    if (a->type->id() != b->type->id()) {
+        return 0;  // Cannot compare different types
+    }
+
+    switch (a->type->id()) {
+        case arrow::Type::INT8: {
+            auto va = std::static_pointer_cast<arrow::Int8Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int8Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::INT16: {
+            auto va = std::static_pointer_cast<arrow::Int16Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int16Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::INT32: {
+            auto va = std::static_pointer_cast<arrow::Int32Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int32Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::INT64: {
+            auto va = std::static_pointer_cast<arrow::Int64Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int64Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::UINT8: {
+            auto va = std::static_pointer_cast<arrow::UInt8Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt8Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::UINT16: {
+            auto va = std::static_pointer_cast<arrow::UInt16Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt16Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::UINT32: {
+            auto va = std::static_pointer_cast<arrow::UInt32Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt32Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::UINT64: {
+            auto va = std::static_pointer_cast<arrow::UInt64Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt64Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::FLOAT: {
+            auto va = std::static_pointer_cast<arrow::FloatScalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::FloatScalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::DOUBLE: {
+            auto va = std::static_pointer_cast<arrow::DoubleScalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::DoubleScalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::STRING: {
+            auto va = std::static_pointer_cast<arrow::StringScalar>(a)->value->ToString();
+            auto vb = std::static_pointer_cast<arrow::StringScalar>(b)->value->ToString();
+            return va.compare(vb);
+        }
+        case arrow::Type::BINARY: {
+            auto va = std::static_pointer_cast<arrow::BinaryScalar>(a)->value->ToString();
+            auto vb = std::static_pointer_cast<arrow::BinaryScalar>(b)->value->ToString();
+            return va.compare(vb);
+        }
+        case arrow::Type::TIMESTAMP: {
+            auto va = std::static_pointer_cast<arrow::TimestampScalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::TimestampScalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::DATE32: {
+            auto va = std::static_pointer_cast<arrow::Date32Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Date32Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::DATE64: {
+            auto va = std::static_pointer_cast<arrow::Date64Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Date64Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        default:
+            return 0;  // Unknown type - cannot compare
+    }
+}
+
+//==============================================================================
 // InMemorySkippingIndex Implementation
 //==============================================================================
 
@@ -205,7 +305,7 @@ bool InMemorySkippingIndex::CanBlockSatisfy(const BlockStats& block,
                                           const std::string& column_name,
                                           const std::string& op,
                                           const std::shared_ptr<arrow::Scalar>& value) const {
-    // Check if this block can possibly satisfy the predicate
+    // Check if this block can possibly satisfy the predicate using zone maps
     auto min_it = block.min_values.find(column_name);
     auto max_it = block.max_values.find(column_name);
 
@@ -214,18 +314,50 @@ bool InMemorySkippingIndex::CanBlockSatisfy(const BlockStats& block,
         return true;
     }
 
-    if (!min_it->second || !max_it->second || !value) {
-        return true; // Can't compare, assume it might match
+    const auto& min_value = min_it->second;
+    const auto& max_value = max_it->second;
+
+    if (!min_value || !max_value || !value) {
+        return true;  // Can't compare, assume it might match
     }
 
     // Perform predicate evaluation based on min/max statistics
-    // TODO: Implement proper Arrow scalar comparison for predicate pushdown
-    // For now, return true (conservative approach - assume block might contain matches)
-    if (op == "=" || op == "==" || op == ">" || op == ">=" || op == "<" || op == "<=") {
-        return true; // Conservative: assume block might contain matching values
+    // Use zone map logic: can the predicate possibly be satisfied by any row in the block?
+
+    if (op == "=" || op == "==") {
+        // Equality: block can satisfy if min <= value <= max
+        // If value is outside [min, max] range, block definitely doesn't contain it
+        int cmp_min = CompareScalars(value, min_value);  // value vs min
+        int cmp_max = CompareScalars(value, max_value);  // value vs max
+        return (cmp_min >= 0 && cmp_max <= 0);  // min <= value <= max
+    }
+    else if (op == "<") {
+        // Less than: block can satisfy if min < value
+        // If min >= value, all values in block are >= value, so no value < value
+        return CompareScalars(min_value, value) < 0;
+    }
+    else if (op == "<=") {
+        // Less than or equal: block can satisfy if min <= value
+        return CompareScalars(min_value, value) <= 0;
+    }
+    else if (op == ">") {
+        // Greater than: block can satisfy if max > value
+        // If max <= value, all values in block are <= value, so no value > value
+        return CompareScalars(max_value, value) > 0;
+    }
+    else if (op == ">=") {
+        // Greater than or equal: block can satisfy if max >= value
+        return CompareScalars(max_value, value) >= 0;
+    }
+    else if (op == "!=" || op == "<>") {
+        // Not equal: block can satisfy unless all values are exactly equal to value
+        // Only skip if min == max == value (single-value block with the excluded value)
+        int cmp_min = CompareScalars(min_value, value);
+        int cmp_max = CompareScalars(max_value, value);
+        return !(cmp_min == 0 && cmp_max == 0);
     }
 
-    // For complex predicates, assume block might contain matching rows
+    // For complex predicates (LIKE, IN, etc.), assume block might contain matching rows
     return true;
 }
 
