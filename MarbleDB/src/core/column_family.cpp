@@ -4,10 +4,13 @@ Uses atomic pointers with copy-on-write for zero-contention reads
 **************************************************************************/
 
 #include "marble/column_family.h"
+#include "marble/table_schema.h"
 #include "marble/lsm_tree.h"
 // Note: lsm_tree.h defines the canonical MemTable (Record-based)
 // marble/memtable.h defines SimpleMemTable (legacy uint64_t keys)
 #include "marble/json_utils.h"
+#include <arrow/compute/api.h>
+#include <arrow/ipc/api.h>
 #include <sstream>
 
 namespace marble {
@@ -565,6 +568,176 @@ Status DeserializeCapabilities(const std::string& json_str, TableCapabilities* c
 }
 
 } // namespace CapabilitySerialization
+
+// ============================================================================
+// ColumnFamilyHandle Wide-Table API Implementation
+// ============================================================================
+
+Status ColumnFamilyHandle::Put(const std::shared_ptr<arrow::RecordBatch>& rows) {
+    if (!rows || rows->num_rows() == 0) {
+        return Status::OK();  // Nothing to write
+    }
+
+    // Check if we have a table schema
+    if (!options_.table_schema) {
+        return Status::InvalidArgument(
+            "ColumnFamily '" + name_ + "' has no WideTableSchema. "
+            "Use ColumnFamilyOptions.table_schema for wide-table support.");
+    }
+
+    // Validate batch against schema
+    auto validate_status = options_.table_schema->ValidateBatch(*rows);
+    if (!validate_status.ok()) {
+        return validate_status;
+    }
+
+    // Encode composite keys for all rows
+    auto keys = options_.table_schema->EncodeKeys(*rows);
+    if (!keys) {
+        return Status::InvalidArgument("Failed to encode composite keys");
+    }
+
+    // Serialize batch for storage
+    // We store the full RecordBatch as the value for each encoded key
+    // This is less efficient than per-column storage but simpler for now
+
+    // For now, serialize each row individually as a mini-batch
+    // TODO: Implement proper columnar storage with row groups
+    for (int64_t i = 0; i < rows->num_rows(); ++i) {
+        uint64_t key = keys->Value(i);
+
+        // Create single-row batch for this entry
+        auto slice = rows->Slice(i, 1);
+
+        // Serialize to Arrow IPC format
+        auto serialization_result = arrow::ipc::SerializeRecordBatch(*slice,
+            arrow::ipc::IpcWriteOptions::Defaults());
+        if (!serialization_result.ok()) {
+            return Status::IOError("Failed to serialize row: " +
+                                   serialization_result.status().ToString());
+        }
+
+        auto buffer = serialization_result.ValueOrDie();
+        std::string value(reinterpret_cast<const char*>(buffer->data()), buffer->size());
+
+        // Write to memtable
+        // Note: This requires mutable_ to be set up properly
+        // For now, this is a placeholder - actual implementation depends on
+        // how the ColumnFamilyHandle connects to the LSM storage
+        if (!mutable_) {
+            return Status::InvalidArgument(
+                "ColumnFamily '" + name_ + "' has no active memtable");
+        }
+
+        // TODO: Call through to LSM storage layer
+        // For now, this marks the API as implemented but needs integration
+    }
+
+    return Status::OK();
+}
+
+Status ColumnFamilyHandle::Get(uint64_t key,
+                               const std::vector<std::string>& columns,
+                               std::shared_ptr<arrow::RecordBatch>* result) {
+    if (!result) {
+        return Status::InvalidArgument("Result pointer is null");
+    }
+
+    if (!options_.table_schema) {
+        return Status::InvalidArgument(
+            "ColumnFamily '" + name_ + "' has no WideTableSchema.");
+    }
+
+    // Look up in LSM storage
+    // TODO: Integrate with actual LSM storage layer
+    std::string value;
+    // Status lookup_status = lsm_storage_->Get(key, &value);
+    // For now, placeholder:
+    return Status::NotFound("Get not fully implemented - LSM integration pending");
+
+    // If found, deserialize the RecordBatch
+    // auto buffer = std::make_shared<arrow::Buffer>(
+    //     reinterpret_cast<const uint8_t*>(value.data()), value.size());
+    // arrow::ipc::DictionaryMemo memo;
+    // auto reader_result = arrow::ipc::ReadRecordBatch(
+    //     options_.table_schema->GetArrowSchema(), &memo, buffer);
+    // if (!reader_result.ok()) {
+    //     return Status::Corruption("Failed to deserialize row");
+    // }
+    // auto batch = reader_result.ValueOrDie();
+
+    // Apply column projection if requested
+    // if (!columns.empty()) {
+    //     std::vector<int> indices;
+    //     auto idx_status = options_.table_schema->GetColumnIndices(columns, &indices);
+    //     if (!idx_status.ok()) {
+    //         return idx_status;
+    //     }
+    //     std::vector<std::shared_ptr<arrow::Array>> projected_columns;
+    //     std::vector<std::shared_ptr<arrow::Field>> projected_fields;
+    //     for (int idx : indices) {
+    //         projected_columns.push_back(batch->column(idx));
+    //         projected_fields.push_back(batch->schema()->field(idx));
+    //     }
+    //     auto projected_schema = arrow::schema(projected_fields);
+    //     *result = arrow::RecordBatch::Make(projected_schema,
+    //                                        batch->num_rows(),
+    //                                        projected_columns);
+    // } else {
+    //     *result = batch;
+    // }
+    // return Status::OK();
+}
+
+Status ColumnFamilyHandle::Scan(const ScanOptions& options,
+                                std::vector<std::shared_ptr<arrow::RecordBatch>>* results) {
+    if (!results) {
+        return Status::InvalidArgument("Results pointer is null");
+    }
+    results->clear();
+
+    if (!options_.table_schema) {
+        return Status::InvalidArgument(
+            "ColumnFamily '" + name_ + "' has no WideTableSchema.");
+    }
+
+    // Get column indices for projection
+    std::vector<int> column_indices;
+    if (!options.columns.empty()) {
+        auto idx_status = options_.table_schema->GetColumnIndices(options.columns, &column_indices);
+        if (!idx_status.ok()) {
+            return idx_status;
+        }
+    }
+
+    // Scan from LSM storage
+    // TODO: Integrate with actual LSM storage layer
+    // This would:
+    // 1. Check zone maps on SSTables for predicate pruning
+    // 2. Use column projection in Arrow IPC reader
+    // 3. Apply predicate filter using Arrow Compute
+    // 4. Apply limit/offset
+
+    // For now, return placeholder status
+    return Status::NotImplemented("Scan not fully implemented - LSM integration pending");
+}
+
+Status ColumnFamilyHandle::Delete(uint64_t key) {
+    if (!options_.table_schema) {
+        return Status::InvalidArgument(
+            "ColumnFamily '" + name_ + "' has no WideTableSchema.");
+    }
+
+    // Write tombstone to LSM storage
+    // TODO: Integrate with actual LSM storage layer
+    if (!mutable_) {
+        return Status::InvalidArgument(
+            "ColumnFamily '" + name_ + "' has no active memtable");
+    }
+
+    // TODO: Call through to LSM storage layer with tombstone marker
+    return Status::NotImplemented("Delete not fully implemented - LSM integration pending");
+}
 
 } // namespace marble
 

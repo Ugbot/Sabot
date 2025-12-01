@@ -255,7 +255,7 @@ Sabot combines **Arrow's columnar performance** with **Python's ecosystem**:
                          ↓
 ┌─────────────────────────────────────────────────────────┐
 │                  Infrastructure Layer                   │
-│   Kafka, Redpanda | PostgreSQL | Redis | RocksDB       │
+│   Kafka, Redpanda | PostgreSQL | MarbleDB | RocksDB    │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -265,18 +265,48 @@ Sabot combines **Arrow's columnar performance** with **Python's ecosystem**:
 |--------|-------------|--------|
 | **cyarrow** | Zero-copy Arrow operations | ✅ Working |
 | **sql** | DuckDB-based SQL execution | ✅ Working |
+| **MarbleDB** | Arrow-native LSM storage | ⚠️ Basic state works |
 | **sparql** | RDF triple store queries | ⚠️ Basic |
 | **kafka** | Kafka source/sink | ⚠️ Basic |
-| **state** | Memory/RocksDB backends | ⚠️ Experimental |
+| **state** | Memory/MarbleDB/RocksDB backends | ⚠️ Experimental |
 | **checkpoint** | Distributed snapshots | ⚠️ Experimental |
 | **graph/cypher** | Graph pattern matching | ❌ Not working |
+
+### MarbleDB Storage Engine
+
+**Arrow-native LSM storage engine** for state management.
+
+```python
+from sabot._cython.state.marbledb_backend import MarbleDBStateBackend
+
+# Create MarbleDB-backed state
+backend = MarbleDBStateBackend("/tmp/state")
+backend.open()
+backend.put_raw("key", b"value")
+result = backend.get_raw("key")
+backend.close()
+```
+
+**Status:** ⚠️ Alpha - basic state backend works, advanced features incomplete
+
+**What works:**
+- ✅ Basic put/get/delete operations
+- ✅ LSM-tree storage with bloom filters
+- ✅ MarbleDB C++ library compiles (19/19 tests)
+
+**What's incomplete:**
+- ⚠️ Arrow table storage (`marbledb_store`) not built
+- ⚠️ Transactions not implemented
+- ⚠️ Distributed features are stubs
+
+See [MarbleDB README](MarbleDB/README.md) for details.
 
 ### Additional Modules (Experimental)
 
 These modules exist but are experimental or incomplete:
 
 - **Feature Engineering** (`sabot/features/`) - Feature store concepts, not production-ready
-- **State Backends** - Memory backend works, RocksDB/Tonbo experimental
+- **State Backends** - Memory backend works, MarbleDB alpha, RocksDB experimental
 - **Shuffle** - Network shuffle infrastructure exists, not fully tested
 
 ### Graph Processing (`sabot/_cython/graph/`)
@@ -386,6 +416,15 @@ async def process_events(stream):
 ### State Management
 
 ```python
+# MarbleDB backend (persistent, basic ops work)
+from sabot._cython.state.marbledb_backend import MarbleDBStateBackend
+
+marble = MarbleDBStateBackend("./state")
+marble.open()
+marble.put_raw("key", b"value")
+result = marble.get_raw("key")
+marble.close()
+
 # Memory backend (fast, not persistent)
 config = sb.BackendConfig(
     backend_type="memory",
@@ -394,16 +433,18 @@ config = sb.BackendConfig(
 )
 backend = sb.MemoryBackend(config)
 
-# RocksDB backend (persistent, larger state)
+# RocksDB backend (persistent, byte-oriented)
 rocksdb = sb.RocksDBBackend(
     sb.BackendConfig(backend_type="rocksdb", path="./state")
 )
 
-# State types
+# State types (work with any backend)
 value_state = sb.ValueState(backend, "counter")      # Single value
 map_state = sb.MapState(backend, "user_profiles")    # Key-value map
 list_state = sb.ListState(backend, "events")         # Ordered list
 ```
+
+**Note:** MarbleDB basic state works. Memory backend is most stable.
 
 ### Checkpointing
 
@@ -541,6 +582,7 @@ See `docs/benchmarks/` for historical benchmark data (may be outdated).
 - **[PROJECT_MAP.md](PROJECT_MAP.md)** - Directory structure and module status
 
 ### Features
+- **[MarbleDB](MarbleDB/README.md)** - Arrow-native LSM storage (alpha, 19/19 tests)
 - **[RDF/SPARQL](docs/features/graph/rdf_sparql.md)** - RDF triple store (basic queries working)
 - **[SQL Engine](docs/features/sql/)** - DuckDB-based SQL execution
 - **[Kafka Integration](docs/features/kafka/)** - Basic Kafka source/sink
@@ -618,10 +660,11 @@ Inspired by:
 
 Built with:
 - **Cython** - High-performance compiled modules for Arrow acceleration
-- **PyArrow** - SIMD-accelerated compute kernels and memory management
+- **Apache Arrow** - SIMD-accelerated compute kernels and memory management
+- **MarbleDB** - Arrow-native LSM storage engine for state management
 - **Redpanda** - Kafka-compatible streaming infrastructure
 - **PostgreSQL** - Durable execution (DBOS-inspired)
-- **RocksDB** - Embedded key-value store for state management
+- **DuckDB** - SQL query engine
 
 ## Support
 

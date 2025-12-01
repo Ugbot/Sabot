@@ -11,6 +11,106 @@
 namespace marble {
 
 //==============================================================================
+// Helper: Compare Arrow Scalars
+//==============================================================================
+
+// Returns: -1 if a < b, 0 if a == b, 1 if a > b
+static int CompareScalars(const std::shared_ptr<arrow::Scalar>& a,
+                          const std::shared_ptr<arrow::Scalar>& b) {
+    if (!a || !b || !a->is_valid || !b->is_valid) {
+        // Handle nulls: non-null > null
+        if (a && a->is_valid && (!b || !b->is_valid)) return 1;
+        if (b && b->is_valid && (!a || !a->is_valid)) return -1;
+        return 0;
+    }
+
+    // Type must match
+    if (a->type->id() != b->type->id()) {
+        return 0;  // Cannot compare different types
+    }
+
+    switch (a->type->id()) {
+        case arrow::Type::INT8: {
+            auto va = std::static_pointer_cast<arrow::Int8Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int8Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::INT16: {
+            auto va = std::static_pointer_cast<arrow::Int16Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int16Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::INT32: {
+            auto va = std::static_pointer_cast<arrow::Int32Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int32Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::INT64: {
+            auto va = std::static_pointer_cast<arrow::Int64Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int64Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::UINT8: {
+            auto va = std::static_pointer_cast<arrow::UInt8Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt8Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::UINT16: {
+            auto va = std::static_pointer_cast<arrow::UInt16Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt16Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::UINT32: {
+            auto va = std::static_pointer_cast<arrow::UInt32Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt32Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::UINT64: {
+            auto va = std::static_pointer_cast<arrow::UInt64Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt64Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::FLOAT: {
+            auto va = std::static_pointer_cast<arrow::FloatScalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::FloatScalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::DOUBLE: {
+            auto va = std::static_pointer_cast<arrow::DoubleScalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::DoubleScalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::STRING: {
+            auto va = std::static_pointer_cast<arrow::StringScalar>(a)->value->ToString();
+            auto vb = std::static_pointer_cast<arrow::StringScalar>(b)->value->ToString();
+            return va.compare(vb);
+        }
+        case arrow::Type::BINARY: {
+            auto va = std::static_pointer_cast<arrow::BinaryScalar>(a)->value->ToString();
+            auto vb = std::static_pointer_cast<arrow::BinaryScalar>(b)->value->ToString();
+            return va.compare(vb);
+        }
+        case arrow::Type::TIMESTAMP: {
+            auto va = std::static_pointer_cast<arrow::TimestampScalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::TimestampScalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::DATE32: {
+            auto va = std::static_pointer_cast<arrow::Date32Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Date32Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::DATE64: {
+            auto va = std::static_pointer_cast<arrow::Date64Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Date64Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        default:
+            return 0;  // Unknown type - cannot compare
+    }
+}
+
+//==============================================================================
 // ColumnStatistics Implementation
 //==============================================================================
 
@@ -19,32 +119,54 @@ bool ColumnStatistics::CanSatisfyPredicate(const ColumnPredicate& predicate) con
         return true;  // Not our column, can't eliminate
     }
 
-    if (!min_value || !max_value) {
-        return true;  // No stats available, assume it can satisfy
+    if (!min_value || !max_value || !predicate.value) {
+        return true;  // No stats or no predicate value, assume it can satisfy
     }
 
-    // For now, implement basic range checks
-    // This could be extended with more sophisticated predicate evaluation
+    // Zone map pruning logic:
+    // - Return false if we can PROVE no rows satisfy the predicate
+    // - Return true (conservative) if some rows MIGHT satisfy
     switch (predicate.predicate_type) {
-        case ColumnPredicate::PredicateType::kLessThan: {
-            // If max_value >= predicate.value, some rows might satisfy
-            // For now, be conservative and allow the scan
+        case ColumnPredicate::PredicateType::kLessThan:
+            // Query: column < X
+            // Satisfiable if min_value < X (at least one row might be < X)
+            return CompareScalars(min_value, predicate.value) < 0;
+
+        case ColumnPredicate::PredicateType::kLessThanOrEqual:
+            // Query: column <= X
+            // Satisfiable if min_value <= X
+            return CompareScalars(min_value, predicate.value) <= 0;
+
+        case ColumnPredicate::PredicateType::kGreaterThan:
+            // Query: column > X
+            // Satisfiable if max_value > X (at least one row might be > X)
+            return CompareScalars(max_value, predicate.value) > 0;
+
+        case ColumnPredicate::PredicateType::kGreaterThanOrEqual:
+            // Query: column >= X
+            // Satisfiable if max_value >= X
+            return CompareScalars(max_value, predicate.value) >= 0;
+
+        case ColumnPredicate::PredicateType::kEqual:
+            // Query: column == X
+            // Satisfiable if min_value <= X <= max_value
+            return CompareScalars(min_value, predicate.value) <= 0 &&
+                   CompareScalars(predicate.value, max_value) <= 0;
+
+        case ColumnPredicate::PredicateType::kNotEqual:
+            // Query: column != X
+            // Can only prune if ALL values equal X (min == max == X)
+            // This is rare, so be conservative
+            return !(CompareScalars(min_value, max_value) == 0 &&
+                     CompareScalars(min_value, predicate.value) == 0);
+
+        case ColumnPredicate::PredicateType::kLike:
+        case ColumnPredicate::PredicateType::kIn:
+            // Cannot evaluate pattern matching or IN lists with zone maps
             return true;
-        }
-        case ColumnPredicate::PredicateType::kGreaterThan: {
-            // For now, be conservative and allow the scan
-            return true;
-        }
-        case ColumnPredicate::PredicateType::kEqual: {
-            // For now, be conservative and allow the scan
-            return true;
-        }
-        default:
-            // For other predicate types, assume they can be satisfied
-            break;
     }
 
-    return true;
+    return true;  // Conservative default
 }
 
 //==============================================================================
@@ -100,28 +222,83 @@ Status ArrowPredicateEvaluator::EvaluateBatch(
         return Status::OK();
     }
 
-    // Start with all rows matching
-    std::vector<bool> result_mask(batch->num_rows(), true);
+    // Start with no combined mask (will be populated on first predicate)
+    std::shared_ptr<arrow::BooleanArray> combined_mask;
 
     for (const auto& compiled : compiled_predicates_) {
         auto column = batch->GetColumnByName(compiled.column_name);
         if (!column) {
-            return Status::InvalidArgument("Column not found: " + compiled.column_name);
+            // Column not found - skip this predicate (conservative)
+            continue;
         }
 
-        // For now, skip Arrow compute evaluations and use simple filtering
-        // TODO: Re-enable once Arrow compute API is properly integrated
-        // Just keep all rows for now
+        if (!compiled.value) {
+            // No value to compare - skip this predicate
+            continue;
+        }
+
+        // Use Arrow compute to compare column with scalar value
+        // This is SIMD-optimized for performance
+        // Map CompareOperator to function name
+        std::string compare_func;
+        switch (compiled.op) {
+            case arrow::compute::CompareOperator::EQUAL:
+                compare_func = "equal";
+                break;
+            case arrow::compute::CompareOperator::NOT_EQUAL:
+                compare_func = "not_equal";
+                break;
+            case arrow::compute::CompareOperator::LESS:
+                compare_func = "less";
+                break;
+            case arrow::compute::CompareOperator::LESS_EQUAL:
+                compare_func = "less_equal";
+                break;
+            case arrow::compute::CompareOperator::GREATER:
+                compare_func = "greater";
+                break;
+            case arrow::compute::CompareOperator::GREATER_EQUAL:
+                compare_func = "greater_equal";
+                break;
+            default:
+                continue;  // Unknown operator
+        }
+
+        auto compare_result = arrow::compute::CallFunction(
+            compare_func,
+            {column, compiled.value});
+
+        if (!compare_result.ok()) {
+            // Comparison failed - skip this predicate (conservative)
+            continue;
+        }
+
+        auto predicate_mask = std::static_pointer_cast<arrow::BooleanArray>(
+            compare_result.ValueOrDie().make_array());
+
+        if (!combined_mask) {
+            // First predicate - use its mask directly
+            combined_mask = predicate_mask;
+        } else {
+            // AND with existing mask using Arrow compute
+            auto and_result = arrow::compute::And(combined_mask, predicate_mask);
+            if (and_result.ok()) {
+                combined_mask = std::static_pointer_cast<arrow::BooleanArray>(
+                    and_result.ValueOrDie().make_array());
+            }
+        }
     }
 
-    // Handle complex predicates (BETWEEN, IN, LIKE, etc.)
-    // For now, skip complex predicates - TODO: Re-implement with correct Arrow API
+    if (!combined_mask) {
+        // No predicates evaluated - all rows match
+        arrow::BooleanBuilder builder;
+        ARROW_RETURN_NOT_OK(builder.AppendValues(std::vector<bool>(batch->num_rows(), true)));
+        ARROW_ASSIGN_OR_RAISE(auto array, builder.Finish());
+        *mask = std::static_pointer_cast<arrow::BooleanArray>(array);
+    } else {
+        *mask = combined_mask;
+    }
 
-    // Build the boolean mask array
-    arrow::BooleanBuilder builder;
-    ARROW_RETURN_NOT_OK(builder.AppendValues(result_mask));
-    ARROW_ASSIGN_OR_RAISE(auto array, builder.Finish());
-    *mask = std::static_pointer_cast<arrow::BooleanArray>(array);
     return Status::OK();
 }
 
@@ -129,14 +306,59 @@ Status ArrowPredicateEvaluator::FilterBatch(
     const std::shared_ptr<arrow::RecordBatch>& batch,
     std::shared_ptr<arrow::RecordBatch>* filtered_batch) const {
 
+    if (!HasPredicates()) {
+        // No predicates - return original batch
+        *filtered_batch = batch;
+        return Status::OK();
+    }
+
     std::shared_ptr<arrow::BooleanArray> mask;
     ARROW_RETURN_NOT_OK(EvaluateBatch(batch, &mask));
 
-    // Filter the batch using the mask
-    // TODO: Re-enable Arrow compute::Filter when API is updated
-    // For now, just return the original batch
-    *filtered_batch = batch;
+    // Count true values in mask - if all true, skip filtering
+    int64_t true_count = 0;
+    for (int64_t i = 0; i < mask->length(); ++i) {
+        if (mask->Value(i)) true_count++;
+    }
 
+    if (true_count == batch->num_rows()) {
+        // All rows match - return original batch (skip filtering overhead)
+        *filtered_batch = batch;
+        return Status::OK();
+    }
+
+    if (true_count == 0) {
+        // No rows match - return empty batch with same schema
+        std::vector<std::shared_ptr<arrow::Array>> empty_arrays;
+        for (int i = 0; i < batch->num_columns(); ++i) {
+            // Create empty array of same type
+            auto type = batch->column(i)->type();
+            std::unique_ptr<arrow::ArrayBuilder> builder;
+            auto builder_status = arrow::MakeBuilder(arrow::default_memory_pool(), type, &builder);
+            if (builder_status.ok()) {
+                auto finish_result = builder->Finish();
+                if (finish_result.ok()) {
+                    empty_arrays.push_back(finish_result.ValueOrDie());
+                }
+            }
+        }
+        *filtered_batch = arrow::RecordBatch::Make(batch->schema(), 0, empty_arrays);
+        return Status::OK();
+    }
+
+    // Filter the batch using Arrow compute (SIMD-optimized)
+    auto filter_result = arrow::compute::Filter(
+        batch,
+        mask,
+        arrow::compute::FilterOptions::Defaults());
+
+    if (!filter_result.ok()) {
+        // Filter failed - return original batch (conservative)
+        *filtered_batch = batch;
+        return Status::OK();
+    }
+
+    *filtered_batch = filter_result.ValueOrDie().record_batch();
     return Status::OK();
 }
 
@@ -519,15 +741,7 @@ Status BuildColumnStatistics(
     ColumnStatistics* stats) {
 
     stats->column_name = column_name;
-    stats->distinct_count = -1;  // Not computed for now
-
-    if (column->length() == 0) {
-        return Status::OK();
-    }
-
-    // Compute basic statistics
-    // TODO: Re-enable Arrow compute statistics when API is updated
-    // For now, provide placeholder statistics
+    stats->distinct_count = -1;  // Not computed for efficiency
     stats->null_count = 0;
     stats->has_nulls = false;
     stats->min_value = nullptr;
@@ -536,7 +750,95 @@ Status BuildColumnStatistics(
     stats->std_dev = 0.0;
     stats->min_length = 0;
     stats->max_length = 0;
-    stats->avg_length = 0.0;
+    stats->avg_length = 0;
+
+    if (column->length() == 0) {
+        return Status::OK();
+    }
+
+    // Compute null count
+    stats->null_count = column->null_count();
+    stats->has_nulls = (stats->null_count > 0);
+
+    // Compute min/max using Arrow Compute
+    auto min_result = arrow::compute::MinMax(column);
+    if (min_result.ok()) {
+        auto min_max_struct = min_result.ValueOrDie().scalar_as<arrow::StructScalar>();
+        if (min_max_struct.is_valid) {
+            // StructScalar contains {min, max} fields
+            const auto& field_values = min_max_struct.value;
+            if (field_values.size() >= 2) {
+                stats->min_value = field_values[0];  // min
+                stats->max_value = field_values[1];  // max
+            }
+        }
+    }
+
+    // Type-specific statistics
+    auto type_id = column->type()->id();
+
+    // Numeric types: compute mean and stddev
+    if (arrow::is_floating(type_id) || arrow::is_integer(type_id)) {
+        // Mean
+        auto mean_result = arrow::compute::Mean(column);
+        if (mean_result.ok()) {
+            auto mean_scalar = mean_result.ValueOrDie().scalar();
+            if (mean_scalar && mean_scalar->is_valid) {
+                if (mean_scalar->type->id() == arrow::Type::DOUBLE) {
+                    stats->mean = std::static_pointer_cast<arrow::DoubleScalar>(mean_scalar)->value;
+                }
+            }
+        }
+
+        // Standard deviation (variance then sqrt)
+        auto variance_result = arrow::compute::Variance(column);
+        if (variance_result.ok()) {
+            auto var_scalar = variance_result.ValueOrDie().scalar();
+            if (var_scalar && var_scalar->is_valid) {
+                if (var_scalar->type->id() == arrow::Type::DOUBLE) {
+                    double variance = std::static_pointer_cast<arrow::DoubleScalar>(var_scalar)->value;
+                    stats->std_dev = std::sqrt(variance);
+                }
+            }
+        }
+    }
+
+    // String/Binary types: compute length statistics
+    if (type_id == arrow::Type::STRING || type_id == arrow::Type::LARGE_STRING ||
+        type_id == arrow::Type::BINARY || type_id == arrow::Type::LARGE_BINARY) {
+
+        int64_t total_length = 0;
+        int64_t min_len = INT64_MAX;
+        int64_t max_len = 0;
+        int64_t valid_count = 0;
+
+        for (int chunk_idx = 0; chunk_idx < column->num_chunks(); ++chunk_idx) {
+            auto chunk = column->chunk(chunk_idx);
+
+            // Compute binary length for this chunk using CallFunction
+            auto length_result = arrow::compute::CallFunction("binary_length", {chunk});
+            if (!length_result.ok()) continue;
+
+            auto lengths = length_result.ValueOrDie().make_array();
+            auto int32_lengths = std::static_pointer_cast<arrow::Int32Array>(lengths);
+
+            for (int64_t i = 0; i < int32_lengths->length(); ++i) {
+                if (!int32_lengths->IsNull(i)) {
+                    int32_t len = int32_lengths->Value(i);
+                    total_length += len;
+                    min_len = std::min(min_len, static_cast<int64_t>(len));
+                    max_len = std::max(max_len, static_cast<int64_t>(len));
+                    valid_count++;
+                }
+            }
+        }
+
+        if (valid_count > 0) {
+            stats->min_length = min_len;
+            stats->max_length = max_len;
+            stats->avg_length = total_length / valid_count;
+        }
+    }
 
     return Status::OK();
 }

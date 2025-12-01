@@ -17,5 +17,12 @@ except ImportError:
     MARBLEDB_JOINS_AVAILABLE = False
     MarbleDBJoinBuffer = None
 
-__all__ = ['hash_join', 'HASH_JOIN_AVAILABLE', 'MarbleDBJoinBuffer', 'MARBLEDB_JOINS_AVAILABLE']
+# JoinBuilder and related components from builder module
+from .builder import JoinBuilder, create_join_builder
+
+__all__ = [
+    'hash_join', 'HASH_JOIN_AVAILABLE',
+    'MarbleDBJoinBuffer', 'MARBLEDB_JOINS_AVAILABLE',
+    'JoinBuilder', 'create_join_builder',
+]
 

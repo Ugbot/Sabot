@@ -40,7 +40,12 @@ cdef extern from "marble/lsm_storage.h" namespace "marble":
         Status Shutdown()
         Status Put(uint64_t key, const string& value)
         Status Get(uint64_t key, string* value)
+        Status MultiGet(const vector[uint64_t]& keys,
+                       vector[string]* values,
+                       vector[Status]* statuses)
         Status Delete(uint64_t key)
+        Status DeleteBatch(const vector[uint64_t]& keys)
+        Status DeleteRange(uint64_t start_key, uint64_t end_key, size_t* deleted_count)
         Status Scan(uint64_t start_key, uint64_t end_key,
                    vector[pair[uint64_t, string]]* results)
         Status Flush()
@@ -59,9 +64,11 @@ cdef class MarbleDBStateBackend(StateBackend):
     cpdef object get_value(self, str state_name, object default_value=*)
     cpdef void clear_value(self, str state_name)
     cpdef void add_to_list(self, str state_name, object value)
+    cdef list _get_list_internal(self, str list_key)
     cpdef object get_list(self, str state_name)
     cpdef void clear_list(self, str state_name)
     cpdef void put_to_map(self, str state_name, object map_key, object value)
+    cdef dict _get_map_internal(self, str map_state_key)
     cpdef object get_from_map(self, str state_name, object map_key, object default_value=*)
     cpdef void remove_from_map(self, str state_name, object map_key)
     cpdef dict get_map(self, str state_name)
@@ -72,6 +79,8 @@ cdef class MarbleDBStateBackend(StateBackend):
     cpdef bint exists_raw(self, str key)
     cpdef dict multi_get_raw(self, list keys)
     cpdef void delete_range_raw(self, str start_key, str end_key)
+    cpdef void insert_batch_raw(self, list keys, list values)
+    cpdef void delete_batch_raw(self, list keys)
     cpdef object scan_range(self, str start_key=*, str end_key=*)
     cpdef str checkpoint(self)
     cpdef void restore(self, str checkpoint_path)

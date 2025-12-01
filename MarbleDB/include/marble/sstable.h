@@ -5,10 +5,22 @@
 #include <vector>
 #include <unordered_map>
 #include <arrow/api.h>
+#include <arrow/compute/api.h>
 #include <marble/status.h>
 #include <marble/file_system.h>
 
 namespace marble {
+
+// Forward declaration
+class WideTableSchema;
+
+// Tombstone marker - a special value that indicates a key was deleted
+// Stored as 8 bytes to be distinguishable from empty values
+static const std::string kTombstoneMarker = "\x7F\xDE\xAD\xBE\xEF\x00\x00\x01";
+
+// ColumnStatistics needs full definition for std::vector in SSTableMetadata
+// Using inline definition here to avoid circular includes with sstable_arrow.h
+struct ColumnStatistics;  // Forward declare for now - use pointers in metadata
 
 /**
  * @brief SSTable metadata for tracking file information
@@ -30,9 +42,27 @@ struct SSTableMetadata {
     uint64_t data_max_key = 0;   // Max value from first data column
     bool has_data_range = false; // True if data_min_key/data_max_key are valid
 
+    // Per-column statistics for full zone map support (wide-table API)
+    // Using shared_ptr to avoid requiring full ColumnStatistics definition here
+    std::vector<std::shared_ptr<ColumnStatistics>> column_stats;
+
+    // Arrow schema stored in the SSTable (for wide-table API)
+    std::shared_ptr<arrow::Schema> arrow_schema;
+
     // Serialization
     Status SerializeToString(std::string* output) const;
     static Status DeserializeFromString(const std::string& input, SSTableMetadata* metadata);
+
+    /**
+     * @brief Check if this SSTable may contain rows matching a predicate
+     *
+     * Uses zone maps (column_stats) to determine if predicate can possibly
+     * match any data in this SSTable.
+     *
+     * @param predicate Arrow compute expression
+     * @return true if SSTable may contain matches, false if definitely not
+     */
+    bool MayContainMatches(const arrow::compute::Expression& predicate) const;
 };
 
 /**
@@ -105,6 +135,79 @@ public:
                               std::vector<std::shared_ptr<::arrow::RecordBatch>>* batches) const = 0;
 
     /**
+     * @brief Scan with column projection (wide-table API)
+     *
+     * Reads only the requested columns from disk using Arrow IPC's native
+     * column selection. This avoids I/O for columns not needed by the query.
+     *
+     * @param start_key Minimum key (inclusive)
+     * @param end_key Maximum key (inclusive)
+     * @param column_indices Column indices to read (empty = all columns)
+     * @param batches Output vector of RecordBatches with projected columns
+     * @return Status indicating success or failure
+     */
+    virtual Status ScanBatchesWithProjection(
+        uint64_t start_key, uint64_t end_key,
+        const std::vector<int>& column_indices,
+        std::vector<std::shared_ptr<::arrow::RecordBatch>>* batches) const {
+        // Default implementation: fall back to full scan, then project
+        // Subclasses should override for true column projection at I/O level
+        return ScanBatches(start_key, end_key, batches);
+    }
+
+    /**
+     * @brief Scan with predicate pushdown and projection (wide-table API)
+     *
+     * Combines zone map pruning, column projection, and predicate filtering
+     * for maximum query efficiency.
+     *
+     * @param start_key Minimum key (inclusive)
+     * @param end_key Maximum key (inclusive)
+     * @param column_indices Column indices to read (empty = all columns)
+     * @param filter Arrow compute expression for row filtering
+     * @param batches Output vector of filtered RecordBatches
+     * @return Status indicating success or failure
+     */
+    virtual Status ScanBatchesWithFilter(
+        uint64_t start_key, uint64_t end_key,
+        const std::vector<int>& column_indices,
+        const std::shared_ptr<arrow::compute::Expression>& filter,
+        std::vector<std::shared_ptr<::arrow::RecordBatch>>* batches) const {
+        // Default implementation: scan with projection, then apply filter
+        RETURN_NOT_OK(ScanBatchesWithProjection(start_key, end_key, column_indices, batches));
+
+        if (filter && batches && !batches->empty()) {
+            // Apply filter to each batch using Arrow Compute
+            std::vector<std::shared_ptr<::arrow::RecordBatch>> filtered;
+            for (const auto& batch : *batches) {
+                // Evaluate expression to get boolean mask
+                auto exec_ctx = arrow::compute::ExecContext();
+                auto expr_result = arrow::compute::ExecuteScalarExpression(
+                    *filter, *batch->schema(), arrow::Datum(batch), &exec_ctx);
+                if (!expr_result.ok()) continue;
+
+                auto mask = expr_result.ValueOrDie();
+                if (!mask.is_array()) continue;
+
+                // Filter the batch using the boolean mask
+                auto filter_result = arrow::compute::Filter(batch, mask.make_array());
+                if (filter_result.ok()) {
+                    auto filtered_datum = filter_result.ValueOrDie();
+                    if (filtered_datum.kind() == arrow::Datum::RECORD_BATCH) {
+                        auto filtered_batch = filtered_datum.record_batch();
+                        if (filtered_batch->num_rows() > 0) {
+                            filtered.push_back(filtered_batch);
+                        }
+                    }
+                }
+            }
+            *batches = std::move(filtered);
+        }
+
+        return Status::OK();
+    }
+
+    /**
      * @brief Get all keys in this SSTable
      */
     virtual Status GetAllKeys(std::vector<uint64_t>* keys) const = 0;
@@ -137,6 +240,25 @@ public:
      * Keys must be added in sorted order
      */
     virtual Status Add(uint64_t key, const std::string& value) = 0;
+
+    /**
+     * @brief Add a key-value pair with metadata to the SSTable
+     *
+     * This extended version stores timestamp and tombstone as proper Arrow columns
+     * for efficient predicate pushdown and filtering.
+     *
+     * @param key Entry key (uint64_t)
+     * @param value Entry value (string)
+     * @param timestamp MVCC timestamp for ordering and visibility
+     * @param is_tombstone True if this is a delete marker
+     * @return Status OK on success
+     */
+    virtual Status AddWithMetadata(uint64_t key, const std::string& value,
+                                   uint64_t timestamp, bool is_tombstone) {
+        // Default implementation falls back to basic Add
+        // Subclasses can override for full metadata support
+        return Add(key, value);
+    }
 
     /**
      * @brief Finalize the SSTable and write it to disk

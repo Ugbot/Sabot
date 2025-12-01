@@ -60,9 +60,15 @@ public:
     virtual Status Get(uint64_t key, std::string* value) const = 0;
 
     /**
-     * @brief Check if key exists
+     * @brief Check if key exists (returns false for tombstones)
      */
     virtual bool Contains(uint64_t key) const = 0;
+
+    /**
+     * @brief Check if key has any entry (Put or Delete tombstone)
+     * Unlike Contains(), returns true for tombstones so caller knows to stop searching older tables.
+     */
+    virtual bool HasEntry(uint64_t key) const = 0;
 
     /**
      * @brief Get all entries in sorted order
@@ -172,6 +178,7 @@ public:
     Status Delete(uint64_t key) override;
     Status Get(uint64_t key, std::string* value) const override;
     bool Contains(uint64_t key) const override;
+    bool HasEntry(uint64_t key) const override;
     Status GetAllEntries(std::vector<SimpleMemTableEntry>* entries) const override;
     Status Scan(uint64_t start_key, uint64_t end_key,
                std::vector<SimpleMemTableEntry>* entries) const override;

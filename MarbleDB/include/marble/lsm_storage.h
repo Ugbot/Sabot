@@ -158,9 +158,39 @@ public:
     virtual Status Delete(uint64_t key) = 0;
 
     /**
+     * @brief Delete a range of keys
+     *
+     * Efficiently deletes all keys in [start_key, end_key] range.
+     * Uses single lock acquisition for scanning and batch tombstone writes.
+     *
+     * @param start_key Start of range (inclusive)
+     * @param end_key End of range (inclusive)
+     * @param deleted_count Output: number of keys deleted
+     * @return Status OK on success
+     */
+    virtual Status DeleteRange(uint64_t start_key, uint64_t end_key, size_t* deleted_count) = 0;
+
+    /**
      * @brief Get a value by key
      */
     virtual Status Get(uint64_t key, std::string* value) const = 0;
+
+    /**
+     * @brief Batch get multiple values by keys
+     *
+     * Optimized for batch lookups:
+     * - Single lock acquisition for all keys
+     * - Batch bloom filter checks
+     * - Sorted key access for cache-friendly I/O
+     *
+     * @param keys Vector of keys to lookup
+     * @param values Output vector of values (empty string for not found)
+     * @param statuses Output vector of statuses for each key
+     * @return Status OK if all lookups succeeded, otherwise first error
+     */
+    virtual Status MultiGet(const std::vector<uint64_t>& keys,
+                           std::vector<std::string>* values,
+                           std::vector<Status>* statuses) const = 0;
 
     /**
      * @brief Check if key exists
@@ -183,6 +213,17 @@ public:
      * @return Status OK on success
      */
     virtual Status PutBatch(const std::shared_ptr<arrow::RecordBatch>& batch) = 0;
+
+    /**
+     * @brief Delete multiple keys atomically using Arrow batch
+     *
+     * This builds an Arrow RecordBatch with tombstone markers for all keys
+     * and calls PutBatch. Atomic: all keys are deleted together.
+     *
+     * @param keys Vector of uint64_t keys to delete
+     * @return Status OK on success
+     */
+    virtual Status DeleteBatch(const std::vector<uint64_t>& keys) = 0;
 
     /**
      * @brief Scan a range as Arrow RecordBatches (zero-copy)
@@ -267,7 +308,11 @@ public:
     Status Shutdown() override;
     Status Put(uint64_t key, const std::string& value) override;
     Status Delete(uint64_t key) override;
+    Status DeleteRange(uint64_t start_key, uint64_t end_key, size_t* deleted_count) override;
     Status Get(uint64_t key, std::string* value) const override;
+    Status MultiGet(const std::vector<uint64_t>& keys,
+                   std::vector<std::string>* values,
+                   std::vector<Status>* statuses) const override;
     bool Contains(uint64_t key) const override;
     Status Scan(uint64_t start_key, uint64_t end_key,
                std::vector<std::pair<uint64_t, std::string>>* results) override;
@@ -289,6 +334,17 @@ public:
      */
     Status PutBatch(const std::shared_ptr<arrow::RecordBatch>& batch) override;
 
+    /**
+     * @brief Delete multiple keys atomically using Arrow batch
+     *
+     * This builds an Arrow RecordBatch with tombstone markers for all keys
+     * and calls PutBatch. Atomic: all keys are deleted together.
+     *
+     * @param keys Vector of uint64_t keys to delete
+     * @return Status OK on success
+     */
+    Status DeleteBatch(const std::vector<uint64_t>& keys) override;
+
     Status Flush() override;
     Status Compact(uint64_t level) override;
     LSMTreeStats GetStats() const override;
@@ -307,6 +363,9 @@ private:
     // MemTables (using Simple interface for uint64_t keys) - LEGACY PATH
     std::unique_ptr<SimpleMemTable> active_memtable_;
     std::vector<std::unique_ptr<SimpleMemTable>> immutable_memtables_;
+
+    // Memtable currently being flushed to SSTable (keeps data visible during flush)
+    std::unique_ptr<SimpleMemTable> flushing_memtable_;
 
     // Arrow-native MemTables - NEW ZERO-COPY PATH
     std::unique_ptr<ArrowBatchMemTable> arrow_active_memtable_;

@@ -305,8 +305,11 @@ uint64_t SimpleRecord::GetCommitTimestamp() const {
 }
 
 bool SimpleRecord::IsVisible(uint64_t snapshot_ts) const {
-    // Simple visibility check: record is visible if its commit timestamp
-    // is less than or equal to the snapshot timestamp
+    // Uncommitted records (commit_ts=0) are never visible to other transactions
+    if (commit_ts_ == 0) {
+        return false;
+    }
+    // Committed records are visible if committed before or at snapshot time
     return commit_ts_ <= snapshot_ts;
 }
 

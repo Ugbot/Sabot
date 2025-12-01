@@ -86,6 +86,7 @@ public:
     Status Delete(uint64_t key) override;
     Status Get(uint64_t key, std::string* value) const override;
     bool Contains(uint64_t key) const override;
+    bool HasEntry(uint64_t key) const override;
     Status GetAllEntries(std::vector<SimpleMemTableEntry>* entries) const override;
     Status Scan(uint64_t start_key, uint64_t end_key,
                std::vector<SimpleMemTableEntry>* entries) const override;

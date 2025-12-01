@@ -276,18 +276,67 @@ class TestMarbleDBMultiGet:
         assert results["batch:missing"] is None
 
 
+class TestMarbleDBDeleteRange:
+    """Test delete range operations."""
+
+    def test_delete_range_raw(self, backend):
+        """Test delete range operation removes keys in range."""
+        # Insert test data
+        backend.put_raw("range:a", b"value_a")
+        backend.put_raw("range:b", b"value_b")
+        backend.put_raw("range:c", b"value_c")
+        backend.put_raw("range:d", b"value_d")
+
+        # Delete range [range:a, range:c) - should delete a and b
+        backend.delete_range_raw("range:a", "range:c")
+
+        # Verify deleted
+        assert backend.get_raw("range:a") is None, "range:a should be deleted"
+        assert backend.get_raw("range:b") is None, "range:b should be deleted"
+        # Verify not deleted
+        assert backend.get_raw("range:c") == b"value_c", "range:c should NOT be deleted"
+        assert backend.get_raw("range:d") == b"value_d", "range:d should NOT be deleted"
+
+    def test_delete_range_persistence(self, temp_db_path):
+        """Test that delete range persists after restart."""
+        if not MARBLEDB_AVAILABLE:
+            pytest.skip(f"MarbleDB not available: {MARBLEDB_IMPORT_ERROR}")
+
+        # Session 1: Insert data and delete range
+        backend1 = MarbleDBStateBackend(temp_db_path)
+        backend1.open()
+        backend1.put_raw("persist:a", b"value_a")
+        backend1.put_raw("persist:b", b"value_b")
+        backend1.put_raw("persist:c", b"value_c")
+        backend1.flush()
+
+        # Delete range
+        backend1.delete_range_raw("persist:a", "persist:c")
+        backend1.flush()
+
+        # Verify in-memory
+        assert backend1.get_raw("persist:a") is None
+        assert backend1.get_raw("persist:b") is None
+        assert backend1.get_raw("persist:c") == b"value_c"
+
+        backend1.close()
+
+        # Session 2: Verify deletion persisted
+        backend2 = MarbleDBStateBackend(temp_db_path)
+        backend2.open()
+
+        assert backend2.get_raw("persist:a") is None, "persist:a should remain deleted"
+        assert backend2.get_raw("persist:b") is None, "persist:b should remain deleted"
+        assert backend2.get_raw("persist:c") == b"value_c", "persist:c should still exist"
+
+        backend2.close()
+
+
 class TestMarbleDBPersistence:
     """Test data persistence across backend restarts."""
 
-    @pytest.mark.skip(reason="Persistence requires WAL flush - known limitation")
     def test_persistence_after_close_reopen(self, temp_db_path):
-        """Test that data persists after close and reopen.
-
-        Note: This test is currently skipped because MarbleDB's LSMTree
-        requires proper WAL handling for persistence across restarts.
-        Data is consistent within a session but may not persist without
-        explicit WAL commit.
-        """
+        """Test that data persists after close and reopen."""
         if not MARBLEDB_AVAILABLE:
             pytest.skip(f"MarbleDB not available: {MARBLEDB_IMPORT_ERROR}")
 
@@ -305,6 +354,122 @@ class TestMarbleDBPersistence:
         backend2.close()
 
         assert result == b"persistent_value", f"Expected b'persistent_value', got {result}"
+
+
+class TestMarbleDBBatchOperations:
+    """Test batch operations."""
+
+    def test_insert_batch_raw(self, backend):
+        """Test batch insert operation."""
+        # Create batch data
+        num_items = 100
+        keys = [f"batch:{i}" for i in range(num_items)]
+        values = [f"value_{i}".encode() for i in range(num_items)]
+
+        # Insert batch
+        backend.insert_batch_raw(keys, values)
+
+        # Verify all values
+        for i in range(num_items):
+            result = backend.get_raw(f"batch:{i}")
+            assert result == f"value_{i}".encode(), f"Key batch:{i}: expected value_{i}, got {result}"
+
+    def test_insert_batch_raw_empty(self, backend):
+        """Test inserting empty batch does nothing."""
+        backend.insert_batch_raw([], [])
+        # Should not raise
+
+    def test_insert_batch_raw_length_mismatch(self, backend):
+        """Test that mismatched lengths raise ValueError."""
+        with pytest.raises(ValueError):
+            backend.insert_batch_raw(["key1", "key2"], [b"value1"])
+
+    def test_delete_batch_raw(self, backend):
+        """Test batch delete operation."""
+        # Insert some keys
+        for i in range(10):
+            backend.put_raw(f"del:{i}", f"val_{i}".encode())
+
+        # Verify they exist
+        for i in range(10):
+            assert backend.get_raw(f"del:{i}") == f"val_{i}".encode()
+
+        # Batch delete first 5
+        backend.delete_batch_raw([f"del:{i}" for i in range(5)])
+
+        # Verify first 5 are deleted
+        for i in range(5):
+            result = backend.get_raw(f"del:{i}")
+            assert result is None or result == b"", f"del:{i} should be deleted, got {result}"
+
+        # Verify remaining 5 still exist
+        for i in range(5, 10):
+            assert backend.get_raw(f"del:{i}") == f"val_{i}".encode()
+
+    def test_delete_batch_raw_empty(self, backend):
+        """Test deleting empty batch does nothing."""
+        backend.delete_batch_raw([])
+        # Should not raise
+
+    def test_batch_persistence(self, temp_db_path):
+        """Test that batch insert persists after restart."""
+        if not MARBLEDB_AVAILABLE:
+            pytest.skip(f"MarbleDB not available: {MARBLEDB_IMPORT_ERROR}")
+
+        # Session 1: Insert batch
+        backend1 = MarbleDBStateBackend(temp_db_path)
+        backend1.open()
+
+        keys = [f"persist_batch:{i}" for i in range(50)]
+        values = [f"value_{i}".encode() for i in range(50)]
+        backend1.insert_batch_raw(keys, values)
+        backend1.flush()
+        backend1.close()
+
+        # Session 2: Verify persistence
+        backend2 = MarbleDBStateBackend(temp_db_path)
+        backend2.open()
+
+        for i in range(50):
+            result = backend2.get_raw(f"persist_batch:{i}")
+            assert result == f"value_{i}".encode(), f"Key persist_batch:{i} not persisted"
+
+        backend2.close()
+
+    def test_delete_batch_persistence(self, temp_db_path):
+        """Test that batch delete persists after restart."""
+        if not MARBLEDB_AVAILABLE:
+            pytest.skip(f"MarbleDB not available: {MARBLEDB_IMPORT_ERROR}")
+
+        # Session 1: Insert and delete batch
+        backend1 = MarbleDBStateBackend(temp_db_path)
+        backend1.open()
+
+        # Insert keys
+        for i in range(20):
+            backend1.put_raw(f"del_persist:{i}", f"val_{i}".encode())
+        backend1.flush()
+
+        # Batch delete half
+        backend1.delete_batch_raw([f"del_persist:{i}" for i in range(10)])
+        backend1.flush()
+        backend1.close()
+
+        # Session 2: Verify deletion persisted
+        backend2 = MarbleDBStateBackend(temp_db_path)
+        backend2.open()
+
+        # First 10 should be deleted
+        for i in range(10):
+            result = backend2.get_raw(f"del_persist:{i}")
+            assert result is None or result == b"", f"del_persist:{i} should remain deleted"
+
+        # Last 10 should still exist
+        for i in range(10, 20):
+            result = backend2.get_raw(f"del_persist:{i}")
+            assert result == f"val_{i}".encode(), f"del_persist:{i} should still exist"
+
+        backend2.close()
 
 
 class TestMarbleDBPerformance:

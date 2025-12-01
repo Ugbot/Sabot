@@ -5,6 +5,7 @@ Aerospike-inspired in-memory index for frequently accessed keys.
 **************************************************************************/
 
 #include "marble/hot_key_cache.h"
+#include "marble/bloom_filter_strategy.h"
 #include "marble/lsm_tree.h"
 #include <chrono>
 #include <algorithm>
@@ -150,6 +151,64 @@ void HotKeyCache::RecordAccess(const Key& key) {
 
 bool HotKeyCache::ShouldPromote(const Key& key) const {
     return access_tracker_.ShouldPromote(key.ToString(), config_.promotion_threshold);
+}
+
+// uint64_t overloads for ArrowSSTableReader integration
+bool HotKeyCache::Get(uint64_t key, HotKeyEntry* entry) {
+    total_lookups_++;
+
+    std::string key_str = std::to_string(key);
+
+    std::lock_guard<std::mutex> lock(cache_mutex_);
+
+    auto it = cache_.find(key_str);
+    if (it != cache_.end()) {
+        cache_hits_++;
+        *entry = it->second;
+        eviction_policy_.RecordAccess(&it->second);
+        return true;
+    }
+
+    cache_misses_++;
+    if (config_.fallback_to_sparse_index) {
+        access_tracker_.RecordAccess(key_str);
+    }
+
+    return false;
+}
+
+void HotKeyCache::Put(uint64_t key, uint64_t sstable_offset, uint64_t row_index) {
+    std::lock_guard<std::mutex> lock(cache_mutex_);
+
+    std::string key_str = std::to_string(key);
+
+    MaybeEvict();
+
+    auto it = cache_.find(key_str);
+    if (it != cache_.end()) {
+        it->second.sstable_offset = sstable_offset;
+        it->second.row_index = row_index;
+        eviction_policy_.RecordAccess(&it->second);
+    } else {
+        // Create entry without Key object for uint64_t path
+        HotKeyEntry entry;
+        entry.key = nullptr;  // No Key object for uint64_t path
+        entry.sstable_offset = sstable_offset;
+        entry.row_index = row_index;
+        entry.access_count = 1;
+        eviction_policy_.RecordAccess(&entry);
+        cache_[key_str] = entry;
+        promotions_++;
+    }
+}
+
+bool HotKeyCache::ShouldPromote(uint64_t key) const {
+    return access_tracker_.ShouldPromote(std::to_string(key), config_.promotion_threshold);
+}
+
+void HotKeyCache::Invalidate(uint64_t key) {
+    std::lock_guard<std::mutex> lock(cache_mutex_);
+    cache_.erase(std::to_string(key));
 }
 
 bool HotKeyCache::Evict() {
@@ -330,21 +389,22 @@ void HotKeyCacheManager::RebalanceMemory() {
 HotKeyNegativeCache::HotKeyNegativeCache(size_t max_entries)
     : max_entries_(max_entries) {
     // Create bloom filter for negative lookups
-    // Use 8 bits per key for ~3% false positive rate
-    // negative_bloom_ = std::make_unique<BloomFilter>(8, max_entries); // TODO: Re-enable
+    // Use ~3% false positive rate (0.03) - good balance of space and accuracy
+    negative_bloom_ = std::make_unique<HashBloomFilter>(max_entries, 0.03);
 }
 
 void HotKeyNegativeCache::RecordMiss(const Key& key) {
     std::lock_guard<std::mutex> lock(mutex_);
-    
+
     std::string key_str = key.ToString();
-    
-    // Add to bloom filter
-    // negative_bloom_->Add(key); // TODO: Re-enable
-    
-    // Add to recent misses set
+
+    // Add to bloom filter for fast probabilistic check
+    std::hash<std::string> hasher;
+    negative_bloom_->Add(hasher(key_str));
+
+    // Add to recent misses set for exact check
     recent_misses_.insert(key_str);
-    
+
     // Evict oldest if over limit
     if (recent_misses_.size() > max_entries_) {
         // Simple eviction - remove first element
@@ -355,42 +415,85 @@ void HotKeyNegativeCache::RecordMiss(const Key& key) {
 
 bool HotKeyNegativeCache::DefinitelyNotExists(const Key& key) const {
     total_checks_++;
-    
-    // Quick check: bloom filter
-    // TODO: Re-enable bloom filter
-    /*
-    if (!negative_bloom_->MayContain(key)) {
+
+    std::string key_str = key.ToString();
+    std::hash<std::string> hasher;
+    uint64_t hash = hasher(key_str);
+
+    // Quick check: bloom filter (if not in bloom filter, definitely not a recorded miss)
+    if (!negative_bloom_->MightContain(hash)) {
         return false;  // Might exist (not in negative cache)
     }
-    */
-    
-    // Detailed check: recent misses set
+
+    // Detailed check: recent misses set (bloom filter says might be a miss)
     std::lock_guard<std::mutex> lock(mutex_);
-    std::string key_str = key.ToString();
-    
+
     if (recent_misses_.find(key_str) != recent_misses_.end()) {
         negative_hits_++;
         return true;  // Definitely doesn't exist (we failed to find it recently)
     }
-    
-    return false;  // Bloom filter false positive
+
+    return false;  // Bloom filter false positive (was in bloom, but not in recent_misses_)
 }
 
 void HotKeyNegativeCache::Invalidate(const Key& key) {
     std::lock_guard<std::mutex> lock(mutex_);
     std::string key_str = key.ToString();
     recent_misses_.erase(key_str);
-    
+
     // Note: Can't remove from bloom filter
     // Bloom filter will have false positives until recreated
+}
+
+// uint64_t overloads for ArrowSSTableReader integration
+void HotKeyNegativeCache::RecordMiss(uint64_t key) {
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    std::string key_str = std::to_string(key);
+
+    // Add to bloom filter (use key directly as hash since uint64_t is already a good hash)
+    negative_bloom_->Add(key);
+
+    // Add to recent misses set
+    recent_misses_.insert(key_str);
+
+    // Evict oldest if over limit
+    if (recent_misses_.size() > max_entries_) {
+        recent_misses_.erase(recent_misses_.begin());
+    }
+}
+
+bool HotKeyNegativeCache::DefinitelyNotExists(uint64_t key) const {
+    total_checks_++;
+
+    // Quick check: bloom filter
+    if (!negative_bloom_->MightContain(key)) {
+        return false;  // Might exist (not in negative cache)
+    }
+
+    // Detailed check: recent misses set
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::string key_str = std::to_string(key);
+
+    if (recent_misses_.find(key_str) != recent_misses_.end()) {
+        negative_hits_++;
+        return true;
+    }
+
+    return false;  // Bloom filter false positive
+}
+
+void HotKeyNegativeCache::Invalidate(uint64_t key) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    recent_misses_.erase(std::to_string(key));
 }
 
 void HotKeyNegativeCache::Clear() {
     std::lock_guard<std::mutex> lock(mutex_);
     recent_misses_.clear();
 
-    // Recreate bloom filter
-    // negative_bloom_ = std::make_unique<BloomFilter>(8, max_entries_); // TODO: Re-enable
+    // Recreate bloom filter (clear and start fresh)
+    negative_bloom_->Clear();
 }
 
 HotKeyNegativeCache::Stats HotKeyNegativeCache::GetStats() const {

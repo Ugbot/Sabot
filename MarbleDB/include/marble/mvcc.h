@@ -157,21 +157,34 @@ public:
         Timestamp snapshot_ts,
         Timestamp current_ts,
         MemTable* memtable) {
-        
+
         for (const auto& key : keys) {
-            // Check if any version exists with ts > snapshot_ts
-            // This means the key was modified after transaction started
-            
+            // Check if any version exists with commit_ts > snapshot_ts
+            // This means the key was modified after our transaction started
+
             std::shared_ptr<Record> record;
             auto status = memtable->Get(*key, &record);
-            
+
             if (status.ok() && record) {
-                // TODO: Check record's timestamp
-                // For now, assume conflict if key exists
-                // Proper implementation needs timestamped records
+                // Check record's commit timestamp for conflict
+                uint64_t record_commit_ts = record->GetCommitTimestamp();
+
+                // If record was committed after our snapshot, there's a conflict
+                // (another transaction modified this key since we started)
+                if (record_commit_ts > snapshot_ts.value()) {
+                    return key;  // Conflict detected
+                }
+
+                // Also check if record is uncommitted (commit_ts == 0) by another transaction
+                // This means another transaction is currently writing to this key
+                uint64_t record_begin_ts = record->GetBeginTimestamp();
+                if (record_commit_ts == 0 && record_begin_ts != snapshot_ts.value()) {
+                    // Uncommitted record from a different transaction
+                    return key;  // Conflict detected (write-write conflict)
+                }
             }
         }
-        
+
         return nullptr;  // No conflicts
     }
 };

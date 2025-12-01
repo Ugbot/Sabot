@@ -13,7 +13,9 @@ each with its own schema, compaction settings, and merge operators.
 #include <marble/merge_operator.h>
 #include <marble/table_capabilities.h>
 #include <marble/optimization_strategy.h>
+#include <marble/table_schema.h>
 #include <arrow/api.h>
+#include <arrow/compute/api.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -81,11 +83,15 @@ struct OptimizationConfig {
  * Each CF can have its own compaction settings, merge operator, etc.
  */
 struct ColumnFamilyOptions {
-    // Arrow schema for this column family
+    // Arrow schema for this column family (legacy - use table_schema for full support)
     std::shared_ptr<arrow::Schema> schema;
-    
-    // Primary key column index
+
+    // Primary key column index (legacy - use table_schema for composite keys)
     int primary_key_index = 0;
+
+    // Full table schema with composite key support (Cassandra/ClickHouse-style)
+    // If set, this takes precedence over schema + primary_key_index
+    std::shared_ptr<WideTableSchema> table_schema;
     
     // Merge operator (optional)
     std::shared_ptr<MergeOperator> merge_operator;
@@ -125,15 +131,20 @@ struct ColumnFamilyOptions {
 
 /**
  * @brief Handle to a column family
- * 
+ *
  * Opaque handle used to reference a specific column family in DB operations.
  * Similar to RocksDB's ColumnFamilyHandle.
+ *
+ * Wide-table API (Cassandra/ClickHouse-style):
+ * - Put(RecordBatch) - Write full rows with schema validation
+ * - Get(key, columns) - Read with column projection
+ * - Scan(options) - Range scan with predicates and projection
  */
 class ColumnFamilyHandle {
 public:
     ColumnFamilyHandle(const std::string& name, uint32_t id)
         : name_(name), id_(id) {}
-    
+
     const std::string& name() const { return name_; }
     uint32_t id() const { return id_; }
 
@@ -141,7 +152,75 @@ public:
     const TableCapabilities& GetCapabilities() const { return options_.capabilities; }
     TableCapabilities& MutableCapabilities() { return options_.capabilities; }
 
+    // ========================================================================
+    // Wide-Table API (Cassandra/ClickHouse-style)
+    // ========================================================================
+
+    /**
+     * @brief Get the wide table schema (returns nullptr if using legacy API)
+     */
+    std::shared_ptr<WideTableSchema> GetWideTableSchema() const {
+        return options_.table_schema;
+    }
+
+    /**
+     * @brief Check if this column family has a wide table schema
+     */
+    bool HasWideTableSchema() const {
+        return options_.table_schema != nullptr;
+    }
+
+    /**
+     * @brief Write rows as Arrow RecordBatch (validates against schema)
+     *
+     * The RecordBatch must match the table schema. Rows are automatically
+     * keyed using the composite key definition (partition + clustering columns).
+     *
+     * @param rows Arrow RecordBatch containing rows to write
+     * @return Status OK on success, InvalidArgument if schema mismatch
+     */
+    Status Put(const std::shared_ptr<arrow::RecordBatch>& rows);
+
+    /**
+     * @brief Read a single row by composite key with column projection
+     *
+     * @param key Encoded composite key (from WideTableSchema::EncodeKey)
+     * @param columns Column names to return (empty = all columns)
+     * @param result Output RecordBatch containing the row(s)
+     * @return Status OK on success, NotFound if key doesn't exist
+     */
+    Status Get(uint64_t key,
+               const std::vector<std::string>& columns,
+               std::shared_ptr<arrow::RecordBatch>* result);
+
+    /**
+     * @brief Scan range of keys with predicates and projection
+     *
+     * Supports:
+     * - Key range filtering (start_key, end_key)
+     * - Column projection (return only requested columns)
+     * - Predicate pushdown (Arrow compute expressions)
+     * - Limit and offset
+     *
+     * @param options Scan options (key range, columns, filter, limit)
+     * @param results Output vector of RecordBatches
+     * @return Status OK on success
+     */
+    Status Scan(const ScanOptions& options,
+                std::vector<std::shared_ptr<arrow::RecordBatch>>* results);
+
+    /**
+     * @brief Delete a row by composite key
+     *
+     * @param key Encoded composite key
+     * @return Status OK on success
+     */
+    Status Delete(uint64_t key);
+
+    // ========================================================================
     // Internal access
+    // ========================================================================
+
     MemTable* mutable_memtable() { return mutable_; }
     const std::vector<std::shared_ptr<LSMSSTable>>& immutable_memtables() const {
         return immutables_;
@@ -170,7 +249,10 @@ private:
 struct ColumnFamilyDescriptor {
     std::string name;
     ColumnFamilyOptions options;
-    
+
+    // Default constructor for Cython/SWIG bindings
+    ColumnFamilyDescriptor() = default;
+
     ColumnFamilyDescriptor(const std::string& n, const ColumnFamilyOptions& opts)
         : name(n), options(opts) {}
 };

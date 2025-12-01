@@ -54,15 +54,24 @@ MmapSSTableWriter::MmapSSTableWriter(const std::string& filepath,
     , finished_(false)
     , bits_per_key_(10.0) {  // 10 bits per key (~1% false positive rate)
 
-    // Create Arrow schema for key-value storage
+    // Create Arrow schema with full metadata columns for searchability
+    // Column layout:
+    //   0: key (uint64)    - Primary key / LSM storage key
+    //   1: value (binary)  - Serialized RecordBatch data
+    //   2: _ts (int64)     - MVCC timestamp for visibility/ordering
+    //   3: _tombstone (bool) - Deletion marker for efficient filtering
     arrow_schema_ = arrow::schema({
         arrow::field("key", arrow::uint64()),
-        arrow::field("value", arrow::binary())
+        arrow::field("value", arrow::binary()),
+        arrow::field("_ts", arrow::int64()),
+        arrow::field("_tombstone", arrow::boolean())
     });
 
     // Reserve batch buffers
     batch_keys_.reserve(kRecordBatchSize);
     batch_values_.reserve(kRecordBatchSize);
+    batch_timestamps_.reserve(kRecordBatchSize);
+    batch_tombstones_.reserve(kRecordBatchSize);
 
     // Reserve bloom filter hash storage
     key_hashes_.reserve(10000);  // Pre-allocate for typical SSTable size
@@ -115,13 +124,17 @@ Status MmapSSTableWriter::Add(uint64_t key, const std::string& value) {
         data_section_start_ = 0;
     }
 
-    // Buffer entry in Arrow RecordBatch buffer
+    // Buffer entry in Arrow RecordBatch buffer with default metadata
     batch_keys_.push_back(key);
     batch_values_.push_back(value);
+    batch_timestamps_.push_back(0);  // Default: no timestamp
+    batch_tombstones_.push_back(value == kTombstoneMarker);  // Detect tombstone from value
     entry_count_++;
 
     // Collect hash for deferred bloom filter construction (RocksDB-style)
-    uint64_t hash = std::hash<uint64_t>{}(key);
+    // Note: Key is already an FNV-1a hash from Cython, so use directly
+    // (std::hash<uint64_t> varies by platform and can cause bloom filter mismatch)
+    uint64_t hash = key;
     // Hash deduplication: only add if different from previous hash
     if (key_hashes_.empty() || hash != key_hashes_.back()) {
         key_hashes_.push_back(hash);
@@ -138,6 +151,68 @@ Status MmapSSTableWriter::Add(uint64_t key, const std::string& value) {
     }
 
     // Flush batch when buffer is full
+    if (batch_keys_.size() >= kRecordBatchSize) {
+        return FlushBatchBuffer();
+    }
+
+    return Status::OK();
+}
+
+Status MmapSSTableWriter::AddWithMetadata(uint64_t key, const std::string& value,
+                                          uint64_t timestamp, bool is_tombstone) {
+    if (finished_) {
+        return Status::InvalidArgument("Cannot add to finished SSTable");
+    }
+
+    // Initialize on first add (same as Add())
+    if (fd_ < 0) {
+        fd_ = open(filepath_.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
+        if (fd_ < 0) {
+            return Status::IOError("Failed to open file: " + filepath_);
+        }
+
+        if (ftruncate(fd_, zone_size_) != 0) {
+            close(fd_);
+            fd_ = -1;
+            return Status::IOError("Failed to truncate file to zone size");
+        }
+
+        mapped_region_ = mmap(nullptr, zone_size_, PROT_READ | PROT_WRITE,
+                             MAP_SHARED, fd_, 0);
+        if (mapped_region_ == MAP_FAILED) {
+            close(fd_);
+            fd_ = -1;
+            return Status::IOError("Failed to mmap file");
+        }
+
+        current_file_size_ = zone_size_;
+        write_offset_ = 0;
+        data_section_start_ = 0;
+    }
+
+    // Buffer entry with explicit metadata
+    batch_keys_.push_back(key);
+    batch_values_.push_back(value);
+    batch_timestamps_.push_back(timestamp);
+    batch_tombstones_.push_back(is_tombstone);
+    entry_count_++;
+
+    // Collect hash for bloom filter
+    uint64_t hash = key;
+    if (key_hashes_.empty() || hash != key_hashes_.back()) {
+        key_hashes_.push_back(hash);
+    }
+
+    // Update key range
+    min_key_ = std::min(min_key_, key);
+    max_key_ = std::max(max_key_, key);
+
+    // Sparse index
+    if (entry_count_ % kSparseIndexInterval == 0) {
+        sparse_index_.emplace_back(key, record_batches_.size());
+    }
+
+    // Flush batch when full
     if (batch_keys_.size() >= kRecordBatchSize) {
         return FlushBatchBuffer();
     }
@@ -195,13 +270,19 @@ Status MmapSSTableWriter::Finish(std::unique_ptr<SSTable>* sstable) {
         }
     }
 
-    // Step 3: Write metadata and footer (footer contains magic at END of file)
+    // Step 3: Write per-column statistics (zone maps)
+    status = WriteColumnStats();
+    if (!status.ok()) {
+        return status;
+    }
+
+    // Step 4: Write metadata and footer (footer contains magic at END of file)
     status = WriteMetadata();
     if (!status.ok()) {
         return status;
     }
 
-    // Step 4: Unmap memory region (if still mapped) and close file descriptor
+    // Step 5: Unmap memory region (if still mapped) and close file descriptor
     if (mapped_region_) {
         if (munmap(mapped_region_, current_file_size_) != 0) {
             return Status::IOError("Failed to unmap memory region");
@@ -216,10 +297,10 @@ Status MmapSSTableWriter::Finish(std::unique_ptr<SSTable>* sstable) {
         fd_ = -1;
     }
 
-    // Step 5: Mark as finished
+    // Step 6: Mark as finished
     finished_ = true;
 
-    // Step 6: Try to reopen SSTable for reading
+    // Step 7: Try to reopen SSTable for reading
 
     if (sstable_mgr_) {
 
@@ -267,8 +348,35 @@ Status MmapSSTableWriter::CreateRecordBatchFromBuffer(std::shared_ptr<arrow::Rec
         return Status::IOError("Failed to finish value array: " + status_arrow.ToString());
     }
 
-    // Create RecordBatch
-    *batch = arrow::RecordBatch::Make(arrow_schema_, batch_keys_.size(), {key_array, value_array});
+    // Build timestamp column (Int64Array) for MVCC/ordering
+    arrow::Int64Builder ts_builder;
+    for (uint64_t ts : batch_timestamps_) {
+        status_arrow = ts_builder.Append(static_cast<int64_t>(ts));
+        if (!status_arrow.ok()) {
+            return Status::IOError("Failed to append timestamp: " + status_arrow.ToString());
+        }
+    }
+    std::shared_ptr<arrow::Array> ts_array;
+    status_arrow = ts_builder.Finish(&ts_array);
+    if (!status_arrow.ok()) {
+        return Status::IOError("Failed to finish timestamp array: " + status_arrow.ToString());
+    }
+
+    // Build tombstone column (BooleanArray) for deletion filtering
+    arrow::BooleanBuilder tombstone_builder;
+    status_arrow = tombstone_builder.AppendValues(batch_tombstones_);
+    if (!status_arrow.ok()) {
+        return Status::IOError("Failed to append tombstones: " + status_arrow.ToString());
+    }
+    std::shared_ptr<arrow::Array> tombstone_array;
+    status_arrow = tombstone_builder.Finish(&tombstone_array);
+    if (!status_arrow.ok()) {
+        return Status::IOError("Failed to finish tombstone array: " + status_arrow.ToString());
+    }
+
+    // Create RecordBatch with all 4 columns: key, value, _ts, _tombstone
+    *batch = arrow::RecordBatch::Make(arrow_schema_, batch_keys_.size(),
+                                       {key_array, value_array, ts_array, tombstone_array});
 
     return Status::OK();
 }
@@ -285,9 +393,9 @@ Status MmapSSTableWriter::FlushBatchBuffer() {
         return status;
     }
 
-    // Compute data column min/max from serialized RecordBatches in column 1
+    // Compute per-column statistics from serialized RecordBatches in column 1
     // Column 0 is LSM storage keys, Column 1 is serialized Arrow RecordBatches with user data
-    // This is done once per batch (every 4096 entries) rather than on every Add() call
+    // This is done once per batch (every 4096 entries) for efficiency
     if (batch->num_columns() >= 2 && batch->num_rows() > 0) {
         auto value_column = batch->column(1);  // BinaryArray with serialized RecordBatches
 
@@ -319,15 +427,21 @@ Status MmapSSTableWriter::FlushBatchBuffer() {
                     continue;  // Skip if cannot read batch
                 }
 
-                // Extract min/max from first data column of inner RecordBatch
+                // Capture inner schema from first batch
+                if (!inner_schema_ && inner_batch->schema()) {
+                    inner_schema_ = inner_batch->schema();
+                }
+
+                // Update per-column statistics for zone maps
+                UpdateColumnStats(inner_batch);
+
+                // Legacy: Update first column min/max for backwards compatibility
                 if (inner_batch->num_columns() > 0 && inner_batch->num_rows() > 0) {
                     auto data_column = inner_batch->column(0);
 
-                    // Only handle uint64 type (can be extended for other types)
                     if (data_column->type()->id() == ::arrow::Type::UINT64) {
                         auto uint_array = std::static_pointer_cast<::arrow::UInt64Array>(data_column);
 
-                        // Compute min/max by scanning the array
                         uint64_t batch_min = UINT64_MAX;
                         uint64_t batch_max = 0;
 
@@ -339,7 +453,6 @@ Status MmapSSTableWriter::FlushBatchBuffer() {
                             }
                         }
 
-                        // Update global min/max for this SSTable
                         if (batch_min != UINT64_MAX) {
                             if (!has_data_range_) {
                                 data_min_key_ = batch_min;
@@ -359,9 +472,11 @@ Status MmapSSTableWriter::FlushBatchBuffer() {
     // Store batch for later writing (will write in WriteIndex())
     record_batches_.push_back(batch);
 
-    // Clear buffers
+    // Clear all buffers
     batch_keys_.clear();
     batch_values_.clear();
+    batch_timestamps_.clear();
+    batch_tombstones_.clear();
 
     return Status::OK();
 }
@@ -450,12 +565,16 @@ Status MmapSSTableWriter::WriteMetadata() {
 
     // Reopen file for appending metadata
     // fd_ is still valid, just seek to end
+    // Current file layout at this point:
+    //   [Arrow IPC data] | [Bloom filter] | [Column stats (zone maps)]
+    // We are now at the end of column stats, about to write sparse index + metadata + footer
     off_t current_pos = lseek(fd_, 0, SEEK_END);
     if (current_pos == -1) {
         return Status::IOError("Failed to seek to end of file");
     }
 
-    // Record bloom filter end position (current position after WriteBloomFilter())
+    // Record position after bloom + column stats sections
+    // (For backwards compat, this field in footer is called bloom_section_end)
     size_t bloom_section_end = current_pos;
 
     // Write sparse index
@@ -476,7 +595,9 @@ Status MmapSSTableWriter::WriteMetadata() {
         }
     }
 
-    size_t index_section_end = lseek(fd_, 0, SEEK_CUR);
+    // This position marks the START of metadata section (after sparse index)
+    // The reader will seek to this position to read metadata fields
+    size_t metadata_start = lseek(fd_, 0, SEEK_CUR);
 
     // Write metadata
     // Format: [ENTRY_COUNT(8)][MIN_KEY(8)][MAX_KEY(8)][LEVEL(8)]
@@ -506,7 +627,15 @@ Status MmapSSTableWriter::WriteMetadata() {
         return Status::IOError("Failed to write has data range flag");
     }
 
-    // Write footer: [DATA_END(8)][BLOOM_END(8)][INDEX_END(8)][MAGIC(8)]
+    // Write footer: [DATA_END(8)][BLOOM_END(8)][METADATA_START(8)][MAGIC(8)]
+    // Full file layout:
+    //   [Arrow IPC data (ends at DATA_END)]
+    //   [Bloom filter bytes]
+    //   [Column statistics / zone maps (ends at BLOOM_END)]
+    //   [Sparse index]
+    //   [Metadata fields (starts at METADATA_START)]
+    //   [Footer: DATA_END | BLOOM_END | METADATA_START | MAGIC]
+    // Note: BLOOM_END now includes column stats section for backwards compat.
     uint64_t magic = 0x4152524F57535354;  // "ARROWSST" in hex
     if (write(fd_, &data_section_end_, sizeof(uint64_t)) != sizeof(uint64_t)) {
         return Status::IOError("Failed to write data section end");
@@ -514,11 +643,16 @@ Status MmapSSTableWriter::WriteMetadata() {
     if (write(fd_, &bloom_section_end, sizeof(uint64_t)) != sizeof(uint64_t)) {
         return Status::IOError("Failed to write bloom section end");
     }
-    if (write(fd_, &index_section_end, sizeof(uint64_t)) != sizeof(uint64_t)) {
-        return Status::IOError("Failed to write index section end");
+    if (write(fd_, &metadata_start, sizeof(uint64_t)) != sizeof(uint64_t)) {
+        return Status::IOError("Failed to write metadata start");
     }
     if (write(fd_, &magic, sizeof(uint64_t)) != sizeof(uint64_t)) {
         return Status::IOError("Failed to write magic number");
+    }
+
+    // Sync to disk to ensure durability before returning
+    if (fsync(fd_) != 0) {
+        return Status::IOError("Failed to sync SSTable to disk");
     }
 
     return Status::OK();
@@ -559,8 +693,9 @@ void MmapSSTableWriter::BuildBloomFilterFromHashes() {
     // Build bloom filter from collected hashes
     for (uint64_t hash : key_hashes_) {
         // Double hashing: use multiple probe positions from single hash
+        // NOTE: Cast i to uint64_t to ensure 64-bit multiplication
         for (int i = 0; i < num_probes; ++i) {
-            uint64_t h = hash + i * 0x9e3779b9;  // Golden ratio constant
+            uint64_t h = hash + static_cast<uint64_t>(i) * 0x9e3779b9ULL;  // Golden ratio constant
             size_t bit_index = h % num_bits;
             SetBit(bit_index);
         }
@@ -615,6 +750,263 @@ Status MmapSSTableWriter::WriteBloomFilter() {
     ssize_t bytes_written = write(fd_, bloom_filter_bytes_.data(), bloom_filter_bytes_.size());
     if (bytes_written != static_cast<ssize_t>(bloom_filter_bytes_.size())) {
         return Status::IOError("Failed to write bloom filter bytes");
+    }
+
+    return Status::OK();
+}
+
+// Helper to compare two Arrow Scalars of the same type
+// Returns negative if a < b, 0 if equal, positive if a > b
+static int CompareScalars(const std::shared_ptr<arrow::Scalar>& a,
+                          const std::shared_ptr<arrow::Scalar>& b) {
+    if (!a || !b || !a->is_valid || !b->is_valid) {
+        // Handle nulls: non-null > null
+        if (a && a->is_valid && (!b || !b->is_valid)) return 1;
+        if (b && b->is_valid && (!a || !a->is_valid)) return -1;
+        return 0;
+    }
+
+    // Type must match
+    if (a->type->id() != b->type->id()) {
+        return 0;  // Cannot compare different types
+    }
+
+    switch (a->type->id()) {
+        case arrow::Type::INT8: {
+            auto va = std::static_pointer_cast<arrow::Int8Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int8Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::INT16: {
+            auto va = std::static_pointer_cast<arrow::Int16Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int16Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::INT32: {
+            auto va = std::static_pointer_cast<arrow::Int32Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int32Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::INT64: {
+            auto va = std::static_pointer_cast<arrow::Int64Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int64Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::UINT8: {
+            auto va = std::static_pointer_cast<arrow::UInt8Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt8Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::UINT16: {
+            auto va = std::static_pointer_cast<arrow::UInt16Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt16Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::UINT32: {
+            auto va = std::static_pointer_cast<arrow::UInt32Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt32Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::UINT64: {
+            auto va = std::static_pointer_cast<arrow::UInt64Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt64Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::FLOAT: {
+            auto va = std::static_pointer_cast<arrow::FloatScalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::FloatScalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::DOUBLE: {
+            auto va = std::static_pointer_cast<arrow::DoubleScalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::DoubleScalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::STRING: {
+            auto va = std::static_pointer_cast<arrow::StringScalar>(a)->value->ToString();
+            auto vb = std::static_pointer_cast<arrow::StringScalar>(b)->value->ToString();
+            return va.compare(vb);
+        }
+        case arrow::Type::BINARY: {
+            auto va = std::static_pointer_cast<arrow::BinaryScalar>(a)->value->ToString();
+            auto vb = std::static_pointer_cast<arrow::BinaryScalar>(b)->value->ToString();
+            return va.compare(vb);
+        }
+        case arrow::Type::TIMESTAMP: {
+            auto va = std::static_pointer_cast<arrow::TimestampScalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::TimestampScalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::DATE32: {
+            auto va = std::static_pointer_cast<arrow::Date32Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Date32Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        case arrow::Type::DATE64: {
+            auto va = std::static_pointer_cast<arrow::Date64Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Date64Scalar>(b)->value;
+            return (va < vb) ? -1 : (va > vb) ? 1 : 0;
+        }
+        default:
+            return 0;  // Unknown type - cannot compare
+    }
+}
+
+void MmapSSTableWriter::UpdateColumnStats(const std::shared_ptr<arrow::RecordBatch>& inner_batch) {
+    if (!inner_batch || inner_batch->num_rows() == 0) {
+        return;
+    }
+
+    // Iterate over all columns in the inner batch
+    for (int col_idx = 0; col_idx < inner_batch->num_columns(); ++col_idx) {
+        auto column = inner_batch->column(col_idx);
+        auto field = inner_batch->schema()->field(col_idx);
+        const std::string& col_name = field->name();
+
+        // Compute min/max using Arrow Compute
+        auto min_max_result = arrow::compute::MinMax(column);
+        if (!min_max_result.ok()) {
+            continue;  // Skip if computation fails
+        }
+
+        auto min_max_struct = min_max_result.ValueOrDie().scalar_as<arrow::StructScalar>();
+        if (!min_max_struct.is_valid || min_max_struct.value.size() < 2) {
+            continue;
+        }
+
+        auto batch_min = min_max_struct.value[0];
+        auto batch_max = min_max_struct.value[1];
+
+        // Null count for this batch
+        int64_t null_count = column->null_count();
+        int64_t row_count = column->length();
+
+        // Merge with existing stats
+        MergeColumnStats(col_name, batch_min, batch_max, null_count, row_count);
+    }
+}
+
+void MmapSSTableWriter::MergeColumnStats(const std::string& column_name,
+                                          const std::shared_ptr<arrow::Scalar>& min_val,
+                                          const std::shared_ptr<arrow::Scalar>& max_val,
+                                          int64_t null_count, int64_t row_count) {
+    auto it = column_stats_map_.find(column_name);
+
+    if (it == column_stats_map_.end()) {
+        // Create new stats entry
+        auto stats = std::make_shared<ColumnStatistics>(column_name);
+        stats->min_value = min_val;
+        stats->max_value = max_val;
+        stats->null_count = null_count;
+        stats->has_nulls = (null_count > 0);
+        column_stats_map_[column_name] = stats;
+    } else {
+        // Merge with existing stats
+        auto& stats = it->second;
+
+        // Update min value
+        if (min_val && min_val->is_valid) {
+            if (!stats->min_value || !stats->min_value->is_valid ||
+                CompareScalars(min_val, stats->min_value) < 0) {
+                stats->min_value = min_val;
+            }
+        }
+
+        // Update max value
+        if (max_val && max_val->is_valid) {
+            if (!stats->max_value || !stats->max_value->is_valid ||
+                CompareScalars(max_val, stats->max_value) > 0) {
+                stats->max_value = max_val;
+            }
+        }
+
+        // Accumulate null count
+        stats->null_count += null_count;
+        stats->has_nulls = (stats->null_count > 0);
+    }
+}
+
+Status MmapSSTableWriter::WriteColumnStats() {
+    // Write column statistics section to file
+    // Format:
+    //   [NUM_COLUMNS (4 bytes)]
+    //   For each column:
+    //     [NAME_LEN (4 bytes)][NAME_BYTES]
+    //     [HAS_NULLS (1 byte)][NULL_COUNT (8 bytes)]
+    //     [HAS_MIN (1 byte)][MIN_TYPE (4 bytes)][MIN_DATA_LEN (4 bytes)][MIN_DATA]
+    //     [HAS_MAX (1 byte)][MAX_TYPE (4 bytes)][MAX_DATA_LEN (4 bytes)][MAX_DATA]
+
+    if (column_stats_map_.empty()) {
+        // Write zero columns indicator
+        uint32_t num_columns = 0;
+        if (write(fd_, &num_columns, sizeof(uint32_t)) != sizeof(uint32_t)) {
+            return Status::IOError("Failed to write column stats count");
+        }
+        return Status::OK();
+    }
+
+    // Write number of columns
+    uint32_t num_columns = static_cast<uint32_t>(column_stats_map_.size());
+    if (write(fd_, &num_columns, sizeof(uint32_t)) != sizeof(uint32_t)) {
+        return Status::IOError("Failed to write column stats count");
+    }
+
+    // Write each column's statistics
+    for (const auto& [col_name, stats] : column_stats_map_) {
+        // Write column name
+        uint32_t name_len = static_cast<uint32_t>(col_name.size());
+        if (write(fd_, &name_len, sizeof(uint32_t)) != sizeof(uint32_t)) {
+            return Status::IOError("Failed to write column name length");
+        }
+        if (write(fd_, col_name.data(), name_len) != static_cast<ssize_t>(name_len)) {
+            return Status::IOError("Failed to write column name");
+        }
+
+        // Write has_nulls flag and null_count
+        uint8_t has_nulls = stats->has_nulls ? 1 : 0;
+        if (write(fd_, &has_nulls, sizeof(uint8_t)) != sizeof(uint8_t)) {
+            return Status::IOError("Failed to write has_nulls flag");
+        }
+        if (write(fd_, &stats->null_count, sizeof(int64_t)) != sizeof(int64_t)) {
+            return Status::IOError("Failed to write null_count");
+        }
+
+        // Serialize min value using Arrow IPC
+        auto write_scalar = [this](const std::shared_ptr<arrow::Scalar>& scalar) -> Status {
+            uint8_t has_value = (scalar && scalar->is_valid) ? 1 : 0;
+            if (write(fd_, &has_value, sizeof(uint8_t)) != sizeof(uint8_t)) {
+                return Status::IOError("Failed to write has_value flag");
+            }
+
+            if (has_value) {
+                // Write type id
+                int32_t type_id = static_cast<int32_t>(scalar->type->id());
+                if (write(fd_, &type_id, sizeof(int32_t)) != sizeof(int32_t)) {
+                    return Status::IOError("Failed to write scalar type");
+                }
+
+                // Serialize scalar value to string using Arrow's ToString
+                std::string scalar_str = scalar->ToString();
+                uint32_t data_len = static_cast<uint32_t>(scalar_str.size());
+                if (write(fd_, &data_len, sizeof(uint32_t)) != sizeof(uint32_t)) {
+                    return Status::IOError("Failed to write scalar data length");
+                }
+                if (data_len > 0) {
+                    if (write(fd_, scalar_str.data(), data_len) != static_cast<ssize_t>(data_len)) {
+                        return Status::IOError("Failed to write scalar data");
+                    }
+                }
+            }
+            return Status::OK();
+        };
+
+        // Write min value
+        auto status = write_scalar(stats->min_value);
+        if (!status.ok()) return status;
+
+        // Write max value
+        status = write_scalar(stats->max_value);
+        if (!status.ok()) return status;
     }
 
     return Status::OK();

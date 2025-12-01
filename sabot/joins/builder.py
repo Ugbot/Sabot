@@ -5,11 +5,11 @@ import asyncio
 from typing import Any, Dict, List, Optional, Callable, AsyncIterator, Union
 from enum import Enum
 
-from .observability import get_observability
+from ..observability import get_observability
 
 # Try to import Cython implementations
 try:
-    from ._cython.joins import (
+    from .._cython.joins import (
         StreamTableJoinProcessor as CythonStreamTableJoin,
         StreamStreamJoinProcessor as CythonStreamStreamJoin,
         IntervalJoinProcessor as CythonIntervalJoin,
@@ -40,7 +40,7 @@ except ImportError:
 
 # Try to import internal Arrow implementation first
 try:
-    from .arrow import Table, RecordBatch, Array, Schema, Field, compute as pc, USING_INTERNAL, USING_EXTERNAL
+    from ..arrow import Table, RecordBatch, Array, Schema, Field, compute as pc, USING_INTERNAL, USING_EXTERNAL
     # Create pa-like namespace for compatibility
     class _ArrowCompat:
         Table = Table

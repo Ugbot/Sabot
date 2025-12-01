@@ -270,6 +270,7 @@ set(MARBLE_SOURCES
     src/core/cache_strategy.cpp
     src/core/index_persistence.cpp
     src/core/optimizations/string_predicate_strategy.cpp
+    src/core/table_schema.cpp
     src/arrow/reader.cpp
     src/arrow/lsm_iterator.cpp
     vendor/simdjson/singleheader/simdjson.cpp
@@ -612,18 +613,65 @@ install(FILES
     DESTINATION lib/cmake/MarbleDB
 )
 
-# Standalone benchmark for predicate pushdown
-add_executable(benchmark_predicate_pushdown
-    build/benchmark_predicate_pushdown.cpp
-)
+# Standalone benchmark for predicate pushdown (conditionally built)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/build/benchmark_predicate_pushdown.cpp")
+    add_executable(benchmark_predicate_pushdown
+        build/benchmark_predicate_pushdown.cpp
+    )
 
-target_link_libraries(benchmark_predicate_pushdown
+    target_link_libraries(benchmark_predicate_pushdown
+        marble_static
+        arrow_shared
+        parquet_shared
+    )
+
+    target_include_directories(benchmark_predicate_pushdown PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/arrow/cpp/build/install/include
+    )
+endif()
+
+#==============================================================================
+# Standalone Tests (no GTest dependency)
+#==============================================================================
+
+# Standalone correctness test
+add_executable(standalone_correctness tests/standalone_correctness.cpp)
+target_link_libraries(standalone_correctness
     marble_static
-    arrow_shared
-    parquet_shared
+    Arrow::arrow_shared
+    Parquet::parquet_shared
+    Threads::Threads
+)
+target_include_directories(standalone_correctness PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_include_directories(benchmark_predicate_pushdown PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/arrow/cpp/build/install/include
-)
+# Standalone benchmark (MarbleDB vs RocksDB)
+# Find RocksDB for comparison benchmark
+find_package(RocksDB QUIET)
+if(RocksDB_FOUND OR EXISTS "/opt/homebrew/include/rocksdb/db.h")
+    add_executable(standalone_benchmark tests/standalone_benchmark.cpp)
+    target_link_libraries(standalone_benchmark
+        marble_static
+        Arrow::arrow_shared
+        Parquet::parquet_shared
+        Threads::Threads
+    )
+    target_include_directories(standalone_benchmark PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+
+    # Try to find RocksDB in standard locations
+    if(RocksDB_FOUND)
+        target_link_libraries(standalone_benchmark RocksDB::rocksdb)
+    else()
+        # Manual RocksDB linking (macOS Homebrew)
+        target_include_directories(standalone_benchmark PRIVATE /opt/homebrew/include)
+        target_link_directories(standalone_benchmark PRIVATE /opt/homebrew/lib)
+        target_link_libraries(standalone_benchmark rocksdb)
+    endif()
+    message(STATUS "Building standalone_benchmark with RocksDB comparison")
+else()
+    message(STATUS "RocksDB not found - standalone_benchmark will not be built")
+endif()

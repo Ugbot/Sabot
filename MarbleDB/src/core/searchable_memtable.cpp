@@ -42,15 +42,22 @@ Status SearchableMemTable::Put(uint64_t key, const std::string& value) {
 }
 
 Status SearchableMemTable::Delete(uint64_t key) {
+    // Get old value BEFORE deletion for proper index cleanup
+    std::string old_value;
+    auto get_status = skip_list_->Get(key, &old_value);
+
     // Mark as deleted in skip list
     auto status = skip_list_->Delete(key);
     if (!status.ok()) {
         return status;
     }
 
-    // Update indexes (mark as deleted)
-    // NOTE: In full implementation, would need to get old value first
-    return UpdateIndexes(key, "", true);
+    // Update indexes with old value so index can find and remove the entry
+    if (get_status.ok()) {
+        return UpdateIndexes(key, old_value, true);
+    }
+
+    return Status::OK();
 }
 
 Status SearchableMemTable::Get(uint64_t key, std::string* value) const {
@@ -59,6 +66,10 @@ Status SearchableMemTable::Get(uint64_t key, std::string* value) const {
 
 bool SearchableMemTable::Contains(uint64_t key) const {
     return skip_list_->Contains(key);
+}
+
+bool SearchableMemTable::HasEntry(uint64_t key) const {
+    return skip_list_->HasEntry(key);
 }
 
 Status SearchableMemTable::GetAllEntries(std::vector<SimpleMemTableEntry>* entries) const {

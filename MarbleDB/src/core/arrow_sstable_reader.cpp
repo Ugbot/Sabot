@@ -15,6 +15,7 @@ limitations under the License.
 **************************************************************************/
 
 #include "marble/arrow_sstable_reader.h"
+#include "marble/sstable.h"  // For kTombstoneMarker
 #include "marble/logging.h"
 #include <fcntl.h>
 #include <unistd.h>
@@ -72,11 +73,10 @@ bool ArrowSSTableReader::ContainsKey(uint64_t key) const {
         return false;
     }
 
-    // Fast path 2: Negative cache
-    // TODO: NegativeCache uses Key type, need to adapt for uint64_t
-    // if (negative_cache_ && negative_cache_->DefinitelyNotExists(key)) {
-    //     return false;
-    // }
+    // Fast path 2: Negative cache (now supports uint64_t)
+    if (negative_cache_ && negative_cache_->DefinitelyNotExists(key)) {
+        return false;
+    }
 
     // Fast path 3: Bloom filter (raw format from MmapSSTableWriter)
     if (!bloom_filter_loaded_) {
@@ -126,11 +126,10 @@ Status ArrowSSTableReader::Get(uint64_t key, std::string* value) const {
     }
 
     // Fast path 2: Negative cache (O(1), definitely doesn't exist)
-    // TODO: NegativeCache uses Key type, need to adapt for uint64_t
-    // if (negative_cache_ && negative_cache_->DefinitelyNotExists(key)) {
-    //     stats_.negative_cache_hits++;
-    //     return Status::NotFound("Key not found (negative cache)");
-    // }
+    if (negative_cache_ && negative_cache_->DefinitelyNotExists(key)) {
+        stats_.negative_cache_hits++;
+        return Status::NotFound("Key not found (negative cache)");
+    }
 
     // Fast path 3: Bloom filter (O(k), k=3-5 hash functions, ~500ns)
     if (!bloom_filter_loaded_) {
@@ -139,12 +138,14 @@ Status ArrowSSTableReader::Get(uint64_t key, std::string* value) const {
 
     // Check raw bloom filter (same algorithm as ContainsKey)
     if (!bloom_bytes_.empty() && bloom_num_bits_ > 0) {
-        std::hash<uint64_t> hasher;
-        uint64_t hash = hasher(key);
+        // Key is already an FNV-1a hash from Cython, so use directly
+        // (std::hash<uint64_t> varies by platform and can cause bloom filter mismatch)
+        uint64_t hash = key;
 
         bool might_contain = true;
         for (int i = 0; i < bloom_num_probes_; ++i) {
-            uint64_t h = hash + i * 0x9e3779b9ULL;
+            // NOTE: Cast i to uint64_t to ensure 64-bit multiplication
+            uint64_t h = hash + static_cast<uint64_t>(i) * 0x9e3779b9ULL;
             size_t bit_index = h % bloom_num_bits_;
 
             uint8_t byte_val = bloom_bytes_[bit_index >> 3];
@@ -177,11 +178,12 @@ Status ArrowSSTableReader::Get(uint64_t key, std::string* value) const {
         status = GetFromSparseIndex(key, value);
         if (status.ok()) {
             stats_.sparse_index_lookups++;
-            // TODO: Promote to hot cache if accessed frequently
-            // HotKeyCache uses Key type, need to adapt for uint64_t
-            // if (hot_key_cache_ && hot_key_cache_->ShouldPromote(key)) {
-            //     stats_.cache_promotions++;
-            // }
+            // Promote to hot cache if accessed frequently
+            if (hot_key_cache_ && hot_key_cache_->ShouldPromote(key)) {
+                // Note: We would need batch_idx and row_idx to properly populate the cache
+                // For now, just increment the counter - full caching requires additional state
+                stats_.cache_promotions++;
+            }
             return status;
         }
     }
@@ -197,22 +199,50 @@ Status ArrowSSTableReader::Get(uint64_t key, std::string* value) const {
         auto key_array = std::static_pointer_cast<arrow::UInt64Array>(batch->column(0));
         auto value_array = std::static_pointer_cast<arrow::BinaryArray>(batch->column(1));
 
-        // Binary search within batch
-        for (int64_t i = 0; i < key_array->length(); ++i) {
-            if (key_array->Value(i) == key) {
+        // Check if we have the new tombstone column (column 3)
+        // New format: [key, value, _ts, _tombstone]
+        // Old format: [key, value]
+        std::shared_ptr<arrow::BooleanArray> tombstone_array = nullptr;
+        if (batch->num_columns() >= 4) {
+            tombstone_array = std::static_pointer_cast<arrow::BooleanArray>(batch->column(3));
+        }
+
+        // Binary search within batch using raw pointer access
+        const uint64_t* raw_keys = key_array->raw_values();
+        int64_t len = key_array->length();
+        auto lower = std::lower_bound(raw_keys, raw_keys + len, key);
+
+        if (lower != raw_keys + len && *lower == key) {
+            int64_t i = lower - raw_keys;
+
+            // Check for tombstone - use column if available, else check marker
+            bool is_tombstone = false;
+            if (tombstone_array) {
+                // Fast path: use Arrow boolean column (no string comparison)
+                is_tombstone = tombstone_array->Value(i);
+            } else {
+                // Fallback for old SSTables: check value for tombstone marker
                 int32_t length;
                 const uint8_t* data_ptr = value_array->GetValue(i, &length);
-                *value = std::string(reinterpret_cast<const char*>(data_ptr), length);
-                return Status::OK();
+                std::string val(reinterpret_cast<const char*>(data_ptr), length);
+                is_tombstone = (val == kTombstoneMarker);
             }
-            if (key_array->Value(i) > key) break;  // Keys are sorted
+
+            if (is_tombstone) {
+                return Status::NotFound("Key was deleted");
+            }
+
+            int32_t length;
+            const uint8_t* data_ptr = value_array->GetValue(i, &length);
+            *value = std::string(reinterpret_cast<const char*>(data_ptr), length);
+            return Status::OK();
         }
     }
 
-    // TODO: Record miss in negative cache (uses Key type)
-    // if (negative_cache_) {
-    //     negative_cache_->RecordMiss(key);
-    // }
+    // Record miss in negative cache
+    if (negative_cache_) {
+        negative_cache_->RecordMiss(key);
+    }
 
     return Status::NotFound("Key not found");
 }
@@ -223,14 +253,14 @@ Status ArrowSSTableReader::GetFromHotCache(uint64_t key, std::string* value,
         return Status::NotFound("Hot cache not enabled");
     }
 
-    // TODO: HotKeyCache uses Key type, need to adapt for uint64_t
-    // HotKeyEntry entry;
-    // if (hot_key_cache_->Get(key, &entry)) {
-    //     // Cache hit - retrieve from batch
-    //     *batch_idx = entry.sstable_offset;  // We store batch index here
-    //     *row_idx = entry.row_index;
-    //     return GetFromBatchIndex(*batch_idx, *row_idx, value);
-    // }
+    // Hot cache lookup (now supports uint64_t)
+    HotKeyEntry entry;
+    if (hot_key_cache_->Get(key, &entry)) {
+        // Cache hit - retrieve from batch
+        *batch_idx = entry.sstable_offset;  // We store batch index here
+        *row_idx = entry.row_index;
+        return GetFromBatchIndex(*batch_idx, *row_idx, value);
+    }
 
     return Status::NotFound("Not in hot cache");
 }
@@ -250,10 +280,23 @@ Status ArrowSSTableReader::GetFromBatchIndex(size_t batch_idx, size_t row_idx,
         return Status::InvalidArgument("Row index out of range");
     }
 
+    // Check for tombstone - use column if available (fast path)
+    if (batch->num_columns() >= 4) {
+        auto tombstone_array = std::static_pointer_cast<arrow::BooleanArray>(batch->column(3));
+        if (tombstone_array->Value(row_idx)) {
+            return Status::NotFound("Key was deleted");
+        }
+    }
+
     auto value_array = std::static_pointer_cast<arrow::BinaryArray>(batch->column(1));
     int32_t length;
     const uint8_t* data_ptr = value_array->GetValue(row_idx, &length);
     *value = std::string(reinterpret_cast<const char*>(data_ptr), length);
+
+    // Fallback tombstone check for old SSTables (without _tombstone column)
+    if (batch->num_columns() < 4 && *value == kTombstoneMarker) {
+        return Status::NotFound("Key was deleted");
+    }
 
     return Status::OK();
 }
@@ -287,15 +330,17 @@ Status ArrowSSTableReader::GetFromSparseIndex(uint64_t key, std::string* value) 
     auto key_array = std::static_pointer_cast<arrow::UInt64Array>(batch->column(0));
     auto value_array = std::static_pointer_cast<arrow::BinaryArray>(batch->column(1));
 
-    // Binary search within batch
-    for (int64_t i = 0; i < key_array->length(); ++i) {
-        if (key_array->Value(i) == key) {
-            int32_t length;
-            const uint8_t* data_ptr = value_array->GetValue(i, &length);
-            *value = std::string(reinterpret_cast<const char*>(data_ptr), length);
-            return Status::OK();
-        }
-        if (key_array->Value(i) > key) break;  // Keys are sorted
+    // Binary search within batch using raw pointer access
+    const uint64_t* raw_keys = key_array->raw_values();
+    int64_t len = key_array->length();
+    auto lower = std::lower_bound(raw_keys, raw_keys + len, key);
+
+    if (lower != raw_keys + len && *lower == key) {
+        int64_t i = lower - raw_keys;
+        int32_t length;
+        const uint8_t* data_ptr = value_array->GetValue(i, &length);
+        *value = std::string(reinterpret_cast<const char*>(data_ptr), length);
+        return Status::OK();
     }
 
     return Status::NotFound("Key not found in batch");
@@ -693,12 +738,12 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
 
     uint64_t data_end = *reinterpret_cast<uint64_t*>(&footer[0]);
     uint64_t bloom_end = *reinterpret_cast<uint64_t*>(&footer[8]);
-    uint64_t index_end = *reinterpret_cast<uint64_t*>(&footer[16]);
+    uint64_t metadata_start = *reinterpret_cast<uint64_t*>(&footer[16]);
     uint64_t magic = *reinterpret_cast<uint64_t*>(&footer[24]);
 
     MARBLE_LOG_DEBUG(ArrowReader) << "Footer - data_end=" << data_end
                                    << ", bloom_end=" << bloom_end
-                                   << ", index_end=" << index_end
+                                   << ", metadata_start=" << metadata_start
                                    << ", magic=0x" << std::hex << magic << std::dec;
 
     if (magic != 0x4152524F57535354) {  // "ARROWSST"
@@ -709,9 +754,9 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
 
     MARBLE_LOG_DEBUG(ArrowReader) << "Magic number verified - this is Arrow format";
 
-    // Read metadata section (between index_end and footer)
-    MARBLE_LOG_DEBUG(ArrowReader) << "Seeking to metadata at offset " << index_end;
-    if (lseek(fd, index_end, SEEK_SET) == -1) {
+    // Read metadata section (starts at metadata_start, ends at footer)
+    MARBLE_LOG_DEBUG(ArrowReader) << "Seeking to metadata at offset " << metadata_start;
+    if (lseek(fd, metadata_start, SEEK_SET) == -1) {
         MARBLE_LOG_ERROR(ArrowReader) << "ERROR - failed to seek to metadata section";
         close(fd);
         return nullptr;
@@ -803,7 +848,7 @@ std::unique_ptr<ArrowSSTableReader> OpenArrowSSTable(
         auto reader = std::make_unique<ArrowSSTableReader>(filepath, metadata, fs);
 
         // Store footer offsets in the reader
-        reader->SetFooterOffsets(data_end, bloom_end, index_end);
+        reader->SetFooterOffsets(data_end, bloom_end, metadata_start);
 
         MARBLE_LOG_DEBUG(ArrowReader) << "Successfully created reader";
         return reader;

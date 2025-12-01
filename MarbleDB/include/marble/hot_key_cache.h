@@ -18,6 +18,7 @@ Design inspired by Aerospike's primary index architecture.
 
 #include <marble/status.h>
 #include <marble/record.h>
+#include <marble/bloom_filter_strategy.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -151,36 +152,51 @@ public:
     
     /**
      * @brief Lookup a key in the hot cache
-     * 
+     *
      * @param key Key to lookup
      * @param entry Output parameter for cache entry
      * @return true if found in cache, false otherwise
      */
     bool Get(const Key& key, HotKeyEntry* entry);
-    
+
+    /**
+     * @brief Lookup a key in the hot cache (uint64_t overload for ArrowSSTableReader)
+     */
+    bool Get(uint64_t key, HotKeyEntry* entry);
+
     /**
      * @brief Insert or update a key in the cache
-     * 
+     *
      * @param key Key to cache
      * @param sstable_offset Byte offset in SSTable
      * @param row_index Row index for direct access
      */
     void Put(std::shared_ptr<Key> key, uint64_t sstable_offset, uint64_t row_index);
-    
+
+    /**
+     * @brief Insert or update a key in the cache (uint64_t overload for ArrowSSTableReader)
+     */
+    void Put(uint64_t key, uint64_t sstable_offset, uint64_t row_index);
+
     /**
      * @brief Record an access (for adaptive promotion)
-     * 
+     *
      * @param key Key that was accessed
      */
     void RecordAccess(const Key& key);
-    
+
     /**
      * @brief Check if a key should be promoted to cache
-     * 
+     *
      * @param key Key to check
      * @return true if key should be cached
      */
     bool ShouldPromote(const Key& key) const;
+
+    /**
+     * @brief Check if a key should be promoted (uint64_t overload for ArrowSSTableReader)
+     */
+    bool ShouldPromote(uint64_t key) const;
     
     /**
      * @brief Evict a single entry (LRU)
@@ -209,11 +225,16 @@ public:
     
     /**
      * @brief Invalidate cache entry (on update/delete)
-     * 
+     *
      * @param key Key to invalidate
      */
     void Invalidate(const Key& key);
-    
+
+    /**
+     * @brief Invalidate cache entry (uint64_t overload for ArrowSSTableReader)
+     */
+    void Invalidate(uint64_t key);
+
     /**
      * @brief Bulk load hot keys (on SSTable open)
      * 
@@ -305,18 +326,33 @@ public:
      * @brief Record a failed lookup
      */
     void RecordMiss(const Key& key);
-    
+
+    /**
+     * @brief Record a failed lookup (uint64_t overload for ArrowSSTableReader)
+     */
+    void RecordMiss(uint64_t key);
+
     /**
      * @brief Check if key is known to not exist
-     * 
+     *
      * @return true if key definitely doesn't exist
      */
     bool DefinitelyNotExists(const Key& key) const;
-    
+
+    /**
+     * @brief Check if key is known to not exist (uint64_t overload for ArrowSSTableReader)
+     */
+    bool DefinitelyNotExists(uint64_t key) const;
+
     /**
      * @brief Invalidate entry (on insert)
      */
     void Invalidate(const Key& key);
+
+    /**
+     * @brief Invalidate entry (uint64_t overload for ArrowSSTableReader)
+     */
+    void Invalidate(uint64_t key);
     
     /**
      * @brief Clear all entries
@@ -340,11 +376,11 @@ public:
     Stats GetStats() const;
     
 private:
-    // std::unique_ptr<BloomFilter> negative_bloom_; // TODO: Re-enable
-    std::unordered_set<std::string> recent_misses_;
+    std::unique_ptr<HashBloomFilter> negative_bloom_;  // Fast probabilistic check
+    std::unordered_set<std::string> recent_misses_;    // Exact recent misses
     size_t max_entries_;
     mutable std::mutex mutex_;
-    
+
     mutable std::atomic<uint64_t> total_checks_{0};
     mutable std::atomic<uint64_t> negative_hits_{0};
 };

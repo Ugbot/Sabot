@@ -1,4 +1,5 @@
 #include "marble/sstable.h"
+#include "marble/sstable_arrow.h"  // For ColumnStatistics
 #include "marble/arrow_sstable_reader.h"
 #include "marble/file_system.h"
 #include "marble/lsm_tree.h"
@@ -9,6 +10,7 @@
 #include <cstring>
 #include <algorithm>
 #include <arrow/api.h>
+#include <arrow/compute/api.h>
 #include <arrow/util/compression.h>
 #include <arrow/io/api.h>
 #include <nlohmann/json.hpp>
@@ -604,7 +606,8 @@ Status SSTableReaderImpl::Open(const std::string& filepath,
                 // Arrow format detected - use ArrowSSTableReader
                 auto arrow_sstable = OpenArrowSSTable(filepath, fs_);
                 if (arrow_sstable) {
-                    *sstable = std::move(arrow_sstable);
+                    // unique_ptr needs explicit cast from derived to base type
+                    *sstable = std::unique_ptr<SSTable>(arrow_sstable.release());
                     return Status::OK();
                 }
                 return Status::IOError("Failed to open Arrow SSTable");
@@ -949,11 +952,22 @@ Status SSTableManagerImpl::ListSSTables(const std::string& directory,
     std::vector<FileInfo> file_infos;
     auto status = fs_->ListFiles(directory, &file_infos);
     if (!status.ok()) return status;
-    
+
     files->clear();
     for (const auto& info : file_infos) {
-        files->push_back(info.path);
+        // Only include .sst files
+        if (info.path.size() >= 4 &&
+            info.path.substr(info.path.size() - 4) == ".sst") {
+            files->push_back(info.path);
+        }
     }
+
+    // Sort by filename to ensure chronological order (oldest first)
+    // Filenames contain timestamps (sstable_<timestamp>.sst), so alphabetical
+    // sorting gives chronological ordering. This ensures that when we iterate
+    // with rbegin()/rend() in ReadFromSSTables, we check newest SSTables first.
+    std::sort(files->begin(), files->end());
+
     return Status::OK();
 }
 
@@ -964,6 +978,180 @@ Status SSTableManagerImpl::DeleteSSTable(const std::string& filepath) {
 Status SSTableManagerImpl::RepairSSTable(const std::string& filepath) {
     // FIXME: Implement SSTable repair functionality
     return Status::NotImplemented("SSTable repair not implemented");
+}
+
+//==============================================================================
+// SSTableMetadata predicate evaluation
+//==============================================================================
+
+// Helper to compare Arrow Scalars with operators
+static bool ScalarLessThan(const std::shared_ptr<arrow::Scalar>& a,
+                           const std::shared_ptr<arrow::Scalar>& b) {
+    if (!a || !b || !a->is_valid || !b->is_valid) return false;
+    if (a->type->id() != b->type->id()) return false;
+
+    switch (a->type->id()) {
+        case arrow::Type::INT64: {
+            auto va = std::static_pointer_cast<arrow::Int64Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int64Scalar>(b)->value;
+            return va < vb;
+        }
+        case arrow::Type::UINT64: {
+            auto va = std::static_pointer_cast<arrow::UInt64Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::UInt64Scalar>(b)->value;
+            return va < vb;
+        }
+        case arrow::Type::DOUBLE: {
+            auto va = std::static_pointer_cast<arrow::DoubleScalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::DoubleScalar>(b)->value;
+            return va < vb;
+        }
+        case arrow::Type::FLOAT: {
+            auto va = std::static_pointer_cast<arrow::FloatScalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::FloatScalar>(b)->value;
+            return va < vb;
+        }
+        case arrow::Type::INT32: {
+            auto va = std::static_pointer_cast<arrow::Int32Scalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::Int32Scalar>(b)->value;
+            return va < vb;
+        }
+        case arrow::Type::TIMESTAMP: {
+            auto va = std::static_pointer_cast<arrow::TimestampScalar>(a)->value;
+            auto vb = std::static_pointer_cast<arrow::TimestampScalar>(b)->value;
+            return va < vb;
+        }
+        case arrow::Type::STRING: {
+            auto va = std::static_pointer_cast<arrow::StringScalar>(a)->value->ToString();
+            auto vb = std::static_pointer_cast<arrow::StringScalar>(b)->value->ToString();
+            return va < vb;
+        }
+        default:
+            return false;  // Unknown type - can't compare, be conservative
+    }
+}
+
+static bool ScalarLessOrEqual(const std::shared_ptr<arrow::Scalar>& a,
+                              const std::shared_ptr<arrow::Scalar>& b) {
+    if (!a || !b || !a->is_valid || !b->is_valid) return false;
+    return !ScalarLessThan(b, a);  // a <= b is equivalent to !(b < a)
+}
+
+bool SSTableMetadata::MayContainMatches(const arrow::compute::Expression& predicate) const {
+    // If no column stats available, be conservative and return true
+    if (column_stats.empty()) {
+        return true;
+    }
+
+    // Build a map of column name -> stats for quick lookup
+    std::unordered_map<std::string, std::shared_ptr<ColumnStatistics>> stats_map;
+    for (const auto& stat : column_stats) {
+        if (stat) {
+            stats_map[stat->column_name] = stat;
+        }
+    }
+
+    // Analyze the predicate expression
+    // For now, handle simple comparison predicates:
+    //   column < value, column <= value, column > value, column >= value, column == value
+
+    // Check if it's a call expression (comparison)
+    if (predicate.call()) {
+        const auto& call = *predicate.call();
+        const std::string& func_name = call.function_name;
+
+        // We need at least 2 arguments for a comparison
+        if (call.arguments.size() < 2) {
+            return true;  // Can't evaluate, be conservative
+        }
+
+        // Check if first argument is a field reference
+        if (!call.arguments[0].field_ref()) {
+            return true;  // Not a simple column reference
+        }
+
+        const std::string col_name = call.arguments[0].field_ref()->ToString();
+
+        // Look up column stats
+        auto it = stats_map.find(col_name);
+        if (it == stats_map.end()) {
+            return true;  // No stats for this column, be conservative
+        }
+        const auto& col_stats = it->second;
+
+        // Get the literal value if second argument is a literal
+        if (!call.arguments[1].literal()) {
+            return true;  // Not a simple literal comparison
+        }
+
+        // literal() returns a Datum pointer; extract the scalar from it
+        auto literal_datum = call.arguments[1].literal();
+        if (!literal_datum->is_scalar()) {
+            return true;  // Not a scalar literal
+        }
+        auto literal_value = literal_datum->scalar();
+
+        // Evaluate based on comparison operator
+        // Zone map pruning logic:
+        //   - For col < value: skip if min_value >= value (all values >= min >= value)
+        //   - For col <= value: skip if min_value > value
+        //   - For col > value: skip if max_value <= value
+        //   - For col >= value: skip if max_value < value
+        //   - For col == value: skip if value < min_value or value > max_value
+
+        if (func_name == "less" || func_name == "less_than") {
+            // col < value: may contain matches if min_value < value
+            if (col_stats->min_value && literal_value) {
+                if (!ScalarLessThan(col_stats->min_value, literal_value)) {
+                    return false;  // All values >= min >= value, no matches
+                }
+            }
+        } else if (func_name == "less_equal" || func_name == "less_than_or_equal") {
+            // col <= value: may contain matches if min_value <= value
+            if (col_stats->min_value && literal_value) {
+                if (ScalarLessThan(literal_value, col_stats->min_value)) {
+                    return false;  // value < min, so no row has col <= value
+                }
+            }
+        } else if (func_name == "greater" || func_name == "greater_than") {
+            // col > value: may contain matches if max_value > value
+            if (col_stats->max_value && literal_value) {
+                if (!ScalarLessThan(literal_value, col_stats->max_value)) {
+                    return false;  // max <= value, so no row has col > value
+                }
+            }
+        } else if (func_name == "greater_equal" || func_name == "greater_than_or_equal") {
+            // col >= value: may contain matches if max_value >= value
+            if (col_stats->max_value && literal_value) {
+                if (ScalarLessThan(col_stats->max_value, literal_value)) {
+                    return false;  // max < value, so no row has col >= value
+                }
+            }
+        } else if (func_name == "equal") {
+            // col == value: may contain matches if min <= value <= max
+            if (col_stats->min_value && col_stats->max_value && literal_value) {
+                // Skip if value < min or value > max
+                if (ScalarLessThan(literal_value, col_stats->min_value) ||
+                    ScalarLessThan(col_stats->max_value, literal_value)) {
+                    return false;
+                }
+            }
+        }
+        // For other operators (not_equal, and, or, etc.), be conservative
+    }
+
+    // Check for AND expressions (both conditions must hold)
+    if (predicate.call() && predicate.call()->function_name == "and_kleene") {
+        const auto& call = *predicate.call();
+        for (const auto& arg : call.arguments) {
+            if (!MayContainMatches(arg)) {
+                return false;  // One condition definitely doesn't match
+            }
+        }
+    }
+
+    // Default: be conservative, assume may contain matches
+    return true;
 }
 
 // Factory functions

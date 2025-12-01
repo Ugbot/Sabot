@@ -63,9 +63,13 @@ Status StandardLSMTree::Init(const LSMTreeConfig& config) {
 }
 
 Status StandardLSMTree::Shutdown() {
+    // STEP 1: Signal shutdown and stop background threads FIRST
+    // This is crucial: background FlushWorker may be in the middle of flushing
+    // flushing_memtable_. If we extracted it here and flushed it ourselves,
+    // we'd get duplicate data. Let FlushWorker finish its current work first.
     shutdown_requested_ = true;
 
-    // Wake up background threads
+    // Wake up background threads so they can exit
     {
         std::lock_guard<std::mutex> lock(mutex_);
         cv_.notify_all();
@@ -89,9 +93,46 @@ Status StandardLSMTree::Shutdown() {
     compaction_threads_.clear();
     flush_threads_.clear();
 
-    // Final flush
-    if (active_memtable_ && active_memtable_->GetEntryCount() > 0) {
-        Flush();
+    // STEP 2: Now that background threads are done, flush any remaining memtables
+    // At this point:
+    // - flushing_memtable_ should be nullptr (FlushWorker reset it after finishing)
+    // - immutable_memtables_ might have entries (if worker didn't get to them)
+    // - active_memtable_ might have entries (recent writes)
+    std::unique_ptr<SimpleMemTable> memtable_to_flush;
+    std::vector<std::unique_ptr<SimpleMemTable>> immutables_to_flush;
+
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (active_memtable_ && active_memtable_->GetEntryCount() > 0) {
+            memtable_to_flush = std::move(active_memtable_);
+            active_memtable_ = memtable_factory_->CreateMemTable();
+        }
+
+        // Move any remaining immutable memtables
+        for (auto& immutable : immutable_memtables_) {
+            if (immutable && immutable->GetEntryCount() > 0) {
+                immutables_to_flush.push_back(std::move(immutable));
+            }
+        }
+        immutable_memtables_.clear();
+
+        // Note: flushing_memtable_ should already be nullptr after FlushWorker finished.
+        // If it's not, the FlushWorker had an error or was interrupted - don't double-flush.
+    }
+
+    // Synchronous flush OUTSIDE the lock (FlushMemTable acquires its own lock)
+    if (memtable_to_flush) {
+        auto status = FlushMemTable(std::move(memtable_to_flush));
+        if (!status.ok()) {
+            // Log but continue shutdown
+        }
+    }
+
+    for (auto& immutable : immutables_to_flush) {
+        auto status = FlushMemTable(std::move(immutable));
+        if (!status.ok()) {
+            // Log but continue shutdown
+        }
     }
 
     return Status::OK();
@@ -151,6 +192,37 @@ Status StandardLSMTree::Delete(uint64_t key) {
     return Status::OK();
 }
 
+Status StandardLSMTree::DeleteRange(uint64_t start_key, uint64_t end_key, size_t* deleted_count) {
+    if (deleted_count) *deleted_count = 0;
+
+    // Scan to find all keys in range (Scan handles its own locking)
+    std::vector<std::pair<uint64_t, std::string>> scan_results;
+    auto scan_status = Scan(start_key, end_key, &scan_results);
+    if (!scan_status.ok() && scan_status.code() != StatusCode::kNotFound) {
+        return scan_status;
+    }
+
+    if (scan_results.empty()) {
+        return Status::OK();
+    }
+
+    // Delete each key individually - no global lock held across batch
+    // This allows readers to interleave with the deletions
+    size_t count = 0;
+    for (const auto& [key, value] : scan_results) {
+        // Each Delete() call acquires/releases lock briefly
+        auto status = Delete(key);
+        if (!status.ok()) {
+            // Continue on error - best effort deletion
+            continue;
+        }
+        count++;
+    }
+
+    if (deleted_count) *deleted_count = count;
+    return Status::OK();
+}
+
 Status StandardLSMTree::Get(uint64_t key, std::string* value) const {
     // Search order: active memtable -> immutable memtables -> SSTables
 
@@ -175,6 +247,74 @@ Status StandardLSMTree::Get(uint64_t key, std::string* value) const {
         stats_.total_reads++;
     }
     return status;
+}
+
+Status StandardLSMTree::MultiGet(const std::vector<uint64_t>& keys,
+                                 std::vector<std::string>* values,
+                                 std::vector<Status>* statuses) const {
+    if (keys.empty()) {
+        return Status::OK();
+    }
+
+    const size_t num_keys = keys.size();
+    values->resize(num_keys);
+    statuses->resize(num_keys);
+
+    // Initialize all statuses to NotFound
+    for (size_t i = 0; i < num_keys; ++i) {
+        (*statuses)[i] = Status::NotFound("Key not found");
+    }
+
+    // Track which keys are still not found
+    std::vector<bool> found(num_keys, false);
+    size_t num_found = 0;
+
+    // Phase 1: Check memtables (single lock acquisition for all keys)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        for (size_t i = 0; i < num_keys; ++i) {
+            if (found[i]) continue;
+
+            std::string value;
+            auto status = ReadFromMemTables(keys[i], &value);
+            if (status.ok()) {
+                (*values)[i] = std::move(value);
+                (*statuses)[i] = Status::OK();
+                found[i] = true;
+                num_found++;
+            }
+        }
+    }
+
+    // Early exit if all keys found
+    if (num_found == num_keys) {
+        std::lock_guard<std::mutex> stats_lock(stats_mutex_);
+        stats_.total_reads += num_keys;
+        return Status::OK();
+    }
+
+    // Phase 2: Check SSTables for remaining keys
+    for (size_t i = 0; i < num_keys; ++i) {
+        if (found[i]) continue;
+
+        std::string value;
+        auto status = ReadFromSSTables(keys[i], &value);
+        if (status.ok()) {
+            (*values)[i] = std::move(value);
+            (*statuses)[i] = Status::OK();
+            found[i] = true;
+            num_found++;
+        }
+    }
+
+    // Update stats
+    {
+        std::lock_guard<std::mutex> stats_lock(stats_mutex_);
+        stats_.total_reads += num_found;
+    }
+
+    // Return OK if any key was found, otherwise return NotFound
+    return num_found > 0 ? Status::OK() : Status::NotFound("No keys found");
 }
 
 bool StandardLSMTree::Contains(uint64_t key) const {
@@ -364,9 +504,8 @@ Status StandardLSMTree::RecoverFromDisk() {
 
     // Load SSTables into appropriate levels
     sstables_.resize(config_.max_levels);
-    for (const auto& filename : sstable_files) {
-        std::string filepath = config_.data_directory + "/" + filename;
-
+    for (const auto& filepath : sstable_files) {
+        // ListSSTables returns full paths, use directly
         std::unique_ptr<SSTable> sstable_unique;
         status = sstable_manager_->OpenSSTable(filepath, &sstable_unique);
         if (!status.ok()) {
@@ -429,17 +568,20 @@ Status StandardLSMTree::FlushMemTable(std::unique_ptr<SimpleMemTable> memtable) 
         if (!status.ok()) return status;
     }
 
-    // Write entries to SSTable
+    // Write entries to SSTable with full metadata (timestamp + tombstone as Arrow columns)
     size_t entries_written = 0;
     for (const auto& entry : entries) {
-        if (entry.op == SimpleMemTableEntry::kPut) {
-            status = writer->Add(entry.key, entry.value);
-            if (!status.ok()) {
-                return status;
-            }
-            entries_written++;
+        bool is_tombstone = (entry.op == SimpleMemTableEntry::kDelete);
+        const std::string& value = is_tombstone ? kTombstoneMarker : entry.value;
+
+        // Use AddWithMetadata to store timestamp and tombstone as proper Arrow columns
+        // This enables predicate pushdown on timestamp and efficient tombstone filtering
+        status = writer->AddWithMetadata(entry.key, value, entry.timestamp, is_tombstone);
+
+        if (!status.ok()) {
+            return status;
         }
-        // Skip delete entries for now (they become tombstones in SSTable)
+        entries_written++;
     }
 
     // Finish SSTable
@@ -835,8 +977,6 @@ void StandardLSMTree::CompactionWorker() {
 
 void StandardLSMTree::FlushWorker() {
     while (!shutdown_requested_) {
-        std::unique_ptr<SimpleMemTable> memtable_to_flush;
-
         {
             std::unique_lock<std::mutex> lock(mutex_);
             cv_.wait(lock, [this]() {
@@ -846,7 +986,13 @@ void StandardLSMTree::FlushWorker() {
             if (shutdown_requested_) break;
 
             if (!immutable_memtables_.empty()) {
-                memtable_to_flush = std::move(immutable_memtables_.front());
+                // Move to flushing_memtable_ so ReadFromMemTables can still access it
+                // Only one flush at a time is supported for simplicity
+                // Wait if there's already a flush in progress
+                if (flushing_memtable_) {
+                    continue;  // Let another flush thread handle it
+                }
+                flushing_memtable_ = std::move(immutable_memtables_.front());
                 immutable_memtables_.erase(immutable_memtables_.begin());
             } else {
                 continue;
@@ -860,7 +1006,20 @@ void StandardLSMTree::FlushWorker() {
         }
 
         // Flush memtable to SSTable
-        auto status = FlushMemTable(std::move(memtable_to_flush));
+        // We pass a copy of the pointer; flushing_memtable_ stays valid
+        std::unique_ptr<SimpleMemTable> memtable_copy;
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            // Create a snapshot/copy for flushing while keeping original visible
+            memtable_copy = flushing_memtable_->CreateSnapshot();
+        }
+        auto status = FlushMemTable(std::move(memtable_copy));
+
+        // After successful flush, clear flushing_memtable_ (data now in SSTable)
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            flushing_memtable_.reset();
+        }
 
         // Decrement ongoing flush counter after work completes
         {
@@ -877,18 +1036,27 @@ void StandardLSMTree::FlushWorker() {
 }
 
 Status StandardLSMTree::ReadFromMemTables(uint64_t key, std::string* value) const {
-    // Check active memtable
-    auto status = active_memtable_->Get(key, value);
-    if (status.ok()) {
-        return Status::OK();
+    // LSM read order: newest to oldest. If a key exists in a newer table (as Put or Delete),
+    // that entry takes precedence - don't search older tables.
+
+    // Check active memtable (newest)
+    if (active_memtable_->HasEntry(key)) {
+        // Key exists in active memtable - use this result (may be Put or tombstone)
+        return active_memtable_->Get(key, value);
     }
 
     // Check immutable memtables (newest first)
     for (auto it = immutable_memtables_.rbegin(); it != immutable_memtables_.rend(); ++it) {
-        status = (*it)->Get(key, value);
-        if (status.ok()) {
-            return Status::OK();
+        if ((*it)->HasEntry(key)) {
+            // Key exists - use this result (may be Put or tombstone)
+            return (*it)->Get(key, value);
         }
+    }
+
+    // Check memtable currently being flushed (if any)
+    // This ensures data visibility during the flush-to-SSTable window
+    if (flushing_memtable_ && flushing_memtable_->HasEntry(key)) {
+        return flushing_memtable_->Get(key, value);
     }
 
     return Status::NotFound("Key not found in memtables");
@@ -896,6 +1064,7 @@ Status StandardLSMTree::ReadFromMemTables(uint64_t key, std::string* value) cons
 
 Status StandardLSMTree::ReadFromSSTables(uint64_t key, std::string* value) const {
     // Search SSTables from newest to oldest (L0, L1, L2, ...)
+    // If key exists in newer SSTable (as Put or tombstone), that's authoritative - stop searching
     for (size_t level = 0; level < sstables_.size(); ++level) {
         const auto& level_sstables = sstables_[level];
 
@@ -906,10 +1075,9 @@ Status StandardLSMTree::ReadFromSSTables(uint64_t key, std::string* value) const
                 const auto& metadata = (*it)->GetMetadata();
                 if (key >= metadata.min_key && key <= metadata.max_key) {
                     if ((*it)->ContainsKey(key)) {
-                        auto status = (*it)->Get(key, value);
-                        if (status.ok()) {
-                            return Status::OK();
-                        }
+                        // Key exists in this SSTable - return result (Put or tombstone)
+                        // Don't continue to older SSTables even if tombstone
+                        return (*it)->Get(key, value);
                     }
                 }
             }
@@ -919,9 +1087,9 @@ Status StandardLSMTree::ReadFromSSTables(uint64_t key, std::string* value) const
             for (const auto& sstable : level_sstables) {
                 if (key >= sstable->GetMetadata().min_key &&
                     key <= sstable->GetMetadata().max_key) {
-                    auto status = sstable->Get(key, value);
-                    if (status.ok()) {
-                        return Status::OK();
+                    if (sstable->ContainsKey(key)) {
+                        // Key exists in this SSTable - return result
+                        return sstable->Get(key, value);
                     }
                 }
             }
@@ -948,6 +1116,19 @@ Status StandardLSMTree::ScanMemTables(uint64_t start_key, uint64_t end_key,
         memtable->Scan(start_key, end_key, &entries);
 
         for (const auto& entry : entries) {
+            if (entry.op == SimpleMemTableEntry::kPut) {
+                results->emplace_back(entry.key, entry.value);
+            }
+        }
+    }
+
+    // Scan flushing memtable (data being written to SSTable asynchronously)
+    // This ensures data remains visible during the flush window
+    if (flushing_memtable_) {
+        std::vector<SimpleMemTableEntry> flushing_entries;
+        flushing_memtable_->Scan(start_key, end_key, &flushing_entries);
+
+        for (const auto& entry : flushing_entries) {
             if (entry.op == SimpleMemTableEntry::kPut) {
                 results->emplace_back(entry.key, entry.value);
             }
@@ -1362,6 +1543,64 @@ Status StandardLSMTree::PutBatch(const std::shared_ptr<arrow::RecordBatch>& batc
     }
 
     return Status::OK();
+}
+
+Status StandardLSMTree::DeleteBatch(const std::vector<uint64_t>& keys) {
+    if (keys.empty()) {
+        return Status::OK();  // Nothing to delete
+    }
+
+    // Build Arrow schema for key-value pairs (same as PutBatch expects)
+    auto schema = arrow::schema({
+        arrow::field("key", arrow::uint64()),
+        arrow::field("value", arrow::binary())
+    });
+
+    // Build key array
+    arrow::UInt64Builder key_builder;
+    auto status_reserve = key_builder.Reserve(keys.size());
+    if (!status_reserve.ok()) {
+        return Status::InternalError("Failed to reserve key array: " + status_reserve.ToString());
+    }
+
+    for (const auto& key : keys) {
+        auto append_status = key_builder.Append(key);
+        if (!append_status.ok()) {
+            return Status::InternalError("Failed to append key: " + append_status.ToString());
+        }
+    }
+
+    std::shared_ptr<arrow::Array> key_array;
+    auto finish_status = key_builder.Finish(&key_array);
+    if (!finish_status.ok()) {
+        return Status::InternalError("Failed to finish key array: " + finish_status.ToString());
+    }
+
+    // Build value array (all tombstone markers)
+    arrow::BinaryBuilder value_builder;
+    auto value_reserve_status = value_builder.Reserve(keys.size());
+    if (!value_reserve_status.ok()) {
+        return Status::InternalError("Failed to reserve value array: " + value_reserve_status.ToString());
+    }
+
+    for (size_t i = 0; i < keys.size(); ++i) {
+        auto append_status = value_builder.Append(kTombstoneMarker);
+        if (!append_status.ok()) {
+            return Status::InternalError("Failed to append tombstone: " + append_status.ToString());
+        }
+    }
+
+    std::shared_ptr<arrow::Array> value_array;
+    auto value_finish_status = value_builder.Finish(&value_array);
+    if (!value_finish_status.ok()) {
+        return Status::InternalError("Failed to finish value array: " + value_finish_status.ToString());
+    }
+
+    // Create RecordBatch with tombstones
+    auto batch = arrow::RecordBatch::Make(schema, keys.size(), {key_array, value_array});
+
+    // Use PutBatch to write the tombstones atomically
+    return PutBatch(batch);
 }
 
 Status StandardLSMTree::SwitchBatchMemTable() {

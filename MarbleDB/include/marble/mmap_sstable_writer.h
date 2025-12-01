@@ -17,12 +17,14 @@ limitations under the License.
 #pragma once
 
 #include "marble/sstable.h"
+#include "marble/sstable_arrow.h"
 #include "marble/file_system.h"
 #include "marble/status.h"
 #include <memory>
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <unordered_map>
 #include <arrow/api.h>
 #include <arrow/ipc/api.h>
 
@@ -81,6 +83,21 @@ public:
      * @return Status OK on success
      */
     Status Add(uint64_t key, const std::string& value) override;
+
+    /**
+     * @brief Add key-value entry with full metadata
+     *
+     * Stores timestamp and tombstone as proper Arrow columns for
+     * efficient predicate pushdown and MVCC filtering.
+     *
+     * @param key Entry key (uint64_t)
+     * @param value Entry value (string)
+     * @param timestamp MVCC timestamp
+     * @param is_tombstone True if this is a delete marker
+     * @return Status OK on success
+     */
+    Status AddWithMetadata(uint64_t key, const std::string& value,
+                           uint64_t timestamp, bool is_tombstone) override;
 
     /**
      * @brief Finish SSTable and flush to disk
@@ -165,6 +182,8 @@ private:
     std::shared_ptr<arrow::Schema> arrow_schema_;
     std::vector<uint64_t> batch_keys_;
     std::vector<std::string> batch_values_;
+    std::vector<uint64_t> batch_timestamps_;   // MVCC timestamps (column 2)
+    std::vector<bool> batch_tombstones_;       // Deletion markers (column 3)
     std::vector<std::shared_ptr<arrow::RecordBatch>> record_batches_;
 
     // Data offset tracking
@@ -189,6 +208,22 @@ private:
     void SetBit(size_t bit_index);
     bool CheckBit(size_t bit_index) const;
     Status WriteBloomFilter();
+
+    // Zone map (per-column statistics) helpers
+    void UpdateColumnStats(const std::shared_ptr<arrow::RecordBatch>& inner_batch);
+    void MergeColumnStats(const std::string& column_name,
+                          const std::shared_ptr<arrow::Scalar>& min_val,
+                          const std::shared_ptr<arrow::Scalar>& max_val,
+                          int64_t null_count, int64_t row_count);
+    Status WriteColumnStats();
+
+    // Per-column statistics for zone maps (keyed by column name)
+    // Tracks min/max/nulls for each column across all batches
+    std::unordered_map<std::string, std::shared_ptr<ColumnStatistics>> column_stats_map_;
+
+    // Schema of the inner RecordBatch (user data inside value column)
+    // Captured from first deserialized batch for consistency checking
+    std::shared_ptr<arrow::Schema> inner_schema_;
 };
 
 /**

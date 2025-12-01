@@ -214,11 +214,14 @@ public:
 };
 
 /**
- * @brief Arrow-based SSTable Reader
+ * @brief Arrow-based SSTable Reader Interface
+ *
+ * Note: This is an abstract interface. The actual implementation
+ * is ArrowSSTableReader in arrow_sstable_reader.h which inherits from SSTable.
  */
-class ArrowSSTableReader {
+class ArrowSSTableReaderInterface {
 public:
-    virtual ~ArrowSSTableReader() = default;
+    virtual ~ArrowSSTableReaderInterface() = default;
 
     /**
      * @brief Open an existing Arrow SSTable file

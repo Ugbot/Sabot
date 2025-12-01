@@ -244,6 +244,13 @@ bool SkipListSimpleMemTable::Contains(uint64_t key) const {
     return node && node->entry.op != SimpleMemTableEntry::kDelete;
 }
 
+bool SkipListSimpleMemTable::HasEntry(uint64_t key) const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    // Returns true if key has ANY entry (Put or Delete tombstone)
+    // This is used to determine if we should stop searching older memtables
+    return Find(key) != nullptr;
+}
+
 Status SkipListSimpleMemTable::GetAllEntries(std::vector<SimpleMemTableEntry>* entries) const {
     std::lock_guard<std::mutex> lock(mutex_);
 
