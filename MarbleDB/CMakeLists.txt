@@ -432,6 +432,25 @@ endif()
 if(MARBLE_BUILD_TESTS)
     enable_testing()
 
+    # Standalone MVCC test (no GTest dependency)
+    # Note: marble_static includes string_predicate_strategy.cpp which uses arrow::py,
+    # requiring the arrow_python library from the Python build directory
+    set(ARROW_PYTHON_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../vendor/arrow/python/build/temp.macosx-15.0-arm64-cpython-313/release")
+    add_executable(test_mvcc_basic tests/test_mvcc_basic.cpp)
+    target_include_directories(test_mvcc_basic PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${ARROW_INCLUDE_DIR}
+        ${Python3_INCLUDE_DIRS}
+    )
+    target_link_directories(test_mvcc_basic PRIVATE ${ARROW_PYTHON_LIB_DIR})
+    target_link_libraries(test_mvcc_basic PRIVATE
+        marble_static
+        Arrow::arrow_shared
+        arrow_python
+        Python3::Python
+    )
+    add_test(NAME MVCCBasicTest COMMAND test_mvcc_basic)
+
     # Try to find GTest, but don't fail if not found
     find_package(GTest QUIET)
     if(GTest_FOUND)
@@ -439,6 +458,8 @@ if(MARBLE_BUILD_TESTS)
             "tests/**/*.cpp"
             "tests/*.cpp"
         )
+        # Exclude standalone tests from GTest suite
+        list(FILTER TEST_SOURCES EXCLUDE REGEX "test_mvcc_basic\\.cpp")
 
         add_executable(marble_tests ${TEST_SOURCES})
 
@@ -452,7 +473,7 @@ if(MARBLE_BUILD_TESTS)
         include(GoogleTest)
         gtest_discover_tests(marble_tests)
     else()
-        message(WARNING "GTest not found - tests will not be built")
+        message(WARNING "GTest not found - GTest-based tests will not be built")
     endif()
 endif()
 
