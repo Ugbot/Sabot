@@ -672,6 +672,27 @@ if(RocksDB_FOUND OR EXISTS "/opt/homebrew/include/rocksdb/db.h")
         target_link_libraries(standalone_benchmark rocksdb)
     endif()
     message(STATUS "Building standalone_benchmark with RocksDB comparison")
+
+    # Disk benchmark (forces reads to hit disk)
+    add_executable(disk_benchmark tests/disk_benchmark.cpp)
+    target_link_libraries(disk_benchmark
+        marble_static
+        Arrow::arrow_shared
+        Parquet::parquet_shared
+        Threads::Threads
+    )
+    target_include_directories(disk_benchmark PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+
+    if(RocksDB_FOUND)
+        target_link_libraries(disk_benchmark RocksDB::rocksdb)
+    else()
+        target_include_directories(disk_benchmark PRIVATE /opt/homebrew/include)
+        target_link_directories(disk_benchmark PRIVATE /opt/homebrew/lib)
+        target_link_libraries(disk_benchmark rocksdb)
+    endif()
+    message(STATUS "Building disk_benchmark with RocksDB comparison")
 else()
     message(STATUS "RocksDB not found - standalone_benchmark will not be built")
 endif()
