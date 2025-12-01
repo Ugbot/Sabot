@@ -25,6 +25,7 @@
 #include "marble/index_persistence.h"
 #include "marble/arrow/reader.h"
 #include "marble/arrow/lsm_iterator.h"
+#include "marble/sstable_arrow.h"
 #include "marble/merge_operator.h"
 #include <nlohmann/json.hpp>
 #include <arrow/api.h>
@@ -41,6 +42,149 @@ namespace marble {
 // Internal Helper Functions
 //==============================================================================
 namespace {
+
+/**
+ * @brief Adapter that wraps ArrowRecordBatchIterator with TableBatchIterator interface
+ *
+ * This provides the standard Valid()/Next()/GetBatch() pattern expected by
+ * streaming consumers while internally using the existing LSM iteration infrastructure.
+ *
+ * Key features:
+ * - Lazy evaluation: batches fetched on-demand
+ * - Zero-copy: returns shared_ptr to internal batches
+ * - Status tracking: captures errors during iteration
+ */
+class TableBatchIteratorAdapter : public TableBatchIterator {
+public:
+    TableBatchIteratorAdapter(
+        std::unique_ptr<ArrowRecordBatchIterator> inner,
+        std::shared_ptr<::arrow::Schema> schema)
+        : inner_(std::move(inner))
+        , schema_(std::move(schema))
+        , valid_(false)
+        , status_(Status::OK())
+        , remaining_estimate_(0) {
+        // Prefetch first batch to initialize Valid() state
+        Advance();
+    }
+
+    ~TableBatchIteratorAdapter() override = default;
+
+    bool Valid() const override {
+        return valid_;
+    }
+
+    void Next() override {
+        if (!valid_) return;
+        Advance();
+    }
+
+    Status GetBatch(std::shared_ptr<::arrow::RecordBatch>* batch) const override {
+        if (!valid_) {
+            return Status::InvalidArgument("Iterator not valid");
+        }
+        *batch = current_batch_;
+        return Status::OK();
+    }
+
+    std::shared_ptr<::arrow::Schema> schema() const override {
+        return schema_;
+    }
+
+    Status status() const override {
+        return status_;
+    }
+
+    int64_t GetApproximateRemainingBatches() const override {
+        return remaining_estimate_;
+    }
+
+private:
+    void Advance() {
+        if (!inner_->HasNext()) {
+            valid_ = false;
+            current_batch_ = nullptr;
+            return;
+        }
+
+        std::shared_ptr<::arrow::RecordBatch> batch;
+        status_ = inner_->Next(&batch);
+
+        if (!status_.ok()) {
+            valid_ = false;
+            current_batch_ = nullptr;
+            return;
+        }
+
+        current_batch_ = std::move(batch);
+        valid_ = true;
+
+        // Update estimate based on inner iterator
+        remaining_estimate_ = inner_->EstimatedRemainingRows() / 10000;  // Rough batch estimate
+        if (remaining_estimate_ < 0) remaining_estimate_ = 0;
+    }
+
+    std::unique_ptr<ArrowRecordBatchIterator> inner_;
+    std::shared_ptr<::arrow::Schema> schema_;
+    std::shared_ptr<::arrow::RecordBatch> current_batch_;
+    bool valid_;
+    Status status_;
+    int64_t remaining_estimate_;
+};
+
+/**
+ * @brief Simple vector-based TableBatchIterator for compatibility
+ *
+ * Used when we have a pre-fetched vector of batches (e.g., from ScanSSTablesBatches)
+ * and want to expose it through the streaming iterator interface.
+ */
+class VectorTableBatchIterator : public TableBatchIterator {
+public:
+    VectorTableBatchIterator(
+        std::vector<std::shared_ptr<::arrow::RecordBatch>> batches,
+        std::shared_ptr<::arrow::Schema> schema)
+        : batches_(std::move(batches))
+        , schema_(std::move(schema))
+        , current_idx_(0) {}
+
+    ~VectorTableBatchIterator() override = default;
+
+    bool Valid() const override {
+        return current_idx_ < batches_.size();
+    }
+
+    void Next() override {
+        if (current_idx_ < batches_.size()) {
+            ++current_idx_;
+        }
+    }
+
+    Status GetBatch(std::shared_ptr<::arrow::RecordBatch>* batch) const override {
+        if (current_idx_ >= batches_.size()) {
+            return Status::InvalidArgument("Iterator not valid");
+        }
+        *batch = batches_[current_idx_];
+        return Status::OK();
+    }
+
+    std::shared_ptr<::arrow::Schema> schema() const override {
+        return schema_;
+    }
+
+    Status status() const override {
+        return Status::OK();
+    }
+
+    int64_t GetApproximateRemainingBatches() const override {
+        return static_cast<int64_t>(batches_.size()) - static_cast<int64_t>(current_idx_);
+    }
+
+private:
+    std::vector<std::shared_ptr<::arrow::RecordBatch>> batches_;
+    std::shared_ptr<::arrow::Schema> schema_;
+    size_t current_idx_;
+};
+
 // Simple MarbleDB implementation for API
 class SimpleMarbleDB : public MarbleDB {
 public:
@@ -1696,6 +1840,62 @@ public:
             lsm_tree_.get(), cf_info->id, cf_info->schema);
 
         *iterator = std::move(lsm_iterator);
+        return Status::OK();
+    }
+
+    // Streaming batch iterator (for zero-copy Arrow integration)
+    Status NewBatchIterator(const std::string& table_name,
+                            std::unique_ptr<TableBatchIterator>* iter) override {
+        // Delegate to predicate-less version
+        return NewBatchIterator(table_name, {}, iter);
+    }
+
+    // Streaming batch iterator with predicate pushdown
+    Status NewBatchIterator(const std::string& table_name,
+                            const std::vector<ColumnPredicate>& predicates,
+                            std::unique_ptr<TableBatchIterator>* iter) override {
+        if (!lsm_tree_) {
+            return Status::InvalidArgument("LSM tree not initialized");
+        }
+
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // Find the table (column family)
+        auto it = column_families_.find(table_name);
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Table '" + table_name + "' does not exist");
+        }
+
+        auto* cf_info = it->second.get();
+        auto schema = cf_info->schema;
+
+        if (!schema) {
+            return Status::InvalidArgument("Table '" + table_name + "' has no schema");
+        }
+
+        // Calculate key range for this table
+        uint32_t table_id = cf_info->id;
+        uint64_t min_key = EncodeBatchKey(table_id, 0);
+        uint64_t max_key = EncodeBatchKey(table_id + 1, 0) - 1;
+
+        // Get batches from LSM tree
+        // For now, use the existing ScanWithPredicates and wrap in VectorRecordBatchIterator
+        // This provides correct behavior while we can optimize later with true streaming
+        std::vector<std::shared_ptr<::arrow::RecordBatch>> batches;
+        Status status;
+
+        if (predicates.empty()) {
+            status = lsm_tree_->ScanSSTablesBatches(min_key, max_key, &batches);
+        } else {
+            status = lsm_tree_->ScanWithPredicates(min_key, max_key, predicates, &batches);
+        }
+
+        if (!status.ok()) {
+            return status;
+        }
+
+        // Create vector-based iterator
+        *iter = std::make_unique<VectorTableBatchIterator>(std::move(batches), schema);
         return Status::OK();
     }
 

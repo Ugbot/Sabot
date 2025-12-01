@@ -589,31 +589,64 @@ Status MarbleDBStoreBackend::DeleteRange(const std::string& table_name,
     return Status::NotSupported("DeleteRange with string keys not yet implemented - need KeyFactory");
 }
 
-// Iterator implementation
+// Legacy iterator implementation (wraps row-level marble::Iterator)
 class MarbleDBStoreBackend::IteratorImpl : public StoreBackend::Iterator {
 public:
     std::unique_ptr<marble::Iterator> iterator_;
-    
+
     IteratorImpl(std::unique_ptr<marble::Iterator> iter) : iterator_(std::move(iter)) {}
-    
+
     bool Valid() override {
         return iterator_ && iterator_->Valid();
     }
-    
+
     void Next() override {
         if (iterator_) {
             iterator_->Next();
         }
     }
-    
+
     Status GetBatch(std::shared_ptr<arrow::RecordBatch>* batch) override {
         if (!iterator_ || !iterator_->Valid()) {
             return Status::InvalidArgument("Iterator not valid");
         }
-        
+
         // TODO: Convert Record to RecordBatch
         // For now, return error
         return Status::NotSupported("Iterator GetBatch not yet implemented");
+    }
+};
+
+// Streaming batch iterator (wraps marble::TableBatchIterator for zero-copy access)
+class MarbleDBStoreBackend::BatchIteratorImpl : public StoreBackend::Iterator {
+public:
+    std::unique_ptr<marble::TableBatchIterator> iterator_;
+
+    BatchIteratorImpl(std::unique_ptr<marble::TableBatchIterator> iter)
+        : iterator_(std::move(iter)) {}
+
+    bool Valid() override {
+        return iterator_ && iterator_->Valid();
+    }
+
+    void Next() override {
+        if (iterator_) {
+            iterator_->Next();
+        }
+    }
+
+    Status GetBatch(std::shared_ptr<arrow::RecordBatch>* batch) override {
+        if (!iterator_ || !iterator_->Valid()) {
+            return Status::InvalidArgument("Iterator not valid");
+        }
+
+        // Use TableBatchIterator's GetBatch - returns batch directly (zero-copy)
+        auto marble_status = iterator_->GetBatch(batch);
+        if (!marble_status.ok()) {
+            return Status::IOError("GetBatch failed: " + marble_status.ToString());
+        }
+
+        return Status::OK();
     }
 };
 
@@ -624,26 +657,27 @@ Status MarbleDBStoreBackend::NewIterator(const std::string& table_name,
     if (!impl_->is_open_ || !impl_->db_) {
         return Status::InvalidArgument("Backend not open");
     }
-    
-    marble::ReadOptions read_opts;
-    
-    // KeyRange constructor: KeyRange(start, start_inclusive, end, end_inclusive)
-    // Key is abstract, need to use a concrete implementation
-    // For string keys, we'll need to create them via the schema or use a helper
-    // For now, use KeyRange::All() or KeyRange::StartAt/EndAt
-    marble::KeyRange range = marble::KeyRange::All();
-    
-    // TODO: Implement proper Key creation from strings
-    // This requires access to the table's KeyFactory or schema
-    // For now, use All() which scans everything
-    
-    std::unique_ptr<marble::Iterator> marble_iter;
-    auto status = impl_->db_->NewIterator(table_name, read_opts, range, &marble_iter);
+
+    // Use the new TableBatchIterator for efficient streaming access
+    // This returns RecordBatches directly without per-row overhead
+    std::unique_ptr<marble::TableBatchIterator> batch_iter;
+    auto status = impl_->db_->NewBatchIterator(table_name, &batch_iter);
     if (!status.ok()) {
-        return Status::IOError("NewIterator failed: " + status.ToString());
+        // Fall back to legacy row-level iterator if batch iterator fails
+        marble::ReadOptions read_opts;
+        marble::KeyRange range = marble::KeyRange::All();
+
+        std::unique_ptr<marble::Iterator> marble_iter;
+        status = impl_->db_->NewIterator(table_name, read_opts, range, &marble_iter);
+        if (!status.ok()) {
+            return Status::IOError("NewIterator failed: " + status.ToString());
+        }
+
+        *iterator = std::make_unique<IteratorImpl>(std::move(marble_iter));
+        return Status::OK();
     }
-    
-    *iterator = std::make_unique<IteratorImpl>(std::move(marble_iter));
+
+    *iterator = std::make_unique<BatchIteratorImpl>(std::move(batch_iter));
     return Status::OK();
 }
 

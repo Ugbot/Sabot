@@ -19,6 +19,7 @@
 namespace marble {
     class MarbleDB;
     class ColumnFamilyHandle;
+    class TableBatchIterator;
 }
 
 namespace sabot {
@@ -108,7 +109,8 @@ public:
                       const std::string& start_key,
                       const std::string& end_key) override;
     
-    class IteratorImpl;
+    class IteratorImpl;      // Legacy row-level iterator
+    class BatchIteratorImpl;  // Streaming batch iterator (uses TableBatchIterator)
     Status NewIterator(const std::string& table_name,
                       const std::string& start_key,
                       const std::string& end_key,

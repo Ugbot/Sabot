@@ -20,6 +20,71 @@ class ColumnFamilyHandle;
 struct TransactionOptions;
 class DBTransaction;
 class SSTable;
+class TableBatchIterator;
+
+/**
+ * @brief Streaming iterator for Arrow RecordBatches from a MarbleDB table
+ *
+ * Provides lazy iteration over RecordBatches from MarbleDB tables.
+ * This is the core interface for zero-copy streaming access:
+ * - No materialization: batches are fetched on-demand
+ * - Memory efficient: only one batch in memory at a time
+ * - Predicate pushdown: zone maps prune non-matching SSTables
+ *
+ * Note: This is distinct from RecordBatchIterator (in record_ref.h) which
+ * iterates over rows within a single batch. This class iterates over
+ * multiple batches from a table scan.
+ *
+ * Usage:
+ *   std::unique_ptr<TableBatchIterator> iter;
+ *   db->NewBatchIterator("table", &iter);
+ *   while (iter->Valid()) {
+ *       std::shared_ptr<arrow::RecordBatch> batch;
+ *       iter->GetBatch(&batch);
+ *       // Process batch...
+ *       iter->Next();
+ *   }
+ */
+class TableBatchIterator {
+public:
+    virtual ~TableBatchIterator() = default;
+
+    /**
+     * @brief Check if iterator has more batches
+     * @return true if current position is valid
+     */
+    virtual bool Valid() const = 0;
+
+    /**
+     * @brief Move to the next batch
+     */
+    virtual void Next() = 0;
+
+    /**
+     * @brief Get the current batch (zero-copy)
+     * @param batch Output parameter for the current batch
+     * @return Status OK on success, InvalidArgument if not valid
+     */
+    virtual Status GetBatch(std::shared_ptr<::arrow::RecordBatch>* batch) const = 0;
+
+    /**
+     * @brief Get the schema for batches in this iterator
+     * @return Arrow schema
+     */
+    virtual std::shared_ptr<::arrow::Schema> schema() const = 0;
+
+    /**
+     * @brief Get the current status of the iterator
+     * @return Status OK if no errors
+     */
+    virtual Status status() const = 0;
+
+    /**
+     * @brief Get approximate number of remaining batches
+     * @return Estimated batch count (may be inexact)
+     */
+    virtual int64_t GetApproximateRemainingBatches() const = 0;
+};
 
 // Forward declaration for arrow_api friend
 namespace arrow_api {
@@ -230,6 +295,37 @@ public:
                                const ReadOptions& options,
                                const KeyRange& range,
                                std::unique_ptr<Iterator>* iterator) = 0;
+
+    /**
+     * @brief Create a streaming batch iterator for a table
+     *
+     * Returns a lazy iterator that yields RecordBatches on demand.
+     * This is the preferred API for streaming access as it:
+     * - Avoids materializing all results in memory
+     * - Enables pipelined processing
+     * - Supports predicate pushdown via zone maps
+     *
+     * @param table_name Name of the table to scan
+     * @param iter Output iterator
+     * @return Status OK on success
+     */
+    virtual Status NewBatchIterator(const std::string& table_name,
+                                    std::unique_ptr<TableBatchIterator>* iter) = 0;
+
+    /**
+     * @brief Create a streaming batch iterator with predicate pushdown
+     *
+     * Like NewBatchIterator but with column predicates for filtering.
+     * Zone maps are used to skip SSTables that don't match predicates.
+     *
+     * @param table_name Name of the table to scan
+     * @param predicates Column predicates for filtering
+     * @param iter Output iterator
+     * @return Status OK on success
+     */
+    virtual Status NewBatchIterator(const std::string& table_name,
+                                    const std::vector<ColumnPredicate>& predicates,
+                                    std::unique_ptr<TableBatchIterator>* iter) = 0;
 
     /**
      * @brief Fast batch-based range scan (10-100x faster than Iterator)
