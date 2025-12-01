@@ -366,40 +366,30 @@ Status ArrowSSTableReader::MultiGet(const std::vector<uint64_t>& keys,
 
 Status ArrowSSTableReader::Scan(uint64_t start_key, uint64_t end_key,
                                  std::vector<std::pair<uint64_t, std::string>>* results) const {
-    // Metadata range pruning
-    if (end_key < metadata_.min_key || start_key > metadata_.max_key) {
-        return Status::OK();  // No overlap
-    }
+    // Delegate to ScanBatches and extract rows
+    // This ensures consistent behavior with the batch path
 
-    // Load batches
-    if (!batches_loaded_) {
-        const_cast<ArrowSSTableReader*>(this)->LoadArrowBatches();
-    }
+    std::vector<std::shared_ptr<arrow::RecordBatch>> batches;
+    auto status = ScanBatches(start_key, end_key, &batches);
+    if (!status.ok()) return status;
 
-    // Find starting batch via sparse index
-    size_t start_batch = 0;
-    if (!sparse_index_.empty()) {
-        auto it = std::lower_bound(sparse_index_.begin(), sparse_index_.end(), start_key,
-            [](const auto& entry, uint64_t k) { return entry.first < k; });
-        if (it != sparse_index_.begin()) --it;
-        start_batch = it->second;
-    }
+    // Extract rows from batches
+    for (const auto& batch : batches) {
+        if (!batch || batch->num_rows() == 0) continue;
 
-    // Scan batches in range
-    for (size_t batch_idx = start_batch; batch_idx < batches_.size(); ++batch_idx) {
-        auto batch = batches_[batch_idx];
         auto key_array = std::static_pointer_cast<arrow::UInt64Array>(batch->column(0));
         auto value_array = std::static_pointer_cast<arrow::BinaryArray>(batch->column(1));
 
-        for (int64_t i = 0; i < key_array->length(); ++i) {
+        for (int64_t i = 0; i < batch->num_rows(); ++i) {
             uint64_t key = key_array->Value(i);
 
-            if (key > end_key) return Status::OK();  // Done
-            if (key >= start_key) {
-                int32_t length;
-                const uint8_t* data_ptr = value_array->GetValue(i, &length);
-                results->emplace_back(key, std::string(reinterpret_cast<const char*>(data_ptr), length));
-            }
+            // Filter to requested range (batches may contain extra rows)
+            if (key < start_key) continue;
+            if (key > end_key) break;  // Keys are sorted, can stop early
+
+            int32_t length;
+            const uint8_t* data_ptr = value_array->GetValue(i, &length);
+            results->emplace_back(key, std::string(reinterpret_cast<const char*>(data_ptr), length));
         }
     }
 
