@@ -822,6 +822,88 @@ class Stream:
         return cls(cpp_kafka_batches())
 
     @classmethod
+    def from_marbledb(
+        cls,
+        db_path: str,
+        table_name: str,
+        predicates: Optional[List[tuple]] = None,
+        store: Optional[Any] = None
+    ) -> 'Stream':
+        """
+        Create stream from MarbleDB table with lazy batch streaming.
+
+        Uses MarbleDB's TableBatchIterator for zero-copy streaming access.
+        Predicates are pushed down to zone maps for efficient filtering.
+
+        Args:
+            db_path: Path to MarbleDB database
+            table_name: Name of the table to scan
+            predicates: Optional list of predicates for pushdown filtering
+                       Format: [(column, op, value), ...]
+                       Supported ops: '=', '>', '<', '>=', '<=', '!='
+            store: Optional existing MarbleDBStoreBackend instance (if None,
+                   a new one will be created and managed internally)
+
+        Returns:
+            Stream from MarbleDB table
+
+        Examples:
+            # Simple scan - streams batches lazily
+            stream = Stream.from_marbledb('/data/state', 'transactions')
+
+            # With predicate pushdown (uses zone maps)
+            stream = Stream.from_marbledb(
+                '/data/state',
+                'transactions',
+                predicates=[('amount', '>', 1000), ('status', '=', 'pending')]
+            )
+
+            # With existing store (store is not closed by stream)
+            store = MarbleDBStoreBackend('/data/state')
+            store.open()
+            stream = Stream.from_marbledb('/data/state', 'orders', store=store)
+
+            # Chain with normal operators
+            (stream
+                .filter(lambda b: cc.greater(b.column('price'), 100))
+                .map(lambda b: b.append_column('fee', cc.multiply(b.column('amount'), 0.03)))
+                .collect()
+            )
+
+        Performance:
+            - Zero-copy: batches returned directly from C++ layer
+            - Zone map pruning: skips SSTables that don't match predicates
+            - Streaming: constant memory (one batch at a time)
+        """
+        try:
+            from sabot._cython.stores.marbledb_store import MarbleDBStoreBackend
+        except ImportError:
+            raise RuntimeError(
+                "MarbleDB store not available. Build with: make -j4"
+            )
+
+        # Use provided store or create new one
+        owns_store = store is None
+        if owns_store:
+            store = MarbleDBStoreBackend(db_path)
+            store.open()
+
+        # Use the iter_batches() streaming API
+        batch_iterator = store.iter_batches(table_name)
+
+        # Wrap in generator to handle cleanup
+        def marbledb_batches():
+            try:
+                for batch in batch_iterator:
+                    yield batch
+            finally:
+                # Only close if we created the store
+                if owns_store:
+                    store.close()
+
+        return cls(marbledb_batches())
+
+    @classmethod
     def from_postgres_cdc(
         cls,
         host: str = "localhost",

@@ -16,6 +16,7 @@ from libc.stdint cimport uint64_t, uint32_t, int64_t, UINT64_MAX
 from libcpp.string cimport string
 from libcpp.memory cimport unique_ptr, shared_ptr, make_shared
 from libcpp.vector cimport vector
+from libcpp.utility cimport move
 from libcpp.unordered_map cimport unordered_map
 from libcpp cimport bool as cbool
 
@@ -90,6 +91,15 @@ cdef extern from "marble/db.h" namespace "marble":
         void SeekToLast()
         Status status()
 
+    # Streaming batch iterator for zero-copy Arrow access
+    cdef cppclass TableBatchIterator:
+        cbool Valid()
+        void Next()
+        Status GetBatch(shared_ptr[RecordBatch]* batch)
+        shared_ptr[Schema] schema()
+        Status status()
+        int64_t GetApproximateRemainingBatches()
+
     cdef cppclass ColumnFamilyHandle:
         pass
 
@@ -113,6 +123,8 @@ cdef extern from "marble/db.h" namespace "marble":
         Status InsertBatch(const string& table_name, const shared_ptr[RecordBatch]& batch)
         Status ScanTable(const string& table_name, unique_ptr[QueryResult]* result)
         Status NewIterator(const string& table_name, const ReadOptions& options, const KeyRange& range, unique_ptr[Iterator]* iterator)
+        # Streaming batch iterator - returns RecordBatches lazily
+        Status NewBatchIterator(const string& table_name, unique_ptr[TableBatchIterator]* iter)
         Status DeleteRange(const WriteOptions& options, const Key& begin_key, const Key& end_key)
         Status DeleteRange(const WriteOptions& options, ColumnFamilyHandle* cf, const Key& begin_key, const Key& end_key)
         vector[string] ListColumnFamilies()
@@ -387,9 +399,90 @@ cdef class MarbleDBStoreBackend:
         """Flush pending writes."""
         if not self._is_open:
             return
-        
+
         cdef Status status
         status = self._db.get().Flush()
         if not status.ok():
             logger.warning(f"Flush warning: {status.ToString().decode('utf-8')}")
+
+    cpdef object iter_batches(self, str table_name):
+        """Streaming batch iterator - yields RecordBatches lazily.
+
+        This is the primary API for zero-copy streaming access to MarbleDB tables.
+        Instead of materializing all data, batches are fetched on-demand.
+
+        Args:
+            table_name: Name of the table to scan
+
+        Yields:
+            PyArrow RecordBatch objects
+
+        Example:
+            for batch in store.iter_batches("my_table"):
+                process_batch(batch)
+        """
+        if not self._is_open:
+            raise RuntimeError("MarbleDB backend not open")
+
+        cdef Status status
+        cdef unique_ptr[TableBatchIterator] iter_ptr
+        cdef string table_name_str
+        cdef _TableBatchIteratorWrapper wrapper
+
+        try:
+            table_name_str = table_name.encode('utf-8')
+            status = self._db.get().NewBatchIterator(table_name_str, &iter_ptr)
+            if not status.ok():
+                raise RuntimeError(f"NewBatchIterator failed: {status.ToString().decode('utf-8')}")
+
+            # Create wrapper using cdef factory function to handle unique_ptr
+            wrapper = _TableBatchIteratorWrapper.__new__(_TableBatchIteratorWrapper)
+            wrapper._table_name = table_name
+            wrapper._iter = move(iter_ptr)
+            return wrapper
+
+        except Exception as e:
+            logger.error(f"iter_batches failed: {e}")
+            raise
+
+
+# Helper class to wrap C++ iterator as Python generator
+cdef class _TableBatchIteratorWrapper:
+    """Wrapper that allows C++ TableBatchIterator to be used as Python iterator."""
+    cdef unique_ptr[TableBatchIterator] _iter
+    cdef str _table_name
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        cdef Status status
+        cdef shared_ptr[RecordBatch] batch_ptr
+        cdef shared_ptr[PCRecordBatch] pa_batch_ptr
+
+        if not self._iter.get().Valid():
+            raise StopIteration
+
+        status = self._iter.get().GetBatch(&batch_ptr)
+        if not status.ok():
+            raise RuntimeError(f"GetBatch failed: {status.ToString().decode('utf-8')}")
+
+        # Advance to next batch for next iteration
+        self._iter.get().Next()
+
+        # Convert C++ RecordBatch to PyArrow RecordBatch
+        # This requires careful handling of shared_ptr ownership
+        if batch_ptr.get() == NULL:
+            raise StopIteration
+
+        # Cast to pyarrow's CRecordBatch type (both are arrow::RecordBatch)
+        # Use reinterpret_cast via Cython's pointer casting
+        pa_batch_ptr = <shared_ptr[PCRecordBatch]>batch_ptr
+
+        # Use pyarrow's mechanism to wrap C++ RecordBatch
+        try:
+            return pa_lib.pyarrow_wrap_batch(pa_batch_ptr)
+        except Exception as e:
+            logger.error(f"Failed to convert batch: {e}")
+            raise RuntimeError(f"Batch conversion failed: {e}")
 

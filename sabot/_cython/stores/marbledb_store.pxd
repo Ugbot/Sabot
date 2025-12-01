@@ -84,11 +84,22 @@ cdef extern from "marble/db.h" namespace "marble":
         string name
         ColumnFamilyOptions options
 
+    # Streaming batch iterator for zero-copy Arrow access
+    cdef cppclass TableBatchIterator:
+        cbool Valid()
+        void Next()
+        Status GetBatch(shared_ptr[RecordBatch]* batch)
+        shared_ptr[Schema] schema()
+        Status status()
+        int64_t GetApproximateRemainingBatches()
+
     cdef cppclass MarbleDB:
         Status CreateColumnFamily(const ColumnFamilyDescriptor& descriptor, ColumnFamilyHandle** handle)
         Status InsertBatch(const string& table_name, const shared_ptr[RecordBatch]& batch)
         Status ScanTable(const string& table_name, unique_ptr[QueryResult]* result)
         Status NewIterator(const string& table_name, const ReadOptions& options, const KeyRange& range, unique_ptr[Iterator]* iterator)
+        # Streaming batch iterator - returns RecordBatches lazily
+        Status NewBatchIterator(const string& table_name, unique_ptr[TableBatchIterator]* iter)
         Status DeleteRange(const WriteOptions& options, const Key& begin_key, const Key& end_key)
         Status DeleteRange(const WriteOptions& options, ColumnFamilyHandle* cf, const Key& begin_key, const Key& end_key)
         vector[string] ListColumnFamilies()
@@ -144,3 +155,5 @@ cdef class MarbleDBStoreBackend:
     cpdef void delete_range(self, str table_name, str start_key, str end_key)
     cpdef list list_column_families(self)
     cpdef void flush(self)
+    # Streaming batch iterator - returns Python generator yielding RecordBatches
+    cpdef object iter_batches(self, str table_name)
