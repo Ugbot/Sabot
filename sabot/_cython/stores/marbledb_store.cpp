@@ -4,82 +4,83 @@
 {
     "distutils": {
         "depends": [
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/api.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/arrow_to_pandas.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/async.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/benchmark.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/common.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/csv.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/extension_type.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/gdb.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/helpers.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/inference.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/ipc.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/numpy_init.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/platform.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/pyarrow.h",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include/arrow/python/udf.h",
-            "MarbleDB/include/marble/api.h",
-            "MarbleDB/include/marble/db.h",
-            "MarbleDB/include/marble/status.h",
-            "vendor/arrow/cpp/build/install/include/arrow/api.h",
-            "vendor/arrow/cpp/build/install/include/arrow/array/concatenate.h",
-            "vendor/arrow/cpp/build/install/include/arrow/builder.h",
-            "vendor/arrow/cpp/build/install/include/arrow/c/abi.h",
-            "vendor/arrow/cpp/build/install/include/arrow/c/bridge.h",
-            "vendor/arrow/cpp/build/install/include/arrow/c/dlpack.h",
-            "vendor/arrow/cpp/build/install/include/arrow/c/dlpack_abi.h",
-            "vendor/arrow/cpp/build/install/include/arrow/compute/api.h",
-            "vendor/arrow/cpp/build/install/include/arrow/compute/cast.h",
-            "vendor/arrow/cpp/build/install/include/arrow/compute/expression.h",
-            "vendor/arrow/cpp/build/install/include/arrow/config.h",
-            "vendor/arrow/cpp/build/install/include/arrow/csv/api.h",
-            "vendor/arrow/cpp/build/install/include/arrow/extension/bool8.h",
-            "vendor/arrow/cpp/build/install/include/arrow/extension/fixed_shape_tensor.h",
-            "vendor/arrow/cpp/build/install/include/arrow/extension/json.h",
-            "vendor/arrow/cpp/build/install/include/arrow/extension/opaque.h",
-            "vendor/arrow/cpp/build/install/include/arrow/extension/uuid.h",
-            "vendor/arrow/cpp/build/install/include/arrow/extension_type.h",
-            "vendor/arrow/cpp/build/install/include/arrow/io/api.h",
-            "vendor/arrow/cpp/build/install/include/arrow/ipc/api.h",
-            "vendor/arrow/cpp/build/install/include/arrow/json/options.h",
-            "vendor/arrow/cpp/build/install/include/arrow/json/reader.h",
-            "vendor/arrow/cpp/build/install/include/arrow/result.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/byte_size.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/cancel.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/compression.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/decimal.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/future.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/io_util.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/iterator.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/key_value_metadata.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/thread_pool.h",
-            "vendor/arrow/cpp/build/install/include/arrow/util/value_parsing.h"
+            "/Users/bengamble/Sabot/MarbleDB/include/marble/api.h",
+            "/Users/bengamble/Sabot/MarbleDB/include/marble/db.h",
+            "/Users/bengamble/Sabot/MarbleDB/include/marble/status.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/array/concatenate.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/builder.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/c/abi.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/c/bridge.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/c/dlpack.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/c/dlpack_abi.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/compute/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/compute/cast.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/compute/expression.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/config.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/csv/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/extension/bool8.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/extension/fixed_shape_tensor.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/extension/json.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/extension/opaque.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/extension/uuid.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/extension_type.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/io/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/ipc/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/json/options.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/json/reader.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/result.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/byte_size.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/cancel.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/compression.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/decimal.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/future.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/io_util.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/iterator.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/key_value_metadata.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/thread_pool.h",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include/arrow/util/value_parsing.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/api.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/arrow_to_pandas.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/async.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/benchmark.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/common.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/csv.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/extension_type.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/gdb.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/helpers.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/inference.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/ipc.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/numpy_init.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/platform.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/pyarrow.h",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src/arrow/python/udf.h"
         ],
         "extra_compile_args": [
             "-std=c++17",
-            "-O2"
+            "-Wno-unused-function",
+            "-Wno-deprecated-declarations"
         ],
         "extra_link_args": [
-            "-Wl,-rpath,@loader_path/../../../vendor/arrow/cpp/build/install/lib",
-            "-Wl,-rpath,@loader_path/../../../MarbleDB/build"
+            "-Wl,-rpath,/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib",
+            "-Wl,-rpath,/Users/bengamble/Sabot/MarbleDB/build"
         ],
         "include_dirs": [
-            "MarbleDB/include",
-            "vendor/arrow/cpp/build/install/include",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow/include",
-            "/opt/homebrew/lib/python3.13/site-packages/numpy/_core/include"
+            "/Users/bengamble/PycharmProjects/pythonProject/sabot/.venv/lib/python3.11/site-packages/numpy/_core/include",
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include",
+            "/Users/bengamble/Sabot/MarbleDB/include",
+            "/Users/bengamble/Sabot/vendor/arrow/python",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow",
+            "/Users/bengamble/Sabot/vendor/arrow/python/pyarrow/src"
         ],
         "language": "c++",
         "libraries": [
-            "marble",
             "arrow",
-            "parquet"
+            "marble"
         ],
         "library_dirs": [
-            "MarbleDB/build",
-            "vendor/arrow/cpp/build/install/lib",
-            "/opt/homebrew/lib/python3.13/site-packages/pyarrow"
+            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib",
+            "/Users/bengamble/Sabot/MarbleDB/build"
         ],
         "name": "sabot._cython.stores.marbledb_store",
         "sources": [
@@ -1902,6 +1903,7 @@ struct __pyx_obj_7pyarrow_3lib_CacheOptions;
 struct __pyx_obj_7pyarrow_3lib_Codec;
 struct __pyx_obj_7pyarrow_3lib_StopToken;
 struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend;
+struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper;
 struct __pyx_opt_args_7cpython_11contextvars_get_value;
 struct __pyx_opt_args_7cpython_11contextvars_get_value_no_default;
 
@@ -2031,7 +2033,7 @@ struct __pyx_opt_args_7pyarrow_3lib_ensure_type {
 };
 struct __pyx_opt_args_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_scan_range_to_table;
 
-/* "sabot/_cython/stores/marbledb_store.pxd":143
+/* "sabot/_cython/stores/marbledb_store.pxd":154
  *     cpdef void insert_batch(self, str table_name, object pyarrow_batch)
  *     cpdef object scan_table(self, str table_name)
  *     cpdef object scan_range_to_table(self, str table_name, str start_key=*, str end_key=*)             # <<<<<<<<<<<<<<
@@ -3363,7 +3365,7 @@ struct __pyx_obj_7pyarrow_3lib_StopToken {
 };
 
 
-/* "sabot/_cython/stores/marbledb_store.pxd":131
+/* "sabot/_cython/stores/marbledb_store.pxd":142
  * 
  * # Extension type declaration
  * cdef class MarbleDBStoreBackend:             # <<<<<<<<<<<<<<
@@ -3378,6 +3380,20 @@ struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend {
   bool _is_open;
   PyObject *_config;
   std::unordered_map<std::string,marble::ColumnFamilyHandle *>  _column_families;
+};
+
+
+/* "sabot/_cython/stores/marbledb_store.pyx":450
+ * 
+ * # Helper class to wrap C++ iterator as Python generator
+ * cdef class _TableBatchIteratorWrapper:             # <<<<<<<<<<<<<<
+ *     """Wrapper that allows C++ TableBatchIterator to be used as Python iterator."""
+ *     cdef unique_ptr[TableBatchIterator] _iter
+*/
+struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper {
+  PyObject_HEAD
+  std::unique_ptr<marble::TableBatchIterator>  _iter;
+  PyObject *_table_name;
 };
 
 
@@ -4683,7 +4699,7 @@ struct __pyx_vtabstruct_7pyarrow_3lib_StopToken {
 static struct __pyx_vtabstruct_7pyarrow_3lib_StopToken *__pyx_vtabptr_7pyarrow_3lib_StopToken;
 
 
-/* "sabot/_cython/stores/marbledb_store.pyx":155
+/* "sabot/_cython/stores/marbledb_store.pyx":167
  * 
  * 
  * cdef class MarbleDBStoreBackend:             # <<<<<<<<<<<<<<
@@ -4701,6 +4717,7 @@ struct __pyx_vtabstruct_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBa
   void (*delete_range)(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *, PyObject *, PyObject *, PyObject *, int __pyx_skip_dispatch);
   PyObject *(*list_column_families)(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *, int __pyx_skip_dispatch);
   void (*flush)(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *, int __pyx_skip_dispatch);
+  PyObject *(*iter_batches)(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *, PyObject *, int __pyx_skip_dispatch);
 };
 static struct __pyx_vtabstruct_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_vtabptr_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend;
 /* #### Code section: utility_code_proto ### */
@@ -5577,6 +5594,9 @@ static unsigned long __Pyx_get_runtime_version(void);
 /* CheckBinaryVersion.proto */
 static int __Pyx_check_binary_version(unsigned long ct_version, unsigned long rt_version, int allow_newer);
 
+/* FunctionImport.proto */
+static int __Pyx_ImportFunction_3_1_4(PyObject *module, const char *funcname, void (**f)(void), const char *sig);
+
 /* MultiPhaseInitModuleState.proto */
 #if CYTHON_PEP489_MULTI_PHASE_INIT && CYTHON_USE_MODULE_STATE
 static PyObject *__Pyx_State_FindModule(void*);
@@ -5660,6 +5680,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
 static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_delete_range(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_table_name, CYTHON_UNUSED PyObject *__pyx_v_start_key, CYTHON_UNUSED PyObject *__pyx_v_end_key, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_list_column_families(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_flush(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_iter_batches(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, PyObject *__pyx_v_table_name, int __pyx_skip_dispatch); /* proto*/
 
 /* Module declarations from "libc.stdint" */
 
@@ -5825,6 +5846,7 @@ int __pyx_module_is_main_sabot___cython__stores__marbledb_store = 0;
 static PyObject *__pyx_builtin_RuntimeError;
 static PyObject *__pyx_builtin_NotImplementedError;
 static PyObject *__pyx_builtin_TypeError;
+static PyObject *__pyx_builtin_StopIteration;
 /* #### Code section: string_decls ### */
 static const char __pyx_k_[] = ".";
 static const char __pyx_k_Q[] = "\200\001\330\004\n\210+\220Q";
@@ -5883,17 +5905,21 @@ static const char __pyx_k_delete_range[] = "delete_range";
 static const char __pyx_k_initializing[] = "_initializing";
 static const char __pyx_k_insert_batch[] = "insert_batch";
 static const char __pyx_k_is_coroutine[] = "_is_coroutine";
+static const char __pyx_k_iter_batches[] = "iter_batches";
 static const char __pyx_k_stringsource[] = "<stringsource>";
 static const char __pyx_k_Flush_warning[] = "Flush warning: ";
+static const char __pyx_k_StopIteration[] = "StopIteration";
 static const char __pyx_k_pyarrow_batch[] = "pyarrow_batch";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
 static const char __pyx_k_pyarrow_schema[] = "pyarrow_schema";
+static const char __pyx_k_GetBatch_failed[] = "GetBatch failed: ";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_ScanTable_failed[] = "ScanTable failed: ";
 static const char __pyx_k_InsertBatch_failed[] = "InsertBatch failed: ";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_NotImplementedError[] = "NotImplementedError";
+static const char __pyx_k_iter_batches_failed[] = "iter_batches failed: ";
 static const char __pyx_k_scan_range_to_table[] = "scan_range_to_table";
 static const char __pyx_k_A_4t1_4t4s_Q_F_L_e1A[] = "\200A\340\010\013\2104\210t\2201\330\014\r\360\006\000\t\014\2104\210t\2204\220s\230#\230Q\360\006\000\r\021\220\004\220F\230!\340\010\014\210L\230\001\330\010\016\210e\2201\220A";
 static const char __pyx_k_MarbleDBStoreBackend[] = "MarbleDBStoreBackend";
@@ -5902,27 +5928,35 @@ static const char __pyx_k_list_column_families[] = "list_column_families";
 static const char __pyx_k_Created_column_family[] = "Created column family '";
 static const char __pyx_k_II_4t1_aq_WE_HG1_t_aq[] = "\320\004I\320I[\320[\\\360\024\000\t\014\2104\210t\2201\330\014\022\220,\230a\230q\340\010\013\210:\220W\230E\240\023\240H\250G\2601\330\014\022\220(\230!\330\020\021\360\n\000\t\020\210t\220;\230a\230q";
 static const char __pyx_k_A_4t1_T_RvQ_4vS_2_0_ir[] = "\200A\340\010\013\2104\210t\2201\330\014\r\360\006\000\t\022\220\024\220T\230\024\230R\230v\240Q\330\010\013\2104\210v\220S\230\001\330\014\022\220(\230!\2302\320\0350\260\006\260i\270r\300\027\310\001\310\021";
+static const char __pyx_k_Batch_conversion_failed[] = "Batch conversion failed: ";
+static const char __pyx_k_Failed_to_convert_batch[] = "Failed to convert batch: ";
 static const char __pyx_k_Failed_to_open_MarbleDB[] = "Failed to open MarbleDB: ";
+static const char __pyx_k_NewBatchIterator_failed[] = "NewBatchIterator failed: ";
 static const char __pyx_k_A_4t1_aq_1_t4t2_8_gQd_1_A[] = "\200A\340\010\013\2104\210t\2201\330\014\022\220,\230a\230q\360\006\000\t\034\2301\340\010\t\330\014\027\220t\2304\230t\2402\320%8\270\001\330\014\020\220\010\230\001\330\020\026\220g\230Q\230d\240'\250\021\250!\330\014\023\2201\340\010\017\210}\230A\330\014\022\220&\230\001\230\022\320\033:\270!\330\014\r";
 static const char __pyx_k_CreateColumnFamily_failed[] = "CreateColumnFamily failed: ";
 static const char __pyx_k_ListColumnFamilies_failed[] = "ListColumnFamilies failed: ";
 static const char __pyx_k_MarbleDBStoreBackend_open[] = "MarbleDBStoreBackend.open";
 static const char __pyx_k_MarbleDB_backend_not_open[] = "MarbleDB backend not open";
+static const char __pyx_k_TableBatchIteratorWrapper[] = "_TableBatchIteratorWrapper";
 static const char __pyx_k_MarbleDBStoreBackend_close[] = "MarbleDBStoreBackend.close";
 static const char __pyx_k_MarbleDBStoreBackend_flush[] = "MarbleDBStoreBackend.flush";
 static const char __pyx_k_MarbleDB_store_backend_closed[] = "MarbleDB store backend closed";
 static const char __pyx_k_A_4t1_aq_A_Zwaq_T_T_q0_t6_A_l_2[] = "\200A\340\010\013\2104\210t\2201\330\014\022\220,\230a\230q\360\016\000\t\n\360\006\000\r\031\320\030,\250A\330\014\030\230\t\240\021\360\006\000\r\036\230Z\240w\250a\250q\330\014\025\220T\230\024\230T\240\022\240<\250q\3200@\300\001\330\014\017\210t\2206\230\023\230A\330\020\026\220l\240!\2402\320%=\270V\3009\310B\310g\320UV\320VW\340\010\017\210}\230A\330\014\022\220&\230\001\230\022\320\0333\2601\330\014\r";
+static const char __pyx_k_A_4t1_aq_Zwaq_T_T_4A5EQa_t6_A_l[] = "\200A\360 \000\t\014\2104\210t\2201\330\014\022\220,\230a\230q\360\016\000\t\n\330\014\035\230Z\240w\250a\250q\330\014\025\220T\230\024\230T\240\022\320#4\260A\3205E\300Q\300a\330\014\017\210t\2206\230\023\230A\330\020\026\220l\240!\2402\320%B\300&\310\t\320QS\320SZ\320Z[\320[\\\360\006\000\r\027\320\0260\260\010\270\001\270\021\330\014\023\220?\240!\330\014\023\2209\230D\240\001\240\021\330\014\023\2201\340\010\017\210}\230A\330\014\022\220&\230\001\230\022\320\0334\260A\330\014\r";
 static const char __pyx_k_A_4t1_aq_Zwaq_T_T_Q_aq_t6_A_l_2[] = "\200A\360\020\000\t\014\2104\210t\2201\330\014\022\220,\230a\230q\360\020\000\t\n\330\014\035\230Z\240w\250a\250q\330\014\025\220T\230\024\230T\240\022\240:\250Q\320.>\270a\270q\330\014\017\210t\2206\230\023\230A\330\020\026\220l\240!\2402\320%;\2706\300\031\310\"\310G\320ST\320TU\360\006\000\r\023\220&\230\004\230B\230h\240a\330\020\031\230\026\230t\2402\240U\250!\2501\250A\330\020\023\2206\230\023\230C\230t\2409\250D\260\003\2603\260a\330\024\037\230z\250\021\250!\360\010\000\024\025\340\014\017\210{\230%\230s\240#\240Q\340\020\027\220r\230\026\230q\240\001\360\016\000\r\023\220(\230!\2301\330\014\023\2202\220V\2301\230A\340\010\017\210}\230A\330\014\022\220&\230\001\230\022\320\0331\260\021\330\014\r";
 static const char __pyx_k_MarbleDBStoreBackend___setstate[] = "MarbleDBStoreBackend.__setstate_cython__";
 static const char __pyx_k_MarbleDBStoreBackend_scan_range[] = "MarbleDBStoreBackend.scan_range_to_table";
 static const char __pyx_k_MarbleDBStoreBackend_scan_table[] = "MarbleDBStoreBackend.scan_table";
 static const char __pyx_k_MarbleDB_Store_Backend_Implemen[] = "\nMarbleDB Store Backend Implementation\n\nCython implementation using MarbleDB Arrow Batch API for table storage.\nProvides InsertBatch, ScanTable, CreateColumnFamily, and NewIterator operations.\n";
+static const char __pyx_k_TableBatchIteratorWrapper___red[] = "_TableBatchIteratorWrapper.__reduce_cython__";
+static const char __pyx_k_TableBatchIteratorWrapper___set[] = "_TableBatchIteratorWrapper.__setstate_cython__";
 static const char __pyx_k_A_4q_D_QoQd_4vS_ar_fIRwVWWX_L_e1[] = "\200A\340\010\013\2104\210q\330\014\r\360\006\000\t%\240D\250\t\260\027\270\001\270\021\360\006\000\t\022\220\034\230Q\230o\250Q\250d\260!\330\010\013\2104\210v\220S\230\001\330\014\022\220,\230a\230r\320!>\270f\300I\310R\310w\320VW\320WX\340\010\014\210L\230\001\330\010\016\210e\2201\220B\320\026;\2704\270q";
 static const char __pyx_k_A_4t1_aq_j_q_A_Q_q_q_Q_5Q_T_T_6a[] = "\200A\360\030\000\t\014\2104\210t\2201\330\014\022\220,\230a\230q\360\010\000\t+\250!\360\010\000\t\n\340\014\031\230\037\250\001\360\006\000\r\027\220j\240\007\240q\250\001\330\014\020\220\010\230\001\330\014\020\220\010\230\n\240*\250A\330\014\020\220\010\320\030-\250Q\330\014\020\220\010\320\030/\250q\330\014\020\220\010\320\030/\250q\330\014\020\220\010\320\030-\250Q\330\014\020\220\010\320\0305\260Q\360\006\000\r\026\220T\230\024\230T\240\022\320#6\260a\260v\270Q\270a\330\014\017\210t\2206\230\023\230A\330\020\026\220l\240!\2402\320%D\300F\310)\320SU\320U\\\320\\]\320]^\360\006\000\r\020\210w\220c\230\021\330\020\024\320\024%\240Q\240k\260\021\340\014\022\220%\220q\230\002\320\0325\3205H\310\003\3101\310A\340\010\017\210}\230A\330\014\022\220&\230\001\230\022\320\033:\270!\330\014\r";
 static const char __pyx_k_MarbleDBStoreBackend___reduce_cy[] = "MarbleDBStoreBackend.__reduce_cython__";
 static const char __pyx_k_MarbleDBStoreBackend_create_colu[] = "MarbleDBStoreBackend.create_column_family";
 static const char __pyx_k_MarbleDBStoreBackend_delete_rang[] = "MarbleDBStoreBackend.delete_range";
 static const char __pyx_k_MarbleDBStoreBackend_insert_batc[] = "MarbleDBStoreBackend.insert_batch";
+static const char __pyx_k_MarbleDBStoreBackend_iter_batche[] = "MarbleDBStoreBackend.iter_batches";
 static const char __pyx_k_MarbleDBStoreBackend_list_column[] = "MarbleDBStoreBackend.list_column_families";
 static const char __pyx_k_MarbleDB_store_backend_opened_at[] = "MarbleDB store backend opened at ";
 static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.";
@@ -5931,6 +5965,7 @@ static const char __pyx_k_sabot__cython_stores_marbledb_st[] = "sabot._cython.st
 static const char __pyx_k_scan_range_to_table_Range_parame[] = "scan_range_to_table: Range parameters ignored, doing full table scan. Use marbledb_backend for proper range scans.";
 static const char __pyx_k_scan_table_C_to_PyArrow_batch_co[] = "scan_table: C++ to PyArrow batch conversion not fully implemented";
 static const char __pyx_k_self__column_families_self__db_c[] = "self._column_families,self._db cannot be converted to a Python object for pickling";
+static const char __pyx_k_self__iter_cannot_be_converted_t[] = "self._iter cannot be converted to a Python object for pickling";
 static const char __pyx_k_sabot__cython_stores_marbledb_st_2[] = "sabot/_cython/stores/marbledb_store.pyx";
 /* #### Code section: decls ### */
 static int __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend___init__(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, PyObject *__pyx_v_db_path, PyObject *__pyx_v_config); /* proto */
@@ -5943,9 +5978,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
 static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_14delete_range(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, PyObject *__pyx_v_table_name, PyObject *__pyx_v_start_key, PyObject *__pyx_v_end_key); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_16list_column_families(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_18flush(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_20__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_22__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_20iter_batches(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, PyObject *__pyx_v_table_name); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_22__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_24__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper___iter__(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_2__next__(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_4__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_6__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_tp_new_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 /* #### Code section: late_includes ### */
 /* #### Code section: module_state ### */
 /* SmallCodeConfig */
@@ -6093,11 +6134,13 @@ typedef struct {
   PyTypeObject *__pyx_ptype_7pyarrow_3lib_Codec;
   PyTypeObject *__pyx_ptype_7pyarrow_3lib_StopToken;
   PyObject *__pyx_type_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend;
+  PyObject *__pyx_type_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper;
   PyTypeObject *__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend;
+  PyTypeObject *__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
   PyObject *__pyx_tuple[1];
-  PyObject *__pyx_codeobj_tab[11];
-  PyObject *__pyx_string_tab[95];
+  PyObject *__pyx_codeobj_tab[14];
+  PyObject *__pyx_string_tab[107];
 /* #### Code section: module_state_contents ### */
 /* CommonTypesMetaclass.module_state_decls */
 PyTypeObject *__pyx_CommonTypesMetaclassType;
@@ -6136,100 +6179,112 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #endif
 /* #### Code section: constant_name_defines ### */
 #define __pyx_kp_u_ __pyx_string_tab[0]
-#define __pyx_kp_u_CreateColumnFamily_failed __pyx_string_tab[1]
-#define __pyx_kp_u_Created_column_family __pyx_string_tab[2]
-#define __pyx_n_u_Dict __pyx_string_tab[3]
-#define __pyx_kp_u_Failed_to_open_MarbleDB __pyx_string_tab[4]
-#define __pyx_kp_u_Flush_warning __pyx_string_tab[5]
-#define __pyx_kp_u_InsertBatch_failed __pyx_string_tab[6]
-#define __pyx_n_u_List __pyx_string_tab[7]
-#define __pyx_kp_u_ListColumnFamilies_failed __pyx_string_tab[8]
-#define __pyx_n_u_MarbleDBStoreBackend __pyx_string_tab[9]
-#define __pyx_n_u_MarbleDBStoreBackend___reduce_cy __pyx_string_tab[10]
-#define __pyx_n_u_MarbleDBStoreBackend___setstate __pyx_string_tab[11]
-#define __pyx_n_u_MarbleDBStoreBackend_close __pyx_string_tab[12]
-#define __pyx_n_u_MarbleDBStoreBackend_create_colu __pyx_string_tab[13]
-#define __pyx_n_u_MarbleDBStoreBackend_delete_rang __pyx_string_tab[14]
-#define __pyx_n_u_MarbleDBStoreBackend_flush __pyx_string_tab[15]
-#define __pyx_n_u_MarbleDBStoreBackend_insert_batc __pyx_string_tab[16]
-#define __pyx_n_u_MarbleDBStoreBackend_list_column __pyx_string_tab[17]
-#define __pyx_n_u_MarbleDBStoreBackend_open __pyx_string_tab[18]
-#define __pyx_n_u_MarbleDBStoreBackend_scan_range __pyx_string_tab[19]
-#define __pyx_n_u_MarbleDBStoreBackend_scan_table __pyx_string_tab[20]
-#define __pyx_kp_u_MarbleDB_backend_not_open __pyx_string_tab[21]
-#define __pyx_kp_u_MarbleDB_store_backend_closed __pyx_string_tab[22]
-#define __pyx_kp_u_MarbleDB_store_backend_opened_at __pyx_string_tab[23]
-#define __pyx_kp_u_None __pyx_string_tab[24]
-#define __pyx_n_u_NotImplementedError __pyx_string_tab[25]
-#define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[26]
-#define __pyx_n_u_Optional __pyx_string_tab[27]
-#define __pyx_n_u_RuntimeError __pyx_string_tab[28]
-#define __pyx_kp_u_ScanTable_failed __pyx_string_tab[29]
-#define __pyx_n_u_TypeError __pyx_string_tab[30]
-#define __pyx_kp_u__2 __pyx_string_tab[31]
-#define __pyx_kp_u_add_note __pyx_string_tab[32]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[33]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[34]
-#define __pyx_n_u_close __pyx_string_tab[35]
-#define __pyx_kp_u_columns __pyx_string_tab[36]
-#define __pyx_n_u_config __pyx_string_tab[37]
-#define __pyx_n_u_create_column_family __pyx_string_tab[38]
-#define __pyx_n_u_db_path __pyx_string_tab[39]
-#define __pyx_n_u_delete_range __pyx_string_tab[40]
-#define __pyx_kp_u_delete_range_not_implemented_for __pyx_string_tab[41]
-#define __pyx_kp_u_disable __pyx_string_tab[42]
-#define __pyx_kp_u_enable __pyx_string_tab[43]
-#define __pyx_n_u_end_key __pyx_string_tab[44]
-#define __pyx_n_u_error __pyx_string_tab[45]
-#define __pyx_n_u_flush __pyx_string_tab[46]
-#define __pyx_n_u_func __pyx_string_tab[47]
-#define __pyx_kp_u_gc __pyx_string_tab[48]
-#define __pyx_n_u_getLogger __pyx_string_tab[49]
-#define __pyx_n_u_getstate __pyx_string_tab[50]
-#define __pyx_n_u_info __pyx_string_tab[51]
-#define __pyx_n_u_initializing __pyx_string_tab[52]
-#define __pyx_n_u_insert_batch __pyx_string_tab[53]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[54]
-#define __pyx_kp_u_isenabled __pyx_string_tab[55]
-#define __pyx_n_u_list_column_families __pyx_string_tab[56]
-#define __pyx_n_u_logger __pyx_string_tab[57]
-#define __pyx_n_u_logging __pyx_string_tab[58]
-#define __pyx_n_u_main __pyx_string_tab[59]
-#define __pyx_n_u_module __pyx_string_tab[60]
-#define __pyx_n_u_name __pyx_string_tab[61]
-#define __pyx_n_u_open __pyx_string_tab[62]
-#define __pyx_n_u_os __pyx_string_tab[63]
-#define __pyx_n_u_pop __pyx_string_tab[64]
-#define __pyx_n_u_pyarrow __pyx_string_tab[65]
-#define __pyx_n_u_pyarrow_batch __pyx_string_tab[66]
-#define __pyx_n_u_pyarrow_schema __pyx_string_tab[67]
-#define __pyx_n_u_pyx_state __pyx_string_tab[68]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[69]
-#define __pyx_n_u_qualname __pyx_string_tab[70]
-#define __pyx_n_u_reduce __pyx_string_tab[71]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[72]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[73]
-#define __pyx_n_u_sabot__cython_stores_marbledb_st __pyx_string_tab[74]
-#define __pyx_kp_u_sabot__cython_stores_marbledb_st_2 __pyx_string_tab[75]
-#define __pyx_n_u_scan_range_to_table __pyx_string_tab[76]
-#define __pyx_kp_u_scan_range_to_table_Range_parame __pyx_string_tab[77]
-#define __pyx_n_u_scan_table __pyx_string_tab[78]
-#define __pyx_kp_u_scan_table_C_to_PyArrow_batch_co __pyx_string_tab[79]
-#define __pyx_n_u_self __pyx_string_tab[80]
-#define __pyx_kp_u_self__column_families_self__db_c __pyx_string_tab[81]
-#define __pyx_n_u_set_name __pyx_string_tab[82]
-#define __pyx_n_u_setstate __pyx_string_tab[83]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[84]
-#define __pyx_n_u_spec __pyx_string_tab[85]
-#define __pyx_n_u_start_key __pyx_string_tab[86]
-#define __pyx_kp_u_stringsource __pyx_string_tab[87]
-#define __pyx_n_u_table __pyx_string_tab[88]
-#define __pyx_n_u_table_name __pyx_string_tab[89]
-#define __pyx_n_u_test __pyx_string_tab[90]
-#define __pyx_n_u_time __pyx_string_tab[91]
-#define __pyx_n_u_typing __pyx_string_tab[92]
-#define __pyx_n_u_warning __pyx_string_tab[93]
-#define __pyx_kp_u_with __pyx_string_tab[94]
+#define __pyx_kp_u_Batch_conversion_failed __pyx_string_tab[1]
+#define __pyx_kp_u_CreateColumnFamily_failed __pyx_string_tab[2]
+#define __pyx_kp_u_Created_column_family __pyx_string_tab[3]
+#define __pyx_n_u_Dict __pyx_string_tab[4]
+#define __pyx_kp_u_Failed_to_convert_batch __pyx_string_tab[5]
+#define __pyx_kp_u_Failed_to_open_MarbleDB __pyx_string_tab[6]
+#define __pyx_kp_u_Flush_warning __pyx_string_tab[7]
+#define __pyx_kp_u_GetBatch_failed __pyx_string_tab[8]
+#define __pyx_kp_u_InsertBatch_failed __pyx_string_tab[9]
+#define __pyx_n_u_List __pyx_string_tab[10]
+#define __pyx_kp_u_ListColumnFamilies_failed __pyx_string_tab[11]
+#define __pyx_n_u_MarbleDBStoreBackend __pyx_string_tab[12]
+#define __pyx_n_u_MarbleDBStoreBackend___reduce_cy __pyx_string_tab[13]
+#define __pyx_n_u_MarbleDBStoreBackend___setstate __pyx_string_tab[14]
+#define __pyx_n_u_MarbleDBStoreBackend_close __pyx_string_tab[15]
+#define __pyx_n_u_MarbleDBStoreBackend_create_colu __pyx_string_tab[16]
+#define __pyx_n_u_MarbleDBStoreBackend_delete_rang __pyx_string_tab[17]
+#define __pyx_n_u_MarbleDBStoreBackend_flush __pyx_string_tab[18]
+#define __pyx_n_u_MarbleDBStoreBackend_insert_batc __pyx_string_tab[19]
+#define __pyx_n_u_MarbleDBStoreBackend_iter_batche __pyx_string_tab[20]
+#define __pyx_n_u_MarbleDBStoreBackend_list_column __pyx_string_tab[21]
+#define __pyx_n_u_MarbleDBStoreBackend_open __pyx_string_tab[22]
+#define __pyx_n_u_MarbleDBStoreBackend_scan_range __pyx_string_tab[23]
+#define __pyx_n_u_MarbleDBStoreBackend_scan_table __pyx_string_tab[24]
+#define __pyx_kp_u_MarbleDB_backend_not_open __pyx_string_tab[25]
+#define __pyx_kp_u_MarbleDB_store_backend_closed __pyx_string_tab[26]
+#define __pyx_kp_u_MarbleDB_store_backend_opened_at __pyx_string_tab[27]
+#define __pyx_kp_u_NewBatchIterator_failed __pyx_string_tab[28]
+#define __pyx_kp_u_None __pyx_string_tab[29]
+#define __pyx_n_u_NotImplementedError __pyx_string_tab[30]
+#define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[31]
+#define __pyx_n_u_Optional __pyx_string_tab[32]
+#define __pyx_n_u_RuntimeError __pyx_string_tab[33]
+#define __pyx_kp_u_ScanTable_failed __pyx_string_tab[34]
+#define __pyx_n_u_StopIteration __pyx_string_tab[35]
+#define __pyx_n_u_TableBatchIteratorWrapper __pyx_string_tab[36]
+#define __pyx_n_u_TableBatchIteratorWrapper___red __pyx_string_tab[37]
+#define __pyx_n_u_TableBatchIteratorWrapper___set __pyx_string_tab[38]
+#define __pyx_n_u_TypeError __pyx_string_tab[39]
+#define __pyx_kp_u__2 __pyx_string_tab[40]
+#define __pyx_kp_u_add_note __pyx_string_tab[41]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[42]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[43]
+#define __pyx_n_u_close __pyx_string_tab[44]
+#define __pyx_kp_u_columns __pyx_string_tab[45]
+#define __pyx_n_u_config __pyx_string_tab[46]
+#define __pyx_n_u_create_column_family __pyx_string_tab[47]
+#define __pyx_n_u_db_path __pyx_string_tab[48]
+#define __pyx_n_u_delete_range __pyx_string_tab[49]
+#define __pyx_kp_u_delete_range_not_implemented_for __pyx_string_tab[50]
+#define __pyx_kp_u_disable __pyx_string_tab[51]
+#define __pyx_kp_u_enable __pyx_string_tab[52]
+#define __pyx_n_u_end_key __pyx_string_tab[53]
+#define __pyx_n_u_error __pyx_string_tab[54]
+#define __pyx_n_u_flush __pyx_string_tab[55]
+#define __pyx_n_u_func __pyx_string_tab[56]
+#define __pyx_kp_u_gc __pyx_string_tab[57]
+#define __pyx_n_u_getLogger __pyx_string_tab[58]
+#define __pyx_n_u_getstate __pyx_string_tab[59]
+#define __pyx_n_u_info __pyx_string_tab[60]
+#define __pyx_n_u_initializing __pyx_string_tab[61]
+#define __pyx_n_u_insert_batch __pyx_string_tab[62]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[63]
+#define __pyx_kp_u_isenabled __pyx_string_tab[64]
+#define __pyx_n_u_iter_batches __pyx_string_tab[65]
+#define __pyx_kp_u_iter_batches_failed __pyx_string_tab[66]
+#define __pyx_n_u_list_column_families __pyx_string_tab[67]
+#define __pyx_n_u_logger __pyx_string_tab[68]
+#define __pyx_n_u_logging __pyx_string_tab[69]
+#define __pyx_n_u_main __pyx_string_tab[70]
+#define __pyx_n_u_module __pyx_string_tab[71]
+#define __pyx_n_u_name __pyx_string_tab[72]
+#define __pyx_n_u_open __pyx_string_tab[73]
+#define __pyx_n_u_os __pyx_string_tab[74]
+#define __pyx_n_u_pop __pyx_string_tab[75]
+#define __pyx_n_u_pyarrow __pyx_string_tab[76]
+#define __pyx_n_u_pyarrow_batch __pyx_string_tab[77]
+#define __pyx_n_u_pyarrow_schema __pyx_string_tab[78]
+#define __pyx_n_u_pyx_state __pyx_string_tab[79]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[80]
+#define __pyx_n_u_qualname __pyx_string_tab[81]
+#define __pyx_n_u_reduce __pyx_string_tab[82]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[83]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[84]
+#define __pyx_n_u_sabot__cython_stores_marbledb_st __pyx_string_tab[85]
+#define __pyx_kp_u_sabot__cython_stores_marbledb_st_2 __pyx_string_tab[86]
+#define __pyx_n_u_scan_range_to_table __pyx_string_tab[87]
+#define __pyx_kp_u_scan_range_to_table_Range_parame __pyx_string_tab[88]
+#define __pyx_n_u_scan_table __pyx_string_tab[89]
+#define __pyx_kp_u_scan_table_C_to_PyArrow_batch_co __pyx_string_tab[90]
+#define __pyx_n_u_self __pyx_string_tab[91]
+#define __pyx_kp_u_self__column_families_self__db_c __pyx_string_tab[92]
+#define __pyx_kp_u_self__iter_cannot_be_converted_t __pyx_string_tab[93]
+#define __pyx_n_u_set_name __pyx_string_tab[94]
+#define __pyx_n_u_setstate __pyx_string_tab[95]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[96]
+#define __pyx_n_u_spec __pyx_string_tab[97]
+#define __pyx_n_u_start_key __pyx_string_tab[98]
+#define __pyx_kp_u_stringsource __pyx_string_tab[99]
+#define __pyx_n_u_table __pyx_string_tab[100]
+#define __pyx_n_u_table_name __pyx_string_tab[101]
+#define __pyx_n_u_test __pyx_string_tab[102]
+#define __pyx_n_u_time __pyx_string_tab[103]
+#define __pyx_n_u_typing __pyx_string_tab[104]
+#define __pyx_n_u_warning __pyx_string_tab[105]
+#define __pyx_kp_u_with __pyx_string_tab[106]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -6360,9 +6415,11 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_ptype_7pyarrow_3lib_StopToken);
   Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend);
   Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend);
+  Py_CLEAR(clear_module_state->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper);
+  Py_CLEAR(clear_module_state->__pyx_type_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper);
   for (int i=0; i<1; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<11; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<95; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<14; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<107; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   return 0;
 }
 #endif
@@ -6493,9 +6550,11 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_ptype_7pyarrow_3lib_StopToken);
   Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend);
   Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend);
+  Py_VISIT(traverse_module_state->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper);
+  Py_VISIT(traverse_module_state->__pyx_type_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper);
   for (int i=0; i<1; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<11; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<95; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<14; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<107; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   return 0;
 }
 #endif
@@ -9170,7 +9229,7 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyarrow_8includes_6common_PyObject_to_ob
   return __pyx_r;
 }
 
-/* "sabot/_cython/stores/marbledb_store.pyx":167
+/* "sabot/_cython/stores/marbledb_store.pyx":179
  *     # Note: cdef attributes declared in .pxd file
  * 
  *     def __init__(self, str db_path, dict config=None):             # <<<<<<<<<<<<<<
@@ -9205,35 +9264,35 @@ static int __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_db_path,&__pyx_mstate_global->__pyx_n_u_config,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 167, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 179, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 167, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 179, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 167, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 179, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 167, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 179, __pyx_L3_error)
       if (!values[1]) values[1] = __Pyx_NewRef(((PyObject*)Py_None));
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 1, 2, i); __PYX_ERR(0, 167, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 1, 2, i); __PYX_ERR(0, 179, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 167, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 179, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 167, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 179, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
@@ -9244,7 +9303,7 @@ static int __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 1, 2, __pyx_nargs); __PYX_ERR(0, 167, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 1, 2, __pyx_nargs); __PYX_ERR(0, 179, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9255,8 +9314,8 @@ static int __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_db_path), (&PyUnicode_Type), 1, "db_path", 1))) __PYX_ERR(0, 167, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_config), (&PyDict_Type), 1, "config", 1))) __PYX_ERR(0, 167, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_db_path), (&PyUnicode_Type), 1, "db_path", 1))) __PYX_ERR(0, 179, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_config), (&PyDict_Type), 1, "config", 1))) __PYX_ERR(0, 179, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend___init__(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self), __pyx_v_db_path, __pyx_v_config);
 
   /* function exit code */
@@ -9287,7 +9346,7 @@ static int __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":169
+  /* "sabot/_cython/stores/marbledb_store.pyx":181
  *     def __init__(self, str db_path, dict config=None):
  *         """Initialize MarbleDB store backend."""
  *         self._db_path = db_path             # <<<<<<<<<<<<<<
@@ -9300,21 +9359,21 @@ static int __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   __Pyx_DECREF(__pyx_v_self->_db_path);
   __pyx_v_self->_db_path = __pyx_v_db_path;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":170
+  /* "sabot/_cython/stores/marbledb_store.pyx":182
  *         """Initialize MarbleDB store backend."""
  *         self._db_path = db_path
  *         self._config = config or {}             # <<<<<<<<<<<<<<
  *         self._is_open = False
  * 
 */
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_config); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_config); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 182, __pyx_L1_error)
   if (!__pyx_t_2) {
   } else {
     __Pyx_INCREF(__pyx_v_config);
     __pyx_t_1 = __pyx_v_config;
     goto __pyx_L3_bool_binop_done;
   }
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 182, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_t_3);
   __pyx_t_1 = __pyx_t_3;
@@ -9326,7 +9385,7 @@ static int __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   __pyx_v_self->_config = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":171
+  /* "sabot/_cython/stores/marbledb_store.pyx":183
  *         self._db_path = db_path
  *         self._config = config or {}
  *         self._is_open = False             # <<<<<<<<<<<<<<
@@ -9335,7 +9394,7 @@ static int __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   __pyx_v_self->_is_open = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":167
+  /* "sabot/_cython/stores/marbledb_store.pyx":179
  *     # Note: cdef attributes declared in .pxd file
  * 
  *     def __init__(self, str db_path, dict config=None):             # <<<<<<<<<<<<<<
@@ -9356,7 +9415,7 @@ static int __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   return __pyx_r;
 }
 
-/* "sabot/_cython/stores/marbledb_store.pyx":173
+/* "sabot/_cython/stores/marbledb_store.pyx":185
  *         self._is_open = False
  * 
  *     cpdef void open(self):             # <<<<<<<<<<<<<<
@@ -9403,7 +9462,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_open); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_open); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_3open)) {
         __pyx_t_3 = NULL;
@@ -9426,7 +9485,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 173, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 185, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -9446,7 +9505,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     #endif
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":175
+  /* "sabot/_cython/stores/marbledb_store.pyx":187
  *     cpdef void open(self):
  *         """Open MarbleDB instance."""
  *         if self._is_open:             # <<<<<<<<<<<<<<
@@ -9456,7 +9515,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   __pyx_t_6 = (__pyx_v_self->_is_open != 0);
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":176
+    /* "sabot/_cython/stores/marbledb_store.pyx":188
  *         """Open MarbleDB instance."""
  *         if self._is_open:
  *             return             # <<<<<<<<<<<<<<
@@ -9465,7 +9524,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
     goto __pyx_L0;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":175
+    /* "sabot/_cython/stores/marbledb_store.pyx":187
  *     cpdef void open(self):
  *         """Open MarbleDB instance."""
  *         if self._is_open:             # <<<<<<<<<<<<<<
@@ -9474,7 +9533,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":179
+  /* "sabot/_cython/stores/marbledb_store.pyx":191
  * 
  *         cdef Status status
  *         cdef string db_path_bytes = self._db_path.encode('utf-8')             # <<<<<<<<<<<<<<
@@ -9483,15 +9542,15 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   if (unlikely(__pyx_v_self->_db_path == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
-    __PYX_ERR(0, 179, __pyx_L1_error)
+    __PYX_ERR(0, 191, __pyx_L1_error)
   }
-  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_self->_db_path); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
+  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_self->_db_path); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 179, __pyx_L1_error)
+  __pyx_t_7 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_db_path_bytes = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_7);
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":182
+  /* "sabot/_cython/stores/marbledb_store.pyx":194
  * 
  *         # Use OpenDatabase from api.h
  *         status = OpenDatabase(db_path_bytes, &self._db)             # <<<<<<<<<<<<<<
@@ -9500,7 +9559,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   __pyx_v_status = marble::OpenDatabase(__pyx_v_db_path_bytes, (&__pyx_v_self->_db));
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":183
+  /* "sabot/_cython/stores/marbledb_store.pyx":195
  *         # Use OpenDatabase from api.h
  *         status = OpenDatabase(db_path_bytes, &self._db)
  *         if not status.ok():             # <<<<<<<<<<<<<<
@@ -9510,7 +9569,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   __pyx_t_6 = (!(__pyx_v_status.ok() != 0));
   if (unlikely(__pyx_t_6)) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":184
+    /* "sabot/_cython/stores/marbledb_store.pyx":196
  *         status = OpenDatabase(db_path_bytes, &self._db)
  *         if not status.ok():
  *             raise RuntimeError(f"Failed to open MarbleDB: {status.ToString().decode('utf-8')}")             # <<<<<<<<<<<<<<
@@ -9520,9 +9579,9 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     __pyx_t_2 = NULL;
     __Pyx_INCREF(__pyx_builtin_RuntimeError);
     __pyx_t_4 = __pyx_builtin_RuntimeError; 
-    __pyx_t_3 = __Pyx_decode_cpp_string(__pyx_v_status.ToString(), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 184, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_decode_cpp_string(__pyx_v_status.ToString(), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 196, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_8 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Failed_to_open_MarbleDB, __pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 184, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Failed_to_open_MarbleDB, __pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 196, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_5 = 1;
@@ -9532,14 +9591,14 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 184, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 196, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 184, __pyx_L1_error)
+    __PYX_ERR(0, 196, __pyx_L1_error)
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":183
+    /* "sabot/_cython/stores/marbledb_store.pyx":195
  *         # Use OpenDatabase from api.h
  *         status = OpenDatabase(db_path_bytes, &self._db)
  *         if not status.ok():             # <<<<<<<<<<<<<<
@@ -9548,7 +9607,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":186
+  /* "sabot/_cython/stores/marbledb_store.pyx":198
  *             raise RuntimeError(f"Failed to open MarbleDB: {status.ToString().decode('utf-8')}")
  * 
  *         self._is_open = True             # <<<<<<<<<<<<<<
@@ -9557,7 +9616,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   __pyx_v_self->_is_open = 1;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":187
+  /* "sabot/_cython/stores/marbledb_store.pyx":199
  * 
  *         self._is_open = True
  *         logger.info(f"MarbleDB store backend opened at {self._db_path}")             # <<<<<<<<<<<<<<
@@ -9565,14 +9624,14 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
  *     cpdef void close(self):
 */
   __pyx_t_4 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  __pyx_t_8 = __Pyx_PyUnicode_Unicode(__pyx_v_self->_db_path); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyUnicode_Unicode(__pyx_v_self->_db_path); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_MarbleDB_store_backend_opened_at, __pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_MarbleDB_store_backend_opened_at, __pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __pyx_t_5 = 1;
@@ -9593,12 +9652,12 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":173
+  /* "sabot/_cython/stores/marbledb_store.pyx":185
  *         self._is_open = False
  * 
  *     cpdef void open(self):             # <<<<<<<<<<<<<<
@@ -9671,8 +9730,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("open", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_open(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 173, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_open(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -9689,7 +9748,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   return __pyx_r;
 }
 
-/* "sabot/_cython/stores/marbledb_store.pyx":189
+/* "sabot/_cython/stores/marbledb_store.pyx":201
  *         logger.info(f"MarbleDB store backend opened at {self._db_path}")
  * 
  *     cpdef void close(self):             # <<<<<<<<<<<<<<
@@ -9732,7 +9791,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_close); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_close); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_5close)) {
         __pyx_t_3 = NULL;
@@ -9755,7 +9814,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 189, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -9775,7 +9834,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     #endif
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":191
+  /* "sabot/_cython/stores/marbledb_store.pyx":203
  *     cpdef void close(self):
  *         """Close MarbleDB."""
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -9785,7 +9844,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   __pyx_t_6 = (!(__pyx_v_self->_is_open != 0));
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":192
+    /* "sabot/_cython/stores/marbledb_store.pyx":204
  *         """Close MarbleDB."""
  *         if not self._is_open:
  *             return             # <<<<<<<<<<<<<<
@@ -9794,7 +9853,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
     goto __pyx_L0;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":191
+    /* "sabot/_cython/stores/marbledb_store.pyx":203
  *     cpdef void close(self):
  *         """Close MarbleDB."""
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -9803,7 +9862,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":195
+  /* "sabot/_cython/stores/marbledb_store.pyx":207
  * 
  *         # Use CloseDatabase from api.h
  *         if self._db.get() != NULL:             # <<<<<<<<<<<<<<
@@ -9813,7 +9872,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   __pyx_t_6 = (__pyx_v_self->_db.get() != NULL);
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":198
+    /* "sabot/_cython/stores/marbledb_store.pyx":210
  *             # CloseDatabase takes unique_ptr by reference and sets it to nullptr
  *             # We'll just reset our unique_ptr
  *             self._db.reset()             # <<<<<<<<<<<<<<
@@ -9822,7 +9881,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
     __pyx_v_self->_db.reset();
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":195
+    /* "sabot/_cython/stores/marbledb_store.pyx":207
  * 
  *         # Use CloseDatabase from api.h
  *         if self._db.get() != NULL:             # <<<<<<<<<<<<<<
@@ -9831,7 +9890,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":200
+  /* "sabot/_cython/stores/marbledb_store.pyx":212
  *             self._db.reset()
  * 
  *         self._is_open = False             # <<<<<<<<<<<<<<
@@ -9840,7 +9899,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   __pyx_v_self->_is_open = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":201
+  /* "sabot/_cython/stores/marbledb_store.pyx":213
  * 
  *         self._is_open = False
  *         logger.info("MarbleDB store backend closed")             # <<<<<<<<<<<<<<
@@ -9848,9 +9907,9 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
  *     cpdef void create_column_family(self, str table_name, object pyarrow_schema):
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_5 = 1;
@@ -9870,12 +9929,12 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 213, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":189
+  /* "sabot/_cython/stores/marbledb_store.pyx":201
  *         logger.info(f"MarbleDB store backend opened at {self._db_path}")
  * 
  *     cpdef void close(self):             # <<<<<<<<<<<<<<
@@ -9947,8 +10006,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("close", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_close(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 189, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_close(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -9965,7 +10024,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   return __pyx_r;
 }
 
-/* "sabot/_cython/stores/marbledb_store.pyx":203
+/* "sabot/_cython/stores/marbledb_store.pyx":215
  *         logger.info("MarbleDB store backend closed")
  * 
  *     cpdef void create_column_family(self, str table_name, object pyarrow_schema):             # <<<<<<<<<<<<<<
@@ -10034,7 +10093,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_create_column_family); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_create_column_family); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_7create_column_family)) {
         __pyx_t_3 = NULL;
@@ -10057,7 +10116,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 215, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10077,7 +10136,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     #endif
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":215
+  /* "sabot/_cython/stores/marbledb_store.pyx":227
  *             pyarrow_schema: PyArrow Schema defining column types
  *         """
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -10087,7 +10146,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   __pyx_t_6 = (!(__pyx_v_self->_is_open != 0));
   if (unlikely(__pyx_t_6)) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":216
+    /* "sabot/_cython/stores/marbledb_store.pyx":228
  *         """
  *         if not self._is_open:
  *             raise RuntimeError("MarbleDB backend not open")             # <<<<<<<<<<<<<<
@@ -10103,14 +10162,14 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 228, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 216, __pyx_L1_error)
+    __PYX_ERR(0, 228, __pyx_L1_error)
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":215
+    /* "sabot/_cython/stores/marbledb_store.pyx":227
  *             pyarrow_schema: PyArrow Schema defining column types
  *         """
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -10119,7 +10178,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":220
+  /* "sabot/_cython/stores/marbledb_store.pyx":232
  *         cdef Status status
  *         cdef ColumnFamilyDescriptor desc
  *         cdef ColumnFamilyHandle* handle = NULL             # <<<<<<<<<<<<<<
@@ -10128,7 +10187,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   __pyx_v_handle = NULL;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":224
+  /* "sabot/_cython/stores/marbledb_store.pyx":236
  *         cdef string cf_name
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -10144,7 +10203,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     __Pyx_XGOTREF(__pyx_t_9);
     /*try:*/ {
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":226
+      /* "sabot/_cython/stores/marbledb_store.pyx":238
  *         try:
  *             # Convert PyArrow schema to C++ Arrow schema
  *             schema_obj = <pa_lib.Schema>pyarrow_schema             # <<<<<<<<<<<<<<
@@ -10156,7 +10215,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_v_schema_obj = ((struct __pyx_obj_7pyarrow_3lib_Schema *)__pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":229
+      /* "sabot/_cython/stores/marbledb_store.pyx":241
  * 
  *             # Build descriptor with Arrow schema
  *             cf_name = table_name.encode('utf-8')             # <<<<<<<<<<<<<<
@@ -10165,15 +10224,15 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       if (unlikely(__pyx_v_table_name == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
-        __PYX_ERR(0, 229, __pyx_L4_error)
+        __PYX_ERR(0, 241, __pyx_L4_error)
       }
-      __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_table_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 229, __pyx_L4_error)
+      __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_table_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_10 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 229, __pyx_L4_error)
+      __pyx_t_10 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 241, __pyx_L4_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_cf_name = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_10);
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":230
+      /* "sabot/_cython/stores/marbledb_store.pyx":242
  *             # Build descriptor with Arrow schema
  *             cf_name = table_name.encode('utf-8')
  *             desc.name = cf_name             # <<<<<<<<<<<<<<
@@ -10182,7 +10241,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       __pyx_v_desc.name = __pyx_v_cf_name;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":231
+      /* "sabot/_cython/stores/marbledb_store.pyx":243
  *             cf_name = table_name.encode('utf-8')
  *             desc.name = cf_name
  *             desc.options.schema = schema_obj.sp_schema             # <<<<<<<<<<<<<<
@@ -10192,7 +10251,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_t_11 = __pyx_v_schema_obj->sp_schema;
       __pyx_v_desc.options.schema = __PYX_STD_MOVE_IF_SUPPORTED(((std::shared_ptr<arrow::Schema> )__pyx_t_11));
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":232
+      /* "sabot/_cython/stores/marbledb_store.pyx":244
  *             desc.name = cf_name
  *             desc.options.schema = schema_obj.sp_schema
  *             desc.options.primary_key_index = 0  # First column is primary key by default             # <<<<<<<<<<<<<<
@@ -10201,7 +10260,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       __pyx_v_desc.options.primary_key_index = 0;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":233
+      /* "sabot/_cython/stores/marbledb_store.pyx":245
  *             desc.options.schema = schema_obj.sp_schema
  *             desc.options.primary_key_index = 0  # First column is primary key by default
  *             desc.options.enable_bloom_filter = True             # <<<<<<<<<<<<<<
@@ -10210,7 +10269,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       __pyx_v_desc.options.enable_bloom_filter = 1;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":234
+      /* "sabot/_cython/stores/marbledb_store.pyx":246
  *             desc.options.primary_key_index = 0  # First column is primary key by default
  *             desc.options.enable_bloom_filter = True
  *             desc.options.enable_sparse_index = True             # <<<<<<<<<<<<<<
@@ -10219,7 +10278,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       __pyx_v_desc.options.enable_sparse_index = 1;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":235
+      /* "sabot/_cython/stores/marbledb_store.pyx":247
  *             desc.options.enable_bloom_filter = True
  *             desc.options.enable_sparse_index = True
  *             desc.options.index_granularity = 8192             # <<<<<<<<<<<<<<
@@ -10228,7 +10287,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       __pyx_v_desc.options.index_granularity = 0x2000;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":236
+      /* "sabot/_cython/stores/marbledb_store.pyx":248
  *             desc.options.enable_sparse_index = True
  *             desc.options.index_granularity = 8192
  *             desc.options.bloom_filter_bits_per_key = 10             # <<<<<<<<<<<<<<
@@ -10237,7 +10296,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       __pyx_v_desc.options.bloom_filter_bits_per_key = 10;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":239
+      /* "sabot/_cython/stores/marbledb_store.pyx":251
  * 
  *             # Create column family
  *             status = self._db.get().CreateColumnFamily(desc, &handle)             # <<<<<<<<<<<<<<
@@ -10246,7 +10305,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       __pyx_v_status = __pyx_v_self->_db.get()->CreateColumnFamily(__pyx_v_desc, (&__pyx_v_handle));
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":240
+      /* "sabot/_cython/stores/marbledb_store.pyx":252
  *             # Create column family
  *             status = self._db.get().CreateColumnFamily(desc, &handle)
  *             if not status.ok():             # <<<<<<<<<<<<<<
@@ -10256,7 +10315,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_t_6 = (!(__pyx_v_status.ok() != 0));
       if (unlikely(__pyx_t_6)) {
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":241
+        /* "sabot/_cython/stores/marbledb_store.pyx":253
  *             status = self._db.get().CreateColumnFamily(desc, &handle)
  *             if not status.ok():
  *                 raise RuntimeError(f"CreateColumnFamily failed: {status.ToString().decode('utf-8')}")             # <<<<<<<<<<<<<<
@@ -10266,9 +10325,9 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
         __pyx_t_4 = NULL;
         __Pyx_INCREF(__pyx_builtin_RuntimeError);
         __pyx_t_2 = __pyx_builtin_RuntimeError; 
-        __pyx_t_3 = __Pyx_decode_cpp_string(__pyx_v_status.ToString(), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 241, __pyx_L4_error)
+        __pyx_t_3 = __Pyx_decode_cpp_string(__pyx_v_status.ToString(), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 253, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_CreateColumnFamily_failed, __pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 241, __pyx_L4_error)
+        __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_CreateColumnFamily_failed, __pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 253, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_t_5 = 1;
@@ -10278,14 +10337,14 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L4_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 253, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_1);
         }
         __Pyx_Raise(__pyx_t_1, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __PYX_ERR(0, 241, __pyx_L4_error)
+        __PYX_ERR(0, 253, __pyx_L4_error)
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":240
+        /* "sabot/_cython/stores/marbledb_store.pyx":252
  *             # Create column family
  *             status = self._db.get().CreateColumnFamily(desc, &handle)
  *             if not status.ok():             # <<<<<<<<<<<<<<
@@ -10294,7 +10353,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       }
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":244
+      /* "sabot/_cython/stores/marbledb_store.pyx":256
  * 
  *             # Store handle for future operations
  *             if handle != NULL:             # <<<<<<<<<<<<<<
@@ -10304,7 +10363,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_t_6 = (__pyx_v_handle != NULL);
       if (__pyx_t_6) {
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":245
+        /* "sabot/_cython/stores/marbledb_store.pyx":257
  *             # Store handle for future operations
  *             if handle != NULL:
  *                 self._column_families[cf_name] = handle             # <<<<<<<<<<<<<<
@@ -10313,7 +10372,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
         (__pyx_v_self->_column_families[__pyx_v_cf_name]) = __pyx_v_handle;
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":244
+        /* "sabot/_cython/stores/marbledb_store.pyx":256
  * 
  *             # Store handle for future operations
  *             if handle != NULL:             # <<<<<<<<<<<<<<
@@ -10322,7 +10381,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       }
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":247
+      /* "sabot/_cython/stores/marbledb_store.pyx":259
  *                 self._column_families[cf_name] = handle
  * 
  *             logger.info(f"Created column family '{table_name}' with {len(pyarrow_schema)} columns")             # <<<<<<<<<<<<<<
@@ -10330,15 +10389,15 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
  *         except Exception as e:
 */
       __pyx_t_2 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 247, __pyx_L4_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 259, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 247, __pyx_L4_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 259, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      __pyx_t_12 = __Pyx_PyUnicode_Unicode(__pyx_v_table_name); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 247, __pyx_L4_error)
+      __pyx_t_12 = __Pyx_PyUnicode_Unicode(__pyx_v_table_name); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 259, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_13 = PyObject_Length(__pyx_v_pyarrow_schema); if (unlikely(__pyx_t_13 == ((Py_ssize_t)-1))) __PYX_ERR(0, 247, __pyx_L4_error)
-      __pyx_t_3 = __Pyx_PyUnicode_From_Py_ssize_t(__pyx_t_13, 0, ' ', 'd'); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 247, __pyx_L4_error)
+      __pyx_t_13 = PyObject_Length(__pyx_v_pyarrow_schema); if (unlikely(__pyx_t_13 == ((Py_ssize_t)-1))) __PYX_ERR(0, 259, __pyx_L4_error)
+      __pyx_t_3 = __Pyx_PyUnicode_From_Py_ssize_t(__pyx_t_13, 0, ' ', 'd'); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 259, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_14[0] = __pyx_mstate_global->__pyx_kp_u_Created_column_family;
       __pyx_t_14[1] = __pyx_t_12;
@@ -10346,7 +10405,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_t_14[3] = __pyx_t_3;
       __pyx_t_14[4] = __pyx_mstate_global->__pyx_kp_u_columns;
       __pyx_t_15 = __Pyx_PyUnicode_Join(__pyx_t_14, 5, 23 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_12) + 7 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3) + 8, 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_12));
-      if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 247, __pyx_L4_error)
+      if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 259, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_15);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -10368,12 +10427,12 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 247, __pyx_L4_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_1);
       }
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":224
+      /* "sabot/_cython/stores/marbledb_store.pyx":236
  *         cdef string cf_name
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -10393,7 +10452,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":249
+    /* "sabot/_cython/stores/marbledb_store.pyx":261
  *             logger.info(f"Created column family '{table_name}' with {len(pyarrow_schema)} columns")
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -10403,7 +10462,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     __pyx_t_16 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_16) {
       __Pyx_AddTraceback("sabot._cython.stores.marbledb_store.MarbleDBStoreBackend.create_column_family", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_4, &__pyx_t_15) < 0) __PYX_ERR(0, 249, __pyx_L6_except_error)
+      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_4, &__pyx_t_15) < 0) __PYX_ERR(0, 261, __pyx_L6_except_error)
       __Pyx_XGOTREF(__pyx_t_1);
       __Pyx_XGOTREF(__pyx_t_4);
       __Pyx_XGOTREF(__pyx_t_15);
@@ -10411,7 +10470,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_v_e = __pyx_t_4;
       /*try:*/ {
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":250
+        /* "sabot/_cython/stores/marbledb_store.pyx":262
  * 
  *         except Exception as e:
  *             logger.error(f"CreateColumnFamily failed: {e}")             # <<<<<<<<<<<<<<
@@ -10419,14 +10478,14 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
  * 
 */
         __pyx_t_3 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 250, __pyx_L17_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 262, __pyx_L17_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_17 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 250, __pyx_L17_error)
+        __pyx_t_17 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 262, __pyx_L17_error)
         __Pyx_GOTREF(__pyx_t_17);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_12 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 250, __pyx_L17_error)
+        __pyx_t_12 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 262, __pyx_L17_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_18 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_CreateColumnFamily_failed, __pyx_t_12); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 250, __pyx_L17_error)
+        __pyx_t_18 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_CreateColumnFamily_failed, __pyx_t_12); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 262, __pyx_L17_error)
         __Pyx_GOTREF(__pyx_t_18);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
         __pyx_t_5 = 1;
@@ -10447,12 +10506,12 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
           __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 250, __pyx_L17_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 262, __pyx_L17_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":251
+        /* "sabot/_cython/stores/marbledb_store.pyx":263
  *         except Exception as e:
  *             logger.error(f"CreateColumnFamily failed: {e}")
  *             raise             # <<<<<<<<<<<<<<
@@ -10464,10 +10523,10 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
         __Pyx_XGIVEREF(__pyx_t_15);
         __Pyx_ErrRestoreWithState(__pyx_t_1, __pyx_t_4, __pyx_t_15);
         __pyx_t_1 = 0;  __pyx_t_4 = 0;  __pyx_t_15 = 0; 
-        __PYX_ERR(0, 251, __pyx_L17_error)
+        __PYX_ERR(0, 263, __pyx_L17_error)
       }
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":249
+      /* "sabot/_cython/stores/marbledb_store.pyx":261
  *             logger.info(f"Created column family '{table_name}' with {len(pyarrow_schema)} columns")
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -10513,7 +10572,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     }
     goto __pyx_L6_except_error;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":224
+    /* "sabot/_cython/stores/marbledb_store.pyx":236
  *         cdef string cf_name
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -10529,7 +10588,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     __pyx_L9_try_end:;
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":203
+  /* "sabot/_cython/stores/marbledb_store.pyx":215
  *         logger.info("MarbleDB store backend closed")
  * 
  *     cpdef void create_column_family(self, str table_name, object pyarrow_schema):             # <<<<<<<<<<<<<<
@@ -10596,39 +10655,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_table_name,&__pyx_mstate_global->__pyx_n_u_pyarrow_schema,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 203, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 215, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 203, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 215, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 203, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 215, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "create_column_family", 0) < 0) __PYX_ERR(0, 203, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "create_column_family", 0) < 0) __PYX_ERR(0, 215, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_column_family", 1, 2, 2, i); __PYX_ERR(0, 203, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("create_column_family", 1, 2, 2, i); __PYX_ERR(0, 215, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 203, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 215, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 203, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 215, __pyx_L3_error)
     }
     __pyx_v_table_name = ((PyObject*)values[0]);
     __pyx_v_pyarrow_schema = values[1];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_column_family", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 203, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_column_family", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 215, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10639,7 +10698,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_table_name), (&PyUnicode_Type), 1, "table_name", 1))) __PYX_ERR(0, 203, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_table_name), (&PyUnicode_Type), 1, "table_name", 1))) __PYX_ERR(0, 215, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_6create_column_family(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self), __pyx_v_table_name, __pyx_v_pyarrow_schema);
 
   /* function exit code */
@@ -10668,8 +10727,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_column_family", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_create_column_family(__pyx_v_self, __pyx_v_table_name, __pyx_v_pyarrow_schema, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 203, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_create_column_family(__pyx_v_self, __pyx_v_table_name, __pyx_v_pyarrow_schema, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -10686,7 +10745,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   return __pyx_r;
 }
 
-/* "sabot/_cython/stores/marbledb_store.pyx":253
+/* "sabot/_cython/stores/marbledb_store.pyx":265
  *             raise
  * 
  *     cpdef void insert_batch(self, str table_name, object pyarrow_batch):             # <<<<<<<<<<<<<<
@@ -10752,7 +10811,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_insert_batch); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 253, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_insert_batch); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_9insert_batch)) {
         __pyx_t_3 = NULL;
@@ -10775,7 +10834,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 253, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10795,7 +10854,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     #endif
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":255
+  /* "sabot/_cython/stores/marbledb_store.pyx":267
  *     cpdef void insert_batch(self, str table_name, object pyarrow_batch):
  *         """Insert Arrow RecordBatch - direct C++ InsertBatch()."""
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -10805,7 +10864,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   __pyx_t_6 = (!(__pyx_v_self->_is_open != 0));
   if (unlikely(__pyx_t_6)) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":256
+    /* "sabot/_cython/stores/marbledb_store.pyx":268
  *         """Insert Arrow RecordBatch - direct C++ InsertBatch()."""
  *         if not self._is_open:
  *             raise RuntimeError("MarbleDB backend not open")             # <<<<<<<<<<<<<<
@@ -10821,14 +10880,14 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 256, __pyx_L1_error)
+    __PYX_ERR(0, 268, __pyx_L1_error)
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":255
+    /* "sabot/_cython/stores/marbledb_store.pyx":267
  *     cpdef void insert_batch(self, str table_name, object pyarrow_batch):
  *         """Insert Arrow RecordBatch - direct C++ InsertBatch()."""
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -10837,7 +10896,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":263
+  /* "sabot/_cython/stores/marbledb_store.pyx":275
  *         cdef string table_name_str
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -10853,7 +10912,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     __Pyx_XGOTREF(__pyx_t_9);
     /*try:*/ {
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":266
+      /* "sabot/_cython/stores/marbledb_store.pyx":278
  *             # Convert PyArrow RecordBatch to C++ RecordBatch
  *             # Use pyarrow.lib to get C++ RecordBatch pointer
  *             batch_obj = <pa_lib.RecordBatch>pyarrow_batch             # <<<<<<<<<<<<<<
@@ -10865,7 +10924,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_v_batch_obj = ((struct __pyx_obj_7pyarrow_3lib_RecordBatch *)__pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":267
+      /* "sabot/_cython/stores/marbledb_store.pyx":279
  *             # Use pyarrow.lib to get C++ RecordBatch pointer
  *             batch_obj = <pa_lib.RecordBatch>pyarrow_batch
  *             cpp_batch = batch_obj.sp_batch             # <<<<<<<<<<<<<<
@@ -10875,7 +10934,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_t_10 = __pyx_v_batch_obj->sp_batch;
       __pyx_v_cpp_batch = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_10);
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":270
+      /* "sabot/_cython/stores/marbledb_store.pyx":282
  * 
  *             # Insert batch
  *             table_name_str = table_name.encode('utf-8')             # <<<<<<<<<<<<<<
@@ -10884,15 +10943,15 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       if (unlikely(__pyx_v_table_name == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
-        __PYX_ERR(0, 270, __pyx_L4_error)
+        __PYX_ERR(0, 282, __pyx_L4_error)
       }
-      __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_table_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L4_error)
+      __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_table_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 282, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_11 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 270, __pyx_L4_error)
+      __pyx_t_11 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 282, __pyx_L4_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_table_name_str = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_11);
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":271
+      /* "sabot/_cython/stores/marbledb_store.pyx":283
  *             # Insert batch
  *             table_name_str = table_name.encode('utf-8')
  *             status = self._db.get().InsertBatch(table_name_str, cpp_batch)             # <<<<<<<<<<<<<<
@@ -10901,7 +10960,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       __pyx_v_status = __pyx_v_self->_db.get()->InsertBatch(__pyx_v_table_name_str, __pyx_v_cpp_batch);
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":272
+      /* "sabot/_cython/stores/marbledb_store.pyx":284
  *             table_name_str = table_name.encode('utf-8')
  *             status = self._db.get().InsertBatch(table_name_str, cpp_batch)
  *             if not status.ok():             # <<<<<<<<<<<<<<
@@ -10911,7 +10970,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_t_6 = (!(__pyx_v_status.ok() != 0));
       if (unlikely(__pyx_t_6)) {
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":273
+        /* "sabot/_cython/stores/marbledb_store.pyx":285
  *             status = self._db.get().InsertBatch(table_name_str, cpp_batch)
  *             if not status.ok():
  *                 raise RuntimeError(f"InsertBatch failed: {status.ToString().decode('utf-8')}")             # <<<<<<<<<<<<<<
@@ -10921,9 +10980,9 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
         __pyx_t_4 = NULL;
         __Pyx_INCREF(__pyx_builtin_RuntimeError);
         __pyx_t_2 = __pyx_builtin_RuntimeError; 
-        __pyx_t_3 = __Pyx_decode_cpp_string(__pyx_v_status.ToString(), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 273, __pyx_L4_error)
+        __pyx_t_3 = __Pyx_decode_cpp_string(__pyx_v_status.ToString(), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_InsertBatch_failed, __pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 273, __pyx_L4_error)
+        __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_InsertBatch_failed, __pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 285, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_t_5 = 1;
@@ -10933,14 +10992,14 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 273, __pyx_L4_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 285, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_1);
         }
         __Pyx_Raise(__pyx_t_1, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __PYX_ERR(0, 273, __pyx_L4_error)
+        __PYX_ERR(0, 285, __pyx_L4_error)
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":272
+        /* "sabot/_cython/stores/marbledb_store.pyx":284
  *             table_name_str = table_name.encode('utf-8')
  *             status = self._db.get().InsertBatch(table_name_str, cpp_batch)
  *             if not status.ok():             # <<<<<<<<<<<<<<
@@ -10949,7 +11008,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
       }
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":263
+      /* "sabot/_cython/stores/marbledb_store.pyx":275
  *         cdef string table_name_str
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -10968,7 +11027,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":275
+    /* "sabot/_cython/stores/marbledb_store.pyx":287
  *                 raise RuntimeError(f"InsertBatch failed: {status.ToString().decode('utf-8')}")
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -10978,7 +11037,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     __pyx_t_13 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_13) {
       __Pyx_AddTraceback("sabot._cython.stores.marbledb_store.MarbleDBStoreBackend.insert_batch", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_2, &__pyx_t_12) < 0) __PYX_ERR(0, 275, __pyx_L6_except_error)
+      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_2, &__pyx_t_12) < 0) __PYX_ERR(0, 287, __pyx_L6_except_error)
       __Pyx_XGOTREF(__pyx_t_1);
       __Pyx_XGOTREF(__pyx_t_2);
       __Pyx_XGOTREF(__pyx_t_12);
@@ -10986,7 +11045,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_v_e = __pyx_t_2;
       /*try:*/ {
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":276
+        /* "sabot/_cython/stores/marbledb_store.pyx":288
  * 
  *         except Exception as e:
  *             logger.error(f"InsertBatch failed: {e}")             # <<<<<<<<<<<<<<
@@ -10994,14 +11053,14 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
  * 
 */
         __pyx_t_3 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 276, __pyx_L16_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 288, __pyx_L16_error)
         __Pyx_GOTREF(__pyx_t_14);
-        __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 276, __pyx_L16_error)
+        __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 288, __pyx_L16_error)
         __Pyx_GOTREF(__pyx_t_15);
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 276, __pyx_L16_error)
+        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 288, __pyx_L16_error)
         __Pyx_GOTREF(__pyx_t_14);
-        __pyx_t_16 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_InsertBatch_failed, __pyx_t_14); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 276, __pyx_L16_error)
+        __pyx_t_16 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_InsertBatch_failed, __pyx_t_14); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 288, __pyx_L16_error)
         __Pyx_GOTREF(__pyx_t_16);
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
         __pyx_t_5 = 1;
@@ -11022,12 +11081,12 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
           __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 276, __pyx_L16_error)
+          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 288, __pyx_L16_error)
           __Pyx_GOTREF(__pyx_t_4);
         }
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":277
+        /* "sabot/_cython/stores/marbledb_store.pyx":289
  *         except Exception as e:
  *             logger.error(f"InsertBatch failed: {e}")
  *             raise             # <<<<<<<<<<<<<<
@@ -11039,10 +11098,10 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
         __Pyx_XGIVEREF(__pyx_t_12);
         __Pyx_ErrRestoreWithState(__pyx_t_1, __pyx_t_2, __pyx_t_12);
         __pyx_t_1 = 0;  __pyx_t_2 = 0;  __pyx_t_12 = 0; 
-        __PYX_ERR(0, 277, __pyx_L16_error)
+        __PYX_ERR(0, 289, __pyx_L16_error)
       }
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":275
+      /* "sabot/_cython/stores/marbledb_store.pyx":287
  *                 raise RuntimeError(f"InsertBatch failed: {status.ToString().decode('utf-8')}")
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -11088,7 +11147,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     }
     goto __pyx_L6_except_error;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":263
+    /* "sabot/_cython/stores/marbledb_store.pyx":275
  *         cdef string table_name_str
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11104,7 +11163,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     __pyx_L9_try_end:;
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":253
+  /* "sabot/_cython/stores/marbledb_store.pyx":265
  *             raise
  * 
  *     cpdef void insert_batch(self, str table_name, object pyarrow_batch):             # <<<<<<<<<<<<<<
@@ -11171,39 +11230,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_table_name,&__pyx_mstate_global->__pyx_n_u_pyarrow_batch,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 253, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 265, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 253, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 265, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 253, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 265, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "insert_batch", 0) < 0) __PYX_ERR(0, 253, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "insert_batch", 0) < 0) __PYX_ERR(0, 265, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("insert_batch", 1, 2, 2, i); __PYX_ERR(0, 253, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("insert_batch", 1, 2, 2, i); __PYX_ERR(0, 265, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 253, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 265, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 253, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 265, __pyx_L3_error)
     }
     __pyx_v_table_name = ((PyObject*)values[0]);
     __pyx_v_pyarrow_batch = values[1];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("insert_batch", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 253, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("insert_batch", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 265, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -11214,7 +11273,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_table_name), (&PyUnicode_Type), 1, "table_name", 1))) __PYX_ERR(0, 253, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_table_name), (&PyUnicode_Type), 1, "table_name", 1))) __PYX_ERR(0, 265, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_8insert_batch(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self), __pyx_v_table_name, __pyx_v_pyarrow_batch);
 
   /* function exit code */
@@ -11243,8 +11302,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("insert_batch", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_insert_batch(__pyx_v_self, __pyx_v_table_name, __pyx_v_pyarrow_batch, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 253, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 253, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_insert_batch(__pyx_v_self, __pyx_v_table_name, __pyx_v_pyarrow_batch, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 265, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -11261,7 +11320,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   return __pyx_r;
 }
 
-/* "sabot/_cython/stores/marbledb_store.pyx":279
+/* "sabot/_cython/stores/marbledb_store.pyx":291
  *             raise
  * 
  *     cpdef object scan_table(self, str table_name):             # <<<<<<<<<<<<<<
@@ -11330,7 +11389,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_scan_table); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_scan_table); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_11scan_table)) {
         __Pyx_XDECREF(__pyx_r);
@@ -11354,7 +11413,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 279, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __pyx_r = __pyx_t_2;
@@ -11375,7 +11434,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     #endif
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":287
+  /* "sabot/_cython/stores/marbledb_store.pyx":299
  *         has working get/put/scan operations.
  *         """
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -11385,7 +11444,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
   __pyx_t_6 = (!(__pyx_v_self->_is_open != 0));
   if (unlikely(__pyx_t_6)) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":288
+    /* "sabot/_cython/stores/marbledb_store.pyx":300
  *         """
  *         if not self._is_open:
  *             raise RuntimeError("MarbleDB backend not open")             # <<<<<<<<<<<<<<
@@ -11401,14 +11460,14 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
       __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 288, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 300, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 288, __pyx_L1_error)
+    __PYX_ERR(0, 300, __pyx_L1_error)
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":287
+    /* "sabot/_cython/stores/marbledb_store.pyx":299
  *         has working get/put/scan operations.
  *         """
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -11417,7 +11476,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":296
+  /* "sabot/_cython/stores/marbledb_store.pyx":308
  *         cdef vector[shared_ptr[RecordBatch]] cpp_batches
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11433,7 +11492,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     __Pyx_XGOTREF(__pyx_t_9);
     /*try:*/ {
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":297
+      /* "sabot/_cython/stores/marbledb_store.pyx":309
  * 
  *         try:
  *             table_name_str = table_name.encode('utf-8')             # <<<<<<<<<<<<<<
@@ -11442,15 +11501,15 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
 */
       if (unlikely(__pyx_v_table_name == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
-        __PYX_ERR(0, 297, __pyx_L4_error)
+        __PYX_ERR(0, 309, __pyx_L4_error)
       }
-      __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_table_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L4_error)
+      __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_table_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 309, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_10 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 297, __pyx_L4_error)
+      __pyx_t_10 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 309, __pyx_L4_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_table_name_str = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_10);
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":298
+      /* "sabot/_cython/stores/marbledb_store.pyx":310
  *         try:
  *             table_name_str = table_name.encode('utf-8')
  *             status = self._db.get().ScanTable(table_name_str, &result)             # <<<<<<<<<<<<<<
@@ -11459,7 +11518,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
 */
       __pyx_v_status = __pyx_v_self->_db.get()->ScanTable(__pyx_v_table_name_str, (&__pyx_v_result));
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":299
+      /* "sabot/_cython/stores/marbledb_store.pyx":311
  *             table_name_str = table_name.encode('utf-8')
  *             status = self._db.get().ScanTable(table_name_str, &result)
  *             if not status.ok():             # <<<<<<<<<<<<<<
@@ -11469,7 +11528,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
       __pyx_t_6 = (!(__pyx_v_status.ok() != 0));
       if (unlikely(__pyx_t_6)) {
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":300
+        /* "sabot/_cython/stores/marbledb_store.pyx":312
  *             status = self._db.get().ScanTable(table_name_str, &result)
  *             if not status.ok():
  *                 raise RuntimeError(f"ScanTable failed: {status.ToString().decode('utf-8')}")             # <<<<<<<<<<<<<<
@@ -11479,9 +11538,9 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
         __pyx_t_4 = NULL;
         __Pyx_INCREF(__pyx_builtin_RuntimeError);
         __pyx_t_2 = __pyx_builtin_RuntimeError; 
-        __pyx_t_3 = __Pyx_decode_cpp_string(__pyx_v_status.ToString(), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 300, __pyx_L4_error)
+        __pyx_t_3 = __Pyx_decode_cpp_string(__pyx_v_status.ToString(), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 312, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_11 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_ScanTable_failed, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 300, __pyx_L4_error)
+        __pyx_t_11 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_ScanTable_failed, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 312, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_t_5 = 1;
@@ -11491,14 +11550,14 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 300, __pyx_L4_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 312, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_1);
         }
         __Pyx_Raise(__pyx_t_1, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __PYX_ERR(0, 300, __pyx_L4_error)
+        __PYX_ERR(0, 312, __pyx_L4_error)
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":299
+        /* "sabot/_cython/stores/marbledb_store.pyx":311
  *             table_name_str = table_name.encode('utf-8')
  *             status = self._db.get().ScanTable(table_name_str, &result)
  *             if not status.ok():             # <<<<<<<<<<<<<<
@@ -11507,7 +11566,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
 */
       }
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":303
+      /* "sabot/_cython/stores/marbledb_store.pyx":315
  * 
  *             # Collect batches in C++ vector
  *             while result.get().HasNext():             # <<<<<<<<<<<<<<
@@ -11518,7 +11577,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
         __pyx_t_6 = (__pyx_v_result.get()->HasNext() != 0);
         if (!__pyx_t_6) break;
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":304
+        /* "sabot/_cython/stores/marbledb_store.pyx":316
  *             # Collect batches in C++ vector
  *             while result.get().HasNext():
  *                 status = result.get().Next(&batch_ptr)             # <<<<<<<<<<<<<<
@@ -11527,7 +11586,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
 */
         __pyx_v_status = __pyx_v_result.get()->Next((&__pyx_v_batch_ptr));
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":305
+        /* "sabot/_cython/stores/marbledb_store.pyx":317
  *             while result.get().HasNext():
  *                 status = result.get().Next(&batch_ptr)
  *                 if status.ok() and batch_ptr.get() != NULL:             # <<<<<<<<<<<<<<
@@ -11545,7 +11604,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
         __pyx_L14_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "sabot/_cython/stores/marbledb_store.pyx":306
+          /* "sabot/_cython/stores/marbledb_store.pyx":318
  *                 status = result.get().Next(&batch_ptr)
  *                 if status.ok() and batch_ptr.get() != NULL:
  *                     cpp_batches.push_back(batch_ptr)             # <<<<<<<<<<<<<<
@@ -11556,10 +11615,10 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
             __pyx_v_cpp_batches.push_back(__pyx_v_batch_ptr);
           } catch(...) {
             __Pyx_CppExn2PyErr();
-            __PYX_ERR(0, 306, __pyx_L4_error)
+            __PYX_ERR(0, 318, __pyx_L4_error)
           }
 
-          /* "sabot/_cython/stores/marbledb_store.pyx":305
+          /* "sabot/_cython/stores/marbledb_store.pyx":317
  *             while result.get().HasNext():
  *                 status = result.get().Next(&batch_ptr)
  *                 if status.ok() and batch_ptr.get() != NULL:             # <<<<<<<<<<<<<<
@@ -11569,19 +11628,19 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
         }
       }
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":310
+      /* "sabot/_cython/stores/marbledb_store.pyx":322
  *             # Convert to PyArrow using pyarrow's IPC serialization
  *             # This is a workaround for shared_ptr conversion issues
  *             import pyarrow as pa             # <<<<<<<<<<<<<<
  * 
  *             if cpp_batches.size() == 0:
 */
-      __pyx_t_1 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_pyarrow, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 310, __pyx_L4_error)
+      __pyx_t_1 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_pyarrow, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 322, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_v_pa = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":312
+      /* "sabot/_cython/stores/marbledb_store.pyx":324
  *             import pyarrow as pa
  * 
  *             if cpp_batches.size() == 0:             # <<<<<<<<<<<<<<
@@ -11591,7 +11650,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
       __pyx_t_6 = (__pyx_v_cpp_batches.size() == 0);
       if (__pyx_t_6) {
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":314
+        /* "sabot/_cython/stores/marbledb_store.pyx":326
  *             if cpp_batches.size() == 0:
  *                 # Return empty table
  *                 return pa.table({})             # <<<<<<<<<<<<<<
@@ -11601,7 +11660,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_2 = __pyx_v_pa;
         __Pyx_INCREF(__pyx_t_2);
-        __pyx_t_11 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 314, __pyx_L4_error)
+        __pyx_t_11 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 326, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_11);
         __pyx_t_5 = 0;
         {
@@ -11609,14 +11668,14 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
           __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_table, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 314, __pyx_L4_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 326, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_1);
         }
         __pyx_r = __pyx_t_1;
         __pyx_t_1 = 0;
         goto __pyx_L8_try_return;
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":312
+        /* "sabot/_cython/stores/marbledb_store.pyx":324
  *             import pyarrow as pa
  * 
  *             if cpp_batches.size() == 0:             # <<<<<<<<<<<<<<
@@ -11625,7 +11684,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
 */
       }
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":321
+      /* "sabot/_cython/stores/marbledb_store.pyx":333
  *             # For now, return a placeholder indicating the scan succeeded
  *             # but conversion isn't implemented yet
  *             logger.warning("scan_table: C++ to PyArrow batch conversion not fully implemented")             # <<<<<<<<<<<<<<
@@ -11633,9 +11692,9 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
  * 
 */
       __pyx_t_11 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L4_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 333, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_warning); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 321, __pyx_L4_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_warning); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 333, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_5 = 1;
@@ -11655,12 +11714,12 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
         __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 321, __pyx_L4_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 333, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_1);
       }
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":322
+      /* "sabot/_cython/stores/marbledb_store.pyx":334
  *             # but conversion isn't implemented yet
  *             logger.warning("scan_table: C++ to PyArrow batch conversion not fully implemented")
  *             return pa.table({})             # <<<<<<<<<<<<<<
@@ -11670,7 +11729,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
       __Pyx_XDECREF(__pyx_r);
       __pyx_t_4 = __pyx_v_pa;
       __Pyx_INCREF(__pyx_t_4);
-      __pyx_t_11 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 322, __pyx_L4_error)
+      __pyx_t_11 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 334, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_11);
       __pyx_t_5 = 0;
       {
@@ -11678,14 +11737,14 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
         __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_table, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 322, __pyx_L4_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 334, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_1);
       }
       __pyx_r = __pyx_t_1;
       __pyx_t_1 = 0;
       goto __pyx_L8_try_return;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":296
+      /* "sabot/_cython/stores/marbledb_store.pyx":308
  *         cdef vector[shared_ptr[RecordBatch]] cpp_batches
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11700,7 +11759,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":324
+    /* "sabot/_cython/stores/marbledb_store.pyx":336
  *             return pa.table({})
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -11710,7 +11769,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     __pyx_t_13 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_13) {
       __Pyx_AddTraceback("sabot._cython.stores.marbledb_store.MarbleDBStoreBackend.scan_table", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_11, &__pyx_t_4) < 0) __PYX_ERR(0, 324, __pyx_L6_except_error)
+      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_11, &__pyx_t_4) < 0) __PYX_ERR(0, 336, __pyx_L6_except_error)
       __Pyx_XGOTREF(__pyx_t_1);
       __Pyx_XGOTREF(__pyx_t_11);
       __Pyx_XGOTREF(__pyx_t_4);
@@ -11718,7 +11777,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
       __pyx_v_e = __pyx_t_11;
       /*try:*/ {
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":325
+        /* "sabot/_cython/stores/marbledb_store.pyx":337
  * 
  *         except Exception as e:
  *             logger.error(f"ScanTable failed: {e}")             # <<<<<<<<<<<<<<
@@ -11726,14 +11785,14 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
  * 
 */
         __pyx_t_3 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 325, __pyx_L22_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 337, __pyx_L22_error)
         __Pyx_GOTREF(__pyx_t_14);
-        __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 325, __pyx_L22_error)
+        __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 337, __pyx_L22_error)
         __Pyx_GOTREF(__pyx_t_15);
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 325, __pyx_L22_error)
+        __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 337, __pyx_L22_error)
         __Pyx_GOTREF(__pyx_t_14);
-        __pyx_t_16 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_ScanTable_failed, __pyx_t_14); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 325, __pyx_L22_error)
+        __pyx_t_16 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_ScanTable_failed, __pyx_t_14); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 337, __pyx_L22_error)
         __Pyx_GOTREF(__pyx_t_16);
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
         __pyx_t_5 = 1;
@@ -11754,12 +11813,12 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
           __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 325, __pyx_L22_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 337, __pyx_L22_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":326
+        /* "sabot/_cython/stores/marbledb_store.pyx":338
  *         except Exception as e:
  *             logger.error(f"ScanTable failed: {e}")
  *             raise             # <<<<<<<<<<<<<<
@@ -11771,10 +11830,10 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
         __Pyx_XGIVEREF(__pyx_t_4);
         __Pyx_ErrRestoreWithState(__pyx_t_1, __pyx_t_11, __pyx_t_4);
         __pyx_t_1 = 0;  __pyx_t_11 = 0;  __pyx_t_4 = 0; 
-        __PYX_ERR(0, 326, __pyx_L22_error)
+        __PYX_ERR(0, 338, __pyx_L22_error)
       }
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":324
+      /* "sabot/_cython/stores/marbledb_store.pyx":336
  *             return pa.table({})
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -11820,7 +11879,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     }
     goto __pyx_L6_except_error;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":296
+    /* "sabot/_cython/stores/marbledb_store.pyx":308
  *         cdef vector[shared_ptr[RecordBatch]] cpp_batches
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11841,7 +11900,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":279
+  /* "sabot/_cython/stores/marbledb_store.pyx":291
  *             raise
  * 
  *     cpdef object scan_table(self, str table_name):             # <<<<<<<<<<<<<<
@@ -11909,32 +11968,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_table_name,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 279, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 291, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 279, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 291, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "scan_table", 0) < 0) __PYX_ERR(0, 279, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "scan_table", 0) < 0) __PYX_ERR(0, 291, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("scan_table", 1, 1, 1, i); __PYX_ERR(0, 279, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("scan_table", 1, 1, 1, i); __PYX_ERR(0, 291, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 279, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 291, __pyx_L3_error)
     }
     __pyx_v_table_name = ((PyObject*)values[0]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("scan_table", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 279, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("scan_table", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 291, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -11945,7 +12004,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_table_name), (&PyUnicode_Type), 1, "table_name", 1))) __PYX_ERR(0, 279, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_table_name), (&PyUnicode_Type), 1, "table_name", 1))) __PYX_ERR(0, 291, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_10scan_table(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self), __pyx_v_table_name);
 
   /* function exit code */
@@ -11974,7 +12033,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("scan_table", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_scan_table(__pyx_v_self, __pyx_v_table_name, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_scan_table(__pyx_v_self, __pyx_v_table_name, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -11991,7 +12050,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   return __pyx_r;
 }
 
-/* "sabot/_cython/stores/marbledb_store.pyx":328
+/* "sabot/_cython/stores/marbledb_store.pyx":340
  *             raise
  * 
  *     cpdef object scan_range_to_table(self, str table_name, str start_key=None, str end_key=None):             # <<<<<<<<<<<<<<
@@ -12046,7 +12105,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_scan_range_to_table); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 328, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_scan_range_to_table); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 340, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_13scan_range_to_table)) {
         __Pyx_XDECREF(__pyx_r);
@@ -12070,7 +12129,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (4-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 328, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 340, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __pyx_r = __pyx_t_2;
@@ -12091,7 +12150,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     #endif
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":338
+  /* "sabot/_cython/stores/marbledb_store.pyx":350
  *         Use marbledb_backend for proper range scans with the LSMTree API.
  *         """
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -12101,7 +12160,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
   __pyx_t_6 = (!(__pyx_v_self->_is_open != 0));
   if (unlikely(__pyx_t_6)) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":339
+    /* "sabot/_cython/stores/marbledb_store.pyx":351
  *         """
  *         if not self._is_open:
  *             raise RuntimeError("MarbleDB backend not open")             # <<<<<<<<<<<<<<
@@ -12117,14 +12176,14 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
       __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 339, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 351, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 339, __pyx_L1_error)
+    __PYX_ERR(0, 351, __pyx_L1_error)
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":338
+    /* "sabot/_cython/stores/marbledb_store.pyx":350
  *         Use marbledb_backend for proper range scans with the LSMTree API.
  *         """
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -12133,7 +12192,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":341
+  /* "sabot/_cython/stores/marbledb_store.pyx":353
  *             raise RuntimeError("MarbleDB backend not open")
  * 
  *         if start_key is not None or end_key is not None:             # <<<<<<<<<<<<<<
@@ -12151,7 +12210,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
   __pyx_L5_bool_binop_done:;
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":342
+    /* "sabot/_cython/stores/marbledb_store.pyx":354
  * 
  *         if start_key is not None or end_key is not None:
  *             logger.warning(             # <<<<<<<<<<<<<<
@@ -12159,9 +12218,9 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
  *                 "doing full table scan. Use marbledb_backend for proper range scans."
 */
     __pyx_t_4 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 342, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 354, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_warning); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 342, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_warning); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 354, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_5 = 1;
@@ -12181,12 +12240,12 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
       __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 342, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 354, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":341
+    /* "sabot/_cython/stores/marbledb_store.pyx":353
  *             raise RuntimeError("MarbleDB backend not open")
  * 
  *         if start_key is not None or end_key is not None:             # <<<<<<<<<<<<<<
@@ -12195,7 +12254,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":348
+  /* "sabot/_cython/stores/marbledb_store.pyx":360
  * 
  *         # Fall back to full table scan
  *         return self.scan_table(table_name)             # <<<<<<<<<<<<<<
@@ -12203,13 +12262,13 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
  *     cpdef void delete_range(self, str table_name, str start_key, str end_key):
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self->__pyx_vtab)->scan_table(__pyx_v_self, __pyx_v_table_name, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self->__pyx_vtab)->scan_table(__pyx_v_self, __pyx_v_table_name, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":328
+  /* "sabot/_cython/stores/marbledb_store.pyx":340
  *             raise
  * 
  *     cpdef object scan_range_to_table(self, str table_name, str start_key=None, str end_key=None):             # <<<<<<<<<<<<<<
@@ -12273,44 +12332,44 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_table_name,&__pyx_mstate_global->__pyx_n_u_start_key,&__pyx_mstate_global->__pyx_n_u_end_key,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 328, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 340, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 328, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 340, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 328, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 340, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 328, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 340, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "scan_range_to_table", 0) < 0) __PYX_ERR(0, 328, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "scan_range_to_table", 0) < 0) __PYX_ERR(0, 340, __pyx_L3_error)
       if (!values[1]) values[1] = __Pyx_NewRef(((PyObject*)Py_None));
       if (!values[2]) values[2] = __Pyx_NewRef(((PyObject*)Py_None));
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("scan_range_to_table", 0, 1, 3, i); __PYX_ERR(0, 328, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("scan_range_to_table", 0, 1, 3, i); __PYX_ERR(0, 340, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 328, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 340, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 328, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 340, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 328, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 340, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
@@ -12323,7 +12382,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("scan_range_to_table", 0, 1, 3, __pyx_nargs); __PYX_ERR(0, 328, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("scan_range_to_table", 0, 1, 3, __pyx_nargs); __PYX_ERR(0, 340, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -12334,9 +12393,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_table_name), (&PyUnicode_Type), 1, "table_name", 1))) __PYX_ERR(0, 328, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_start_key), (&PyUnicode_Type), 1, "start_key", 1))) __PYX_ERR(0, 328, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_end_key), (&PyUnicode_Type), 1, "end_key", 1))) __PYX_ERR(0, 328, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_table_name), (&PyUnicode_Type), 1, "table_name", 1))) __PYX_ERR(0, 340, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_start_key), (&PyUnicode_Type), 1, "start_key", 1))) __PYX_ERR(0, 340, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_end_key), (&PyUnicode_Type), 1, "end_key", 1))) __PYX_ERR(0, 340, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_12scan_range_to_table(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self), __pyx_v_table_name, __pyx_v_start_key, __pyx_v_end_key);
 
   /* function exit code */
@@ -12369,7 +12428,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   __pyx_t_2.__pyx_n = 2;
   __pyx_t_2.start_key = __pyx_v_start_key;
   __pyx_t_2.end_key = __pyx_v_end_key;
-  __pyx_t_1 = __pyx_vtabptr_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend->scan_range_to_table(__pyx_v_self, __pyx_v_table_name, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 328, __pyx_L1_error)
+  __pyx_t_1 = __pyx_vtabptr_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend->scan_range_to_table(__pyx_v_self, __pyx_v_table_name, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 340, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -12386,7 +12445,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   return __pyx_r;
 }
 
-/* "sabot/_cython/stores/marbledb_store.pyx":350
+/* "sabot/_cython/stores/marbledb_store.pyx":362
  *         return self.scan_table(table_name)
  * 
  *     cpdef void delete_range(self, str table_name, str start_key, str end_key):             # <<<<<<<<<<<<<<
@@ -12429,7 +12488,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_delete_range); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 350, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_delete_range); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_15delete_range)) {
         __pyx_t_3 = NULL;
@@ -12452,7 +12511,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (4-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 350, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 362, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -12472,7 +12531,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     #endif
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":358
+  /* "sabot/_cython/stores/marbledb_store.pyx":370
  *         Use marbledb_backend for delete operations.
  *         """
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -12482,7 +12541,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   __pyx_t_6 = (!(__pyx_v_self->_is_open != 0));
   if (unlikely(__pyx_t_6)) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":359
+    /* "sabot/_cython/stores/marbledb_store.pyx":371
  *         """
  *         if not self._is_open:
  *             raise RuntimeError("MarbleDB backend not open")             # <<<<<<<<<<<<<<
@@ -12498,14 +12557,14 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 359, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 371, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 359, __pyx_L1_error)
+    __PYX_ERR(0, 371, __pyx_L1_error)
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":358
+    /* "sabot/_cython/stores/marbledb_store.pyx":370
  *         Use marbledb_backend for delete operations.
  *         """
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -12514,7 +12573,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":363
+  /* "sabot/_cython/stores/marbledb_store.pyx":375
  *         # The MarbleDB DeleteRange API requires concrete Key objects (StringKey, Int64Key)
  *         # which we don't have bindings for yet. The abstract Key class can't be instantiated.
  *         raise NotImplementedError(             # <<<<<<<<<<<<<<
@@ -12530,14 +12589,14 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 363, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 375, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_Raise(__pyx_t_1, 0, 0, 0);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __PYX_ERR(0, 363, __pyx_L1_error)
+  __PYX_ERR(0, 375, __pyx_L1_error)
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":350
+  /* "sabot/_cython/stores/marbledb_store.pyx":362
  *         return self.scan_table(table_name)
  * 
  *     cpdef void delete_range(self, str table_name, str start_key, str end_key):             # <<<<<<<<<<<<<<
@@ -12598,38 +12657,38 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_table_name,&__pyx_mstate_global->__pyx_n_u_start_key,&__pyx_mstate_global->__pyx_n_u_end_key,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 350, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 362, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 350, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 362, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 350, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 362, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 350, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 362, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "delete_range", 0) < 0) __PYX_ERR(0, 350, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "delete_range", 0) < 0) __PYX_ERR(0, 362, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("delete_range", 1, 3, 3, i); __PYX_ERR(0, 350, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("delete_range", 1, 3, 3, i); __PYX_ERR(0, 362, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 3)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 350, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 362, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 350, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 362, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 350, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 362, __pyx_L3_error)
     }
     __pyx_v_table_name = ((PyObject*)values[0]);
     __pyx_v_start_key = ((PyObject*)values[1]);
@@ -12637,7 +12696,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("delete_range", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 350, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("delete_range", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 362, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -12648,9 +12707,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_table_name), (&PyUnicode_Type), 1, "table_name", 1))) __PYX_ERR(0, 350, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_start_key), (&PyUnicode_Type), 1, "start_key", 1))) __PYX_ERR(0, 350, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_end_key), (&PyUnicode_Type), 1, "end_key", 1))) __PYX_ERR(0, 350, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_table_name), (&PyUnicode_Type), 1, "table_name", 1))) __PYX_ERR(0, 362, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_start_key), (&PyUnicode_Type), 1, "start_key", 1))) __PYX_ERR(0, 362, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_end_key), (&PyUnicode_Type), 1, "end_key", 1))) __PYX_ERR(0, 362, __pyx_L1_error)
   __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_14delete_range(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self), __pyx_v_table_name, __pyx_v_start_key, __pyx_v_end_key);
 
   /* function exit code */
@@ -12679,8 +12738,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("delete_range", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_delete_range(__pyx_v_self, __pyx_v_table_name, __pyx_v_start_key, __pyx_v_end_key, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 350, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_delete_range(__pyx_v_self, __pyx_v_table_name, __pyx_v_start_key, __pyx_v_end_key, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 362, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -12697,7 +12756,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   return __pyx_r;
 }
 
-/* "sabot/_cython/stores/marbledb_store.pyx":368
+/* "sabot/_cython/stores/marbledb_store.pyx":380
  *         )
  * 
  *     cpdef list list_column_families(self):             # <<<<<<<<<<<<<<
@@ -12764,7 +12823,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_list_column_families); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 368, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_list_column_families); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_17list_column_families)) {
         __Pyx_XDECREF(__pyx_r);
@@ -12788,10 +12847,10 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 368, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_2))) __PYX_ERR(0, 368, __pyx_L1_error)
+        if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_2))) __PYX_ERR(0, 380, __pyx_L1_error)
         __pyx_r = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -12810,7 +12869,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     #endif
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":370
+  /* "sabot/_cython/stores/marbledb_store.pyx":382
  *     cpdef list list_column_families(self):
  *         """List all column families."""
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -12820,7 +12879,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
   __pyx_t_6 = (!(__pyx_v_self->_is_open != 0));
   if (unlikely(__pyx_t_6)) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":371
+    /* "sabot/_cython/stores/marbledb_store.pyx":383
  *         """List all column families."""
  *         if not self._is_open:
  *             raise RuntimeError("MarbleDB backend not open")             # <<<<<<<<<<<<<<
@@ -12836,14 +12895,14 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
       __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 371, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 383, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 371, __pyx_L1_error)
+    __PYX_ERR(0, 383, __pyx_L1_error)
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":370
+    /* "sabot/_cython/stores/marbledb_store.pyx":382
  *     cpdef list list_column_families(self):
  *         """List all column families."""
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -12852,19 +12911,19 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":374
+  /* "sabot/_cython/stores/marbledb_store.pyx":386
  * 
  *         cdef vector[string] cf_names
  *         cdef list result = []             # <<<<<<<<<<<<<<
  * 
  *         try:
 */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 374, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_result = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":376
+  /* "sabot/_cython/stores/marbledb_store.pyx":388
  *         cdef list result = []
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -12880,7 +12939,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     __Pyx_XGOTREF(__pyx_t_9);
     /*try:*/ {
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":377
+      /* "sabot/_cython/stores/marbledb_store.pyx":389
  * 
  *         try:
  *             cf_names = self._db.get().ListColumnFamilies()             # <<<<<<<<<<<<<<
@@ -12889,7 +12948,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
 */
       __pyx_v_cf_names = __pyx_v_self->_db.get()->ListColumnFamilies();
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":378
+      /* "sabot/_cython/stores/marbledb_store.pyx":390
  *         try:
  *             cf_names = self._db.get().ListColumnFamilies()
  *             for name in cf_names:             # <<<<<<<<<<<<<<
@@ -12901,19 +12960,19 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
         __pyx_t_11 = *__pyx_t_10;
         __pyx_v_name = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_11);
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":379
+        /* "sabot/_cython/stores/marbledb_store.pyx":391
  *             cf_names = self._db.get().ListColumnFamilies()
  *             for name in cf_names:
  *                 result.append(name.decode('utf-8'))             # <<<<<<<<<<<<<<
  *             return result
  * 
 */
-        __pyx_t_1 = __Pyx_decode_cpp_string(__pyx_v_name, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L4_error)
+        __pyx_t_1 = __Pyx_decode_cpp_string(__pyx_v_name, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 391, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_12 = __Pyx_PyList_Append(__pyx_v_result, __pyx_t_1); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 379, __pyx_L4_error)
+        __pyx_t_12 = __Pyx_PyList_Append(__pyx_v_result, __pyx_t_1); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 391, __pyx_L4_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":378
+        /* "sabot/_cython/stores/marbledb_store.pyx":390
  *         try:
  *             cf_names = self._db.get().ListColumnFamilies()
  *             for name in cf_names:             # <<<<<<<<<<<<<<
@@ -12922,7 +12981,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
 */
       }
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":380
+      /* "sabot/_cython/stores/marbledb_store.pyx":392
  *             for name in cf_names:
  *                 result.append(name.decode('utf-8'))
  *             return result             # <<<<<<<<<<<<<<
@@ -12934,7 +12993,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
       __pyx_r = __pyx_v_result;
       goto __pyx_L8_try_return;
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":376
+      /* "sabot/_cython/stores/marbledb_store.pyx":388
  *         cdef list result = []
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -12948,7 +13007,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":382
+    /* "sabot/_cython/stores/marbledb_store.pyx":394
  *             return result
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -12958,7 +13017,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     __pyx_t_13 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_13) {
       __Pyx_AddTraceback("sabot._cython.stores.marbledb_store.MarbleDBStoreBackend.list_column_families", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_4, &__pyx_t_2) < 0) __PYX_ERR(0, 382, __pyx_L6_except_error)
+      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_4, &__pyx_t_2) < 0) __PYX_ERR(0, 394, __pyx_L6_except_error)
       __Pyx_XGOTREF(__pyx_t_1);
       __Pyx_XGOTREF(__pyx_t_4);
       __Pyx_XGOTREF(__pyx_t_2);
@@ -12966,7 +13025,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
       __pyx_v_e = __pyx_t_4;
       /*try:*/ {
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":383
+        /* "sabot/_cython/stores/marbledb_store.pyx":395
  * 
  *         except Exception as e:
  *             logger.error(f"ListColumnFamilies failed: {e}")             # <<<<<<<<<<<<<<
@@ -12974,14 +13033,14 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
  * 
 */
         __pyx_t_14 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 383, __pyx_L18_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 395, __pyx_L18_error)
         __Pyx_GOTREF(__pyx_t_15);
-        __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 383, __pyx_L18_error)
+        __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 395, __pyx_L18_error)
         __Pyx_GOTREF(__pyx_t_16);
         __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-        __pyx_t_15 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 383, __pyx_L18_error)
+        __pyx_t_15 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 395, __pyx_L18_error)
         __Pyx_GOTREF(__pyx_t_15);
-        __pyx_t_17 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_ListColumnFamilies_failed, __pyx_t_15); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 383, __pyx_L18_error)
+        __pyx_t_17 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_ListColumnFamilies_failed, __pyx_t_15); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 395, __pyx_L18_error)
         __Pyx_GOTREF(__pyx_t_17);
         __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
         __pyx_t_5 = 1;
@@ -13002,12 +13061,12 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
           __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
           __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
           __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 383, __pyx_L18_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 395, __pyx_L18_error)
           __Pyx_GOTREF(__pyx_t_3);
         }
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "sabot/_cython/stores/marbledb_store.pyx":384
+        /* "sabot/_cython/stores/marbledb_store.pyx":396
  *         except Exception as e:
  *             logger.error(f"ListColumnFamilies failed: {e}")
  *             raise             # <<<<<<<<<<<<<<
@@ -13019,10 +13078,10 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
         __Pyx_XGIVEREF(__pyx_t_2);
         __Pyx_ErrRestoreWithState(__pyx_t_1, __pyx_t_4, __pyx_t_2);
         __pyx_t_1 = 0;  __pyx_t_4 = 0;  __pyx_t_2 = 0; 
-        __PYX_ERR(0, 384, __pyx_L18_error)
+        __PYX_ERR(0, 396, __pyx_L18_error)
       }
 
-      /* "sabot/_cython/stores/marbledb_store.pyx":382
+      /* "sabot/_cython/stores/marbledb_store.pyx":394
  *             return result
  * 
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -13068,7 +13127,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     }
     goto __pyx_L6_except_error;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":376
+    /* "sabot/_cython/stores/marbledb_store.pyx":388
  *         cdef list result = []
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -13089,7 +13148,7 @@ static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStor
     goto __pyx_L0;
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":368
+  /* "sabot/_cython/stores/marbledb_store.pyx":380
  *         )
  * 
  *     cpdef list list_column_families(self):             # <<<<<<<<<<<<<<
@@ -13169,7 +13228,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("list_column_families", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_list_column_families(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 368, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_list_column_families(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 380, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -13186,7 +13245,7 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   return __pyx_r;
 }
 
-/* "sabot/_cython/stores/marbledb_store.pyx":386
+/* "sabot/_cython/stores/marbledb_store.pyx":398
  *             raise
  * 
  *     cpdef void flush(self):             # <<<<<<<<<<<<<<
@@ -13231,7 +13290,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_flush); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_flush); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 398, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_19flush)) {
         __pyx_t_3 = NULL;
@@ -13254,7 +13313,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 386, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 398, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -13274,7 +13333,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
     #endif
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":388
+  /* "sabot/_cython/stores/marbledb_store.pyx":400
  *     cpdef void flush(self):
  *         """Flush pending writes."""
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -13284,7 +13343,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   __pyx_t_6 = (!(__pyx_v_self->_is_open != 0));
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":389
+    /* "sabot/_cython/stores/marbledb_store.pyx":401
  *         """Flush pending writes."""
  *         if not self._is_open:
  *             return             # <<<<<<<<<<<<<<
@@ -13293,7 +13352,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
     goto __pyx_L0;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":388
+    /* "sabot/_cython/stores/marbledb_store.pyx":400
  *     cpdef void flush(self):
  *         """Flush pending writes."""
  *         if not self._is_open:             # <<<<<<<<<<<<<<
@@ -13302,7 +13361,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":392
+  /* "sabot/_cython/stores/marbledb_store.pyx":404
  * 
  *         cdef Status status
  *         status = self._db.get().Flush()             # <<<<<<<<<<<<<<
@@ -13311,7 +13370,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   __pyx_v_status = __pyx_v_self->_db.get()->Flush();
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":393
+  /* "sabot/_cython/stores/marbledb_store.pyx":405
  *         cdef Status status
  *         status = self._db.get().Flush()
  *         if not status.ok():             # <<<<<<<<<<<<<<
@@ -13321,21 +13380,22 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
   __pyx_t_6 = (!(__pyx_v_status.ok() != 0));
   if (__pyx_t_6) {
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":394
+    /* "sabot/_cython/stores/marbledb_store.pyx":406
  *         status = self._db.get().Flush()
  *         if not status.ok():
  *             logger.warning(f"Flush warning: {status.ToString().decode('utf-8')}")             # <<<<<<<<<<<<<<
  * 
+ *     cpdef object iter_batches(self, str table_name):
 */
     __pyx_t_2 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 406, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_warning); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_warning); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 406, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_decode_cpp_string(__pyx_v_status.ToString(), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_decode_cpp_string(__pyx_v_status.ToString(), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 406, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_7 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Flush_warning, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Flush_warning, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 406, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_5 = 1;
@@ -13356,12 +13416,12 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 394, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 406, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "sabot/_cython/stores/marbledb_store.pyx":393
+    /* "sabot/_cython/stores/marbledb_store.pyx":405
  *         cdef Status status
  *         status = self._db.get().Flush()
  *         if not status.ok():             # <<<<<<<<<<<<<<
@@ -13370,7 +13430,7 @@ static void __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBack
 */
   }
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":386
+  /* "sabot/_cython/stores/marbledb_store.pyx":398
  *             raise
  * 
  *     cpdef void flush(self):             # <<<<<<<<<<<<<<
@@ -13443,8 +13503,8 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("flush", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_flush(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 386, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L1_error)
+  __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_flush(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 398, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 398, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -13461,6 +13521,601 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   return __pyx_r;
 }
 
+/* "sabot/_cython/stores/marbledb_store.pyx":408
+ *             logger.warning(f"Flush warning: {status.ToString().decode('utf-8')}")
+ * 
+ *     cpdef object iter_batches(self, str table_name):             # <<<<<<<<<<<<<<
+ *         """Streaming batch iterator - yields RecordBatches lazily.
+ * 
+*/
+
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21iter_batches(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static PyObject *__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_iter_batches(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, PyObject *__pyx_v_table_name, int __pyx_skip_dispatch) {
+  marble::Status __pyx_v_status;
+  std::unique_ptr<marble::TableBatchIterator>  __pyx_v_iter_ptr;
+  std::string __pyx_v_table_name_str;
+  struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *__pyx_v_wrapper = 0;
+  PyObject *__pyx_v_e = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_5;
+  int __pyx_t_6;
+  PyObject *__pyx_t_7 = NULL;
+  PyObject *__pyx_t_8 = NULL;
+  PyObject *__pyx_t_9 = NULL;
+  std::string __pyx_t_10;
+  PyObject *__pyx_t_11 = NULL;
+  int __pyx_t_12;
+  PyObject *__pyx_t_13 = NULL;
+  PyObject *__pyx_t_14 = NULL;
+  PyObject *__pyx_t_15 = NULL;
+  int __pyx_t_16;
+  char const *__pyx_t_17;
+  PyObject *__pyx_t_18 = NULL;
+  PyObject *__pyx_t_19 = NULL;
+  PyObject *__pyx_t_20 = NULL;
+  PyObject *__pyx_t_21 = NULL;
+  PyObject *__pyx_t_22 = NULL;
+  PyObject *__pyx_t_23 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("iter_batches", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (
+  #if !CYTHON_USE_TYPE_SLOTS
+  unlikely(Py_TYPE(((PyObject *)__pyx_v_self)) != __pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend &&
+  __Pyx_PyType_HasFeature(Py_TYPE(((PyObject *)__pyx_v_self)), Py_TPFLAGS_HAVE_GC))
+  #else
+  unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0 || __Pyx_PyType_HasFeature(Py_TYPE(((PyObject *)__pyx_v_self)), (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))
+  #endif
+  ) {
+    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
+      PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      #endif
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_iter_batches); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 408, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21iter_batches)) {
+        __Pyx_XDECREF(__pyx_r);
+        __pyx_t_3 = NULL;
+        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_4 = __pyx_t_1; 
+        __pyx_t_5 = 1;
+        #if CYTHON_UNPACK_METHODS
+        if (unlikely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+          assert(__pyx_t_3);
+          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_3);
+          __Pyx_INCREF(__pyx__function);
+          __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
+          __pyx_t_5 = 0;
+        }
+        #endif
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_table_name};
+          __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 408, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_2);
+        }
+        __pyx_r = __pyx_t_2;
+        __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        goto __pyx_L0;
+      }
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
+      if (unlikely(__pyx_typedict_guard != __pyx_tp_dict_version)) {
+        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+      }
+      #endif
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    }
+    #endif
+  }
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":424
+ *                 process_batch(batch)
+ *         """
+ *         if not self._is_open:             # <<<<<<<<<<<<<<
+ *             raise RuntimeError("MarbleDB backend not open")
+ * 
+*/
+  __pyx_t_6 = (!(__pyx_v_self->_is_open != 0));
+  if (unlikely(__pyx_t_6)) {
+
+    /* "sabot/_cython/stores/marbledb_store.pyx":425
+ *         """
+ *         if not self._is_open:
+ *             raise RuntimeError("MarbleDB backend not open")             # <<<<<<<<<<<<<<
+ * 
+ *         cdef Status status
+*/
+    __pyx_t_2 = NULL;
+    __Pyx_INCREF(__pyx_builtin_RuntimeError);
+    __pyx_t_4 = __pyx_builtin_RuntimeError; 
+    __pyx_t_5 = 1;
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_mstate_global->__pyx_kp_u_MarbleDB_backend_not_open};
+      __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 425, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+    }
+    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __PYX_ERR(0, 425, __pyx_L1_error)
+
+    /* "sabot/_cython/stores/marbledb_store.pyx":424
+ *                 process_batch(batch)
+ *         """
+ *         if not self._is_open:             # <<<<<<<<<<<<<<
+ *             raise RuntimeError("MarbleDB backend not open")
+ * 
+*/
+  }
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":432
+ *         cdef _TableBatchIteratorWrapper wrapper
+ * 
+ *         try:             # <<<<<<<<<<<<<<
+ *             table_name_str = table_name.encode('utf-8')
+ *             status = self._db.get().NewBatchIterator(table_name_str, &iter_ptr)
+*/
+  {
+    __Pyx_PyThreadState_declare
+    __Pyx_PyThreadState_assign
+    __Pyx_ExceptionSave(&__pyx_t_7, &__pyx_t_8, &__pyx_t_9);
+    __Pyx_XGOTREF(__pyx_t_7);
+    __Pyx_XGOTREF(__pyx_t_8);
+    __Pyx_XGOTREF(__pyx_t_9);
+    /*try:*/ {
+
+      /* "sabot/_cython/stores/marbledb_store.pyx":433
+ * 
+ *         try:
+ *             table_name_str = table_name.encode('utf-8')             # <<<<<<<<<<<<<<
+ *             status = self._db.get().NewBatchIterator(table_name_str, &iter_ptr)
+ *             if not status.ok():
+*/
+      if (unlikely(__pyx_v_table_name == Py_None)) {
+        PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
+        __PYX_ERR(0, 433, __pyx_L4_error)
+      }
+      __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_table_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 433, __pyx_L4_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_t_10 = __pyx_convert_string_from_py_6libcpp_6string_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 433, __pyx_L4_error)
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __pyx_v_table_name_str = __PYX_STD_MOVE_IF_SUPPORTED(__pyx_t_10);
+
+      /* "sabot/_cython/stores/marbledb_store.pyx":434
+ *         try:
+ *             table_name_str = table_name.encode('utf-8')
+ *             status = self._db.get().NewBatchIterator(table_name_str, &iter_ptr)             # <<<<<<<<<<<<<<
+ *             if not status.ok():
+ *                 raise RuntimeError(f"NewBatchIterator failed: {status.ToString().decode('utf-8')}")
+*/
+      __pyx_v_status = __pyx_v_self->_db.get()->NewBatchIterator(__pyx_v_table_name_str, (&__pyx_v_iter_ptr));
+
+      /* "sabot/_cython/stores/marbledb_store.pyx":435
+ *             table_name_str = table_name.encode('utf-8')
+ *             status = self._db.get().NewBatchIterator(table_name_str, &iter_ptr)
+ *             if not status.ok():             # <<<<<<<<<<<<<<
+ *                 raise RuntimeError(f"NewBatchIterator failed: {status.ToString().decode('utf-8')}")
+ * 
+*/
+      __pyx_t_6 = (!(__pyx_v_status.ok() != 0));
+      if (unlikely(__pyx_t_6)) {
+
+        /* "sabot/_cython/stores/marbledb_store.pyx":436
+ *             status = self._db.get().NewBatchIterator(table_name_str, &iter_ptr)
+ *             if not status.ok():
+ *                 raise RuntimeError(f"NewBatchIterator failed: {status.ToString().decode('utf-8')}")             # <<<<<<<<<<<<<<
+ * 
+ *             # Create wrapper using cdef factory function to handle unique_ptr
+*/
+        __pyx_t_4 = NULL;
+        __Pyx_INCREF(__pyx_builtin_RuntimeError);
+        __pyx_t_2 = __pyx_builtin_RuntimeError; 
+        __pyx_t_3 = __Pyx_decode_cpp_string(__pyx_v_status.ToString(), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 436, __pyx_L4_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        __pyx_t_11 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_NewBatchIterator_failed, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 436, __pyx_L4_error)
+        __Pyx_GOTREF(__pyx_t_11);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __pyx_t_5 = 1;
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_t_11};
+          __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 436, __pyx_L4_error)
+          __Pyx_GOTREF(__pyx_t_1);
+        }
+        __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __PYX_ERR(0, 436, __pyx_L4_error)
+
+        /* "sabot/_cython/stores/marbledb_store.pyx":435
+ *             table_name_str = table_name.encode('utf-8')
+ *             status = self._db.get().NewBatchIterator(table_name_str, &iter_ptr)
+ *             if not status.ok():             # <<<<<<<<<<<<<<
+ *                 raise RuntimeError(f"NewBatchIterator failed: {status.ToString().decode('utf-8')}")
+ * 
+*/
+      }
+
+      /* "sabot/_cython/stores/marbledb_store.pyx":439
+ * 
+ *             # Create wrapper using cdef factory function to handle unique_ptr
+ *             wrapper = _TableBatchIteratorWrapper.__new__(_TableBatchIteratorWrapper)             # <<<<<<<<<<<<<<
+ *             wrapper._table_name = table_name
+ *             wrapper._iter = move(iter_ptr)
+*/
+      __pyx_t_1 = ((PyObject *)__pyx_tp_new_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper(((PyTypeObject *)__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper), __pyx_mstate_global->__pyx_empty_tuple, NULL)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 439, __pyx_L4_error)
+      __Pyx_GOTREF((PyObject *)__pyx_t_1);
+      __pyx_v_wrapper = ((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *)__pyx_t_1);
+      __pyx_t_1 = 0;
+
+      /* "sabot/_cython/stores/marbledb_store.pyx":440
+ *             # Create wrapper using cdef factory function to handle unique_ptr
+ *             wrapper = _TableBatchIteratorWrapper.__new__(_TableBatchIteratorWrapper)
+ *             wrapper._table_name = table_name             # <<<<<<<<<<<<<<
+ *             wrapper._iter = move(iter_ptr)
+ *             return wrapper
+*/
+      __Pyx_INCREF(__pyx_v_table_name);
+      __Pyx_GIVEREF(__pyx_v_table_name);
+      __Pyx_GOTREF(__pyx_v_wrapper->_table_name);
+      __Pyx_DECREF(__pyx_v_wrapper->_table_name);
+      __pyx_v_wrapper->_table_name = __pyx_v_table_name;
+
+      /* "sabot/_cython/stores/marbledb_store.pyx":441
+ *             wrapper = _TableBatchIteratorWrapper.__new__(_TableBatchIteratorWrapper)
+ *             wrapper._table_name = table_name
+ *             wrapper._iter = move(iter_ptr)             # <<<<<<<<<<<<<<
+ *             return wrapper
+ * 
+*/
+      __pyx_v_wrapper->_iter = cython_std::move<std::unique_ptr<marble::TableBatchIterator> >(__pyx_v_iter_ptr);
+
+      /* "sabot/_cython/stores/marbledb_store.pyx":442
+ *             wrapper._table_name = table_name
+ *             wrapper._iter = move(iter_ptr)
+ *             return wrapper             # <<<<<<<<<<<<<<
+ * 
+ *         except Exception as e:
+*/
+      __Pyx_XDECREF(__pyx_r);
+      __Pyx_INCREF((PyObject *)__pyx_v_wrapper);
+      __pyx_r = ((PyObject *)__pyx_v_wrapper);
+      goto __pyx_L8_try_return;
+
+      /* "sabot/_cython/stores/marbledb_store.pyx":432
+ *         cdef _TableBatchIteratorWrapper wrapper
+ * 
+ *         try:             # <<<<<<<<<<<<<<
+ *             table_name_str = table_name.encode('utf-8')
+ *             status = self._db.get().NewBatchIterator(table_name_str, &iter_ptr)
+*/
+    }
+    __pyx_L4_error:;
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+    /* "sabot/_cython/stores/marbledb_store.pyx":444
+ *             return wrapper
+ * 
+ *         except Exception as e:             # <<<<<<<<<<<<<<
+ *             logger.error(f"iter_batches failed: {e}")
+ *             raise
+*/
+    __pyx_t_12 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
+    if (__pyx_t_12) {
+      __Pyx_AddTraceback("sabot._cython.stores.marbledb_store.MarbleDBStoreBackend.iter_batches", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_2, &__pyx_t_11) < 0) __PYX_ERR(0, 444, __pyx_L6_except_error)
+      __Pyx_XGOTREF(__pyx_t_1);
+      __Pyx_XGOTREF(__pyx_t_2);
+      __Pyx_XGOTREF(__pyx_t_11);
+      __Pyx_INCREF(__pyx_t_2);
+      __pyx_v_e = __pyx_t_2;
+      /*try:*/ {
+
+        /* "sabot/_cython/stores/marbledb_store.pyx":445
+ * 
+ *         except Exception as e:
+ *             logger.error(f"iter_batches failed: {e}")             # <<<<<<<<<<<<<<
+ *             raise
+ * 
+*/
+        __pyx_t_3 = NULL;
+        __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 445, __pyx_L16_error)
+        __Pyx_GOTREF(__pyx_t_13);
+        __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 445, __pyx_L16_error)
+        __Pyx_GOTREF(__pyx_t_14);
+        __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+        __pyx_t_13 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 445, __pyx_L16_error)
+        __Pyx_GOTREF(__pyx_t_13);
+        __pyx_t_15 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_iter_batches_failed, __pyx_t_13); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 445, __pyx_L16_error)
+        __Pyx_GOTREF(__pyx_t_15);
+        __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+        __pyx_t_5 = 1;
+        #if CYTHON_UNPACK_METHODS
+        if (unlikely(PyMethod_Check(__pyx_t_14))) {
+          __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_14);
+          assert(__pyx_t_3);
+          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_14);
+          __Pyx_INCREF(__pyx_t_3);
+          __Pyx_INCREF(__pyx__function);
+          __Pyx_DECREF_SET(__pyx_t_14, __pyx__function);
+          __pyx_t_5 = 0;
+        }
+        #endif
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_t_15};
+          __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+          __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 445, __pyx_L16_error)
+          __Pyx_GOTREF(__pyx_t_4);
+        }
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+        /* "sabot/_cython/stores/marbledb_store.pyx":446
+ *         except Exception as e:
+ *             logger.error(f"iter_batches failed: {e}")
+ *             raise             # <<<<<<<<<<<<<<
+ * 
+ * 
+*/
+        __Pyx_GIVEREF(__pyx_t_1);
+        __Pyx_GIVEREF(__pyx_t_2);
+        __Pyx_XGIVEREF(__pyx_t_11);
+        __Pyx_ErrRestoreWithState(__pyx_t_1, __pyx_t_2, __pyx_t_11);
+        __pyx_t_1 = 0;  __pyx_t_2 = 0;  __pyx_t_11 = 0; 
+        __PYX_ERR(0, 446, __pyx_L16_error)
+      }
+
+      /* "sabot/_cython/stores/marbledb_store.pyx":444
+ *             return wrapper
+ * 
+ *         except Exception as e:             # <<<<<<<<<<<<<<
+ *             logger.error(f"iter_batches failed: {e}")
+ *             raise
+*/
+      /*finally:*/ {
+        __pyx_L16_error:;
+        /*exception exit:*/{
+          __Pyx_PyThreadState_declare
+          __Pyx_PyThreadState_assign
+          __pyx_t_18 = 0; __pyx_t_19 = 0; __pyx_t_20 = 0; __pyx_t_21 = 0; __pyx_t_22 = 0; __pyx_t_23 = 0;
+          __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
+          __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
+          __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+           __Pyx_ExceptionSwap(&__pyx_t_21, &__pyx_t_22, &__pyx_t_23);
+          if ( unlikely(__Pyx_GetException(&__pyx_t_18, &__pyx_t_19, &__pyx_t_20) < 0)) __Pyx_ErrFetch(&__pyx_t_18, &__pyx_t_19, &__pyx_t_20);
+          __Pyx_XGOTREF(__pyx_t_18);
+          __Pyx_XGOTREF(__pyx_t_19);
+          __Pyx_XGOTREF(__pyx_t_20);
+          __Pyx_XGOTREF(__pyx_t_21);
+          __Pyx_XGOTREF(__pyx_t_22);
+          __Pyx_XGOTREF(__pyx_t_23);
+          __pyx_t_12 = __pyx_lineno; __pyx_t_16 = __pyx_clineno; __pyx_t_17 = __pyx_filename;
+          {
+            __Pyx_DECREF(__pyx_v_e); __pyx_v_e = 0;
+          }
+          __Pyx_XGIVEREF(__pyx_t_21);
+          __Pyx_XGIVEREF(__pyx_t_22);
+          __Pyx_XGIVEREF(__pyx_t_23);
+          __Pyx_ExceptionReset(__pyx_t_21, __pyx_t_22, __pyx_t_23);
+          __Pyx_XGIVEREF(__pyx_t_18);
+          __Pyx_XGIVEREF(__pyx_t_19);
+          __Pyx_XGIVEREF(__pyx_t_20);
+          __Pyx_ErrRestore(__pyx_t_18, __pyx_t_19, __pyx_t_20);
+          __pyx_t_18 = 0; __pyx_t_19 = 0; __pyx_t_20 = 0; __pyx_t_21 = 0; __pyx_t_22 = 0; __pyx_t_23 = 0;
+          __pyx_lineno = __pyx_t_12; __pyx_clineno = __pyx_t_16; __pyx_filename = __pyx_t_17;
+          goto __pyx_L6_except_error;
+        }
+      }
+    }
+    goto __pyx_L6_except_error;
+
+    /* "sabot/_cython/stores/marbledb_store.pyx":432
+ *         cdef _TableBatchIteratorWrapper wrapper
+ * 
+ *         try:             # <<<<<<<<<<<<<<
+ *             table_name_str = table_name.encode('utf-8')
+ *             status = self._db.get().NewBatchIterator(table_name_str, &iter_ptr)
+*/
+    __pyx_L6_except_error:;
+    __Pyx_XGIVEREF(__pyx_t_7);
+    __Pyx_XGIVEREF(__pyx_t_8);
+    __Pyx_XGIVEREF(__pyx_t_9);
+    __Pyx_ExceptionReset(__pyx_t_7, __pyx_t_8, __pyx_t_9);
+    goto __pyx_L1_error;
+    __pyx_L8_try_return:;
+    __Pyx_XGIVEREF(__pyx_t_7);
+    __Pyx_XGIVEREF(__pyx_t_8);
+    __Pyx_XGIVEREF(__pyx_t_9);
+    __Pyx_ExceptionReset(__pyx_t_7, __pyx_t_8, __pyx_t_9);
+    goto __pyx_L0;
+  }
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":408
+ *             logger.warning(f"Flush warning: {status.ToString().decode('utf-8')}")
+ * 
+ *     cpdef object iter_batches(self, str table_name):             # <<<<<<<<<<<<<<
+ *         """Streaming batch iterator - yields RecordBatches lazily.
+ * 
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_11);
+  __Pyx_XDECREF(__pyx_t_13);
+  __Pyx_XDECREF(__pyx_t_14);
+  __Pyx_XDECREF(__pyx_t_15);
+  __Pyx_AddTraceback("sabot._cython.stores.marbledb_store.MarbleDBStoreBackend.iter_batches", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_wrapper);
+  __Pyx_XDECREF(__pyx_v_e);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21iter_batches(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_20iter_batches, "Streaming batch iterator - yields RecordBatches lazily.\n\n        This is the primary API for zero-copy streaming access to MarbleDB tables.\n        Instead of materializing all data, batches are fetched on-demand.\n\n        Args:\n            table_name: Name of the table to scan\n\n        Yields:\n            PyArrow RecordBatch objects\n\n        Example:\n            for batch in store.iter_batches(\"my_table\"):\n                process_batch(batch)\n        ");
+static PyMethodDef __pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21iter_batches = {"iter_batches", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21iter_batches, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_20iter_batches};
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21iter_batches(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  PyObject *__pyx_v_table_name = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("iter_batches (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_table_name,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 408, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 408, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "iter_batches", 0) < 0) __PYX_ERR(0, 408, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("iter_batches", 1, 1, 1, i); __PYX_ERR(0, 408, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 408, __pyx_L3_error)
+    }
+    __pyx_v_table_name = ((PyObject*)values[0]);
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("iter_batches", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 408, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("sabot._cython.stores.marbledb_store.MarbleDBStoreBackend.iter_batches", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_table_name), (&PyUnicode_Type), 1, "table_name", 1))) __PYX_ERR(0, 408, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_20iter_batches(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self), __pyx_v_table_name);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  goto __pyx_L7_cleaned_up;
+  __pyx_L0:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __pyx_L7_cleaned_up:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_20iter_batches(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, PyObject *__pyx_v_table_name) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("iter_batches", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_iter_batches(__pyx_v_self, __pyx_v_table_name, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 408, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("sabot._cython.stores.marbledb_store.MarbleDBStoreBackend.iter_batches", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
 /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     raise TypeError, "self._column_families,self._db cannot be converted to a Python object for pickling"
@@ -13468,15 +14123,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21__reduce_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_23__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21__reduce_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_23__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_23__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_23__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -13502,14 +14157,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("__reduce_cython__", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_20__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_22__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_20__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self) {
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_22__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -13549,15 +14204,15 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_23__setstate_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_25__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_23__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_23__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_23__setstate_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_25__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_25__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_25__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -13623,7 +14278,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_22__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self), __pyx_v___pyx_state);
+  __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_24__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *)__pyx_v_self), __pyx_v___pyx_state);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -13633,7 +14288,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_22__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_24__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
@@ -13659,6 +14314,685 @@ static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBSto
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_AddTraceback("sabot._cython.stores.marbledb_store.MarbleDBStoreBackend.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "sabot/_cython/stores/marbledb_store.pyx":455
+ *     cdef str _table_name
+ * 
+ *     def __iter__(self):             # <<<<<<<<<<<<<<
+ *         return self
+ * 
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_1__iter__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_1__iter__(PyObject *__pyx_v_self) {
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__iter__ (wrapper)", 0);
+  __pyx_kwvalues = __Pyx_KwValues_VARARGS(__pyx_args, __pyx_nargs);
+  __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper___iter__(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper___iter__(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__iter__", 0);
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":456
+ * 
+ *     def __iter__(self):
+ *         return self             # <<<<<<<<<<<<<<
+ * 
+ *     def __next__(self):
+*/
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF((PyObject *)__pyx_v_self);
+  __pyx_r = ((PyObject *)__pyx_v_self);
+  goto __pyx_L0;
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":455
+ *     cdef str _table_name
+ * 
+ *     def __iter__(self):             # <<<<<<<<<<<<<<
+ *         return self
+ * 
+*/
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "sabot/_cython/stores/marbledb_store.pyx":458
+ *         return self
+ * 
+ *     def __next__(self):             # <<<<<<<<<<<<<<
+ *         cdef Status status
+ *         cdef shared_ptr[RecordBatch] batch_ptr
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_3__next__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_3__next__(PyObject *__pyx_v_self) {
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__next__ (wrapper)", 0);
+  __pyx_kwvalues = __Pyx_KwValues_VARARGS(__pyx_args, __pyx_nargs);
+  __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_2__next__(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_2__next__(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *__pyx_v_self) {
+  marble::Status __pyx_v_status;
+  std::shared_ptr<arrow::RecordBatch>  __pyx_v_batch_ptr;
+  std::shared_ptr< arrow::RecordBatch>  __pyx_v_pa_batch_ptr;
+  PyObject *__pyx_v_e = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_error_without_exception = 0; /* StopIteration */
+  int __pyx_t_1;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  size_t __pyx_t_7;
+  PyObject *__pyx_t_8 = NULL;
+  PyObject *__pyx_t_9 = NULL;
+  PyObject *__pyx_t_10 = NULL;
+  int __pyx_t_11;
+  PyObject *__pyx_t_12 = NULL;
+  PyObject *__pyx_t_13 = NULL;
+  PyObject *__pyx_t_14 = NULL;
+  int __pyx_t_15;
+  char const *__pyx_t_16;
+  PyObject *__pyx_t_17 = NULL;
+  PyObject *__pyx_t_18 = NULL;
+  PyObject *__pyx_t_19 = NULL;
+  PyObject *__pyx_t_20 = NULL;
+  PyObject *__pyx_t_21 = NULL;
+  PyObject *__pyx_t_22 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__next__", 0);
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":463
+ *         cdef shared_ptr[PCRecordBatch] pa_batch_ptr
+ * 
+ *         if not self._iter.get().Valid():             # <<<<<<<<<<<<<<
+ *             raise StopIteration
+ * 
+*/
+  __pyx_t_1 = (!(__pyx_v_self->_iter.get()->Valid() != 0));
+  if (unlikely(__pyx_t_1)) {
+
+    /* "sabot/_cython/stores/marbledb_store.pyx":464
+ * 
+ *         if not self._iter.get().Valid():
+ *             raise StopIteration             # <<<<<<<<<<<<<<
+ * 
+ *         status = self._iter.get().GetBatch(&batch_ptr)
+*/
+    __pyx_error_without_exception = 1;
+    goto __pyx_L1_error;;
+
+    /* "sabot/_cython/stores/marbledb_store.pyx":463
+ *         cdef shared_ptr[PCRecordBatch] pa_batch_ptr
+ * 
+ *         if not self._iter.get().Valid():             # <<<<<<<<<<<<<<
+ *             raise StopIteration
+ * 
+*/
+  }
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":466
+ *             raise StopIteration
+ * 
+ *         status = self._iter.get().GetBatch(&batch_ptr)             # <<<<<<<<<<<<<<
+ *         if not status.ok():
+ *             raise RuntimeError(f"GetBatch failed: {status.ToString().decode('utf-8')}")
+*/
+  __pyx_v_status = __pyx_v_self->_iter.get()->GetBatch((&__pyx_v_batch_ptr));
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":467
+ * 
+ *         status = self._iter.get().GetBatch(&batch_ptr)
+ *         if not status.ok():             # <<<<<<<<<<<<<<
+ *             raise RuntimeError(f"GetBatch failed: {status.ToString().decode('utf-8')}")
+ * 
+*/
+  __pyx_t_1 = (!(__pyx_v_status.ok() != 0));
+  if (unlikely(__pyx_t_1)) {
+
+    /* "sabot/_cython/stores/marbledb_store.pyx":468
+ *         status = self._iter.get().GetBatch(&batch_ptr)
+ *         if not status.ok():
+ *             raise RuntimeError(f"GetBatch failed: {status.ToString().decode('utf-8')}")             # <<<<<<<<<<<<<<
+ * 
+ *         # Advance to next batch for next iteration
+*/
+    __pyx_t_3 = NULL;
+    __Pyx_INCREF(__pyx_builtin_RuntimeError);
+    __pyx_t_4 = __pyx_builtin_RuntimeError; 
+    __pyx_t_5 = __Pyx_decode_cpp_string(__pyx_v_status.ToString(), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 468, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_6 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_GetBatch_failed, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 468, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_7 = 1;
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_t_6};
+      __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (__pyx_t_7*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 468, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+    }
+    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __PYX_ERR(0, 468, __pyx_L1_error)
+
+    /* "sabot/_cython/stores/marbledb_store.pyx":467
+ * 
+ *         status = self._iter.get().GetBatch(&batch_ptr)
+ *         if not status.ok():             # <<<<<<<<<<<<<<
+ *             raise RuntimeError(f"GetBatch failed: {status.ToString().decode('utf-8')}")
+ * 
+*/
+  }
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":471
+ * 
+ *         # Advance to next batch for next iteration
+ *         self._iter.get().Next()             # <<<<<<<<<<<<<<
+ * 
+ *         # Convert C++ RecordBatch to PyArrow RecordBatch
+*/
+  __pyx_v_self->_iter.get()->Next();
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":475
+ *         # Convert C++ RecordBatch to PyArrow RecordBatch
+ *         # This requires careful handling of shared_ptr ownership
+ *         if batch_ptr.get() == NULL:             # <<<<<<<<<<<<<<
+ *             raise StopIteration
+ * 
+*/
+  __pyx_t_1 = (__pyx_v_batch_ptr.get() == NULL);
+  if (unlikely(__pyx_t_1)) {
+
+    /* "sabot/_cython/stores/marbledb_store.pyx":476
+ *         # This requires careful handling of shared_ptr ownership
+ *         if batch_ptr.get() == NULL:
+ *             raise StopIteration             # <<<<<<<<<<<<<<
+ * 
+ *         # Cast to pyarrow's CRecordBatch type (both are arrow::RecordBatch)
+*/
+    __pyx_error_without_exception = 1;
+    goto __pyx_L1_error;;
+
+    /* "sabot/_cython/stores/marbledb_store.pyx":475
+ *         # Convert C++ RecordBatch to PyArrow RecordBatch
+ *         # This requires careful handling of shared_ptr ownership
+ *         if batch_ptr.get() == NULL:             # <<<<<<<<<<<<<<
+ *             raise StopIteration
+ * 
+*/
+  }
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":480
+ *         # Cast to pyarrow's CRecordBatch type (both are arrow::RecordBatch)
+ *         # Use reinterpret_cast via Cython's pointer casting
+ *         pa_batch_ptr = <shared_ptr[PCRecordBatch]>batch_ptr             # <<<<<<<<<<<<<<
+ * 
+ *         # Use pyarrow's mechanism to wrap C++ RecordBatch
+*/
+  __pyx_v_pa_batch_ptr = ((std::shared_ptr< arrow::RecordBatch> )__pyx_v_batch_ptr);
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":483
+ * 
+ *         # Use pyarrow's mechanism to wrap C++ RecordBatch
+ *         try:             # <<<<<<<<<<<<<<
+ *             return pa_lib.pyarrow_wrap_batch(pa_batch_ptr)
+ *         except Exception as e:
+*/
+  {
+    __Pyx_PyThreadState_declare
+    __Pyx_PyThreadState_assign
+    __Pyx_ExceptionSave(&__pyx_t_8, &__pyx_t_9, &__pyx_t_10);
+    __Pyx_XGOTREF(__pyx_t_8);
+    __Pyx_XGOTREF(__pyx_t_9);
+    __Pyx_XGOTREF(__pyx_t_10);
+    /*try:*/ {
+
+      /* "sabot/_cython/stores/marbledb_store.pyx":484
+ *         # Use pyarrow's mechanism to wrap C++ RecordBatch
+ *         try:
+ *             return pa_lib.pyarrow_wrap_batch(pa_batch_ptr)             # <<<<<<<<<<<<<<
+ *         except Exception as e:
+ *             logger.error(f"Failed to convert batch: {e}")
+*/
+      __Pyx_XDECREF(__pyx_r);
+      __pyx_t_2 = __pyx_f_7pyarrow_3lib_pyarrow_wrap_batch(__pyx_v_pa_batch_ptr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 484, __pyx_L6_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_r = __pyx_t_2;
+      __pyx_t_2 = 0;
+      goto __pyx_L10_try_return;
+
+      /* "sabot/_cython/stores/marbledb_store.pyx":483
+ * 
+ *         # Use pyarrow's mechanism to wrap C++ RecordBatch
+ *         try:             # <<<<<<<<<<<<<<
+ *             return pa_lib.pyarrow_wrap_batch(pa_batch_ptr)
+ *         except Exception as e:
+*/
+    }
+    __pyx_L6_error:;
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+    /* "sabot/_cython/stores/marbledb_store.pyx":485
+ *         try:
+ *             return pa_lib.pyarrow_wrap_batch(pa_batch_ptr)
+ *         except Exception as e:             # <<<<<<<<<<<<<<
+ *             logger.error(f"Failed to convert batch: {e}")
+ *             raise RuntimeError(f"Batch conversion failed: {e}")
+*/
+    __pyx_t_11 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
+    if (__pyx_t_11) {
+      __Pyx_AddTraceback("sabot._cython.stores.marbledb_store._TableBatchIteratorWrapper.__next__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_4, &__pyx_t_6) < 0) __PYX_ERR(0, 485, __pyx_L8_except_error)
+      __Pyx_XGOTREF(__pyx_t_2);
+      __Pyx_XGOTREF(__pyx_t_4);
+      __Pyx_XGOTREF(__pyx_t_6);
+      __Pyx_INCREF(__pyx_t_4);
+      __pyx_v_e = __pyx_t_4;
+      /*try:*/ {
+
+        /* "sabot/_cython/stores/marbledb_store.pyx":486
+ *             return pa_lib.pyarrow_wrap_batch(pa_batch_ptr)
+ *         except Exception as e:
+ *             logger.error(f"Failed to convert batch: {e}")             # <<<<<<<<<<<<<<
+ *             raise RuntimeError(f"Batch conversion failed: {e}")
+ * 
+*/
+        __pyx_t_5 = NULL;
+        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 486, __pyx_L17_error)
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 486, __pyx_L17_error)
+        __Pyx_GOTREF(__pyx_t_13);
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __pyx_t_12 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 486, __pyx_L17_error)
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_14 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Failed_to_convert_batch, __pyx_t_12); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 486, __pyx_L17_error)
+        __Pyx_GOTREF(__pyx_t_14);
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __pyx_t_7 = 1;
+        #if CYTHON_UNPACK_METHODS
+        if (unlikely(PyMethod_Check(__pyx_t_13))) {
+          __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_13);
+          assert(__pyx_t_5);
+          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_13);
+          __Pyx_INCREF(__pyx_t_5);
+          __Pyx_INCREF(__pyx__function);
+          __Pyx_DECREF_SET(__pyx_t_13, __pyx__function);
+          __pyx_t_7 = 0;
+        }
+        #endif
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_t_14};
+          __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_13, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (__pyx_t_7*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+          __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 486, __pyx_L17_error)
+          __Pyx_GOTREF(__pyx_t_3);
+        }
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+        /* "sabot/_cython/stores/marbledb_store.pyx":487
+ *         except Exception as e:
+ *             logger.error(f"Failed to convert batch: {e}")
+ *             raise RuntimeError(f"Batch conversion failed: {e}")             # <<<<<<<<<<<<<<
+ * 
+*/
+        __pyx_t_13 = NULL;
+        __Pyx_INCREF(__pyx_builtin_RuntimeError);
+        __pyx_t_14 = __pyx_builtin_RuntimeError; 
+        __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 487, __pyx_L17_error)
+        __Pyx_GOTREF(__pyx_t_5);
+        __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Batch_conversion_failed, __pyx_t_5); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 487, __pyx_L17_error)
+        __Pyx_GOTREF(__pyx_t_12);
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+        __pyx_t_7 = 1;
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_13, __pyx_t_12};
+          __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (__pyx_t_7*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
+          __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+          __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 487, __pyx_L17_error)
+          __Pyx_GOTREF(__pyx_t_3);
+        }
+        __Pyx_Raise(__pyx_t_3, 0, 0, 0);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __PYX_ERR(0, 487, __pyx_L17_error)
+      }
+
+      /* "sabot/_cython/stores/marbledb_store.pyx":485
+ *         try:
+ *             return pa_lib.pyarrow_wrap_batch(pa_batch_ptr)
+ *         except Exception as e:             # <<<<<<<<<<<<<<
+ *             logger.error(f"Failed to convert batch: {e}")
+ *             raise RuntimeError(f"Batch conversion failed: {e}")
+*/
+      /*finally:*/ {
+        __pyx_L17_error:;
+        /*exception exit:*/{
+          __Pyx_PyThreadState_declare
+          __Pyx_PyThreadState_assign
+          __pyx_t_17 = 0; __pyx_t_18 = 0; __pyx_t_19 = 0; __pyx_t_20 = 0; __pyx_t_21 = 0; __pyx_t_22 = 0;
+          __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+          __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
+          __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+           __Pyx_ExceptionSwap(&__pyx_t_20, &__pyx_t_21, &__pyx_t_22);
+          if ( unlikely(__Pyx_GetException(&__pyx_t_17, &__pyx_t_18, &__pyx_t_19) < 0)) __Pyx_ErrFetch(&__pyx_t_17, &__pyx_t_18, &__pyx_t_19);
+          __Pyx_XGOTREF(__pyx_t_17);
+          __Pyx_XGOTREF(__pyx_t_18);
+          __Pyx_XGOTREF(__pyx_t_19);
+          __Pyx_XGOTREF(__pyx_t_20);
+          __Pyx_XGOTREF(__pyx_t_21);
+          __Pyx_XGOTREF(__pyx_t_22);
+          __pyx_t_11 = __pyx_lineno; __pyx_t_15 = __pyx_clineno; __pyx_t_16 = __pyx_filename;
+          {
+            __Pyx_DECREF(__pyx_v_e); __pyx_v_e = 0;
+          }
+          __Pyx_XGIVEREF(__pyx_t_20);
+          __Pyx_XGIVEREF(__pyx_t_21);
+          __Pyx_XGIVEREF(__pyx_t_22);
+          __Pyx_ExceptionReset(__pyx_t_20, __pyx_t_21, __pyx_t_22);
+          __Pyx_XGIVEREF(__pyx_t_17);
+          __Pyx_XGIVEREF(__pyx_t_18);
+          __Pyx_XGIVEREF(__pyx_t_19);
+          __Pyx_ErrRestore(__pyx_t_17, __pyx_t_18, __pyx_t_19);
+          __pyx_t_17 = 0; __pyx_t_18 = 0; __pyx_t_19 = 0; __pyx_t_20 = 0; __pyx_t_21 = 0; __pyx_t_22 = 0;
+          __pyx_lineno = __pyx_t_11; __pyx_clineno = __pyx_t_15; __pyx_filename = __pyx_t_16;
+          goto __pyx_L8_except_error;
+        }
+      }
+    }
+    goto __pyx_L8_except_error;
+
+    /* "sabot/_cython/stores/marbledb_store.pyx":483
+ * 
+ *         # Use pyarrow's mechanism to wrap C++ RecordBatch
+ *         try:             # <<<<<<<<<<<<<<
+ *             return pa_lib.pyarrow_wrap_batch(pa_batch_ptr)
+ *         except Exception as e:
+*/
+    __pyx_L8_except_error:;
+    __Pyx_XGIVEREF(__pyx_t_8);
+    __Pyx_XGIVEREF(__pyx_t_9);
+    __Pyx_XGIVEREF(__pyx_t_10);
+    __Pyx_ExceptionReset(__pyx_t_8, __pyx_t_9, __pyx_t_10);
+    goto __pyx_L1_error;
+    __pyx_L10_try_return:;
+    __Pyx_XGIVEREF(__pyx_t_8);
+    __Pyx_XGIVEREF(__pyx_t_9);
+    __Pyx_XGIVEREF(__pyx_t_10);
+    __Pyx_ExceptionReset(__pyx_t_8, __pyx_t_9, __pyx_t_10);
+    goto __pyx_L0;
+  }
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":458
+ *         return self
+ * 
+ *     def __next__(self):             # <<<<<<<<<<<<<<
+ *         cdef Status status
+ *         cdef shared_ptr[RecordBatch] batch_ptr
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_12);
+  __Pyx_XDECREF(__pyx_t_13);
+  __Pyx_XDECREF(__pyx_t_14);
+  if (!__pyx_error_without_exception) {
+    __Pyx_AddTraceback("sabot._cython.stores.marbledb_store._TableBatchIteratorWrapper.__next__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  }
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_e);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "(tree fragment)":1
+ * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"
+ * def __setstate_cython__(self, __pyx_state):
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_5__reduce_cython__(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static PyMethodDef __pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_5__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_5__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_5__reduce_cython__(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  if (unlikely(__pyx_nargs > 0)) { __Pyx_RaiseArgtupleInvalid("__reduce_cython__", 1, 0, 0, __pyx_nargs); return NULL; }
+  const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+  if (unlikely(__pyx_kwds_len < 0)) return NULL;
+  if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("__reduce_cython__", __pyx_kwds); return NULL;}
+  __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_4__reduce_cython__(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_4__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__reduce_cython__", 0);
+
+  /* "(tree fragment)":2
+ * def __reduce_cython__(self):
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"             # <<<<<<<<<<<<<<
+ * def __setstate_cython__(self, __pyx_state):
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"
+*/
+  __Pyx_Raise(__pyx_builtin_TypeError, __pyx_mstate_global->__pyx_kp_u_self__iter_cannot_be_converted_t, 0, 0);
+  __PYX_ERR(1, 2, __pyx_L1_error)
+
+  /* "(tree fragment)":1
+ * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"
+ * def __setstate_cython__(self, __pyx_state):
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("sabot._cython.stores.marbledb_store._TableBatchIteratorWrapper.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "(tree fragment)":3
+ * def __reduce_cython__(self):
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"
+ * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_7__setstate_cython__(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static PyMethodDef __pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_7__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_7__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_7__setstate_cython__(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  CYTHON_UNUSED PyObject *__pyx_v___pyx_state = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_pyx_state,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(1, 3, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(1, 3, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__setstate_cython__", 0) < 0) __PYX_ERR(1, 3, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__setstate_cython__", 1, 1, 1, i); __PYX_ERR(1, 3, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(1, 3, __pyx_L3_error)
+    }
+    __pyx_v___pyx_state = values[0];
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("__setstate_cython__", 1, 1, 1, __pyx_nargs); __PYX_ERR(1, 3, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("sabot._cython.stores.marbledb_store._TableBatchIteratorWrapper.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_6__setstate_cython__(((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *)__pyx_v_self), __pyx_v___pyx_state);
+
+  /* function exit code */
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_6__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__setstate_cython__", 0);
+
+  /* "(tree fragment)":4
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"
+ * def __setstate_cython__(self, __pyx_state):
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"             # <<<<<<<<<<<<<<
+*/
+  __Pyx_Raise(__pyx_builtin_TypeError, __pyx_mstate_global->__pyx_kp_u_self__iter_cannot_be_converted_t, 0, 0);
+  __PYX_ERR(1, 4, __pyx_L1_error)
+
+  /* "(tree fragment)":3
+ * def __reduce_cython__(self):
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"
+ * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("sabot._cython.stores.marbledb_store._TableBatchIteratorWrapper.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
@@ -13737,8 +15071,8 @@ static int __pyx_tp_clear_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStore
 }
 
 static PyMethodDef __pyx_methods_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend[] = {
-  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_23__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_23__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_25__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 #if CYTHON_USE_TYPE_SPECS
@@ -13839,6 +15173,156 @@ static PyTypeObject __pyx_type_5sabot_7_cython_6stores_14marbledb_store_MarbleDB
 };
 #endif
 
+static PyObject *__pyx_tp_new_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+  struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *p;
+  PyObject *o;
+  #if CYTHON_COMPILING_IN_LIMITED_API
+  allocfunc alloc_func = (allocfunc)PyType_GetSlot(t, Py_tp_alloc);
+  o = alloc_func(t, 0);
+  #else
+  if (likely(!__Pyx_PyType_HasFeature(t, Py_TPFLAGS_IS_ABSTRACT))) {
+    o = (*t->tp_alloc)(t, 0);
+  } else {
+    o = (PyObject *) PyBaseObject_Type.tp_new(t, __pyx_mstate_global->__pyx_empty_tuple, 0);
+  }
+  if (unlikely(!o)) return 0;
+  #endif
+  p = ((struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *)o);
+  __Pyx_default_placement_construct(&(p->_iter));
+  p->_table_name = ((PyObject*)Py_None); Py_INCREF(Py_None);
+  return o;
+}
+
+static void __pyx_tp_dealloc_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper(PyObject *o) {
+  struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *p = (struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper *)o;
+  #if CYTHON_USE_TP_FINALIZE
+  if (unlikely((PY_VERSION_HEX >= 0x03080000 || __Pyx_PyType_HasFeature(Py_TYPE(o), Py_TPFLAGS_HAVE_FINALIZE)) && __Pyx_PyObject_GetSlot(o, tp_finalize, destructor)) && (!PyType_IS_GC(Py_TYPE(o)) || !__Pyx_PyObject_GC_IsFinalized(o))) {
+    if (__Pyx_PyObject_GetSlot(o, tp_dealloc, destructor) == __pyx_tp_dealloc_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper) {
+      if (PyObject_CallFinalizerFromDealloc(o)) return;
+    }
+  }
+  #endif
+  __Pyx_call_destructor(p->_iter);
+  Py_CLEAR(p->_table_name);
+  #if CYTHON_USE_TYPE_SLOTS
+  (*Py_TYPE(o)->tp_free)(o);
+  #else
+  {
+    freefunc tp_free = (freefunc)PyType_GetSlot(Py_TYPE(o), Py_tp_free);
+    if (tp_free) tp_free(o);
+  }
+  #endif
+}
+
+static PyObject *__pyx_specialmethod___pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_3__next__(PyObject *self, CYTHON_UNUSED PyObject *arg) {
+  PyObject *res = __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_3__next__(self);
+  if (!res && !PyErr_Occurred()) { PyErr_SetNone(PyExc_StopIteration); }
+  return res;
+}
+
+static PyMethodDef __pyx_methods_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper[] = {
+  {"__next__", (PyCFunction)__pyx_specialmethod___pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_3__next__, METH_NOARGS|METH_COEXIST, 0},
+  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_5__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_7__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {0, 0, 0, 0}
+};
+#if CYTHON_USE_TYPE_SPECS
+static PyType_Slot __pyx_type_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper_slots[] = {
+  {Py_tp_dealloc, (void *)__pyx_tp_dealloc_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper},
+  {Py_tp_doc, (void *)PyDoc_STR("Wrapper that allows C++ TableBatchIterator to be used as Python iterator.")},
+  {Py_tp_iter, (void *)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_1__iter__},
+  {Py_tp_iternext, (void *)__pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_3__next__},
+  {Py_tp_methods, (void *)__pyx_methods_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper},
+  {Py_tp_new, (void *)__pyx_tp_new_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper},
+  {0, 0},
+};
+static PyType_Spec __pyx_type_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper_spec = {
+  "sabot._cython.stores.marbledb_store._TableBatchIteratorWrapper",
+  sizeof(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper),
+  0,
+  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE,
+  __pyx_type_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper_slots,
+};
+#else
+
+static PyTypeObject __pyx_type_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper = {
+  PyVarObject_HEAD_INIT(0, 0)
+  "sabot._cython.stores.marbledb_store.""_TableBatchIteratorWrapper", /*tp_name*/
+  sizeof(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper), /*tp_basicsize*/
+  0, /*tp_itemsize*/
+  __pyx_tp_dealloc_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper, /*tp_dealloc*/
+  #if PY_VERSION_HEX < 0x030800b4
+  0, /*tp_print*/
+  #endif
+  #if PY_VERSION_HEX >= 0x030800b4
+  0, /*tp_vectorcall_offset*/
+  #endif
+  0, /*tp_getattr*/
+  0, /*tp_setattr*/
+  0, /*tp_as_async*/
+  0, /*tp_repr*/
+  0, /*tp_as_number*/
+  0, /*tp_as_sequence*/
+  0, /*tp_as_mapping*/
+  0, /*tp_hash*/
+  0, /*tp_call*/
+  0, /*tp_str*/
+  0, /*tp_getattro*/
+  0, /*tp_setattro*/
+  0, /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE, /*tp_flags*/
+  PyDoc_STR("Wrapper that allows C++ TableBatchIterator to be used as Python iterator."), /*tp_doc*/
+  0, /*tp_traverse*/
+  0, /*tp_clear*/
+  0, /*tp_richcompare*/
+  0, /*tp_weaklistoffset*/
+  __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_1__iter__, /*tp_iter*/
+  __pyx_pw_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_3__next__, /*tp_iternext*/
+  __pyx_methods_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper, /*tp_methods*/
+  0, /*tp_members*/
+  0, /*tp_getset*/
+  0, /*tp_base*/
+  0, /*tp_dict*/
+  0, /*tp_descr_get*/
+  0, /*tp_descr_set*/
+  #if !CYTHON_USE_TYPE_SPECS
+  0, /*tp_dictoffset*/
+  #endif
+  0, /*tp_init*/
+  0, /*tp_alloc*/
+  __pyx_tp_new_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper, /*tp_new*/
+  0, /*tp_free*/
+  0, /*tp_is_gc*/
+  0, /*tp_bases*/
+  0, /*tp_mro*/
+  0, /*tp_cache*/
+  0, /*tp_subclasses*/
+  0, /*tp_weaklist*/
+  0, /*tp_del*/
+  0, /*tp_version_tag*/
+  #if CYTHON_USE_TP_FINALIZE
+  0, /*tp_finalize*/
+  #else
+  NULL, /*tp_finalize*/
+  #endif
+  #if PY_VERSION_HEX >= 0x030800b1 && (!CYTHON_COMPILING_IN_PYPY || PYPY_VERSION_NUM >= 0x07030800)
+  0, /*tp_vectorcall*/
+  #endif
+  #if __PYX_NEED_TP_PRINT_SLOT == 1
+  0, /*tp_print*/
+  #endif
+  #if PY_VERSION_HEX >= 0x030C0000
+  0, /*tp_watched*/
+  #endif
+  #if PY_VERSION_HEX >= 0x030d00A4
+  0, /*tp_versions_used*/
+  #endif
+  #if CYTHON_COMPILING_IN_PYPY && PY_VERSION_HEX >= 0x03090000 && PY_VERSION_HEX < 0x030a0000
+  0, /*tp_pypy_flags*/
+  #endif
+};
+#endif
+
 static PyMethodDef __pyx_methods[] = {
   {0, 0, 0, 0}
 };
@@ -13902,16 +15386,17 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_vtable_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend.delete_range = (void (*)(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *, PyObject *, PyObject *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_delete_range;
   __pyx_vtable_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend.list_column_families = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_list_column_families;
   __pyx_vtable_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend.flush = (void (*)(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_flush;
+  __pyx_vtable_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend.iter_batches = (PyObject *(*)(struct __pyx_obj_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_iter_batches;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend)) __PYX_ERR(0, 155, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend) < 0) __PYX_ERR(0, 155, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend)) __PYX_ERR(0, 167, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend = &__pyx_type_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend) < 0) __PYX_ERR(0, 155, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend->tp_getattro == PyObject_GenericGetAttr)) {
@@ -13920,7 +15405,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 155, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 167, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend___init__.doc = __pyx_doc_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend___init__;
@@ -13928,10 +15413,28 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_vtabptr_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend) < 0) __PYX_ERR(0, 155, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend) < 0) __PYX_ERR(0, 155, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend) < 0) __PYX_ERR(0, 155, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend) < 0) __PYX_ERR(0, 155, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_vtabptr_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
+  #if CYTHON_USE_TYPE_SPECS
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper)) __PYX_ERR(0, 450, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper_spec, __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper) < 0) __PYX_ERR(0, 450, __pyx_L1_error)
+  #else
+  __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper = &__pyx_type_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper;
+  #endif
+  #if !CYTHON_COMPILING_IN_LIMITED_API
+  #endif
+  #if !CYTHON_USE_TYPE_SPECS
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper) < 0) __PYX_ERR(0, 450, __pyx_L1_error)
+  #endif
+  #if !CYTHON_COMPILING_IN_LIMITED_API
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper->tp_dictoffset && __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper->tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper->tp_getattro = PyObject_GenericGetAttr;
+  }
+  #endif
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_TableBatchIteratorWrapper, (PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper) < 0) __PYX_ERR(0, 450, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store__TableBatchIteratorWrapper) < 0) __PYX_ERR(0, 450, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -15046,10 +16549,22 @@ static int __Pyx_modinit_variable_import_code(__pyx_mstatetype *__pyx_mstate) {
 static int __Pyx_modinit_function_import_code(__pyx_mstatetype *__pyx_mstate) {
   __Pyx_RefNannyDeclarations
   CYTHON_UNUSED_VAR(__pyx_mstate);
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_import_code", 0);
   /*--- Function import code ---*/
+  __pyx_t_1 = PyImport_ImportModule("pyarrow.lib"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (__Pyx_ImportFunction_3_1_4(__pyx_t_1, "pyarrow_wrap_batch", (void (**)(void))&__pyx_f_7pyarrow_3lib_pyarrow_wrap_batch, "PyObject *(std::shared_ptr< arrow::RecordBatch>  const &)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_RefNannyFinishContext();
+  return -1;
 }
 
 #if CYTHON_PEP489_MULTI_PHASE_INIT
@@ -15335,7 +16850,7 @@ __Pyx_RefNannySetupContext("PyInit_marbledb_store", 0);
   if (unlikely((__Pyx_modinit_type_init_code(__pyx_mstate) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
   if (unlikely((__Pyx_modinit_type_import_code(__pyx_mstate) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
   (void)__Pyx_modinit_variable_import_code(__pyx_mstate);
-  (void)__Pyx_modinit_function_import_code(__pyx_mstate);
+  if (unlikely((__Pyx_modinit_function_import_code(__pyx_mstate) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
   /*--- Execution code ---*/
 
   /* "sabot/_cython/stores/marbledb_store.pyx":10
@@ -15400,7 +16915,7 @@ __Pyx_RefNannySetupContext("PyInit_marbledb_store", 0);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":22
+  /* "sabot/_cython/stores/marbledb_store.pyx":23
  * from libcpp cimport bool as cbool
  * 
  * logger = logging.getLogger(__name__)             # <<<<<<<<<<<<<<
@@ -15408,12 +16923,12 @@ __Pyx_RefNannySetupContext("PyInit_marbledb_store", 0);
  * # MarbleDB C++ declarations
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logging); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logging); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_getLogger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_getLogger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_6 = 1;
   {
@@ -15422,119 +16937,131 @@ __Pyx_RefNannySetupContext("PyInit_marbledb_store", 0);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 22, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 23, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
   }
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_logger, __pyx_t_3) < 0) __PYX_ERR(0, 22, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_logger, __pyx_t_3) < 0) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":173
+  /* "sabot/_cython/stores/marbledb_store.pyx":185
  *         self._is_open = False
  * 
  *     cpdef void open(self):             # <<<<<<<<<<<<<<
  *         """Open MarbleDB instance."""
  *         if self._is_open:
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_3open, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_open, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_3open, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_open, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 185, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_open, __pyx_t_3) < 0) __PYX_ERR(0, 173, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_open, __pyx_t_3) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":189
+  /* "sabot/_cython/stores/marbledb_store.pyx":201
  *         logger.info(f"MarbleDB store backend opened at {self._db_path}")
  * 
  *     cpdef void close(self):             # <<<<<<<<<<<<<<
  *         """Close MarbleDB."""
  *         if not self._is_open:
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_5close, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_close, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_5close, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_close, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_close, __pyx_t_3) < 0) __PYX_ERR(0, 189, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_close, __pyx_t_3) < 0) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":203
+  /* "sabot/_cython/stores/marbledb_store.pyx":215
  *         logger.info("MarbleDB store backend closed")
  * 
  *     cpdef void create_column_family(self, str table_name, object pyarrow_schema):             # <<<<<<<<<<<<<<
  *         """Create column family (table) with Arrow schema.
  * 
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_7create_column_family, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_create_colu, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_7create_column_family, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_create_colu, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 215, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_create_column_family, __pyx_t_3) < 0) __PYX_ERR(0, 203, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_create_column_family, __pyx_t_3) < 0) __PYX_ERR(0, 215, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":253
+  /* "sabot/_cython/stores/marbledb_store.pyx":265
  *             raise
  * 
  *     cpdef void insert_batch(self, str table_name, object pyarrow_batch):             # <<<<<<<<<<<<<<
  *         """Insert Arrow RecordBatch - direct C++ InsertBatch()."""
  *         if not self._is_open:
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_9insert_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_insert_batc, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 253, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_9insert_batch, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_insert_batc, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_insert_batch, __pyx_t_3) < 0) __PYX_ERR(0, 253, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_insert_batch, __pyx_t_3) < 0) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":279
+  /* "sabot/_cython/stores/marbledb_store.pyx":291
  *             raise
  * 
  *     cpdef object scan_table(self, str table_name):             # <<<<<<<<<<<<<<
  *         """Scan table - returns PyArrow Table.
  * 
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_11scan_table, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_scan_table, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_11scan_table, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_scan_table, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_scan_table, __pyx_t_3) < 0) __PYX_ERR(0, 279, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_scan_table, __pyx_t_3) < 0) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":328
+  /* "sabot/_cython/stores/marbledb_store.pyx":340
  *             raise
  * 
  *     cpdef object scan_range_to_table(self, str table_name, str start_key=None, str end_key=None):             # <<<<<<<<<<<<<<
  *         """Scan range and return as PyArrow Table.
  * 
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_13scan_range_to_table, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_scan_range, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 328, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_13scan_range_to_table, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_scan_range, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 340, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_3, __pyx_mstate_global->__pyx_tuple[0]);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_scan_range_to_table, __pyx_t_3) < 0) __PYX_ERR(0, 328, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_scan_range_to_table, __pyx_t_3) < 0) __PYX_ERR(0, 340, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":350
+  /* "sabot/_cython/stores/marbledb_store.pyx":362
  *         return self.scan_table(table_name)
  * 
  *     cpdef void delete_range(self, str table_name, str start_key, str end_key):             # <<<<<<<<<<<<<<
  *         """Delete range of keys.
  * 
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_15delete_range, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_delete_rang, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_15delete_range, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_delete_rang, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_delete_range, __pyx_t_3) < 0) __PYX_ERR(0, 350, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_delete_range, __pyx_t_3) < 0) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":368
+  /* "sabot/_cython/stores/marbledb_store.pyx":380
  *         )
  * 
  *     cpdef list list_column_families(self):             # <<<<<<<<<<<<<<
  *         """List all column families."""
  *         if not self._is_open:
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_17list_column_families, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_list_column, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 368, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_17list_column_families, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_list_column, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_list_column_families, __pyx_t_3) < 0) __PYX_ERR(0, 368, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_list_column_families, __pyx_t_3) < 0) __PYX_ERR(0, 380, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":386
+  /* "sabot/_cython/stores/marbledb_store.pyx":398
  *             raise
  * 
  *     cpdef void flush(self):             # <<<<<<<<<<<<<<
  *         """Flush pending writes."""
  *         if not self._is_open:
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_19flush, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_flush, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 386, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_19flush, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_flush, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 398, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_flush, __pyx_t_3) < 0) __PYX_ERR(0, 386, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_flush, __pyx_t_3) < 0) __PYX_ERR(0, 398, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "sabot/_cython/stores/marbledb_store.pyx":408
+ *             logger.warning(f"Flush warning: {status.ToString().decode('utf-8')}")
+ * 
+ *     cpdef object iter_batches(self, str table_name):             # <<<<<<<<<<<<<<
+ *         """Streaming batch iterator - yields RecordBatches lazily.
+ * 
+*/
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21iter_batches, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend_iter_batche, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 408, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_5sabot_7_cython_6stores_14marbledb_store_MarbleDBStoreBackend, __pyx_mstate_global->__pyx_n_u_iter_batches, __pyx_t_3) < 0) __PYX_ERR(0, 408, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "(tree fragment)":1
@@ -15542,7 +17069,7 @@ __Pyx_RefNannySetupContext("PyInit_marbledb_store", 0);
  *     raise TypeError, "self._column_families,self._db cannot be converted to a Python object for pickling"
  * def __setstate_cython__(self, __pyx_state):
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_21__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend___reduce_cy, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_23__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend___reduce_cy, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_3) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -15553,7 +17080,28 @@ __Pyx_RefNannySetupContext("PyInit_marbledb_store", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     raise TypeError, "self._column_families,self._db cannot be converted to a Python object for pickling"
 */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_23__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend___setstate, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 3, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_20MarbleDBStoreBackend_25__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MarbleDBStoreBackend___setstate, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11])); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 3, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_3) < 0) __PYX_ERR(1, 3, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "(tree fragment)":1
+ * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"
+ * def __setstate_cython__(self, __pyx_state):
+*/
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_5__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TableBatchIteratorWrapper___red, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[12])); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_3) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "(tree fragment)":3
+ * def __reduce_cython__(self):
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"
+ * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
+ *     raise TypeError, "self._iter cannot be converted to a Python object for pickling"
+*/
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5sabot_7_cython_6stores_14marbledb_store_26_TableBatchIteratorWrapper_7__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TableBatchIteratorWrapper___set, NULL, __pyx_mstate_global->__pyx_n_u_sabot__cython_stores_marbledb_st, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[13])); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_3) < 0) __PYX_ERR(1, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -15630,11 +17178,14 @@ typedef struct {
 static const char * const __pyx_string_tab_encodings[] = { 0 };
 static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_, sizeof(__pyx_k_), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_ */
+  {__pyx_k_Batch_conversion_failed, sizeof(__pyx_k_Batch_conversion_failed), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Batch_conversion_failed */
   {__pyx_k_CreateColumnFamily_failed, sizeof(__pyx_k_CreateColumnFamily_failed), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_CreateColumnFamily_failed */
   {__pyx_k_Created_column_family, sizeof(__pyx_k_Created_column_family), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Created_column_family */
   {__pyx_k_Dict, sizeof(__pyx_k_Dict), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Dict */
+  {__pyx_k_Failed_to_convert_batch, sizeof(__pyx_k_Failed_to_convert_batch), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Failed_to_convert_batch */
   {__pyx_k_Failed_to_open_MarbleDB, sizeof(__pyx_k_Failed_to_open_MarbleDB), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Failed_to_open_MarbleDB */
   {__pyx_k_Flush_warning, sizeof(__pyx_k_Flush_warning), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Flush_warning */
+  {__pyx_k_GetBatch_failed, sizeof(__pyx_k_GetBatch_failed), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_GetBatch_failed */
   {__pyx_k_InsertBatch_failed, sizeof(__pyx_k_InsertBatch_failed), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_InsertBatch_failed */
   {__pyx_k_List, sizeof(__pyx_k_List), 0, 1, 1}, /* PyObject cname: __pyx_n_u_List */
   {__pyx_k_ListColumnFamilies_failed, sizeof(__pyx_k_ListColumnFamilies_failed), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_ListColumnFamilies_failed */
@@ -15646,6 +17197,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_MarbleDBStoreBackend_delete_rang, sizeof(__pyx_k_MarbleDBStoreBackend_delete_rang), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MarbleDBStoreBackend_delete_rang */
   {__pyx_k_MarbleDBStoreBackend_flush, sizeof(__pyx_k_MarbleDBStoreBackend_flush), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MarbleDBStoreBackend_flush */
   {__pyx_k_MarbleDBStoreBackend_insert_batc, sizeof(__pyx_k_MarbleDBStoreBackend_insert_batc), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MarbleDBStoreBackend_insert_batc */
+  {__pyx_k_MarbleDBStoreBackend_iter_batche, sizeof(__pyx_k_MarbleDBStoreBackend_iter_batche), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MarbleDBStoreBackend_iter_batche */
   {__pyx_k_MarbleDBStoreBackend_list_column, sizeof(__pyx_k_MarbleDBStoreBackend_list_column), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MarbleDBStoreBackend_list_column */
   {__pyx_k_MarbleDBStoreBackend_open, sizeof(__pyx_k_MarbleDBStoreBackend_open), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MarbleDBStoreBackend_open */
   {__pyx_k_MarbleDBStoreBackend_scan_range, sizeof(__pyx_k_MarbleDBStoreBackend_scan_range), 0, 1, 1}, /* PyObject cname: __pyx_n_u_MarbleDBStoreBackend_scan_range */
@@ -15653,12 +17205,17 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_MarbleDB_backend_not_open, sizeof(__pyx_k_MarbleDB_backend_not_open), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_MarbleDB_backend_not_open */
   {__pyx_k_MarbleDB_store_backend_closed, sizeof(__pyx_k_MarbleDB_store_backend_closed), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_MarbleDB_store_backend_closed */
   {__pyx_k_MarbleDB_store_backend_opened_at, sizeof(__pyx_k_MarbleDB_store_backend_opened_at), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_MarbleDB_store_backend_opened_at */
+  {__pyx_k_NewBatchIterator_failed, sizeof(__pyx_k_NewBatchIterator_failed), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_NewBatchIterator_failed */
   {__pyx_k_None, sizeof(__pyx_k_None), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_None */
   {__pyx_k_NotImplementedError, sizeof(__pyx_k_NotImplementedError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_NotImplementedError */
   {__pyx_k_Note_that_Cython_is_deliberately, sizeof(__pyx_k_Note_that_Cython_is_deliberately), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Note_that_Cython_is_deliberately */
   {__pyx_k_Optional, sizeof(__pyx_k_Optional), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Optional */
   {__pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_RuntimeError */
   {__pyx_k_ScanTable_failed, sizeof(__pyx_k_ScanTable_failed), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_ScanTable_failed */
+  {__pyx_k_StopIteration, sizeof(__pyx_k_StopIteration), 0, 1, 1}, /* PyObject cname: __pyx_n_u_StopIteration */
+  {__pyx_k_TableBatchIteratorWrapper, sizeof(__pyx_k_TableBatchIteratorWrapper), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TableBatchIteratorWrapper */
+  {__pyx_k_TableBatchIteratorWrapper___red, sizeof(__pyx_k_TableBatchIteratorWrapper___red), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TableBatchIteratorWrapper___red */
+  {__pyx_k_TableBatchIteratorWrapper___set, sizeof(__pyx_k_TableBatchIteratorWrapper___set), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TableBatchIteratorWrapper___set */
   {__pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TypeError */
   {__pyx_k__2, sizeof(__pyx_k__2), 0, 1, 0}, /* PyObject cname: __pyx_kp_u__2 */
   {__pyx_k_add_note, sizeof(__pyx_k_add_note), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_add_note */
@@ -15685,6 +17242,8 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_insert_batch, sizeof(__pyx_k_insert_batch), 0, 1, 1}, /* PyObject cname: __pyx_n_u_insert_batch */
   {__pyx_k_is_coroutine, sizeof(__pyx_k_is_coroutine), 0, 1, 1}, /* PyObject cname: __pyx_n_u_is_coroutine */
   {__pyx_k_isenabled, sizeof(__pyx_k_isenabled), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_isenabled */
+  {__pyx_k_iter_batches, sizeof(__pyx_k_iter_batches), 0, 1, 1}, /* PyObject cname: __pyx_n_u_iter_batches */
+  {__pyx_k_iter_batches_failed, sizeof(__pyx_k_iter_batches_failed), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_iter_batches_failed */
   {__pyx_k_list_column_families, sizeof(__pyx_k_list_column_families), 0, 1, 1}, /* PyObject cname: __pyx_n_u_list_column_families */
   {__pyx_k_logger, sizeof(__pyx_k_logger), 0, 1, 1}, /* PyObject cname: __pyx_n_u_logger */
   {__pyx_k_logging, sizeof(__pyx_k_logging), 0, 1, 1}, /* PyObject cname: __pyx_n_u_logging */
@@ -15711,6 +17270,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_scan_table_C_to_PyArrow_batch_co, sizeof(__pyx_k_scan_table_C_to_PyArrow_batch_co), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_scan_table_C_to_PyArrow_batch_co */
   {__pyx_k_self, sizeof(__pyx_k_self), 0, 1, 1}, /* PyObject cname: __pyx_n_u_self */
   {__pyx_k_self__column_families_self__db_c, sizeof(__pyx_k_self__column_families_self__db_c), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_self__column_families_self__db_c */
+  {__pyx_k_self__iter_cannot_be_converted_t, sizeof(__pyx_k_self__iter_cannot_be_converted_t), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_self__iter_cannot_be_converted_t */
   {__pyx_k_set_name, sizeof(__pyx_k_set_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_set_name */
   {__pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate */
   {__pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate_cython */
@@ -15733,9 +17293,10 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, c
 
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
-  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 184, __pyx_L1_error)
-  __pyx_builtin_NotImplementedError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_NotImplementedError); if (!__pyx_builtin_NotImplementedError) __PYX_ERR(0, 363, __pyx_L1_error)
+  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 196, __pyx_L1_error)
+  __pyx_builtin_NotImplementedError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_NotImplementedError); if (!__pyx_builtin_NotImplementedError) __PYX_ERR(0, 375, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
+  __pyx_builtin_StopIteration = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_StopIteration); if (!__pyx_builtin_StopIteration) __PYX_ERR(0, 464, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -15747,14 +17308,14 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "sabot/_cython/stores/marbledb_store.pyx":328
+  /* "sabot/_cython/stores/marbledb_store.pyx":340
  *             raise
  * 
  *     cpdef object scan_range_to_table(self, str table_name, str start_key=None, str end_key=None):             # <<<<<<<<<<<<<<
  *         """Scan range and return as PyArrow Table.
  * 
 */
-  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(2, Py_None, Py_None); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 328, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(2, Py_None, Py_None); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 340, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[0]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[0]);
   __Pyx_RefNannyFinishContext();
@@ -15800,59 +17361,74 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 173, 104};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 185, 104};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_stores_marbledb_st_2, __pyx_mstate->__pyx_n_u_open, __pyx_k_A_4q_D_QoQd_4vS_ar_fIRwVWWX_L_e1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 189, 58};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 201, 58};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_stores_marbledb_st_2, __pyx_mstate->__pyx_n_u_close, __pyx_k_A_4t1_4t4s_Q_F_L_e1A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 203, 253};
+    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 215, 253};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_table_name, __pyx_mstate->__pyx_n_u_pyarrow_schema};
     __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_stores_marbledb_st_2, __pyx_mstate->__pyx_n_u_create_column_family, __pyx_k_A_4t1_aq_j_q_A_Q_q_q_Q_5Q_T_T_6a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 253, 136};
+    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 265, 136};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_table_name, __pyx_mstate->__pyx_n_u_pyarrow_batch};
     __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_stores_marbledb_st_2, __pyx_mstate->__pyx_n_u_insert_batch, __pyx_k_A_4t1_aq_A_Zwaq_T_T_q0_t6_A_l_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 279, 234};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 291, 234};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_table_name};
     __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_stores_marbledb_st_2, __pyx_mstate->__pyx_n_u_scan_table, __pyx_k_A_4t1_aq_Zwaq_T_T_Q_aq_t6_A_l_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 328, 69};
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 340, 69};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_table_name, __pyx_mstate->__pyx_n_u_start_key, __pyx_mstate->__pyx_n_u_end_key};
     __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_stores_marbledb_st_2, __pyx_mstate->__pyx_n_u_scan_range_to_table, __pyx_k_II_4t1_aq_WE_HG1_t_aq, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 350, 35};
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 362, 35};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_table_name, __pyx_mstate->__pyx_n_u_start_key, __pyx_mstate->__pyx_n_u_end_key};
     __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_stores_marbledb_st_2, __pyx_mstate->__pyx_n_u_delete_range, __pyx_k_A_4t1_aq, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 368, 97};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 380, 97};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_stores_marbledb_st_2, __pyx_mstate->__pyx_n_u_list_column_families, __pyx_k_A_4t1_aq_1_t4t2_8_gQd_1_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 386, 66};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 398, 66};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_stores_marbledb_st_2, __pyx_mstate->__pyx_n_u_flush, __pyx_k_A_4t1_T_RvQ_4vS_2_0_ir, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
   }
   {
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 408, 161};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_table_name};
+    __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_sabot__cython_stores_marbledb_st_2, __pyx_mstate->__pyx_n_u_iter_batches, __pyx_k_A_4t1_aq_Zwaq_T_T_4A5EQa_t6_A_l, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
+  }
+  {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 3, 9};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[11] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[11])) goto bad;
+  }
+  {
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 9};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
+    __pyx_mstate_global->__pyx_codeobj_tab[12] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[12])) goto bad;
+  }
+  {
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 3, 9};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
+    __pyx_mstate_global->__pyx_codeobj_tab[13] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[13])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;
@@ -21402,6 +22978,51 @@ static int __Pyx_check_binary_version(unsigned long ct_version, unsigned long rt
         return PyErr_WarnEx(NULL, message, 1);
     }
 }
+
+/* FunctionImport */
+#ifndef __PYX_HAVE_RT_ImportFunction_3_1_4
+#define __PYX_HAVE_RT_ImportFunction_3_1_4
+static int __Pyx_ImportFunction_3_1_4(PyObject *module, const char *funcname, void (**f)(void), const char *sig) {
+    PyObject *d = 0;
+    PyObject *cobj = 0;
+    union {
+        void (*fp)(void);
+        void *p;
+    } tmp;
+    d = PyObject_GetAttrString(module, "__pyx_capi__");
+    if (!d)
+        goto bad;
+#if (defined(Py_LIMITED_API) && Py_LIMITED_API >= 0x030d0000) || (!defined(Py_LIMITED_API) && PY_VERSION_HEX >= 0x030d0000)
+    PyDict_GetItemStringRef(d, funcname, &cobj);
+#else
+    cobj = PyDict_GetItemString(d, funcname);
+    Py_XINCREF(cobj);
+#endif
+    if (!cobj) {
+        PyErr_Format(PyExc_ImportError,
+            "%.200s does not export expected C function %.200s",
+                PyModule_GetName(module), funcname);
+        goto bad;
+    }
+    if (!PyCapsule_IsValid(cobj, sig)) {
+        PyErr_Format(PyExc_TypeError,
+            "C function %.200s.%.200s has wrong signature (expected %.500s, got %.500s)",
+             PyModule_GetName(module), funcname, sig, PyCapsule_GetName(cobj));
+        goto bad;
+    }
+    tmp.p = PyCapsule_GetPointer(cobj, sig);
+    *f = tmp.fp;
+    if (!(*f))
+        goto bad;
+    Py_DECREF(d);
+    Py_DECREF(cobj);
+    return 0;
+bad:
+    Py_XDECREF(d);
+    Py_XDECREF(cobj);
+    return -1;
+}
+#endif
 
 /* NewCodeObj */
 #if CYTHON_COMPILING_IN_LIMITED_API
