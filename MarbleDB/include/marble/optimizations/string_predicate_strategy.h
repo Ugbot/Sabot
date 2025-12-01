@@ -72,14 +72,15 @@ struct StringPredicateInfo {
 };
 
 //==============================================================================
-// String Wrapper - C++ wrapper around Sabot's Cython string operations
+// StringOperationsWrapper - Arrow C++ compute string operations
 //==============================================================================
 
 /**
- * C++ wrapper around Sabot's SIMD string operations.
+ * C++ wrapper around Arrow's SIMD string compute operations.
  *
- * Provides C++ API to call Sabot's Cython-wrapped Arrow compute kernels.
+ * Provides C++ API to Arrow compute kernels for string operations.
  * All operations are zero-copy and SIMD-accelerated.
+ * No Python dependency - pure Arrow C++ implementation.
  */
 class StringOperationsWrapper {
 public:
@@ -144,19 +145,12 @@ public:
     Length(const std::shared_ptr<arrow::StringArray>& array);
 
     /**
-     * Check if module is available (returns false if Cython module not built)
+     * Check if Arrow compute is available (always true for C++ implementation)
      */
     bool IsAvailable() const { return is_available_; }
 
 private:
-    bool is_available_;  // Is Cython module available?
-
-    // Internal: Call Python string operations via Python C API
-    arrow::Result<std::shared_ptr<arrow::BooleanArray>>
-    CallPythonStringOp(const std::string& func_name,
-                       const std::shared_ptr<arrow::StringArray>& array,
-                       const std::string& pattern,
-                       bool ignore_case = false);
+    bool is_available_;  // Arrow compute is always available
 };
 
 //==============================================================================

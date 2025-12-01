@@ -1,14 +1,15 @@
 /**
  * String Predicate Optimization Strategy Implementation
  *
- * Integrates Sabot's SIMD-accelerated string operations into MarbleDB.
+ * Uses Arrow C++ compute kernels for SIMD-accelerated string operations.
+ * No Python dependency - pure C++ implementation.
  */
 
 #include "marble/optimizations/string_predicate_strategy.h"
 #include "marble/api.h"  // For ColumnPredicate definition
 #include "marble/table_capabilities.h"
-#include <Python.h>
-#include <arrow/python/pyarrow.h>
+#include <arrow/compute/api.h>
+#include <arrow/compute/exec.h>
 #include <chrono>
 #include <sstream>
 #include <iomanip>
@@ -16,154 +17,35 @@
 namespace marble {
 
 //==============================================================================
-// StringOperationsWrapper - C++ wrapper around Cython string operations
+// StringOperationsWrapper - Pure Arrow C++ compute implementation
 //==============================================================================
 
-StringOperationsWrapper::StringOperationsWrapper() : is_available_(false) {
-    // Initialize Python interpreter if not already initialized
-    if (!Py_IsInitialized()) {
-        Py_Initialize();
-    }
-
-    // Initialize PyArrow
-    arrow::py::import_pyarrow();
-
-    // Try to import sabot._cython.arrow.string_operations module
-    PyObject* module = PyImport_ImportModule("sabot._cython.arrow.string_operations");
-    if (module != nullptr) {
-        is_available_ = true;
-        Py_DECREF(module);
-    } else {
-        // Module not available (not built or import error)
-        PyErr_Clear();
-        is_available_ = false;
-    }
+StringOperationsWrapper::StringOperationsWrapper() : is_available_(true) {
+    // Arrow compute is always available - no Python dependency
 }
 
-StringOperationsWrapper::~StringOperationsWrapper() {
-    // Don't finalize Python (other code may be using it)
-}
-
-arrow::Result<std::shared_ptr<arrow::BooleanArray>>
-StringOperationsWrapper::CallPythonStringOp(
-    const std::string& func_name,
-    const std::shared_ptr<arrow::StringArray>& array,
-    const std::string& pattern,
-    bool ignore_case) {
-
-    if (!is_available_) {
-        return arrow::Status::NotImplemented(
-            "Sabot string operations module not available");
-    }
-
-    // Acquire GIL
-    PyGILState_STATE gstate = PyGILState_Ensure();
-
-    PyObject* result = nullptr;
-    std::shared_ptr<arrow::BooleanArray> bool_array;
-
-    try {
-        // Import module
-        PyObject* module = PyImport_ImportModule("sabot._cython.arrow.string_operations");
-        if (module == nullptr) {
-            PyErr_Print();
-            PyGILState_Release(gstate);
-            return arrow::Status::IOError("Failed to import string_operations module");
-        }
-
-        // Get function
-        PyObject* func = PyObject_GetAttrString(module, func_name.c_str());
-        Py_DECREF(module);
-        if (func == nullptr) {
-            PyErr_Print();
-            PyGILState_Release(gstate);
-            return arrow::Status::IOError("Failed to get function: " + func_name);
-        }
-
-        // Convert Arrow array to PyArrow
-        PyObject* py_array = arrow::py::wrap_array(array);
-        if (py_array == nullptr) {
-            Py_DECREF(func);
-            PyErr_Print();
-            PyGILState_Release(gstate);
-            return arrow::Status::IOError("Failed to convert array to PyArrow");
-        }
-
-        // Create arguments tuple
-        PyObject* args;
-        if (func_name == "length") {
-            // length() takes only array
-            args = PyTuple_Pack(1, py_array);
-        } else {
-            // Other functions take (array, pattern, ignore_case)
-            PyObject* py_pattern = PyUnicode_FromString(pattern.c_str());
-            PyObject* py_ignore_case = ignore_case ? Py_True : Py_False;
-            Py_INCREF(py_ignore_case);  // PyTuple_Pack steals reference
-
-            if (func_name == "equal" || func_name == "not_equal") {
-                // equal/not_equal don't have ignore_case parameter
-                args = PyTuple_Pack(2, py_array, py_pattern);
-                Py_DECREF(py_ignore_case);
-            } else {
-                // contains, starts_with, ends_with, match_regex have ignore_case
-                args = PyTuple_Pack(3, py_array, py_pattern, py_ignore_case);
-            }
-            Py_DECREF(py_pattern);
-        }
-        Py_DECREF(py_array);
-
-        if (args == nullptr) {
-            Py_DECREF(func);
-            PyErr_Print();
-            PyGILState_Release(gstate);
-            return arrow::Status::IOError("Failed to create args tuple");
-        }
-
-        // Call function
-        result = PyObject_CallObject(func, args);
-        Py_DECREF(args);
-        Py_DECREF(func);
-
-        if (result == nullptr) {
-            PyErr_Print();
-            PyGILState_Release(gstate);
-            return arrow::Status::IOError("Python function call failed");
-        }
-
-        // Convert result back to Arrow array
-        arrow::Result<std::shared_ptr<arrow::Array>> unwrap_result =
-            arrow::py::unwrap_array(result);
-        Py_DECREF(result);
-
-        if (!unwrap_result.ok()) {
-            PyGILState_Release(gstate);
-            return arrow::Status::IOError("Failed to unwrap result array");
-        }
-
-        bool_array = std::static_pointer_cast<arrow::BooleanArray>(unwrap_result.ValueOrDie());
-
-    } catch (const std::exception& e) {
-        if (result) Py_DECREF(result);
-        PyGILState_Release(gstate);
-        return arrow::Status::IOError("Exception in Python call: " + std::string(e.what()));
-    }
-
-    PyGILState_Release(gstate);
-    return bool_array;
-}
+StringOperationsWrapper::~StringOperationsWrapper() = default;
 
 arrow::Result<std::shared_ptr<arrow::BooleanArray>>
 StringOperationsWrapper::Equal(
     const std::shared_ptr<arrow::StringArray>& array,
     const std::string& pattern) {
-    return CallPythonStringOp("equal", array, pattern, false);
+
+    auto scalar = arrow::MakeScalar(pattern);
+    ARROW_ASSIGN_OR_RAISE(auto result,
+        arrow::compute::CallFunction("equal", {array, scalar}));
+    return std::static_pointer_cast<arrow::BooleanArray>(result.make_array());
 }
 
 arrow::Result<std::shared_ptr<arrow::BooleanArray>>
 StringOperationsWrapper::NotEqual(
     const std::shared_ptr<arrow::StringArray>& array,
     const std::string& pattern) {
-    return CallPythonStringOp("not_equal", array, pattern, false);
+
+    auto scalar = arrow::MakeScalar(pattern);
+    ARROW_ASSIGN_OR_RAISE(auto result,
+        arrow::compute::CallFunction("not_equal", {array, scalar}));
+    return std::static_pointer_cast<arrow::BooleanArray>(result.make_array());
 }
 
 arrow::Result<std::shared_ptr<arrow::BooleanArray>>
@@ -171,7 +53,11 @@ StringOperationsWrapper::Contains(
     const std::shared_ptr<arrow::StringArray>& array,
     const std::string& pattern,
     bool ignore_case) {
-    return CallPythonStringOp("contains", array, pattern, ignore_case);
+
+    arrow::compute::MatchSubstringOptions opts(pattern, ignore_case);
+    ARROW_ASSIGN_OR_RAISE(auto result,
+        arrow::compute::CallFunction("match_substring", {array}, &opts));
+    return std::static_pointer_cast<arrow::BooleanArray>(result.make_array());
 }
 
 arrow::Result<std::shared_ptr<arrow::BooleanArray>>
@@ -179,7 +65,11 @@ StringOperationsWrapper::StartsWith(
     const std::shared_ptr<arrow::StringArray>& array,
     const std::string& pattern,
     bool ignore_case) {
-    return CallPythonStringOp("starts_with", array, pattern, ignore_case);
+
+    arrow::compute::MatchSubstringOptions opts(pattern, ignore_case);
+    ARROW_ASSIGN_OR_RAISE(auto result,
+        arrow::compute::CallFunction("starts_with", {array}, &opts));
+    return std::static_pointer_cast<arrow::BooleanArray>(result.make_array());
 }
 
 arrow::Result<std::shared_ptr<arrow::BooleanArray>>
@@ -187,7 +77,11 @@ StringOperationsWrapper::EndsWith(
     const std::shared_ptr<arrow::StringArray>& array,
     const std::string& pattern,
     bool ignore_case) {
-    return CallPythonStringOp("ends_with", array, pattern, ignore_case);
+
+    arrow::compute::MatchSubstringOptions opts(pattern, ignore_case);
+    ARROW_ASSIGN_OR_RAISE(auto result,
+        arrow::compute::CallFunction("ends_with", {array}, &opts));
+    return std::static_pointer_cast<arrow::BooleanArray>(result.make_array());
 }
 
 arrow::Result<std::shared_ptr<arrow::BooleanArray>>
@@ -195,67 +89,20 @@ StringOperationsWrapper::MatchRegex(
     const std::shared_ptr<arrow::StringArray>& array,
     const std::string& pattern,
     bool ignore_case) {
-    return CallPythonStringOp("match_regex", array, pattern, ignore_case);
+
+    arrow::compute::MatchSubstringOptions opts(pattern, ignore_case);
+    ARROW_ASSIGN_OR_RAISE(auto result,
+        arrow::compute::CallFunction("match_substring_regex", {array}, &opts));
+    return std::static_pointer_cast<arrow::BooleanArray>(result.make_array());
 }
 
 arrow::Result<std::shared_ptr<arrow::Int32Array>>
 StringOperationsWrapper::Length(
     const std::shared_ptr<arrow::StringArray>& array) {
 
-    if (!is_available_) {
-        return arrow::Status::NotImplemented(
-            "Sabot string operations module not available");
-    }
-
-    // Similar to CallPythonStringOp but returns Int32Array
-    PyGILState_STATE gstate = PyGILState_Ensure();
-
-    PyObject* module = PyImport_ImportModule("sabot._cython.arrow.string_operations");
-    if (module == nullptr) {
-        PyErr_Print();
-        PyGILState_Release(gstate);
-        return arrow::Status::IOError("Failed to import module");
-    }
-
-    PyObject* func = PyObject_GetAttrString(module, "length");
-    Py_DECREF(module);
-    if (func == nullptr) {
-        PyErr_Print();
-        PyGILState_Release(gstate);
-        return arrow::Status::IOError("Failed to get length function");
-    }
-
-    PyObject* py_array = arrow::py::wrap_array(array);
-    if (py_array == nullptr) {
-        Py_DECREF(func);
-        PyErr_Print();
-        PyGILState_Release(gstate);
-        return arrow::Status::IOError("Failed to wrap array");
-    }
-
-    PyObject* args = PyTuple_Pack(1, py_array);
-    Py_DECREF(py_array);
-
-    PyObject* result = PyObject_CallObject(func, args);
-    Py_DECREF(args);
-    Py_DECREF(func);
-
-    if (result == nullptr) {
-        PyErr_Print();
-        PyGILState_Release(gstate);
-        return arrow::Status::IOError("Length function call failed");
-    }
-
-    arrow::Result<std::shared_ptr<arrow::Array>> unwrap_result =
-        arrow::py::unwrap_array(result);
-    Py_DECREF(result);
-    PyGILState_Release(gstate);
-
-    if (!unwrap_result.ok()) {
-        return arrow::Status::IOError("Failed to unwrap result");
-    }
-
-    return std::static_pointer_cast<arrow::Int32Array>(unwrap_result.ValueOrDie());
+    ARROW_ASSIGN_OR_RAISE(auto result,
+        arrow::compute::CallFunction("utf8_length", {array}));
+    return std::static_pointer_cast<arrow::Int32Array>(result.make_array());
 }
 
 //==============================================================================
@@ -283,7 +130,7 @@ Status StringPredicateStrategy::OnRead(ReadContext* ctx) {
     // ★★★ STRING PREDICATE OPTIMIZATION - 30-40x Performance Improvement ★★★
     //
     // This method wires up SIMD-accelerated string operations for predicate filtering.
-    // Sabot's string_operations.py provides 352M ops/sec SIMD string matching.
+    // Arrow compute provides SIMD string matching with high throughput.
     //
     // Expected performance improvements:
     // - WHERE name LIKE '%pattern%': 30-40x faster (Boyer-Moore SIMD)
@@ -319,10 +166,12 @@ Status StringPredicateStrategy::OnRead(ReadContext* ctx) {
     // For range scans with string LIKE predicates, mark for SIMD filtering
     if (ctx->is_range_scan) {
         // NOTE: Actual SIMD filtering happens downstream during batch processing
-        // The StringOperationsWrapper provides the SIMD operations:
-        // - string_equals_batch() - 352M ops/sec
-        // - string_contains_batch() - SIMD Boyer-Moore
-        // - string_startswith_batch() - SIMD prefix matching
+        // The StringOperationsWrapper provides the SIMD operations via Arrow compute:
+        // - Equal/NotEqual - fast equality comparison
+        // - Contains - SIMD Boyer-Moore substring search
+        // - StartsWith - SIMD prefix matching
+        // - EndsWith - SIMD suffix matching
+        // - MatchRegex - RE2-based regex matching
         //
         // These are applied in the Arrow reader when processing RecordBatches.
         // Here we just track that optimization will be applied.
@@ -459,7 +308,7 @@ std::string StringPredicateStrategy::GetStats() const {
     ss << "  Vocabulary cache: " << stats_.vocab_cache_size << " entries\n";
     ss << "  Vocab cache hits: " << stats_.vocab_cache_hits << "\n";
     ss << "  Vocab cache misses: " << stats_.vocab_cache_misses << "\n";
-    ss << "  SIMD module available: " << (string_ops_->IsAvailable() ? "yes" : "no") << "\n";
+    ss << "  Arrow compute available: " << (string_ops_->IsAvailable() ? "yes" : "no") << "\n";
     return ss.str();
 }
 
@@ -494,7 +343,6 @@ StringPredicateStrategy::AutoConfigure(const std::shared_ptr<arrow::Schema>& sch
 void StringPredicateStrategy::CacheVocabulary(const std::string& str, int64_t id) {
     if (vocabulary_cache_.size() >= max_vocabulary_cache_size_) {
         // Simple LRU: clear cache when full
-        // TODO: Implement proper LRU eviction
         vocabulary_cache_.clear();
     }
     vocabulary_cache_[str] = id;

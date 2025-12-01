@@ -46,7 +46,6 @@ endif()
 # Dependencies
 find_package(Boost REQUIRED COMPONENTS filesystem system coroutine)
 find_package(Threads REQUIRED)
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
 # Use ONLY vendored Arrow (never system Arrow per project requirements)
 set(ARROW_VENDORED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/arrow/cpp/build/install)
@@ -181,7 +180,6 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/simdjson/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/arrow/python/pyarrow/src)
 
 # Add NuRaft includes if enabled
 if(MARBLE_ENABLE_RAFT AND NURAFT_FOUND)
@@ -303,7 +301,6 @@ if(MARBLE_BUILD_STATIC)
             Boost::filesystem
             Boost::system
             Threads::Threads
-            Python3::Python
     )
 
     # Link NuRaft if enabled
@@ -333,7 +330,6 @@ if(MARBLE_BUILD_STATIC)
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:include>
-            ${Python3_INCLUDE_DIRS}
     )
 
     # Alias for backward compatibility
@@ -354,7 +350,6 @@ if(MARBLE_BUILD_SHARED)
             Boost::filesystem
             Boost::system
             Threads::Threads
-            Python3::Python
     )
 
     # Link NuRaft if enabled
@@ -384,7 +379,6 @@ if(MARBLE_BUILD_SHARED)
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:include>
-            ${Python3_INCLUDE_DIRS}
     )
 
     # Alias for convenience
@@ -433,21 +427,15 @@ if(MARBLE_BUILD_TESTS)
     enable_testing()
 
     # Standalone MVCC test (no GTest dependency)
-    # Note: marble_static includes string_predicate_strategy.cpp which uses arrow::py,
-    # requiring the arrow_python library from the Python build directory
-    set(ARROW_PYTHON_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../vendor/arrow/python/build/temp.macosx-15.0-arm64-cpython-313/release")
+    # MarbleDB is now standalone - no Python dependency required
     add_executable(test_mvcc_basic tests/test_mvcc_basic.cpp)
     target_include_directories(test_mvcc_basic PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${ARROW_INCLUDE_DIR}
-        ${Python3_INCLUDE_DIRS}
     )
-    target_link_directories(test_mvcc_basic PRIVATE ${ARROW_PYTHON_LIB_DIR})
     target_link_libraries(test_mvcc_basic PRIVATE
         marble_static
         Arrow::arrow_shared
-        arrow_python
-        Python3::Python
     )
     add_test(NAME MVCCBasicTest COMMAND test_mvcc_basic)
 
