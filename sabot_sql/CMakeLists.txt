@@ -90,16 +90,22 @@ include_directories(
 # Collect source files
 # ============================================================================
 
-# Sabot SQL sources
-file(GLOB_RECURSE SABOT_SQL_SOURCES
+# Sabot SQL sources - Only SQL core files for now (streaming excluded due to missing deps)
+file(GLOB SABOT_SQL_SOURCES
     "${CMAKE_SOURCE_DIR}/src/sql/*.cpp"
-    "${CMAKE_SOURCE_DIR}/src/streaming/*.cpp"
 )
 
-# Exclude files with compilation issues (API mismatches with current DuckDB/Arrow)
+# Exclude SQL files with compilation issues (API mismatches with current DuckDB/Arrow)
 list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "enhanced_parser\\.cpp$")
 list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "streaming_operators\\.cpp$")
 list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "extended_parser\\.cpp$")
+list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "sabot_sql_bridge\\.cpp$")
+list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "query_engine\\.cpp$")
+list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "sql_operator_translator\\.cpp$")
+list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "sabot_operator_translator\\.cpp$")
+list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "c_api\\.cpp$")
+list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "simple_executor\\.cpp$")
+list(FILTER SABOT_SQL_SOURCES EXCLUDE REGEX "flink_sql_extension\\.cpp$")
 
 # Count sources for logging
 list(LENGTH SABOT_SQL_SOURCES SABOT_SQL_COUNT)

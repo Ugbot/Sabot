@@ -5,35 +5,66 @@ Setup script for SabotSQL Cython bindings
 
 from setuptools import setup, Extension
 from Cython.Build import cythonize
-import pyarrow as pa
 import os
 
-# Get Arrow paths
-arrow_include_dir = pa.get_include()
-arrow_lib_dir = os.path.join(os.path.dirname(pa.__file__), 'lib')
+# Base paths
+SABOT_ROOT = os.path.dirname(os.path.dirname(__file__))
+SABOT_SQL_DIR = os.path.dirname(__file__)
 
-# SabotSQL include directory
-sabot_sql_include_dir = os.path.join(os.path.dirname(__file__), 'include')
+# Vendored library paths
+ARROW_ROOT = os.path.join(SABOT_ROOT, "vendor/arrow/cpp/build/install")
+DUCKDB_ROOT = os.path.join(SABOT_ROOT, "vendor/duckdb")
 
-# Define the extension
+# Include directories
+include_dirs = [
+    os.path.join(SABOT_SQL_DIR, "include"),
+    os.path.join(ARROW_ROOT, "include"),
+    os.path.join(DUCKDB_ROOT, "src/include"),
+]
+
+# Library directories
+library_dirs = [
+    os.path.join(SABOT_SQL_DIR, "build"),
+    os.path.join(ARROW_ROOT, "lib"),
+    os.path.join(DUCKDB_ROOT, "build/release/src"),
+]
+
+# Common compile/link args
+compile_args = ["-std=c++17", "-O3"]
+link_args = ["-std=c++17"]
+
+# macOS rpath for vendored libraries
+if os.uname().sysname == 'Darwin':
+    link_args.extend([
+        f"-Wl,-rpath,{os.path.join(ARROW_ROOT, 'lib')}",
+        f"-Wl,-rpath,{os.path.join(SABOT_SQL_DIR, 'build')}",
+        f"-Wl,-rpath,{os.path.join(DUCKDB_ROOT, 'build/release/src')}",
+    ])
+
+# Define extensions
 extensions = [
+    # Simple SQL bridge (uses sabot_sql lib)
     Extension(
-        "sabot_sql",
+        "sabot_sql_ext",
         ["sabot_sql_simple.pyx"],
-        include_dirs=[
-            sabot_sql_include_dir,
-            arrow_include_dir,
-            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/include"
-        ],
+        include_dirs=include_dirs,
         libraries=["sabot_sql", "arrow"],
-        library_dirs=[
-            "/Users/bengamble/Sabot/sabot_sql/build",
-            "/Users/bengamble/Sabot/vendor/arrow/cpp/build/install/lib"
-        ],
+        library_dirs=library_dirs,
         language="c++",
-        extra_compile_args=["-std=c++20"],
-        extra_link_args=["-std=c++20"]
-    )
+        extra_compile_args=compile_args,
+        extra_link_args=link_args
+    ),
+    # Plan Bridge (DuckDB plan parsing and stage partitioning)
+    Extension(
+        "plan_bridge",
+        ["plan_bridge.pyx"],
+        include_dirs=include_dirs,
+        libraries=["sabot_sql", "arrow", "duckdb"],
+        library_dirs=library_dirs,
+        language="c++",
+        extra_compile_args=compile_args,
+        extra_link_args=link_args
+    ),
 ]
 
 setup(

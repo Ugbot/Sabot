@@ -52,6 +52,28 @@ set(ARROW_VENDORED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/arrow/cpp/build/in
 find_package(Arrow REQUIRED PATHS ${ARROW_VENDORED_PATH}/lib/cmake/Arrow NO_DEFAULT_PATH)
 find_package(Parquet REQUIRED PATHS ${ARROW_VENDORED_PATH}/lib/cmake/Parquet NO_DEFAULT_PATH)
 
+# Find Arrow Acero for join operations
+find_package(ArrowAcero QUIET PATHS ${ARROW_VENDORED_PATH}/lib/cmake/ArrowAcero NO_DEFAULT_PATH)
+if(NOT ArrowAcero_FOUND)
+    # Try finding the library directly
+    find_library(ARROW_ACERO_LIB
+        NAMES arrow_acero
+        PATHS ${ARROW_VENDORED_PATH}/lib
+        NO_DEFAULT_PATH
+    )
+    if(ARROW_ACERO_LIB)
+        message(STATUS "Found Arrow Acero library: ${ARROW_ACERO_LIB}")
+        set(ArrowAcero_FOUND TRUE)
+    endif()
+endif()
+
+if(ArrowAcero_FOUND)
+    message(STATUS "Arrow Acero enabled - join operations available")
+    add_compile_definitions(MARBLE_HAS_ACERO)
+else()
+    message(WARNING "Arrow Acero not found - join operations will return NotImplemented")
+endif()
+
 # Find Arrow Flight
 find_package(ArrowFlight QUIET)
 if(NOT ArrowFlight_FOUND)
@@ -303,6 +325,15 @@ if(MARBLE_BUILD_STATIC)
             Threads::Threads
     )
 
+    # Link Arrow Acero for join operations
+    if(ArrowAcero_FOUND)
+        if(TARGET ArrowAcero::arrow_acero_shared)
+            target_link_libraries(marble_static PUBLIC ArrowAcero::arrow_acero_shared)
+        elseif(ARROW_ACERO_LIB)
+            target_link_libraries(marble_static PUBLIC ${ARROW_ACERO_LIB})
+        endif()
+    endif()
+
     # Link NuRaft if enabled
     if(MARBLE_ENABLE_RAFT AND NURAFT_FOUND)
         target_link_libraries(marble_static
@@ -439,6 +470,49 @@ if(MARBLE_BUILD_TESTS)
     )
     add_test(NAME MVCCBasicTest COMMAND test_mvcc_basic)
 
+    # Standalone Bitemporal Table test (no GTest dependency)
+    add_executable(test_bitemporal_table tests/test_bitemporal_table.cpp)
+    target_include_directories(test_bitemporal_table PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${ARROW_INCLUDE_DIR}
+    )
+    target_link_libraries(test_bitemporal_table PRIVATE
+        marble_static
+        Arrow::arrow_shared
+    )
+    add_test(NAME BitemporalTableTest COMMAND test_bitemporal_table)
+
+    # Standalone Join Operations test (no GTest dependency)
+    add_executable(test_joins tests/test_joins.cpp)
+    target_include_directories(test_joins PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${ARROW_INCLUDE_DIR}
+    )
+    target_link_libraries(test_joins PRIVATE
+        marble_static
+        Arrow::arrow_shared
+    )
+    if(ArrowAcero_FOUND)
+        if(TARGET ArrowAcero::arrow_acero_shared)
+            target_link_libraries(test_joins PRIVATE ArrowAcero::arrow_acero_shared)
+        elseif(ARROW_ACERO_LIB)
+            target_link_libraries(test_joins PRIVATE ${ARROW_ACERO_LIB})
+        endif()
+    endif()
+    add_test(NAME JoinOperationsTest COMMAND test_joins)
+
+    # Standalone Temporal Persistence test (no GTest dependency)
+    add_executable(test_temporal_persistence tests/test_temporal_persistence.cpp)
+    target_include_directories(test_temporal_persistence PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${ARROW_INCLUDE_DIR}
+    )
+    target_link_libraries(test_temporal_persistence PRIVATE
+        marble_static
+        Arrow::arrow_shared
+    )
+    add_test(NAME TemporalPersistenceTest COMMAND test_temporal_persistence)
+
     # Try to find GTest, but don't fail if not found
     find_package(GTest QUIET)
     if(GTest_FOUND)
@@ -448,6 +522,8 @@ if(MARBLE_BUILD_TESTS)
         )
         # Exclude standalone tests from GTest suite
         list(FILTER TEST_SOURCES EXCLUDE REGEX "test_mvcc_basic\\.cpp")
+        list(FILTER TEST_SOURCES EXCLUDE REGEX "test_bitemporal_table\\.cpp")
+        list(FILTER TEST_SOURCES EXCLUDE REGEX "test_temporal_persistence\\.cpp")
 
         add_executable(marble_tests ${TEST_SOURCES})
 

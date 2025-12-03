@@ -34,6 +34,33 @@ struct JoinCondition {
     std::string operator_;  // e.g., "=", "<", ">"
 };
 
+/**
+ * @brief Specification for ASOF join operations on any time column
+ *
+ * ASOF joins find the closest match in the right table for each row in the left
+ * table based on a time column. This is commonly used for:
+ * - Joining trades with quotes (financial data)
+ * - Event correlation with sensor readings
+ * - Point-in-time lookups
+ */
+struct AsofJoinSpec {
+    /// Time column name (must exist in both tables)
+    std::string time_column;
+
+    /// Grouping columns for per-group ASOF matching (e.g., symbol, sensor_id)
+    std::vector<std::string> by_columns;
+
+    /// Tolerance for matching in the same units as the time column
+    /// - Negative: match only past values (right.time - left.time <= 0)
+    /// - Positive: match only future values (right.time - left.time >= 0)
+    /// - Zero: exact match only
+    int64_t tolerance = 0;
+
+    /// Suffixes for output columns from each table
+    std::string left_suffix = "";
+    std::string right_suffix = "_right";
+};
+
 class QueryPlan {
 public:
     virtual ~QueryPlan() = default;
@@ -398,6 +425,76 @@ std::unique_ptr<SymbolLibrary> CreateSymbolLibrary();
 std::unique_ptr<TimeSeriesAnalytics> CreateTimeSeriesAnalytics();
 std::unique_ptr<AdvancedQueryPlanner> CreateAdvancedQueryPlanner();
 ComplexQueryBuilder CreateComplexQueryBuilder();
+
+//==============================================================================
+// Standalone Join Functions (Table-to-Table Operations)
+//==============================================================================
+
+/**
+ * @brief Perform hash join between two Arrow tables
+ *
+ * Joins two tables on specified key columns using hash-based algorithm.
+ * Powered by Arrow Acero execution engine.
+ *
+ * @param left Left input table
+ * @param right Right input table
+ * @param left_keys Key column names from left table
+ * @param right_keys Key column names from right table (must match left_keys length)
+ * @param join_type Type of join (kInner, kLeft, kRight, kFull)
+ * @param left_suffix Suffix for left columns in case of name collision
+ * @param right_suffix Suffix for right columns in case of name collision
+ * @param result Output table
+ * @return Status::OK() on success
+ */
+Status HashJoin(
+    std::shared_ptr<arrow::Table> left,
+    std::shared_ptr<arrow::Table> right,
+    const std::vector<std::string>& left_keys,
+    const std::vector<std::string>& right_keys,
+    JoinType join_type,
+    const std::string& left_suffix,
+    const std::string& right_suffix,
+    std::shared_ptr<arrow::Table>* result);
+
+/**
+ * @brief Simplified hash join with same key names in both tables
+ *
+ * @param left Left input table
+ * @param right Right input table
+ * @param on_keys Key column names (must exist in both tables)
+ * @param join_type Type of join (default: kInner)
+ * @param result Output table
+ * @return Status::OK() on success
+ */
+Status HashJoin(
+    std::shared_ptr<arrow::Table> left,
+    std::shared_ptr<arrow::Table> right,
+    const std::vector<std::string>& on_keys,
+    JoinType join_type,
+    std::shared_ptr<arrow::Table>* result);
+
+/**
+ * @brief Perform ASOF join between two Arrow tables
+ *
+ * ASOF join matches each row in the left table with the closest row in the
+ * right table based on a time column. This is useful for:
+ * - Joining trades with quotes (find last quote before each trade)
+ * - Event correlation with sensor data
+ * - Point-in-time lookups
+ *
+ * Both tables must be sorted by the time column before calling this function.
+ *
+ * @param left Left input table (must be sorted by time_column)
+ * @param right Right input table (must be sorted by time_column)
+ * @param spec ASOF join specification (time column, by columns, tolerance)
+ * @param result Output table
+ * @return Status::OK() on success
+ */
+Status AsofJoin(
+    std::shared_ptr<arrow::Table> left,
+    std::shared_ptr<arrow::Table> right,
+    const AsofJoinSpec& spec,
+    std::shared_ptr<arrow::Table>* result);
 
 } // namespace marble
 

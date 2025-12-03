@@ -11,6 +11,7 @@
 #include <marble/merge_operator.h>
 #include <marble/record_ref.h>
 #include <marble/metrics.h>
+#include <marble/table_capabilities.h>
 
 namespace marble {
 
@@ -224,11 +225,115 @@ public:
     virtual Status InsertBatch(const std::string& table_name,
                               const std::shared_ptr<arrow::RecordBatch>& batch) = 0;
 
+    /**
+     * @brief Temporal update for bitemporal/system-time tables
+     *
+     * For temporal tables, updates don't overwrite data. Instead:
+     * 1. Close existing versions (set _system_time_end = now)
+     * 2. Insert new versions with updated values (_system_time_start = now)
+     *
+     * This maintains full history for time-travel queries.
+     *
+     * @param table_name Name of the temporal table
+     * @param key_columns Names of columns that identify rows to update
+     * @param key_values Values of key columns to match
+     * @param updated_batch New data for matched rows (only user columns)
+     * @return Status OK on success, InvalidArgument if table not temporal
+     */
+    virtual Status TemporalUpdate(const std::string& table_name,
+                                 const std::vector<std::string>& key_columns,
+                                 const std::shared_ptr<arrow::RecordBatch>& key_values,
+                                 const std::shared_ptr<arrow::RecordBatch>& updated_batch) = 0;
+
+    /**
+     * @brief Temporal delete for bitemporal/system-time tables (soft delete)
+     *
+     * For temporal tables, deletes don't remove data. Instead:
+     * 1. Close existing versions (set _system_time_end = now)
+     * 2. Insert tombstone versions with _is_deleted = true
+     *
+     * This maintains full history and allows time-travel queries
+     * to see data that existed at past points in time.
+     *
+     * @param table_name Name of the temporal table
+     * @param key_columns Names of columns that identify rows to delete
+     * @param key_values Values of key columns to match
+     * @return Status OK on success, InvalidArgument if table not temporal
+     */
+    virtual Status TemporalDelete(const std::string& table_name,
+                                 const std::vector<std::string>& key_columns,
+                                 const std::shared_ptr<arrow::RecordBatch>& key_values) = 0;
+
     // Table operations
     virtual Status CreateTable(const TableSchema& schema) = 0;
+
+    /**
+     * @brief Create a table with specific capabilities
+     *
+     * Creates a table with the given schema and capabilities. For bitemporal
+     * or system-time tables, the schema is automatically augmented with
+     * temporal columns:
+     * - _system_time_start: When the version was created
+     * - _system_time_end: When the version was superseded
+     * - _valid_time_start: When the data is/was valid (bitemporal only)
+     * - _valid_time_end: When the data validity ends (bitemporal only)
+     * - _is_deleted: Soft delete flag for audit trail
+     *
+     * @param schema Table schema (will be augmented for temporal tables)
+     * @param caps Table capabilities including temporal model
+     * @return Status OK on success
+     */
+    virtual Status CreateTable(const TableSchema& schema,
+                              const TableCapabilities& caps) = 0;
+
     virtual Status ScanTable(const std::string& table_name,
                             std::unique_ptr<QueryResult>* result) = 0;
-    
+
+    /**
+     * @brief Temporal scan with time-travel support
+     *
+     * Scans a bitemporal table with system time and/or valid time constraints.
+     * Uses zone map pruning to skip batches that don't match temporal criteria.
+     *
+     * @param table_name Name of the table to scan
+     * @param system_time_at Point-in-time system time query (AS OF), 0 for current
+     * @param valid_time_start Valid time range start (0 for unbounded)
+     * @param valid_time_end Valid time range end (MAX for unbounded)
+     * @param include_deleted Whether to include soft-deleted records
+     * @param result Output query result
+     * @return Status
+     */
+    virtual Status TemporalScan(const std::string& table_name,
+                               uint64_t system_time_at,
+                               uint64_t valid_time_start,
+                               uint64_t valid_time_end,
+                               bool include_deleted,
+                               std::unique_ptr<QueryResult>* result) = 0;
+
+    /**
+     * @brief Temporal scan with version deduplication
+     *
+     * Like TemporalScan but also deduplicates by business key, keeping only
+     * the latest version (highest _system_time_start) for each unique key.
+     * This provides "latest wins" semantics for append-only storage.
+     *
+     * @param table_name Name of the table to scan
+     * @param key_columns Business key column names for deduplication
+     * @param system_time_at Point-in-time system time query (AS OF), 0 for current
+     * @param valid_time_start Valid time range start (0 for unbounded)
+     * @param valid_time_end Valid time range end (MAX for unbounded)
+     * @param include_deleted Whether to include soft-deleted records
+     * @param result Output query result
+     * @return Status
+     */
+    virtual Status TemporalScanDedup(const std::string& table_name,
+                                    const std::vector<std::string>& key_columns,
+                                    uint64_t system_time_at,
+                                    uint64_t valid_time_start,
+                                    uint64_t valid_time_end,
+                                    bool include_deleted,
+                                    std::unique_ptr<QueryResult>* result) = 0;
+
     /**
      * @brief Column Family operations
      */
@@ -366,6 +471,39 @@ public:
     virtual Status Flush() = 0;
     virtual Status CompactRange(const KeyRange& range) = 0;
     virtual Status Destroy() = 0;
+
+    // Version garbage collection for temporal tables
+    /**
+     * @brief Prune old versions from a temporal table
+     *
+     * For bitemporal tables, this removes old versions based on the table's
+     * MVCCSettings GC policy:
+     * - kKeepAllVersions: No pruning (for audit)
+     * - kKeepRecentVersions: Keep N most recent versions per key
+     * - kKeepVersionsUntil: Remove versions with sys_end < timestamp
+     *
+     * @param table_name The table to prune
+     * @param versions_removed Output: number of versions removed
+     * @return Status OK if successful
+     */
+    virtual Status PruneVersions(const std::string& table_name,
+                                 uint64_t* versions_removed) = 0;
+
+    /**
+     * @brief Prune old versions with custom parameters
+     *
+     * Allows overriding the table's default GC settings.
+     *
+     * @param table_name The table to prune
+     * @param max_versions_per_key Maximum versions to keep per business key
+     * @param min_system_time_us Prune versions with sys_end < this timestamp
+     * @param versions_removed Output: number of versions removed
+     * @return Status OK if successful
+     */
+    virtual Status PruneVersions(const std::string& table_name,
+                                 size_t max_versions_per_key,
+                                 uint64_t min_system_time_us,
+                                 uint64_t* versions_removed) = 0;
 
     // Checkpointing and state management
     virtual Status CreateCheckpoint(const std::string& checkpoint_path) = 0;

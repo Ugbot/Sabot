@@ -11,10 +11,12 @@ import sys
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 import pyarrow as pa
+import numpy as np
 
 # Get Arrow paths from pyarrow
 arrow_include = pa.get_include()
 arrow_lib = pa.get_library_dirs()[0] if pa.get_library_dirs() else None
+numpy_include = np.get_include()
 
 # Paths relative to this file
 MARBLEDB_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -26,6 +28,7 @@ include_dirs = [
     os.path.join(MARBLEDB_ROOT, 'include'),  # MarbleDB headers
     os.path.join(ARROW_ROOT, 'include'),      # Arrow headers
     arrow_include,                             # PyArrow headers
+    numpy_include,                             # NumPy headers
 ]
 
 # Library directories
@@ -39,7 +42,8 @@ if arrow_lib:
 
 # Libraries to link
 libraries = [
-    'arrow',       # Arrow C++
+    'arrow',         # Arrow C++ core
+    'arrow_acero',   # Arrow Acero execution engine (for joins)
 ]
 
 # Runtime library directories

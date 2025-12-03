@@ -78,6 +78,15 @@ try:
 except ImportError as e:
     logger.debug(f"stores_memory not available: {e}")
 
+# Spillable buffers (bigger-than-memory streaming)
+try:
+    from .buffers import SpillableBuffer, SPILLABLE_BUFFER_AVAILABLE
+    AVAILABLE_MODULES.append('buffers')
+except ImportError as e:
+    logger.debug(f"buffers not available: {e}")
+    SpillableBuffer = None
+    SPILLABLE_BUFFER_AVAILABLE = False
+
 # State management
 try:
     from .state import state_backend, value_state, list_state, map_state, reducing_state, aggregating_state, rocksdb_state

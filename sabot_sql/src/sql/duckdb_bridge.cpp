@@ -2,117 +2,109 @@
 #include <arrow/io/memory.h>
 #include <arrow/ipc/writer.h>
 #include <arrow/ipc/reader.h>
+#include <arrow/builder.h>
 #include "duckdb/main/prepared_statement_data.hpp"
 #include "duckdb/planner/binder.hpp"
 #include "duckdb/planner/planner.hpp"
 #include "duckdb/parser/parser.hpp"
+#include "duckdb/common/types/vector.hpp"
 
 namespace sabot_sql {
 namespace sql {
 
-// TypeConverter implementation
-arrow::Result<std::shared_ptr<arrow::DataType>> 
-TypeConverter::DuckDBToArrow(const duckdb::LogicalType& duck_type) {
+// Helper function to convert DuckDB Vector to Arrow Array
+arrow::Result<std::shared_ptr<arrow::Array>> ConvertVectorToArrow(
+    duckdb::Vector& vec, idx_t count) {
+
+    auto& type = vec.GetType();
     using duckdb::LogicalTypeId;
-    
-    switch (duck_type.id()) {
-        case LogicalTypeId::BOOLEAN:
-            return arrow::boolean();
-        case LogicalTypeId::TINYINT:
-            return arrow::int8();
-        case LogicalTypeId::SMALLINT:
-            return arrow::int16();
-        case LogicalTypeId::INTEGER:
-            return arrow::int32();
-        case LogicalTypeId::BIGINT:
-            return arrow::int64();
-        case LogicalTypeId::UTINYINT:
-            return arrow::uint8();
-        case LogicalTypeId::USMALLINT:
-            return arrow::uint16();
-        case LogicalTypeId::UINTEGER:
-            return arrow::uint32();
-        case LogicalTypeId::UBIGINT:
-            return arrow::uint64();
-        case LogicalTypeId::FLOAT:
-            return arrow::float32();
-        case LogicalTypeId::DOUBLE:
-            return arrow::float64();
-        case LogicalTypeId::VARCHAR:
-            return arrow::utf8();
-        case LogicalTypeId::DATE:
-            return arrow::date32();
-        case LogicalTypeId::TIMESTAMP:
-            return arrow::timestamp(arrow::TimeUnit::MICRO);
-        case LogicalTypeId::TIME:
-            return arrow::time64(arrow::TimeUnit::MICRO);
-        case LogicalTypeId::BLOB:
-            return arrow::binary();
+
+    switch (type.id()) {
+        case LogicalTypeId::BOOLEAN: {
+            arrow::BooleanBuilder builder;
+            auto data = duckdb::FlatVector::GetData<bool>(vec);
+            auto& validity = duckdb::FlatVector::Validity(vec);
+            for (idx_t i = 0; i < count; i++) {
+                if (validity.RowIsValid(i)) {
+                    ARROW_RETURN_NOT_OK(builder.Append(data[i]));
+                } else {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                }
+            }
+            return builder.Finish();
+        }
+        case LogicalTypeId::INTEGER: {
+            arrow::Int32Builder builder;
+            auto data = duckdb::FlatVector::GetData<int32_t>(vec);
+            auto& validity = duckdb::FlatVector::Validity(vec);
+            for (idx_t i = 0; i < count; i++) {
+                if (validity.RowIsValid(i)) {
+                    ARROW_RETURN_NOT_OK(builder.Append(data[i]));
+                } else {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                }
+            }
+            return builder.Finish();
+        }
+        case LogicalTypeId::BIGINT: {
+            arrow::Int64Builder builder;
+            auto data = duckdb::FlatVector::GetData<int64_t>(vec);
+            auto& validity = duckdb::FlatVector::Validity(vec);
+            for (idx_t i = 0; i < count; i++) {
+                if (validity.RowIsValid(i)) {
+                    ARROW_RETURN_NOT_OK(builder.Append(data[i]));
+                } else {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                }
+            }
+            return builder.Finish();
+        }
+        case LogicalTypeId::DOUBLE: {
+            arrow::DoubleBuilder builder;
+            auto data = duckdb::FlatVector::GetData<double>(vec);
+            auto& validity = duckdb::FlatVector::Validity(vec);
+            for (idx_t i = 0; i < count; i++) {
+                if (validity.RowIsValid(i)) {
+                    ARROW_RETURN_NOT_OK(builder.Append(data[i]));
+                } else {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                }
+            }
+            return builder.Finish();
+        }
+        case LogicalTypeId::FLOAT: {
+            arrow::FloatBuilder builder;
+            auto data = duckdb::FlatVector::GetData<float>(vec);
+            auto& validity = duckdb::FlatVector::Validity(vec);
+            for (idx_t i = 0; i < count; i++) {
+                if (validity.RowIsValid(i)) {
+                    ARROW_RETURN_NOT_OK(builder.Append(data[i]));
+                } else {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                }
+            }
+            return builder.Finish();
+        }
+        case LogicalTypeId::VARCHAR: {
+            arrow::StringBuilder builder;
+            auto& validity = duckdb::FlatVector::Validity(vec);
+            for (idx_t i = 0; i < count; i++) {
+                if (validity.RowIsValid(i)) {
+                    auto str_val = vec.GetValue(i).ToString();
+                    ARROW_RETURN_NOT_OK(builder.Append(str_val));
+                } else {
+                    ARROW_RETURN_NOT_OK(builder.AppendNull());
+                }
+            }
+            return builder.Finish();
+        }
         default:
             return arrow::Status::NotImplemented(
-                "DuckDB type not yet supported: " + duck_type.ToString());
+                "Vector type not yet supported: " + type.ToString());
     }
 }
 
-arrow::Result<duckdb::LogicalType> 
-TypeConverter::ArrowToDuckDB(const std::shared_ptr<arrow::DataType>& arrow_type) {
-    switch (arrow_type->id()) {
-        case arrow::Type::BOOL:
-            return duckdb::LogicalType::BOOLEAN;
-        case arrow::Type::INT8:
-            return duckdb::LogicalType::TINYINT;
-        case arrow::Type::INT16:
-            return duckdb::LogicalType::SMALLINT;
-        case arrow::Type::INT32:
-            return duckdb::LogicalType::INTEGER;
-        case arrow::Type::INT64:
-            return duckdb::LogicalType::BIGINT;
-        case arrow::Type::UINT8:
-            return duckdb::LogicalType::UTINYINT;
-        case arrow::Type::UINT16:
-            return duckdb::LogicalType::USMALLINT;
-        case arrow::Type::UINT32:
-            return duckdb::LogicalType::UINTEGER;
-        case arrow::Type::UINT64:
-            return duckdb::LogicalType::UBIGINT;
-        case arrow::Type::FLOAT:
-            return duckdb::LogicalType::FLOAT;
-        case arrow::Type::DOUBLE:
-            return duckdb::LogicalType::DOUBLE;
-        case arrow::Type::STRING:
-            return duckdb::LogicalType::VARCHAR;
-        case arrow::Type::DATE32:
-            return duckdb::LogicalType::DATE;
-        case arrow::Type::TIMESTAMP:
-            return duckdb::LogicalType::TIMESTAMP;
-        case arrow::Type::BINARY:
-            return duckdb::LogicalType::BLOB;
-        default:
-            return arrow::Status::NotImplemented(
-                "Arrow type not yet supported: " + arrow_type->ToString());
-    }
-}
-
-arrow::Result<std::shared_ptr<arrow::Schema>> 
-TypeConverter::DuckDBSchemaToArrow(
-    const std::vector<duckdb::LogicalType>& duck_types,
-    const std::vector<std::string>& column_names) {
-    
-    if (duck_types.size() != column_names.size()) {
-        return arrow::Status::Invalid(
-            "Type and name count mismatch");
-    }
-    
-    std::vector<std::shared_ptr<arrow::Field>> fields;
-    fields.reserve(duck_types.size());
-    
-    for (size_t i = 0; i < duck_types.size(); i++) {
-        ARROW_ASSIGN_OR_RAISE(auto arrow_type, DuckDBToArrow(duck_types[i]));
-        fields.push_back(arrow::field(column_names[i], arrow_type));
-    }
-    
-    return arrow::schema(fields);
-}
+// TypeConverter implementation is in type_converter.cpp
 
 // DuckDBBridge implementation
 DuckDBBridge::DuckDBBridge(
@@ -163,32 +155,33 @@ arrow::Status DuckDBBridge::RegisterArrowTableInternal(
     }
 }
 
-arrow::Result<LogicalPlan> 
+arrow::Result<LogicalPlan>
 DuckDBBridge::ParseAndOptimize(const std::string& sql) {
     try {
         // Parse SQL
         duckdb::Parser parser;
         parser.ParseQuery(sql);
-        
+
         if (parser.statements.empty()) {
             return arrow::Status::Invalid("Empty query");
         }
-        
-        // Bind and plan - Updated for DuckDB API changes
-        auto binder = duckdb::Binder::CreateBinder(*connection_->context);
-        binder->BindStatement(*parser.statements[0]);
-        
+
+        // Create planner - it handles both binding and plan generation
         duckdb::Planner planner(*connection_->context);
         planner.CreatePlan(std::move(parser.statements[0]));
-        
+
         // Extract logical plan
         LogicalPlan plan = ExtractLogicalPlan(std::move(planner.plan));
-        
+
+        // Copy column names and types from planner
+        plan.column_names = planner.names;
+        plan.column_types = planner.types;
+
         // Analyze plan features
         AnalyzePlanFeatures(plan);
-        
+
         return plan;
-        
+
     } catch (const std::exception& e) {
         return arrow::Status::Invalid(
             "Failed to parse/optimize SQL: " + std::string(e.what()));
@@ -254,41 +247,52 @@ DuckDBBridge::ExtractPhysicalPlanStructure(const LogicalPlan& logical_plan) {
     return info;
 }
 
-arrow::Result<std::shared_ptr<arrow::Table>> 
+arrow::Result<std::shared_ptr<arrow::Table>>
 DuckDBBridge::ExecuteWithDuckDB(const std::string& sql) {
     try {
         auto result = connection_->Query(sql);
-        
+
         if (result->HasError()) {
             return arrow::Status::Invalid(
                 "Query error: " + result->GetError());
         }
-        
-        // Convert to Arrow
-        // Updated for DuckDB API changes - use Arrow conversion
-        auto arrow_result = result->ToArrowTable();
-        if (!arrow_result) {
-            return arrow::Status::Invalid("Failed to fetch result");
-        }
-        
-        // Collect all batches into a table
+
+        // Get schema from result
+        ARROW_ASSIGN_OR_RAISE(
+            auto schema,
+            TypeConverter::DuckDBSchemaToArrow(result->types, result->names));
+
+        // Collect all chunks and convert to Arrow
         std::vector<std::shared_ptr<arrow::RecordBatch>> batches;
-        while (arrow_result) {
-            batches.push_back(arrow_result);
-            arrow_result = result->ToArrowTable();
+
+        // Fetch all data chunks
+        while (true) {
+            auto chunk = result->Fetch();
+            if (!chunk || chunk->size() == 0) {
+                break;
+            }
+
+            // Convert DuckDB DataChunk to Arrow RecordBatch
+            std::vector<std::shared_ptr<arrow::Array>> arrays;
+            arrays.reserve(chunk->ColumnCount());
+
+            for (idx_t col_idx = 0; col_idx < chunk->ColumnCount(); col_idx++) {
+                auto& vec = chunk->data[col_idx];
+                ARROW_ASSIGN_OR_RAISE(auto array, ConvertVectorToArrow(vec, chunk->size()));
+                arrays.push_back(array);
+            }
+
+            auto batch = arrow::RecordBatch::Make(schema, chunk->size(), arrays);
+            batches.push_back(batch);
         }
-        
+
         if (batches.empty()) {
-            // Empty result - create empty table with schema
-            ARROW_ASSIGN_OR_RAISE(
-                auto schema, 
-                TypeConverter::DuckDBSchemaToArrow(
-                    result->types, result->names));
+            // Empty result
             return arrow::Table::MakeEmpty(schema);
         }
-        
-        return arrow::Table::FromRecordBatches(batches);
-        
+
+        return arrow::Table::FromRecordBatches(schema, batches);
+
     } catch (const std::exception& e) {
         return arrow::Status::IOError(
             "Failed to execute query: " + std::string(e.what()));

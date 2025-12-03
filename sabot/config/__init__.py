@@ -272,3 +272,40 @@ def save_config(path: Path):
     """Save current configuration to file."""
     config = get_config()
     config.save_to_file(path)
+
+
+# Memory configuration for bigger-than-memory streaming
+from .memory import (
+    MemoryConfig,
+    MemorySettings,
+    configure_memory,
+    get_memory_config,
+    DEFAULT_JOIN_MEMORY_THRESHOLD,
+    DEFAULT_GROUPBY_FLUSH_THRESHOLD,
+    DEFAULT_GROUPBY_MEMORY_THRESHOLD,
+    DEFAULT_WINDOW_PER_OPERATOR,
+    DEFAULT_WINDOW_TOTAL,
+    DEFAULT_SPILL_PATH,
+)
+
+__all__ = [
+    # Main config
+    'SabotConfig',
+    'TelemetryConfig',
+    'PerformanceConfig',
+    'OperationalConfig',
+    'get_config',
+    'init_config',
+    'save_config',
+    # Memory config
+    'MemoryConfig',
+    'MemorySettings',
+    'configure_memory',
+    'get_memory_config',
+    'DEFAULT_JOIN_MEMORY_THRESHOLD',
+    'DEFAULT_GROUPBY_FLUSH_THRESHOLD',
+    'DEFAULT_GROUPBY_MEMORY_THRESHOLD',
+    'DEFAULT_WINDOW_PER_OPERATOR',
+    'DEFAULT_WINDOW_TOTAL',
+    'DEFAULT_SPILL_PATH',
+]

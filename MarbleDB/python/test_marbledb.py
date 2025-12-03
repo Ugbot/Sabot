@@ -32,7 +32,7 @@ def test_basic_operations():
         print("✓ Created database options")
 
         # Open database
-        db = marbledb.MarbleDB.open(options)
+        db = marbledb.PyMarbleDB.open(options)
         print("✓ Opened database")
 
         # Create schema
@@ -96,7 +96,7 @@ def test_iterator():
         options.db_path = test_path
         options.enable_wal = True
 
-        db = marbledb.MarbleDB.open(options)
+        db = marbledb.PyMarbleDB.open(options)
         print("✓ Opened database")
 
         # Create schema
@@ -164,7 +164,7 @@ def test_context_manager():
         options.enable_wal = True
 
         # Use context manager
-        with marbledb.MarbleDB.open(options) as db:
+        with marbledb.PyMarbleDB.open(options) as db:
             print("✓ Opened database with context manager")
 
             schema = pa.schema([
@@ -238,7 +238,7 @@ def test_large_batch():
         options.db_path = test_path
         options.enable_wal = True
 
-        db = marbledb.MarbleDB.open(options)
+        db = marbledb.PyMarbleDB.open(options)
         print("✓ Opened database")
 
         schema = pa.schema([
@@ -281,6 +281,206 @@ def test_large_batch():
             print(f"Cleaned up test directory: {test_path}")
 
 
+def test_bitemporal_table_creation():
+    """Test creating a bitemporal table."""
+    print("=" * 60)
+    print("Test 6: Bitemporal Table Creation")
+    print("=" * 60)
+
+    test_path = tempfile.mkdtemp(prefix="marbledb_bitemporal_test_")
+    print(f"Test database path: {test_path}")
+
+    try:
+        # Open database
+        db = marbledb.open_database(test_path)
+        print("✓ Opened database with open_database()")
+
+        # Create bitemporal table
+        schema = pa.schema([
+            pa.field('employee_id', pa.string()),
+            pa.field('salary', pa.float64()),
+        ])
+
+        caps = marbledb.PyTableCapabilities.bitemporal(max_versions=5)
+        print(f"✓ Created bitemporal capabilities (max_versions={caps.max_versions_per_key})")
+
+        db.create_table("employees", schema, caps)
+        print("✓ Created bitemporal table 'employees'")
+
+        # Insert some data
+        emp_ids = pa.array(['EMP001', 'EMP002', 'EMP003'], type=pa.string())
+        salaries = pa.array([50000.0, 60000.0, 70000.0], type=pa.float64())
+        batch = pa.RecordBatch.from_arrays([emp_ids, salaries], schema=schema)
+
+        db.insert_batch('employees', batch)
+        print(f"✓ Inserted {batch.num_rows} employee records")
+
+        # Flush and close
+        db.flush()
+        db.close()
+        print("✓ Flushed and closed database")
+
+        print("\n✅ Test 6 PASSED\n")
+
+    finally:
+        if os.path.exists(test_path):
+            shutil.rmtree(test_path)
+            print(f"Cleaned up test directory: {test_path}")
+
+
+def test_temporal_scan_dedup():
+    """Test temporal scan with deduplication."""
+    print("=" * 60)
+    print("Test 7: Temporal Scan Dedup")
+    print("=" * 60)
+
+    test_path = tempfile.mkdtemp(prefix="marbledb_temporal_scan_test_")
+    print(f"Test database path: {test_path}")
+
+    try:
+        # Open database
+        db = marbledb.open_database(test_path)
+        print("✓ Opened database")
+
+        # Create bitemporal table
+        schema = pa.schema([
+            pa.field('employee_id', pa.string()),
+            pa.field('salary', pa.float64()),
+        ])
+
+        caps = marbledb.PyTableCapabilities.bitemporal()
+        db.create_table("employees", schema, caps)
+        print("✓ Created bitemporal table")
+
+        # Insert initial data
+        emp_ids = pa.array(['EMP001'], type=pa.string())
+        salaries = pa.array([50000.0], type=pa.float64())
+        batch = pa.RecordBatch.from_arrays([emp_ids, salaries], schema=schema)
+        db.insert_batch('employees', batch)
+        print("✓ Inserted initial employee (salary: $50,000)")
+
+        # Update salary (creates a new version)
+        key_batch = pa.RecordBatch.from_arrays(
+            [pa.array(['EMP001'], type=pa.string())],
+            schema=pa.schema([pa.field('employee_id', pa.string())])
+        )
+        updated_batch = pa.RecordBatch.from_arrays(
+            [pa.array(['EMP001'], type=pa.string()),
+             pa.array([65000.0], type=pa.float64())],
+            schema=schema
+        )
+        db.temporal_update('employees', ['employee_id'], key_batch, updated_batch)
+        print("✓ Updated salary to $65,000 (created new version)")
+
+        # Another update
+        updated_batch2 = pa.RecordBatch.from_arrays(
+            [pa.array(['EMP001'], type=pa.string()),
+             pa.array([75000.0], type=pa.float64())],
+            schema=schema
+        )
+        db.temporal_update('employees', ['employee_id'], key_batch, updated_batch2)
+        print("✓ Updated salary to $75,000 (created another version)")
+
+        # Query with deduplication - should only see latest version
+        result = db.temporal_scan_dedup('employees', ['employee_id'])
+        table = result.to_table()
+        print(f"✓ Temporal scan returned {table.num_rows} row(s) (should be 1)")
+
+        if table.num_rows != 1:
+            raise AssertionError(f"Expected 1 row, got {table.num_rows}")
+
+        # Verify we got the latest salary
+        salary = table.column('salary')[0].as_py()
+        print(f"  Current salary: ${salary:,.0f}")
+        if salary != 75000.0:
+            raise AssertionError(f"Expected salary $75,000, got ${salary}")
+
+        db.close()
+        print("✓ Closed database")
+
+        print("\n✅ Test 7 PASSED\n")
+
+    finally:
+        if os.path.exists(test_path):
+            shutil.rmtree(test_path)
+            print(f"Cleaned up test directory: {test_path}")
+
+
+def test_prune_versions():
+    """Test version pruning."""
+    print("=" * 60)
+    print("Test 8: Prune Versions")
+    print("=" * 60)
+
+    test_path = tempfile.mkdtemp(prefix="marbledb_prune_test_")
+    print(f"Test database path: {test_path}")
+
+    try:
+        # Open database
+        db = marbledb.open_database(test_path)
+        print("✓ Opened database")
+
+        # Create bitemporal table with max 2 versions
+        schema = pa.schema([
+            pa.field('employee_id', pa.string()),
+            pa.field('salary', pa.float64()),
+        ])
+
+        caps = marbledb.PyTableCapabilities.bitemporal(
+            max_versions=2,
+            gc_policy=marbledb.GC_KEEP_RECENT
+        )
+        db.create_table("employees", schema, caps)
+        print("✓ Created bitemporal table (max 2 versions)")
+
+        # Insert initial data
+        emp_ids = pa.array(['EMP001'], type=pa.string())
+        salaries = pa.array([50000.0], type=pa.float64())
+        batch = pa.RecordBatch.from_arrays([emp_ids, salaries], schema=schema)
+        db.insert_batch('employees', batch)
+
+        # Create 5 versions via updates
+        key_batch = pa.RecordBatch.from_arrays(
+            [pa.array(['EMP001'], type=pa.string())],
+            schema=pa.schema([pa.field('employee_id', pa.string())])
+        )
+
+        for i in range(1, 5):
+            updated_batch = pa.RecordBatch.from_arrays(
+                [pa.array(['EMP001'], type=pa.string()),
+                 pa.array([50000.0 + i * 5000], type=pa.float64())],
+                schema=schema
+            )
+            db.temporal_update('employees', ['employee_id'], key_batch, updated_batch)
+
+        db.flush()
+        print("✓ Created 5 versions of employee salary")
+
+        # Prune to keep only 2 most recent versions
+        removed = db.prune_versions('employees', max_versions_per_key=2)
+        print(f"✓ Prune removed {removed} old version(s)")
+
+        # Verify current state still works
+        result = db.temporal_scan_dedup('employees', ['employee_id'])
+        table = result.to_table()
+        salary = table.column('salary')[0].as_py()
+        print(f"  Current salary after prune: ${salary:,.0f}")
+
+        # Should still have the latest salary (50000 + 4*5000 = 70000)
+        if salary != 70000.0:
+            raise AssertionError(f"Expected salary $70,000 after prune, got ${salary}")
+
+        db.close()
+        print("✓ Closed database")
+
+        print("\n✅ Test 8 PASSED\n")
+
+    finally:
+        if os.path.exists(test_path):
+            shutil.rmtree(test_path)
+            print(f"Cleaned up test directory: {test_path}")
+
+
 def main():
     """Run all tests."""
     print("\n" + "=" * 60)
@@ -293,6 +493,9 @@ def main():
         test_context_manager,
         test_triple_keys,
         test_large_batch,
+        test_bitemporal_table_creation,
+        test_temporal_scan_dedup,
+        test_prune_versions,
     ]
 
     passed = 0

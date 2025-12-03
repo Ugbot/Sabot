@@ -10,6 +10,13 @@
 #include <marble/table.h>
 #include <marble/analytics.h>
 
+// Arrow Acero for join operations
+#ifdef MARBLE_HAS_ACERO
+#include <arrow/acero/api.h>
+#include <arrow/acero/exec_plan.h>
+#include <arrow/acero/options.h>
+#endif
+
 namespace marble {
 
 // Forward declarations for internal classes
@@ -898,6 +905,234 @@ std::unique_ptr<AdvancedQueryPlanner> CreateAdvancedQueryPlanner() {
 ComplexQueryBuilder CreateComplexQueryBuilder() {
     return ComplexQueryBuilder();
 }
+
+//==============================================================================
+// Standalone Join Functions Implementation
+//==============================================================================
+
+#ifdef MARBLE_HAS_ACERO
+
+namespace {
+
+// Helper to convert MarbleDB JoinType to Acero JoinType
+arrow::acero::JoinType MapJoinType(JoinType type) {
+    switch (type) {
+        case JoinType::kInner: return arrow::acero::JoinType::INNER;
+        case JoinType::kLeft:  return arrow::acero::JoinType::LEFT_OUTER;
+        case JoinType::kRight: return arrow::acero::JoinType::RIGHT_OUTER;
+        case JoinType::kFull:  return arrow::acero::JoinType::FULL_OUTER;
+        case JoinType::kCross: return arrow::acero::JoinType::INNER; // No keys = cross
+        default: return arrow::acero::JoinType::INNER;
+    }
+}
+
+// Helper to convert string column names to FieldRef
+std::vector<arrow::FieldRef> ToFieldRefs(const std::vector<std::string>& columns) {
+    std::vector<arrow::FieldRef> refs;
+    refs.reserve(columns.size());
+    for (const auto& col : columns) {
+        refs.push_back(arrow::FieldRef(col));
+    }
+    return refs;
+}
+
+} // anonymous namespace
+
+Status HashJoin(
+    std::shared_ptr<arrow::Table> left,
+    std::shared_ptr<arrow::Table> right,
+    const std::vector<std::string>& left_keys,
+    const std::vector<std::string>& right_keys,
+    JoinType join_type,
+    const std::string& left_suffix,
+    const std::string& right_suffix,
+    std::shared_ptr<arrow::Table>* result) {
+
+    if (!left || !right) {
+        return Status::InvalidArgument("Input tables cannot be null");
+    }
+
+    if (left_keys.empty() || right_keys.empty()) {
+        return Status::InvalidArgument("Key columns cannot be empty");
+    }
+
+    if (left_keys.size() != right_keys.size()) {
+        return Status::InvalidArgument("Left and right key column counts must match");
+    }
+
+    // Validate key columns exist
+    for (const auto& key : left_keys) {
+        if (left->schema()->GetFieldIndex(key) < 0) {
+            return Status::InvalidArgument("Left key column not found: " + key);
+        }
+    }
+    for (const auto& key : right_keys) {
+        if (right->schema()->GetFieldIndex(key) < 0) {
+            return Status::InvalidArgument("Right key column not found: " + key);
+        }
+    }
+
+    // Build key field references
+    auto left_key_refs = ToFieldRefs(left_keys);
+    auto right_key_refs = ToFieldRefs(right_keys);
+
+    // Create hash join options
+    arrow::acero::HashJoinNodeOptions join_opts(
+        MapJoinType(join_type),
+        left_key_refs,
+        right_key_refs,
+        arrow::compute::literal(true),  // No filter
+        left_suffix,
+        right_suffix
+    );
+
+    // Build execution plan using Declaration API
+    arrow::acero::Declaration left_source{
+        "table_source",
+        arrow::acero::TableSourceNodeOptions{left}
+    };
+    arrow::acero::Declaration right_source{
+        "table_source",
+        arrow::acero::TableSourceNodeOptions{right}
+    };
+    arrow::acero::Declaration join{
+        "hashjoin",
+        {std::move(left_source), std::move(right_source)},
+        std::move(join_opts)
+    };
+
+    // Execute and collect result
+    auto table_result = arrow::acero::DeclarationToTable(std::move(join));
+    if (!table_result.ok()) {
+        return Status::FromArrowStatus(table_result.status());
+    }
+
+    *result = *table_result;
+    return Status::OK();
+}
+
+Status HashJoin(
+    std::shared_ptr<arrow::Table> left,
+    std::shared_ptr<arrow::Table> right,
+    const std::vector<std::string>& on_keys,
+    JoinType join_type,
+    std::shared_ptr<arrow::Table>* result) {
+
+    // Use same keys for both tables, with default suffixes
+    return HashJoin(left, right, on_keys, on_keys, join_type, "", "_right", result);
+}
+
+Status AsofJoin(
+    std::shared_ptr<arrow::Table> left,
+    std::shared_ptr<arrow::Table> right,
+    const AsofJoinSpec& spec,
+    std::shared_ptr<arrow::Table>* result) {
+
+    if (!left || !right) {
+        return Status::InvalidArgument("Input tables cannot be null");
+    }
+
+    if (spec.time_column.empty()) {
+        return Status::InvalidArgument("Time column must be specified");
+    }
+
+    // Validate time column exists in both tables
+    int left_time_idx = left->schema()->GetFieldIndex(spec.time_column);
+    int right_time_idx = right->schema()->GetFieldIndex(spec.time_column);
+
+    if (left_time_idx < 0) {
+        return Status::InvalidArgument("Time column not found in left table: " + spec.time_column);
+    }
+    if (right_time_idx < 0) {
+        return Status::InvalidArgument("Time column not found in right table: " + spec.time_column);
+    }
+
+    // Validate by columns exist
+    for (const auto& by_col : spec.by_columns) {
+        if (left->schema()->GetFieldIndex(by_col) < 0) {
+            return Status::InvalidArgument("By column not found in left table: " + by_col);
+        }
+        if (right->schema()->GetFieldIndex(by_col) < 0) {
+            return Status::InvalidArgument("By column not found in right table: " + by_col);
+        }
+    }
+
+    // Build ASOF join keys
+    arrow::acero::AsofJoinNodeOptions::Keys left_keys;
+    left_keys.on_key = arrow::FieldRef(spec.time_column);
+    for (const auto& by_col : spec.by_columns) {
+        left_keys.by_key.push_back(arrow::FieldRef(by_col));
+    }
+
+    arrow::acero::AsofJoinNodeOptions::Keys right_keys;
+    right_keys.on_key = arrow::FieldRef(spec.time_column);
+    for (const auto& by_col : spec.by_columns) {
+        right_keys.by_key.push_back(arrow::FieldRef(by_col));
+    }
+
+    // Create ASOF join options
+    arrow::acero::AsofJoinNodeOptions asof_opts(
+        {left_keys, right_keys},
+        spec.tolerance
+    );
+
+    // Build execution plan
+    arrow::acero::Declaration left_source{
+        "table_source",
+        arrow::acero::TableSourceNodeOptions{left}
+    };
+    arrow::acero::Declaration right_source{
+        "table_source",
+        arrow::acero::TableSourceNodeOptions{right}
+    };
+    arrow::acero::Declaration join{
+        "asofjoin",
+        {std::move(left_source), std::move(right_source)},
+        std::move(asof_opts)
+    };
+
+    // Execute and collect result
+    auto table_result = arrow::acero::DeclarationToTable(std::move(join));
+    if (!table_result.ok()) {
+        return Status::FromArrowStatus(table_result.status());
+    }
+
+    *result = *table_result;
+    return Status::OK();
+}
+
+#else // MARBLE_HAS_ACERO not defined
+
+Status HashJoin(
+    std::shared_ptr<arrow::Table> /*left*/,
+    std::shared_ptr<arrow::Table> /*right*/,
+    const std::vector<std::string>& /*left_keys*/,
+    const std::vector<std::string>& /*right_keys*/,
+    JoinType /*join_type*/,
+    const std::string& /*left_suffix*/,
+    const std::string& /*right_suffix*/,
+    std::shared_ptr<arrow::Table>* /*result*/) {
+    return Status::NotImplemented("HashJoin requires Arrow Acero (MARBLE_HAS_ACERO not defined)");
+}
+
+Status HashJoin(
+    std::shared_ptr<arrow::Table> /*left*/,
+    std::shared_ptr<arrow::Table> /*right*/,
+    const std::vector<std::string>& /*on_keys*/,
+    JoinType /*join_type*/,
+    std::shared_ptr<arrow::Table>* /*result*/) {
+    return Status::NotImplemented("HashJoin requires Arrow Acero (MARBLE_HAS_ACERO not defined)");
+}
+
+Status AsofJoin(
+    std::shared_ptr<arrow::Table> /*left*/,
+    std::shared_ptr<arrow::Table> /*right*/,
+    const AsofJoinSpec& /*spec*/,
+    std::shared_ptr<arrow::Table>* /*result*/) {
+    return Status::NotImplemented("AsofJoin requires Arrow Acero (MARBLE_HAS_ACERO not defined)");
+}
+
+#endif // MARBLE_HAS_ACERO
 
 } // namespace marble
 

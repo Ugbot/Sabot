@@ -39,16 +39,18 @@ except ImportError:
 # State management (old imports - maintain backward compatibility)
 try:
     from .stores import (
-        BackendConfig,
+        StoreBackendConfig as BackendConfig,  # Renamed for backward compat
         MemoryBackend,
-        OptimizedMemoryBackend,
-        RocksDBBackend,
+        UltraFastMemoryBackend as OptimizedMemoryBackend,  # Renamed for backward compat
+        MarbleDBStoreBackend,  # Primary backend (3.30x faster reads than RocksDB)
+        RocksDBBackend,        # Fallback
     )
 except ImportError:
     # New unified state system doesn't have these yet
     BackendConfig = None
     MemoryBackend = None
     OptimizedMemoryBackend = None
+    MarbleDBStoreBackend = None
     RocksDBBackend = None
 
 try:
@@ -145,7 +147,8 @@ __all__ = [
     "BackendConfig",
     "MemoryBackend",
     "OptimizedMemoryBackend",
-    "RocksDBBackend",
+    "MarbleDBStoreBackend",  # Primary backend
+    "RocksDBBackend",        # Fallback
     "ValueState",
     "MapState",
     "ListState",

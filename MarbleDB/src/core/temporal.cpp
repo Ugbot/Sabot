@@ -18,6 +18,8 @@ limitations under the License.
 #include "marble/table.h"
 #include "marble/table_capabilities.h"
 #include "marble/metrics.h"
+#include "marble/db.h"
+#include "marble/api.h"
 #include <arrow/api.h>
 #include <arrow/compute/api.h>
 #include <filesystem>
@@ -149,18 +151,43 @@ class TemporalDatabaseImpl;
 
 /**
  * @brief Temporal table implementation with bitemporal versioning
+ *
+ * Supports two storage modes:
+ * 1. In-memory (legacy): Data stored in table_data_ for testing/MVP
+ * 2. Persistent (LSM): Data stored via MarbleDB's LSM tree
  */
 class TemporalTableImpl : public TemporalTable {
 public:
+    // Legacy constructor - in-memory storage
     TemporalTableImpl(const std::string& base_path, const TableSchema& schema, TemporalModel model)
         : base_path_(base_path)
         , schema_(schema)
         , model_(model)
-        , current_version_(0) {
+        , current_version_(0)
+        , db_(nullptr)
+        , use_persistent_storage_(false) {
         table_path_ = base_path_ + "/" + schema_.table_name;
         fs::create_directories(table_path_);
 
         // Initialize with system time columns if needed
+        InitializeTemporalSchema();
+        LoadSnapshots();
+    }
+
+    // New constructor - persistent storage via MarbleDB
+    TemporalTableImpl(MarbleDB* db, const std::string& table_name,
+                     const TableSchema& schema, TemporalModel model)
+        : base_path_("")
+        , schema_(schema)
+        , model_(model)
+        , current_version_(0)
+        , db_(db)
+        , use_persistent_storage_(true) {
+        // Table already created in MarbleDB with augmented schema
+        // Just need to track temporal metadata locally
+        table_path_ = "/tmp/marble_temporal/" + table_name;
+        fs::create_directories(table_path_);
+
         InitializeTemporalSchema();
         LoadSnapshots();
     }
@@ -374,30 +401,49 @@ private:
     const TableSchema& GetSchema() const { return schema_; }
 
     Status Append(const arrow::RecordBatch& batch) {
-        // For MVP, just store in memory
-        // FIXME: Simplified for MVP - proper error handling needed
+        // ★★★ PERSISTENT STORAGE PATH - Use MarbleDB LSM ★★★
+        if (use_persistent_storage_ && db_) {
+            // Create a copy via Make() since RecordBatch is abstract
+            auto batch_ptr = arrow::RecordBatch::Make(
+                batch.schema(), batch.num_rows(), batch.columns());
+
+            // Insert via MarbleDB's LSM tree
+            return db_->InsertBatch(schema_.table_name, batch_ptr);
+        }
+
+        // ★★★ LEGACY IN-MEMORY PATH - For backwards compatibility ★★★
         auto batch_ptr = arrow::RecordBatch::Make(batch.schema(), batch.num_rows(), batch.columns());
 
         if (!table_data_) {
-            // Create table from record batch
-            // FIXME: Simplified for MVP - proper error handling needed
             auto table_result = arrow::Table::FromRecordBatches({batch_ptr});
+            if (!table_result.ok()) {
+                return Status::FromArrowStatus(table_result.status());
+            }
             table_data_ = table_result.ValueUnsafe();
         } else {
-            // Concatenate with existing data
-            // FIXME: Simplified for MVP - proper error handling needed
             auto new_table_result = arrow::Table::FromRecordBatches({batch_ptr});
+            if (!new_table_result.ok()) {
+                return Status::FromArrowStatus(new_table_result.status());
+            }
             auto new_table = new_table_result.ValueUnsafe();
-            // FIXME: Simplified for MVP - proper error handling needed
             auto combined = arrow::ConcatenateTables({table_data_, new_table});
+            if (!combined.ok()) {
+                return Status::FromArrowStatus(combined.status());
+            }
             table_data_ = combined.ValueUnsafe();
         }
         return Status::OK();
     }
 
     Status Scan(const ScanSpec& spec, std::unique_ptr<QueryResult>* result) {
+        // ★★★ PERSISTENT STORAGE PATH - Use MarbleDB LSM ★★★
+        if (use_persistent_storage_ && db_) {
+            return db_->ScanTable(schema_.table_name, result);
+        }
+
+        // ★★★ LEGACY IN-MEMORY PATH - For backwards compatibility ★★★
         if (!table_data_) {
-            auto empty_table_result = arrow::Table::MakeEmpty(schema_.arrow_schema);
+            auto empty_table_result = arrow::Table::MakeEmpty(temporal_schema_);
             if (!empty_table_result.ok()) {
                 return Status::FromArrowStatus(empty_table_result.status());
             }
@@ -430,7 +476,11 @@ private:
     std::vector<SnapshotId> snapshots_;
     uint64_t current_version_;
 
-    // In-memory table data for MVP
+    // ★★★ PERSISTENT STORAGE - MarbleDB LSM tree ★★★
+    MarbleDB* db_;                      // Non-owning pointer to MarbleDB instance
+    bool use_persistent_storage_;       // True = use LSM, False = use in-memory
+
+    // In-memory table data for legacy/testing mode
     std::shared_ptr<arrow::Table> table_data_;
 };
 
@@ -580,6 +630,15 @@ std::shared_ptr<TemporalTable> CreateTemporalTable(const std::string& base_path,
                                                   const TableSchema& schema,
                                                   TemporalModel model) {
     return std::make_shared<TemporalTableImpl>(base_path, schema, model);
+}
+
+// ★★★ NEW: Factory function for persistent temporal table backed by MarbleDB ★★★
+std::shared_ptr<TemporalTable> CreatePersistentTemporalTable(
+    MarbleDB* db,
+    const std::string& table_name,
+    const TableSchema& schema,
+    TemporalModel model) {
+    return std::make_shared<TemporalTableImpl>(db, table_name, schema, model);
 }
 
 // Helper function to configure temporal features from TableCapabilities

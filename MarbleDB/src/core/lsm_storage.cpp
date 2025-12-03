@@ -377,11 +377,26 @@ Status StandardLSMTree::Scan(uint64_t start_key, uint64_t end_key,
 Status StandardLSMTree::Flush() {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    if (!active_memtable_ || active_memtable_->GetEntryCount() == 0) {
-        return Status::OK();
+    Status status = Status::OK();
+
+    // Flush regular memtable if it has data
+    if (active_memtable_ && active_memtable_->GetEntryCount() > 0) {
+        status = SwitchMemTable();
+        if (!status.ok()) {
+            return status;
+        }
     }
 
-    return SwitchMemTable();
+    // ★★★ ALSO FLUSH ARROW BATCH MEMTABLE ★★★
+    // This is critical for batch-based writes (InsertBatch, PutBatch)
+    if (arrow_active_memtable_) {
+        status = SwitchBatchMemTable();
+        if (!status.ok()) {
+            return status;
+        }
+    }
+
+    return Status::OK();
 }
 
 Status StandardLSMTree::Compact(uint64_t level) {

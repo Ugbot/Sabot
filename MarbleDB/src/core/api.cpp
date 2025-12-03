@@ -31,10 +31,15 @@
 #include <arrow/api.h>
 #include <arrow/ipc/api.h>
 #include <arrow/io/api.h>
+#include <arrow/compute/api.h>
 #include <unordered_map>
 #include <mutex>
 #include <sstream>
 #include <iostream>
+#include <fstream>
+#include <chrono>
+#include <atomic>
+#include <limits>
 
 namespace marble {
 
@@ -227,23 +232,32 @@ public:
         mvcc_manager_owned_ = CreateMVCCManager(CreateDefaultTimestampProvider());
         mvcc_manager_ = mvcc_manager_owned_.get();
 
-        // ★★★ CREATE DEFAULT COLUMN FAMILY ★★★
+        // ★★★ LOAD PERSISTED COLUMN FAMILIES ★★★
+        // Restore column families from registry file (if exists)
+        status = LoadColumnFamilyRegistry();
+        if (!status.ok()) {
+            throw std::runtime_error("Failed to load column family registry: " + status.ToString());
+        }
+
+        // ★★★ CREATE DEFAULT COLUMN FAMILY (only if not loaded from registry) ★★★
         // Create a default column family with a generic schema so that Get() without
         // a column family handle will work
-        auto default_schema = arrow::schema({
-            arrow::field("key", arrow::uint64()),
-            arrow::field("value", arrow::binary())
-        });
+        if (column_families_.find("default") == column_families_.end()) {
+            auto default_schema = arrow::schema({
+                arrow::field("key", arrow::uint64()),
+                arrow::field("value", arrow::binary())
+            });
 
-        ColumnFamilyOptions default_options;
-        default_options.schema = default_schema;
-        ColumnFamilyDescriptor default_descriptor("default", default_options);
-        ColumnFamilyHandle* default_handle = nullptr;
+            ColumnFamilyOptions default_options;
+            default_options.schema = default_schema;
+            ColumnFamilyDescriptor default_descriptor("default", default_options);
+            ColumnFamilyHandle* default_handle = nullptr;
 
-        // Create the default column family (ignore errors - it might already exist)
-        auto create_status = CreateColumnFamily(default_descriptor, &default_handle);
-        if (create_status.ok() && default_handle) {
-            delete default_handle;  // We don't need the handle
+            // Create the default column family
+            auto create_status = CreateColumnFamily(default_descriptor, &default_handle);
+            if (create_status.ok() && default_handle) {
+                delete default_handle;  // We don't need the handle
+            }
         }
     }
 
@@ -260,6 +274,9 @@ public:
         uint64_t next_batch_id = 0;  // Sequential batch ID for LSM storage
         std::shared_ptr<SkippingIndex> skipping_index;
         std::shared_ptr<BloomFilter> bloom_filter;
+
+        // Table capabilities (temporal model, MVCC settings, etc.)
+        TableCapabilities capabilities;
 
         // Secondary index: maps row keys to (batch_id, row_offset) pairs
         // This enables individual row lookups via Get/Put/Delete operations
@@ -309,11 +326,17 @@ public:
 
         ColumnFamilyInfo(std::string n, std::shared_ptr<arrow::Schema> s, uint32_t i)
             : name(std::move(n)), schema(std::move(s)), id(i) {
-            // Auto-configure optimizations based on schema
-            TableCapabilities caps;  // Use default capabilities
+            // Auto-configure optimizations based on schema with default capabilities
             WorkloadHints hints;
-            // Let factory auto-detect from schema
-            optimization_pipeline = OptimizationFactory::CreateForSchema(s, caps, hints);
+            optimization_pipeline = OptimizationFactory::CreateForSchema(schema, capabilities, hints);
+        }
+
+        ColumnFamilyInfo(std::string n, std::shared_ptr<arrow::Schema> s, uint32_t i,
+                        const TableCapabilities& caps)
+            : name(std::move(n)), schema(std::move(s)), id(i), capabilities(caps) {
+            // Configure optimizations based on schema and capabilities
+            WorkloadHints hints;
+            optimization_pipeline = OptimizationFactory::CreateForSchema(schema, capabilities, hints);
         }
 
         // Flush buffered records to LSM tree and update secondary index
@@ -1338,6 +1361,191 @@ public:
     }
 
 private:
+    /**
+     * @brief Augment a user-provided batch with temporal columns
+     *
+     * For temporal tables, users provide batches with only their data columns.
+     * This method adds the temporal columns with appropriate default values:
+     * - _system_time_start: current timestamp
+     * - _system_time_end: max timestamp (infinity)
+     * - _system_version: incremented version
+     * - _valid_time_start: current timestamp (for valid-time or bitemporal)
+     * - _valid_time_end: max timestamp (infinity)
+     * - _is_deleted: false
+     */
+    Status AugmentBatchWithTemporalColumns(
+        const std::shared_ptr<arrow::RecordBatch>& user_batch,
+        ColumnFamilyInfo* cf_info,
+        std::shared_ptr<arrow::RecordBatch>* augmented_batch) {
+
+        int64_t num_rows = user_batch->num_rows();
+
+        // Get current time in microseconds
+        auto now = std::chrono::system_clock::now();
+        auto now_us = std::chrono::duration_cast<std::chrono::microseconds>(
+            now.time_since_epoch()).count();
+        int64_t max_time = std::numeric_limits<int64_t>::max();
+
+        // Increment version
+        static std::atomic<int64_t> version_counter{1};
+        int64_t version = version_counter.fetch_add(1);
+
+        // Start with user columns
+        std::vector<std::shared_ptr<arrow::Array>> columns(user_batch->columns().begin(),
+                                                          user_batch->columns().end());
+        std::vector<std::shared_ptr<arrow::Field>> fields(user_batch->schema()->fields().begin(),
+                                                         user_batch->schema()->fields().end());
+
+        auto temporal_model = cf_info->capabilities.temporal_model;
+
+        // Add system time columns for system-time or bitemporal
+        if (temporal_model == TableCapabilities::TemporalModel::kBitemporal ||
+            temporal_model == TableCapabilities::TemporalModel::kSystemTime) {
+
+            // _system_time_start: current time
+            arrow::TimestampBuilder start_builder(arrow::timestamp(arrow::TimeUnit::MICRO),
+                                                  arrow::default_memory_pool());
+            for (int64_t i = 0; i < num_rows; ++i) {
+                ARROW_RETURN_NOT_OK(start_builder.Append(now_us));
+            }
+            std::shared_ptr<arrow::Array> start_array;
+            ARROW_RETURN_NOT_OK(start_builder.Finish(&start_array));
+            columns.push_back(start_array);
+            fields.push_back(arrow::field("_system_time_start", arrow::timestamp(arrow::TimeUnit::MICRO)));
+
+            // _system_time_end: max time (infinity)
+            arrow::TimestampBuilder end_builder(arrow::timestamp(arrow::TimeUnit::MICRO),
+                                               arrow::default_memory_pool());
+            for (int64_t i = 0; i < num_rows; ++i) {
+                ARROW_RETURN_NOT_OK(end_builder.Append(max_time));
+            }
+            std::shared_ptr<arrow::Array> end_array;
+            ARROW_RETURN_NOT_OK(end_builder.Finish(&end_array));
+            columns.push_back(end_array);
+            fields.push_back(arrow::field("_system_time_end", arrow::timestamp(arrow::TimeUnit::MICRO)));
+
+            // _system_version: incremented version
+            arrow::Int64Builder version_builder;
+            for (int64_t i = 0; i < num_rows; ++i) {
+                ARROW_RETURN_NOT_OK(version_builder.Append(version));
+            }
+            std::shared_ptr<arrow::Array> version_array;
+            ARROW_RETURN_NOT_OK(version_builder.Finish(&version_array));
+            columns.push_back(version_array);
+            fields.push_back(arrow::field("_system_version", arrow::int64()));
+        }
+
+        // Add valid time columns for valid-time or bitemporal
+        if (temporal_model == TableCapabilities::TemporalModel::kBitemporal ||
+            temporal_model == TableCapabilities::TemporalModel::kValidTime) {
+
+            // Check if user provided explicit valid time columns in input
+            int user_valid_start_idx = user_batch->schema()->GetFieldIndex("_valid_time_start");
+            int user_valid_end_idx = user_batch->schema()->GetFieldIndex("_valid_time_end");
+
+            if (user_valid_start_idx >= 0 && user_valid_end_idx >= 0) {
+                // User provided valid time - use their values
+                // The columns are already in the user_batch columns vector
+                // Just add them to fields with proper typing
+                auto valid_start_col = user_batch->column(user_valid_start_idx);
+                auto valid_end_col = user_batch->column(user_valid_end_idx);
+
+                // Convert to timestamp type if needed (user may have provided as uint64)
+                if (valid_start_col->type()->id() == arrow::Type::UINT64) {
+                    // Cast uint64 to timestamp
+                    arrow::TimestampBuilder valid_start_builder(arrow::timestamp(arrow::TimeUnit::MICRO),
+                                                                arrow::default_memory_pool());
+                    auto uint_arr = std::static_pointer_cast<arrow::UInt64Array>(valid_start_col);
+                    for (int64_t i = 0; i < num_rows; ++i) {
+                        ARROW_RETURN_NOT_OK(valid_start_builder.Append(static_cast<int64_t>(uint_arr->Value(i))));
+                    }
+                    std::shared_ptr<arrow::Array> valid_start_array;
+                    ARROW_RETURN_NOT_OK(valid_start_builder.Finish(&valid_start_array));
+                    columns.push_back(valid_start_array);
+                } else {
+                    columns.push_back(valid_start_col);
+                }
+                fields.push_back(arrow::field("_valid_time_start", arrow::timestamp(arrow::TimeUnit::MICRO)));
+
+                if (valid_end_col->type()->id() == arrow::Type::UINT64) {
+                    // Cast uint64 to timestamp
+                    arrow::TimestampBuilder valid_end_builder(arrow::timestamp(arrow::TimeUnit::MICRO),
+                                                              arrow::default_memory_pool());
+                    auto uint_arr = std::static_pointer_cast<arrow::UInt64Array>(valid_end_col);
+                    for (int64_t i = 0; i < num_rows; ++i) {
+                        ARROW_RETURN_NOT_OK(valid_end_builder.Append(static_cast<int64_t>(uint_arr->Value(i))));
+                    }
+                    std::shared_ptr<arrow::Array> valid_end_array;
+                    ARROW_RETURN_NOT_OK(valid_end_builder.Finish(&valid_end_array));
+                    columns.push_back(valid_end_array);
+                } else {
+                    columns.push_back(valid_end_col);
+                }
+                fields.push_back(arrow::field("_valid_time_end", arrow::timestamp(arrow::TimeUnit::MICRO)));
+
+                // Remove the user-provided valid time columns from the earlier position
+                // (they were copied when we initialized columns from user_batch)
+                // Find and remove them by rebuilding the columns/fields vectors
+                std::vector<std::shared_ptr<arrow::Array>> filtered_columns;
+                std::vector<std::shared_ptr<arrow::Field>> filtered_fields;
+                for (size_t i = 0; i < columns.size(); ++i) {
+                    std::string field_name = fields[i]->name();
+                    // Skip the user-provided valid time columns in their original position
+                    // (we'll keep them at the end where we just added them)
+                    if (i < static_cast<size_t>(user_batch->num_columns()) &&
+                        (field_name == "_valid_time_start" || field_name == "_valid_time_end")) {
+                        continue;
+                    }
+                    filtered_columns.push_back(columns[i]);
+                    filtered_fields.push_back(fields[i]);
+                }
+                columns = std::move(filtered_columns);
+                fields = std::move(filtered_fields);
+
+            } else {
+                // User did not provide valid time - use defaults
+
+                // _valid_time_start: current time (default valid from now)
+                arrow::TimestampBuilder valid_start_builder(arrow::timestamp(arrow::TimeUnit::MICRO),
+                                                            arrow::default_memory_pool());
+                for (int64_t i = 0; i < num_rows; ++i) {
+                    ARROW_RETURN_NOT_OK(valid_start_builder.Append(now_us));
+                }
+                std::shared_ptr<arrow::Array> valid_start_array;
+                ARROW_RETURN_NOT_OK(valid_start_builder.Finish(&valid_start_array));
+                columns.push_back(valid_start_array);
+                fields.push_back(arrow::field("_valid_time_start", arrow::timestamp(arrow::TimeUnit::MICRO)));
+
+                // _valid_time_end: max time (valid forever by default)
+                arrow::TimestampBuilder valid_end_builder(arrow::timestamp(arrow::TimeUnit::MICRO),
+                                                          arrow::default_memory_pool());
+                for (int64_t i = 0; i < num_rows; ++i) {
+                    ARROW_RETURN_NOT_OK(valid_end_builder.Append(max_time));
+                }
+                std::shared_ptr<arrow::Array> valid_end_array;
+                ARROW_RETURN_NOT_OK(valid_end_builder.Finish(&valid_end_array));
+                columns.push_back(valid_end_array);
+                fields.push_back(arrow::field("_valid_time_end", arrow::timestamp(arrow::TimeUnit::MICRO)));
+            }
+        }
+
+        // Add _is_deleted column (always for temporal tables)
+        arrow::BooleanBuilder deleted_builder;
+        for (int64_t i = 0; i < num_rows; ++i) {
+            ARROW_RETURN_NOT_OK(deleted_builder.Append(false));
+        }
+        std::shared_ptr<arrow::Array> deleted_array;
+        ARROW_RETURN_NOT_OK(deleted_builder.Finish(&deleted_array));
+        columns.push_back(deleted_array);
+        fields.push_back(arrow::field("_is_deleted", arrow::boolean()));
+
+        // Create augmented batch
+        auto augmented_schema = arrow::schema(fields);
+        *augmented_batch = arrow::RecordBatch::Make(augmented_schema, num_rows, columns);
+
+        return Status::OK();
+    }
+
     Status InsertBatchInternal(const std::string& table_name, const std::shared_ptr<arrow::RecordBatch>& batch) {
         std::lock_guard<std::mutex> lock(cf_mutex_);
 
@@ -1349,8 +1557,23 @@ private:
 
         auto* cf_info = it->second.get();
 
+        // ★★★ AUTO-AUGMENT BATCH FOR TEMPORAL TABLES ★★★
+        // If the column family has temporal capabilities, automatically add temporal columns
+        // to user-provided batches that only contain user columns
+        std::shared_ptr<arrow::RecordBatch> augmented_batch = batch;
+        if (cf_info->capabilities.temporal_model != TableCapabilities::TemporalModel::kNone) {
+            // Check if batch needs temporal augmentation
+            // User provides N columns, CF expects N + temporal columns
+            if (batch->num_columns() < cf_info->schema->num_fields()) {
+                auto augment_status = AugmentBatchWithTemporalColumns(batch, cf_info, &augmented_batch);
+                if (!augment_status.ok()) {
+                    return augment_status;
+                }
+            }
+        }
+
         // Validate batch schema matches column family schema
-        if (!batch->schema()->Equals(cf_info->schema)) {
+        if (!augmented_batch->schema()->Equals(cf_info->schema)) {
             return Status::InvalidArgument("Batch schema does not match column family schema for '" + table_name + "'");
         }
 
@@ -1362,7 +1585,7 @@ private:
         auto new_metadata = std::make_shared<arrow::KeyValueMetadata>();
 
         // Copy existing metadata if present
-        auto existing_metadata = batch->schema()->metadata();
+        auto existing_metadata = augmented_batch->schema()->metadata();
         if (existing_metadata) {
             for (int64_t i = 0; i < existing_metadata->size(); ++i) {
                 new_metadata->Append(existing_metadata->key(i), existing_metadata->value(i));
@@ -1374,24 +1597,29 @@ private:
         new_metadata->Append("batch_id", std::to_string(batch_id));
         new_metadata->Append("cf_name", table_name);
 
-        auto schema_with_metadata = batch->schema()->WithMetadata(new_metadata);
+        auto schema_with_metadata = augmented_batch->schema()->WithMetadata(new_metadata);
         auto batch_with_metadata = arrow::RecordBatch::Make(
             schema_with_metadata,
-            batch->num_rows(),
-            batch->columns());
+            augmented_batch->num_rows(),
+            augmented_batch->columns());
 
-        // Write to LSM tree using zero-copy Arrow-native path
-        auto put_status = lsm_tree_->PutBatch(batch_with_metadata);
+        // ★★★ PERSISTENCE PATH ★★★
+        // Use serialization path for proper SSTable persistence.
+        // The Arrow-native PutBatch path doesn't persist across database restarts
+        // because arrow_immutable_memtables_ are in-memory only.
+        std::string serialized_batch;
+        auto serialize_status = SerializeArrowBatch(batch_with_metadata, &serialized_batch);
+        if (!serialize_status.ok()) {
+            return serialize_status;
+        }
+        uint64_t batch_key = EncodeBatchKey(cf_info->id, batch_id);
+        auto put_status = lsm_tree_->Put(batch_key, serialized_batch);
         if (!put_status.ok()) {
             return put_status;
         }
 
-        // LEGACY PATH (preserved for backwards compatibility)
-        // Keep the old serialization path commented out in case we need to revert
-        // std::string serialized_batch;
-        // auto serialize_status = SerializeArrowBatch(batch, &serialized_batch);
-        // uint64_t batch_key = EncodeBatchKey(cf_info->id, batch_id);
-        // auto put_status = lsm_tree_->Put(batch_key, serialized_batch);
+        // ZERO-COPY PATH (disabled - doesn't persist across restarts)
+        // auto put_status = lsm_tree_->PutBatch(batch_with_metadata);
 
         // ★★★ ROW_INDEX DISABLED - COMPOUND KEY SUPPORT NEEDED ★★★
         //
@@ -1499,20 +1727,70 @@ private:
             }
         }
 
+        // ★★★ PERSIST BATCH ID COUNTER ★★★
+        // Save column family registry to ensure next_batch_id is persisted.
+        // This prevents batch key collisions after database reopen.
+        auto save_status = SaveColumnFamilyRegistry();
+        if (!save_status.ok()) {
+            // Log warning but don't fail the insert
+            std::cerr << "Warning: Failed to save CF registry: " << save_status.ToString() << std::endl;
+        }
+
         return Status::OK();
     }
 
 public:
     // Table operations
     Status CreateTable(const TableSchema& schema) override {
-        // Create column family with provided schema
+        // Create column family with provided schema (default capabilities)
+        return CreateTable(schema, TableCapabilities());
+    }
+
+    Status CreateTable(const TableSchema& schema,
+                      const TableCapabilities& caps) override {
+        // Augment schema with temporal columns if bitemporal is enabled
+        std::shared_ptr<arrow::Schema> augmented_schema = schema.arrow_schema;
+
+        auto temporal_model = caps.temporal_model;
+        if (temporal_model == TableCapabilities::TemporalModel::kBitemporal ||
+            temporal_model == TableCapabilities::TemporalModel::kSystemTime ||
+            temporal_model == TableCapabilities::TemporalModel::kValidTime) {
+
+            std::vector<std::shared_ptr<arrow::Field>> fields = schema.arrow_schema->fields();
+
+            // Add system time columns for system-time or bitemporal
+            if (temporal_model == TableCapabilities::TemporalModel::kBitemporal ||
+                temporal_model == TableCapabilities::TemporalModel::kSystemTime) {
+                fields.push_back(arrow::field("_system_time_start",
+                    arrow::timestamp(arrow::TimeUnit::MICRO)));
+                fields.push_back(arrow::field("_system_time_end",
+                    arrow::timestamp(arrow::TimeUnit::MICRO)));
+                fields.push_back(arrow::field("_system_version", arrow::int64()));
+            }
+
+            // Add valid time columns for valid-time or bitemporal
+            if (temporal_model == TableCapabilities::TemporalModel::kBitemporal ||
+                temporal_model == TableCapabilities::TemporalModel::kValidTime) {
+                fields.push_back(arrow::field("_valid_time_start",
+                    arrow::timestamp(arrow::TimeUnit::MICRO)));
+                fields.push_back(arrow::field("_valid_time_end",
+                    arrow::timestamp(arrow::TimeUnit::MICRO)));
+            }
+
+            // Add soft delete flag for all temporal tables
+            fields.push_back(arrow::field("_is_deleted", arrow::boolean()));
+
+            augmented_schema = arrow::schema(fields);
+        }
+
+        // Create column family with augmented schema
         ColumnFamilyOptions options;
-        options.schema = schema.arrow_schema;
+        options.schema = augmented_schema;
 
         ColumnFamilyDescriptor descriptor(schema.table_name, options);
 
         ColumnFamilyHandle* handle = nullptr;
-        auto status = CreateColumnFamily(descriptor, &handle);
+        auto status = CreateColumnFamilyWithCapabilities(descriptor, caps, &handle);
 
         // Clean up handle (we don't need to return it for CreateTable)
         if (handle) {
@@ -1533,42 +1811,39 @@ public:
 
         auto* cf_info = it->second.get();
 
-        // ARROW-NATIVE PATH: Read batches directly without deserialization
+        // ★★★ PERSISTENCE PATH ★★★
+        // Read serialized batches from LSM tree and deserialize.
+        // This path properly reads data persisted via Put() calls.
         std::vector<std::shared_ptr<arrow::RecordBatch>> record_batches;
 
-        // Scan all batches from LSM tree using zero-copy Arrow-native path
-        std::vector<std::shared_ptr<arrow::RecordBatch>> all_batches;
-        auto scan_status = lsm_tree_->ScanSSTablesBatches(0, UINT64_MAX, &all_batches);
+        // Encode key range for this table's batches
+        uint64_t start_key = EncodeBatchKey(cf_info->id, 0);
+        uint64_t end_key = EncodeBatchKey(cf_info->id, UINT64_MAX);
+
+        // Scan LSM tree for serialized batches
+        std::vector<std::pair<uint64_t, std::string>> lsm_results;
+        auto scan_status = lsm_tree_->Scan(start_key, end_key, &lsm_results);
         if (!scan_status.ok()) {
             return scan_status;
         }
 
-        // Filter batches by column family ID using metadata
-        for (const auto& batch : all_batches) {
-            auto metadata = batch->schema()->metadata();
-            if (!metadata) continue;
-
-            // Check if this batch belongs to our column family
-            auto cf_id_index = metadata->FindKey("cf_id");
-            if (cf_id_index == -1) continue;
-
-            auto cf_id_str = metadata->value(cf_id_index);
-            uint64_t batch_cf_id = std::stoull(cf_id_str);
-
-            if (batch_cf_id == cf_info->id) {
-                record_batches.push_back(batch);
+        // Deserialize batches
+        for (const auto& [key, serialized_batch] : lsm_results) {
+            std::shared_ptr<arrow::RecordBatch> batch;
+            auto deserialize_status = DeserializeArrowBatch(
+                serialized_batch.data(),
+                serialized_batch.size(),
+                &batch
+            );
+            if (!deserialize_status.ok()) {
+                return deserialize_status;
             }
+            record_batches.push_back(batch);
         }
 
-        // LEGACY PATH (preserved for backwards compatibility)
-        // The old deserialization path is commented out
-        // std::vector<std::pair<uint64_t, std::string>> lsm_results;
-        // auto scan_status = lsm_tree_->Scan(start_key, end_key, &lsm_results);
-        // for (const auto& [key, serialized_batch] : lsm_results) {
-        //     std::shared_ptr<arrow::RecordBatch> batch;
-        //     auto deserialize_status = DeserializeArrowBatch(...);
-        //     record_batches.push_back(batch);
-        // }
+        // ZERO-COPY PATH (disabled - in-memory only, doesn't persist)
+        // std::vector<std::shared_ptr<arrow::RecordBatch>> all_batches;
+        // lsm_tree_->ScanSSTablesBatches(0, UINT64_MAX, &all_batches);
 
         // Handle empty case
         if (record_batches.empty()) {
@@ -1591,6 +1866,890 @@ public:
         return TableQueryResult::Create(combined_table, result);
     }
 
+    /**
+     * @brief Temporal scan with time-travel and filtering
+     *
+     * Scans a bitemporal table with temporal constraints:
+     * - system_time_at: "AS OF" query - only rows where start <= system_time_at < end
+     * - valid_time range: only rows that overlap with [valid_time_start, valid_time_end)
+     * - include_deleted: whether to include soft-deleted records
+     */
+    Status TemporalScan(const std::string& table_name,
+                       uint64_t system_time_at,
+                       uint64_t valid_time_start,
+                       uint64_t valid_time_end,
+                       bool include_deleted,
+                       std::unique_ptr<QueryResult>* result) override {
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // Find column family
+        auto it = column_families_.find(table_name);
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Column family '" + table_name + "' does not exist");
+        }
+
+        auto* cf_info = it->second.get();
+
+        // Verify table has temporal capabilities
+        if (cf_info->capabilities.temporal_model == TableCapabilities::TemporalModel::kNone) {
+            // For non-temporal tables, fall back to regular scan
+            return ScanTable(table_name, result);
+        }
+
+        // Get current time if system_time_at is 0 (meaning "current")
+        uint64_t query_system_time = system_time_at;
+        if (query_system_time == 0) {
+            auto now = std::chrono::system_clock::now();
+            query_system_time = std::chrono::duration_cast<std::chrono::microseconds>(
+                now.time_since_epoch()).count();
+        }
+
+        // Read all batches from LSM tree
+        std::vector<std::shared_ptr<arrow::RecordBatch>> all_batches;
+        uint64_t start_key = EncodeBatchKey(cf_info->id, 0);
+        uint64_t end_key = EncodeBatchKey(cf_info->id, UINT64_MAX);
+
+        std::vector<std::pair<uint64_t, std::string>> lsm_results;
+        auto scan_status = lsm_tree_->Scan(start_key, end_key, &lsm_results);
+        if (!scan_status.ok()) {
+            return scan_status;
+        }
+
+        // Deserialize batches
+        for (const auto& [key, serialized_batch] : lsm_results) {
+            std::shared_ptr<arrow::RecordBatch> batch;
+            auto deserialize_status = DeserializeArrowBatch(
+                serialized_batch.data(),
+                serialized_batch.size(),
+                &batch
+            );
+            if (!deserialize_status.ok()) continue;
+            all_batches.push_back(batch);
+        }
+
+        // Filter batches based on temporal constraints
+        std::vector<std::shared_ptr<arrow::RecordBatch>> filtered_batches;
+
+        for (const auto& batch : all_batches) {
+            // Get column indices
+            int sys_start_idx = batch->schema()->GetFieldIndex("_system_time_start");
+            int sys_end_idx = batch->schema()->GetFieldIndex("_system_time_end");
+            int valid_start_idx = batch->schema()->GetFieldIndex("_valid_time_start");
+            int valid_end_idx = batch->schema()->GetFieldIndex("_valid_time_end");
+            int is_deleted_idx = batch->schema()->GetFieldIndex("_is_deleted");
+
+            if (sys_start_idx < 0 || sys_end_idx < 0) {
+                // Not a temporal batch, include all rows
+                filtered_batches.push_back(batch);
+                continue;
+            }
+
+            // Build filter mask
+            auto sys_start_arr = std::static_pointer_cast<arrow::UInt64Array>(batch->column(sys_start_idx));
+            auto sys_end_arr = std::static_pointer_cast<arrow::UInt64Array>(batch->column(sys_end_idx));
+
+            std::shared_ptr<arrow::UInt64Array> valid_start_arr, valid_end_arr;
+            if (valid_start_idx >= 0 && valid_end_idx >= 0) {
+                valid_start_arr = std::static_pointer_cast<arrow::UInt64Array>(batch->column(valid_start_idx));
+                valid_end_arr = std::static_pointer_cast<arrow::UInt64Array>(batch->column(valid_end_idx));
+            }
+
+            std::shared_ptr<arrow::BooleanArray> is_deleted_arr;
+            if (is_deleted_idx >= 0) {
+                is_deleted_arr = std::static_pointer_cast<arrow::BooleanArray>(batch->column(is_deleted_idx));
+            }
+
+            // Build mask of rows to include
+            std::vector<int64_t> indices_to_keep;
+            for (int64_t i = 0; i < batch->num_rows(); ++i) {
+                uint64_t sys_start = sys_start_arr->Value(i);
+                uint64_t sys_end = sys_end_arr->Value(i);
+
+                // System time filter: row was valid at query_system_time
+                // Row is visible if: sys_start <= query_system_time < sys_end
+                if (sys_start > query_system_time || sys_end <= query_system_time) {
+                    continue;  // Row not visible at this system time
+                }
+
+                // Valid time filter (if specified and columns exist)
+                if (valid_start_arr && valid_end_arr && (valid_time_start > 0 || valid_time_end < UINT64_MAX)) {
+                    uint64_t row_valid_start = valid_start_arr->Value(i);
+                    uint64_t row_valid_end = valid_end_arr->Value(i);
+
+                    // Check overlap: [row_valid_start, row_valid_end) overlaps [valid_time_start, valid_time_end)
+                    if (row_valid_end <= valid_time_start || row_valid_start >= valid_time_end) {
+                        continue;  // No overlap in valid time
+                    }
+                }
+
+                // Deleted filter
+                if (!include_deleted && is_deleted_arr && is_deleted_arr->Value(i)) {
+                    continue;  // Skip deleted rows
+                }
+
+                indices_to_keep.push_back(i);
+            }
+
+            // Create filtered batch using Take
+            if (!indices_to_keep.empty()) {
+                arrow::Int64Builder idx_builder;
+                for (int64_t idx : indices_to_keep) {
+                    idx_builder.Append(idx).ok();
+                }
+                std::shared_ptr<arrow::Array> idx_array;
+                idx_builder.Finish(&idx_array).ok();
+
+                auto take_result = arrow::compute::Take(batch, idx_array);
+                if (take_result.ok()) {
+                    auto taken = take_result.ValueOrDie();
+                    // Arrow 22.0 returns Datum with kind RECORD_BATCH
+                    if (taken.kind() == arrow::Datum::RECORD_BATCH) {
+                        filtered_batches.push_back(taken.record_batch());
+                    }
+                }
+            }
+        }
+
+        // Handle empty case
+        if (filtered_batches.empty()) {
+            std::vector<std::shared_ptr<arrow::ChunkedArray>> empty_columns;
+            for (int i = 0; i < cf_info->schema->num_fields(); ++i) {
+                auto field = cf_info->schema->field(i);
+                auto empty_array = arrow::MakeArrayOfNull(field->type(), 0).ValueOrDie();
+                auto chunked_array = std::make_shared<arrow::ChunkedArray>(empty_array);
+                empty_columns.push_back(chunked_array);
+            }
+            auto empty_table = arrow::Table::Make(cf_info->schema, empty_columns);
+            return TableQueryResult::Create(empty_table, result);
+        }
+
+        // Concatenate filtered batches
+        ARROW_ASSIGN_OR_RAISE(auto combined_table,
+                             arrow::Table::FromRecordBatches(cf_info->schema, filtered_batches));
+
+        return TableQueryResult::Create(combined_table, result);
+    }
+
+    /**
+     * @brief Temporal scan with version deduplication
+     *
+     * Implements "latest wins" semantics for append-only bitemporal storage:
+     * 1. Fetch ALL rows where sys_start <= query_time (including closed markers)
+     * 2. For each business key, keep only the row with highest sys_start
+     * 3. Filter out rows where sys_end <= query_time (closed) or is_deleted (unless include_deleted)
+     *
+     * This is necessary for append-only storage where we can't modify existing rows.
+     */
+    Status TemporalScanDedup(const std::string& table_name,
+                            const std::vector<std::string>& key_columns,
+                            uint64_t system_time_at,
+                            uint64_t valid_time_start,
+                            uint64_t valid_time_end,
+                            bool include_deleted,
+                            std::unique_ptr<QueryResult>* result) override {
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // Find column family
+        auto it = column_families_.find(table_name);
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Column family '" + table_name + "' does not exist");
+        }
+
+        auto* cf_info = it->second.get();
+
+        // For non-temporal tables, fall back to regular scan
+        if (cf_info->capabilities.temporal_model == TableCapabilities::TemporalModel::kNone) {
+            return ScanTable(table_name, result);
+        }
+
+        // Get query time (0 means current time)
+        uint64_t query_time = system_time_at;
+        if (query_time == 0) {
+            auto now = std::chrono::system_clock::now();
+            query_time = std::chrono::duration_cast<std::chrono::microseconds>(
+                now.time_since_epoch()).count();
+        }
+
+        // Read all batches from LSM tree
+        std::vector<std::shared_ptr<arrow::RecordBatch>> all_batches;
+        uint64_t start_key = EncodeBatchKey(cf_info->id, 0);
+        uint64_t end_key = EncodeBatchKey(cf_info->id, UINT64_MAX);
+
+        std::vector<std::pair<uint64_t, std::string>> lsm_results;
+        auto scan_status = lsm_tree_->Scan(start_key, end_key, &lsm_results);
+        if (!scan_status.ok()) {
+            return scan_status;
+        }
+
+        // Deserialize batches
+        for (const auto& [key, serialized_batch] : lsm_results) {
+            std::shared_ptr<arrow::RecordBatch> batch;
+            auto deserialize_status = DeserializeArrowBatch(
+                serialized_batch.data(),
+                serialized_batch.size(),
+                &batch
+            );
+            if (!deserialize_status.ok()) continue;
+            all_batches.push_back(batch);
+        }
+
+        // If no batches, return empty result
+        if (all_batches.empty()) {
+            std::vector<std::shared_ptr<arrow::ChunkedArray>> empty_columns;
+            for (int i = 0; i < cf_info->schema->num_fields(); ++i) {
+                auto field = cf_info->schema->field(i);
+                auto empty_array = arrow::MakeArrayOfNull(field->type(), 0).ValueOrDie();
+                auto chunked_array = std::make_shared<arrow::ChunkedArray>(empty_array);
+                empty_columns.push_back(chunked_array);
+            }
+            auto empty_table = arrow::Table::Make(cf_info->schema, empty_columns);
+            return TableQueryResult::Create(empty_table, result);
+        }
+
+        // Combine all batches into single table
+        ARROW_ASSIGN_OR_RAISE(auto table,
+                             arrow::Table::FromRecordBatches(cf_info->schema, all_batches));
+
+        if (table->num_rows() == 0 || key_columns.empty()) {
+            return TableQueryResult::Create(table, result);
+        }
+
+        // Get column indices
+        std::vector<int> key_col_indices;
+        for (const auto& key_col : key_columns) {
+            int idx = table->schema()->GetFieldIndex(key_col);
+            if (idx < 0) {
+                return Status::InvalidArgument("Key column '" + key_col + "' not found");
+            }
+            key_col_indices.push_back(idx);
+        }
+
+        int sys_start_idx = table->schema()->GetFieldIndex("_system_time_start");
+        int sys_end_idx = table->schema()->GetFieldIndex("_system_time_end");
+        int is_deleted_idx = table->schema()->GetFieldIndex("_is_deleted");
+        int valid_start_idx = table->schema()->GetFieldIndex("_valid_time_start");
+        int valid_end_idx = table->schema()->GetFieldIndex("_valid_time_end");
+
+        if (sys_start_idx < 0 || sys_end_idx < 0) {
+            // Not a temporal table, return as-is
+            return TableQueryResult::Create(table, result);
+        }
+
+        // Helper to get value from chunked column at row index
+        // Handles both UInt64 and Timestamp columns (valid time uses timestamp[us])
+        auto get_uint64_value = [&](int col_idx, int64_t row_idx) -> uint64_t {
+            auto chunked_col = table->column(col_idx);
+            int64_t remaining = row_idx;
+            for (int chunk_idx = 0; chunk_idx < chunked_col->num_chunks(); ++chunk_idx) {
+                auto chunk = chunked_col->chunk(chunk_idx);
+                if (remaining < chunk->length()) {
+                    // Check column type - valid time columns are timestamp[us]
+                    if (chunk->type()->id() == arrow::Type::TIMESTAMP) {
+                        auto arr = std::static_pointer_cast<arrow::TimestampArray>(chunk);
+                        return static_cast<uint64_t>(arr->Value(remaining));
+                    } else {
+                        auto arr = std::static_pointer_cast<arrow::UInt64Array>(chunk);
+                        return arr->Value(remaining);
+                    }
+                }
+                remaining -= chunk->length();
+            }
+            return 0;
+        };
+
+        auto get_bool_value = [&](int col_idx, int64_t row_idx) -> bool {
+            auto chunked_col = table->column(col_idx);
+            int64_t remaining = row_idx;
+            for (int chunk_idx = 0; chunk_idx < chunked_col->num_chunks(); ++chunk_idx) {
+                auto chunk = chunked_col->chunk(chunk_idx);
+                if (remaining < chunk->length()) {
+                    auto arr = std::static_pointer_cast<arrow::BooleanArray>(chunk);
+                    return arr->Value(remaining);
+                }
+                remaining -= chunk->length();
+            }
+            return false;
+        };
+
+        // Helper to compute composite key hash
+        auto compute_key_hash = [&](int64_t row_idx) -> size_t {
+            size_t hash = 0;
+            for (int col_idx : key_col_indices) {
+                auto chunked_col = table->column(col_idx);
+
+                // Find the right chunk and offset
+                int64_t remaining = row_idx;
+                for (int chunk_idx = 0; chunk_idx < chunked_col->num_chunks(); ++chunk_idx) {
+                    auto chunk = chunked_col->chunk(chunk_idx);
+                    if (remaining < chunk->length()) {
+                        switch (chunk->type()->id()) {
+                            case arrow::Type::STRING: {
+                                auto arr = std::static_pointer_cast<arrow::StringArray>(chunk);
+                                if (!arr->IsNull(remaining)) {
+                                    std::string val = arr->GetString(remaining);
+                                    hash ^= std::hash<std::string>{}(val) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+                                }
+                                break;
+                            }
+                            case arrow::Type::INT64: {
+                                auto arr = std::static_pointer_cast<arrow::Int64Array>(chunk);
+                                if (!arr->IsNull(remaining)) {
+                                    hash ^= std::hash<int64_t>{}(arr->Value(remaining)) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+                                }
+                                break;
+                            }
+                            case arrow::Type::UINT64: {
+                                auto arr = std::static_pointer_cast<arrow::UInt64Array>(chunk);
+                                if (!arr->IsNull(remaining)) {
+                                    hash ^= std::hash<uint64_t>{}(arr->Value(remaining)) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+                                }
+                                break;
+                            }
+                            case arrow::Type::DOUBLE: {
+                                auto arr = std::static_pointer_cast<arrow::DoubleArray>(chunk);
+                                if (!arr->IsNull(remaining)) {
+                                    hash ^= std::hash<double>{}(arr->Value(remaining)) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+                                }
+                                break;
+                            }
+                            default:
+                                hash ^= std::hash<int64_t>{}(row_idx) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+                                break;
+                        }
+                        break;
+                    }
+                    remaining -= chunk->length();
+                }
+            }
+            return hash;
+        };
+
+        // STEP 1: Filter rows by system time and valid time
+        // - sys_start <= query_time (can't see rows inserted in the future)
+        // - valid time overlaps query valid time range (if specified)
+        std::vector<int64_t> visible_rows;
+        bool has_valid_time_filter = valid_start_idx >= 0 && valid_end_idx >= 0 &&
+            (valid_time_start > 0 || valid_time_end < UINT64_MAX);
+
+        for (int64_t row = 0; row < table->num_rows(); ++row) {
+            uint64_t sys_start = get_uint64_value(sys_start_idx, row);
+            if (sys_start > query_time) {
+                continue;  // Row not yet visible at query time
+            }
+
+            // Apply valid time filter BEFORE deduplication
+            // This ensures we keep all rows that match the valid time query
+            if (has_valid_time_filter) {
+                uint64_t row_valid_start = get_uint64_value(valid_start_idx, row);
+                uint64_t row_valid_end = get_uint64_value(valid_end_idx, row);
+                // Check overlap: [row_valid_start, row_valid_end) ∩ [valid_time_start, valid_time_end)
+                if (row_valid_end <= valid_time_start || row_valid_start >= valid_time_end) {
+                    continue;  // No overlap in valid time
+                }
+            }
+
+            visible_rows.push_back(row);
+        }
+
+        // STEP 2: Deduplicate - for each key, keep only the row with highest sys_start
+        // For bitemporal tables, the composite key includes valid time to preserve
+        // multiple non-overlapping valid time periods
+        std::unordered_map<size_t, std::pair<int64_t, uint64_t>> best_rows;
+
+        for (int64_t row : visible_rows) {
+            // For valid time queries, include valid_time_start in the key hash
+            // so that different valid periods are kept as separate entries
+            size_t key_hash = compute_key_hash(row);
+            if (has_valid_time_filter && valid_start_idx >= 0) {
+                uint64_t row_valid_start = get_uint64_value(valid_start_idx, row);
+                key_hash ^= std::hash<uint64_t>{}(row_valid_start) + 0x9e3779b9 + (key_hash << 6) + (key_hash >> 2);
+            }
+
+            uint64_t sys_start = get_uint64_value(sys_start_idx, row);
+
+            auto it = best_rows.find(key_hash);
+            if (it == best_rows.end()) {
+                best_rows[key_hash] = {row, sys_start};
+            } else if (sys_start > it->second.second) {
+                // This row is newer, replace
+                it->second = {row, sys_start};
+            }
+        }
+
+        // STEP 3: Filter winning rows - exclude closed or deleted
+        std::vector<int64_t> final_indices;
+        final_indices.reserve(best_rows.size());
+
+        for (const auto& [key_hash, row_info] : best_rows) {
+            int64_t row = row_info.first;
+
+            // Check if row is closed (sys_end <= query_time)
+            uint64_t sys_end = get_uint64_value(sys_end_idx, row);
+            if (sys_end <= query_time) {
+                continue;  // Row was closed at query time
+            }
+
+            // Check if deleted
+            if (!include_deleted && is_deleted_idx >= 0) {
+                bool is_deleted = get_bool_value(is_deleted_idx, row);
+                if (is_deleted) {
+                    continue;  // Skip deleted rows
+                }
+            }
+
+            final_indices.push_back(row);
+        }
+
+        // Sort indices to maintain original order
+        std::sort(final_indices.begin(), final_indices.end());
+
+        // Handle empty result
+        if (final_indices.empty()) {
+            std::vector<std::shared_ptr<arrow::ChunkedArray>> empty_columns;
+            for (int i = 0; i < cf_info->schema->num_fields(); ++i) {
+                auto field = cf_info->schema->field(i);
+                auto empty_array = arrow::MakeArrayOfNull(field->type(), 0).ValueOrDie();
+                auto chunked_array = std::make_shared<arrow::ChunkedArray>(empty_array);
+                empty_columns.push_back(chunked_array);
+            }
+            auto empty_table = arrow::Table::Make(cf_info->schema, empty_columns);
+            return TableQueryResult::Create(empty_table, result);
+        }
+
+        // Create index array for Take
+        arrow::Int64Builder idx_builder;
+        for (int64_t idx : final_indices) {
+            idx_builder.Append(idx).ok();
+        }
+        std::shared_ptr<arrow::Array> idx_array;
+        idx_builder.Finish(&idx_array).ok();
+
+        // Take only the winning rows
+        auto take_result = arrow::compute::Take(table, idx_array);
+        if (!take_result.ok()) {
+            return Status::InternalError("Failed to take winning rows: " + take_result.status().ToString());
+        }
+
+        auto taken = take_result.ValueOrDie();
+        if (taken.kind() == arrow::Datum::TABLE) {
+            return TableQueryResult::Create(taken.table(), result);
+        }
+
+        // Shouldn't happen, but fallback to original table
+        return TableQueryResult::Create(table, result);
+    }
+
+    /**
+     * @brief Temporal update - close old versions and insert new ones
+     *
+     * For temporal tables, updates maintain full history by:
+     * 1. Finding existing rows with matching key columns and _system_time_end = MAX
+     * 2. Closing them (setting _system_time_end = now)
+     * 3. Inserting new versions with the updated data
+     */
+    Status TemporalUpdate(const std::string& table_name,
+                         const std::vector<std::string>& key_columns,
+                         const std::shared_ptr<arrow::RecordBatch>& key_values,
+                         const std::shared_ptr<arrow::RecordBatch>& updated_batch) override {
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // Find column family
+        auto it = column_families_.find(table_name);
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Table '" + table_name + "' does not exist");
+        }
+
+        auto* cf_info = it->second.get();
+
+        // Verify table has temporal capabilities
+        if (cf_info->capabilities.temporal_model == TableCapabilities::TemporalModel::kNone) {
+            return Status::InvalidArgument("Table '" + table_name + "' is not a temporal table");
+        }
+
+        // Get current timestamp
+        auto now = std::chrono::system_clock::now();
+        auto now_us = std::chrono::duration_cast<std::chrono::microseconds>(
+            now.time_since_epoch()).count();
+
+        // Step 1: Scan existing data to find rows to close
+        uint64_t start_key = EncodeBatchKey(cf_info->id, 0);
+        uint64_t end_key = EncodeBatchKey(cf_info->id, UINT64_MAX);
+
+        std::vector<std::pair<uint64_t, std::string>> lsm_results;
+        auto scan_status = lsm_tree_->Scan(start_key, end_key, &lsm_results);
+        if (!scan_status.ok()) {
+            return scan_status;
+        }
+
+        // Track which rows need closing (matched by key columns)
+        std::vector<std::shared_ptr<arrow::RecordBatch>> batches_to_close;
+
+        for (const auto& [batch_key, serialized] : lsm_results) {
+            std::shared_ptr<arrow::RecordBatch> batch;
+            auto status = DeserializeArrowBatch(serialized.data(), serialized.size(), &batch);
+            if (!status.ok()) continue;
+
+            // Check if this batch has rows matching our key values
+            auto closed_batch = CloseMatchingRows(batch, key_columns, key_values, now_us);
+            if (closed_batch && closed_batch->num_rows() > 0) {
+                batches_to_close.push_back(closed_batch);
+            }
+        }
+
+        // Step 2: Write closed versions back
+        for (const auto& closed_batch : batches_to_close) {
+            uint64_t batch_id = cf_info->next_batch_id++;
+
+            std::string serialized;
+            auto serialize_status = SerializeArrowBatch(closed_batch, &serialized);
+            if (!serialize_status.ok()) {
+                return serialize_status;
+            }
+
+            uint64_t batch_key = EncodeBatchKey(cf_info->id, batch_id);
+            auto put_status = lsm_tree_->Put(batch_key, serialized);
+            if (!put_status.ok()) {
+                return put_status;
+            }
+        }
+
+        // Persist batch ID counter after writing closed versions
+        if (!batches_to_close.empty()) {
+            auto save_status = SaveColumnFamilyRegistry();
+            if (!save_status.ok()) {
+                std::cerr << "Warning: Failed to save CF registry after update: " << save_status.ToString() << std::endl;
+            }
+        }
+
+        // Step 3: Insert new versions with updated data
+        // The InsertBatch method will auto-augment temporal columns
+        // Need to release lock before calling InsertBatch
+        cf_mutex_.unlock();
+        auto insert_status = InsertBatch(table_name, updated_batch);
+        cf_mutex_.lock();
+
+        return insert_status;
+    }
+
+    /**
+     * @brief Temporal delete - soft delete by closing versions and marking deleted
+     */
+    Status TemporalDelete(const std::string& table_name,
+                         const std::vector<std::string>& key_columns,
+                         const std::shared_ptr<arrow::RecordBatch>& key_values) override {
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // Find column family
+        auto it = column_families_.find(table_name);
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Table '" + table_name + "' does not exist");
+        }
+
+        auto* cf_info = it->second.get();
+
+        // Verify table has temporal capabilities
+        if (cf_info->capabilities.temporal_model == TableCapabilities::TemporalModel::kNone) {
+            return Status::InvalidArgument("Table '" + table_name + "' is not a temporal table");
+        }
+
+        // Get current timestamp
+        auto now = std::chrono::system_clock::now();
+        auto now_us = std::chrono::duration_cast<std::chrono::microseconds>(
+            now.time_since_epoch()).count();
+
+        // Step 1: Scan existing data to find rows to delete
+        uint64_t start_key = EncodeBatchKey(cf_info->id, 0);
+        uint64_t end_key = EncodeBatchKey(cf_info->id, UINT64_MAX);
+
+        std::vector<std::pair<uint64_t, std::string>> lsm_results;
+        auto scan_status = lsm_tree_->Scan(start_key, end_key, &lsm_results);
+        if (!scan_status.ok()) {
+            return scan_status;
+        }
+
+        // Track which rows need closing and tombstones
+        std::vector<std::shared_ptr<arrow::RecordBatch>> closed_batches;
+        std::vector<std::shared_ptr<arrow::RecordBatch>> tombstone_batches;
+
+        for (const auto& [batch_key, serialized] : lsm_results) {
+            std::shared_ptr<arrow::RecordBatch> batch;
+            auto status = DeserializeArrowBatch(serialized.data(), serialized.size(), &batch);
+            if (!status.ok()) continue;
+
+            // Step 1a: Close matching rows (set sys_time_end = now)
+            auto closed_batch = CloseMatchingRows(batch, key_columns, key_values, now_us);
+            if (closed_batch && closed_batch->num_rows() > 0) {
+                closed_batches.push_back(closed_batch);
+            }
+
+            // Step 1b: Create tombstone batch for matching rows
+            auto tombstone_batch = CreateTombstoneForMatchingRows(
+                batch, key_columns, key_values, now_us, cf_info);
+            if (tombstone_batch && tombstone_batch->num_rows() > 0) {
+                tombstone_batches.push_back(tombstone_batch);
+            }
+        }
+
+        // Step 2: Write closed versions
+        for (const auto& closed_batch : closed_batches) {
+            uint64_t batch_id = cf_info->next_batch_id++;
+
+            std::string serialized;
+            auto serialize_status = SerializeArrowBatch(closed_batch, &serialized);
+            if (!serialize_status.ok()) {
+                return serialize_status;
+            }
+
+            uint64_t batch_key = EncodeBatchKey(cf_info->id, batch_id);
+            auto put_status = lsm_tree_->Put(batch_key, serialized);
+            if (!put_status.ok()) {
+                return put_status;
+            }
+        }
+
+        // Step 3: Write tombstone versions
+        for (const auto& tombstone_batch : tombstone_batches) {
+            uint64_t batch_id = cf_info->next_batch_id++;
+
+            std::string serialized;
+            auto serialize_status = SerializeArrowBatch(tombstone_batch, &serialized);
+            if (!serialize_status.ok()) {
+                return serialize_status;
+            }
+
+            uint64_t batch_key = EncodeBatchKey(cf_info->id, batch_id);
+            auto put_status = lsm_tree_->Put(batch_key, serialized);
+            if (!put_status.ok()) {
+                return put_status;
+            }
+        }
+
+        // Persist batch ID counter
+        auto save_status = SaveColumnFamilyRegistry();
+        if (!save_status.ok()) {
+            std::cerr << "Warning: Failed to save CF registry after delete: " << save_status.ToString() << std::endl;
+        }
+
+        return Status::OK();
+    }
+
+private:
+    /**
+     * @brief Close matching rows by setting _system_time_end to now
+     *
+     * Returns a batch containing only rows that matched the key columns,
+     * with their _system_time_end updated to the current time.
+     */
+    std::shared_ptr<arrow::RecordBatch> CloseMatchingRows(
+        const std::shared_ptr<arrow::RecordBatch>& batch,
+        const std::vector<std::string>& key_columns,
+        const std::shared_ptr<arrow::RecordBatch>& key_values,
+        int64_t close_time) {
+
+        if (!batch || batch->num_rows() == 0) return nullptr;
+
+        // Find _system_time_end column index
+        int sys_time_end_idx = batch->schema()->GetFieldIndex("_system_time_end");
+        if (sys_time_end_idx == -1) return nullptr;
+
+        // Build matching row indices
+        std::vector<int64_t> matching_indices;
+        for (int64_t i = 0; i < batch->num_rows(); ++i) {
+            if (RowMatchesKeys(batch, i, key_columns, key_values)) {
+                // Only close rows that are currently "open" (system_time_end == MAX)
+                auto sys_end_arr = std::static_pointer_cast<arrow::TimestampArray>(
+                    batch->column(sys_time_end_idx));
+                if (sys_end_arr->Value(i) == std::numeric_limits<int64_t>::max()) {
+                    matching_indices.push_back(i);
+                }
+            }
+        }
+
+        if (matching_indices.empty()) return nullptr;
+
+        // Build new batch with updated _system_time_end
+        std::vector<std::shared_ptr<arrow::Array>> new_columns;
+        for (int col = 0; col < batch->num_columns(); ++col) {
+            if (col == sys_time_end_idx) {
+                // Build new timestamp array with close_time for matched rows
+                arrow::TimestampBuilder builder(arrow::timestamp(arrow::TimeUnit::MICRO),
+                                               arrow::default_memory_pool());
+                for (int64_t idx : matching_indices) {
+                    builder.Append(close_time).ok();
+                }
+                std::shared_ptr<arrow::Array> arr;
+                builder.Finish(&arr).ok();
+                new_columns.push_back(arr);
+            } else {
+                // Take subset of original column
+                auto take_result = arrow::compute::Take(
+                    batch->column(col),
+                    arrow::Int64Array(matching_indices.size(),
+                        arrow::Buffer::Wrap(matching_indices.data(),
+                            matching_indices.size() * sizeof(int64_t))));
+                if (take_result.ok()) {
+                    new_columns.push_back(take_result.ValueUnsafe().make_array());
+                } else {
+                    return nullptr;
+                }
+            }
+        }
+
+        return arrow::RecordBatch::Make(batch->schema(), matching_indices.size(), new_columns);
+    }
+
+    /**
+     * @brief Create tombstone records for matching rows
+     *
+     * Returns a batch containing tombstone records (_is_deleted = true)
+     * for rows that matched the key columns.
+     */
+    std::shared_ptr<arrow::RecordBatch> CreateTombstoneForMatchingRows(
+        const std::shared_ptr<arrow::RecordBatch>& batch,
+        const std::vector<std::string>& key_columns,
+        const std::shared_ptr<arrow::RecordBatch>& key_values,
+        int64_t tombstone_time,
+        ColumnFamilyInfo* cf_info) {
+
+        if (!batch || batch->num_rows() == 0) return nullptr;
+
+        // Find column indices
+        int sys_time_end_idx = batch->schema()->GetFieldIndex("_system_time_end");
+        int is_deleted_idx = batch->schema()->GetFieldIndex("_is_deleted");
+        if (sys_time_end_idx == -1 || is_deleted_idx == -1) return nullptr;
+
+        // Build matching row indices (only non-deleted rows)
+        std::vector<int64_t> matching_indices;
+        auto is_deleted_arr = std::static_pointer_cast<arrow::BooleanArray>(
+            batch->column(is_deleted_idx));
+
+        for (int64_t i = 0; i < batch->num_rows(); ++i) {
+            if (RowMatchesKeys(batch, i, key_columns, key_values)) {
+                auto sys_end_arr = std::static_pointer_cast<arrow::TimestampArray>(
+                    batch->column(sys_time_end_idx));
+                // Only create tombstone for currently active (not deleted) rows
+                if (sys_end_arr->Value(i) == std::numeric_limits<int64_t>::max() &&
+                    !is_deleted_arr->Value(i)) {
+                    matching_indices.push_back(i);
+                }
+            }
+        }
+
+        if (matching_indices.empty()) return nullptr;
+
+        // Build tombstone batch
+        std::vector<std::shared_ptr<arrow::Array>> new_columns;
+        int64_t max_time = std::numeric_limits<int64_t>::max();
+
+        for (int col = 0; col < batch->num_columns(); ++col) {
+            std::string col_name = batch->schema()->field(col)->name();
+
+            if (col_name == "_system_time_start") {
+                // New version starts now
+                arrow::TimestampBuilder builder(arrow::timestamp(arrow::TimeUnit::MICRO),
+                                               arrow::default_memory_pool());
+                for (size_t i = 0; i < matching_indices.size(); ++i) {
+                    builder.Append(tombstone_time).ok();
+                }
+                std::shared_ptr<arrow::Array> arr;
+                builder.Finish(&arr).ok();
+                new_columns.push_back(arr);
+            } else if (col_name == "_system_time_end") {
+                // Tombstone is open-ended
+                arrow::TimestampBuilder builder(arrow::timestamp(arrow::TimeUnit::MICRO),
+                                               arrow::default_memory_pool());
+                for (size_t i = 0; i < matching_indices.size(); ++i) {
+                    builder.Append(max_time).ok();
+                }
+                std::shared_ptr<arrow::Array> arr;
+                builder.Finish(&arr).ok();
+                new_columns.push_back(arr);
+            } else if (col_name == "_is_deleted") {
+                // Mark as deleted
+                arrow::BooleanBuilder builder;
+                for (size_t i = 0; i < matching_indices.size(); ++i) {
+                    builder.Append(true).ok();
+                }
+                std::shared_ptr<arrow::Array> arr;
+                builder.Finish(&arr).ok();
+                new_columns.push_back(arr);
+            } else {
+                // Copy data columns from original
+                auto take_result = arrow::compute::Take(
+                    batch->column(col),
+                    arrow::Int64Array(matching_indices.size(),
+                        arrow::Buffer::Wrap(matching_indices.data(),
+                            matching_indices.size() * sizeof(int64_t))));
+                if (take_result.ok()) {
+                    new_columns.push_back(take_result.ValueUnsafe().make_array());
+                } else {
+                    return nullptr;
+                }
+            }
+        }
+
+        return arrow::RecordBatch::Make(batch->schema(), matching_indices.size(), new_columns);
+    }
+
+    /**
+     * @brief Check if a row matches all key column values
+     */
+    bool RowMatchesKeys(const std::shared_ptr<arrow::RecordBatch>& batch,
+                       int64_t row_idx,
+                       const std::vector<std::string>& key_columns,
+                       const std::shared_ptr<arrow::RecordBatch>& key_values) {
+        // For each key column, check if the value matches any key_values row
+        for (const auto& key_col : key_columns) {
+            int batch_col_idx = batch->schema()->GetFieldIndex(key_col);
+            int key_col_idx = key_values->schema()->GetFieldIndex(key_col);
+
+            if (batch_col_idx == -1 || key_col_idx == -1) continue;
+
+            // Check if this row's value matches any key value
+            bool found_match = false;
+            for (int64_t k = 0; k < key_values->num_rows(); ++k) {
+                if (ValuesEqual(batch->column(batch_col_idx), row_idx,
+                               key_values->column(key_col_idx), k)) {
+                    found_match = true;
+                    break;
+                }
+            }
+            if (!found_match) return false;
+        }
+        return true;
+    }
+
+    /**
+     * @brief Compare two array values for equality
+     */
+    bool ValuesEqual(const std::shared_ptr<arrow::Array>& arr1, int64_t idx1,
+                    const std::shared_ptr<arrow::Array>& arr2, int64_t idx2) {
+        if (arr1->type()->id() != arr2->type()->id()) return false;
+        if (arr1->IsNull(idx1) && arr2->IsNull(idx2)) return true;
+        if (arr1->IsNull(idx1) || arr2->IsNull(idx2)) return false;
+
+        switch (arr1->type()->id()) {
+            case arrow::Type::STRING: {
+                auto s1 = std::static_pointer_cast<arrow::StringArray>(arr1);
+                auto s2 = std::static_pointer_cast<arrow::StringArray>(arr2);
+                return s1->GetView(idx1) == s2->GetView(idx2);
+            }
+            case arrow::Type::INT64: {
+                auto i1 = std::static_pointer_cast<arrow::Int64Array>(arr1);
+                auto i2 = std::static_pointer_cast<arrow::Int64Array>(arr2);
+                return i1->Value(idx1) == i2->Value(idx2);
+            }
+            case arrow::Type::DOUBLE: {
+                auto d1 = std::static_pointer_cast<arrow::DoubleArray>(arr1);
+                auto d2 = std::static_pointer_cast<arrow::DoubleArray>(arr2);
+                return d1->Value(idx1) == d2->Value(idx2);
+            }
+            default:
+                return false;
+        }
+    }
+
+public:
     /**
      * @brief Create Arrow-optimized query builder
      */
@@ -1643,6 +2802,85 @@ public:
     }
 
     // Column Family operations
+    // Private helper for creating column family with capabilities
+    Status CreateColumnFamilyWithCapabilities(const ColumnFamilyDescriptor& descriptor,
+                                             const TableCapabilities& caps,
+                                             ColumnFamilyHandle** handle) {
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        // Check if column family already exists
+        if (column_families_.find(descriptor.name) != column_families_.end()) {
+            return Status::InvalidArgument("Column family '" + descriptor.name + "' already exists");
+        }
+
+        // Validate schema
+        if (!descriptor.options.schema) {
+            return Status::InvalidArgument("Column family must have a valid Arrow schema");
+        }
+
+        // Create column family info with capabilities
+        uint32_t cf_id = next_cf_id_++;
+        auto cf_info = std::make_unique<ColumnFamilyInfo>(
+            descriptor.name, descriptor.options.schema, cf_id, caps);
+
+        // Store in registry
+        auto* cf_ptr = cf_info.get();
+        column_families_[descriptor.name] = std::move(cf_info);
+        id_to_cf_[cf_id] = cf_ptr;
+
+        // Conditional optimization pipeline based on temporal model
+        if (caps.temporal_model != TableCapabilities::TemporalModel::kNone) {
+            // Temporal tables use full optimization pipeline for zone map filtering
+            // (kept enabled for temporal pruning)
+        } else if (!descriptor.options.optimization_config.enable_pluggable_optimizations ||
+                   !descriptor.options.optimization_config.auto_configure) {
+            cf_ptr->optimization_pipeline = nullptr;
+        }
+
+        // Lock-free optimization for default column family
+        if (descriptor.name == "default") {
+            default_cf_.store(cf_ptr, std::memory_order_release);
+        }
+
+        // Register with index persistence manager
+        if (index_persistence_manager_) {
+            auto register_status = index_persistence_manager_->RegisterColumnFamily(cf_id, descriptor.name);
+            if (!register_status.ok()) {
+                std::cerr << "Failed to register column family with index persistence: "
+                         << register_status.ToString() << std::endl;
+            }
+
+            auto load_status = cf_ptr->LoadIndexes(this);
+            if (!load_status.ok()) {
+                std::cerr << "Failed to load persisted indexes: "
+                         << load_status.ToString() << std::endl;
+            }
+        }
+
+        // Create handle
+        *handle = new ColumnFamilyHandle(descriptor.name, cf_id);
+
+        // Configure advanced features
+        if (global_advanced_features_manager) {
+            auto config_status = global_advanced_features_manager->ConfigureFromCapabilities(
+                descriptor.name, caps);
+            if (!config_status.ok() && global_logger) {
+                global_logger->warn("CreateColumnFamilyWithCapabilities",
+                    "Failed to configure advanced features for " + descriptor.name +
+                    ": " + config_status.ToString());
+            }
+        }
+
+        // ★★★ PERSIST COLUMN FAMILY REGISTRY ★★★
+        auto save_status = SaveColumnFamilyRegistry();
+        if (!save_status.ok()) {
+            std::cerr << "Warning: Failed to save column family registry: "
+                     << save_status.ToString() << std::endl;
+        }
+
+        return Status::OK();
+    }
+
     Status CreateColumnFamily(const ColumnFamilyDescriptor& descriptor, ColumnFamilyHandle** handle) override {
         std::lock_guard<std::mutex> lock(cf_mutex_);
 
@@ -1714,9 +2952,16 @@ public:
             }
         }
 
+        // ★★★ PERSIST COLUMN FAMILY REGISTRY ★★★
+        auto save_status = SaveColumnFamilyRegistry();
+        if (!save_status.ok()) {
+            std::cerr << "Warning: Failed to save column family registry: "
+                     << save_status.ToString() << std::endl;
+        }
+
         return Status::OK();
     }
-    
+
     Status DropColumnFamily(ColumnFamilyHandle* handle) override {
         return Status::NotImplemented("DropColumnFamily not implemented");
     }
@@ -1730,7 +2975,242 @@ public:
         }
         return names;
     }
-    
+
+    // ===== Column Family Registry Persistence =====
+
+    /**
+     * @brief Save column family registry to disk
+     *
+     * Serializes all column families (name, id, schema, capabilities) to JSON.
+     * Called after each CreateColumnFamily/CreateColumnFamilyWithCapabilities.
+     */
+    Status SaveColumnFamilyRegistry() {
+        using json = nlohmann::json;
+
+        json registry;
+        registry["version"] = 1;
+        registry["next_cf_id"] = next_cf_id_;
+
+        json column_families_json = json::array();
+
+        for (const auto& [name, cf_info] : column_families_) {
+            json cf_json;
+            cf_json["name"] = name;
+            cf_json["id"] = cf_info->id;
+
+            // Serialize Arrow schema using IPC format
+            if (cf_info->schema) {
+                auto buffer_result = arrow::ipc::SerializeSchema(*cf_info->schema);
+                if (buffer_result.ok()) {
+                    auto buffer = buffer_result.ValueOrDie();
+                    // Base64 encode for JSON storage
+                    std::string schema_bytes(reinterpret_cast<const char*>(buffer->data()), buffer->size());
+                    cf_json["schema_base64"] = Base64Encode(schema_bytes);
+                } else {
+                    cf_json["schema_base64"] = "";  // Empty if serialization fails
+                }
+            } else {
+                cf_json["schema_base64"] = "";
+            }
+
+            // Serialize capabilities
+            json caps_json;
+            caps_json["enable_mvcc"] = cf_info->capabilities.enable_mvcc;
+            caps_json["temporal_model"] = static_cast<int>(cf_info->capabilities.temporal_model);
+            caps_json["enable_full_text_search"] = cf_info->capabilities.enable_full_text_search;
+            caps_json["enable_ttl"] = cf_info->capabilities.enable_ttl;
+            caps_json["enable_zero_copy_reads"] = cf_info->capabilities.enable_zero_copy_reads;
+            caps_json["enable_hot_key_cache"] = cf_info->capabilities.enable_hot_key_cache;
+            caps_json["enable_negative_cache"] = cf_info->capabilities.enable_negative_cache;
+            cf_json["capabilities"] = caps_json;
+
+            // Persist batch ID counter for correct batch key generation on reopen
+            cf_json["next_batch_id"] = cf_info->next_batch_id;
+
+            column_families_json.push_back(cf_json);
+        }
+
+        registry["column_families"] = column_families_json;
+
+        // Write to disk
+        std::string registry_path = path_ + "/cf_registry.json";
+        std::ofstream ofs(registry_path);
+        if (!ofs) {
+            return Status::IOError("Failed to open column family registry for writing: " + registry_path);
+        }
+
+        ofs << registry.dump(2);  // Pretty print with indent=2
+        ofs.close();
+
+        if (!ofs) {
+            return Status::IOError("Failed to write column family registry: " + registry_path);
+        }
+
+        return Status::OK();
+    }
+
+    /**
+     * @brief Load column family registry from disk
+     *
+     * Called during database initialization to restore column families.
+     */
+    Status LoadColumnFamilyRegistry() {
+        using json = nlohmann::json;
+
+        std::string registry_path = path_ + "/cf_registry.json";
+        std::ifstream ifs(registry_path);
+        if (!ifs) {
+            // No registry file - this is OK for new databases
+            return Status::OK();
+        }
+
+        json registry;
+        try {
+            ifs >> registry;
+        } catch (const json::parse_error& e) {
+            return Status::Corruption("Failed to parse column family registry: " + std::string(e.what()));
+        }
+
+        // Validate version
+        int version = registry.value("version", 0);
+        if (version != 1) {
+            return Status::Corruption("Unsupported column family registry version: " + std::to_string(version));
+        }
+
+        // Restore next_cf_id
+        next_cf_id_ = registry.value("next_cf_id", 1u);
+
+        // Restore column families
+        auto& column_families_json = registry["column_families"];
+        for (const auto& cf_json : column_families_json) {
+            std::string name = cf_json["name"];
+            uint32_t cf_id = cf_json["id"];
+
+            // Deserialize Arrow schema
+            std::shared_ptr<arrow::Schema> schema;
+            std::string schema_base64 = cf_json.value("schema_base64", "");
+            if (!schema_base64.empty()) {
+                std::string schema_bytes = Base64Decode(schema_base64);
+                auto buffer = arrow::Buffer::FromString(schema_bytes);
+                arrow::io::BufferReader reader(buffer);
+                arrow::ipc::DictionaryMemo dict_memo;
+                auto schema_result = arrow::ipc::ReadSchema(&reader, &dict_memo);
+                if (schema_result.ok()) {
+                    schema = schema_result.ValueOrDie();
+                }
+            }
+
+            if (!schema) {
+                // Create a minimal schema if deserialization failed
+                schema = arrow::schema({
+                    arrow::field("key", arrow::uint64()),
+                    arrow::field("value", arrow::binary())
+                });
+            }
+
+            // Deserialize capabilities
+            TableCapabilities caps;
+            if (cf_json.contains("capabilities")) {
+                auto& caps_json = cf_json["capabilities"];
+                caps.enable_mvcc = caps_json.value("enable_mvcc", false);
+                caps.temporal_model = static_cast<TableCapabilities::TemporalModel>(
+                    caps_json.value("temporal_model", 0));
+                caps.enable_full_text_search = caps_json.value("enable_full_text_search", false);
+                caps.enable_ttl = caps_json.value("enable_ttl", false);
+                caps.enable_zero_copy_reads = caps_json.value("enable_zero_copy_reads", true);
+                caps.enable_hot_key_cache = caps_json.value("enable_hot_key_cache", true);
+                caps.enable_negative_cache = caps_json.value("enable_negative_cache", true);
+            }
+
+            // Create column family info (no lock needed - called during construction)
+            auto cf_info = std::make_unique<ColumnFamilyInfo>(name, schema, cf_id, caps);
+
+            // Restore batch ID counter to prevent key collisions
+            cf_info->next_batch_id = cf_json.value("next_batch_id", uint64_t(0));
+
+            auto* cf_ptr = cf_info.get();
+            column_families_[name] = std::move(cf_info);
+            id_to_cf_[cf_id] = cf_ptr;
+
+            // Set up lock-free optimization for default
+            if (name == "default") {
+                default_cf_.store(cf_ptr, std::memory_order_release);
+            }
+
+            // Register with index persistence manager
+            if (index_persistence_manager_) {
+                auto register_status = index_persistence_manager_->RegisterColumnFamily(cf_id, name);
+                if (!register_status.ok()) {
+                    std::cerr << "Failed to register column family with index persistence: "
+                             << register_status.ToString() << std::endl;
+                }
+
+                auto load_status = cf_ptr->LoadIndexes(this);
+                if (!load_status.ok()) {
+                    std::cerr << "Failed to load persisted indexes: "
+                             << load_status.ToString() << std::endl;
+                }
+            }
+        }
+
+        return Status::OK();
+    }
+
+    // Base64 encoding/decoding helpers
+    static std::string Base64Encode(const std::string& input) {
+        static const char* chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        std::string result;
+        result.reserve(((input.size() + 2) / 3) * 4);
+
+        size_t i = 0;
+        while (i < input.size()) {
+            uint32_t octet_a = i < input.size() ? static_cast<uint8_t>(input[i++]) : 0;
+            uint32_t octet_b = i < input.size() ? static_cast<uint8_t>(input[i++]) : 0;
+            uint32_t octet_c = i < input.size() ? static_cast<uint8_t>(input[i++]) : 0;
+
+            uint32_t triple = (octet_a << 16) + (octet_b << 8) + octet_c;
+
+            result += chars[(triple >> 18) & 0x3F];
+            result += chars[(triple >> 12) & 0x3F];
+            result += (i > input.size() + 1) ? '=' : chars[(triple >> 6) & 0x3F];
+            result += (i > input.size()) ? '=' : chars[triple & 0x3F];
+        }
+
+        return result;
+    }
+
+    static std::string Base64Decode(const std::string& input) {
+        static const int decode_table[] = {
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,62,-1,-1,-1,63,
+            52,53,54,55,56,57,58,59,60,61,-1,-1,-1,-1,-1,-1,
+            -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,
+            15,16,17,18,19,20,21,22,23,24,25,-1,-1,-1,-1,-1,
+            -1,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
+            41,42,43,44,45,46,47,48,49,50,51,-1,-1,-1,-1,-1
+        };
+
+        std::string result;
+        result.reserve((input.size() / 4) * 3);
+
+        size_t i = 0;
+        while (i < input.size()) {
+            uint32_t sextet_a = (input[i] == '=') ? 0 : decode_table[static_cast<uint8_t>(input[i])]; i++;
+            uint32_t sextet_b = (i < input.size() && input[i] == '=') ? 0 : decode_table[static_cast<uint8_t>(input[i])]; i++;
+            uint32_t sextet_c = (i < input.size() && input[i] == '=') ? 0 : decode_table[static_cast<uint8_t>(input[i])]; i++;
+            uint32_t sextet_d = (i < input.size() && input[i] == '=') ? 0 : decode_table[static_cast<uint8_t>(input[i])]; i++;
+
+            uint32_t triple = (sextet_a << 18) + (sextet_b << 12) + (sextet_c << 6) + sextet_d;
+
+            result += static_cast<char>((triple >> 16) & 0xFF);
+            if (i >= 3 && input[i-2] != '=') result += static_cast<char>((triple >> 8) & 0xFF);
+            if (i >= 4 && input[i-1] != '=') result += static_cast<char>(triple & 0xFF);
+        }
+
+        return result;
+    }
+
     // CF-specific operations
     Status Put(const WriteOptions& options, ColumnFamilyHandle* cf, std::shared_ptr<Record> record) override {
         return Status::NotImplemented("CF Put not implemented");
@@ -2126,6 +3606,227 @@ public:
         return Status::NotImplemented("Destroy not implemented");
     }
 
+    // Version garbage collection for temporal tables
+    Status PruneVersions(const std::string& table_name,
+                         uint64_t* versions_removed) override {
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        auto it = column_families_.find(table_name);
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Table '" + table_name + "' does not exist");
+        }
+
+        auto* cf_info = it->second.get();
+
+        // Get GC settings from table capabilities
+        auto policy = cf_info->capabilities.mvcc_settings.gc_policy;
+        size_t max_versions = cf_info->capabilities.mvcc_settings.max_versions_per_key;
+        uint64_t gc_timestamp = cf_info->capabilities.mvcc_settings.gc_timestamp_ms * 1000; // Convert to microseconds
+
+        return PruneVersionsImpl(cf_info, policy, max_versions, gc_timestamp, versions_removed);
+    }
+
+    Status PruneVersions(const std::string& table_name,
+                         size_t max_versions_per_key,
+                         uint64_t min_system_time_us,
+                         uint64_t* versions_removed) override {
+        std::lock_guard<std::mutex> lock(cf_mutex_);
+
+        auto it = column_families_.find(table_name);
+        if (it == column_families_.end()) {
+            return Status::InvalidArgument("Table '" + table_name + "' does not exist");
+        }
+
+        auto* cf_info = it->second.get();
+
+        // Use kKeepRecentVersions policy with provided parameters
+        auto policy = TableCapabilities::MVCCSettings::GCPolicy::kKeepRecentVersions;
+        return PruneVersionsImpl(cf_info, policy, max_versions_per_key, min_system_time_us, versions_removed);
+    }
+
+private:
+    Status PruneVersionsImpl(ColumnFamilyInfo* cf_info,
+                             TableCapabilities::MVCCSettings::GCPolicy policy,
+                             size_t max_versions_per_key,
+                             uint64_t min_system_time_us,
+                             uint64_t* versions_removed) {
+        if (versions_removed) *versions_removed = 0;
+
+        // Only temporal tables have versions to prune
+        if (cf_info->capabilities.temporal_model == TableCapabilities::TemporalModel::kNone) {
+            return Status::InvalidArgument("Table is not a temporal table");
+        }
+
+        // For kKeepAllVersions policy, no pruning
+        if (policy == TableCapabilities::MVCCSettings::GCPolicy::kKeepAllVersions) {
+            return Status::OK();
+        }
+
+        // Get all data using batch cache
+        std::vector<std::shared_ptr<arrow::RecordBatch>> all_batches;
+        for (const auto& [batch_id, cache_entry] : cf_info->batch_cache) {
+            if (cache_entry.batch) {
+                all_batches.push_back(cache_entry.batch);
+            }
+        }
+
+        if (all_batches.empty()) {
+            return Status::OK();
+        }
+
+        // Combine into single table
+        auto table_result = arrow::Table::FromRecordBatches(cf_info->schema, all_batches);
+        if (!table_result.ok()) {
+            return Status::InternalError("Failed to combine batches");
+        }
+        auto table = table_result.ValueUnsafe();
+
+        int64_t total_rows = table->num_rows();
+        if (total_rows == 0) {
+            return Status::OK();
+        }
+
+        // Get temporal column indices
+        int sys_start_idx = table->schema()->GetFieldIndex("_system_time_start");
+        int sys_end_idx = table->schema()->GetFieldIndex("_system_time_end");
+
+        if (sys_start_idx < 0 || sys_end_idx < 0) {
+            return Status::InvalidArgument("Table missing temporal columns");
+        }
+
+        // Helper to get uint64/timestamp value from chunked array
+        auto get_time_value = [&](int col_idx, int64_t row_idx) -> uint64_t {
+            auto chunked_col = table->column(col_idx);
+            int64_t remaining = row_idx;
+            for (int chunk_idx = 0; chunk_idx < chunked_col->num_chunks(); ++chunk_idx) {
+                auto chunk = chunked_col->chunk(chunk_idx);
+                if (remaining < chunk->length()) {
+                    if (chunk->type()->id() == arrow::Type::TIMESTAMP) {
+                        auto arr = std::static_pointer_cast<arrow::TimestampArray>(chunk);
+                        return static_cast<uint64_t>(arr->Value(remaining));
+                    } else {
+                        auto arr = std::static_pointer_cast<arrow::UInt64Array>(chunk);
+                        return arr->Value(remaining);
+                    }
+                }
+                remaining -= chunk->length();
+            }
+            return 0;
+        };
+
+        // Identify rows to keep
+        std::vector<int64_t> keep_indices;
+        uint64_t pruned = 0;
+
+        if (policy == TableCapabilities::MVCCSettings::GCPolicy::kKeepVersionsUntil) {
+            // Keep versions where sys_end > min_system_time_us (or sys_end = MAX)
+            for (int64_t row = 0; row < total_rows; ++row) {
+                uint64_t sys_end = get_time_value(sys_end_idx, row);
+                // Keep if: still current (sys_end = MAX) OR closed after threshold
+                if (sys_end == UINT64_MAX || sys_end > min_system_time_us) {
+                    keep_indices.push_back(row);
+                } else {
+                    pruned++;
+                }
+            }
+        } else if (policy == TableCapabilities::MVCCSettings::GCPolicy::kKeepRecentVersions) {
+            // Group rows by business key, keep N most recent per key
+            std::vector<int> key_col_indices;
+            for (int i = 0; i < table->num_columns(); ++i) {
+                std::string col_name = table->field(i)->name();
+                if (col_name.find("_system_") == std::string::npos &&
+                    col_name.find("_valid_") == std::string::npos &&
+                    col_name != "_is_deleted" && col_name != "_system_version") {
+                    key_col_indices.push_back(i);
+                    break; // Use first non-temporal column as key
+                }
+            }
+
+            if (key_col_indices.empty()) {
+                return Status::OK();
+            }
+
+            // Build map: key -> list of (row_idx, sys_start)
+            std::unordered_map<std::string, std::vector<std::pair<int64_t, uint64_t>>> key_versions;
+
+            for (int64_t row = 0; row < total_rows; ++row) {
+                std::string key_str;
+                for (int col_idx : key_col_indices) {
+                    auto chunked_col = table->column(col_idx);
+                    int64_t remaining = row;
+                    for (int chunk_idx = 0; chunk_idx < chunked_col->num_chunks(); ++chunk_idx) {
+                        auto chunk = chunked_col->chunk(chunk_idx);
+                        if (remaining < chunk->length()) {
+                            if (chunk->type()->id() == arrow::Type::STRING) {
+                                auto arr = std::static_pointer_cast<arrow::StringArray>(chunk);
+                                key_str += arr->GetString(remaining);
+                            }
+                            break;
+                        }
+                        remaining -= chunk->length();
+                    }
+                }
+
+                uint64_t sys_start = get_time_value(sys_start_idx, row);
+                key_versions[key_str].push_back({row, sys_start});
+            }
+
+            // For each key, keep only max_versions_per_key most recent
+            for (auto& [key, versions] : key_versions) {
+                std::sort(versions.begin(), versions.end(),
+                    [](const auto& a, const auto& b) { return a.second > b.second; });
+
+                for (size_t i = 0; i < versions.size(); ++i) {
+                    if (i < max_versions_per_key) {
+                        keep_indices.push_back(versions[i].first);
+                    } else {
+                        pruned++;
+                    }
+                }
+            }
+
+            std::sort(keep_indices.begin(), keep_indices.end());
+        }
+
+        if (versions_removed) *versions_removed = pruned;
+
+        if (pruned == 0) {
+            return Status::OK();
+        }
+
+        // Create pruned table with only kept rows
+        arrow::Int64Builder idx_builder;
+        for (int64_t idx : keep_indices) {
+            idx_builder.Append(idx).ok();
+        }
+        std::shared_ptr<arrow::Array> idx_array;
+        idx_builder.Finish(&idx_array).ok();
+
+        auto take_result = arrow::compute::Take(table, idx_array);
+        if (!take_result.ok()) {
+            return Status::InternalError("Failed to create pruned table");
+        }
+
+        auto pruned_table = take_result.ValueOrDie().table();
+        auto batch_result = pruned_table->CombineChunksToBatch();
+        if (!batch_result.ok()) {
+            return Status::InternalError("Failed to convert pruned table to batch");
+        }
+
+        // Clear batch cache and re-insert pruned batch
+        cf_info->batch_cache.clear();
+        cf_info->row_index.clear();
+        cf_info->next_batch_id = 0;
+
+        // Store pruned batch in cache
+        uint64_t batch_id = cf_info->next_batch_id++;
+        cf_info->batch_cache[batch_id] = ColumnFamilyInfo::BatchCacheEntry(
+            batch_result.ValueUnsafe(), cf_info->cache_access_counter++);
+
+        return Status::OK();
+    }
+
+public:
     // Checkpoint operations
     Status CreateCheckpoint(const std::string& checkpoint_path) override {
         return Status::NotImplemented("CreateCheckpoint not implemented");

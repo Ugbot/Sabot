@@ -1189,6 +1189,101 @@ class Stream:
                     yield batch.select(columns_list)
             return Stream(python_select(), None)
 
+    def sql(
+        self,
+        query: str,
+        table_name: str = 'stream',
+        num_workers: int = 4
+    ) -> 'Stream':
+        """
+        Execute SQL on the current stream.
+
+        Materializes the stream to an Arrow table, registers it with
+        the SQL engine, executes the query, and returns a new stream.
+
+        Args:
+            query: SQL query (use table_name to reference stream data)
+            table_name: Name to register stream as (default: 'stream')
+            num_workers: Number of parallel workers for execution
+
+        Returns:
+            Stream with query results
+
+        Examples:
+            # Filter and aggregate with SQL
+            stream.sql("SELECT symbol, SUM(amount) FROM stream GROUP BY symbol")
+
+            # Join with another table
+            stream.sql('''
+                SELECT s.*, r.rate
+                FROM stream s
+                JOIN rates r ON s.currency = r.code
+            ''')
+
+            # Window functions
+            stream.sql('''
+                SELECT *,
+                    ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY timestamp) as rn
+                FROM stream
+            ''')
+        """
+        import asyncio
+        from sabot.sql.controller import SQLController
+
+        # Materialize stream to table synchronously
+        batches = list(self._source)
+
+        if not batches:
+            return Stream(iter([]), None)
+
+        table = ca.Table.from_batches(batches)
+
+        # Execute SQL
+        async def execute_sql():
+            controller = SQLController()
+            await controller.register_table(table_name, table)
+            result = await controller.execute(
+                query,
+                num_agents=num_workers,
+                execution_mode="local_parallel"
+            )
+            return result
+
+        # Run async execution
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            result = loop.run_until_complete(execute_sql())
+        finally:
+            loop.close()
+
+        # Return result as stream
+        if hasattr(result, 'to_batches'):
+            return Stream(result.to_batches(), None)
+        else:
+            return Stream(iter([result]), None)
+
+    def timeseries(self) -> 'TimeSeriesStreamOps':
+        """
+        Access time series operations on this stream.
+
+        Returns:
+            TimeSeriesStreamOps for chaining time series operations
+
+        Examples:
+            # Rolling average
+            stream.timeseries().rolling(
+                window_size=20, column='price', agg='mean'
+            )
+
+            # EWMA smoothing
+            stream.timeseries().ewma(column='price', alpha=0.1)
+
+            # Log returns
+            stream.timeseries().log_returns(column='price')
+        """
+        return TimeSeriesStreamOps(self)
+
     # ========================================================================
     # String Operations (SIMD-Accelerated)
     # ========================================================================
@@ -2446,6 +2541,438 @@ class GroupedStream:
                 yield batch
         
         return Stream(arrow_groupby_streaming(), None)
+
+
+class TimeSeriesStreamOps:
+    """
+    Time series operations for streams.
+
+    Provides fluent API for time series transformations like rolling windows,
+    EWMA, log returns, and temporal joins.
+
+    All operations use the SQLController's time series operators internally,
+    which leverage Arrow compute for vectorized performance.
+    """
+
+    def __init__(self, stream: Stream):
+        """
+        Initialize time series operations for a stream.
+
+        Args:
+            stream: The source stream to apply time series operations to
+        """
+        self._stream = stream
+
+    def _materialize_and_apply(self, operation_func) -> Stream:
+        """
+        Materialize stream to table, apply operation, return new stream.
+
+        Args:
+            operation_func: Async function(controller, table) -> result_table
+        """
+        import asyncio
+        from sabot.sql.controller import SQLController
+
+        async def execute():
+            # Materialize stream to table
+            batches = []
+            for batch in self._stream:
+                batches.append(batch)
+
+            if not batches:
+                return ca.table({})
+
+            table = ca.Table.from_batches(batches)
+
+            # Apply operation
+            controller = SQLController()
+            result = await operation_func(controller, table)
+            return result
+
+        # Run and convert result to stream
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            result = loop.run_until_complete(execute())
+        finally:
+            loop.close()
+
+        # Return as stream
+        if hasattr(result, 'to_batches'):
+            return Stream(result.to_batches(), None)
+        else:
+            return Stream(iter([result]), None)
+
+    def rolling(
+        self,
+        window_size: int,
+        column: str,
+        agg: str = 'mean',
+        min_periods: int = 1,
+        output_column: Optional[str] = None
+    ) -> Stream:
+        """
+        Apply rolling window aggregation to a column.
+
+        Args:
+            window_size: Number of rows in the rolling window
+            column: Column to aggregate
+            agg: Aggregation function ('mean', 'sum', 'min', 'max', 'std', 'var')
+            min_periods: Minimum observations required (default: 1)
+            output_column: Output column name (default: {column}_{agg}_{window_size})
+
+        Returns:
+            Stream with added rolling aggregation column
+
+        Examples:
+            # 20-period rolling mean
+            stream.timeseries().rolling(20, 'price', agg='mean')
+
+            # Rolling standard deviation
+            stream.timeseries().rolling(50, 'returns', agg='std')
+        """
+        async def apply_rolling(controller, table):
+            return await controller._apply_rolling_window(
+                table=table,
+                column=column,
+                window_size=window_size,
+                agg=agg,
+                min_periods=min_periods,
+                output_column=output_column
+            )
+
+        return self._materialize_and_apply(apply_rolling)
+
+    def ewma(
+        self,
+        column: str,
+        alpha: float = 0.5,
+        output_column: Optional[str] = None
+    ) -> Stream:
+        """
+        Apply Exponential Weighted Moving Average (EWMA).
+
+        Args:
+            column: Column to smooth
+            alpha: Smoothing factor (0 < alpha <= 1). Higher = more weight on recent values.
+            output_column: Output column name (default: {column}_ewma)
+
+        Returns:
+            Stream with EWMA column
+
+        Examples:
+            # Fast EWMA (alpha=0.3)
+            stream.timeseries().ewma('price', alpha=0.3)
+
+            # Slow EWMA (alpha=0.1) for trend following
+            stream.timeseries().ewma('price', alpha=0.1)
+        """
+        async def apply_ewma(controller, table):
+            return await controller._apply_ewma(
+                table=table,
+                column=column,
+                alpha=alpha,
+                output_column=output_column
+            )
+
+        return self._materialize_and_apply(apply_ewma)
+
+    def log_returns(
+        self,
+        column: str = 'price',
+        output_column: Optional[str] = None
+    ) -> Stream:
+        """
+        Calculate logarithmic returns: ln(price_t / price_{t-1}).
+
+        Args:
+            column: Price column name
+            output_column: Output column name (default: log_returns)
+
+        Returns:
+            Stream with log returns column
+
+        Example:
+            stream.timeseries().log_returns('close')
+        """
+        async def apply_log_returns(controller, table):
+            return await controller._apply_log_returns(
+                table=table,
+                column=column,
+                output_column=output_column
+            )
+
+        return self._materialize_and_apply(apply_log_returns)
+
+    def time_bucket(
+        self,
+        time_column: str = 'timestamp',
+        bucket_size: str = '1h',
+        output_column: str = 'bucket'
+    ) -> Stream:
+        """
+        Assign rows to time buckets.
+
+        Args:
+            time_column: Timestamp column name
+            bucket_size: Bucket size (e.g., '1h', '5m', '1d')
+            output_column: Output column name for bucket
+
+        Returns:
+            Stream with bucket column
+
+        Example:
+            stream.timeseries().time_bucket('event_time', '5m')
+        """
+        async def apply_time_bucket(controller, table):
+            return await controller._apply_time_bucket(
+                table=table,
+                time_column=time_column,
+                bucket_size=bucket_size,
+                output_column=output_column
+            )
+
+        return self._materialize_and_apply(apply_time_bucket)
+
+    def time_diff(
+        self,
+        time_column: str = 'timestamp',
+        output_column: str = 'time_diff_ms'
+    ) -> Stream:
+        """
+        Calculate time difference between consecutive rows.
+
+        Args:
+            time_column: Timestamp column name
+            output_column: Output column name for time difference (in milliseconds)
+
+        Returns:
+            Stream with time difference column
+
+        Example:
+            stream.timeseries().time_diff('event_time')
+        """
+        async def apply_time_diff(controller, table):
+            return await controller._apply_time_diff(
+                table=table,
+                time_column=time_column,
+                output_column=output_column
+            )
+
+        return self._materialize_and_apply(apply_time_diff)
+
+    def resample(
+        self,
+        time_column: str = 'timestamp',
+        rule: str = '1h',
+        agg: Dict[str, str] = None
+    ) -> Stream:
+        """
+        Resample time series data to a different frequency.
+
+        Args:
+            time_column: Timestamp column name
+            rule: Resampling rule (e.g., '1h', '5m', '1d')
+            agg: Aggregation functions per column (e.g., {'price': 'mean', 'volume': 'sum'})
+
+        Returns:
+            Stream with resampled data
+
+        Example:
+            stream.timeseries().resample('timestamp', '5m', {'price': 'mean', 'volume': 'sum'})
+        """
+        async def apply_resample(controller, table):
+            return await controller._apply_resample(
+                table=table,
+                time_column=time_column,
+                rule=rule,
+                agg=agg or {}
+            )
+
+        return self._materialize_and_apply(apply_resample)
+
+    def fill(
+        self,
+        method: str = 'forward',
+        columns: Optional[List[str]] = None
+    ) -> Stream:
+        """
+        Fill missing values in time series.
+
+        Args:
+            method: Fill method ('forward', 'backward', 'linear', 'zero', 'mean')
+            columns: Columns to fill (None = all numeric columns)
+
+        Returns:
+            Stream with filled values
+
+        Examples:
+            # Forward fill missing values
+            stream.timeseries().fill('forward')
+
+            # Linear interpolation for specific columns
+            stream.timeseries().fill('linear', columns=['price', 'volume'])
+        """
+        async def apply_fill(controller, table):
+            return await controller._apply_fill(
+                table=table,
+                method=method,
+                columns=columns
+            )
+
+        return self._materialize_and_apply(apply_fill)
+
+    def session_window(
+        self,
+        time_column: str = 'timestamp',
+        gap_ms: int = 30000,
+        output_column: str = 'session_id'
+    ) -> Stream:
+        """
+        Assign session IDs based on activity gaps.
+
+        Args:
+            time_column: Timestamp column name
+            gap_ms: Maximum gap in milliseconds between events in same session
+            output_column: Output column name for session ID
+
+        Returns:
+            Stream with session ID column
+
+        Example:
+            # 30-second session timeout
+            stream.timeseries().session_window('event_time', gap_ms=30000)
+        """
+        async def apply_session_window(controller, table):
+            return await controller._apply_session_window(
+                table=table,
+                time_column=time_column,
+                gap_ms=gap_ms,
+                output_column=output_column
+            )
+
+        return self._materialize_and_apply(apply_session_window)
+
+    def asof_join(
+        self,
+        right: Stream,
+        time_column: str = 'timestamp',
+        direction: str = 'backward'
+    ) -> Stream:
+        """
+        As-of join with another stream (most recent match).
+
+        Args:
+            right: Right stream to join with
+            time_column: Timestamp column name (must exist in both streams)
+            direction: 'backward' (most recent before) or 'forward' (next after)
+
+        Returns:
+            Joined stream
+
+        Example:
+            # Join trades with most recent quotes
+            trades.timeseries().asof_join(quotes, 'trade_time', 'backward')
+        """
+        import asyncio
+        from sabot.sql.controller import SQLController
+
+        async def execute():
+            # Materialize both streams
+            left_batches = list(self._stream)
+            right_batches = list(right)
+
+            if not left_batches or not right_batches:
+                return ca.table({})
+
+            left_table = ca.Table.from_batches(left_batches)
+            right_table = ca.Table.from_batches(right_batches)
+
+            # Apply ASOF join via controller
+            controller = SQLController()
+            result = await controller._apply_asof_join(
+                left_table=left_table,
+                right_table=right_table,
+                time_column=time_column,
+                direction=direction
+            )
+            return result
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            result = loop.run_until_complete(execute())
+        finally:
+            loop.close()
+
+        if hasattr(result, 'to_batches'):
+            return Stream(result.to_batches(), None)
+        else:
+            return Stream(iter([result]), None)
+
+    def interval_join(
+        self,
+        right: Stream,
+        time_column: str = 'timestamp',
+        lower_bound_ms: int = -60000,
+        upper_bound_ms: int = 60000
+    ) -> Stream:
+        """
+        Interval join with another stream (rows within time range).
+
+        Args:
+            right: Right stream to join with
+            time_column: Timestamp column name (must exist in both streams)
+            lower_bound_ms: Lower bound offset in milliseconds (negative = before)
+            upper_bound_ms: Upper bound offset in milliseconds
+
+        Returns:
+            Joined stream
+
+        Example:
+            # Join events within ±1 minute window
+            events.timeseries().interval_join(
+                alerts, 'event_time',
+                lower_bound_ms=-60000,
+                upper_bound_ms=60000
+            )
+        """
+        import asyncio
+        from sabot.sql.controller import SQLController
+
+        async def execute():
+            # Materialize both streams
+            left_batches = list(self._stream)
+            right_batches = list(right)
+
+            if not left_batches or not right_batches:
+                return ca.table({})
+
+            left_table = ca.Table.from_batches(left_batches)
+            right_table = ca.Table.from_batches(right_batches)
+
+            # Apply interval join via controller
+            controller = SQLController()
+            result = await controller._apply_interval_join(
+                left_table=left_table,
+                right_table=right_table,
+                time_column=time_column,
+                lower_bound=lower_bound_ms,
+                upper_bound=upper_bound_ms
+            )
+            return result
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            result = loop.run_until_complete(execute())
+        finally:
+            loop.close()
+
+        if hasattr(result, 'to_batches'):
+            return Stream(result.to_batches(), None)
+        else:
+            return Stream(iter([result]), None)
 
 
 class OutputStream:

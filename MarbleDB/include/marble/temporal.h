@@ -250,14 +250,22 @@ public:
     static SnapshotId GenerateSnapshotId();
 };
 
+// Forward declarations
+class MarbleDB;
+struct TableCapabilities;
+
 // Factory functions
 std::shared_ptr<TemporalDatabase> CreateTemporalDatabase(const std::string& base_path);
 std::shared_ptr<TemporalTable> CreateTemporalTable(const std::string& base_path,
                                                   const TableSchema& schema,
                                                   TemporalModel model = TemporalModel::kBitemporal);
 
-// Forward declaration for TableCapabilities integration
-struct TableCapabilities;
+// ★★★ NEW: Factory for persistent temporal table backed by MarbleDB LSM ★★★
+std::shared_ptr<TemporalTable> CreatePersistentTemporalTable(
+    MarbleDB* db,
+    const std::string& table_name,
+    const TableSchema& schema,
+    TemporalModel model = TemporalModel::kBitemporal);
 
 // Helper function to configure temporal features from TableCapabilities
 Status ConfigureTemporalFromCapabilities(

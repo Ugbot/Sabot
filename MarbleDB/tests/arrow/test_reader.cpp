@@ -79,7 +79,7 @@ TEST_F(ArrowReaderTest, FactoryFunctions) {
     EXPECT_TRUE(result1.status().IsInvalid());
 
     // Test OpenTableWithOptions factory
-    ScanOptions options;
+    arrow_api::ScanOptions options;
     options.columns = {"key", "value"};
     options.batch_size = 1000;
 

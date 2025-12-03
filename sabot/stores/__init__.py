@@ -5,7 +5,15 @@ from .base import StoreBackend, StoreBackendConfig
 from .memory import MemoryBackend
 from .redis import RedisBackend
 
-# Import new components
+# Import MarbleDB first as the primary backend (3.30x faster reads than RocksDB)
+try:
+    from .marbledb import MarbleDBStoreBackend
+    MARBLEDB_AVAILABLE = True
+except ImportError:
+    MARBLEDB_AVAILABLE = False
+    MarbleDBStoreBackend = None
+
+# RocksDB as fallback
 try:
     from .rocksdb import RocksDBBackend
     ROCKSDB_AVAILABLE = True
@@ -57,17 +65,23 @@ __all__ = [
     'create_backend_auto',
     'CYTHON_AVAILABLE',
     'ARROW_AVAILABLE',
+    'MARBLEDB_AVAILABLE',
     'TONBO_AVAILABLE',
     'ROCKSDB_AVAILABLE',
 ]
 
 # Conditionally add optional backends to __all__
+# MarbleDB is the primary backend (3.30x faster reads, 1.78x faster writes than RocksDB)
+if MARBLEDB_AVAILABLE:
+    __all__.append('MarbleDBStoreBackend')
+
 if ARROW_AVAILABLE:
     __all__.append('ArrowFileBackend')
 
 if TONBO_AVAILABLE:
     __all__.append('TonboBackend')
 
+# RocksDB as fallback
 if ROCKSDB_AVAILABLE:
     __all__.append('RocksDBBackend')
 

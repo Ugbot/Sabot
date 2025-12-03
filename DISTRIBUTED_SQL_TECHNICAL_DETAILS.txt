@@ -1,0 +1,310 @@
+SABOT DISTRIBUTED SQL - TECHNICAL DETAILS & CODE LOCATIONS
+===========================================================
+
+FILE LOCATIONS & SIZES:
+- /Users/bengamble/Sabot/sabot/sql/controller.py (588 lines)
+  * _default_operator_builder() - lines 494-587 (incomplete dispatch)
+  * execute_distributed() - lines 412-450 (uses PlanBridge)
+  * execute_with_stage_scheduler() - lines 452-492 (main async entry)
+
+- /Users/bengamble/Sabot/sabot/sql/stage_scheduler.py (553 lines)
+  * execute() - lines 102-165 (wave-based execution)
+  * _execute_operator_pipeline() - lines 309-329 (single-input pipeline!)
+  * _execute_single_operator() - lines 331-350 (simple callable dispatch)
+  * ShuffleCoordinator - lines 368-549 (in-memory shuffle implementation)
+
+- /Users/bengamble/Sabot/sabot/sql/plan_bridge.py (517 lines)
+  * parse_and_partition() - lines 63-95 (main entry point)
+  * _extract_plan_info() - lines 97+ (incomplete EXPLAIN parsing)
+  * _partition_into_stages() - (not shown in read, incomplete)
+
+- /Users/bengamble/Sabot/sabot/sql/distributed_plan.py (291 lines)
+  * OperatorSpec dataclass - lines 35-90
+  * ExecutionStage dataclass - lines 127-167
+  * DistributedQueryPlan dataclass - lines 170-211
+
+- /Users/bengamble/Sabot/sabot/sql/sql_to_operators.py (337 lines)
+  * SQLOperatorBuilder class - incomplete
+  * TableScanOperator - lines 30-55
+
+CYTHON OPERATORS (all in /Users/bengamble/Sabot/sabot/_cython/operators/):
+- filter_operator.pyx (184 lines)
+  * CythonFilterOperator class - lines 16-156
+  * Supports: >, <, >=, <=, =, !=, <>
+  * Supports: AND, OR expressions
+  * Issue: Not exported in setup.py - can't be imported!
+
+- joins.pyx (31,352 bytes)
+  * CythonHashJoinOperator (implements hash join with spill support)
+  * CythonIntervalJoinOperator (interval/temporal joins)
+  * CythonAsofJoinOperator (as-of joins for time series)
+  * StreamingHashTableBuilder - lines 63-240+ (pre-allocated memory pools)
+  * Issue: Not exported in setup.py setup properly
+
+- aggregations.pyx (21,964 bytes)
+  * CythonGroupByOperator - lines 72-100+ (SIMD groupby)
+  * CythonReduceOperator (reduce operations)
+  * CythonAggregateOperator (aggregate operations)
+  * CythonDistinctOperator (distinct operations)
+  * Issue: Not exported, not dispatched in controller
+
+- transform.pyx (18,403 bytes)
+  * CythonMapOperator - lines 47-100+ (batch transformation)
+  * CythonFilterOperator - lines (alternative filter impl)
+  * Numba auto-compilation support
+  * Issue: Map operator works, Filter operator has import conflict
+
+- streaming_groupby.pyx (24,423 bytes)
+  * StreamingGroupByOperator - bigger-than-memory groupby
+  * Partial aggregation with MarbleDB spill
+  * Flush/merge logic for streaming aggregation
+  * Status: Built and working, not integrated in SQL path
+
+- spillable_window_buffer.pyx (17,284 bytes)
+  * Window function buffer with disk spill
+  * Status: Built, but no window operator orchestration
+
+
+EXECUTION FLOW ANALYSIS:
+
+Current (Broken) Flow for: SELECT * FROM t WHERE x > 5
+1. SQL → PlanBridge.parse_and_partition()
+   - Returns placeholder plan (not parsing EXPLAIN!)
+   
+2. StageScheduler.execute(plan)
+   - Creates source stage with TableScan + Filter
+   - Calls _execute_stage() → _execute_task()
+   
+3. _execute_task()
+   - Gets source data: _get_source_data() ✅ Works
+   - Builds operators: _execute_operator_pipeline()
+   
+4. _execute_operator_pipeline(operators=[TableScan, Filter], input_data)
+   - For each operator:
+     * operator = builder(spec, result)
+     * result = await _execute_single_operator(operator, result)
+   
+5. _default_operator_builder(spec, result)
+   - For Filter: returns CythonFilterOperator.apply
+   - **WRONG**: should return lambda table: filter_op.apply(table)
+   
+6. _execute_single_operator(operator, input_data)
+   - Tries: await operator.execute_async(input_data)
+   - Falls back: await loop.run_in_executor(None, operator.execute, input_data)
+   - Final: operator(input_data)
+   - **FAILS**: FilterOperator.apply is a method, not callable
+
+
+Correct Flow Should Be:
+1. PlanBridge correctly parses EXPLAIN output
+2. Creates proper OperatorSpec for each operator
+3. StageScheduler executes stages
+4. For each operator spec, _default_operator_builder returns proper operator
+5. _execute_single_operator calls it correctly
+
+
+SPECIFIC BUGS & FIXES:
+
+BUG #1: HashJoin Returns None
+File: controller.py, lines 563-566
+```python
+elif spec.type == "HashJoin":
+    # For joins, we need special handling (two inputs)
+    # Return None for now - joins handled specially in scheduler
+    return None
+```
+Impact: Joins silently fail - no error, just returns None
+Fix: Implement proper join dispatch with multi-input support
+
+
+BUG #2: Pandas Conversion for Aggregates
+File: controller.py, lines 547-559
+```python
+else:
+    # Group-by aggregation using pandas for now
+    df = table.to_pandas()
+    agg_dict = {}
+    result_df = df.groupby(group_keys).agg(agg_dict).reset_index()
+```
+Impact: Huge memory blow-up, 10-100x slower than Cython
+Fix: Use CythonGroupByOperator directly
+
+
+BUG #3: Multi-Input Operator Not Supported
+File: stage_scheduler.py, lines 309-329
+```python
+async def _execute_operator_pipeline(operators, input_data, partition_id):
+    result = input_data
+    for op_spec in operators:
+        operator = self.operator_builder(op_spec, result)  # Single input!
+        result = await self._execute_single_operator(operator, result)
+    return result
+```
+Impact: Joins need TWO inputs (left + right) but pipeline only has one
+Fix: Special case joins to get left from previous op, right from shuffle
+
+
+BUG #4: Filter Operator Method vs Callable
+File: controller.py, lines 512-514
+```python
+from sabot._cython.operators.filter_operator import CythonFilterOperator
+filter_op = CythonFilterOperator(filter_expr)
+return filter_op.apply  # ← Returns method object, not callable!
+```
+Impact: Crash when trying to call as function
+Fix: return lambda table: filter_op.apply(table)
+
+
+BUG #5: Missing Operator Exports
+Files: setup.py or pyproject.toml
+Issue: These .pyx files exist but not built to .so:
+  - filter_operator.pyx (149K .pyx)
+  - aggregations.pyx (21K .pyx)
+  - expression_translator.pyx (15K .pyx)
+  - plan_to_operators.pyx (12K .pyx)
+  - registry_optimized.pyx (5K .pyx)
+  - hash_join_streaming.pyx (33K .pyx)
+  - hash_join_memory.pyx (exists but no .so)
+
+Fix: Add cython modules to build configuration
+
+
+OPERATOR SPECIFICATION DATACLASS GAPS:
+
+Current OperatorSpec has these fields:
+- type: str (Filter, HashJoin, Aggregate, etc.)
+- filter_expression: str (for Filter only)
+- group_by_keys: List[str] (for Aggregate)
+- left_keys/right_keys: List[str] (for Join)
+- projected_columns: List[str] (for Projection)
+
+Missing:
+- output_column_names: List[str] (what does operator produce?)
+- output_column_types: List[str] (types of result columns)
+- window_spec: WindowSpec (for window functions)
+- sort_keys: List[str] (for Sort operator)
+- sort_directions: List[str] (ASC/DESC)
+
+
+SCHEMA PROPAGATION MISSING:
+
+TableScan on "orders" produces:
+  [order_id: int64, customer_id: int64, amount: float64]
+
+Filter > 100 produces:
+  [order_id: int64, customer_id: int64, amount: float64]  (same)
+
+Aggregate GROUP BY customer_id SUM(amount) produces:
+  [customer_id: int64, sum_amount: float64]  ← Different schema!
+
+But StageScheduler never validates this:
+  - Can't check if next stage's columns exist
+  - Can't validate filter column references
+  - Can't handle projection column ordering
+
+
+PARTIAL AGGREGATE MERGING MISSING:
+
+Correct GroupBy flow for distributed:
+  Stage 0 (4 partitions):
+    TableScan → Filter → Partial GroupBy
+    Produces 4 partial results:
+      Partial0: {(cust_1, count=100, sum=50000), (cust_2, count=150, sum=75000), ...}
+      Partial1: {(cust_1, count=120, sum=60000), (cust_3, count=100, sum=50000), ...}
+      ...
+
+  Stage 1 (Shuffle by customer_id):
+    Shuffle: Redistribute partials by group key
+
+  Stage 2 (4 partitions):
+    Merge Partials → Final Aggregate
+    For cust_1: sum all partial counts & sums
+              count_final = 100 + 120 + ... = X
+              sum_final = 50000 + 60000 + ... = Y
+
+Current implementation:
+  Stage 0: Computes full groupby on single partition
+  Never does shuffles partials
+  Never merges across partitions
+  ← Wrong approach entirely!
+
+
+BUILD SYSTEM ANALYSIS:
+
+Works:
+- filter_operator.pyx → builds to .c → compiles to .so
+- aggregations.pyx → builds to .c → compiles to .so (but NOT exported!)
+- streaming_groupby.pyx → builds to .so directly
+
+Doesn't work:
+- filter_operator.cpython-311-darwin.so exists but NOT in directory
+  (ls doesn't show it, only .pyx file)
+- aggregations.cpython-311-darwin.so exists but NOT importable
+- hash_join_memory.pyx has no .so file
+
+Likely cause: Cython headers/declarations (.pxd files) not exporting properly
+
+
+IMPORT TEST RESULTS:
+
+Successful imports:
+✅ from sabot._cython.operators.joins import CythonHashJoinOperator
+✅ from sabot._cython.operators.transform import CythonMapOperator
+✅ from sabot._cython.operators.streaming_groupby import StreamingGroupByOperator
+✅ from sabot._cython.operators.morsel_operator import MorselDrivenOperator
+✅ from sabot._cython.operators.base_operator import BaseOperator
+
+Failed imports:
+❌ from sabot._cython.operators.filter_operator import CythonFilterOperator
+   Error: No module named 'sabot._cython.operators.filter_operator'
+   
+❌ from sabot._cython.operators.aggregations import CythonGroupByOperator
+   Error: No module named 'sabot._cython.operators.aggregations'
+
+Build artifacts found:
+- filter_operator.c (556K) - compiled C code
+- filter_operator.cpython-311-darwin.so (149K) - doesn't import!
+- aggregations.cpp (1608K) - compiled C++ code  
+- aggregations.cpython-311-darwin.so (262K) - doesn't import!
+
+Diagnosis: .so files exist but not properly integrated into Python path
+  or __init__.py doesn't expose them
+
+
+NEXT STEPS:
+
+To get distributed SQL working:
+
+1. Fix imports (1 hour)
+   - Check setup.py/pyproject.toml for export rules
+   - Ensure .so files are in correct location
+   - Update __init__.py to expose operators
+
+2. Fix operator dispatch (2-3 hours)
+   - Fix HashJoin: dispatch to CythonHashJoinOperator
+   - Fix Aggregate: dispatch to CythonGroupByOperator
+   - Fix Filter: wrap method in lambda
+
+3. Add multi-input semantics (4-6 hours)
+   - Detect HashJoin in _execute_operator_pipeline
+   - Get left from previous stage
+   - Get right from shuffle buffer
+   - Build & probe with join operator
+
+4. Implement Sort operator (4-6 hours)
+   - Arrow C++ sort_indices kernel
+   - Arrow C++ take for gathering sorted rows
+   - Integrate with projection
+
+5. Add schema propagation (6-8 hours)
+   - Track schema through operator pipeline
+   - Validate column references
+   - Handle projection column reordering
+
+6. Implement partial merging (8-10 hours)
+   - Create Merge operator type
+   - Implement aggregation merging logic
+   - Use Tonbo or MarbleDB for state
+
+Total: ~25-35 hours to working distributed SQL engine
+

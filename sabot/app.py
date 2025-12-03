@@ -1116,18 +1116,18 @@ class App(AppT):
         """Create a materialized view manager with RocksDB persistence."""
         return get_materialized_view_manager(db_path)
 
-    def materializations(self, default_backend: str = 'memory'):
+    def materializations(self, default_backend: str = 'marbledb'):
         """
         Create unified materialization manager (dimension tables + analytical views).
 
         This is the modern API for creating:
-        - Dimension tables: Lookup-optimized (RocksDB backend)
-        - Analytical views: Scan-optimized (Tonbo backend)
+        - Dimension tables: Lookup-optimized (MarbleDB backend - default)
+        - Analytical views: Scan-optimized (MarbleDB backend)
 
         Both can be populated from streams, files, operators, or CDC.
 
         Args:
-            default_backend: Default storage backend ('memory', 'rocksdb', 'tonbo')
+            default_backend: Default storage backend ('marbledb', 'memory', 'rocksdb')
 
         Returns:
             MaterializationManager instance

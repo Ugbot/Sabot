@@ -43,9 +43,20 @@ except ImportError:
 # Import base operator
 from sabot._cython.operators.shuffled_operator cimport ShuffledOperator
 
+# Import SpillableBuffer for bigger-than-memory support
+try:
+    from sabot._cython.buffers.spillable_buffer import SpillableBuffer
+    SPILLABLE_BUFFER_AVAILABLE = True
+except ImportError:
+    SPILLABLE_BUFFER_AVAILABLE = False
+    SpillableBuffer = None
+
+# Default memory threshold for join builds (256MB)
+DEFAULT_JOIN_MEMORY_THRESHOLD = 256 * 1024 * 1024
+
 
 # ============================================================================
-# Streaming Hash Table Builder (Zero-Copy)
+# Streaming Hash Table Builder (Zero-Copy with Spill Support)
 # ============================================================================
 
 @cython.final
@@ -55,37 +66,70 @@ cdef class StreamingHashTableBuilder:
 
     Accumulates right-side batches and builds vectorized hash index.
     Uses Arrow arrays throughout (no Python conversions).
+
+    Supports bigger-than-memory via SpillableBuffer:
+    - When memory threshold exceeded, batches spill to MarbleDB
+    - Iteration transparently reads from memory + disk
+    - Zero-copy Arrow batch storage
     """
     cdef:
-        list _batches                    # List of Arrow RecordBatches
+        object _batch_buffer             # SpillableBuffer or list (fallback)
         object _concatenated             # Concatenated Table (lazy)
         dict _hash_index                 # Python dict: tuple(key) → list of row indices
         list _key_columns                # Key column names
         cbool _is_built                  # Whether index is built
         int64_t _total_rows              # Total rows accumulated
         object _schema                   # Schema of accumulated batches
+        int64_t _memory_threshold        # Memory threshold before spill
+        str _buffer_id                   # Unique buffer identifier
 
-    def __init__(self, key_columns: List[str]):
-        """Initialize builder with key columns."""
-        self._batches = []
+    def __init__(self, key_columns: List[str], memory_threshold: int = DEFAULT_JOIN_MEMORY_THRESHOLD,
+                 buffer_id: str = None):
+        """Initialize builder with key columns and memory threshold.
+
+        Args:
+            key_columns: List of key column names for hash index
+            memory_threshold: Memory threshold in bytes before spilling to disk (default 256MB)
+            buffer_id: Unique identifier for the spill buffer
+        """
+        self._key_columns = key_columns
+        self._memory_threshold = memory_threshold
+        self._buffer_id = buffer_id or f"join_build_{id(self)}"
+
+        # Initialize batch storage (SpillableBuffer or list fallback)
+        if SPILLABLE_BUFFER_AVAILABLE and SpillableBuffer is not None:
+            self._batch_buffer = SpillableBuffer(
+                buffer_id=self._buffer_id,
+                memory_threshold_bytes=memory_threshold,
+                db_path="/tmp/sabot_join_spill"
+            )
+        else:
+            self._batch_buffer = []  # Fallback to in-memory list
+
         self._concatenated = None
         self._hash_index = {}
-        self._key_columns = key_columns
         self._is_built = False
         self._total_rows = 0
         self._schema = None
 
     cpdef void add_batch(self, object batch):
         """
-        Add batch to build side (streaming accumulation).
+        Add batch to build side (streaming accumulation with spill support).
 
         Args:
             batch: Arrow RecordBatch to add
+
+        When memory threshold is exceeded, batches automatically spill to MarbleDB.
         """
         if batch is None or batch.num_rows == 0:
             return
 
-        self._batches.append(batch)
+        # Add to buffer (SpillableBuffer handles spill, list just appends)
+        if SPILLABLE_BUFFER_AVAILABLE and hasattr(self._batch_buffer, 'append'):
+            self._batch_buffer.append(batch)
+        else:
+            self._batch_buffer.append(batch)
+
         self._total_rows += batch.num_rows
         self._is_built = False
 
@@ -97,12 +141,18 @@ cdef class StreamingHashTableBuilder:
         Build hash index from accumulated batches (vectorized).
 
         Uses bulk array operations instead of row-by-row conversion.
+        Transparently reads from memory + spilled batches.
         """
-        if self._is_built or not self._batches:
+        if self._is_built or self._total_rows == 0:
+            return
+
+        # Iterate through buffer (SpillableBuffer yields memory + spilled)
+        all_batches = list(self._batch_buffer)
+        if not all_batches:
             return
 
         # Concatenate all batches into single Table
-        self._concatenated = pa.Table.from_batches(self._batches)
+        self._concatenated = pa.Table.from_batches(all_batches)
 
         # Extract key columns as Python lists (bulk operation)
         # This is much faster than row-by-row .as_py()
@@ -121,6 +171,26 @@ cdef class StreamingHashTableBuilder:
             self._hash_index[key].append(i)
 
         self._is_built = True
+
+    def close(self):
+        """Close buffer and cleanup spill files."""
+        if SPILLABLE_BUFFER_AVAILABLE and hasattr(self._batch_buffer, 'close'):
+            self._batch_buffer.close()
+        self._hash_index = {}
+        self._concatenated = None
+
+    def memory_used(self):
+        """Get current memory usage in bytes."""
+        if SPILLABLE_BUFFER_AVAILABLE and hasattr(self._batch_buffer, 'memory_used'):
+            return self._batch_buffer.memory_used()
+        # Fallback: estimate from batches
+        return sum(b.nbytes for b in self._batch_buffer) if self._batch_buffer else 0
+
+    def is_spilled(self):
+        """Check if buffer has spilled to disk."""
+        if SPILLABLE_BUFFER_AVAILABLE and hasattr(self._batch_buffer, 'is_spilled'):
+            return self._batch_buffer.is_spilled()
+        return False
 
     def probe_batch_vectorized(self, object left_batch, list left_keys, str join_type):
         """
@@ -319,7 +389,8 @@ cdef class CythonHashJoinOperator(ShuffledOperator):
     """
 
     def __init__(self, left_source, right_source, left_keys: List[str],
-                 right_keys: List[str], join_type: str = 'inner', schema=None):
+                 right_keys: List[str], join_type: str = 'inner', schema=None,
+                 memory_threshold: int = DEFAULT_JOIN_MEMORY_THRESHOLD):
         """
         Initialize vectorized hash join operator with shuffle support.
 
@@ -330,6 +401,8 @@ cdef class CythonHashJoinOperator(ShuffledOperator):
             right_keys: Join keys from right stream
             join_type: 'inner', 'left', 'right', or 'outer'
             schema: Output schema (inferred)
+            memory_threshold: Memory threshold in bytes before spilling build side to disk
+                             (default 256MB). Set to 0 to disable spilling.
         """
         # DON'T call super().__init__() in Cython extension types!
         # Cython automatically calls parent __cinit__ during object construction.
@@ -349,9 +422,13 @@ cdef class CythonHashJoinOperator(ShuffledOperator):
         self._left_keys = left_keys
         self._right_keys = right_keys
         self._join_type = join_type.lower()
+        self._memory_threshold = memory_threshold
 
-        # Create streaming hash table builder
-        self._hash_builder = StreamingHashTableBuilder(right_keys)
+        # Create streaming hash table builder with spill support
+        self._hash_builder = StreamingHashTableBuilder(
+            right_keys,
+            memory_threshold=memory_threshold if memory_threshold > 0 else DEFAULT_JOIN_MEMORY_THRESHOLD
+        )
 
         # Validate join type
         if self._join_type not in ('inner', 'left', 'right', 'outer'):
