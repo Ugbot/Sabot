@@ -180,3 +180,7 @@ cdef class BaseOperator:
     cpdef str get_operator_name(self):
         """Get operator name for logging/debugging"""
         return self.__class__.__name__
+
+    cpdef object get_source(self):
+        """Get the source iterator/operator (for MorselDrivenOperator access)"""
+        return self._source

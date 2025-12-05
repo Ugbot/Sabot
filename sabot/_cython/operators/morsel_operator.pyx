@@ -59,8 +59,16 @@ cdef class MorselDrivenOperator(BaseOperator):
         self._shuffle_client = None
 
         # Copy source and schema from wrapped operator
-        self._source = getattr(wrapped_operator, '_source', kwargs.get('source'))
-        self._schema = getattr(wrapped_operator, '_schema', kwargs.get('schema'))
+        # Use get_source() method since _source is a cdef attribute not accessible via getattr
+        if hasattr(wrapped_operator, 'get_source'):
+            self._source = wrapped_operator.get_source()
+        else:
+            self._source = getattr(wrapped_operator, '_source', kwargs.get('source'))
+
+        if hasattr(wrapped_operator, 'get_schema'):
+            self._schema = wrapped_operator.get_schema()
+        else:
+            self._schema = getattr(wrapped_operator, '_schema', kwargs.get('schema'))
 
         # Copy stateful metadata
         self._stateful = getattr(wrapped_operator, '_stateful', False)
@@ -343,16 +351,22 @@ cdef class MorselDrivenOperator(BaseOperator):
     def __iter__(self):
         """
         Iterate over batches from source and process with morsel execution.
-        
+
         CRITICAL: Must iterate self._source (from wrapped operator), not assume
         self._source is set on this wrapper. This enables lazy/streaming sources.
         """
         # Get source from wrapped operator
-        source = self._source or getattr(self._wrapped_operator, '_source', None)
-        
+        # Use get_source() method since _source is a cdef attribute not accessible via getattr
+        source = self._source
+        if source is None:
+            if hasattr(self._wrapped_operator, 'get_source'):
+                source = self._wrapped_operator.get_source()
+            else:
+                source = getattr(self._wrapped_operator, '_source', None)
+
         if source is None:
             return
-        
+
         # Iterate and process each batch
         for batch in source:
             result = self.process_batch(batch)

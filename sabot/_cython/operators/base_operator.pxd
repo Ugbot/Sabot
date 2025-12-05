@@ -21,3 +21,4 @@ cdef class BaseOperator:
     cpdef object get_schema(self)
     cpdef bint is_stateful(self)
     cpdef str get_operator_name(self)
+    cpdef object get_source(self)
