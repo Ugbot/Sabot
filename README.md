@@ -670,7 +670,7 @@ Built with:
 
 - **Issues**: [GitHub Issues](https://github.com/yourusername/sabot/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/yourusername/sabot/discussions)
-- **Email**: team@sabot.io
+
 
 ---
 
